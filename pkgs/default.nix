@@ -10,10 +10,10 @@ let
         });
     }));
 in {
-    abcm2ps = prev.callPackage ./abcm2ps {
+    abcm2ps = prev.callPackage ./cxx-packages/abcm2ps {
         stdenv = prev.clangStdenv;
     };
-    abcmidi = prev.callPackage ./abcmidi {
+    abcmidi = prev.callPackage ./cxx-packages/abcmidi {
         stdenv = prev.clangStdenv;
     };
     

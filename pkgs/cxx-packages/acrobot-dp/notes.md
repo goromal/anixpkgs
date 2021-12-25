@@ -1,0 +1,1 @@
+- see if you can parallelize with a cuda option
