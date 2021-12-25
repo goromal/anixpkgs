@@ -1,2 +1,5 @@
-{ pkgs ? import (builtins.fetchGit (import ./pkgs.nix)) { } }:
-import ./pkgs/all-packages.nix { inherit pkgs; }
+with import ./dependencies.nix;
+import nix-ros-overlay { 
+  inherit nixpkgs;
+  overlays = [ (import ./overlay.nix) ];
+}
