@@ -1,3 +1,3 @@
 # ANixpkgs
 
-A collection of personal (or otherwise personally useful) repositories packaged as Nix derivations.
+A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
