@@ -26,6 +26,7 @@ let
                 buildPythonPackage = pySelf.buildPythonPackage;
                 fetchPypi = pySelf.fetchPypi;
                 pythonOlder = pySelf.pythonOlder;
+                pythonAtLeast = pySelf.pythonAtLeast;
                 ffmpeg = prev.ffmpeg;
                 libsndfile = prev.libsndfile;
                 ffmpeg-python = python.pkgs.ffmpeg-python;

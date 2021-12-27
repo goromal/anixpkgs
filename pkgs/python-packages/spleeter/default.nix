@@ -1,6 +1,7 @@
 # https://github.com/deezer/spleeter
 { buildPythonPackage
 , fetchPypi
+, pythonAtLeast
 , pythonOlder
 , pandas
 , tensorflow
@@ -28,8 +29,7 @@ in buildPythonPackage rec {
         ffmpeg
         libsndfile
     ];
-    # TODO only 3.8
-    disabled = pythonOlder "3.8";
+    disabled = pythonOlder "3.8" || pythonAtLeast "3.9";
     propagatedBuildInputs = [
         numpy
         pandas
@@ -47,6 +47,7 @@ in buildPythonPackage rec {
         ${adjustDependency llvmlite " = \"^0.36.0\"" ">=0.36.0,<0.37.0" " (>=0.36.0,<0.37.0)"}
         ${adjustDependency numpy " = \"<1.20.0,>=1.16.0\"" ">=1.16.0,<1.20.0" " (>=1.16.0,<1.20.0)"}
         ${adjustDependency librosa " = \"0.8.0\"" "==0.8.0" " (==0.8.0)"}
+        substituteInPlace spleeter/model/functions/unet.py --replace 'tensorflow.compat.v1.keras' 'tensorflow.keras'
     '';
     src = fetchPypi {
         inherit pname version;
