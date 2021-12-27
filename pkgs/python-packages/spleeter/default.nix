@@ -9,11 +9,18 @@
 , ffmpeg-python
 , norbert
 , typer
-, llvm-lite
+, llvmlite
 , numpy
+, httpx
+, librosa
 }:
 let
-    makeAdjustment = pn: 
+    adjustDependency = ppackage: ppSpec: sSpec: pSpec: ''
+        substituteInPlace pyproject.toml --replace '${ppackage.pname}${ppSpec}' '${ppackage.pname} = "${ppackage.version}"'
+        substituteInPlace setup.py --replace '${ppackage.pname}${sSpec}' '${ppackage.pname}==${ppackage.version}'
+        substituteInPlace PKG-INFO --replace '${ppackage.pname}${pSpec}' '${ppackage.pname} (==${ppackage.version})'
+    '';
+    tfVers = tensorflow.version;
 in buildPythonPackage rec {
     pname = "spleeter";
     version = "2.3.0";
@@ -28,14 +35,18 @@ in buildPythonPackage rec {
         pandas
         typer
         tensorflow
-        llvm-lite
+        llvmlite
         ffmpeg-python
         norbert
+        httpx
+        librosa
     ];
     postPatch = ''
-        substituteInPlace pyproject.toml --replace 'tensorflow = "2.5.0"' 'tensorflow = "2.7.0"'
-        substituteInPlace setup.py --replace 'tensorflow==2.5.0' 'tensorflow==2.7.0'
-        substituteInPlace PKG-INFO --replace 'tensorflow (==2.5.0)' 'tensorflow (==2.7.0)'
+        ${adjustDependency tensorflow " = \"2.5.0\"" "==2.5.0" " (==2.5.0)"}
+        ${adjustDependency typer " = \"^0.3.2\"" ">=0.3.2,<0.4.0" " (>=0.3.2,<0.4.0)"}
+        ${adjustDependency llvmlite " = \"^0.36.0\"" ">=0.36.0,<0.37.0" " (>=0.36.0,<0.37.0)"}
+        ${adjustDependency numpy " = \"<1.20.0,>=1.16.0\"" ">=1.16.0,<1.20.0" " (>=1.16.0,<1.20.0)"}
+        ${adjustDependency librosa " = \"0.8.0\"" "==0.8.0" " (==0.8.0)"}
     '';
     src = fetchPypi {
         inherit pname version;

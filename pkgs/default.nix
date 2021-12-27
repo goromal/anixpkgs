@@ -33,8 +33,10 @@ let
                 tensorflow = python.pkgs.tensorflow;
                 norbert = python.pkgs.norbert;
                 typer = python.pkgs.typer;
-                llvm-lite = python.pkgs.llvm-lite;
+                llvmlite = pySelf.llvmlite;
                 numpy = python.pkgs.numpy;
+                httpx = python.pkgs.httpx;
+                librosa = python.pkgs.librosa;
             };
         });
     }));
