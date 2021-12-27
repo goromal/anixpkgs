@@ -6,6 +6,16 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            geometry = pySelf.callPackage ./python-packages/geometry {
+                callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                manif-geom-cpp = final.manif-geom-cpp;
+                eigen = prev.eigen;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                buildPythonPackage = pySelf.buildPythonPackage;
+            };
             norbert = pySelf.callPackage ./python-packages/norbert {
                 buildPythonPackage = pySelf.buildPythonPackage;
                 fetchPypi = pySelf.fetchPypi;

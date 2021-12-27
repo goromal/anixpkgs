@@ -1,13 +1,31 @@
-{ python
-, pname
-, description
+{ pname
 , version
+, description
+, stdenv
+, pkg-src
+, cppNativeBuildInputs
+, cppBuildInputs
+, pybind11
+, python
+, buildPythonPackage
 , propagatedBuildInputs
-, pyexec
 }:
 let
+    pyboundPkg = stdenv.mkDerivation {
+        name = "${pname}-pybind-build";
+        inherit version;
+        src = pkg-src;
+        nativeBuildInputs = cppNativeBuildInputs;
+        buildInputs = [ pybind11 ] ++ cppBuildInputs;
+        # TODO kind of hacky--should find a more secure way to grab the built library
+        installPhase = ''
+            mkdir -p $out/lib
+            cp -r ${pname}* $out/lib
+        '';
+    };
+    pyboundTarget = "${pyboundPkg}/lib/${pname}*";
     pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
-in python.pkgs.buildPythonPackage rec {
+in buildPythonPackage rec {
     inherit pname;
     inherit version;
     src = ./pkgTemplate/.;
@@ -21,7 +39,7 @@ in python.pkgs.buildPythonPackage rec {
         sed -i 's|_tmpversion|${version}|g' ${pname}/__version__.py
     '';
     postInstall = ''
-        cp ${pyexec} $out/${pythonLibDir}/${pname}/
+        cp ${pyboundTarget} $out/${pythonLibDir}/${pname}/
         chmod -R 777 $out/${pythonLibDir}
     '';
 }
