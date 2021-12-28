@@ -1,1 +1,3 @@
 - see if you can parallelize with a cuda option
+  - version with and without gpu
+- can you generalize this to different models? autodiff useful here?
