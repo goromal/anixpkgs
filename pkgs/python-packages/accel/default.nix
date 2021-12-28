@@ -2,7 +2,10 @@
 # perform all CI (for all other repos too!) from THIS repo
 { stdenv
 , runCommand
+, python
 , buildPythonPackage
+, pythonOlder
+, pythonAtLeast
 , numpy
 , requests
 , colorama
@@ -23,6 +26,7 @@ let
 in buildPythonPackage rec {
     pname = versionInfo.pname;
     version = versionInfo.version;
+    disabled = pythonOlder “3.8” || pythonAtLeast “3.9”;
     src = pkg-src;
     propagatedBuildInputs = [
         numpy
