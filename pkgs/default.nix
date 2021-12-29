@@ -93,6 +93,11 @@ let
         });
     }));
 in {
+    color-prints = prev.callPackage ./bash-packages/color-prints {
+        stdenv = prev.stdenv;
+        writeShellScriptBin = prev.writeShellScriptBin;
+    };
+
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp {
         stdenv = prev.clangStdenv;
         cmake = prev.cmake;
