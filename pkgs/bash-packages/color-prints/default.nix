@@ -5,7 +5,7 @@ let
     # https://en.wikipedia.org/wiki/ANSI_escape_code
     echo-color = colorname: colorcode:
         writeShellScriptBin "echo_${colorname}" ''
-            echo -e "TEST \033[1;${builtins.toString colorcode}m$@\033[0m"
+            echo -e "\033[1;${builtins.toString colorcode}m$@\033[0m"
         '';
     echo-green = echo-color "green" 32;
     echo-cyan = echo-color "cyan" 36;
@@ -22,4 +22,4 @@ in stdenv.mkDerivation {
         cp ${echo-red}/bin/echo_red $out/bin
         cp ${echo-yellow}/bin/echo_yellow $out/bin
     '';
-};
+}
