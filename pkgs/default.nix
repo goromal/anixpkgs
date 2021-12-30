@@ -93,6 +93,17 @@ let
         });
     }));
 in {
+    # abc = prev.callPackage ./bash-packages/abc {
+    #     writeShellScriptBin = prev.writeShellScriptBin;
+    #     abcm2ps = prev.abcm2ps;
+    #     abcmidi = prev.abcmidi;
+    #     ffmpeg = prev.ffmpeg;
+    #     inkscape = prev.inkscape;
+    #     poppler_utils = prev.poppler_utils;
+    #     timidity = prev.timidity;
+    #     lame = prev.lame;
+    # };
+
     color-prints = prev.callPackage ./bash-packages/color-prints {
         stdenv = prev.stdenv;
         writeShellScriptBin = prev.writeShellScriptBin;
