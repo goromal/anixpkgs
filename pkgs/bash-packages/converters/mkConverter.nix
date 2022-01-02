@@ -19,6 +19,7 @@ let
     '') convOptCmds;
     conv_opt_cmds = builtins.concatStringsSep "\n" conv_opt_list;
     # TODO check extension logic below
+    # TODO check for required args
 in writeShellScriptBin name ''
     ${argparse.cmd}
     infile="$1"
