@@ -48,6 +48,16 @@ in {
         eigen = prev.eigen;
         boost = prev.boost;
     };
+
+    _base_java_args = {
+        stdenv = prev.stdenv;
+        jdk = prev.jdk11_headless;
+        jre_minimal = prev.jre_minimal;
+        ant = prev.ant;
+        makeWrapper = prev.makeWrapper;
+    };
+
+    evil-hangman = prev.callPackage ./java-packages/evil-hangman final._base_java_args;
     
     python27 = pythonOverridesFor prev.python27;
     python37 = pythonOverridesFor prev.python37;

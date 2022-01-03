@@ -1,0 +1,16 @@
+diff --git a/hangman/EvilHangman.java b/hangman/EvilHangman.java
+index 79cbfbf..e889cdc 100755
+--- a/hangman/EvilHangman.java
++++ b/hangman/EvilHangman.java
+@@ -6,6 +6,11 @@ import java.util.*;
+ public class EvilHangman {
+     public static void main(String[] args) {
+ 
++        if (args.length < 3) {
++            System.out.println("usage: evil-hangman <word-length> <num-guesses>");
++            System.exit(1);
++        }
++
+         Scanner scanner = new Scanner(System.in);
+         int numGuesses = Integer.parseInt(args[2]);
+ 
