@@ -19,21 +19,34 @@ let
         ;;
     '') convOptCmds;
     conv_opt_cmds = builtins.concatStringsSep "\n" conv_opt_list;
-    # TODO check extension logic below
-    # TODO check for required args
-in writeShellScriptBin name ''
-    ${argparse.cmd}
-    infile="$1"
-    infile_ext="${strings.getExtension "infile"}"
-    infile_ext="''${1##*/}"
-    outfile="''${2%.*}.${extension}"
-    case $infile_ext in
-    ${conv_opt_cmds}
-    *)
-    ${color-prints}/bin/echo_red "ERROR: unhandled input extension ($infile_ext)."
+    printerr = "${color-prints}/bin/echo_red";
+    printusage = ''
     cat << EOF
     ${usage_str}
     EOF
+    '';
+    # TODO check extension logic below
+in writeShellScriptBin name ''
+    ${argparse.cmd}
+    infile="$1"
+    if [[ -z "$infile" ]]; then
+        ${printerr} "ERROR: no input file specified."
+        ${printusage}
+        exit
+    fi
+    infile_ext="''${1##*/}"
+    outfile="''${2%.*}.${extension}"
+    if [[ -z "$outfile" ]]; then
+        ${printerr} "ERROR: no output file specified."
+        ${printusage}
+        exit
+    fi
+    case $infile_ext in
+    ${conv_opt_cmds}
+    *)
+    ${printerr} "ERROR: unhandled input extension ($infile_ext)."
+    ${printusage}
+    exit
     ;;
     esac
 ''
