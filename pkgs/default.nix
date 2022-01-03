@@ -93,16 +93,23 @@ let
         });
     }));
 in {
-    # abc = prev.callPackage ./bash-packages/abc {
-    #     writeShellScriptBin = prev.writeShellScriptBin;
-    #     abcm2ps = prev.abcm2ps;
-    #     abcmidi = prev.abcmidi;
-    #     ffmpeg = prev.ffmpeg;
-    #     inkscape = prev.inkscape;
-    #     poppler_utils = prev.poppler_utils;
-    #     timidity = prev.timidity;
-    #     lame = prev.lame;
-    # };
+    _conv_base_args = {
+        writeShellScriptBin = prev.writeShellScriptBin;
+        callPackage = prev.callPackage;
+        color-prints = prev.callPackage ./bash-packages/color-prints {};
+        strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {};
+        redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+    };
+
+    abc = prev.callPackage ./bash-packages/converters/abc.nix (final._conv_base_args // {
+       abcmidi = prev.abcmidi;
+    });
+
+    svg = prev.callPackage ./bash-packages/converters/svg.nix (final._conv_base_args // {
+       inkscape = prev.inkscape;
+       abcm2ps = prev.abcm2ps;
+       scour = prev.python38.pkgs.scour;
+    });        
 
     color-prints = prev.callPackage ./bash-packages/color-prints {
         stdenv = prev.stdenv;

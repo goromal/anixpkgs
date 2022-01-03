@@ -14,8 +14,7 @@ let
         ;;
     '') optsWithVarsAndDefaults;
     arg_opt_assigns = builtins.concatStringsSep "\n" arg_opt_assign_list;
-in rec {
-    cmd = ''
+in ''
     ${def_assigns}
     POSITIONAL=()
     while [[ $# -gt 0 ]]
@@ -24,8 +23,8 @@ in rec {
     case $key in
         -h|--help)
         cat << EOF
-        ${usage_str}
-        EOF
+${usage_str}
+EOF
         exit
         ;;
         ${arg_opt_assigns}
@@ -36,5 +35,4 @@ in rec {
     esac
     done
     set -- "''${POSITIONAL[@]}"
-    '';
-}
+''

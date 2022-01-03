@@ -1,9 +1,6 @@
 {}:
 rec {
-    getExtension = varName: ''
-    # TODO
-    '';
-    getWithoutExtension = varName: ''
-    # TODO
-    '';
+    getExtension = varName: ''''${${varName}##*/}'';
+    getWithoutExtension = varName: ''''${${varName}%.*}'';
+    replaceExtension = varName: newExtension: ''${getWithoutExtension varName}.${newExtension}'';
 }

@@ -1,6 +1,7 @@
 { writeShellScriptBin
 , callPackage
 , color-prints
+, strings
 , redirects
 , abcmidi
 }:
@@ -10,7 +11,11 @@ let
     usage_str = ''
     usage: abc inputfile outputfile
 
-    Create an abc file from .smf and .midi files.
+    Create an abc file.
+
+    Inputs:
+        .smf
+        .midi
     '';
     optsWithVarsAndDefaults = [ ];
     convOptCmds = [
@@ -22,6 +27,6 @@ let
         ''; }
     ];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints;
+  inherit writeShellScriptBin callPackage color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
 }

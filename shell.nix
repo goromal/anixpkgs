@@ -6,5 +6,7 @@ mkShell {
         evil-hangman
         spelling-corrector
         simple-image-editor
+        abc
+        svg
     ];
 }

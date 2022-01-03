@@ -22,20 +22,21 @@ let
     printerr = "${color-prints}/bin/echo_red";
     printusage = ''
     cat << EOF
-    ${usage_str}
-    EOF
-    '';
-    # TODO check extension logic below
+${usage_str}
+EOF
+    ''; # ${argparse}
 in writeShellScriptBin name ''
-    ${argparse.cmd}
+    ${argparse}
     infile="$1"
     if [[ -z "$infile" ]]; then
         ${printerr} "ERROR: no input file specified."
         ${printusage}
         exit
     fi
-    infile_ext="''${1##*/}"
-    outfile="''${2%.*}.${extension}"
+    infile_ext=${strings.getExtension "infile"}
+    echo_green "INFILE_EXT=$infile_ext"
+    outfile=${strings.replaceExtension "2" extension}
+    echo_green "OUTFILE=$outfile"
     if [[ -z "$outfile" ]]; then
         ${printerr} "ERROR: no output file specified."
         ${printusage}
