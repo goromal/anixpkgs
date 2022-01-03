@@ -1,6 +1,7 @@
 { writeShellScriptBin
 , callPackage
 , color-prints
+, strings
 , name
 , extension
 , usage_str
@@ -23,6 +24,7 @@ let
 in writeShellScriptBin name ''
     ${argparse.cmd}
     infile="$1"
+    infile_ext="${strings.getExtension "infile"}"
     infile_ext="''${1##*/}"
     outfile="''${2%.*}.${extension}"
     case $infile_ext in
