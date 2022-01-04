@@ -1,0 +1,16 @@
+diff --git a/spell/Main.java b/spell/Main.java
+index 3cf8c0e..1292149 100755
+--- a/spell/Main.java
++++ b/spell/Main.java
+@@ -14,6 +14,11 @@ public class Main {
+ 	 */
+ 	public static void main(String[] args) throws IOException {
+ 
++		if (args.length < 2) {
++			System.out.println("usage: spelling-corrector <word>");
++			System.exit(1);
++		}
++
+ 		String dictionaryFileName = args[0];
+ 		String inputWord = args[1];
+ 

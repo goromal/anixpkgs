@@ -1,6 +1,14 @@
 final: prev: 
 with prev.lib;
 let
+    baseJavaArgs = {
+        stdenv = prev.stdenv;
+        jdk = prev.jdk11_headless;
+        jre_minimal = prev.jre_minimal;
+        ant = prev.ant;
+        makeWrapper = prev.makeWrapper;
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -49,16 +57,9 @@ in {
         boost = prev.boost;
     };
 
-    _base_java_args = {
-        stdenv = prev.stdenv;
-        jdk = prev.jdk11_headless;
-        jre_minimal = prev.jre_minimal;
-        ant = prev.ant;
-        makeWrapper = prev.makeWrapper;
-    };
+    evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
+    spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;
 
-    evil-hangman = prev.callPackage ./java-packages/evil-hangman final._base_java_args;
-    
     python27 = pythonOverridesFor prev.python27;
     python37 = pythonOverridesFor prev.python37;
     python38 = pythonOverridesFor prev.python38;
