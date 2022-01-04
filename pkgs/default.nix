@@ -1,10 +1,18 @@
 final: prev: 
 with prev.lib;
 let
+    minJDK = prev.jdk11_headless;
+    minJRE = prev.jre_minimal.override {
+        jdk = minJDK;
+        modules = [
+            "java.base"
+            "java.logging"
+        ];
+    };
     baseJavaArgs = {
         stdenv = prev.stdenv;
-        jdk = prev.jdk11_headless;
-        jre_minimal = prev.jre_minimal;
+        jdk = minJDK;
+        jre = minJRE;
         ant = prev.ant;
         makeWrapper = prev.makeWrapper;
     };
@@ -59,6 +67,7 @@ in {
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;
+    simple-image-editor = prev.callPackage ./java-packages/simple-image-editor baseJavaArgs;
 
     python27 = pythonOverridesFor prev.python27;
     python37 = pythonOverridesFor prev.python37;

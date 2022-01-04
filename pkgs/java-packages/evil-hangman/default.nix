@@ -1,18 +1,10 @@
 { stdenv
 , jdk
-, jre_minimal
+, jre
 , ant
 , makeWrapper
 }:
-let
-    min_jre = jre_minimal.override {
-        inherit jdk;
-        modules = [
-            "java.base"
-            "java.logging"
-        ];
-    };
-in stdenv.mkDerivation {
+stdenv.mkDerivation {
     name = "evil-hangman";
     version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);
@@ -34,7 +26,7 @@ in stdenv.mkDerivation {
     mkdir -p $out/share/hangman
     cp dictionary.txt $out
     cp hangman/hangman/*.class $out/share/hangman
-    makeWrapper ${min_jre}/bin/java $out/bin/evil-hangman \
+    makeWrapper ${jre}/bin/java $out/bin/evil-hangman \
         --add-flags "-cp $out/share hangman.EvilHangman $out/dictionary.txt"
     '';
 }

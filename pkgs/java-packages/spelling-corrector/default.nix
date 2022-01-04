@@ -1,19 +1,11 @@
 { stdenv
 , jdk
-, jre_minimal
+, jre
 , ant
 , makeWrapper
 }:
-let
-    min_jre = jre_minimal.override {
-        inherit jdk;
-        modules = [
-            "java.base"
-            "java.logging"
-        ];
-    };
-in stdenv.mkDerivation {
-    name = "evil-hangman";
+stdenv.mkDerivation {
+    name = "spelling-corrector";
     version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);
 
@@ -34,7 +26,7 @@ in stdenv.mkDerivation {
     mkdir -p $out/share/spell
     cp dictionary.txt $out
     cp spell/spell/*.class $out/share/spell
-    makeWrapper ${min_jre}/bin/java $out/bin/spelling-corrector \
+    makeWrapper ${jre}/bin/java $out/bin/spelling-corrector \
         --add-flags "-cp $out/share spell.Main $out/dictionary.txt"
     '';
 }

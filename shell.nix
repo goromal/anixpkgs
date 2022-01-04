@@ -3,6 +3,7 @@ with pkgs;
 mkShell {
     nativeBuildInputs = [
         evil-hangman
-	spelling-corrector
+	    spelling-corrector
+        simple-image-editor
     ];
 }
