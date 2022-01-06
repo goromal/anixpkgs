@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 about = {}  # type: ignore
 here = os.path.abspath(os.path.dirname(__file__))
-with open(os.path.join(here, '_tmp', '__version__.py')) as f:
+with open(os.path.join(here, '__version__.py')) as f:
     exec(f.read(), about)
 
 # package configuration - for reference see:

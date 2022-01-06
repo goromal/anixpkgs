@@ -36,14 +36,12 @@ in buildPythonPackage rec {
     inherit propagatedBuildInputs;
     doCheck = false;
     prePatch = ''
-        mv _tmp ${pname}
-        sed -i 's|_tmp|${pname}|g' setup.py
-        sed -i 's|_tmptitle|${pname}|g' ${pname}/__version__.py
-        sed -i 's|_tmpdescription|${description}|g' ${pname}/__version__.py
-        sed -i 's|_tmpversion|${version}|g' ${pname}/__version__.py
+        sed -i 's|_tmptitle|${pname}|g' __version__.py
+        sed -i 's|_tmpdescription|${description}|g' __version__.py
+        sed -i 's|_tmpversion|${version}|g' __version__.py
     '';
     postInstall = ''
-        cp ${pyboundTarget} $out/${pythonLibDir}/${pname}/
+        cp ${pyboundTarget} $out/${pythonLibDir}/
         chmod -R 777 $out/${pythonLibDir}
     '';
 }
