@@ -14,6 +14,21 @@ let
                 eigen = prev.eigen;
                 pybind11 = python.pkgs.pybind11;
                 inherit python;
+                pythonOlder = pySelf.pythonOlder;
+                buildPythonPackage = pySelf.buildPythonPackage;
+            };
+            pyceres = pySelf.callPackage ./python-packages/pyceres {
+                callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                manif-geom-cpp = final.manif-geom-cpp;
+                eigen = prev.eigen;
+                glog = prev.glog;
+                gflags = prev.gflags;
+                suitesparse = prev.suitesparse;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                pythonOlder = pySelf.pythonOlder;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
             norbert = pySelf.callPackage ./python-packages/norbert {

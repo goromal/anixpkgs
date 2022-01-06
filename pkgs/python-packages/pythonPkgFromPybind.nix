@@ -5,12 +5,15 @@
 , pkg-src
 , cppNativeBuildInputs
 , cppBuildInputs
+, cppTarget ? null
 , pybind11
 , python
+, pythonOlder
 , buildPythonPackage
 , propagatedBuildInputs
 }:
 let
+    copyTarget = if cppTarget != null then cppTarget else "${pname}*";
     pyboundPkg = stdenv.mkDerivation {
         name = "${pname}-pybind-build";
         inherit version;
@@ -20,7 +23,7 @@ let
         # TODO kind of hacky--should find a more secure way to grab the built library
         installPhase = ''
             mkdir -p $out/lib
-            cp -r ${pname}* $out/lib
+            cp -r ${copyTarget} $out/lib
         '';
     };
     pyboundTarget = "${pyboundPkg}/lib/${pname}*";
@@ -29,6 +32,7 @@ in buildPythonPackage rec {
     inherit pname;
     inherit version;
     src = ./pkgTemplate/.;
+    disabled = pythonOlder "3.6";
     inherit propagatedBuildInputs;
     doCheck = false;
     prePatch = ''
