@@ -13,7 +13,7 @@ export NIX_PATH=anixpkgs=/your/path/to/anixpkgs
 and in your Nix derivations:
 
 ```nix
-pkgs = import <anixpkgs>; # a set, not a function
+let pkgs = import <anixpkgs>; # a set, not a function
 ```
 An example Nix shell for trying out Python packages:
 
