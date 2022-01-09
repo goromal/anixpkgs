@@ -79,6 +79,14 @@ in {
         eigen = prev.eigen;
         boost = prev.boost;
     };
+    ceres-factors = prev.callPackage ./cxx-packages/ceres-factors {
+        stdenv = prev.clangStdenv;
+        cmake = prev.cmake;
+        eigen = prev.eigen;
+        ceres = prev.ceres-solver;
+        manif-geom-cpp = final.manif-geom-cpp;
+        boost = prev.boost;
+    };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;
