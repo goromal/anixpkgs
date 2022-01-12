@@ -20,6 +20,9 @@ let
         src = pkg-src;
         nativeBuildInputs = cppNativeBuildInputs;
         buildInputs = [ pybind11 ] ++ cppBuildInputs;
+        preConfigure = ''
+        cmakeFlags="$cmakeFlags --no-warn-unused-cli"
+        '';
         # TODO kind of hacky--should find a more secure way to grab the built library
         installPhase = ''
             mkdir -p $out/lib

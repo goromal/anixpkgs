@@ -47,6 +47,19 @@ let
                 pythonOlder = pySelf.pythonOlder;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
+            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors {
+                callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                ceres = prev.ceres-solver;
+                ceres-factors = final.ceres-factors;
+                manif-geom-cpp = final.manif-geom-cpp;
+                eigen = prev.eigen;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                pythonOlder = pySelf.pythonOlder;
+                buildPythonPackage = pySelf.buildPythonPackage;
+            };
             norbert = pySelf.callPackage ./python-packages/norbert {
                 buildPythonPackage = pySelf.buildPythonPackage;
                 fetchPypi = pySelf.fetchPypi;
