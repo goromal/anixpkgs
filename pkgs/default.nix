@@ -37,11 +37,24 @@ let
                 callPackage = prev.callPackage;
                 stdenv = prev.clangStdenv;
                 cmake = prev.cmake;
-                manif-geom-cpp = final.manif-geom-cpp;
+                ceres = prev.ceres-solver;
                 eigen = prev.eigen;
                 glog = prev.glog;
                 gflags = prev.gflags;
                 suitesparse = prev.suitesparse;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                pythonOlder = pySelf.pythonOlder;
+                buildPythonPackage = pySelf.buildPythonPackage;
+            };
+            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors {
+                callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                ceres = prev.ceres-solver;
+                ceres-factors = final.ceres-factors;
+                manif-geom-cpp = final.manif-geom-cpp;
+                eigen = prev.eigen;
                 pybind11 = python.pkgs.pybind11;
                 inherit python;
                 pythonOlder = pySelf.pythonOlder;
@@ -77,6 +90,14 @@ in {
         stdenv = prev.clangStdenv;
         cmake = prev.cmake;
         eigen = prev.eigen;
+        boost = prev.boost;
+    };
+    ceres-factors = prev.callPackage ./cxx-packages/ceres-factors {
+        stdenv = prev.clangStdenv;
+        cmake = prev.cmake;
+        eigen = prev.eigen;
+        ceres = prev.ceres-solver;
+        manif-geom-cpp = final.manif-geom-cpp;
         boost = prev.boost;
     };
 

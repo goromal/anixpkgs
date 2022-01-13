@@ -5,6 +5,7 @@
 , pkg-src
 , cppNativeBuildInputs
 , cppBuildInputs
+, cppSetup ? null
 , cppTarget ? null
 , pybind11
 , python
@@ -13,13 +14,17 @@
 , propagatedBuildInputs
 }:
 let
-    copyTarget = if cppTarget != null then cppTarget else "${pname}*";
+    copyTarget = if cppTarget != null then cppTarget else "${pname}.cpython*";
     pyboundPkg = stdenv.mkDerivation {
         name = "${pname}-pybind-build";
         inherit version;
         src = pkg-src;
         nativeBuildInputs = cppNativeBuildInputs;
         buildInputs = [ pybind11 ] ++ cppBuildInputs;
+        prePatch = if cppSetup != null then cppSetup else "";
+        preConfigure = ''
+        cmakeFlags="$cmakeFlags --no-warn-unused-cli"
+        '';
         # TODO kind of hacky--should find a more secure way to grab the built library
         installPhase = ''
             mkdir -p $out/lib

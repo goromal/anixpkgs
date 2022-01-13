@@ -1,10 +1,12 @@
 { stdenv
 , cmake
 , eigen
+, ceres
+, manif-geom-cpp
 , boost
 }:
 stdenv.mkDerivation {
-    name = "manif-geom-cpp";
+    name = "ceres-factors";
     version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);
     nativeBuildInputs = [
@@ -12,6 +14,8 @@ stdenv.mkDerivation {
     ];
     buildInputs = [
         eigen
+        ceres
+        manif-geom-cpp
         boost
     ];
     preConfigure = ''

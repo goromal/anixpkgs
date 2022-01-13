@@ -1,5 +1,5 @@
 {
-    url = "git@github.com:goromal/ceres-solver.git";
-    rev = "aa1971b6d46a3a289c294b6e75d3eee84d4de78c";
+    url = "git@github.com:Edwinem/ceres_python_bindings.git";
+    rev = "2106d043bce37adcfef450dd23d3005480948c37";
     ref = "master";
 }

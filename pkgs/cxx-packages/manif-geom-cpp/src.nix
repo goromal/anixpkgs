@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/manif-geom-cpp.git";
-    rev = "452881c99704a110ef3ef1e2c0da37c8063e9f1d";
+    rev = "d1d89ec580e4fe5a7bb3b237337922bc24fa04a3";
     ref = "master";
 }
