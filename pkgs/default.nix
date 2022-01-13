@@ -37,7 +37,7 @@ let
                 callPackage = prev.callPackage;
                 stdenv = prev.clangStdenv;
                 cmake = prev.cmake;
-                manif-geom-cpp = final.manif-geom-cpp;
+                ceres = prev.ceres-solver;
                 eigen = prev.eigen;
                 glog = prev.glog;
                 gflags = prev.gflags;

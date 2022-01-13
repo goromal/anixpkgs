@@ -11,7 +11,7 @@
 , buildPythonPackage
 }:
 callPackage ../pythonPkgFromPybind.nix {
-    pname = "pyceres_factors";
+    pname = "PyCeresFactors";
     version = "1.0.0";
     description = "Python bindings of ceres-factors.";
     inherit stdenv;
