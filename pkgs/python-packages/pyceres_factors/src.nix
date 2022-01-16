@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/pyceres_factors.git";
-    rev = "6817335664f442ae07dc1e820f02e2d483916854";
+    rev = "a6e14882156d10b9fa1bda2e5c9448ab4ec33c27";
     ref = "main";
 }
