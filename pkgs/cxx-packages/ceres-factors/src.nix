@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/ceres-factors.git";
-    rev = "d29a5937755d946d862a0c49e22eded69eaa565d";
+    rev = "11791ce9da16d03ba8e9462589252ecea6559549";
     ref = "main";
 }

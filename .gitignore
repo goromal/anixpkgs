@@ -1,2 +1,4 @@
 .envrc
 result
+test.sh
+build/*

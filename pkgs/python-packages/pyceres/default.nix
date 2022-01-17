@@ -9,6 +9,7 @@
 , pybind11
 , python
 , pythonOlder
+, pytestCheckHook
 , buildPythonPackage
 }:
 callPackage ../pythonPkgFromPybind.nix {
@@ -38,6 +39,8 @@ callPackage ../pythonPkgFromPybind.nix {
     inherit pybind11;
     inherit python;
     inherit pythonOlder;
+    inherit pytestCheckHook;
     inherit buildPythonPackage;
     propagatedBuildInputs = [];
+    checkPkgs = [];
 }

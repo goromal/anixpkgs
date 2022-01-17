@@ -28,9 +28,11 @@ let
                 cmake = prev.cmake;
                 manif-geom-cpp = final.manif-geom-cpp;
                 eigen = prev.eigen;
+                numpy = python.pkgs.numpy;
                 pybind11 = python.pkgs.pybind11;
                 inherit python;
                 pythonOlder = pySelf.pythonOlder;
+                pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
             pyceres = pySelf.callPackage ./python-packages/pyceres {
@@ -45,6 +47,7 @@ let
                 pybind11 = python.pkgs.pybind11;
                 inherit python;
                 pythonOlder = pySelf.pythonOlder;
+                pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors {
@@ -55,9 +58,13 @@ let
                 ceres-factors = final.ceres-factors;
                 manif-geom-cpp = final.manif-geom-cpp;
                 eigen = prev.eigen;
+                numpy = python.pkgs.numpy;
+                geometry = python.pkgs.geometry;
+                pyceres = python.pkgs.pyceres;
                 pybind11 = python.pkgs.pybind11;
                 inherit python;
                 pythonOlder = pySelf.pythonOlder;
+                pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
             norbert = pySelf.callPackage ./python-packages/norbert {
