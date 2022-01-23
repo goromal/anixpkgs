@@ -1,4 +1,4 @@
-{ pkgs ? import <anixpkgs> }:
+{ pkgs ? import <nixpkgs> {} }:
 with pkgs;
 mkShell {
     nativeBuildInputs = [
