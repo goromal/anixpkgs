@@ -33,15 +33,13 @@ in writeShellScriptBin name ''
         ${printusage}
         exit
     fi
-    infile_ext=${strings.getExtension "infile"}
-    echo_green "INFILE_EXT=$infile_ext"
-    outfile=${strings.replaceExtension "2" extension}
-    echo_green "OUTFILE=$outfile"
-    if [[ -z "$outfile" ]]; then
+    infile_ext=`${strings.getExtension} "$infile"`
+    if [[ -z "$2" ]]; then
         ${printerr} "ERROR: no output file specified."
         ${printusage}
         exit
     fi
+    outfile=`${strings.replaceExtension} "$2" ${extension}`
     case $infile_ext in
     ${conv_opt_cmds}
     *)

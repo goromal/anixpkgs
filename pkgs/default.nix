@@ -17,6 +17,16 @@ let
         makeWrapper = prev.makeWrapper;
     };
 
+    baseConvArgs = {
+        writeShellScriptBin = prev.writeShellScriptBin;
+        callPackage = prev.callPackage;
+        color-prints = prev.callPackage ./bash-packages/color-prints {};
+        strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {
+            writeShellScript = prev.writeShellScript;
+        };
+        redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -93,23 +103,19 @@ let
         });
     }));
 in {
-    _conv_base_args = {
-        writeShellScriptBin = prev.writeShellScriptBin;
-        callPackage = prev.callPackage;
-        color-prints = prev.callPackage ./bash-packages/color-prints {};
-        strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {};
-        redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
-    };
-
-    abc = prev.callPackage ./bash-packages/converters/abc.nix (final._conv_base_args // {
+    abc = prev.callPackage ./bash-packages/converters/abc.nix (baseConvArgs // {
        abcmidi = prev.abcmidi;
     });
 
-    svg = prev.callPackage ./bash-packages/converters/svg.nix (final._conv_base_args // {
+    svg = prev.callPackage ./bash-packages/converters/svg.nix (baseConvArgs // {
        inkscape = prev.inkscape;
        abcm2ps = prev.abcm2ps;
        scour = prev.python38.pkgs.scour;
-    });        
+    });
+
+    # mp3 = prev.callPackage ./bash-packages/converters/mp3.nix (baseConvArgs // {
+    #     # TODO package in test state
+    # });
 
     color-prints = prev.callPackage ./bash-packages/color-prints {
         stdenv = prev.stdenv;
