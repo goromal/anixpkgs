@@ -106,16 +106,44 @@ in {
     abc = prev.callPackage ./bash-packages/converters/abc.nix (baseConvArgs // {
        abcmidi = prev.abcmidi;
     });
+    doku = prev.callPackage ./bash-packages/converters/doku.nix (baseConvArgs // {
 
+    });
+    epub = prev.callPackage ./bash-packages/converters/epub.nix (baseConvArgs // {
+
+    });
+    gif = prev.callPackage ./bash-packages/converters/gif.nix (baseConvArgs // {
+
+    });
+    html = prev.callPackage ./bash-packages/converters/html.nix (baseConvArgs // {
+
+    });
+    md = prev.callPackage ./bash-packages/converters/md.nix (baseConvArgs // {
+
+    });
+    midi = prev.callPackage ./bash-packages/converters/midi.nix (baseConvArgs // {
+
+    });
+    mp3 = prev.callPackage ./bash-packages/converters/mp3.nix (baseConvArgs // {
+        
+    });
+    mp4 = prev.callPackage ./bash-packages/converters/mp4.nix (baseConvArgs // {
+
+    });
+    pdf = prev.callPackage ./bash-packages/converters/pdf.nix (baseConvArgs // {
+
+    });
+    png = prev.callPackage ./bash-packages/converters/png.nix (baseConvArgs // {
+
+    });
     svg = prev.callPackage ./bash-packages/converters/svg.nix (baseConvArgs // {
        inkscape = prev.inkscape;
        abcm2ps = prev.abcm2ps;
        scour = prev.python38.pkgs.scour;
     });
+    zipper = prev.callPackage ./bash-packages/converters/zipper.nix (baseConvArgs // {
 
-    # mp3 = prev.callPackage ./bash-packages/converters/mp3.nix (baseConvArgs // {
-    #     # TODO package in test state
-    # });
+    });
 
     color-prints = prev.callPackage ./bash-packages/color-prints {
         stdenv = prev.stdenv;

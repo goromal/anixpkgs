@@ -3,50 +3,30 @@
 , color-prints
 , strings
 , redirects
-}: # TODO package is in a test state
+}:
 let
     name = "mp3";
     extension = "mp3";
     usage_str = ''
     usage: mp3 inputfile outputfile
 
-    Create an mp3 file.
+    Create a mp3 file.
 
     Inputs:
-        .TODO
+        .mp3
+        .mp4
+        .wav
+        .midi
 
     Options:
-        --one   (T/F)
-        --two   TWO
-        --three (T/F)
+        --TODO
     '';
     optsWithVarsAndDefaults = [
-        {
-            var = "one";
-            isBool = true;
-            default = "0";
-            flags = "--one";
-        }
-        {
-            var = "two";
-            isBool = false;
-            default = "UNSET";
-            flags = "--two";
-        }
-        {
-            var = "three";
-            isBool = true;
-            default = "0";
-            flags = "--three";
-        }
+        
     ];
     convOptCmds = [
-        { extension = "pdf|PDF"; commands = ''
-        echo_green "inputfile: $infile"
-        echo_green "outputfile: $outfile"
-        echo_yellow "one: $one"
-        echo_yellow "two: $two"
-        echo_yellow "three: $three"
+        { extension = "*"; commands = ''
+        echo_yellow "NOT IMPLEMENTED YET"
         ''; }
     ];
 in callPackage ./mkConverter.nix {

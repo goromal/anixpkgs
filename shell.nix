@@ -6,8 +6,18 @@ mkShell {
         # evil-hangman
         # spelling-corrector
         # simple-image-editor
-        # abc
-        svg
+        abc
+        doku
+        epub
+        gif
+        html
+        md
+        midi
         mp3
+        mp4
+        pdf
+        png
+        svg
+        zipper
     ];
 }
