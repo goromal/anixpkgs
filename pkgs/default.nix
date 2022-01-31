@@ -17,11 +17,26 @@ let
         makeWrapper = prev.makeWrapper;
     };
 
+    baseConvArgs = {
+        writeShellScriptBin = prev.writeShellScriptBin;
+        callPackage = prev.callPackage;
+        color-prints = prev.callPackage ./bash-packages/color-prints {};
+        strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {
+            writeShellScript = prev.writeShellScript;
+        };
+        redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            sunnyside = pySelf.callPackage ./python-packages/sunnyside {
+                callPackage = prev.callPackage;
+                pytestCheckHook = pySelf.pytestCheckHook;
+                buildPythonPackage = pySelf.buildPythonPackage;
+            };
             geometry = pySelf.callPackage ./python-packages/geometry {
                 callPackage = prev.callPackage;
                 stdenv = prev.clangStdenv;
@@ -90,9 +105,63 @@ let
                 httpx = python.pkgs.httpx;
                 librosa = python.pkgs.librosa;
             };
+            ichabod = pySelf.callPackage ./python-packages/ichabod {
+                callPackage = prev.callPackage;
+                pytestCheckHook = pySelf.pytestCheckHook;
+                buildPythonPackage = pySelf.buildPythonPackage;
+                pystemd = python.pkgs.pystemd;
+                veryprettytable = python.pkgs.veryprettytable;
+            };
         });
     }));
 in {
+    abc = prev.callPackage ./bash-packages/converters/abc.nix (baseConvArgs // {
+       abcmidi = prev.abcmidi;
+    });
+    doku = prev.callPackage ./bash-packages/converters/doku.nix (baseConvArgs // {
+
+    });
+    epub = prev.callPackage ./bash-packages/converters/epub.nix (baseConvArgs // {
+
+    });
+    gif = prev.callPackage ./bash-packages/converters/gif.nix (baseConvArgs // {
+
+    });
+    html = prev.callPackage ./bash-packages/converters/html.nix (baseConvArgs // {
+
+    });
+    md = prev.callPackage ./bash-packages/converters/md.nix (baseConvArgs // {
+
+    });
+    midi = prev.callPackage ./bash-packages/converters/midi.nix (baseConvArgs // {
+
+    });
+    mp3 = prev.callPackage ./bash-packages/converters/mp3.nix (baseConvArgs // {
+        
+    });
+    mp4 = prev.callPackage ./bash-packages/converters/mp4.nix (baseConvArgs // {
+
+    });
+    pdf = prev.callPackage ./bash-packages/converters/pdf.nix (baseConvArgs // {
+
+    });
+    png = prev.callPackage ./bash-packages/converters/png.nix (baseConvArgs // {
+
+    });
+    svg = prev.callPackage ./bash-packages/converters/svg.nix (baseConvArgs // {
+       inkscape = prev.inkscape;
+       abcm2ps = prev.abcm2ps;
+       scour = prev.python38.pkgs.scour;
+    });
+    zipper = prev.callPackage ./bash-packages/converters/zipper.nix (baseConvArgs // {
+
+    });
+
+    color-prints = prev.callPackage ./bash-packages/color-prints {
+        stdenv = prev.stdenv;
+        writeShellScriptBin = prev.writeShellScriptBin;
+    };
+
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp {
         stdenv = prev.clangStdenv;
         cmake = prev.cmake;

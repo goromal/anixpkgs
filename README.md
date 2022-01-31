@@ -2,7 +2,11 @@
 
 A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
 
-## Usage
+The philosophy for the library implementations (and, sometimes, re-implementations) is to facilitate:
+
+- Implementation and notation consistency
+- Seamless interoperability
+- Quick idea and calculation prototyping
 
 To use, clone this repo and add to `~/.bashrc`:
 
