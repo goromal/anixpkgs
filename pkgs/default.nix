@@ -105,6 +105,13 @@ let
                 httpx = python.pkgs.httpx;
                 librosa = python.pkgs.librosa;
             };
+            ichabod = pySelf.callPackage ./python-packages/ichabod {
+                callPackage = prev.callPackage;
+                pytestCheckHook = pySelf.pytestCheckHook;
+                buildPythonPackage = pySelf.buildPythonPackage;
+                pystemd = python.pkgs.pystemd;
+                veryprettytable = python.pkgs.veryprettytable;
+            };
         });
     }));
 in {

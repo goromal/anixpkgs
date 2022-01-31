@@ -5,8 +5,9 @@
 , test-dir ? null
 , pytestCheckHook
 , buildPythonPackage
-, propagatedBuildInputs
-, checkPkgs
+, nativeBuildInputs ? []
+, propagatedBuildInputs ? []
+, checkPkgs ? []
 }:
 let
     testsCpyCmd = if test-dir != null then ''
@@ -16,6 +17,7 @@ in buildPythonPackage rec {
     inherit pname;
     inherit version;
     src = ./pkgTemplate/.;
+    inherit nativeBuildInputs;
     inherit propagatedBuildInputs;
     doCheck = (test-dir != null);
     checkInputs = [ pytestCheckHook ] ++ checkPkgs;
