@@ -32,12 +32,12 @@ nb evil-hangman
 nb spelling-corrector
 nb simple-image-editor
 
-echo "Building Python 3.8 packages..."
+echo "Building Python 3.8 packages (minus spleeter)..."
 
 nb python38.pkgs.sunnyside
 nb python38.pkgs.geometry
 nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors
 nb python38.pkgs.norbert
-nb python38.pkgs.spleeter
+# nb python38.pkgs.spleeter
 nb python38.pkgs.ichabod
