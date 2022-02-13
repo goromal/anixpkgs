@@ -18,4 +18,6 @@ jobs:
       with:
         name: github-public
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - run: ./scripts/build_all.sh
