@@ -41,3 +41,5 @@ nb python38.pkgs.pyceres_factors
 nb python38.pkgs.norbert
 # nb python38.pkgs.spleeter
 nb python38.pkgs.ichabod
+nb python38.pkgs.pysignals
+nb python38.pkgs.mesh-plotter
