@@ -82,6 +82,22 @@ let
                 pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
             };
+            pysignals = pySelf.callPackage ./python-packages/pysignals {
+                callPackage = prev.callPackage;
+                pytestCheckHook = pySelf.pytestCheckHook;
+                buildPythonPackage = pySelf.buildPythonPackage;
+                numpy = python.pkgs.numpy;
+                geometry = python.pkgs.geometry;
+            };
+            mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter {
+                buildPythonPackage = pySelf.buildPythonPackage;
+                fetchPypi = pySelf.fetchPypi;
+                pythonOlder = pySelf.pythonOlder;
+                numpy = python.pkgs.numpy;
+                matplotlib = python.pkgs.matplotlib;
+                geometry = python.pkgs.geometry;
+                pysignals = python.pkgs.pysignals;
+            };
             norbert = pySelf.callPackage ./python-packages/norbert {
                 buildPythonPackage = pySelf.buildPythonPackage;
                 fetchPypi = pySelf.fetchPypi;

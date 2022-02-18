@@ -336,7 +336,7 @@ def search(db, terms):
                     }
                 results.append(result)
         # limit page size to not print walls of results
-        # TODO: consider pagination
+        #    : consider pagination
         results = results[:30]
         return results
 
@@ -357,7 +357,7 @@ def parse_config_file(text):
     config.set('Search', 'total-results', 50)
 
     config.add_section('Misc')
-    # TODO: try to use configparser.BasicInterpolation
+    #     : try to use configparser.BasicInterpolation
     #       for interpolating in the command
     config.set('Misc', 'openCommand', '')
     config.set('Misc', 'transmission', 'false')
@@ -467,7 +467,7 @@ class Printer:
             kwargs.pop('color', None)
             return builtins.print(*args, file=sys.stderr, **kwargs)
 
-    # TODO: extract the name from the search results
+    #     : extract the name from the search results
     #       instead of from the magnet link when possible
     def search_results(self, results, local=None):
         columns = shutil.get_terminal_size((80, 20)).columns
