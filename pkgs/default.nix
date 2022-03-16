@@ -192,6 +192,13 @@ in {
         manif-geom-cpp = final.manif-geom-cpp;
         boost = prev.boost;
     };
+    signals-cpp = prev.callPackage ./cxx-packages/signals-cpp {
+        stdenv = prev.clangStdenv;
+        cmake = prev.cmake;
+        eigen = prev.eigen;
+        manif-geom-cpp = final.manif-geom-cpp;
+        boost = prev.boost;
+    };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;
