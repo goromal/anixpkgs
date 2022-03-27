@@ -25,6 +25,7 @@ echo "Building C++ packages..."
 
 nb manif-geom-cpp
 nb ceres-factors
+nb signals-cpp
 
 echo "Building Java packages..."
 
@@ -42,4 +43,4 @@ nb python38.pkgs.norbert
 # nb python38.pkgs.spleeter
 nb python38.pkgs.ichabod
 nb python38.pkgs.pysignals
-nb python38.pkgs.mesh-plotter
+# nb python38.pkgs.mesh-plotter TODO reimplement
