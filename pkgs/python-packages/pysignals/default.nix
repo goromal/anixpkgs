@@ -14,7 +14,7 @@
 }:
 callPackage ../pythonPkgFromPybind.nix {
     pname = "pysignals";
-    version = "0.0.0-beta";
+    version = "1.0.0";
     description = "Python bindings of signals-cpp.";
     inherit stdenv;
     pkg-src = builtins.fetchGit (import ./src.nix);
