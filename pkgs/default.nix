@@ -84,6 +84,13 @@ let
             };
             pysignals = pySelf.callPackage ./python-packages/pysignals {
                 callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                signals-cpp = final.signals-cpp;
+                eigen = prev.eigen;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                pythonOlder = pySelf.pythonOlder;
                 pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
                 numpy = python.pkgs.numpy;
