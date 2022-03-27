@@ -6,7 +6,7 @@
 }:
 stdenv.mkDerivation {
     name = "signals-cpp";
-    version = "0.0.0-beta";
+    version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);
     nativeBuildInputs = [
         cmake
