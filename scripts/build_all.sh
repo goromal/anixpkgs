@@ -25,6 +25,7 @@ echo "Building C++ packages..."
 
 nb manif-geom-cpp
 nb ceres-factors
+nb signals-cpp
 
 echo "Building Java packages..."
 

@@ -1,18 +1,38 @@
 { callPackage
+, stdenv
+, cmake
+, signals-cpp
+, manif-geom-cpp
+, eigen
+, pybind11
+, python
+, pythonOlder
 , pytestCheckHook
 , buildPythonPackage
 , numpy
 , geometry
 }:
-# TODO replace with pybind11 package
-callPackage ../pythonPkgFromScript.nix {
+callPackage ../pythonPkgFromPybind.nix {
     pname = "pysignals";
-    version = "0.0.0";
-    description = ".";
-    is-exec = false;
-    script-file = ./pysignals.py;
-    test-dir = ./tests/.;
-    inherit pytestCheckHook buildPythonPackage;
+    version = "1.0.0";
+    description = "Python bindings of signals-cpp.";
+    inherit stdenv;
+    pkg-src = builtins.fetchGit (import ./src.nix);
+    cppNativeBuildInputs = [
+        cmake
+    ];
+    cppBuildInputs = [
+        signals-cpp
+        manif-geom-cpp
+        eigen
+    ];
+    hasTests = true;
+    inherit pybind11;
+    inherit python;
+    inherit pythonOlder;
+    inherit pytestCheckHook;
+    inherit buildPythonPackage;
+    propagatedBuildInputs = [];
     checkPkgs = [
         numpy
         geometry

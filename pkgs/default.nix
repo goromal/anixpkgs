@@ -84,6 +84,13 @@ let
             };
             pysignals = pySelf.callPackage ./python-packages/pysignals {
                 callPackage = prev.callPackage;
+                stdenv = prev.clangStdenv;
+                cmake = prev.cmake;
+                signals-cpp = final.signals-cpp;
+                eigen = prev.eigen;
+                pybind11 = python.pkgs.pybind11;
+                inherit python;
+                pythonOlder = pySelf.pythonOlder;
                 pytestCheckHook = pySelf.pytestCheckHook;
                 buildPythonPackage = pySelf.buildPythonPackage;
                 numpy = python.pkgs.numpy;
@@ -189,6 +196,13 @@ in {
         cmake = prev.cmake;
         eigen = prev.eigen;
         ceres = prev.ceres-solver;
+        manif-geom-cpp = final.manif-geom-cpp;
+        boost = prev.boost;
+    };
+    signals-cpp = prev.callPackage ./cxx-packages/signals-cpp {
+        stdenv = prev.clangStdenv;
+        cmake = prev.cmake;
+        eigen = prev.eigen;
         manif-geom-cpp = final.manif-geom-cpp;
         boost = prev.boost;
     };
