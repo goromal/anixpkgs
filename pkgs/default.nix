@@ -222,6 +222,8 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
+    
+    sunnyside = final.python38.pkgs.sunnyside;
 
     nixos-machines = rec {
         minimal = {

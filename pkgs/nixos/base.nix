@@ -43,6 +43,7 @@ with lib;
             dtc
             # anixpkgs
             color-prints
+            sunnyside
         ];
 
         environment.shellAliases = {
