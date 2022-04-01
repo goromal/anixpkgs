@@ -15,8 +15,8 @@ with lib;
             git
             iotop
             iperf
-            htop
-            jq
+            htop            # CPU performance diagnostics
+            jq              # Pretty formatting of JSON strings
             libpwquality
             lsof
             manpages
@@ -29,7 +29,7 @@ with lib;
             tshark
             fish
             screen
-            minicom
+            minicom         # Serial port comms
             dhcpcd
             dnsutils
             v4l_utils
@@ -41,9 +41,10 @@ with lib;
             ethtool
             arp-scan
             dtc
+            ncdu            # Get file and folder size information
             # anixpkgs
-            color-prints
-            sunnyside
+            color-prints    # Colored terminal outputs
+            sunnyside       # File security
         ];
 
         environment.shellAliases = {
