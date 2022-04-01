@@ -27,6 +27,12 @@ let
         redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
     };
 
+    baseModuleArgs = {
+        pkgs = final;
+        config = final.config;
+        lib = final.lib;
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -216,4 +222,18 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
+
+    nixos-machines = rec {
+        minimal = {
+            sitl = import ./nixos/minimal/sitl.nix baseModuleArgs;
+        };
+        base = {
+            sitl = import ./nixos/base/sitl.nix baseModuleArgs;
+        };
+    };
+    run-sitl-machine = prev.callPackage ./bash-packages/run-sitl {
+        writeShellScriptBin = prev.writeShellScriptBin;
+        callPackage = prev.callPackage;
+        color-prints = prev.callPackage ./bash-packages/color-prints {};
+    };
 }
