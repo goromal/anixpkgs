@@ -8,6 +8,7 @@ with lib;
     ];
     
     config = {
+        # TODO: bash script for centralized network analysis
         environment.systemPackages = [
             # upstream
             ack
@@ -42,6 +43,7 @@ with lib;
             arp-scan
             dtc
             ncdu            # Get file and folder size information
+            nmap            # Network analysis
             # anixpkgs
             color-prints    # Colored terminal outputs
             sunnyside       # File security
