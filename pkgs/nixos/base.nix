@@ -8,6 +8,7 @@ with lib;
     ];
     
     config = {
+        # TODO: nixpkgs in ~/sources/anixpkgs
         # TODO: bash script for centralized network analysis
         environment.systemPackages = [
             # upstream
@@ -16,10 +17,12 @@ with lib;
             git
             iotop
             iperf
+            python3
             htop            # CPU performance diagnostics
             jq              # Pretty formatting of JSON strings
             libpwquality
             lsof
+            coreutils
             manpages
             mosh
             nethogs
@@ -39,6 +42,7 @@ with lib;
             chrony
             unzip
             mosh
+            wget
             ethtool
             arp-scan
             dtc

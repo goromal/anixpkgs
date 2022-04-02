@@ -1,17 +1,19 @@
 { writeShellScriptBin
 , callPackage
 , color-prints
+, machines
 }:
 let
     cmd-name = "run-sitl-machine";
+    machine-desc-list = map (x: "   - ${x.name}: ${x.description}") machines;
+    machines-desc = builtins.concatStringsSep "\n" machine-desc-list;
     usage_str = ''
     usage: ${cmd-name} machine-name
 
     Run a SITL emulation for <nixpkgs> -A nixos-machines.[machine-name].sitl
 
     Machines:
-        - minimal: Just the latest kernel, and nothing else.
-        - base: Machine wrapper around all common processes and programs.
+    ${machines-desc}
     '';
     argparse = callPackage ../bash-utils/argparse.nix {
         inherit usage_str;

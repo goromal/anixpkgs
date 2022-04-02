@@ -33,6 +33,11 @@ let
         lib = final.lib;
     };
 
+    makeMachines = name: {
+        sitl = import (./nixos + (("/" + name) + "/sitl.nix")) baseModuleArgs;
+        # TODO add list arg for hardware names
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -226,16 +231,18 @@ in {
     sunnyside = final.python38.pkgs.sunnyside;
 
     nixos-machines = rec {
-        minimal = {
-            sitl = import ./nixos/minimal/sitl.nix baseModuleArgs;
-        };
-        base = {
-            sitl = import ./nixos/base/sitl.nix baseModuleArgs;
-        };
+        minimal = makeMachines "minimal";
+        base = makeMachines "base";
+        personal = makeMachines "personal";
     };
     run-sitl-machine = prev.callPackage ./bash-packages/run-sitl {
         writeShellScriptBin = prev.writeShellScriptBin;
         callPackage = prev.callPackage;
         color-prints = prev.callPackage ./bash-packages/color-prints {};
+        machines = [
+            { name = "minimal"; description = "Just the latest Linux kernel, and nothing else."; }
+            { name = "base"; description = "Machine wrapper around all common processes and programs."; }
+            { name = "personal"; description = "Personal Linux machine for the day-to-day."; }
+        ];
     };
 }
