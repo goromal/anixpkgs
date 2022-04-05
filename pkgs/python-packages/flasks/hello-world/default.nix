@@ -3,7 +3,7 @@
 , writeTextFile
 , callPackage
 }:
-callPackage ../mkFlaskApp.nix {
+callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "flask_hello_world";
     version = "0.0.0";
     inherit buildPythonApplication flask writeTextFile;
