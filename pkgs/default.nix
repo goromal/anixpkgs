@@ -229,6 +229,7 @@ in {
     python310 = pythonOverridesFor prev.python310;
     
     sunnyside = final.python38.pkgs.sunnyside;
+    spleeter = final.python38.pkgs.spleeter;
 
     nixos-machines = rec {
         minimal = makeMachines "minimal";
