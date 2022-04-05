@@ -27,6 +27,17 @@ let
         redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
     };
 
+    baseModuleArgs = {
+        pkgs = final;
+        config = final.config;
+        lib = final.lib;
+    };
+
+    makeMachines = name: {
+        sitl = import (./nixos + (("/" + name) + "/sitl.nix")) baseModuleArgs;
+        # TODO add list arg for hardware names
+    };
+
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -216,4 +227,23 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
+    
+    sunnyside = final.python38.pkgs.sunnyside;
+    spleeter = final.python38.pkgs.spleeter;
+
+    nixos-machines = rec {
+        minimal = makeMachines "minimal";
+        base = makeMachines "base";
+        personal = makeMachines "personal";
+    };
+    run-sitl-machine = prev.callPackage ./bash-packages/run-sitl {
+        writeShellScriptBin = prev.writeShellScriptBin;
+        callPackage = prev.callPackage;
+        color-prints = prev.callPackage ./bash-packages/color-prints {};
+        machines = [
+            { name = "minimal"; description = "Just the latest Linux kernel, and nothing else."; }
+            { name = "base"; description = "Machine wrapper around all common processes and programs."; }
+            { name = "personal"; description = "Personal Linux machine for the day-to-day."; }
+        ];
+    };
 }

@@ -47,6 +47,9 @@ in buildPythonPackage rec {
         ${adjustDependency llvmlite " = \"^0.36.0\"" ">=0.36.0,<0.37.0" " (>=0.36.0,<0.37.0)"}
         ${adjustDependency numpy " = \"<1.20.0,>=1.16.0\"" ">=1.16.0,<1.20.0" " (>=1.16.0,<1.20.0)"}
         ${adjustDependency librosa " = \"0.8.0\"" "==0.8.0" " (==0.8.0)"}
+        substituteInPlace pyproject.toml --replace 'version = \"^0.19.0\"' 'version = "${httpx.version}"'
+        substituteInPlace setup.py --replace 'httpx[http2]>=0.19.0,<0.20.0' 'httpx[http2]==${httpx.version}'
+        substituteInPlace PKG-INFO --replace 'httpx[http2] (>=0.19.0,<0.20.0)' 'httpx[http2] (==${httpx.version})'
         substituteInPlace spleeter/model/functions/unet.py --replace 'tensorflow.compat.v1.keras' 'tensorflow.keras'
     '';
     src = fetchPypi {
@@ -55,3 +58,5 @@ in buildPythonPackage rec {
     };
     doCheck = false;
 }
+# mkdir -p ~/spleeter/pretrained_models/2stems
+# wget -qO- https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz | tar xvz -C ~/spleeter/pretrained_models/2stems
