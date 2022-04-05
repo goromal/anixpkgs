@@ -146,6 +146,12 @@ let
                 pystemd = python.pkgs.pystemd;
                 veryprettytable = python.pkgs.veryprettytable;
             };
+            flask-hello-world = pySelf.callPackage ./python-packages/flasks/hello-world {
+                callPackage = prev.callPackage;
+                flask = python.pkgs.flask;
+                writeTextFile = prev.writeTextFile;
+                buildPythonApplication = pySelf.buildPythonApplication;
+            };
         });
     }));
 in {
