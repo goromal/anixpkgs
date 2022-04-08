@@ -1,13 +1,15 @@
 { writeShellScript }:
 rec {
+    getBasename = writeShellScript "getBasename" ''
+        filename=$(basename -- "$1")
+        echo "$filename"
+    '';
     getExtension = writeShellScript "getExtension" ''
-        fnamefull="$1"
-        filename=$(basename -- "$fnamefull")
+        filename=`${getBasename} "$1"`
         echo "''${filename##*.}"
     '';
     getWithoutExtension = writeShellScript "getWithoutExtension" ''
-        fnamefull="$1"
-        filename=$(basename -- "$fnamefull")
+        filename=`${getBasename} "$1"`
         echo "''${filename%.*}"
     '';
     replaceExtension = writeShellScript "replaceExtension" ''

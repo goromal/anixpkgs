@@ -44,3 +44,7 @@ nb python38.pkgs.norbert
 nb python38.pkgs.ichabod
 nb python38.pkgs.pysignals
 nb python38.pkgs.mesh-plotter
+nb python38.pkgs.flask-hello-world
+nb python38.pkgs.flask-url2mp4
+nb python38.pkgs.flask-mp4server
+nb python38.pkgs.flask-mp3server
