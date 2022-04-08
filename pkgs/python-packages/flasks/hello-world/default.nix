@@ -2,11 +2,13 @@
 , flask
 , writeTextFile
 , callPackage
+, writeShellScript
+, python
 }:
 callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "flask_hello_world";
     version = "0.0.0";
-    inherit buildPythonApplication flask writeTextFile;
+    inherit buildPythonApplication flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [];
     flaskScript = ''
         @app.route('/')

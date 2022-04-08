@@ -17,14 +17,16 @@ let
         makeWrapper = prev.makeWrapper;
     };
 
+    strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {
+        writeShellScript = prev.writeShellScript;
+    };
+    redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+
     baseConvArgs = {
         writeShellScriptBin = prev.writeShellScriptBin;
         callPackage = prev.callPackage;
         color-prints = prev.callPackage ./bash-packages/color-prints {};
-        strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {
-            writeShellScript = prev.writeShellScript;
-        };
-        redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+        inherit strings redirects;
     };
 
     baseModuleArgs = {
@@ -150,6 +152,36 @@ let
                 callPackage = prev.callPackage;
                 flask = python.pkgs.flask;
                 writeTextFile = prev.writeTextFile;
+                writeShellScript = prev.writeShellScript;
+                buildPythonApplication = pySelf.buildPythonApplication;
+                inherit python;
+            };
+            flask-url2mp4 = pySelf.callPackage ./python-packages/flasks/url2mp4 {
+                callPackage = prev.callPackage;
+                flask = python.pkgs.flask;
+                mp4 = final.mp4;
+                youtube-dl = final.youtube-dl;
+                inherit strings redirects python;
+                writeTextFile = prev.writeTextFile;
+                writeShellScript = prev.writeShellScript;
+                buildPythonApplication = pySelf.buildPythonApplication;
+            };
+            flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server {
+                callPackage = prev.callPackage;
+                flask = python.pkgs.flask;
+                mp4 = final.mp4;
+                inherit strings redirects python;
+                writeTextFile = prev.writeTextFile;
+                writeShellScript = prev.writeShellScript;
+                buildPythonApplication = pySelf.buildPythonApplication;
+            };
+            flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server {
+                callPackage = prev.callPackage;
+                flask = python.pkgs.flask;
+                mp3 = final.mp3;
+                inherit strings redirects python;
+                writeTextFile = prev.writeTextFile;
+                writeShellScript = prev.writeShellScript;
                 buildPythonApplication = pySelf.buildPythonApplication;
             };
         });
@@ -177,10 +209,11 @@ in {
 
     });
     mp3 = prev.callPackage ./bash-packages/converters/mp3.nix (baseConvArgs // {
-        
+        ffmpeg = final.ffmpeg;
+        rubberband = final.rubberband;
     });
     mp4 = prev.callPackage ./bash-packages/converters/mp4.nix (baseConvArgs // {
-
+        ffmpeg = final.ffmpeg;
     });
     pdf = prev.callPackage ./bash-packages/converters/pdf.nix (baseConvArgs // {
 
@@ -236,6 +269,10 @@ in {
     
     sunnyside = final.python38.pkgs.sunnyside;
     spleeter = final.python38.pkgs.spleeter;
+    flask-hello-world = final.python38.pkgs.flask-hello-world;
+    flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
+    flask-mp4server = final.python38.pkgs.flask-mp4server;
+    flask-mp3server = final.python38.pkgs.flask-mp3server;
 
     nixos-machines = rec {
         minimal = makeMachines "minimal";

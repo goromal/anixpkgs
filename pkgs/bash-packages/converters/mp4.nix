@@ -3,6 +3,7 @@
 , color-prints
 , strings
 , redirects
+, ffmpeg
 }:
 let
     name = "mp4";
@@ -26,9 +27,9 @@ let
     optsWithVarsAndDefaults = [
         
     ];
-    convOptCmds = [
+    convOptCmds = [ # TODO
         { extension = "*"; commands = ''
-        echo_yellow "NOT IMPLEMENTED YET"
+        ${ffmpeg}/bin/ffmpeg -i $infile -vcodec libx264 $outfile ${redirects.suppress_all}
         ''; }
     ];
 in callPackage ./mkConverter.nix {
