@@ -187,6 +187,11 @@ let
         });
     }));
 in {
+    strings = prev.callPackage ./bash-packages/bash-utils/strings.nix {
+        writeShellScript = prev.writeShellScript;
+    };
+    redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix {};
+
     abc = prev.callPackage ./bash-packages/converters/abc.nix (baseConvArgs // {
        abcmidi = prev.abcmidi;
     });
