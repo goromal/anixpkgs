@@ -66,7 +66,8 @@ let
         ''; }
         { extension = "abc|ABC"; commands = ''
         tmpdir=$(mktemp -d)
-        ${abcm2ps}/bin/abc2ps "$infile" -v -O $tmpdir/step1.svg ${redirects.suppress_all}
+        ${abcm2ps}/bin/abcm2ps "$infile" -v -O $tmpdir/step1.svg # ${redirects.suppress_all}
+        # TODO deal with multiple pages!
         if [[ "$scour" == "1" ]]; then
             ${scour}/bin/scour -i $tmpdir/step1.svg -o $tmpdir/step2.svg ${scour_args} ${redirects.suppress_all}
         else
