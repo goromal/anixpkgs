@@ -148,6 +148,8 @@ let
                 pystemd = python.pkgs.pystemd;
                 veryprettytable = python.pkgs.veryprettytable;
             };
+            imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
+            vidstab-cv4 = pySelf.callPackage ./python-packages/vidstab-cv4 { };
             flask-hello-world = pySelf.callPackage ./python-packages/flasks/hello-world {
                 callPackage = prev.callPackage;
                 flask = python.pkgs.flask;
