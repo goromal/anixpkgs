@@ -1,11 +1,11 @@
-{ stdenv
+{ clangStdenv
 , cmake
 , eigen
-, ceres
+, ceres-solver
 , manif-geom-cpp
 , boost
 }:
-stdenv.mkDerivation {
+clangStdenv.mkDerivation {
     name = "ceres-factors";
     version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);
@@ -14,7 +14,7 @@ stdenv.mkDerivation {
     ];
     buildInputs = [
         eigen
-        ceres
+        ceres-solver
         manif-geom-cpp
         boost
     ];

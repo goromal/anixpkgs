@@ -1,7 +1,7 @@
 { callPackage
-, stdenv
+, clangStdenv
 , cmake
-, ceres
+, ceres-solver
 , eigen
 , glog
 , gflags
@@ -16,13 +16,13 @@ callPackage ../pythonPkgFromPybind.nix {
     pname = "PyCeres";
     version = "2.0.0";
     description = "Python bindings for the Ceres Solver.";
-    inherit stdenv;
+    inherit clangStdenv;
     pkg-src = builtins.fetchGit (import ./src.nix);
     cppNativeBuildInputs = [
         cmake
     ];
     cppBuildInputs = [
-        ceres
+        ceres-solver
         eigen
         glog
         gflags

@@ -1,10 +1,10 @@
-{ stdenv
+{ clangStdenv
 , cmake
 , eigen
 , manif-geom-cpp
 , boost
 }:
-stdenv.mkDerivation {
+clangStdenv.mkDerivation {
     name = "signals-cpp";
     version = "1.0.0";
     src = builtins.fetchGit (import ./src.nix);

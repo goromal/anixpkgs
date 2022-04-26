@@ -1,7 +1,7 @@
 { callPackage
-, stdenv
+, clangStdenv
 , cmake
-, ceres
+, ceres-solver
 , ceres-factors
 , manif-geom-cpp 
 , eigen
@@ -18,13 +18,13 @@ callPackage ../pythonPkgFromPybind.nix {
     pname = "PyCeresFactors";
     version = "1.0.0";
     description = "Python bindings of ceres-factors.";
-    inherit stdenv;
+    inherit clangStdenv;
     pkg-src = builtins.fetchGit (import ./src.nix);
     cppNativeBuildInputs = [
         cmake
     ];
     cppBuildInputs = [
-        ceres
+        ceres-solver
         ceres-factors
         manif-geom-cpp
         eigen
