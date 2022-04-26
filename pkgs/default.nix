@@ -42,6 +42,8 @@ let
             norbert = pySelf.callPackage ./python-packages/norbert { };
             spleeter = pySelf.callPackage ./python-packages/spleeter { };
             ichabod = pySelf.callPackage ./python-packages/ichabod { };
+            imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
+            vidstab-cv4 = pySelf.callPackage ./python-packages/vidstab-cv4 { };
             flask-hello-world = pySelf.callPackage ./python-packages/flasks/hello-world { };
             flask-url2mp4 = pySelf.callPackage ./python-packages/flasks/url2mp4 { };
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
@@ -82,6 +84,7 @@ in {
     
     sunnyside = final.python38.pkgs.sunnyside;
     spleeter = final.python38.pkgs.spleeter;
+    vidstab = final.python38.pkgs.vidstab;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
     flask-mp4server = final.python38.pkgs.flask-mp4server;
