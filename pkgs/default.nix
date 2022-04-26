@@ -45,11 +45,7 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
-            sunnyside = pySelf.callPackage ./python-packages/sunnyside {
-                callPackage = prev.callPackage;
-                pytestCheckHook = pySelf.pytestCheckHook;
-                buildPythonPackage = pySelf.buildPythonPackage;
-            };
+            sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             geometry = pySelf.callPackage ./python-packages/geometry {
                 callPackage = prev.callPackage;
                 stdenv = prev.clangStdenv;
