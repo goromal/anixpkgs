@@ -1,7 +1,7 @@
 { pname
 , version
 , description
-, stdenv
+, clangStdenv
 , pkg-src
 , cppNativeBuildInputs
 , cppBuildInputs
@@ -18,7 +18,7 @@
 }:
 let
     copyTarget = if cppTarget != null then cppTarget else "${pname}.cpython*";
-    pyboundPkg = stdenv.mkDerivation {
+    pyboundPkg = clangStdenv.mkDerivation {
         name = "${pname}-pybind-build";
         inherit version;
         src = pkg-src;
