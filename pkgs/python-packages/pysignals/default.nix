@@ -1,5 +1,5 @@
 { callPackage
-, stdenv
+, clangStdenv
 , cmake
 , signals-cpp
 , manif-geom-cpp
@@ -16,7 +16,7 @@ callPackage ../pythonPkgFromPybind.nix {
     pname = "pysignals";
     version = "1.0.0";
     description = "Python bindings of signals-cpp.";
-    inherit stdenv;
+    inherit clangStdenv;
     pkg-src = builtins.fetchGit (import ./src.nix);
     cppNativeBuildInputs = [
         cmake
