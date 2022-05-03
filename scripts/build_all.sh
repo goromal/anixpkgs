@@ -12,7 +12,6 @@ nb epub
 nb gif
 nb html
 nb md
-nb midi
 nb mp3
 nb mp4
 nb pdf

@@ -60,7 +60,6 @@ in {
     gif = prev.callPackage ./bash-packages/converters/gif.nix { };
     html = prev.callPackage ./bash-packages/converters/html.nix { };
     md = prev.callPackage ./bash-packages/converters/md.nix { };
-    midi = prev.callPackage ./bash-packages/converters/midi.nix { };
     mp3 = prev.callPackage ./bash-packages/converters/mp3.nix { };
     mp4 = prev.callPackage ./bash-packages/converters/mp4.nix { };
     pdf = prev.callPackage ./bash-packages/converters/pdf.nix { };
