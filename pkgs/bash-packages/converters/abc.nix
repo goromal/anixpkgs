@@ -3,6 +3,7 @@
 , color-prints
 , strings
 , redirects
+, python3
 , abcmidi
 }:
 let
@@ -18,12 +19,14 @@ let
         .midi
     '';
     optsWithVarsAndDefaults = [ ];
+    smf2abc_py = ./res/smf2abc.py;
     convOptCmds = [
         { extension = "midi|MIDI"; commands = ''
             ${abcmidi}/bin/midi2abc "$infile" -o "$outfile" ${redirects.suppress_stdout}
         ''; }
         { extension = "smf|SMF"; commands = ''
-            ${color-prints}/bin/echo_yellow "NOT YET IMPLEMENTED"
+            convres=$(${python3}/bin/python3 ${smf2abc_py} "$infile" "$outfile")
+            [[ -z "$convres" ]] || ${color-prints}/bin/echo_red "$convres"
         ''; }
     ];
 in callPackage ./mkConverter.nix {
