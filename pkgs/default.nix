@@ -84,7 +84,6 @@ in {
     
     sunnyside = final.python38.pkgs.sunnyside;
     spleeter = final.python38.pkgs.spleeter;
-    vidstab = final.python38.pkgs.vidstab;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
     flask-mp4server = final.python38.pkgs.flask-mp4server;
