@@ -5,6 +5,8 @@
 , redirects
 , ffmpeg
 , rubberband
+, abcmidi
+, timidity
 }:
 let
     name = "mp3";
@@ -18,7 +20,7 @@ let
         .mp3
         .mp4
         .wav
-        .midi
+        .abc
 
     Options:
         --transpose [+- # HALF STEPS]
@@ -65,6 +67,23 @@ let
             _stp2="$_stp1"
         fi
         mv "$_stp2" "$outfile"
+        rm -rf $tmpdir
+        ''; }
+        { extension = "wav|WAV"; commands = ''
+        ${color-prints}/bin/echo_yellow "NOT IMPLEMENTED YET"
+        ''; }
+        { extension = "abc|ABC"; commands = ''
+        tmpdir=$(mktemp -d)
+        _stp1="$tmpdir/_abc2midi.midi"
+        ${abcmidi}/bin/abc2midi "$infile" -o "$_stp1" ${redirects.suppress_all}
+        _stp2="$tmpdir/_midi2mp3.mp3"
+        ${timidity}/bin/timidity "$_stp1" -Ow -o - | ${ffmpeg}/bin/ffmpeg -i - -acodec libmp3lame -ab 64k "$_stp2" ${redirects.suppress_all}
+        if [[ "$transpose" != "NULL" ]]; then
+            ${apply_transpose "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
+        mv "$_stp3" "$outfile"
         rm -rf $tmpdir
         ''; }
     ];
