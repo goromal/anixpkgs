@@ -48,6 +48,7 @@ let
             flask-url2mp4 = pySelf.callPackage ./python-packages/flasks/url2mp4 { };
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
             flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server { };
+            flask-smfserver = pySelf.callPackage ./python-packages/flasks/smfserver { };
         });
     }));
 in {
@@ -87,6 +88,7 @@ in {
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
     flask-mp4server = final.python38.pkgs.flask-mp4server;
     flask-mp3server = final.python38.pkgs.flask-mp3server;
+    flask-smfserver = final.python38.pkgs.flask-smfserver;
 
     nixos-machines = rec {
         minimal = makeMachines "minimal";
