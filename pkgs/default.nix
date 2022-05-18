@@ -10,11 +10,8 @@ let
         ];
     };
     baseJavaArgs = {
-        stdenv = prev.stdenv;
         jdk = minJDK;
         jre = minJRE;
-        ant = prev.ant;
-        makeWrapper = prev.makeWrapper;
     };
 
     baseModuleArgs = {
@@ -81,7 +78,7 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
-    
+ 
     sunnyside = final.python38.pkgs.sunnyside;
     spleeter = final.python38.pkgs.spleeter;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
