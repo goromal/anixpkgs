@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/signals-cpp.git";
-    rev = "24198c72f152fcfce93f777b72ae7e372e3dfd9b";
-    ref = "dev/dynamics_tests";
+    rev = "e6e4d948a478a26100686c76455ba4577860f3d2";
+    ref = "master";
 }
