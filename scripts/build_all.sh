@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e pipefail
+
 nb() {
 nix-build . -A $1
 }
