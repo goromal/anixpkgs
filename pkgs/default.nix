@@ -30,6 +30,7 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             geometry = pySelf.callPackage ./python-packages/geometry { };
             pyceres = pySelf.callPackage ./python-packages/pyceres { };
