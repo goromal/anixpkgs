@@ -30,6 +30,7 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             geometry = pySelf.callPackage ./python-packages/geometry { };
             pyceres = pySelf.callPackage ./python-packages/pyceres { };
@@ -86,6 +87,8 @@ in {
     flask-mp4server = final.python38.pkgs.flask-mp4server;
     flask-mp3server = final.python38.pkgs.flask-mp3server;
     flask-smfserver = final.python38.pkgs.flask-smfserver;
+
+    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
     nixos-machines = rec {
         minimal = makeMachines "minimal";

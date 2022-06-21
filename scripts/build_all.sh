@@ -20,7 +20,8 @@ nb pdf
 nb png
 nb svg
 nb zipper
-nb color-prints 
+nb color-prints
+nb manage-gmail
 
 echo "Building C++ packages..."
 
@@ -45,6 +46,7 @@ nb python38.pkgs.norbert
 nb python38.pkgs.ichabod
 nb python38.pkgs.pysignals
 nb python38.pkgs.mesh-plotter
+nb python38.pkgs.gmail-parser
 nb python38.pkgs.imutils-cv4
 nb python38.pkgs.vidstab-cv4
 nb python38.pkgs.flask-hello-world
