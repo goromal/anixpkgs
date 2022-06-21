@@ -88,6 +88,8 @@ in {
     flask-mp3server = final.python38.pkgs.flask-mp3server;
     flask-smfserver = final.python38.pkgs.flask-smfserver;
 
+    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
+
     nixos-machines = rec {
         minimal = makeMachines "minimal";
         base = makeMachines "base";

@@ -3,7 +3,10 @@
 , google-api-python-client
 , pydrive
 , google-auth
+, google-auth-oauthlib
 , oauth2client
+, html2text
+, progressbar2
 }:
 buildPythonPackage rec {
     pname = "gmail_parser";
@@ -13,7 +16,10 @@ buildPythonPackage rec {
         google-api-python-client
         pydrive
         google-auth
+        google-auth-oauthlib
         oauth2client
+        html2text
+        progressbar2
     ];
-    src = ../../../../gmail-parser/.;
+    src = builtins.fetchGit (import ./src.nix);
 }
