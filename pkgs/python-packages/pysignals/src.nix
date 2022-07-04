@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/pysignals.git";
-    rev = "4937d294537b70122ab64d81749a85c10a3636d9";
+    rev = "c5bb4fcbc40ef9722bb3d1bd7f4118e7ecaf8012";
     ref = "dev/so2";
 }
