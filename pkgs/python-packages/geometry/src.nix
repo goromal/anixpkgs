@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/geometry.git";
-    rev = "0e4bde49a24b3dd415637d559fbdb9380b648db3";
+    rev = "e7d7c5bec927295df9109977a9b4757c27332cc4";
     ref = "dev/se2";
 }
