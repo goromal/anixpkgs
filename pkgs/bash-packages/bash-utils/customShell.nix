@@ -10,4 +10,3 @@ pkgs.mkShell {
         ${hookCmd}
     '';
 }
-    
