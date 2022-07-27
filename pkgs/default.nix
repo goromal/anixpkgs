@@ -69,6 +69,7 @@ in {
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { };
+    secure-delete = prev.callPackage ./cxx-packages/secure-delete { };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;

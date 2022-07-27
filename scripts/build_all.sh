@@ -28,6 +28,7 @@ echo "Building C++ packages..."
 nb manif-geom-cpp
 nb ceres-factors
 nb signals-cpp
+nb secure-delete
 
 echo "Building Java packages..."
 
