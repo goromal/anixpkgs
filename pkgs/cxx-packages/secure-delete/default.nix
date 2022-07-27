@@ -7,8 +7,8 @@ let
     progName = "secure-delete";
     builderScript = writeShellScript "builder.sh" ''
         export PATH="$coreutils/bin:$gcc/bin"
-        mkdir $out
-        gcc -o $out/${progName} $src/src.c
+        mkdir -p $out/bin
+        gcc -o $out/bin/${progName} $src/src.c
     '';
 in derivation {
     name = progName;
