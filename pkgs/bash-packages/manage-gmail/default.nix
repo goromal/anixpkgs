@@ -50,7 +50,8 @@ let
     custom-shell-cmd = callPackage ../bash-utils/mkCustomShellCmd.nix {
         pkgList = [ pythonEnv ];
         shellName = pkgname;
-        hookCmd = "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus' && ipython";
+        hookCmd = "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus'";
+        runCmd = "ipython";
     };
 in writeShellScriptBin pkgname ''
     ${argparse}
