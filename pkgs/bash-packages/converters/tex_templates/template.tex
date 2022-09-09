@@ -1,0 +1,115 @@
+\documentclass[10pt]{article}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage[svgnames]{xcolor}  % https://www.latextemplates.com/svgnames-colors
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage[font={small,it}]{caption}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+
+% \newcommand{\notesColor}{Red}
+\newcommand{\notesColor}{SteelBlue}
+% \newcommand{\notesColor}{Maroon}
+% \newcommand{\notesColor}{RoyalBlue}
+% \newcommand{\notesColor}{NavyBlue}
+
+\titleformat{\section}
+{\color{\notesColor}\normalfont\Large\bfseries}
+{\thesection}{0.5em}{\color{black}}[{\titlerule[0.5pt]}]
+
+\titleformat{\subsection}
+{\color{\notesColor}\normalfont\large\bfseries}
+{\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}
+{\color{\notesColor}\normalfont\bfseries}
+{\thesubsubsection}{0.5em}{}
+
+\renewcommand{\labelitemi}{\textcolor{\notesColor}{$$\bullet$$}}
+\renewcommand{\labelitemii}{\textcolor{\notesColor}{$$\circ$$}}
+\renewcommand{\labelitemiii}{\textcolor{\notesColor}{$$\ast$$}}
+\renewcommand{\labelitemiv}{\textcolor{\notesColor}{$$\bullet$$}}
+
+\newcommand{\ts}[1]{\textsuperscript{#1}}
+
+\makeatletter
+\fancypagestyle{andrewspagestyle}{%
+  \fancyhf{}
+  \fancyfoot[C]{\textcolor{\notesColor}{\textbf{\thepage}}}% Page # in middle/centre of footer
+  \renewcommand{\headrulewidth}{0pt} % no header rule
+}
+\makeatother
+\pagestyle{andrewspagestyle}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% PANDOC REQUIREMENTS %%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={$author-meta$},
+            pdftitle={$title-meta$},
+            colorlinks=true,
+            citecolor=$if(citecolor)$$citecolor$$else$blue$endif$,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$blue$endif$,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$magenta$endif$,
+            pdfborder={0 0 0}}
+
+$if(graphics)$
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+$endif$
+
+$if(listings)$
+\usepackage{listings}
+$endif$
+$if(lhs)$
+\lstnewenvironment{code}{
+\lstset{language=Haskell,basicstyle=\small\ttfamily}
+}{}
+$endif$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+$if(verbatim-in-note)$
+\usepackage{fancyvrb}
+\VerbatimFootnotes
+$endif$
+$if(tables)$
+\usepackage{longtable,booktabs}
+$endif$
+
+\setcounter{secnumdepth}{0}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% END PANDOC REQUIREMENTS %%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+$body$
+
+\end{document}

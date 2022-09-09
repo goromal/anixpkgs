@@ -22,6 +22,7 @@ nb svg
 nb zipper
 nb color-prints
 nb manage-gmail
+nb md2pdf
 
 echo "Building C++ packages..."
 
