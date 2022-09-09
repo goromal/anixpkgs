@@ -53,6 +53,7 @@ in {
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
+    md2pdf = prev.callPackage ./bash-packages/converters/md2pdf.nix { };
     abc = prev.callPackage ./bash-packages/converters/abc.nix { };
     doku = prev.callPackage ./bash-packages/converters/doku.nix { };
     epub = prev.callPackage ./bash-packages/converters/epub.nix { };
