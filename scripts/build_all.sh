@@ -24,6 +24,7 @@ nb color-prints
 nb manage-gmail
 nb md2pdf
 nb notabilify
+nb fix-perms
 
 echo "Building C++ packages..."
 

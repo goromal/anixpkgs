@@ -68,6 +68,7 @@ in {
     png = prev.callPackage ./bash-packages/converters/png.nix { };
     svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = prev.python38.pkgs.scour; };
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
+    fix-perms = prev.callPackage ./bash-packages/fix-perms { };
 
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { };
