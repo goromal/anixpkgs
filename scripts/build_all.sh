@@ -23,6 +23,7 @@ nb zipper
 nb color-prints
 nb manage-gmail
 nb md2pdf
+nb notabilify
 
 echo "Building C++ packages..."
 
