@@ -56,6 +56,9 @@ in {
     color-prints = prev.callPackage ./bash-packages/color-prints { };
     md2pdf = prev.callPackage ./bash-packages/converters/md2pdf.nix { };
     notabilify = prev.callPackage ./bash-packages/converters/notabilify.nix { };
+    make-title = prev.callPackage ./bash-packages/make-title { };
+    pb = prev.callPackage ./bash-packages/pb { };
+    code2pdf = prev.callPackage ./bash-packages/converters/code2pdf.nix { };
     abc = prev.callPackage ./bash-packages/converters/abc.nix { };
     doku = prev.callPackage ./bash-packages/converters/doku.nix { };
     epub = prev.callPackage ./bash-packages/converters/epub.nix { };
