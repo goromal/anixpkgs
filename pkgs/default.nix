@@ -54,6 +54,7 @@ in {
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
+    git-cc = prev.callPackage ./bash-packages/git-cc { };
     md2pdf = prev.callPackage ./bash-packages/converters/md2pdf.nix { };
     notabilify = prev.callPackage ./bash-packages/converters/notabilify.nix { };
     make-title = prev.callPackage ./bash-packages/make-title { };

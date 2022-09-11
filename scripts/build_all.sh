@@ -28,6 +28,7 @@ nb fix-perms
 nb make-title
 nb pb
 nb code2pdf
+nb git-cc
 
 echo "Building C++ packages..."
 
