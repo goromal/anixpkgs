@@ -18,8 +18,8 @@ let
     convOptCmds = [
         { extension = "pdf|PDF"; commands = ''
         tmpdir=$(mktemp -d)
-        ${cpdf}/bin/cpdf -scale-to-fit a4landscape "infile" -o "$tmpdir/_intermediate.pdf" ${redirects.suppress_all}
-        ${cpdf}/bin/cpdf -shift "-190 0" "$tmpdir/_intermediate.pdf" -o "$outfile" ${redirects.suppress_all}
+        ${cpdf} -scale-to-fit a4landscape "$infile" -o "$tmpdir/_intermediate.pdf" # ${redirects.suppress_all}
+        ${cpdf} -shift "-190 0" "$tmpdir/_intermediate.pdf" -o "$outfile" # ${redirects.suppress_all}
         rm -rf "$tmpdir"
         ''; }
     ];
