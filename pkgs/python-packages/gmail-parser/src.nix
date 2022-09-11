@@ -1,5 +1,5 @@
 {
     url = "git@github.com:goromal/gmail_parser.git";
-    rev = "4aa6f662b5af38c3246c2be77de1b7fab363f8bb";
+    rev = "9302a5ebb6b5dc6e49c8119906c0a29216dbe301";
     ref = "master";
 }

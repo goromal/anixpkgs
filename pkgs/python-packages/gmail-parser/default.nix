@@ -1,7 +1,7 @@
 { buildPythonPackage
 , pythonOlder
 , google-api-python-client
-, pydrive
+, pydrive2
 , google-auth
 , google-auth-oauthlib
 , oauth2client
@@ -14,7 +14,7 @@ buildPythonPackage rec {
     disabled = pythonOlder "3.8";
     propagatedBuildInputs = [
         google-api-python-client
-        pydrive
+        pydrive2
         google-auth
         google-auth-oauthlib
         oauth2client
