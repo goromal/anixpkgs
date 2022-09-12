@@ -54,8 +54,7 @@ in writeShellScriptBin pkgname ''
     SPACELESS=(''${STR// /-})
     STRLIST=`echo $SPACELESS | fold -w1`
     for i in $STRLIST; do
-        ESTR="$ECHOCOM -en '$PC'"
-        eval "$ESTR"
+        $ECHOCOM -en "$PC"
     done
     }
 

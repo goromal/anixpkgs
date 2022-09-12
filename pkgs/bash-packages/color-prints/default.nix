@@ -30,9 +30,7 @@ let
             esac
             done
             set -- "''${POSITIONAL[@]}" # restore positional parameters
-            COFF="\033[0m"
-            ECHOSTR="echo ''${FLAGS} \"\033[1;${builtins.toString colorcode}m$@''${COFF}\";"
-            eval "''${ECHOSTR}"
+            echo $FLAGS "\033[1;${builtins.toString colorcode}m$@\033[0m"
         '';
     echo-black = echo-color "black" 30;
     echo-red = echo-color "red" 31;

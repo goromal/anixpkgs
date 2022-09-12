@@ -77,8 +77,7 @@ in writeShellScriptBin pkgname ''
         LENGTH=$2
         N=0
         while [ $N -lt $LENGTH ]; do
-            ESTR="$ECHOCOM -en '$CHAR'"
-            eval "$ESTR"
+            $ECHOCOM -en "$CHAR"
             N=$[$N+1]
         done
     }
@@ -87,12 +86,10 @@ in writeShellScriptBin pkgname ''
     BARNUM=$(($BARSIZE * $ITERNUM / $ITERTOT))
     SPCNUM=$(($BARSIZE - $BARNUM))
 
-    ESTR="$ECHOCOM -n '['"
-    eval "$ESTR"
+    $ECHOCOM -n "["
     echoCharWithLength $PADCHAR $BARNUM
     echoCharWithLength ' ' $SPCNUM
     ENDSTR1="] "
-    ESTR="$ECHOCOM -n '$ENDSTR1'"
-    eval "$ESTR"
+    $ECHOCOM -n "$ENDSTR1"
     echo -ne "(''${PERCENTAGE}%)\r"
 ''
