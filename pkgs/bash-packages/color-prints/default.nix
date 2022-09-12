@@ -5,7 +5,32 @@ let
     # https://en.wikipedia.org/wiki/ANSI_escape_code
     echo-color = colorname: colorcode:
         writeShellScriptBin "echo_${colorname}" ''
-            echo -e "\033[1;${builtins.toString colorcode}m$@\033[0m"
+            FLAGS='-e'
+            POSITIONAL=()
+            while [[ $# -gt 0 ]]
+            do
+            key="$1"
+            case $key in
+                -n)
+                FLAGS="''${FLAGS} -n"
+                shift
+                ;;
+                -e)
+                FLAGS="''${FLAGS}"
+                shift
+                ;;
+                -en|-ne)
+                FLAGS="''${FLAGS} -n"
+                shift
+                ;;
+                *)    # unknown option
+                POSITIONAL+=("$1") # save it in an array for later
+                shift # past argument
+                ;;
+            esac
+            done
+            set -- "''${POSITIONAL[@]}" # restore positional parameters
+            echo $FLAGS "\033[1;${builtins.toString colorcode}m$@\033[0m"
         '';
     echo-black = echo-color "black" 30;
     echo-red = echo-color "red" 31;

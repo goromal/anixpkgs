@@ -5,7 +5,7 @@
 , pandoc
 }:
 let
-    template_file = ./tex_templates/template.tex;
+    template_file = ./res/tex_templates/template.tex;
     name = "md2pdf";
     extension = "pdf";
     usage_str = ''

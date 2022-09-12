@@ -38,6 +38,7 @@ let
             pysignals = pySelf.callPackage ./python-packages/pysignals { };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { };
             norbert = pySelf.callPackage ./python-packages/norbert { };
+            scrape = pySelf.callPackage ./python-packages/scrape { };
             spleeter = pySelf.callPackage ./python-packages/spleeter { };
             ichabod = pySelf.callPackage ./python-packages/ichabod { };
             imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
@@ -53,7 +54,12 @@ in {
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
+    git-cc = prev.callPackage ./bash-packages/git-cc { };
     md2pdf = prev.callPackage ./bash-packages/converters/md2pdf.nix { };
+    notabilify = prev.callPackage ./bash-packages/converters/notabilify.nix { };
+    make-title = prev.callPackage ./bash-packages/make-title { };
+    pb = prev.callPackage ./bash-packages/pb { };
+    code2pdf = prev.callPackage ./bash-packages/converters/code2pdf.nix { };
     abc = prev.callPackage ./bash-packages/converters/abc.nix { };
     doku = prev.callPackage ./bash-packages/converters/doku.nix { };
     epub = prev.callPackage ./bash-packages/converters/epub.nix { };
@@ -66,6 +72,7 @@ in {
     png = prev.callPackage ./bash-packages/converters/png.nix { };
     svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = prev.python38.pkgs.scour; };
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
+    fix-perms = prev.callPackage ./bash-packages/fix-perms { };
 
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { };
@@ -83,6 +90,7 @@ in {
     python310 = pythonOverridesFor prev.python310;
  
     sunnyside = final.python38.pkgs.sunnyside;
+    scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
