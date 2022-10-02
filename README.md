@@ -100,12 +100,8 @@ nixos-generate-config --root /mnt/nixos
 with pkgs;
 with lib;
 let
-  anixpkgs_src = builtins.fetchGit {
-    url = "git@github.com:goromal/anixpkgs.git";
-    ref = "[DESIRED_REF]";
-    rev = "[OPTIONAL_DESIRED_REV]";
-  };
-in
+  anixpkgs_src = builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/ajt/machine-refactor.tar.gz";
+in {
   imports = [
     ./hardware-configuration.nix
     "${anixpkgs_src}/pkgs/nixos/base.nix"
