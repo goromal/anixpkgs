@@ -88,43 +88,32 @@ mount /dev/disk/by-label/NixOS /mnt/nixos
 mkdir /mnt/nixos/boot
 mount /dev/disk/by-label/EFI /mnt/nixos/boot
 ```
-9. Generate an initial configuration:
+9. Generate an initial configuration (you'll want it to enable WiFi connectivity and a web browser at least):
 ```bash
 nixos-generate-config --root /mnt/nixos
 # /etc/nixos/configuration.nix
 # /etc/nixos/hardware-configuration.nix
 ```
-10. Edit `/etc/nixos/configuration.nix` to the following, which will set up the basic boilerplate for all machines:
-```nix
-{ config, pkgs, lib, ... }:
-with pkgs;
-with lib;
-let
-  anixpkgs_src = builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/ajt/machine-refactor.tar.gz";
-in {
-  imports = [
-    ./hardware-configuration.nix
-    "${anixpkgs_src}/pkgs/nixos/base.nix"
-  ];
-  networking.hostName = "atorgesen-laptop";
-  system.stateVersion = whatever-it-was-before;
-}
-```
-11. Do the installation:
+10. Do the installation:
 ```bash
 nixos-install --root /mnt/nixos
 ```
-12. If everything went well:
+11. If everything went well:
 ```bash
 reboot
 ```
-13. Log into your user, then clone and link an editable version of the configuration:
+12. Log into Github and generate an SSH key for authentication.
+13. Clone and link an editable version of the configuration:
 ```bash
-mkdir -p /data/andrew/sources
+mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
 cat /etc/nixos/hardware-configuration.nix > /data/andrew/sources/anixpkgs/pkgs/nixos/personal/[hardware-configuration.nix] # update link/headings in configuration.nix
 sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
-sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old/hardware-configuration.nix
+sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
 sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/personal/configuration.nix /etc/nixos/configuration.nix
-nrs
+```
+14. Make other needed updates to the configuration, then apply:
+```bash
+sudo nixos-rebuild boot
+sudo reboot
 ```
