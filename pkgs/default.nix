@@ -101,8 +101,6 @@ in {
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
     nixos-machines = rec {
-        minimal = makeMachines "minimal";
-        base = makeMachines "base";
         personal = makeMachines "personal";
     };
     run-sitl-machine = prev.callPackage ./bash-packages/run-sitl {
@@ -110,8 +108,6 @@ in {
         callPackage = prev.callPackage;
         color-prints = prev.callPackage ./bash-packages/color-prints {};
         machines = [
-            { name = "minimal"; description = "Just the latest Linux kernel, and nothing else."; }
-            { name = "base"; description = "Machine wrapper around all common processes and programs."; }
             { name = "personal"; description = "Personal Linux machine for the day-to-day."; }
         ];
     };
