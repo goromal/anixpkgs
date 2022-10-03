@@ -115,7 +115,7 @@ with lib;
 
     environment.shellAliases = {
         jfu = "journalctl -fu";
-        nrs = "sudo nixos-rebuild switch";
+        nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
         code = "codium";
     };
     environment.noXlibs = false;

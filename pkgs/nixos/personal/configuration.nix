@@ -7,10 +7,15 @@ let
                                   # of original config
     nixos-version = "22.05"; # Should match the channel in <nixpkgs>
     anix-version  = "0.0.0"; # Whatever you want
-    hardware-config = null; # e.g., ./hardware-configuration.nix
+    hardware-config = ./hardware-configuration-inspiron.nix;
     ##################################################################
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
-    anixpkgs     = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {};
+    anixpkgs     = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {
+        config.allowUnfree = true;
+    };
+    play-zelda = writeShellScriptBin "playzelda" ''
+        ${dolphinEmu}/bin/dolphin-emu -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
+    '';
 in
 {
     imports = [
@@ -26,6 +31,8 @@ in
     ];
 
     networking.hostName = "atorgesen-laptop";
+    boot.loader.efi.efiSysMountPoint = "/boot/efi";
+    networking.networkmanager.enable = true;
 
     # Enable the X11 windowing system.
     services.xserver.enable = true;
@@ -44,6 +51,8 @@ in
     sound.enable = true;
     hardware.pulseaudio.enable = true;
 
+    services.udev.packages = [ pkgs.dolphinEmu ];
+
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
 
@@ -60,6 +69,31 @@ in
                 package = pkgs.nordic;
             };
         };
+        dconf.settings = {
+            "org/gnome/desktop/background" = {
+                "picture-uri" = "/data/andrew/.background-image";
+            };
+            "org/gnome/desktop/screensaver" = {
+                "picture-uri" = "/data/andrew/.background-image";
+            };
+            "org/gnome/desktop/wm/preferences" = {
+                "button-layout" = ":minimize,maximize,close";
+            };
+            "org/gnome/desktop/interface" = {
+                "clock-format" = "12h";
+            };
+            "org/gnome/shell" = {
+                "favorite-apps" = [
+                    "org.gnome.Nautilus.desktop"
+                    "google-chrome.desktop"
+                    "terminator.desktop"
+                    "codium.desktop"
+                    "pinta.desktop"
+                    "gimp.desktop"
+                    "org.inkscape.Inkscape.desktop"
+                ];
+            };
+        };
 
         home.packages = [
             ## upstream
@@ -67,9 +101,8 @@ in
             vlc
             evince
             inkscape
-            # dropbox # TODO configure
-            vscodium
             chromium
+            maestral
             google-chrome
             direnv
             gnumake
@@ -81,7 +114,7 @@ in
             simplescreenrecorder
             pinta
             pandoc
-            # texlive.combined.scheme-full TODO enable, add vscodium plugin
+            texlive.combined.scheme-full
             docker
             ## my packages
             anixpkgs.color-prints
@@ -90,7 +123,7 @@ in
             anixpkgs.notabilify
             anixpkgs.make-title
             anixpkgs.pb
-            anixpkgs.cod2pdf
+            anixpkgs.code2pdf
             anixpkgs.abc
             anixpkgs.doku
             anixpkgs.epub
@@ -107,16 +140,24 @@ in
             anixpkgs.secure-delete
             anixpkgs.sunnyside
             anixpkgs.scrape
-            anixpkgs.flask-url2mp4
-            anixpkgs.flask-mp4server
-            anixpkgs.flask-mp3server
-            anixpkgs.flask-smfserver
             anixpkgs.manage-gmail
+            play-zelda
         ];
 
-        # TODO vscodium default settings
-
-        # TODO add text file creation to context menu
+        # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
+        programs.vscode = {
+            enable = true;
+            package = vscodium;
+            extensions = with vscode-extensions; [
+                jnoortheen.nix-ide
+                yzhang.markdown-all-in-one
+                xaver.clang-format
+                ms-python.python
+                valentjn.vscode-ltex
+                llvm-vs-code-extensions.vscode-clangd
+                b4dm4n.vscode-nixpkgs-fmt
+            ];
+        };
 
         programs.git = {
             package = gitAndTools.gitFull;
@@ -167,23 +208,6 @@ in
             ];
         };
 
-        systemd.user.services.dropbox = {
-            Unit = {
-                Description = "Dropbox";
-                After = [ "graphical-session-pre.target" ];
-                PartOf = [ "graphical-session.target" ];
-            };
-            Service = {
-                Restart = "on-failure";
-                RestartSec = 1;
-                ExecStart = "${dropbox}/bin/dropbox";
-                Environment = "QT_PLUGIN_PATH=/run/current-system/sw/${qt5.qtbase.qtPluginPrefix}";
-            };
-            Install = {
-                WantedBy = [ "graphical-session.target" ];
-            };
-        };
-
         home.file = {
             ".tmux.conf" = {
                 text = ''
@@ -195,6 +219,21 @@ in
             };
             ".background-image" = {
                 source = ../res/wallpaper.jpg;
+            };
+            "Templates/EmptyDocument" = {
+                text = "";
+            };
+            ".config/VSCodium/User/settings.json" = {
+                text = ''
+                {
+                    "editor.formatOnSave": true,
+                    "editor.minimap.enabled": false,
+                    "clang-format.language.cpp.enable": true,
+                    "clang-format.executable": "/run/current-system/sw/bin/clang-format",
+                    "clang-format.language.cpp.style": "",
+                    "window.zoomLevel": -1
+                }
+                '';
             };
         };
     };
