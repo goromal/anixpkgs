@@ -9,7 +9,7 @@ rec {
         echo "''${filename##*.}"
     '';
     getWithoutExtension = writeShellScript "getWithoutExtension" ''
-        filename=`${getBasename} "$1"`
+        filename="$1"
         echo "''${filename%.*}"
     '';
     replaceExtension = writeShellScript "replaceExtension" ''
@@ -17,5 +17,9 @@ rec {
         newExtension="$2"
         woExt=`${getWithoutExtension} "$fnamefull"`
         echo "$woExt.$newExtension"
+    '';
+    escapeSpaces = writeShellScript "escapeSpaces" ''
+        line="$1"
+        echo "$line" | sed 's/ /\\ /g'
     '';
 }
