@@ -28,6 +28,8 @@ nb fix-perms
 nb make-title
 nb pb
 nb code2pdf
+nb cpp-helper
+nb mp4unite
 nb git-cc
 
 echo "Building C++ packages..."

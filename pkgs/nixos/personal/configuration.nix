@@ -14,7 +14,7 @@ let
         config.allowUnfree = true;
     };
     play-zelda = writeShellScriptBin "playzelda" ''
-        ${dolphinEmu}/bin/dolphin-emu -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
+        ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
     '';
 in
 {
@@ -33,6 +33,7 @@ in
     networking.hostName = "atorgesen-laptop";
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
     networking.networkmanager.enable = true;
+    boot.supportedFilesystems = [ "ntfs" ];
 
     # Enable the X11 windowing system.
     services.xserver.enable = true;
@@ -50,6 +51,7 @@ in
 
     sound.enable = true;
     hardware.pulseaudio.enable = true;
+    nixpkgs.config.pulseaudio = true;
 
     services.udev.packages = [ pkgs.dolphinEmu ];
 
@@ -81,6 +83,9 @@ in
             };
             "org/gnome/desktop/interface" = {
                 "clock-format" = "12h";
+            };
+            "org/gnome/desktop/privacy" = {
+                "remember-recent-files" = false;
             };
             "org/gnome/shell" = {
                 "favorite-apps" = [
@@ -115,6 +120,7 @@ in
             pinta
             pandoc
             texlive.combined.scheme-full
+            poppler_utils
             docker
             ## my packages
             anixpkgs.color-prints
@@ -156,6 +162,13 @@ in
                 valentjn.vscode-ltex
                 llvm-vs-code-extensions.vscode-clangd
                 b4dm4n.vscode-nixpkgs-fmt
+            ] ++ vscode-utils.extensionsFromVscodeMarketplace [
+                {
+                    name = "cmake";
+                    publisher = "twxs";
+                    version = "0.0.17";
+                    sha256 = "11hzjd0gxkq37689rrr2aszxng5l9fwpgs9nnglq3zhfa1msyn08";
+                }
             ];
         };
 
