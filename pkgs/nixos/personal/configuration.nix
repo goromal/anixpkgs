@@ -162,6 +162,13 @@ in
                 valentjn.vscode-ltex
                 llvm-vs-code-extensions.vscode-clangd
                 b4dm4n.vscode-nixpkgs-fmt
+            ] ++ vscode-utils.extensionsFromVscodeMarketplace [
+                {
+                    name = "cmake";
+                    publisher = "twxs";
+                    version = "0.0.17";
+                    sha256 = "11hzjd0gxkq37689rrr2aszxng5l9fwpgs9nnglq3zhfa1msyn08";
+                }
             ];
         };
 
