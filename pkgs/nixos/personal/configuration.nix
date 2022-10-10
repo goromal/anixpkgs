@@ -6,7 +6,7 @@ let
     orig-nixos-version = "22.05"; # Should match system.stateVersion 
                                   # of original config
     nixos-version = "22.05"; # Should match the channel in <nixpkgs>
-    anix-version  = "0.0.0"; # Whatever you want
+    anix-version  = "0.1.0"; # Whatever you want
     hardware-config = ./hardware-configuration-inspiron.nix;
     ##################################################################
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
@@ -125,6 +125,7 @@ in
             ## my packages
             anixpkgs.color-prints
             anixpkgs.git-cc
+            anixpkgs.cpp-helper
             anixpkgs.md2pdf
             anixpkgs.notabilify
             anixpkgs.make-title
@@ -138,6 +139,7 @@ in
             anixpkgs.md
             anixpkgs.mp3
             anixpkgs.mp4
+            anixpkgs.mp4unite
             anixpkgs.pdf
             anixpkgs.png
             anixpkgs.svg
