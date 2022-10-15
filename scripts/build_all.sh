@@ -68,3 +68,24 @@ nb python38.pkgs.flask-url2mp4
 nb python38.pkgs.flask-mp4server
 nb python38.pkgs.flask-mp3server
 nb python38.pkgs.flask-smfserver
+
+echo "Building ROS packages..."
+
+nb rosPackages.noetic.std-msgs
+nb rosPackages.noetic.geometry-msgs
+nb rosPackages.noetic.message-generation
+nb rosPackages.noetic.roscpp
+nb rosPackages.noetic.rospy
+nb rosPackages.noetic.nav-msgs
+nb rosPackages.noetic.sensor-msgs
+nb rosPackages.noetic.tf2
+nb rosPackages.noetic.tf2-ros
+nb rosPackages.noetic.visualization-msgs
+# nb rosPackages.noetic.mav-comm
+nb rosPackages.noetic.eigen-conversions
+nb rosPackages.noetic.message-runtime
+nb rosPackages.noetic.dynamic-reconfigure
+nb rosPackages.noetic.ublox-msgs
+nb rosPackages.noetic.eigen-stl-containers
+nb rosPackages.noetic.tf
+nb rosPackages.noetic.std-srvs
