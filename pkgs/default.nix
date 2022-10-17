@@ -104,6 +104,8 @@ in {
 
     xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { };
 
+    aerowake = prev.callPackage ./ros-packages/aerowake { rosDistro = prev.rosPackages.noetic; };
+
     nixos-machines = rec {
         personal = makeMachines "personal";
     };
