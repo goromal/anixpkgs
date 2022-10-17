@@ -123,6 +123,7 @@ in
             poppler_utils
             docker
             meld
+            libreoffice-qt
             ## my packages
             anixpkgs.color-prints
             anixpkgs.git-cc
