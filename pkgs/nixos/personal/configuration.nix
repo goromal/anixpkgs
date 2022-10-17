@@ -122,6 +122,7 @@ in
             texlive.combined.scheme-full
             poppler_utils
             docker
+            meld
             ## my packages
             anixpkgs.color-prints
             anixpkgs.git-cc
@@ -157,6 +158,9 @@ in
             enable = true;
             package = vscodium;
             extensions = with vscode-extensions; [
+                eamodio.gitlens
+                ms-python.vscode-pylance
+                matklad.rust-analyzer
                 jnoortheen.nix-ide
                 yzhang.markdown-all-in-one
                 xaver.clang-format
@@ -248,6 +252,27 @@ in
                     "clang-format.language.cpp.style": "",
                     "window.zoomLevel": -1
                 }
+                '';
+            };
+            ".config/terminator/config" = {
+                text = ''
+                [global_config]
+                [keybindings]
+                [profiles]
+                [[default]]
+                    background_color = "#002b36"
+                    cursor_color = "#aaaaaa"
+                    foreground_color = "#839496"
+                    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+                [layouts]
+                [[default]]
+                    [[[window0]]]
+                    type = Window
+                    parent = ""
+                    [[[child1]]]
+                    type = Terminal
+                    parent = window0
+                [plugins]
                 '';
             };
         };
