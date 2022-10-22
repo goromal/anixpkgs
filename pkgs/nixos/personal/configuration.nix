@@ -251,7 +251,9 @@ in
                     "clang-format.language.cpp.enable": true,
                     "clang-format.executable": "/run/current-system/sw/bin/clang-format",
                     "clang-format.language.cpp.style": "",
-                    "window.zoomLevel": -1
+                    "window.zoomLevel": -1,
+                    "workbench.startupEditor": "none",
+                    "security.workspace.trust.untrustedFiles": "open"
                 }
                 '';
             };
