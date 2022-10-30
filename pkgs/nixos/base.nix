@@ -75,8 +75,6 @@ with lib;
         ack
         gcc
         gdb
-        cargo
-        rustc
         git
         cmake
         valgrind

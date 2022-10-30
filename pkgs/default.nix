@@ -117,4 +117,6 @@ in {
             { name = "personal"; description = "Personal Linux machine for the day-to-day."; }
         ];
     };
+
+    multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
 }

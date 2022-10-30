@@ -91,6 +91,7 @@ nb rosPackages.noetic.std-srvs
 nb rosPackages.noetic.gazebo
 nb rosPackages.noetic.gazebo-plugins
 nb rosPackages.noetic.gazebo-ros
+nb rosPackages.noetic.ros-core
 
 nb aerowake.acl_msgs
 nb aerowake.air_dynamics
