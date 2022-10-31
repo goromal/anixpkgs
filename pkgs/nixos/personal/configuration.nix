@@ -124,6 +124,7 @@ in
             docker
             meld
             libreoffice-qt
+            slack
             ## my packages
             anixpkgs.color-prints
             anixpkgs.git-cc
