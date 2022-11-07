@@ -45,6 +45,10 @@ nb evil-hangman
 nb spelling-corrector
 nb simple-image-editor
 
+echo "Building Rust packages..."
+
+nb xv-lidar-rs
+
 echo "Building Python 3.8 packages (minus spleeter)..."
 
 nb python38.pkgs.sunnyside
