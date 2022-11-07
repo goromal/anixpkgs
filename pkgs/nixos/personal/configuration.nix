@@ -177,6 +177,12 @@ in
                     version = "0.0.17";
                     sha256 = "11hzjd0gxkq37689rrr2aszxng5l9fwpgs9nnglq3zhfa1msyn08";
                 }
+                {
+                    name = "vscode-rustfmt";
+                    publisher = "statiolake";
+                    version = "0.1.2";
+                    sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
+                }
             ];
         };
 
