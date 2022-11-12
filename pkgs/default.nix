@@ -102,6 +102,8 @@ in {
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
+    xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { };
+
     nixos-machines = rec {
         personal = makeMachines "personal";
     };
