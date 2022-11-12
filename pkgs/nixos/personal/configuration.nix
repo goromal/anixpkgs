@@ -6,7 +6,7 @@ let
     orig-nixos-version = "22.05"; # Should match system.stateVersion 
                                   # of original config
     nixos-version = "22.05"; # Should match the channel in <nixpkgs>
-    anix-version  = "0.1.0"; # Whatever you want
+    anix-version  = "0.2.0"; # Whatever you want
     hardware-config = ./hardware-configuration-inspiron.nix;
     ##################################################################
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
