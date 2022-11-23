@@ -45,6 +45,21 @@ in
     # Enable the GNOME Desktop Environment.
     services.xserver.displayManager.gdm.enable = true;
     services.xserver.desktopManager.gnome.enable = true;
+    environment.gnome.excludePackages = [
+        gnome-photos
+        gnome-tour
+    ] ++ (with gnome; [
+        cheese
+        gnome-music
+        epiphany
+        geary
+        evince
+        totem
+        tali
+        iagno
+        hitori
+        atomix
+    ]);
 
     # Enable CUPS to print documents.
     # services.printing.enable = true;
@@ -63,8 +78,8 @@ in
         gtk = {
             enable = true;
             iconTheme = {
-                name = "Numix-Circle";
-                package = pkgs.numix-icon-theme-circle;
+                name = "Nordzy";
+                package = pkgs.nordzy-icon-theme;
             };
             theme = {
                 name = "Nordic";
@@ -91,20 +106,29 @@ in
                 "favorite-apps" = [
                     "org.gnome.Nautilus.desktop"
                     "google-chrome.desktop"
+                    "Alacritty.desktop"
                     "terminator.desktop"
                     "codium.desktop"
                     "pinta.desktop"
                     "gimp.desktop"
                     "org.inkscape.Inkscape.desktop"
                 ];
+                "enabled-extensions" = [
+                    "Vitals@CoreCoding.com"
+                ];
+            };
+            "org/gnome/shell/extensions/dash-to-dock" = {
+                "dash-max-icon-size" = "16";
             };
         };
 
         home.packages = [
             ## upstream
             gnome3.gnome-tweaks
+            gnomeExtensions.vitals
             vlc
             evince
+            zathura
             inkscape
             chromium
             maestral
@@ -125,6 +149,9 @@ in
             meld
             libreoffice-qt
             slack
+            neofetch
+            onefetch # git info for a local repo in terminal
+            alacritty
             ## my packages
             anixpkgs.color-prints
             anixpkgs.git-cc
@@ -264,15 +291,61 @@ in
                 }
                 '';
             };
+            ".config/zathura/zathurarc" = {
+                text = ''
+                # zathurarc-dark
+                set notification-error-bg       "#586e75" # base01
+                set notification-error-fg       "#dc322f" # red
+                set notification-warning-bg     "#586e75" # base01
+                set notification-warning-fg     "#dc322f" # red
+                set notification-bg             "#586e75" # base01
+                set notification-fg             "#b58900" # yellow
+
+                set completion-group-bg         "#002b36" # base03
+                set completion-group-fg         "#839496" # base0
+                set completion-bg               "#073642" # base02
+                set completion-fg               "#93a1a1" # base1
+                set completion-highlight-bg     "#586e75" # base01
+                set completion-highlight-fg     "#eee8d5" # base2
+
+                # Define the color in index mode
+                set index-bg                   "#073642" # base02
+                set index-fg                   "#93a1a1" # base1
+                set index-active-bg             "#586e75" # base01
+                set index-active-fg             "#eee8d5" # base2
+
+                set inputbar-bg                 "#586e75" # base01
+                set inputbar-fg                 "#eee8d5" # base2
+
+                set statusbar-bg                "#073642" # base02
+                set statusbar-fg                "#93a1a1" # base1
+
+                set highlight-color             "#657b83" # base00  # hightlight match when search keyword(vim's /)
+                set highlight-active-color      "#268bd2" # blue
+
+                set default-bg                  "#073642" # base02
+                set default-fg                  "#93a1a1" # base1
+                # set render-loading              true
+                # set render-loading-fg           "#073642" # base02
+                # set render-loading-bg           "#073642" # base02
+
+                # Recolor book content's color
+                set recolor                     true
+                set recolor-lightcolor          "#073642" # base02
+                set recolor-darkcolor           "#93a1a1" # base1
+                # set recolor-keephue             true      # keep original color
+                '';
+            };
+            # https://rigel.netlify.app/#terminal
             ".config/terminator/config" = {
                 text = ''
                 [global_config]
                 [keybindings]
                 [profiles]
                 [[default]]
-                    background_color = "#002b36"
-                    cursor_color = "#aaaaaa"
-                    foreground_color = "#839496"
+                    background_color = "#002635"
+                    cursor_color = "#ffcc1b"
+                    foreground_color = "#e6e6dc"
                     palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
                 [layouts]
                 [[default]]
@@ -283,6 +356,41 @@ in
                     type = Terminal
                     parent = window0
                 [plugins]
+                '';
+            };
+            ".config/alacritty/alacritty.yml" = {
+                text = ''
+                colors:
+                    # Default colors
+                    primary:
+                        background: '0x002635'
+                        foreground: '0xe6e6dc'
+
+                    # Normal colors
+                    normal:
+                        black:   '0x00384d'
+                        red:     '0xc43061'
+                        green:   '0x7fc06e'
+                        yellow:  '0xf08e48'
+                        blue:    '0x1c8db2'
+                        magenta: '0xc694ff'
+                        cyan:    '0x00cccc'
+                        white:   '0x77929e'
+
+                    # Bright colors
+                    bright:
+                        black:   '0x517f8d'
+                        red:     '0xff5a67'
+                        green:   '0x9cf087'
+                        yellow:  '0xffcc1b'
+                        blue:    '0x7eb2dd'
+                        magenta: '0xfb94ff'
+                        cyan:    '0x00ffff'
+                        white:   '0xb7cff9'
+
+                    cursor:
+                        text: "0x002635"
+                        cursor: "0xffcc1b"
                 '';
             };
         };
