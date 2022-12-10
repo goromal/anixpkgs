@@ -29,6 +29,7 @@ with lib;
     nix.extraOptions = ''
         narinfo-cache-positive-ttl = 0
         narinfo-cache-negative-ttl = 0
+        experimental-features = nix-command flakes
     '';
     nix.maxJobs = 4;
     nix.nixPath = [ "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos" ];
