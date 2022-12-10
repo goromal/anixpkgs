@@ -9,6 +9,9 @@ let
     anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {
         config.allowUnfree = true;
     };
+    unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
+        config = config.nixpkgs.config;
+    };
 in
 {
     imports = [
@@ -109,9 +112,7 @@ in
             evince
             zathura
             inkscape
-            chromium
             maestral
-            google-chrome
             direnv
             gnumake
             graphviz
@@ -127,14 +128,16 @@ in
             docker
             meld
             libreoffice-qt
-            slack
             neofetch
-            onefetch # git info for a local repo in terminal
+            onefetch
             alacritty
+            ## unstable
+            unstable.google-chrome
+            unstable.slack
             ## my packages
             anixpkgs.color-prints
-            anixpkgs.git-cc
             anixpkgs.cpp-helper
+            anixpkgs.git-cc
             anixpkgs.md2pdf
             anixpkgs.notabilify
             anixpkgs.make-title
@@ -166,7 +169,7 @@ in
         # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
         programs.vscode = {
             enable = true;
-            package = vscodium;
+            package = unstable.vscodium;
             extensions = with vscode-extensions; [
                 eamodio.gitlens
                 ms-python.vscode-pylance
