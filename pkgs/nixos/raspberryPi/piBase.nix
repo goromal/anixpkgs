@@ -8,7 +8,7 @@ with lib;
     ];
 
     environment.systemPackages = [
-        raspberrypi-tools
+        libraspberrypi
     ];
 
     fileSystems = {
