@@ -4,7 +4,7 @@ with lib;
 let
     orig-nixos-version = "22.05";
     nixos-version = "22.05"; # Should match the channel in <nixpkgs>
-    anix-version = "0.2.0"; # Version for personal packages
+    anix-version = "0.3.0"; # Version for personal packages
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
     anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {
         config.allowUnfree = true;
@@ -131,12 +131,14 @@ in
             neofetch
             onefetch
             alacritty
+            black
             ## unstable
             unstable.google-chrome
             unstable.slack
             ## my packages
             anixpkgs.color-prints
             anixpkgs.cpp-helper
+            anixpkgs.makepyshell
             anixpkgs.git-cc
             anixpkgs.md2pdf
             anixpkgs.notabilify
@@ -160,6 +162,7 @@ in
             anixpkgs.secure-delete
             anixpkgs.sunnyside
             anixpkgs.scrape
+            anixpkgs.trafficsim
             anixpkgs.manage-gmail
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
@@ -271,7 +274,8 @@ in
                     "clang-format.language.cpp.style": "",
                     "window.zoomLevel": -1,
                     "workbench.startupEditor": "none",
-                    "security.workspace.trust.untrustedFiles": "open"
+                    "security.workspace.trust.untrustedFiles": "open",
+                    "python.formatting.provider": "/data/andrew/.nix-profile/bin/black"
                 }
                 '';
             };
