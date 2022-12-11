@@ -4,7 +4,15 @@ with pkgs;
 with lib;
 {
     imports = [
-        "${fetchTarball "https://github.com/NixOS/nixos-hardware/archive/936e4649098d6a5e0762058cb7687be1b2d90550.tar.gz" }/raspberry-pi/3"
         ./piBase.nix
     ];
+
+    boot.loader.grub.enable = false;
+    boot.kernelParams = ["cma=256M"];
+    boot.loader.raspberryPi.enable = true;
+    boot.loader.raspberryPi.version = 3;
+    boot.loader.raspberryPi.uboot.enable = true;
+    boot.loader.raspberryPi.firmwareConfig = ''
+        gpu_mem=256
+    '';
 }
