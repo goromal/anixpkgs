@@ -3,10 +3,10 @@
 , buildPythonPackage
 }:
 callPackage ../pythonPkgFromScript.nix {
-    pname = "sunnyside";
+    pname = "makepyshell";
     version = "1.0.0";
-    description = "Make scrambled eggs.";
-    script-file = ./sunnyside.py;
+    description = "Generate a nix-shell file for Python development.";
+    script-file = (builtins.fetchGit (import ./src.nix)) + "/makepyshell.py";
     inherit pytestCheckHook buildPythonPackage;
     propagatedBuildInputs = [];
     checkPkgs = [];

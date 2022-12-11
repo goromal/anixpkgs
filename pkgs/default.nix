@@ -37,9 +37,11 @@ let
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { };
             pysignals = pySelf.callPackage ./python-packages/pysignals { };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { };
+            makepyshell = pySelf.callPackage ./python-packages/makepyshell { };
             norbert = pySelf.callPackage ./python-packages/norbert { };
             scrape = pySelf.callPackage ./python-packages/scrape { };
             spleeter = pySelf.callPackage ./python-packages/spleeter { };
+            trafficsim = pySelf.callPackage ./python-packages/trafficsim { };
             ichabod = pySelf.callPackage ./python-packages/ichabod { };
             imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
             vidstab-cv4 = pySelf.callPackage ./python-packages/vidstab-cv4 { };
@@ -91,9 +93,11 @@ in {
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
  
+    makepyshell = final.python38.pkgs.makepyshell;
     sunnyside = final.python38.pkgs.sunnyside;
     scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;
+    trafficsim = final.python38.pkgs.trafficsim;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
     flask-mp4server = final.python38.pkgs.flask-mp4server;

@@ -55,12 +55,14 @@ nb python38.pkgs.sunnyside
 nb python38.pkgs.geometry
 nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors
+nb python38.pkgs.makepyshell
 nb python38.pkgs.norbert
 # nb python38.pkgs.spleeter
 nb python38.pkgs.ichabod
 nb python38.pkgs.pysignals
 nb python38.pkgs.mesh-plotter
 nb python38.pkgs.gmail-parser
+nb python38.pkgs.trafficsim
 nb python38.pkgs.imutils-cv4
 nb python38.pkgs.vidstab-cv4
 nb python38.pkgs.flask-hello-world
