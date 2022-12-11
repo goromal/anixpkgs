@@ -19,13 +19,15 @@ with lib;
         };
     };
 
-    networking = {
-        wireless = {
-            enable = true;
-            networks."LANtasia".psk = "2292238177";
-            interfaces = [ "wlan0" ];
-        };
-    };
+    networking.networkmanager.enable = true;
+
+    # networking = {
+    #     wireless = {
+    #         enable = true;
+    #         networks."LANtasia".psk = "2292238177";
+    #         interfaces = [ "wlan0" ];
+    #     };
+    # };
 
     # Use 1GB of additional swap memory in order to not run out of memory
     # when installing lots of things while running other things at the same time.
