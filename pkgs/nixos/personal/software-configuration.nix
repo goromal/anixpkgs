@@ -2,10 +2,7 @@
 with pkgs;
 with lib;
 let
-    orig-nixos-version = "22.05";
-    nixos-version = "22.05"; # Should match the channel in <nixpkgs>
     anix-version = "0.3.0"; # Version for personal packages
-    home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
     anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {
         config.allowUnfree = true;
     };
@@ -16,7 +13,6 @@ in
 {
     imports = [
         ../base.nix
-        (import "${home-manager}/nixos")
     ];
 
     nix.nixPath = [
@@ -24,8 +20,19 @@ in
     ];
 
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
-    networking.networkmanager.enable = true;
     boot.supportedFilesystems = [ "ntfs" ];
+
+    boot.postBootCommands = let
+        gdm_user_conf = ''
+        [User]
+        Session=
+        XSession=
+        Icon=/data/andrew/.face
+        SystemAccount=false
+        '';
+      in ''
+        echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
+      '';
 
     services.xserver.enable = true;
     services.xserver.displayManager.gdm.enable = true;
@@ -53,8 +60,6 @@ in
     services.udev.packages = [ pkgs.dolphinEmu ];
 
     home-manager.users.andrew = {
-        programs.home-manager.enable = true;
-
         # nixpkgs/pkgs/data/themes
         # nixpkgs/pkgs/data/icons
         gtk = {
@@ -113,8 +118,6 @@ in
             zathura
             inkscape
             maestral
-            direnv
-            gnumake
             graphviz
             imagemagick
             terminator
@@ -128,10 +131,7 @@ in
             docker
             meld
             libreoffice-qt
-            neofetch
-            onefetch
             alacritty
-            black
             ## unstable
             unstable.google-chrome
             unstable.slack
@@ -200,66 +200,12 @@ in
             ];
         };
 
-        programs.git = {
-            package = gitAndTools.gitFull;
-            enable = true;
-            userName = "Andrew Torgesen";
-            userEmail = "andrew.torgesen@gmail.com";
-            extraConfig = {
-                init = {
-                    defaultBranch = "master";
-                };
-            };
-        };
-
-        programs.command-not-found.enable = true;
-
-        programs.vim = {
-            enable = true;
-            extraConfig = ''
-                if has('gui_running')
-                    set guifont=Iosevka
-                endif
-                set expandtab
-                " open NERDTree automatically if no file specified
-                "autocmd StdinReadPre * let s:std_in=1
-                "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-                " open NERDTree on Ctrl-n
-                map <C-n> :NERDTreeToggle<CR>
-                set wildignore+=*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,\~$,*/.log,*/.aux,*/.cls,*/.aux,*/.bbl,*/.blg,*/.fls,*/.fdb*/,*/.toc,*/.out,*/.glo,*/.log,*/.ist,*/.fdb_latexmk
-                set encoding=utf-8
-                set termguicolors
-                set background=dark
-                let g:mix_format_on_save = 1
-                let g:mix_format_options = '--check-equivalent'
-            '';
-            settings = {
-                number = true;
-            };
-            plugins = with vimPlugins; [
-                vim-elixir
-                sensible
-                vim-airline
-                The_NERD_tree
-                fugitive
-                vim-gitgutter
-                YouCompleteMe
-                vim-abolish
-                command-t
-            ];
-        };
-
         home.file = {
-            ".tmux.conf" = {
-                text = ''
-                    set-option -g default-shell /run/current-system/sw/bin/fish
-                    set-window-option -g mode-keys vi
-                    set -g default-terminal "screen-256color"
-                    set -ga terminal-overrides ',screen-256color:Tc'
-                '';
-            };
             ".background-image" = {
                 source = ../res/wallpaper.jpg;
+            };
+            ".face" = {
+                source = ../res/ajt.png;
             };
             "Templates/EmptyDocument" = {
                 text = "";
@@ -382,19 +328,5 @@ in
                 '';
             };
         };
-    };
-
-    # Open ports in the firewall.
-    # networking.firewall.allowedTCPPorts = [ ... ];
-    # networking.firewall.allowedUDPPorts = [ ... ];
-    # Or disable the firewall altogether.
-    # networking.firewall.enable = false;
-
-    # This value determines the NixOS release from which the default
-    # settings for stateful data, like file locations and database versions
-    # on your system were taken. It‘s perfectly fine and recommended to leave
-    # this value at the release version of the first install of this system.
-    # Before changing this value read the documentation for this option
-    # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-    system.stateVersion = orig-nixos-version; # Did you read the comment?    
+    }; 
 }
