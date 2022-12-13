@@ -21,6 +21,8 @@ with lib;
 
     networking.networkmanager.enable = true;
 
+    # TODO add some home-manager and basic git config
+
     # networking = {
     #     wireless = {
     #         enable = true;
