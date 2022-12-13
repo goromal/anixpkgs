@@ -6,7 +6,7 @@ with lib;
         ./base.nix
     ];
 
-    networking.hostName = "atorgesen-pi";
+    networking.hostName = "atorgesen-pi3-test";
 
     nix.nixPath = [
         "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/raspberryPi/3/test.nix"
