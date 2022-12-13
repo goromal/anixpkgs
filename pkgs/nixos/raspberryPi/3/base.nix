@@ -4,7 +4,7 @@ with pkgs;
 with lib;
 {
     imports = [
-        ./piBase.nix
+        ../base.nix
     ];
 
     boot.loader.grub.enable = false;
