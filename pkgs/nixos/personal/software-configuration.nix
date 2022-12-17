@@ -13,6 +13,7 @@ with import ../dependencies.nix { inherit config; };
 
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
     boot.supportedFilesystems = [ "ntfs" ];
+    boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
     boot.postBootCommands = let
         gdm_user_conf = ''
@@ -124,6 +125,7 @@ with import ../dependencies.nix { inherit config; };
             meld
             libreoffice-qt
             alacritty
+            nixos-generators
             ## unstable
             unstable.google-chrome
             unstable.slack
