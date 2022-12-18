@@ -13,4 +13,10 @@ in {
 
     # Enable GPU acceleration
     hardware.raspberry-pi."4".fkms-3d.enable = true;
+
+    home-manager.users.andrew.home.packages = [
+        (writeShellScriptBin "wifi-connect" ''
+            nmcli d wifi connect LANtasia password 2292238177 ifname wlp1s0u1u1
+        '')
+    ];
 }
