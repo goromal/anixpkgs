@@ -1,11 +1,14 @@
 { config }:
 let
-    anix-version = "0.3.0";
+    anix-version = "0.4.0";
 in {
-    anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz") {
+    # anixpkgs = import <anixpkgs>
+    anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz")
+    {
         config.allowUnfree = true;
     };
-    unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
+    unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
+    {
         config = config.nixpkgs.config;
     };
 }
