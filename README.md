@@ -48,7 +48,7 @@ nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
 sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
 ```
 
-On the Pi, set up the Nix channel:
+On the Pi, copy over SSH keys (including to `/root/.ssh/`!) and then set up the Nix channel:
 
 ```bash
 sudo nix-channel --add https://nixos.org/channels/nixos-22.05 nixos
