@@ -1,5 +1,4 @@
 { config, pkgs, lib, ... }:
-with import ../dependencies.nix { inherit config; };
 {
     imports = [
         ./hardware-configuration-inspiron.nix
