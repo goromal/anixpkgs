@@ -2,11 +2,14 @@
 { config, pkgs, lib, ... }:
 with pkgs;
 with lib;
-{
+let hwArch = fetchTarball "https://github.com/NixOS/nixos-hardware/archive/c9c1a5294e4ec378882351af1a3462862c61cb96.tar.gz";
+in {
     imports = [
-        "${fetchTarball "https://github.com/NixOS/nixos-hardware/archive/936e4649098d6a5e0762058cb7687be1b2d90550.tar.gz" }/raspberry-pi/4"
+        "${hwArch}/raspberry-pi/4"
         ../base.nix
     ];
+
+    boot.kernelPackages = mkForce linuxPackages_rpi4;
 
     # Enable GPU acceleration
     hardware.raspberry-pi."4".fkms-3d.enable = true;

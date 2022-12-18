@@ -2,7 +2,7 @@
 { config, pkgs, lib, ... }:
 with pkgs;
 with lib;
-with callPackage import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix { inherit config; };
 {
     imports = [
         ../base.nix
@@ -11,6 +11,20 @@ with callPackage import ../dependencies.nix { inherit config; };
     nix.nixPath = [
         "anixpkgs=/data/andrew/sources/anixpkgs"
     ];
+
+    # boot.kernelPackages = mkForce config.boot.zfs.package.latestCompatibleLinuxPackages;
+
+    # https://github.com/NixOS/nixpkgs/issues/154163
+    nixpkgs.overlays = [
+        (final: super: {
+            # modprobe: FATAL: Module sun4i-drm not found
+            makeModulesClosure = x:
+                super.makeModulesClosure (x // { allowMissing = true; });
+        })
+    ];
+
+    # Grub is used on Raspberry Pi
+    boot.loader.systemd-boot.enable = mkForce false;
 
     environment.systemPackages = [
         libraspberrypi

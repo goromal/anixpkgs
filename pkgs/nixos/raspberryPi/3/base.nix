@@ -7,6 +7,8 @@ with lib;
         ../base.nix
     ];
 
+    boot.kernelPackages = mkForce linuxPackages_rpi3;
+
     boot.loader.grub.enable = false;
     boot.kernelParams = ["cma=256M"];
     boot.loader.raspberryPi.enable = true;
