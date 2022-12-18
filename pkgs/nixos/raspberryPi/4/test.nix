@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }:
 with pkgs;
 with lib;
-with import ../dependencies.nix { inherit config; };
+with import ../../dependencies.nix { inherit config; };
 {
     imports = [
         ./base.nix
