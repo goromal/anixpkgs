@@ -4,6 +4,7 @@
 , youtube-dl
 , strings
 , redirects
+, wget-pkg
 , writeTextFile
 , callPackage
 , writeShellScript
@@ -16,15 +17,21 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     scriptPropagatedBuildInputs = [];
     flaskScript = ''
         from subprocess import Popen, PIPE
+        import tempfile, shutil
 
         vidname = None
+        tmpdir = None
 
         @app.route('/video', methods=['GET','POST'])
         def test():
             global vidname
+            global tmpdir
             if flask.request.method == 'POST':
+                if tmpdir is not None:
+                    shutil.rmtree(tmpdir)
                 url = flask.request.form['text']
-                p = Popen([helper_script, url], stdout=PIPE, stderr=PIPE)
+                tmpdir = tempfile.mkdtemp()
+                p = Popen([helper_script, url, tmpdir], stdout=PIPE, stderr=PIPE)
                 vidname, _ = p.communicate()
                 vidname = vidname.decode("utf-8").strip()
                 print('Operation complete.')
@@ -50,15 +57,15 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
         if [ -z "$url" ]; then
             url=http://dl5.webmfiles.org/big-buck-bunny_trailer.webm
         fi
-        cd $(mktemp -d)
+        cd "$2"
         if [[ "$url" == *"yout"* ]]; then
             fname=video
             ${youtube-dl}/bin/youtube-dl -o $fname.mp4 -f mp4 "$url" ${redirects.suppress_all}
         else
             filename=`${strings.getBasename} "$url"`
-            fname=`${strings.getWithoutExtension} "$url"`
-            wget "$url" ${redirects.suppress_all}
-            ${mp4} "$filename" "$fname" ${redirects.suppress_all}
+            fname=`${strings.getWithoutExtension} "$filename"`
+            ${wget-pkg}/bin/wget "$url" > wgetout 2>&1 # ${redirects.suppress_all}
+            ${mp4}/bin/mp4 "$filename" "$fname" > mp4out 2>&1 # ${redirects.suppress_all}
         fi
         echo "$PWD/$fname.mp4"
     '';

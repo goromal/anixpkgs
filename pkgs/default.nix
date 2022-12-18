@@ -46,7 +46,7 @@ let
             imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
             vidstab-cv4 = pySelf.callPackage ./python-packages/vidstab-cv4 { };
             flask-hello-world = pySelf.callPackage ./python-packages/flasks/hello-world { };
-            flask-url2mp4 = pySelf.callPackage ./python-packages/flasks/url2mp4 { };
+            flask-url2mp4 = pySelf.callPackage ./python-packages/flasks/url2mp4 { wget-pkg = prev.wget; };
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
             flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server { };
             flask-smfserver = pySelf.callPackage ./python-packages/flasks/smfserver { };
