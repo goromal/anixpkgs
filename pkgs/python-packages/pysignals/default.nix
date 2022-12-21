@@ -11,13 +11,14 @@
 , buildPythonPackage
 , numpy
 , geometry
+, pkg-src
 }:
 callPackage ../pythonPkgFromPybind.nix {
     pname = "pysignals";
     version = "1.0.0";
     description = "Python bindings of signals-cpp.";
     inherit clangStdenv;
-    pkg-src = builtins.fetchGit (import ./src.nix);
+    inherit pkg-src;
     cppNativeBuildInputs = [
         cmake
     ];

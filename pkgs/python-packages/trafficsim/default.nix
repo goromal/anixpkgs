@@ -5,12 +5,13 @@
 , matplotlib
 , geometry
 , pysignals
+, pkg-src
 }:
 callPackage ../pythonPkgFromScript.nix {
     pname = "trafficsim";
     version = "1.0.0";
     description = "Simulate traffic.";
-    script-file = (builtins.fetchGit (import ./src.nix)) + "/traffic.py";
+    script-file = "${pkg-src}/traffic.py";
     inherit pytestCheckHook buildPythonPackage;
     propagatedBuildInputs = [
         numpy

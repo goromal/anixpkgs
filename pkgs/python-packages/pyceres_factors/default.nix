@@ -13,13 +13,14 @@
 , pythonOlder
 , pytestCheckHook
 , buildPythonPackage
+, pkg-src
 }:
 callPackage ../pythonPkgFromPybind.nix {
     pname = "PyCeresFactors";
     version = "1.0.0";
     description = "Python bindings of ceres-factors.";
     inherit clangStdenv;
-    pkg-src = builtins.fetchGit (import ./src.nix);
+    inherit pkg-src;
     cppNativeBuildInputs = [
         cmake
     ];

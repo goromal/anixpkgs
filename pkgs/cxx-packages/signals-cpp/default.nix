@@ -3,11 +3,12 @@
 , eigen
 , manif-geom-cpp
 , boost
+, pkg-src
 }:
 clangStdenv.mkDerivation {
     name = "signals-cpp";
     version = "1.0.0";
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
     nativeBuildInputs = [
         cmake
     ];

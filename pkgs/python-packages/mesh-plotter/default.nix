@@ -5,6 +5,7 @@
 , matplotlib
 , geometry
 , pysignals
+, pkg-src
 }:
 buildPythonPackage rec {
     pname = "mesh_plotter";
@@ -17,5 +18,5 @@ buildPythonPackage rec {
         geometry
         pysignals
     ];
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
 }
