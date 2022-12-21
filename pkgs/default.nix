@@ -1,7 +1,7 @@
 final: prev: 
 with prev.lib;
 let
-    pkgSources = import ../sources.nix { };
+    pkgSources = import ../sources.nix;
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
         jdk = minJDK;
