@@ -1,6 +1,7 @@
 final: prev: 
 with prev.lib;
 let
+    pkgSources = import ../sources.nix { };
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
         jdk = minJDK;
@@ -30,18 +31,18 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
-            gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { };
+            gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
-            geometry = pySelf.callPackage ./python-packages/geometry { };
-            pyceres = pySelf.callPackage ./python-packages/pyceres { };
-            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { };
-            pysignals = pySelf.callPackage ./python-packages/pysignals { };
-            mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { };
-            makepyshell = pySelf.callPackage ./python-packages/makepyshell { };
+            geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; };
+            pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
+            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
+            pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
+            mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
+            makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
             norbert = pySelf.callPackage ./python-packages/norbert { };
-            scrape = pySelf.callPackage ./python-packages/scrape { };
+            scrape = pySelf.callPackage ./python-packages/scrape { pkg-src = pkgSources.scrape; };
             spleeter = pySelf.callPackage ./python-packages/spleeter { };
-            trafficsim = pySelf.callPackage ./python-packages/trafficsim { };
+            trafficsim = pySelf.callPackage ./python-packages/trafficsim { pkg-src = pkgSources.trafficsim; };
             ichabod = pySelf.callPackage ./python-packages/ichabod { };
             imutils-cv4 = pySelf.callPackage ./python-packages/imutils-cv4 { };
             vidstab-cv4 = pySelf.callPackage ./python-packages/vidstab-cv4 { };
@@ -78,14 +79,14 @@ in {
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
     fix-perms = prev.callPackage ./bash-packages/fix-perms { };
 
-    manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { };
-    ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { };
-    signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { };
-    secure-delete = prev.callPackage ./cxx-packages/secure-delete { };
+    manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
+    ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
+    signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
+    secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
 
-    evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs;
-    spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs;
-    simple-image-editor = prev.callPackage ./java-packages/simple-image-editor baseJavaArgs;
+    evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs // { pkg-src = pkgSources.evil-hangman; };
+    spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; };
+    simple-image-editor = prev.callPackage ./java-packages/simple-image-editor baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; };
 
     python27 = pythonOverridesFor prev.python27;
     python37 = pythonOverridesFor prev.python37;
@@ -106,7 +107,7 @@ in {
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
-    xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { };
+    xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; };
 
     nixos-machines = rec {
         personal = makeMachines "personal";

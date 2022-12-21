@@ -7,6 +7,7 @@
 , oauth2client
 , html2text
 , progressbar2
+, pkg-src
 }:
 buildPythonPackage rec {
     pname = "gmail_parser";
@@ -21,5 +22,5 @@ buildPythonPackage rec {
         html2text
         progressbar2
     ];
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
 }

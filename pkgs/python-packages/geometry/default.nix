@@ -9,13 +9,14 @@
 , pythonOlder
 , pytestCheckHook
 , buildPythonPackage
+, pkg-src
 }:
 callPackage ../pythonPkgFromPybind.nix {
     pname = "geometry";
     version = "1.0.0";
     description = "Implementations for SO(3) and SE(3).";
     inherit clangStdenv;
-    pkg-src = builtins.fetchGit (import ./src.nix);
+    inherit pkg-src;
     cppNativeBuildInputs = [
         cmake
     ];
