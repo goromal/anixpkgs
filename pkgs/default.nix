@@ -84,9 +84,9 @@ in {
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
 
-    evil-hangman = prev.callPackage ./java-packages/evil-hangman baseJavaArgs // { pkg-src = pkgSources.evil-hangman; };
-    spelling-corrector = prev.callPackage ./java-packages/spelling-corrector baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; };
-    simple-image-editor = prev.callPackage ./java-packages/simple-image-editor baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; };
+    evil-hangman = prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; });
+    spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
+    simple-image-editor = prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; });
 
     python27 = pythonOverridesFor prev.python27;
     python37 = pythonOverridesFor prev.python37;
