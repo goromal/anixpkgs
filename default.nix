@@ -2,7 +2,9 @@
 , ...
 }@args:
 with import ./dependencies.nix;
-import nix-ros-overlay { 
-  inherit nixpkgs;
-  overlays = [ (import ./overlay.nix) ] ++ overlays;
+import nixpkgs {
+  overlays = [
+    (import "${nix-ros-overlay}/overlay.nix")
+    (import ./overlay.nix)
+  ] ++ overlays;
 } // args
