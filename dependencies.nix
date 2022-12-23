@@ -6,7 +6,7 @@
     };
     nix-ros-overlay = builtins.fetchGit {
         url = "git@github.com:lopsided98/nix-ros-overlay.git";
-        rev = "1fb554b5ddcf09c3d109067d9b8976e7382c5413";
+        rev = "795e67fe0e19118cef94209e4470edc64f13df93";
         ref = "master";
     };
 }
