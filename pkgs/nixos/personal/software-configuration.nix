@@ -27,6 +27,10 @@ with import ../dependencies.nix { inherit config; };
         echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
       '';
 
+    networking.firewall.allowedTCPPorts = [
+        4444
+    ];
+
     services.xserver.enable = true;
     services.xserver.displayManager.gdm.enable = true;
     services.xserver.desktopManager.gnome.enable = true;

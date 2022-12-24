@@ -28,4 +28,9 @@ with import ../../dependencies.nix { inherit config; };
         package = anixpkgs.flask-url2mp4;
         port = 4051;
     };
+
+    networking.firewall.allowedTCPPorts = [
+        4050
+        4051
+    ];
 }
