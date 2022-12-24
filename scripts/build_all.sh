@@ -52,6 +52,7 @@ nb xv-lidar-rs
 echo "Building Python 3.8 packages (minus spleeter)..."
 
 nb python38.pkgs.sunnyside
+nb python38.pkgs.find_rotational_conventions
 nb python38.pkgs.geometry
 nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors

@@ -33,6 +33,7 @@ let
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
+            find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
             geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; };
             pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
@@ -98,6 +99,7 @@ in {
     sunnyside = final.python38.pkgs.sunnyside;
     scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;
+    find_rotational_conventions = final.python38.pkgs.find_rotational_conventions;
     trafficsim = final.python38.pkgs.trafficsim;
     flask-hello-world = final.python38.pkgs.flask-hello-world;
     flask-url2mp4 = final.python38.pkgs.flask-url2mp4;

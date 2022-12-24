@@ -35,6 +35,11 @@
         rev = "d930ce4ea14770822f0dcb24f00884593bc9918f";
         ref = "master";
     };
+    find_rotational_conventions = builtins.fetchGit {
+        url = "https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e.git";
+        rev = "f783b777f1c6dcea21a7a1d30519be2f56a810c3";
+        ref = "main";
+    };
     geometry = builtins.fetchGit {
         url = "git@github.com:goromal/geometry.git";
         rev = "a5a5ed08b0daf7ef91b4ed342a9e407225b12ad0";
