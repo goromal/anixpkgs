@@ -34,6 +34,30 @@ in
 python-with-my-packages.env
 ```
 
+or, if e.g., having to also use a ROS-based Python package concurrently:
+
+```nix
+let
+  pkgs = import <anixpkgs> {};
+in pkgs.mkShell {
+  buildInputs = [
+    pkgs.python38
+    pkgs.python38.pkgs.numpy
+    pkgs.python38.pkgs.geometry
+    pkgs.python38.pkgs.find_rotational_conventions
+    pkgs.rosPackages.noetic.tf-conversions
+  ];
+  shellHook = ''
+    # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
+    # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
+    export PIP_PREFIX=$(pwd)/_build/pip_packages
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PYTHONPATH"
+    export PATH="$PIP_PREFIX/bin:$PATH"
+    unset SOURCE_DATE_EPOCH
+  '';
+}
+```
+
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
