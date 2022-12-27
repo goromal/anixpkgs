@@ -92,6 +92,7 @@ in
         htop
         jq
         libpwquality
+        libinput
         lsof
         coreutils
         clang

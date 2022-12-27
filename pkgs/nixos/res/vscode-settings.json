@@ -1,0 +1,12 @@
+{
+    "editor.formatOnSave": true,
+    "editor.minimap.enabled": false,
+    "clang-format.executable": "/run/current-system/sw/bin/clang-format",
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
+    },
+    "window.zoomLevel": -1,
+    "workbench.startupEditor": "none",
+    "security.workspace.trust.untrustedFiles": "open",
+    "python.formatting.provider": "/data/andrew/.nix-profile/bin/black"
+}
