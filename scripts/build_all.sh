@@ -38,6 +38,7 @@ nb manif-geom-cpp
 nb ceres-factors
 nb signals-cpp
 nb secure-delete
+nb sorting
 
 echo "Building Java packages..."
 
