@@ -38,6 +38,7 @@ let
             pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
             pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
+            pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
             norbert = pySelf.callPackage ./python-packages/norbert { };
