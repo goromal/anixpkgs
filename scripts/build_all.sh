@@ -73,6 +73,7 @@ nb python38.pkgs.flask-url2mp4
 nb python38.pkgs.flask-mp4server
 nb python38.pkgs.flask-mp3server
 nb python38.pkgs.flask-smfserver
+nb python38.pkgs.rankserver
 
 echo "Building ROS packages..."
 

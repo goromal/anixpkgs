@@ -53,6 +53,7 @@ let
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
             flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server { };
             flask-smfserver = pySelf.callPackage ./python-packages/flasks/smfserver { };
+            rankserver = pySelf.callPackage ./python-packages/flasks/rankserver { };
         });
     }));
 in {
@@ -108,6 +109,7 @@ in {
     flask-mp4server = final.python38.pkgs.flask-mp4server;
     flask-mp3server = final.python38.pkgs.flask-mp3server;
     flask-smfserver = final.python38.pkgs.flask-smfserver;
+    rankserver = final.python38.pkgs.rankserver;
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
