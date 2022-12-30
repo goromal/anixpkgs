@@ -50,6 +50,8 @@ with import ../dependencies.nix { inherit config; };
         atomix
     ]);
 
+    services.lorri.enable = true;
+
     sound.enable = true;
     hardware.pulseaudio.enable = true;
     nixpkgs.config.pulseaudio = true;

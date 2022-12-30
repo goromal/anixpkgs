@@ -125,6 +125,8 @@ in
         nmap
     ];
 
+    programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
+
     environment.shellAliases = {
         jfu = "journalctl -fu";
         nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
