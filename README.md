@@ -1,5 +1,7 @@
 # anixpkgs
 
+![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
+
 A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
 
 The philosophy for the library implementations (and, sometimes, re-implementations) is to facilitate:
