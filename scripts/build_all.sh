@@ -38,6 +38,7 @@ nb manif-geom-cpp
 nb ceres-factors
 nb signals-cpp
 nb secure-delete
+nb sorting
 
 echo "Building Java packages..."
 
@@ -56,6 +57,7 @@ nb python38.pkgs.find_rotational_conventions
 nb python38.pkgs.geometry
 nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors
+nb python38.pkgs.pysorting
 nb python38.pkgs.makepyshell
 nb python38.pkgs.norbert
 # nb python38.pkgs.spleeter
@@ -71,6 +73,7 @@ nb python38.pkgs.flask-url2mp4
 nb python38.pkgs.flask-mp4server
 nb python38.pkgs.flask-mp3server
 nb python38.pkgs.flask-smfserver
+nb python38.pkgs.rankserver
 
 echo "Building ROS packages..."
 

@@ -1,9 +1,7 @@
 { callPackage
 , clangStdenv
 , cmake
-, manif-geom-cpp 
-, eigen
-, numpy
+, sorting
 , pybind11
 , python
 , pythonOlder
@@ -12,17 +10,16 @@
 , pkg-src
 }:
 callPackage ../pythonPkgFromPybind.nix {
-    pname = "geometry";
+    pname = "pysorting";
     version = "1.0.0";
-    description = "Implementations for SO(3) and SE(3).";
+    description = "RESTful incremental sorting with client-side comparators.";
     inherit clangStdenv;
     inherit pkg-src;
     cppNativeBuildInputs = [
         cmake
     ];
     cppBuildInputs = [
-        manif-geom-cpp
-        eigen
+        sorting
     ];
     hasTests = true;
     inherit pybind11;
@@ -31,5 +28,5 @@ callPackage ../pythonPkgFromPybind.nix {
     inherit pytestCheckHook;
     inherit buildPythonPackage;
     propagatedBuildInputs = [];
-    checkPkgs = [ numpy ];
+    checkPkgs = [];
 }

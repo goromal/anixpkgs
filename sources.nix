@@ -20,6 +20,11 @@
         rev = "5fca7190b13b4d357755e54e7b161d94d3990e57";
         ref = "master";
     };
+    sorting = builtins.fetchGit {
+        url = "git@github.com:goromal/sorting.git";
+        rev = "78a3ea02690fdbc0c7d91fee825f37469550d950";
+        ref = "master";
+    };
     evil-hangman = builtins.fetchGit {
         url = "git@github.com:goromal/evil-hangman.git";
         rev = "198c067dd33fe5c9b77685a8b2ddd059c9316923";
@@ -73,6 +78,11 @@
     pysignals = builtins.fetchGit {
         url = "git@github.com:goromal/pysignals.git";
         rev = "714c5ea42366292d9528fa6aee34d530ac52929c";
+        ref = "master";
+    };
+    pysorting = builtins.fetchGit {
+        url = "git@github.com:goromal/pysorting.git";
+        rev = "cdd7d537b013d1f46b8f42c635438c34e3784be2";
         ref = "master";
     };
     scrape = builtins.fetchGit {

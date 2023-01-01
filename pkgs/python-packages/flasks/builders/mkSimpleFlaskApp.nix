@@ -4,6 +4,7 @@
 , flask
 , writeTextFile
 , flaskScript
+, overrideFullFlaskScript ? false
 , helperScript ? null
 , templateText ? null
 , writeShellScript
@@ -53,7 +54,7 @@ let
     };
     script_file = writeTextFile {
         name = "${pname}.py";
-        text = ''
+        text = if ! overrideFullFlaskScript then ''
             import flask
             import argparse
             app = flask.Flask(__name__)
@@ -67,7 +68,7 @@ let
                 app.run(host="0.0.0.0", port=args.port)
             if __name__ == "__main__":
                 run()
-        '';
+        '' else flaskScript;
     };
 in buildPythonApplication rec {
     inherit pname;

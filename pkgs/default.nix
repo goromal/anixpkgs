@@ -38,6 +38,7 @@ let
             pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
             pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
+            pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
             norbert = pySelf.callPackage ./python-packages/norbert { };
@@ -52,6 +53,7 @@ let
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
             flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server { };
             flask-smfserver = pySelf.callPackage ./python-packages/flasks/smfserver { };
+            rankserver = pySelf.callPackage ./python-packages/flasks/rankserver { };
         });
     }));
 in {
@@ -84,6 +86,7 @@ in {
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
+    sorting = prev.callPackage ./cxx-packages/sorting { pkg-src = pkgSources.sorting; };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; });
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
@@ -106,6 +109,7 @@ in {
     flask-mp4server = final.python38.pkgs.flask-mp4server;
     flask-mp3server = final.python38.pkgs.flask-mp3server;
     flask-smfserver = final.python38.pkgs.flask-smfserver;
+    rankserver = final.python38.pkgs.rankserver;
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
 
