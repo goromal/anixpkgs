@@ -7,7 +7,7 @@ from pysorting import (
     QuickSortState,
     persistStateToDisk,
     sortStateFromDisk,
-    restfulRandomizedQuickSort,
+    restfulQuickSort,
 )
 
 UINT32_MAX = 0xffffffff
@@ -105,7 +105,7 @@ class RankServer:
         i = 0
         self.state.c = enum_int
         while not full_step and i < max_iter:
-            res, state_out = restfulRandomizedQuickSort(self.state)
+            res, state_out = restfulQuickSort(self.state)
             if not res:
                 return (False, "RESTful sort step failed")
             self.state = state_out
@@ -139,10 +139,10 @@ def index():
             rankserver.resetState()
         else:
             if "choose_l" in flask.request.form:
-                print("CHOOSE LEFT")
+                # print("CHOOSE LEFT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_GREATER))
             else:
-                print("CHOOSE_RIGHT")
+                # print("CHOOSE_RIGHT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_LESS))
         rankserver.save()
     

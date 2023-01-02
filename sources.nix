@@ -22,7 +22,7 @@
     };
     sorting = builtins.fetchGit {
         url = "git@github.com:goromal/sorting.git";
-        rev = "78a3ea02690fdbc0c7d91fee825f37469550d950";
+        rev = "06b7e099649f0b5a4dc8f6cff807017fe369890d";
         ref = "master";
     };
     evil-hangman = builtins.fetchGit {
@@ -82,7 +82,7 @@
     };
     pysorting = builtins.fetchGit {
         url = "git@github.com:goromal/pysorting.git";
-        rev = "cdd7d537b013d1f46b8f42c635438c34e3784be2";
+        rev = "ca0439d63607990160c29a1c2d1e6eed450ac98f";
         ref = "master";
     };
     scrape = builtins.fetchGit {
