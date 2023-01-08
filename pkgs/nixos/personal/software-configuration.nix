@@ -121,6 +121,7 @@ with import ../dependencies.nix { inherit config; };
             imagemagick
             terminator
             xclip
+            pciutils
             gimp
             simplescreenrecorder
             pinta

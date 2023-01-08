@@ -34,4 +34,14 @@
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # Inspiron Touchpad
+  # boot.kernelModules = [ "psmouse" ]; redundant
+  # boot.kernelParams = [ "psmouse.synaptics_intertouch=0" ]; # https://wiki.ubuntu.com/DebuggingTouchpadDetection
+  services.xserver = {
+    libinput.enable = true;
+    libinput.touchpad.tapping = true;
+    libinput.touchpad.tappingDragLock = true;
+    exportConfiguration = true;
+  };
 }
