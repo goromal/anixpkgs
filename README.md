@@ -121,7 +121,7 @@ wipefs [--all -a] /dev/sda
    2. Create the boot partition: *Partition* > *New*
       1. Free space preceding (MiB): 1
       2. New size (MiB): 512
-      3. Free spae following (MiB): Rest
+      3. Free space following (MiB): Rest
       4. Align to: MiB
       5. Create as: Primary Partition
       6. Partition name: EFI
