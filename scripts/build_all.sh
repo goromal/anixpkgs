@@ -55,6 +55,7 @@ echo "Building Python 3.8 packages (minus spleeter)..."
 nb python38.pkgs.sunnyside
 nb python38.pkgs.find_rotational_conventions
 nb python38.pkgs.geometry
+nb python38.pkgs.mavlog-utils
 nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors
 nb python38.pkgs.pysorting
