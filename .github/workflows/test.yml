@@ -8,6 +8,7 @@ on:
       - master
 jobs:
   tests:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.4.0

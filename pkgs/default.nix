@@ -39,6 +39,7 @@ let
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
             pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
             pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
+            mavlog-utils = pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = pkgSources.mavlog-utils; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
             norbert = pySelf.callPackage ./python-packages/norbert { };
@@ -99,6 +100,7 @@ in {
     python310 = pythonOverridesFor prev.python310;
  
     makepyshell = final.python38.pkgs.makepyshell;
+    mavlog-utils = final.python38.pkgs.mavlog-utils;
     sunnyside = final.python38.pkgs.sunnyside;
     scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;
