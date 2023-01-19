@@ -2,6 +2,7 @@
 , coreutils
 , gcc
 , bash
+, pkg-src
 }:
 let
     progName = "secure-delete";
@@ -16,6 +17,6 @@ in derivation {
     builder = "${bash}/bin/bash";
     args = [ builderScript ];
     inherit gcc coreutils;
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
     system = builtins.currentSystem;
 }

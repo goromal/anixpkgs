@@ -3,11 +3,12 @@
 , jre
 , ant
 , makeWrapper
+, pkg-src
 }:
 stdenv.mkDerivation {
     name = "spelling-corrector";
     version = "1.0.0";
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
 
     nativeBuildInputs = [ 
         jdk 

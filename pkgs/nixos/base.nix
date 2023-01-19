@@ -1,7 +1,15 @@
 { config, pkgs, lib, ... }:
 with pkgs;
 with lib;
+let
+    nixos-version = "22.05"; # Should match the channel in <nixpkgs>
+    home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+in
 {
+    imports = [
+        (import "${home-manager}/nixos")
+    ];
+
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
@@ -19,14 +27,17 @@ with lib;
     nix.binaryCaches = [
         "https://cache.nixos.org/"
         "https://github-public.cachix.org"
+        "https://ros.cachix.org"
     ];
     nix.binaryCachePublicKeys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+        "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
     ];
     nix.extraOptions = ''
         narinfo-cache-positive-ttl = 0
         narinfo-cache-negative-ttl = 0
+        experimental-features = nix-command flakes
     '';
     nix.maxJobs = 4;
     nix.nixPath = [ "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos" ];
@@ -43,12 +54,7 @@ with lib;
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.interfaces.eno1.useDHCP = true;
-    networking.interfaces.wlp179s0.useDHCP = true;
-
-    # Configure network proxy if necessary
-    # networking.proxy.default = "http://user:password@proxy:port/";
-    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+    networking.networkmanager.enable = true;
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -76,7 +82,9 @@ with lib;
         gcc
         gdb
         git
+        gnumake
         cmake
+        direnv
         valgrind
         iotop
         iperf
@@ -84,11 +92,15 @@ with lib;
         htop
         jq
         libpwquality
+        libinput
         lsof
         coreutils
         clang
         clang-tools
+        neofetch
+        onefetch
         man-pages
+        black
         mosh
         nethogs
         tcpdump
@@ -112,6 +124,8 @@ with lib;
         ncdu
         nmap
     ];
+
+    programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
 
     environment.shellAliases = {
         jfu = "journalctl -fu";
@@ -143,4 +157,68 @@ with lib;
         ];
     };
     users.mutableUsers = true;
+
+    home-manager.users.andrew = {
+        programs.home-manager.enable = true;
+
+        programs.git = {
+            package = gitAndTools.gitFull;
+            enable = true;
+            userName = "Andrew Torgesen";
+            userEmail = "andrew.torgesen@gmail.com";
+            extraConfig = {
+                init = {
+                    defaultBranch = "master";
+                };
+            };
+        };
+
+        programs.command-not-found.enable = true;
+
+        programs.vim = {
+            enable = true;
+            extraConfig = ''
+                if has('gui_running')
+                    set guifont=Iosevka
+                endif
+                set expandtab
+                " open NERDTree automatically if no file specified
+                "autocmd StdinReadPre * let s:std_in=1
+                "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+                " open NERDTree on Ctrl-n
+                map <C-n> :NERDTreeToggle<CR>
+                set wildignore+=*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,\~$,*/.log,*/.aux,*/.cls,*/.aux,*/.bbl,*/.blg,*/.fls,*/.fdb*/,*/.toc,*/.out,*/.glo,*/.log,*/.ist,*/.fdb_latexmk
+                set encoding=utf-8
+                set termguicolors
+                set background=dark
+                let g:mix_format_on_save = 1
+                let g:mix_format_options = '--check-equivalent'
+            '';
+            settings = {
+                number = true;
+            };
+            plugins = with vimPlugins; [
+                vim-elixir
+                sensible
+                vim-airline
+                The_NERD_tree
+                fugitive
+                vim-gitgutter
+                YouCompleteMe
+                vim-abolish
+                command-t
+            ];
+        };
+
+        home.file = {
+            ".tmux.conf" = {
+                text = ''
+                    set-option -g default-shell /run/current-system/sw/bin/fish
+                    set-window-option -g mode-keys vi
+                    set -g default-terminal "screen-256color"
+                    set -ga terminal-overrides ',screen-256color:Tc'
+                '';
+            };
+        };
+    };
 }

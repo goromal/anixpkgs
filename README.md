@@ -1,5 +1,7 @@
 # anixpkgs
 
+![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
+
 A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
 
 The philosophy for the library implementations (and, sometimes, re-implementations) is to facilitate:
@@ -34,6 +36,63 @@ in
 python-with-my-packages.env
 ```
 
+or, if e.g., having to also use a ROS-based Python package concurrently:
+
+```nix
+let
+  pkgs = import <anixpkgs> {};
+in pkgs.mkShell {
+  buildInputs = [
+    pkgs.python38
+    pkgs.python38.pkgs.numpy
+    pkgs.python38.pkgs.geometry
+    pkgs.python38.pkgs.find_rotational_conventions
+    pkgs.rosPackages.noetic.tf-conversions
+  ];
+  shellHook = ''
+    # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
+    # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
+    export PIP_PREFIX=$(pwd)/_build/pip_packages
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PYTHONPATH"
+    export PATH="$PIP_PREFIX/bin:$PATH"
+    unset SOURCE_DATE_EPOCH
+  '';
+}
+```
+
+## Build a Raspberry Pi NixOS SD Installer Image
+
+```bash
+nixos-generate -f sd-aarch64-installer --system aarch64-linux -c /path/to/rpi/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+```
+
+```bash
+nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
+```
+
+```bash
+sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
+```
+
+On the Pi, copy over SSH keys (including to `/root/.ssh/`!) and then set up the Nix channel:
+
+```bash
+sudo nix-channel --add https://nixos.org/channels/nixos-22.05 nixos
+sudo nix-channel --update
+```
+
+## Build a NixOS ISO Image
+
+TODO work out hardware configuration portion.
+
+```bash
+nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+```
+
+```bash
+sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
+```
+
 ## Installation Instructions on a New Machine
 
 *Sources*
@@ -62,7 +121,7 @@ wipefs [--all -a] /dev/sda
    2. Create the boot partition: *Partition* > *New*
       1. Free space preceding (MiB): 1
       2. New size (MiB): 512
-      3. Free spae following (MiB): Rest
+      3. Free space following (MiB): Rest
       4. Align to: MiB
       5. Create as: Primary Partition
       6. Partition name: EFI

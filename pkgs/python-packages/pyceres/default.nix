@@ -11,13 +11,14 @@
 , pythonOlder
 , pytestCheckHook
 , buildPythonPackage
+, pkg-src
 }:
 callPackage ../pythonPkgFromPybind.nix {
     pname = "PyCeres";
     version = "2.0.0";
     description = "Python bindings for the Ceres Solver.";
     inherit clangStdenv;
-    pkg-src = builtins.fetchGit (import ./src.nix);
+    inherit pkg-src;
     cppNativeBuildInputs = [
         cmake
     ];

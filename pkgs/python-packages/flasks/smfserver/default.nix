@@ -11,21 +11,25 @@
 }:
 callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "flask_smfserver";
-    version = "0.0.0";
+    version = "0.0.1";
     inherit buildPythonApplication flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [];
     flaskScript = ''
         from subprocess import Popen, PIPE
-        import tempfile, os
+        import tempfile, os, shutil
 
         mp3name = None
         smftext = "# SMF song here."
+        tmpdir = None
 
         @app.route('/audio', methods=['GET','POST'])
         def test():
             global mp3name
             global smftext
+            global tmpdir
             if flask.request.method == 'POST':
+                if tmpdir is not None:
+                    shutil.rmtree(tmpdir)
                 smftext = flask.request.form['text']
                 tmpdir = tempfile.mkdtemp()
                 fname = "_textfile.smf"

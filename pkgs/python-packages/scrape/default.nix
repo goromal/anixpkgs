@@ -4,6 +4,7 @@
 , colorama
 , requests
 , lxml
+, pkg-src
 }:
 buildPythonPackage rec {
     pname = "scrape";
@@ -14,5 +15,5 @@ buildPythonPackage rec {
         requests
         lxml
     ];
-    src = builtins.fetchGit (import ./src.nix);
+    src = pkg-src;
 }
