@@ -1,5 +1,4 @@
 { buildPythonPackage
-, fetchPypi
 , pythonOlder
 , numpy
 , matplotlib

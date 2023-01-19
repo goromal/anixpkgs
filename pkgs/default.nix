@@ -41,6 +41,7 @@ let
             pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
+            mavproxy = pySelf.callPackage ./python-packages/mavproxy { pkg-src = pkgSources.mavproxy; };
             norbert = pySelf.callPackage ./python-packages/norbert { };
             scrape = pySelf.callPackage ./python-packages/scrape { pkg-src = pkgSources.scrape; };
             spleeter = pySelf.callPackage ./python-packages/spleeter { };
@@ -97,8 +98,10 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
+    python311 = pythonOverridesFor prev.python311;
  
     makepyshell = final.python38.pkgs.makepyshell;
+    mavproxy = final.python38.pkgs.mavproxy;
     sunnyside = final.python38.pkgs.sunnyside;
     scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;

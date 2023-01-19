@@ -60,6 +60,11 @@
         rev = "9006a586bfc6233ea069c2c6975e57e42f470a17";
         ref = "main";
     };
+    mavproxy = builtins.fetchGit {
+        url = "https://github.com/ArduPilot/MAVProxy.git";
+        rev = "4c43c2e293f846eb3cca619640b7efb28a7d1f29";
+        ref = "master";
+    };
     mesh-plotter = builtins.fetchGit {
         url = "git@github.com:goromal/mesh-plotter.git";
         rev = "e973dd7abb45e64c509f712350399bcd2da372b5";
