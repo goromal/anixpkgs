@@ -101,7 +101,7 @@ in {
     python311 = pythonOverridesFor prev.python311;
  
     makepyshell = final.python38.pkgs.makepyshell;
-    mavproxy = final.python38.pkgs.mavproxy;
+    mavproxy = final.python311.pkgs.mavproxy;
     sunnyside = final.python38.pkgs.sunnyside;
     scrape = final.python38.pkgs.scrape;
     spleeter = final.python38.pkgs.spleeter;

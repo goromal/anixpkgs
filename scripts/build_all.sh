@@ -59,7 +59,7 @@ nb python38.pkgs.pyceres
 nb python38.pkgs.pyceres_factors
 nb python38.pkgs.pysorting
 nb python38.pkgs.makepyshell
-nb python38.pkgs.mavproxy
+nb mavproxy
 nb python38.pkgs.norbert
 # nb python38.pkgs.spleeter
 nb python38.pkgs.ichabod
