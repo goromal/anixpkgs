@@ -65,7 +65,7 @@ nb python38.pkgs.norbert
 nb python38.pkgs.ichabod
 nb python38.pkgs.pysignals
 nb python38.pkgs.mesh-plotter
-nb python38.pkgs.gmail-parser
+nb python310.pkgs.gmail-parser
 nb python38.pkgs.trafficsim
 nb python38.pkgs.imutils-cv4
 nb python38.pkgs.vidstab-cv4

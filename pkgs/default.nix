@@ -98,6 +98,7 @@ in {
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
+    python311 = pythonOverridesFor prev.python311;
  
     makepyshell = final.python38.pkgs.makepyshell;
     mavlog-utils = final.python38.pkgs.mavlog-utils;
@@ -113,7 +114,7 @@ in {
     flask-smfserver = final.python38.pkgs.flask-smfserver;
     rankserver = final.python38.pkgs.rankserver;
 
-    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python38; };
+    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
     xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; };
 
