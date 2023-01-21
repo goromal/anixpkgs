@@ -98,7 +98,7 @@ in {
     python310 = pythonOverridesFor prev.python310;
     python311 = pythonOverridesFor prev.python311;
     
-    python3 = python39;
+    python3 = final.python39;
  
     makepyshell = final.python3.pkgs.makepyshell;
     mavlog-utils = final.python3.pkgs.mavlog-utils;
