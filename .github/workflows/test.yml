@@ -23,7 +23,7 @@ jobs:
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_envs.sh
   tests:
-    name: Build and Test
+    name: Misc. Packages
     needs: envs
     runs-on: ubuntu-latest
     steps:
@@ -39,7 +39,7 @@ jobs:
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_misc.sh
   cpp:
-    name: Cpp Packages
+    name: C++ Packages
     needs: envs
     runs-on: ubuntu-latest
     steps:
