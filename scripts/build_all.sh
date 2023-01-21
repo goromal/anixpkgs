@@ -50,31 +50,31 @@ echo "Building Rust packages..."
 
 nb xv-lidar-rs
 
-echo "Building Python 3.8 packages (minus spleeter)..."
+echo "Building Python 3 packages (minus spleeter)..."
 
-nb python38.pkgs.sunnyside
-nb python38.pkgs.find_rotational_conventions
-nb python38.pkgs.geometry
-nb python38.pkgs.mavlog-utils
-nb python38.pkgs.pyceres
-nb python38.pkgs.pyceres_factors
-nb python38.pkgs.pysorting
-nb python38.pkgs.makepyshell
-nb python38.pkgs.norbert
-# nb python38.pkgs.spleeter
-nb python38.pkgs.ichabod
-nb python38.pkgs.pysignals
-nb python38.pkgs.mesh-plotter
+nb python3.pkgs.sunnyside
+nb python3.pkgs.find_rotational_conventions
+nb python3.pkgs.geometry
+nb python3.pkgs.mavlog-utils
+nb python3.pkgs.pyceres
+nb python3.pkgs.pyceres_factors
+nb python3.pkgs.pysorting
+nb python3.pkgs.makepyshell
+nb python3.pkgs.norbert
+# nb python3.pkgs.spleeter
+nb python3.pkgs.ichabod
+nb python3.pkgs.pysignals
+nb python3.pkgs.mesh-plotter
 nb python310.pkgs.gmail-parser
-nb python38.pkgs.trafficsim
-nb python38.pkgs.imutils-cv4
-nb python38.pkgs.vidstab-cv4
-nb python38.pkgs.flask-hello-world
-nb python38.pkgs.flask-url2mp4
-nb python38.pkgs.flask-mp4server
-nb python38.pkgs.flask-mp3server
-nb python38.pkgs.flask-smfserver
-nb python38.pkgs.rankserver
+nb python3.pkgs.trafficsim
+nb python3.pkgs.imutils-cv4
+nb python3.pkgs.vidstab-cv4
+nb python3.pkgs.flask-hello-world
+nb python3.pkgs.flask-url2mp4
+nb python3.pkgs.flask-mp4server
+nb python3.pkgs.flask-mp3server
+nb python3.pkgs.flask-smfserver
+nb python3.pkgs.rankserver
 
 echo "Building ROS packages..."
 

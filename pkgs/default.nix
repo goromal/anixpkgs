@@ -79,7 +79,7 @@ in {
     mp4 = prev.callPackage ./bash-packages/converters/mp4.nix { };
     pdf = prev.callPackage ./bash-packages/converters/pdf.nix { };
     png = prev.callPackage ./bash-packages/converters/png.nix { };
-    svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = prev.python38.pkgs.scour; };
+    svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = final.python3.pkgs.scour; };
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
     fix-perms = prev.callPackage ./bash-packages/fix-perms { };
 
@@ -93,26 +93,26 @@ in {
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
     simple-image-editor = prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; });
 
-    python27 = pythonOverridesFor prev.python27;
-    python37 = pythonOverridesFor prev.python37;
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
     python311 = pythonOverridesFor prev.python311;
+    
+    python3 = python39;
  
-    makepyshell = final.python38.pkgs.makepyshell;
-    mavlog-utils = final.python38.pkgs.mavlog-utils;
-    sunnyside = final.python38.pkgs.sunnyside;
-    scrape = final.python38.pkgs.scrape;
-    spleeter = final.python38.pkgs.spleeter;
-    find_rotational_conventions = final.python38.pkgs.find_rotational_conventions;
-    trafficsim = final.python38.pkgs.trafficsim;
-    flask-hello-world = final.python38.pkgs.flask-hello-world;
-    flask-url2mp4 = final.python38.pkgs.flask-url2mp4;
-    flask-mp4server = final.python38.pkgs.flask-mp4server;
-    flask-mp3server = final.python38.pkgs.flask-mp3server;
-    flask-smfserver = final.python38.pkgs.flask-smfserver;
-    rankserver = final.python38.pkgs.rankserver;
+    makepyshell = final.python3.pkgs.makepyshell;
+    mavlog-utils = final.python3.pkgs.mavlog-utils;
+    sunnyside = final.python3.pkgs.sunnyside;
+    scrape = final.python3.pkgs.scrape;
+    spleeter = final.python3.pkgs.spleeter;
+    find_rotational_conventions = final.python3.pkgs.find_rotational_conventions;
+    trafficsim = final.python3.pkgs.trafficsim;
+    flask-hello-world = final.python3.pkgs.flask-hello-world;
+    flask-url2mp4 = final.python3.pkgs.flask-url2mp4;
+    flask-mp4server = final.python3.pkgs.flask-mp4server;
+    flask-mp3server = final.python3.pkgs.flask-mp3server;
+    flask-smfserver = final.python3.pkgs.flask-smfserver;
+    rankserver = final.python3.pkgs.rankserver;
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
