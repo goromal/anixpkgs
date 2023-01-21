@@ -37,7 +37,7 @@ jobs:
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_cpp.sh
-   python:
+  python:
     name: Python Packages
     needs: cpp
     runs-on: ubuntu-latest
