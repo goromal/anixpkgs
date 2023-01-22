@@ -10,6 +10,6 @@ echo "Building build environments..."
 
 nb clangStdenv
 nb python3
-nb python3.pybind11
+nb python3.pkgs.pybind11
 nb python310
 nb rustPlatform
