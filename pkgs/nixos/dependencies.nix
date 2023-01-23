@@ -1,7 +1,6 @@
 { config }:
-let
+rec {
     anix-version = "0.7.0";
-in {
     # anixpkgs = import <anixpkgs>
     anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz")
     {
