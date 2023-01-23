@@ -1,4 +1,4 @@
-{ buildPythonApplication
+{ buildPythonPackage
 , flask
 , abc
 , mp3
@@ -12,7 +12,7 @@
 callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "flask_smfserver";
     version = "0.0.1";
-    inherit buildPythonApplication flask writeTextFile writeShellScript python;
+    inherit buildPythonPackage flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [];
     flaskScript = ''
         from subprocess import Popen, PIPE

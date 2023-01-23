@@ -7,18 +7,82 @@ on:
     branches:
       - master
 jobs:
-  tests:
-    name: Build and Test
+  envs:
+    name: Build Environments
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2.4.0
     - uses: cachix/install-nix-action@v15
       with:
-        nix_path: nixpkgs=channel:nixos-unstable
+        nix_path: nixpkgs=channel:nixos-22.05
     - uses: cachix/cachix-action@v10
       with:
         name: github-public
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_all.sh
+    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_envs.sh
+  tests:
+    name: Misc. Packages
+    needs: envs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.0
+    - uses: cachix/install-nix-action@v15
+      with:
+        nix_path: nixpkgs=channel:nixos-22.05
+    - uses: cachix/cachix-action@v10
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_misc.sh
+  cpp:
+    name: C++ Packages
+    needs: envs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.0
+    - uses: cachix/install-nix-action@v15
+      with:
+        nix_path: nixpkgs=channel:nixos-22.05
+    - uses: cachix/cachix-action@v10
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_cpp.sh
+  python:
+    name: Python Packages
+    needs: cpp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.0
+    - uses: cachix/install-nix-action@v15
+      with:
+        nix_path: nixpkgs=channel:nixos-22.05
+    - uses: cachix/cachix-action@v10
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_python.sh
+  ros:
+    name: ROS Packages
+    needs: python
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.4.0
+    - uses: cachix/install-nix-action@v15
+      with:
+        nix_path: nixpkgs=channel:nixos-22.05
+    - uses: cachix/cachix-action@v10
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_misc.sh

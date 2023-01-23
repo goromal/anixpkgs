@@ -1,6 +1,6 @@
 { pname
 , version
-, buildPythonApplication
+, buildPythonPackage
 , flask
 , writeTextFile
 , flaskScript
@@ -70,7 +70,7 @@ let
                 run()
         '' else flaskScript;
     };
-in buildPythonApplication rec {
+in buildPythonPackage rec {
     inherit pname;
     inherit version;
     src = ./.;

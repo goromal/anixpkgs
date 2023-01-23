@@ -1,4 +1,4 @@
-{ buildPythonApplication
+{ buildPythonPackage
 , flask
 , mp4
 , youtube-dl
@@ -13,7 +13,7 @@
 callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "flask_url2mp4";
     version = "0.0.0";
-    inherit buildPythonApplication flask writeTextFile writeShellScript python;
+    inherit buildPythonPackage flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [];
     flaskScript = ''
         from subprocess import Popen, PIPE
