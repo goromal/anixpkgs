@@ -1,8 +1,8 @@
 {
     nixpkgs = builtins.fetchGit {
         url = "git@github.com:NixOS/nixpkgs.git";
-        rev = "4d2b37a84fad1091b9de401eb450aae66f1a741e"; # initial cut
-        ref = "release-22.11";
+        rev = "4b7664384c7600dadb4dc8d1708626d073681b40"; # 01-08-23
+        ref = "master";
     };
     nix-ros-overlay = builtins.fetchGit {
         url = "git@github.com:lopsided98/nix-ros-overlay.git";

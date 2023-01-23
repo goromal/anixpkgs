@@ -58,6 +58,29 @@ let
         });
     }));
 in {
+    python38 = pythonOverridesFor prev.python38;
+    python39 = pythonOverridesFor prev.python39;
+    python310 = pythonOverridesFor prev.python310;
+    python311 = pythonOverridesFor prev.python311;
+
+    # python3 = final.python39; # causes loads of re-builds for clangStdenv
+ 
+    makepyshell = final.python39.pkgs.makepyshell;
+    mavlog-utils = final.python39.pkgs.mavlog-utils;
+    sunnyside = final.python39.pkgs.sunnyside;
+    scrape = final.python39.pkgs.scrape;
+    spleeter = final.python39.pkgs.spleeter;
+    find_rotational_conventions = final.python39.pkgs.find_rotational_conventions;
+    trafficsim = final.python39.pkgs.trafficsim;
+    flask-hello-world = final.python39.pkgs.flask-hello-world;
+    flask-url2mp4 = final.python39.pkgs.flask-url2mp4;
+    flask-mp4server = final.python39.pkgs.flask-mp4server;
+    flask-mp3server = final.python39.pkgs.flask-mp3server;
+    flask-smfserver = final.python39.pkgs.flask-smfserver;
+    rankserver = final.python39.pkgs.rankserver;
+
+    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
+
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
@@ -79,7 +102,7 @@ in {
     mp4 = prev.callPackage ./bash-packages/converters/mp4.nix { };
     pdf = prev.callPackage ./bash-packages/converters/pdf.nix { };
     png = prev.callPackage ./bash-packages/converters/png.nix { };
-    svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = final.python3.pkgs.scour; };
+    svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = final.python39.pkgs.scour; };
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
     fix-perms = prev.callPackage ./bash-packages/fix-perms { };
 
@@ -92,29 +115,6 @@ in {
     evil-hangman = prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; });
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
     simple-image-editor = prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; });
-
-    python38 = pythonOverridesFor prev.python38;
-    python39 = pythonOverridesFor prev.python39;
-    python310 = pythonOverridesFor prev.python310;
-    python311 = pythonOverridesFor prev.python311;
-    
-    python3 = final.python39;
- 
-    makepyshell = final.python3.pkgs.makepyshell;
-    mavlog-utils = final.python3.pkgs.mavlog-utils;
-    sunnyside = final.python3.pkgs.sunnyside;
-    scrape = final.python3.pkgs.scrape;
-    spleeter = final.python3.pkgs.spleeter;
-    find_rotational_conventions = final.python3.pkgs.find_rotational_conventions;
-    trafficsim = final.python3.pkgs.trafficsim;
-    flask-hello-world = final.python3.pkgs.flask-hello-world;
-    flask-url2mp4 = final.python3.pkgs.flask-url2mp4;
-    flask-mp4server = final.python3.pkgs.flask-mp4server;
-    flask-mp3server = final.python3.pkgs.flask-mp3server;
-    flask-smfserver = final.python3.pkgs.flask-smfserver;
-    rankserver = final.python3.pkgs.rankserver;
-
-    manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
     xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; };
 
