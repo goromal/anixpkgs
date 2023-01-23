@@ -1,4 +1,4 @@
-{ buildPythonApplication
+{ buildPythonPackage
 , flask
 , pysorting
 , strings
@@ -11,7 +11,7 @@
 callPackage ../builders/mkSimpleFlaskApp.nix {
     pname = "rankserver";
     version = "0.0.1";
-    inherit buildPythonApplication flask writeTextFile writeShellScript python;
+    inherit buildPythonPackage flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [ pysorting ];
     overrideFullFlaskScript = true;
     flaskScript = builtins.readFile ./server.py;
