@@ -123,6 +123,7 @@ in
         dtc
         ncdu
         nmap
+        nix-tree # https://github.com/utdemir/nix-tree
     ];
 
     programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
