@@ -135,6 +135,7 @@ with import ../dependencies.nix { inherit config; };
             libreoffice-qt
             alacritty
             nixos-generators
+            wireshark
             ## unstable
             unstable.google-chrome
             unstable.slack
