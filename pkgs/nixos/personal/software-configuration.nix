@@ -57,8 +57,6 @@ with import ../dependencies.nix { inherit config; };
     nixpkgs.config.pulseaudio = true;
 
     services.udev.packages = [ pkgs.dolphinEmu ];
-    
-    programs.wireshark.enable = true;
 
     home-manager.users.andrew = {
         # nixpkgs/pkgs/data/themes
@@ -135,7 +133,6 @@ with import ../dependencies.nix { inherit config; };
             libreoffice-qt
             alacritty
             nixos-generators
-            wireshark
             ## unstable
             unstable.google-chrome
             unstable.slack
