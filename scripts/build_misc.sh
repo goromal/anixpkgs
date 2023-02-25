@@ -31,6 +31,7 @@ nb code2pdf
 nb cpp-helper
 nb mp4unite
 nb git-cc
+nb pkgshell
 
 echo "Building Java packages..."
 

@@ -105,6 +105,7 @@ in {
     svg = prev.callPackage ./bash-packages/converters/svg.nix { scour = final.python39.pkgs.scour; };
     zipper = prev.callPackage ./bash-packages/converters/zipper.nix { };
     fix-perms = prev.callPackage ./bash-packages/fix-perms { };
+    pkgshell = prev.callPackage ./bash-packages/pkgshell { };
 
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };

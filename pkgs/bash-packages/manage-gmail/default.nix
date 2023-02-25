@@ -47,13 +47,14 @@ let
         '';
         optsWithVarsAndDefaults = [];
     };
-    custom-shell-cmd = callPackage ../bash-utils/mkCustomShellCmd.nix {
-        pkgList = [ pythonEnv ];
-        shellName = pkgname;
-        hookCmd = "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus'";
-        runCmd = "ipython";
-    };
+    shellFile = ../bash-utils/customShell.nix;
+    hookCmd = "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus'";
 in writeShellScriptBin pkgname ''
     ${argparse}
-    ${custom-shell-cmd}
+    nix-shell ${shellFile} \
+      --arg pkgList "[ ${pythonEnv} ]" \
+      --argstr shellName "${pkgname}" \
+      --argstr hookCmd "${hookCmd}" \
+      --arg colorCode 31 \
+      --run "ipython"
 ''
