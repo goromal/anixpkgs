@@ -1,0 +1,14 @@
+dev_dir = ~/dev
+data_dir = ~/data
+
+# deployments
+<anixpkgs> = ~/sources/anixpkgs
+
+# repositories
+[manif-geom-cpp] = anixpkgs manif-geom-cpp
+[geometry] = anixpkgs geometry
+[pyvitools] = git@github.com:goromal/pyvitools.git
+[scrape] = git@github.com:goromal/scrape.git
+
+# workspaces
+signals = manif-geom-cpp geometry pyvitools
