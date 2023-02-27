@@ -38,8 +38,10 @@ def get_deps_from_dep(dep, attr):
     return deps
 
 def main():
-    DEVDIR = "~/dev"
-    DATADIR = "~/data"
+    DEVDIR = os.path.expanduser("~/dev")
+    DATADIR = os.path.expanduser("~/data")
+    PKGSDIR = os.path.expanduser("~/sources/nixpkgs")
+    PKGSVAR = "<nixpkgs>"
     DEVRCFILE = os.path.expanduser("~/.devrc")
     # DEVRCFILE = "devrc_ex"
 
@@ -52,13 +54,13 @@ def main():
         exit()
 
     wsname = sys.argv[1]
-    deployments = {}
     repos = {}
+    attrs = {}
     urls = {}
     dependencies = {}
     wssources = []
     source_sets = []
-    sources = "[]" # "[{name=...;url=...;deps=[...];}]"
+    sources = "[]" # "[{name=...;url=...;attr=...;deps=[...];}]"
     foundws = False
 
     try:
@@ -68,11 +70,13 @@ def main():
                     left = line.split("=")[0].strip()
                     right = line.split("=")[1].strip()
                     if left == "dev_dir":
-                        DEVDIR = right
+                        DEVDIR = os.path.expanduser(right)
                     elif left == "data_dir":
-                        DATADIR = right
-                    elif "<" in left:
-                        deployments[left.replace("<","").replace(">","")] = os.path.expanduser(right)
+                        DATADIR = os.path.expanduser(right)
+                    elif left == "pkgs_dir":
+                        PKGSDIR = os.path.expanduser(right)
+                    elif left == "pkgs_var":
+                        PKGSVAR = right
                     elif "[" in left:
                         repos[left.replace("[","").replace("]","")] = right
                     elif left == wsname:
@@ -85,18 +89,19 @@ def main():
         for repo, spec in repos.items():
             specsplit = spec.split()
             if len(specsplit) > 1:
-                deployment = specsplit[0]
                 attr = specsplit[1]
-                dep = deployments[deployment]
-                urls[repo] = get_url_from_dep(dep, attr)
-                dependencies[repo] = get_deps_from_dep(dep, attr)
+                dep = PKGSDIR
+                attrs[repo] = f"pkgs.{attr}"
+                urls[repo] = get_url_from_dep(dep, attr.split(".")[-1])
+                dependencies[repo] = get_deps_from_dep(dep, attr.split(".")[-1])
             else:
+                attrs[repo] = ""
                 urls[repo] = specsplit[0]
                 dependencies[repo] = []
         
         for wssource in wssources:
             deps_str = "[{}]".format(" ".join(dependencies[wssource]))
-            source_sets.append(f"{{name=\"{wssource}\";url=\"{urls[wssource]}\";deps={deps_str};}}")
+            source_sets.append(f"{{name=\"{wssource}\";url=\"{urls[wssource]}\";attr=\"{attrs[wssource]}\";deps={deps_str};}}")
         
         sources = "[{}]".format("".join(source_sets))
 
@@ -104,7 +109,7 @@ def main():
         print("_BADDEVRC_")
         exit()
 
-    print(f"{DEVDIR}|{DATADIR}|{sources}")
+    print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{sources}")
 
 if __name__ == "__main__":
     main()

@@ -16,13 +16,12 @@ let
         =================================================================
         dev_dir = ~/dev
         data_dir = ~/data
-
-        # deployments
-        <anixpkgs> = ~/sources/anixpkgs
+        pkgs_dir = ~/sources/anixpkgs
+        pkgs_var = <anixpkgs>
 
         # repositories
-        [manif-geom-cpp] = anixpkgs manif-geom-cpp
-        [geometry] = anixpkgs geometry
+        [manif-geom-cpp] = pkgs manif-geom-cpp
+        [geometry] = pkgs python3.pkgs.geometry
         [pyvitools] = git@github.com:goromal/pyvitools.git
         [scrape] = git@github.com:goromal/scrape.git
 
@@ -35,6 +34,7 @@ let
     printErr = "${color-prints}/bin/echo_red";
     parseScript = ./parseWorkspace.py;
     shellFile = ./mkDevShell.nix;
+    shellSetupScript = ./setupWsShell.py;
 in writeShellScriptBin pkgname ''
     ${argparse}
 
@@ -61,12 +61,15 @@ in writeShellScriptBin pkgname ''
         IFS='|' read -ra rcinfoarray <<< "$rcinfo"
         dev_dir="''${rcinfoarray[0]}"
         data_dir="''${rcinfoarray[1]}"
-        sources_list="''${rcinfoarray[2]}"
+        pkgs_var="''${rcinfoarray[2]}"
+        sources_list="''${rcinfoarray[3]}"
         nix-shell ${shellFile} \
           --arg setupws ${setupws} \
           --argstr wsname "$wsname" \
           --argstr devDir "$dev_dir" \
           --argstr dataDir "$data_dir" \
+          --argstr pkgsVar "$pkgs_var" \
+          --arg shellSetupScript ${shellSetupScript} \
           --arg repoSpecList "$sources_list"
     fi
 ''

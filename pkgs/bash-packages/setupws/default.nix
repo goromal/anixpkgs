@@ -37,7 +37,7 @@ let
 
     printErr = "${color-prints}/bin/echo_red";
     printYlw = "${color-prints}/bin/echo_yellow";
-    printGrn = "${color-prints}/bin/echo_green"; # TODO ^^^^ add lorri support
+    printGrn = "${color-prints}/bin/echo_green";
 in writeShellScriptBin "setupws" ''
     ${argparse}
 
@@ -67,6 +67,8 @@ in writeShellScriptBin "setupws" ''
 
     if [[ ! -f .envrc ]]; then
         echo "export WSROOT=$dev_ws_dir" > .envrc
+        lorri init
+        echo 'eval "$(lorri direnv)"' >> .envrc
         direnv allow
     fi
 
