@@ -137,6 +137,10 @@ with import ../dependencies.nix { inherit config; };
             unstable.google-chrome
             unstable.slack
             ## my packages
+            anixpkgs.setupws
+            anixpkgs.listsources
+            anixpkgs.pkgshell
+            anixpkgs.devshell
             anixpkgs.color-prints
             anixpkgs.cpp-helper
             anixpkgs.makepyshell

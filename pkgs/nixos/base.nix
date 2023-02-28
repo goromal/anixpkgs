@@ -123,6 +123,8 @@ in
         dtc
         ncdu
         nmap
+        # https://github.com/utdemir/nix-tree
+        (writeShellScriptBin "nix-deps" ''nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree'')
     ];
 
     programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
@@ -148,7 +150,7 @@ in
         createHome = true;
         description = "Andrew Torgesen";
         group = "dev";
-        extraGroups = [ "users" "wheel" "networkmanager" "dialout" "video" "docker" "systemd-journal" ];
+        extraGroups = [ "users" "wheel" "networkmanager" "dialout" "video" "docker" "systemd-journal" "wireshark" ];
         subUidRanges = [ { count = 1; startUid = 1000; } { count = 65536; startUid = 100000; } ];
         subGidRanges = [ { count = 1; startGid = 100; } { count = 65536; startGid = 100000; } ];
         hashedPassword = "$6$0fv.6VfJi8qfOLtZ$nJ9OeiLzDenXaogPJl1bIe6ipx4KTnsyPExB.9sZk/dEXfFv34PtRRxZf28RKwrpcg5bgmee6QiQFGQQhv4rS/";
@@ -157,6 +159,8 @@ in
         ];
     };
     users.mutableUsers = true;
+
+    programs.wireshark.enable = true;
 
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
