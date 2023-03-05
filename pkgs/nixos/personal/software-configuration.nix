@@ -137,6 +137,10 @@ with import ../dependencies.nix { inherit config; };
             unstable.google-chrome
             unstable.slack
             ## my packages
+            anixpkgs.setupws
+            anixpkgs.listsources
+            anixpkgs.pkgshell
+            anixpkgs.devshell
             anixpkgs.color-prints
             anixpkgs.cpp-helper
             anixpkgs.makepyshell
@@ -165,6 +169,7 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.scrape
             anixpkgs.trafficsim
             anixpkgs.manage-gmail
+            anixpkgs.mavlog-utils
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
@@ -202,7 +207,14 @@ with import ../dependencies.nix { inherit config; };
         };
 
         home.file = {
-            ".background-image".source = ../res/wallpaper.jpg;
+            ".background-image".source = ((runCommand "make-wallpaper" {} ''
+                mkdir $out
+                ${imagemagick}/bin/convert -font ${../res/nexa.ttf} \
+                   -pointsize 30 \
+                   -fill black \
+                   -draw 'text 320,1343 "v${anix-version}"' \
+                   ${../res/wallpaper.png} $out/wallpaper.png
+            '') + "/wallpaper.png");
             ".face".source = ../res/ajt.png;
             "Templates/EmptyDocument".text = "";
             ".config/VSCodium/User/settings.json".source = ../res/vscode-settings.json;

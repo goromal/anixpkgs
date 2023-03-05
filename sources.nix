@@ -62,7 +62,7 @@
     };
     mavlog-utils = builtins.fetchGit {
         url = "git@github.com:goromal/mavlog-utils.git";
-        rev = "ce48f0c487dabf6139192a5098794b408abc5ffd";
+        rev = "3b108eeabe2c46aa5d1e160d5f53d94c5abb50eb";
         ref = "master";
     };
     mesh-plotter = builtins.fetchGit {
