@@ -39,6 +39,8 @@ let
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
             pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
             pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
+            python-dokuwiki = pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = pkgSources.python-dokuwiki; };
+            wiki-tools = pySelf.callPackage ./python-packages/wiki-tools { pkg-src = pkgSources.wiki-tools; };
             mavlog-utils = pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = pkgSources.mavlog-utils; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };

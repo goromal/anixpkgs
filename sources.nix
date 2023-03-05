@@ -90,6 +90,10 @@
         rev = "cdd7d537b013d1f46b8f42c635438c34e3784be2";
         ref = "master";
     };
+    python-dokuwiki = builtins.fetchGit {
+        url = "git@github.com:fmenabe/python-dokuwiki.git";
+        ref = "refs/tags/1.3.3";
+    };
     scrape = builtins.fetchGit {
         url = "git@github.com:goromal/scrape.git";
         rev = "78949266ffb0a15f396004865631a44c84ac7257";
@@ -99,6 +103,11 @@
         url = "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96.git";
         rev = "bd0d6741dbbd85d2951739c351dd501ac7e9af97";
         ref = "main";
+    };
+    wiki-tools = builtins.fetchGit {
+        url = "git@github.com:goromal/wiki-tools.git";
+        rev = "b13663ed6c607e91608eff5e023fe6bf7789379d";
+        ref = "master";
     };
     xv-lidar-rs = builtins.fetchGit {
         url = "git@github.com:goromal/xv-lidar-rs.git";
