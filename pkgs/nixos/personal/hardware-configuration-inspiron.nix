@@ -44,4 +44,7 @@
     libinput.touchpad.tappingDragLock = true;
     exportConfiguration = true;
   };
+
+  # Essential Firmware
+  hardware.enableRedistributableFirmware = lib.mkDefault true;
 }

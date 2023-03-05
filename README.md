@@ -2,6 +2,8 @@
 
 ![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
 
+![](anixpkgs.png "anixpkgs")
+
 A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
 
 The philosophy for the library implementations (and, sometimes, re-implementations) is to facilitate:
@@ -26,7 +28,7 @@ An example Nix shell for trying out Python packages:
 ```nix
 { pkgs ? import <nixpkgs> {} }:
 let
-  python-with-my-packages = pkgs.python38.withPackages (p: with p; [
+  python-with-my-packages = pkgs.python39.withPackages (p: with p; [
     numpy
     matplotlib
     geometry
@@ -43,17 +45,17 @@ let
   pkgs = import <anixpkgs> {};
 in pkgs.mkShell {
   buildInputs = [
-    pkgs.python38
-    pkgs.python38.pkgs.numpy
-    pkgs.python38.pkgs.geometry
-    pkgs.python38.pkgs.find_rotational_conventions
+    pkgs.python39
+    pkgs.python39.pkgs.numpy
+    pkgs.python39.pkgs.geometry
+    pkgs.python39.pkgs.find_rotational_conventions
     pkgs.rosPackages.noetic.tf-conversions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
     # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
     export PIP_PREFIX=$(pwd)/_build/pip_packages
-    export PYTHONPATH="$PIP_PREFIX/${pkgs.python3.sitePackages}:$PYTHONPATH"
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python39.sitePackages}:$PYTHONPATH"
     export PATH="$PIP_PREFIX/bin:$PATH"
     unset SOURCE_DATE_EPOCH
   '';
