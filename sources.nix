@@ -52,7 +52,7 @@
     };
     gmail-parser = builtins.fetchGit {
         url = "git@github.com:goromal/gmail_parser.git";
-        rev = "9302a5ebb6b5dc6e49c8119906c0a29216dbe301";
+        rev = "de149ce863c7742e50a92000a5f3013159d5129e";
         ref = "master";
     };
     makepyshell = builtins.fetchGit {
