@@ -132,6 +132,7 @@ in
     environment.shellAliases = {
         jfu = "journalctl -fu";
         nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
+        nrb = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot";
         code = "codium";
     };
     environment.noXlibs = false;
