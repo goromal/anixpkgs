@@ -40,6 +40,11 @@
         rev = "d930ce4ea14770822f0dcb24f00884593bc9918f";
         ref = "master";
     };
+    book-notes-sync = builtins.fetchGit {
+        url = "git@github.com:goromal/book-notes-sync.git";
+        rev = "39d17230dad81febac4ee8f2c3ebdd5d58e70b9f";
+        ref = "master";
+    };
     find_rotational_conventions = builtins.fetchGit {
         url = "https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e.git";
         rev = "f783b777f1c6dcea21a7a1d30519be2f56a810c3";
