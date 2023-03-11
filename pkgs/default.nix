@@ -81,6 +81,8 @@ in {
     flask-mp3server = final.python39.pkgs.flask-mp3server;
     flask-smfserver = final.python39.pkgs.flask-smfserver;
     rankserver = final.python39.pkgs.rankserver;
+    wiki-tools = final.python310.pkgs.wiki-tools;
+    book-notes-sync = final.python310.pkgs.book-notes-sync;
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
