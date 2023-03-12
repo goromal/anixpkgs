@@ -168,6 +168,8 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.scrape
             anixpkgs.trafficsim
             anixpkgs.manage-gmail
+            anixpkgs.wiki-tools
+            anixpkgs.book-notes-sync
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')

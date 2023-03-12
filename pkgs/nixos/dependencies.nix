@@ -1,6 +1,6 @@
 { config }:
 rec {
-    anix-version = "0.8.0";
+    anix-version = "0.9.0";
     # anixpkgs = import <anixpkgs>
     anixpkgs = import (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz")
     {
