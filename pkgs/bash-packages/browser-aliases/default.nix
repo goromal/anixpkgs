@@ -2,6 +2,7 @@
 , callPackage
 , writeShellScriptBin
 , color-prints
+, redirects
 , browserExec
 }:
 let
@@ -24,7 +25,7 @@ let
             ${printErr} "TAG2 not specified."
             exit 1
         fi
-        ${browserExec} "https://github.com/goromal/anixpkgs/compare/v$1...v$2"
+        ${browserExec} "https://github.com/goromal/anixpkgs/compare/v$1...v$2" ${redirects.suppress_all}
     '';
     open-notes-argparse = callPackage ../bash-utils/argparse.nix {
         usage_str = ''
@@ -41,7 +42,7 @@ let
             exit 1
         fi
         urls=$(for i in $@; do echo "https://notes.andrewtorgesen.com/doku.php?id=$i"; done)
-        ${browserExec} $urls
+        ${browserExec} $urls ${redirects.suppress_all}
     '';
 in stdenv.mkDerivation {
     name = "browser-aliases";
