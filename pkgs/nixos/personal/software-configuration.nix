@@ -172,6 +172,9 @@ with import ../dependencies.nix { inherit config; };
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
+            (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+                browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
+            })
         ];
 
         # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
