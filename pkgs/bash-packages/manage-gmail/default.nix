@@ -43,7 +43,7 @@ let
 
             You at least need a Google Drive secrets file:
 
-            ~/google_secrets/pydrive_secrets/client_secrets.json
+            ~/secrets/pydrive/client_secrets.json
         '';
         optsWithVarsAndDefaults = [];
     };

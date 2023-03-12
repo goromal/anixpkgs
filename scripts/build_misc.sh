@@ -12,7 +12,6 @@ nb abc
 nb doku
 nb epub
 nb gif
-nb html
 nb md
 nb mp3
 nb mp4
