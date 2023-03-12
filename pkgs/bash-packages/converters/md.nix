@@ -14,7 +14,7 @@ let
 
     Inputs:
         .md
-        .html
+        .doku
         .pdf
 
     Options:

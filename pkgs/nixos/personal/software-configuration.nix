@@ -154,7 +154,6 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.doku
             anixpkgs.epub
             anixpkgs.gif
-            anixpkgs.html
             anixpkgs.md
             anixpkgs.mp3
             anixpkgs.mp4

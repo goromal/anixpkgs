@@ -15,6 +15,7 @@ let
     Inputs:
         .pdf
         .md
+        .doku
         .epub
         .svg
 

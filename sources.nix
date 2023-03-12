@@ -111,7 +111,7 @@
     };
     wiki-tools = builtins.fetchGit {
         url = "git@github.com:goromal/wiki-tools.git";
-        rev = "b13663ed6c607e91608eff5e023fe6bf7789379d";
+        rev = "c83825e67b05fe59fe781560d140c06ac6915cf1";
         ref = "master";
     };
     xv-lidar-rs = builtins.fetchGit {
