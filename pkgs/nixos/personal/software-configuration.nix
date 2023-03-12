@@ -169,7 +169,6 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.scrape
             anixpkgs.trafficsim
             anixpkgs.manage-gmail
-            anixpkgs.mavlog-utils
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
