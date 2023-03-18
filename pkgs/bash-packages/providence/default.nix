@@ -30,8 +30,17 @@ in writeShellScriptBin pkgname ''
         RANDOM=$$$(date +%s)
         ${printGrn} ''${sentences[ $RANDOM % ''${#sentences[@]} ]}
     elif [[ "$domain" == "passage" ]]; then
-        ${printErr} "Not implemented yet! Sorry."
-        exit 1
+        readarray -t scriplist <<< $(${wikitools} get --page-id backend:scriptural-canon)
+        scripdesc=''${scriplist[ $RANDOM % ''${#scriplist[@]} ]}
+        readarray -d '!' -t scriptdat <<< "$scripdesc"
+        scripname="''${scriptdat[0]}"
+        readarray -d '|' -t bookspecs <<< "''${scriptdat[1]}"
+        bookspec=''${bookspecs[ $RANDOM % ''${#bookspecs[@]} ]}
+        readarray -d ':' -t bookdat <<< "$bookspec"
+        bookname="''${bookdat[0]}"
+        chapsnum="''${bookdat[1]}"
+        chap=$(( ( RANDOM % $chapsnum )  + 1 ))
+        ${printGrn} "''${scripname} -> ''${bookname} $chap"
     else
         ${printErr} "Unrecognized domain: $domain."
         exit 1
