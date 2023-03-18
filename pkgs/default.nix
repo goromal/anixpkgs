@@ -113,6 +113,7 @@ in {
     listsources = prev.callPackage ./bash-packages/listsources { };
     pkgshell = prev.callPackage ./bash-packages/pkgshell { };
     devshell = prev.callPackage ./bash-packages/devshell { };
+    providence = prev.callPackage ./bash-packages/providence { };
 
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };

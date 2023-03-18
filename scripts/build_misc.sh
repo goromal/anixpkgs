@@ -34,6 +34,7 @@ nb setupws
 nb listsources
 nb pkgshell
 nb devshell
+nb providence
 
 echo "Building Java packages..."
 
