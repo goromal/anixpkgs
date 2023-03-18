@@ -1,6 +1,7 @@
 { config, pkgs, lib, ... }:
 with pkgs;
 with lib;
+with import ./dependencies.nix { inherit config; };
 let
     nixos-version = "22.05"; # Should match the channel in <nixpkgs>
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
@@ -22,6 +23,11 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
     };
 
+    nix.nixPath = [
+        "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
+        "anixpkgs=/data/andrew/sources/anixpkgs"
+    ];
+
     nix.autoOptimiseStore = true;
     nix.buildCores = 4;
     nix.binaryCaches = [
@@ -40,7 +46,6 @@ in
         experimental-features = nix-command flakes
     '';
     nix.maxJobs = 4;
-    nix.nixPath = [ "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos" ];
     nixpkgs.config.allowUnfree = true;
 
     # Use the systemd-boot EFI boot loader.
@@ -165,6 +170,26 @@ in
 
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
+
+        home.packages = [
+            anixpkgs.color-prints
+            anixpkgs.git-cc
+            anixpkgs.fix-perms
+            anixpkgs.secure-delete
+            anixpkgs.sunnyside
+            anixpkgs.setupws
+            anixpkgs.listsources
+            anixpkgs.pkgshell
+            anixpkgs.devshell
+            anixpkgs.cpp-helper
+            anixpkgs.makepyshell
+            anixpkgs.wiki-tools
+            anixpkgs.book-notes-sync
+            anixpkgs.providence
+            anixpkgs.make-title
+            anixpkgs.pb
+            anixpkgs.manage-gmail
+        ];
 
         programs.git = {
             package = gitAndTools.gitFull;

@@ -7,10 +7,6 @@ with import ../dependencies.nix { inherit config; };
         ../base.nix
     ];
 
-    nix.nixPath = [
-        "anixpkgs=/data/andrew/sources/anixpkgs"
-    ];
-
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
     boot.supportedFilesystems = [ "ntfs" ];
     boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
@@ -137,18 +133,8 @@ with import ../dependencies.nix { inherit config; };
             unstable.google-chrome
             unstable.slack
             ## my packages
-            anixpkgs.setupws
-            anixpkgs.listsources
-            anixpkgs.pkgshell
-            anixpkgs.devshell
-            anixpkgs.color-prints
-            anixpkgs.cpp-helper
-            anixpkgs.makepyshell
-            anixpkgs.git-cc
             anixpkgs.md2pdf
             anixpkgs.notabilify
-            anixpkgs.make-title
-            anixpkgs.pb
             anixpkgs.code2pdf
             anixpkgs.abc
             anixpkgs.doku
@@ -162,14 +148,8 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.png
             anixpkgs.svg
             anixpkgs.zipper
-            anixpkgs.fix-perms
-            anixpkgs.secure-delete
-            anixpkgs.sunnyside
             anixpkgs.scrape
             anixpkgs.trafficsim
-            anixpkgs.manage-gmail
-            anixpkgs.wiki-tools
-            anixpkgs.book-notes-sync
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
