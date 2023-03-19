@@ -129,7 +129,16 @@ in
         ncdu
         nmap
         # https://github.com/utdemir/nix-tree
-        (writeShellScriptBin "nix-deps" ''nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree'')
+        (writeShellScriptBin "nix-deps" ''
+        if [[ $# -ge 2 ]]; then
+            nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree
+        elif [[ $# -eq 1 ]]; then
+            ${nix-tree}/bin/nix-tree "$1"
+        else
+            ${anixpkgs.color-prints}/bin/echo_red "Must specify either a store path or nix-build rules."
+        fi
+        '')
+        (writeShellScriptBin "anix-version" ''echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${if local-build then "Local Build" else "v${anix-version}"})"'')
     ];
 
     programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
