@@ -9,7 +9,7 @@ with lib;
     networking.hostName = "atorgesen-pi3-test";
 
     nix.nixPath = [
-        "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/raspberryPi/3/test.nix"
+        "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/pi/3/test.nix"
     ];
 
     system.stateVersion = "22.05";

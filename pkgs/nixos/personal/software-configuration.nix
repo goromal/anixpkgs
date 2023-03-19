@@ -195,7 +195,7 @@ with import ../dependencies.nix { inherit config; };
                 ${imagemagick}/bin/convert -font ${../res/nexa.ttf} \
                    -pointsize 30 \
                    -fill black \
-                   -draw 'text 320,1343 "v${anix-version}"' \
+                   -draw 'text 320,1343 "${if local-build then "Local Build" else "v${anix-version}"}"' \
                    ${../res/wallpaper.png} $out/wallpaper.png
             '') + "/wallpaper.png");
             ".face".source = ../res/ajt.png;
