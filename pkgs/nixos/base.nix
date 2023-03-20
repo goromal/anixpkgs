@@ -205,9 +205,21 @@ in
             enable = true;
             userName = "Andrew Torgesen";
             userEmail = "andrew.torgesen@gmail.com";
+            aliases = {
+                aa = "add -A";
+                cm = "commit -m";
+                co = "checkout";
+                s = "status";
+            };
             extraConfig = {
                 init = {
                     defaultBranch = "master";
+                };
+                push = {
+                    default = "current";
+                };
+                pull = {
+                    default = "current";
                 };
             };
         };
