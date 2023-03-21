@@ -210,6 +210,7 @@ in
                 cm = "commit -m";
                 co = "checkout";
                 s = "status";
+                d = "diff";
             };
             extraConfig = {
                 init = {
