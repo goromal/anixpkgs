@@ -22,7 +22,7 @@
     };
     sorting = builtins.fetchGit {
         url = "git@github.com:goromal/sorting.git";
-        rev = "06b7e099649f0b5a4dc8f6cff807017fe369890d";
+        rev = "b254d4c895afcbc551fb0b55eefe9c9cec388d80";
         ref = "master";
     };
     evil-hangman = builtins.fetchGit {
