@@ -7,10 +7,6 @@ with import ../dependencies.nix { inherit config; };
         ../base.nix
     ];
 
-    nix.nixPath = [
-        "anixpkgs=/data/andrew/sources/anixpkgs"
-    ];
-
     boot.loader.efi.efiSysMountPoint = "/boot/efi";
     boot.supportedFilesystems = [ "ntfs" ];
     boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
@@ -137,24 +133,13 @@ with import ../dependencies.nix { inherit config; };
             unstable.google-chrome
             unstable.slack
             ## my packages
-            anixpkgs.setupws
-            anixpkgs.listsources
-            anixpkgs.pkgshell
-            anixpkgs.devshell
-            anixpkgs.color-prints
-            anixpkgs.cpp-helper
-            anixpkgs.makepyshell
-            anixpkgs.git-cc
             anixpkgs.md2pdf
             anixpkgs.notabilify
-            anixpkgs.make-title
-            anixpkgs.pb
             anixpkgs.code2pdf
             anixpkgs.abc
             anixpkgs.doku
             anixpkgs.epub
             anixpkgs.gif
-            anixpkgs.html
             anixpkgs.md
             anixpkgs.mp3
             anixpkgs.mp4
@@ -163,16 +148,14 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.png
             anixpkgs.svg
             anixpkgs.zipper
-            anixpkgs.fix-perms
-            anixpkgs.secure-delete
-            anixpkgs.sunnyside
             anixpkgs.scrape
             anixpkgs.trafficsim
-            anixpkgs.manage-gmail
-            anixpkgs.mavlog-utils
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
+            (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+                browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
+            })
         ];
 
         # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
@@ -212,7 +195,7 @@ with import ../dependencies.nix { inherit config; };
                 ${imagemagick}/bin/convert -font ${../res/nexa.ttf} \
                    -pointsize 30 \
                    -fill black \
-                   -draw 'text 320,1343 "v${anix-version}"' \
+                   -draw 'text 320,1343 "${if local-build then "Local Build" else "v${anix-version}"}"' \
                    ${../res/wallpaper.png} $out/wallpaper.png
             '') + "/wallpaper.png");
             ".face".source = ../res/ajt.png;

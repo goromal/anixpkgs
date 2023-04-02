@@ -40,6 +40,11 @@
         rev = "d930ce4ea14770822f0dcb24f00884593bc9918f";
         ref = "master";
     };
+    book-notes-sync = builtins.fetchGit {
+        url = "git@github.com:goromal/book-notes-sync.git";
+        rev = "39d17230dad81febac4ee8f2c3ebdd5d58e70b9f";
+        ref = "master";
+    };
     find_rotational_conventions = builtins.fetchGit {
         url = "https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e.git";
         rev = "f783b777f1c6dcea21a7a1d30519be2f56a810c3";
@@ -52,7 +57,7 @@
     };
     gmail-parser = builtins.fetchGit {
         url = "git@github.com:goromal/gmail_parser.git";
-        rev = "9302a5ebb6b5dc6e49c8119906c0a29216dbe301";
+        rev = "de149ce863c7742e50a92000a5f3013159d5129e";
         ref = "master";
     };
     makepyshell = builtins.fetchGit {
@@ -90,6 +95,10 @@
         rev = "ca0439d63607990160c29a1c2d1e6eed450ac98f";
         ref = "master";
     };
+    python-dokuwiki = builtins.fetchGit {
+        url = "git@github.com:fmenabe/python-dokuwiki.git";
+        ref = "refs/tags/1.3.3";
+    };
     scrape = builtins.fetchGit {
         url = "git@github.com:goromal/scrape.git";
         rev = "78949266ffb0a15f396004865631a44c84ac7257";
@@ -99,6 +108,11 @@
         url = "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96.git";
         rev = "bd0d6741dbbd85d2951739c351dd501ac7e9af97";
         ref = "main";
+    };
+    wiki-tools = builtins.fetchGit {
+        url = "git@github.com:goromal/wiki-tools.git";
+        rev = "c83825e67b05fe59fe781560d140c06ac6915cf1";
+        ref = "master";
     };
     xv-lidar-rs = builtins.fetchGit {
         url = "git@github.com:goromal/xv-lidar-rs.git";

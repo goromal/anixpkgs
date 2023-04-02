@@ -8,10 +8,6 @@ with import ../dependencies.nix { inherit config; };
         ../base.nix
     ];
 
-    nix.nixPath = [
-        "anixpkgs=/data/andrew/sources/anixpkgs"
-    ];
-
     # boot.kernelPackages = mkForce config.boot.zfs.package.latestCompatibleLinuxPackages;
 
     # https://github.com/NixOS/nixpkgs/issues/154163
@@ -39,13 +35,7 @@ with import ../dependencies.nix { inherit config; };
     };
 
     home-manager.users.andrew = {
-        home.packages = [
-            anixpkgs.color-prints
-            anixpkgs.git-cc
-            anixpkgs.fix-perms
-            anixpkgs.secure-delete
-            anixpkgs.sunnyside
-        ];
+        # home.packages = [];
     };
 
     # Use 1GB of additional swap memory in order to not run out of memory

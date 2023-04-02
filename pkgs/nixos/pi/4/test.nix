@@ -12,7 +12,7 @@ with import ../../dependencies.nix { inherit config; };
     networking.hostName = "atorgesen-pi4-test";
 
     nix.nixPath = [
-        "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/raspberryPi/4/test.nix"
+        "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/pi/4/test.nix"
     ];
 
     system.stateVersion = "22.05";
