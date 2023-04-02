@@ -39,6 +39,9 @@ let
             pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
             pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
             pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
+            python-dokuwiki = pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = pkgSources.python-dokuwiki; };
+            book-notes-sync = pySelf.callPackage ./python-packages/book-notes-sync { pkg-src = pkgSources.book-notes-sync; };
+            wiki-tools = pySelf.callPackage ./python-packages/wiki-tools { pkg-src = pkgSources.wiki-tools; };
             mavlog-utils = pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = pkgSources.mavlog-utils; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
             makepyshell = pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; };
@@ -78,6 +81,8 @@ in {
     flask-mp3server = final.python39.pkgs.flask-mp3server;
     flask-smfserver = final.python39.pkgs.flask-smfserver;
     rankserver = final.python39.pkgs.rankserver;
+    wiki-tools = final.python310.pkgs.wiki-tools;
+    book-notes-sync = final.python310.pkgs.book-notes-sync;
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
@@ -96,7 +101,6 @@ in {
     doku = prev.callPackage ./bash-packages/converters/doku.nix { };
     epub = prev.callPackage ./bash-packages/converters/epub.nix { };
     gif = prev.callPackage ./bash-packages/converters/gif.nix { };
-    html = prev.callPackage ./bash-packages/converters/html.nix { };
     md = prev.callPackage ./bash-packages/converters/md.nix { };
     mp3 = prev.callPackage ./bash-packages/converters/mp3.nix { };
     mp4 = prev.callPackage ./bash-packages/converters/mp4.nix { };
@@ -109,6 +113,7 @@ in {
     listsources = prev.callPackage ./bash-packages/listsources { };
     pkgshell = prev.callPackage ./bash-packages/pkgshell { };
     devshell = prev.callPackage ./bash-packages/devshell { };
+    providence = prev.callPackage ./bash-packages/providence { };
 
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };

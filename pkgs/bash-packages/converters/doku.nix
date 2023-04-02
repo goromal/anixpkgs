@@ -10,11 +10,11 @@ let
     usage_str = ''
     usage: doku inputfile outputfile
 
-    Create a DokuWiki text file.
+    Create a DokuWiki page.
 
     Inputs:
         .txt (DokuWiki format)
-        .html
+        .md
 
     Options:
         --TODO
