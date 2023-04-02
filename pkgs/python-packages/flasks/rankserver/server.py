@@ -7,7 +7,7 @@ from pysorting import (
     QuickSortState,
     persistStateToDisk,
     sortStateFromDisk,
-    restfulRandomizedQuickSort,
+    restfulQuickSort,
 )
 
 UINT32_MAX = 0xffffffff
@@ -69,10 +69,7 @@ class RankServer:
         self.rank_list = []
         for idx in self.state.arr:
             self.rank_list.append(self.file_map[idx])
-        self.rev_rank_list = []
-        for i in range(self.state.n):
-            self.rev_rank_list.append(self.rank_list[-i])
-        print(self.rev_rank_list)
+        self.rev_rank_list = self.rank_list[::-1]
         return (True, "")
     
     def resetState(self):
@@ -90,13 +87,13 @@ class RankServer:
         return self.rev_rank_list
 
     def getCompFiles(self):
-        print(f"arr={self.state.arr}")
-        print(f"p={self.state.p} i={self.state.i} j={self.state.j}")
-        rightfile = self.rank_list[self.state.arr[self.state.p]]
+        # print(f"arr={self.state.arr}")
+        # print(f"p={self.state.p} i={self.state.i} j={self.state.j}")
+        rightfile = self.file_map[self.state.arr[self.state.p]]
         if self.state.l == int(ComparatorLeft.I):
-            leftfile = self.rank_list[self.state.arr[self.state.i]]
+            leftfile = self.file_map[self.state.arr[self.state.i]]
         else:
-            leftfile = self.rank_list[self.state.arr[self.state.j]]
+            leftfile = self.file_map[self.state.arr[self.state.j]]
         return (leftfile, rightfile)
     
     def submitChoice(self, enum_int):
@@ -105,7 +102,7 @@ class RankServer:
         i = 0
         self.state.c = enum_int
         while not full_step and i < max_iter:
-            res, state_out = restfulRandomizedQuickSort(self.state)
+            res, state_out = restfulQuickSort(self.state)
             if not res:
                 return (False, "RESTful sort step failed")
             self.state = state_out
@@ -139,10 +136,10 @@ def index():
             rankserver.resetState()
         else:
             if "choose_l" in flask.request.form:
-                print("CHOOSE LEFT")
+                # print("CHOOSE LEFT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_GREATER))
             else:
-                print("CHOOSE_RIGHT")
+                # print("CHOOSE_RIGHT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_LESS))
         rankserver.save()
     
