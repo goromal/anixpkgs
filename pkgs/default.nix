@@ -1,6 +1,7 @@
 final: prev: 
 with prev.lib;
 let
+    # Java base environment
     pkgSources = import ../sources.nix;
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
@@ -15,17 +16,24 @@ let
         jre = minJRE;
     };
 
+    # Pkg-build modules
     baseModuleArgs = {
         pkgs = final;
         config = final.config;
         lib = final.lib;
     };
-
     makeMachines = name: {
         sitl = import (./nixos + (("/" + name) + "/sitl.nix")) baseModuleArgs;
         # TODO add list arg for hardware names
     };
 
+    # Aarch64 defaults to gcc9 for the time being, which triggers a bug when building with pybind11.
+    # Provide a stdenv that forces gcc11 for Aarch64 machines.
+    myStdenv = (if (stdenv.hostPlatform.isAarch64 && stdenv.hostPlatform.isLinux)
+                then gcc11Stdenv
+                else clangStdenv);
+
+    # Python version-agnostic overrides
     pythonOverridesFor = superPython: fix (python: superPython.override ({
         packageOverrides ? _: _: {}, ...
     }: {
@@ -34,11 +42,11 @@ let
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
-            geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; };
-            pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
-            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; };
-            pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; };
-            pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
+            geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; clangStdenv = myStdenv; };
+            pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; clangStdenv = myStdenv; };
+            pyceres_factors = pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; clangStdenv = myStdenv; };
+            pysignals = pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; clangStdenv = myStdenv; };
+            pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; clangStdenv = myStdenv; };
             python-dokuwiki = pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = pkgSources.python-dokuwiki; };
             book-notes-sync = pySelf.callPackage ./python-packages/book-notes-sync { pkg-src = pkgSources.book-notes-sync; };
             wiki-tools = pySelf.callPackage ./python-packages/wiki-tools { pkg-src = pkgSources.wiki-tools; };
