@@ -31,10 +31,10 @@ let
     # Provide a stdenv that forces gcc11 for Aarch64 machines.
     # Will need a compatible python version (enforcing for Python39 only)
     mkAarchFriendly = (prev.stdenv.hostPlatform.isAarch64 && prev.stdenv.hostPlatform.isLinux);
-    myStdenv = (if mkAarchFriendly then prev.gcc11Stdenv else prev.clangStdenv);
-    myPython39 = (if mkAarchFriendly then (
-        builtins.getAttr "python39" (prev.pythonInterpreters.override { stdenv = prev.gcc11Stdenv; })
-        ) else prev.python39);
+    myAarchStdenv = prev.gcc11Stdenv;
+    myAarchPython = prev.pythonInterpreters.override { stdenv = myAarchStdenv; };
+    myStdenv = (if mkAarchFriendly then myAarchStdenv else prev.clangStdenv);
+    myPython39 = (if mkAarchFriendly then myAarchPython.python39 else prev.python39);
 
     # Python version-agnostic overrides
     pythonOverridesFor = superPython: fix (python: superPython.override ({
