@@ -29,9 +29,9 @@ let
 
     # Aarch64 defaults to gcc9 for the time being, which triggers a bug when building with pybind11.
     # Provide a stdenv that forces gcc11 for Aarch64 machines.
-    myStdenv = (if (stdenv.hostPlatform.isAarch64 && stdenv.hostPlatform.isLinux)
-                then gcc11Stdenv
-                else clangStdenv);
+    myStdenv = (if (prev.stdenv.hostPlatform.isAarch64 && prev.stdenv.hostPlatform.isLinux)
+                then prev.gcc11Stdenv
+                else prev.clangStdenv);
 
     # Python version-agnostic overrides
     pythonOverridesFor = superPython: fix (python: superPython.override ({
