@@ -15,6 +15,7 @@
         rev = "4d4c8781eaa5509a229ce6e04f751350cd0eb707";
         ref = "master";
     };
+    rankserver-cpp = ../../dev/ranking/sources/rankserver-cpp/.; # ^^^^ TODO
     secure-delete = builtins.fetchGit {
         url = "git@github.com:goromal/secure-delete.git";
         rev = "a114f5b0c24c2616b22f25be39430793587bd2fd";
