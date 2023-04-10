@@ -5,6 +5,11 @@
         rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";
         ref = "main";
     };
+    crowcpp = builtins.fetchGit {
+        url = "git@github.com:CrowCpp/Crow.git";
+        rev = "215834f8f9d0f50795ed92c5d255410053f30096";
+        ref = "master";
+    };
     manif-geom-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/manif-geom-cpp.git";
         rev = "4d4c8781eaa5509a229ce6e04f751350cd0eb707";
