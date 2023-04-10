@@ -12,12 +12,14 @@ let
 
         Options:
         --make-format-file             Dumps a format rules file into .clang-format
+        --make-exec-lib   CPPNAME      Generate a lib+exec package template
         --make-header-lib CPPNAME      Generate a header-only library template
         --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
         '';
         optsWithVarsAndDefaults = [
             { var = "makeff"; isBool = true; default = "0"; flags = "--make-format-file"; }
             { var = "makehot"; isBool = false; default = ""; flags = "--make-header-lib"; }
+            { var = "makeexl"; isBool = false; default = ""; flags = "--make-exec-lib"; }
             { var = "makepbl"; isBool = false; default = ""; flags = "--make-pybind-lib"; }
         ];
     };
@@ -49,6 +51,27 @@ let
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/README.md"
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/cmake/example-cppConfig.cmake.in"
         mv "$makehot/cmake/example-cppConfig.cmake.in" "$makehot/cmake/''${makehot}Config.cmake.in"
+    fi
+    '';
+    makeexlRule = ''
+    if [[ ! -z "$makeexl" ]]; then
+        if [[ -d "$makeexl" ]]; then
+            while true; do
+                read -p "Destination directory exists ($makeexl); remove? [yn] " yn
+                case $yn in
+                    [Yy]* ) rm -rf "$makeexl"; break;;
+                    [Nn]* ) echo "Aborting."; exit;;
+                    * ) ${printErr} "Please respond y or n";;
+                esac
+            done
+        fi
+        ${printGrn} "Generating lib+exec package boilerplate for $makeexl..."
+        git clone git@github.com:goromal/example-cpp2.git "$tmpdir/example-cpp2" ${redirects.suppress_all}
+        ${git-cc}/bin/git-cc "$tmpdir/example-cpp2" "$makeexl" ${redirects.suppress_all}
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/CMakeLists.txt"
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/README.md"
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/cmake/example-cppConfig.cmake.in"
+        mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
     '';
     makepblRule = ''
@@ -93,6 +116,7 @@ in writeShellScriptBin pkgname ''
     tmpdir=$(mktemp -d)
     ${makeffRule}
     ${makehotRule}
+    ${makeexlRule}
     ${makepblRule}
     rm -rf "$tmpdir"
 ''
