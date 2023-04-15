@@ -14,3 +14,4 @@ nb signals-cpp
 nb secure-delete
 nb sorting
 nb crowcpp
+nb rankserver-cpp

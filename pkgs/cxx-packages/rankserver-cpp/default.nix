@@ -1,8 +1,10 @@
 { clangStdenv
 , cmake
+, asio
 , boost
 , crowcpp
 , sorting
+, pkg-src
 }:
 clangStdenv.mkDerivation {
     name = "rankserver-cpp";
@@ -12,6 +14,7 @@ clangStdenv.mkDerivation {
         cmake
     ];
     buildInputs = [
+        asio
         boost
         crowcpp
         sorting
