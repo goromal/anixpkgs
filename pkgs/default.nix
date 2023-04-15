@@ -120,6 +120,8 @@ in {
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
     sorting = prev.callPackage ./cxx-packages/sorting { pkg-src = pkgSources.sorting; };
+    rankserver-cpp = prev.callPackage ./cxx-packages/rankserver-cpp { pkg-src = pkgSources.rankserver-cpp; };
+    crowcpp = prev.callPackage ./cxx-packages/crowcpp { pkg-src = pkgSources.crowcpp; };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; });
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });

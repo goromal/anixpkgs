@@ -5,9 +5,19 @@
         rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";
         ref = "main";
     };
+    crowcpp = builtins.fetchGit {
+        url = "git@github.com:goromal/Crow.git";
+        rev = "8405788649538e5a45c791af5db5df5e171a8844";
+        ref = "master";
+    };
     manif-geom-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/manif-geom-cpp.git";
         rev = "4d4c8781eaa5509a229ce6e04f751350cd0eb707";
+        ref = "master";
+    };
+    rankserver-cpp = builtins.fetchGit {
+        url = "git@github.com:goromal/rankserver-cpp.git";
+        rev = "45ed9b94b452cfe796590f465b4900d99e7c7aeb";
         ref = "master";
     };
     secure-delete = builtins.fetchGit {
