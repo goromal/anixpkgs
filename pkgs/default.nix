@@ -90,6 +90,7 @@ in {
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
     cpp-helper = prev.callPackage ./bash-packages/cpp-helper { };
+    dirgroups = prev.callPackage ./bash-packages/dirgroups { };
     git-cc = prev.callPackage ./bash-packages/git-cc { };
     md2pdf = prev.callPackage ./bash-packages/converters/md2pdf.nix { };
     mp4unite = prev.callPackage ./bash-packages/mp4unite { };
