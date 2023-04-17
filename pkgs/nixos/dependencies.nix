@@ -1,6 +1,6 @@
 { config }:
 rec {
-    local-build = false;
+    local-build = true;
     anix-version = "0.11.0";
     anixpkgs = import (if local-build then
         ../../default.nix else

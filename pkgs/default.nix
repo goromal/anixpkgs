@@ -60,7 +60,9 @@ let
             rankserver = pySelf.callPackage ./python-packages/flasks/rankserver { };
         });
     }));
-in {
+in rec {
+    pkgData = import pkgSources.anixdata {};
+
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;
@@ -123,6 +125,11 @@ in {
     sorting = prev.callPackage ./cxx-packages/sorting { pkg-src = pkgSources.sorting; };
     rankserver-cpp = prev.callPackage ./cxx-packages/rankserver-cpp { pkg-src = pkgSources.rankserver-cpp; };
     crowcpp = prev.callPackage ./cxx-packages/crowcpp { pkg-src = pkgSources.crowcpp; };
+    mfn = prev.callPackage ./cxx-packages/mfn {
+        pkg-src = pkgSources.mfn;
+        model-proto = pkgData.models.gender.proto.data;
+        model-weights = pkgData.models.gender.weights.data;
+    };
 
     evil-hangman = prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; });
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
