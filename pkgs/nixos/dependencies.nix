@@ -1,7 +1,7 @@
 { config }:
 rec {
-    local-build = true;
-    anix-version = "0.11.0";
+    local-build = false;
+    anix-version = "0.12.0";
     anixpkgs = import (if local-build then
         ../../default.nix else
         (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz"))
