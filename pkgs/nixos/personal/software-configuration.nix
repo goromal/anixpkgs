@@ -156,6 +156,7 @@ with import ../dependencies.nix { inherit config; };
             (anixpkgs.callPackage ../../bash-packages/browser-aliases {
                 browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
             })
+            anixpkgs.mfn
         ];
 
         # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
