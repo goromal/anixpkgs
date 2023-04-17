@@ -1,5 +1,10 @@
 {
     # TODO replace with flake.nix
+    anixdata = builtins.fetchGit {
+        url = "git@github.com:goromal/anixdata.git";
+        rev = "13b1b596e5c8db91c6e52e09cdd3b79f31b400a6";
+        ref = "master";
+    };
     ceres-factors = builtins.fetchGit {
         url = "git@github.com:goromal/ceres-factors.git";
         rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";
@@ -13,6 +18,11 @@
     manif-geom-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/manif-geom-cpp.git";
         rev = "4d4c8781eaa5509a229ce6e04f751350cd0eb707";
+        ref = "master";
+    };
+    mfn = builtins.fetchGit {
+        url = "git@github.com:goromal/mfn.git";
+        rev = "a46db67cb711f6d2033436114a2e9dbb9b2e87b3";
         ref = "master";
     };
     rankserver-cpp = builtins.fetchGit {
