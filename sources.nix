@@ -27,7 +27,7 @@
     };
     rankserver-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/rankserver-cpp.git";
-        rev = "45ed9b94b452cfe796590f465b4900d99e7c7aeb";
+        rev = "4b0b1f4295e3e3ad45a84e6323fe4260964b2044";
         ref = "master";
     };
     secure-delete = builtins.fetchGit {
