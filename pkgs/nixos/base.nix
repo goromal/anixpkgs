@@ -198,6 +198,7 @@ in
             anixpkgs.make-title
             anixpkgs.pb
             anixpkgs.manage-gmail
+            anixpkgs.dirgroups
         ];
 
         programs.git = {

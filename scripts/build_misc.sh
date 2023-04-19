@@ -20,6 +20,7 @@ nb png
 nb svg
 nb zipper
 nb color-prints
+nb dirgroups
 nb manage-gmail
 nb md2pdf
 nb notabilify

@@ -156,6 +156,7 @@ with import ../dependencies.nix { inherit config; };
             (anixpkgs.callPackage ../../bash-packages/browser-aliases {
                 browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
             })
+            anixpkgs.mfn
         ];
 
         # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
@@ -189,22 +190,29 @@ with import ../dependencies.nix { inherit config; };
             ];
         };
 
-        home.file = {
+        home.file = with anixpkgs.pkgData; {
             ".background-image".source = ((runCommand "make-wallpaper" {} ''
                 mkdir $out
-                ${imagemagick}/bin/convert -font ${../res/nexa.ttf} \
+                ${imagemagick}/bin/convert -font ${fonts.nexa.data} \
                    -pointsize 30 \
                    -fill black \
                    -draw 'text 320,1343 "${if local-build then "Local Build" else "v${anix-version}"}"' \
-                   ${../res/wallpaper.png} $out/wallpaper.png
+                   ${img.wallpaper.data} $out/wallpaper.png
             '') + "/wallpaper.png");
-            ".face".source = ../res/ajt.png;
+            ".face".source = img.ajt-logo-white.data;
             "Templates/EmptyDocument".text = "";
             ".config/VSCodium/User/settings.json".source = ../res/vscode-settings.json;
             ".config/zathura/zathurarc".source = ../res/zathurarc;
-            # https://rigel.netlify.app/#terminal
-            ".config/terminator/config".source = ../res/terminator-config;
+            ".config/terminator/config".source = ../res/terminator-config; # https://rigel.netlify.app/#terminal
             ".config/alacritty/alacritty.yml".source = ../res/alacritty.yml;
+            "configs/${configs.book-notes.name}".source = configs.book-notes.data;
+            "models/gender/${models.gender.proto.name}".source = models.gender.proto.data;
+            "models/gender/${models.gender.weights.name}".source = models.gender.weights.data;
+            "spleeter/pretrained_models/2stems/${models.spleeter.checkpoint.name}".source = models.spleeter.checkpoint.data;
+            "spleeter/pretrained_models/2stems/${models.spleeter.model-data.name}".source = models.spleeter.model-data.data;
+            "spleeter/pretrained_models/2stems/${models.spleeter.model-index.name}".source = models.spleeter.model-index.data;
+            "spleeter/pretrained_models/2stems/${models.spleeter.model-meta.name}".source = models.spleeter.model-meta.data;
+            "records/${records.crypt.name}".source = records.crypt.data;
         };
     }; 
 }
