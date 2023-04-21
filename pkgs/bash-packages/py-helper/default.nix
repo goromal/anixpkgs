@@ -2,6 +2,7 @@
 , callPackage
 , color-prints
 , redirects
+, strings
 , git-cc
 }:
 let
@@ -33,7 +34,7 @@ let
     fi
     '';
     makepkgRule = ''
-    if [[ ! -z "makepkg" ]]; then
+    if [[ ! -z "$makepkg" ]]; then
         if [[ -d "$makepkg" ]]; then
             while true; do
                 read -p "Destination directory exists ($makepkg); remove? [yn] " yn
@@ -45,14 +46,16 @@ let
             done
         fi
         ${printGrn} "Generating Python package template for $makepkg..."
-        git clone git@github.com:goromal/example-py.git "$tmpdir/example-py" ${redirects.suppress_all}
+        git clone git@github.com:goromal/example_py.git "$tmpdir/example-py" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-py" "$makepkg" ${redirects.suppress_all}
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/README.md"
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/setup.py"
+        makepkgSnake="$(${strings.kebabToSnake} $makepkg)"
+        sed -i 's|example_py|'"$makepkgSnake"'|g' "$makepkg/setup.py"
+        sed -i 's|example_py|'"$makepkgSnake"'|g' "$makepkg/example_py/__version__.py"
+        mv "$makepkg/example_py" "$makepkg/$makepkgSnake"
     fi
-    ''; 
-    # TODO implement example-py from wiki-tools
-    # TODO rename example_py dir (setup.py reference too) to makepkg [replacing - with _]
+    '';
     makepblRule = ''
     if [[ ! -z "$makepbl" ]]; then
         if [[ "$makepbl" != *","* ]]; then

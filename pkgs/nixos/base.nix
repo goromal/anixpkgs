@@ -191,6 +191,7 @@ in
             anixpkgs.pkgshell
             anixpkgs.devshell
             anixpkgs.cpp-helper
+            anixpkgs.py-helper
             anixpkgs.makepyshell
             anixpkgs.wiki-tools
             anixpkgs.book-notes-sync

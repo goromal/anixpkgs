@@ -22,4 +22,8 @@ rec {
         line="$1"
         echo "$line" | sed 's/ /\\ /g'
     '';
+    kebabToSnake = writeShellScript "kebabToSnake" ''
+        kebabstr="$1"
+        echo "''${kebabstr//-/_}"
+    '';
 }

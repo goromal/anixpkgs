@@ -7,7 +7,7 @@ in with pkgs; clangStdenv.mkDerivation {
         cmake
     ];
     buildInputs = [
-        # ADD depts
+        # ADD deps
     ];
     preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
