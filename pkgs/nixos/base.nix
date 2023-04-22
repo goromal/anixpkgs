@@ -110,6 +110,7 @@ in
         nethogs
         tcpdump
         gparted
+        logkeys
         tmux
         traceroute
         fish
