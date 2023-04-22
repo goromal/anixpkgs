@@ -29,6 +29,7 @@ nb make-title
 nb pb
 nb code2pdf
 nb cpp-helper
+nb py-helper
 nb mp4unite
 nb git-cc
 nb setupws
