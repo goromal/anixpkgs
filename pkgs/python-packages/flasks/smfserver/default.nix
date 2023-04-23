@@ -44,7 +44,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
                 if "FAILED" in mp3name:
                     return flask.render_template('index.html', prog_output=mp3name, text_content=smftext)
                 else:
-                    return flask.send_file(mp3name, attachment_filename=os.path.basename(mp3name))
+                    return flask.send_file(mp3name, download_name=os.path.basename(mp3name))
     '';
     templateText = ''
         <!DOCTYPE html>

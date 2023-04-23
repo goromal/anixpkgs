@@ -57,6 +57,7 @@ let
             flask-mp4server = pySelf.callPackage ./python-packages/flasks/mp4server { };
             flask-mp3server = pySelf.callPackage ./python-packages/flasks/mp3server { };
             flask-smfserver = pySelf.callPackage ./python-packages/flasks/smfserver { };
+            flask-oatbox = pySelf.callPackage ./python-packages/flasks/oatbox { };
             rankserver = pySelf.callPackage ./python-packages/flasks/rankserver { };
         });
     }));
@@ -82,6 +83,7 @@ in rec {
     flask-mp4server = final.python39.pkgs.flask-mp4server;
     flask-mp3server = final.python39.pkgs.flask-mp3server;
     flask-smfserver = final.python39.pkgs.flask-smfserver;
+    flask-oatbox = final.python39.pkgs.flask-oatbox;
     rankserver = final.python39.pkgs.rankserver;
     wiki-tools = final.python310.pkgs.wiki-tools;
     book-notes-sync = final.python310.pkgs.book-notes-sync;

@@ -37,7 +37,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
                 print('Operation complete.')
             
             if not vidname is None:
-                return flask.send_file(vidname, attachment_filename=os.path.basename(vidname))
+                return flask.send_file(vidname, download_name=os.path.basename(vidname))
     '';
     templateText = ''
         <!DOCTYPE html>

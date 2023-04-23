@@ -1,22 +1,22 @@
 { buildPythonPackage
 , flask
-, mp3
-, strings
-, redirects
 , writeTextFile
 , callPackage
 , writeShellScript
 , python
 }:
 callPackage ../builders/mkSimpleFlaskApp.nix {
-    pname = "flask_mp3server";
+    pname = "flask_oatbox";
     version = "0.0.0";
     inherit buildPythonPackage flask writeTextFile writeShellScript python;
     scriptPropagatedBuildInputs = [];
+    overrideFullFlaskScript = true;
     flaskScript = ''
-        from flask import send_file
-        import os, tempfile, shutil
-        from subprocess import Popen, PIPE
+        import flask
+        import argparse
+        import os
+
+        app = flask.Flask(__name__)
 
         takefile = None
 
@@ -39,26 +39,33 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
                 os.remove(f_prev)
             f.save(f.filename)
 
-@app.route('/', methods=['GET','POST'])
-def index():
-    return render_template('twowayfile.html', status=get_status())
+        @app.route('/', methods=['GET','POST'])
+        def index():
+            return flask.render_template('index.html', status=get_status())
 
-@app.route('/placebox', methods=['GET','POST'])
-def place():
-    if request.method == 'POST':    
-        ufile = request.files['file']
-        put_file(ufile)
-    return render_template('twowayfile.html', status=get_status())
+        @app.route('/placebox', methods=['GET','POST'])
+        def place():
+            if flask.request.method == 'POST':    
+                ufile = flask.request.files['file']
+                put_file(ufile)
+            return flask.render_template('index.html', status=get_status())
 
-@app.route('/takebox', methods=['GET','POST'])
-def take():
-    global takefile
-    if request.method == 'POST':
-        takefile = get_file()
+        @app.route('/takebox', methods=['GET','POST'])
+        def take():
+            global takefile
+            if flask.request.method == 'POST':
+                takefile = get_file()
 
-    if not takefile is None:
-        return send_file(takefile, attachment_filename=os.path.basename(takefile))
-
+            if not takefile is None:
+                return flask.send_file(takefile, download_name=os.path.basename(takefile))
+        
+        def run():
+            parser = argparse.ArgumentParser()
+            parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
+            args = parser.parse_args()
+            app.run(host="0.0.0.0", port=args.port)
+        if __name__ == "__main__":
+            run()
     '';
     templateText = ''
         <!doctype html>
@@ -89,5 +96,4 @@ def take():
           </body>
         </html>
     '';
-    helperScript = "";
 }
