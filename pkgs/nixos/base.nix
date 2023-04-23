@@ -84,22 +84,43 @@ in
 
     environment.systemPackages = [
         ack
+        procs
+        tldr
+        fzf
+        fdupes
+        exa # TODO ls (or l) alias?
+        zoxide # z, ...
+        duf
         gcc
         gdb
         git
+        tig
+        scc
+        most
         gnumake
+        just
+        hyperfine
         cmake
         direnv
         valgrind
         iotop
         iperf
+        iftop
         python3
+        xsel
         htop
         jq
         libpwquality
         libinput
+        rsync
         lsof
+        mc
         coreutils
+        ripgrep
+        diff-so-fancy
+        entr
+        bat
+        sd
         clang
         clang-tools
         neofetch
@@ -113,9 +134,11 @@ in
         logkeys
         tmux
         traceroute
+        mtr
         fish
         screen
         minicom
+        exiftool
         dhcpcd
         dnsutils
         v4l_utils
@@ -124,11 +147,14 @@ in
         chrony
         unzip
         wget
+        aria2
+        httpie
         ethtool
         arp-scan
         dtc
         ncdu
         nmap
+        unstable.mprocs
         # https://github.com/utdemir/nix-tree
         (writeShellScriptBin "nix-deps" ''
         if [[ $# -ge 2 ]]; then
