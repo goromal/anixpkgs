@@ -30,6 +30,7 @@ nb python39.pkgs.flask-url2mp4
 nb python39.pkgs.flask-mp4server
 nb python39.pkgs.flask-mp3server
 nb python39.pkgs.flask-smfserver
+nb python39.pkgs.flask-oatbox
 nb python39.pkgs.rankserver
 nb python310.pkgs.python-dokuwiki
 nb python310.pkgs.wiki-tools
