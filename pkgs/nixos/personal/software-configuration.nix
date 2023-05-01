@@ -113,6 +113,7 @@ with import ../dependencies.nix { inherit config; };
             vlc
             evince
             zathura
+            calibre
             maestral
             graphviz
             imagemagick
