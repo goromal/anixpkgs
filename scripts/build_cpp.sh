@@ -8,6 +8,7 @@ nix-build . -A $1
 
 echo "Building C++ packages..."
 
+nb aapis-cpp
 nb manif-geom-cpp
 nb ceres-factors
 nb signals-cpp

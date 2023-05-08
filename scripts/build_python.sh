@@ -8,6 +8,7 @@ nix-build . -A $1
 
 echo "Building Python 3 packages (minus spleeter)..."
 
+nb python39.pkgs.aapis-py
 nb python39.pkgs.sunnyside
 nb python39.pkgs.find_rotational_conventions
 nb python39.pkgs.geometry
