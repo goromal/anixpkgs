@@ -106,6 +106,7 @@ in rec {
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
+    aapis-grpcurl = prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; };
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };

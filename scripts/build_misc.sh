@@ -8,6 +8,7 @@ nix-build . -A $1
 
 echo "Building Bash packages..."
 
+nb aapis-grpcurl
 nb abc
 nb doku
 nb epub
