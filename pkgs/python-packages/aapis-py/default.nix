@@ -38,8 +38,9 @@ in buildPythonPackage rec {
         mkdir -p aapis_py/aapis_fds
         touch aapis_py/aapis_fds/__init__.py
         touch aapis_py/aapis_fds/py.typed
-        cp ${apis-fds} aapis_py/aapis_fds/aapis.desc
+        mkdir -p aapis_py/aapis
         touch aapis_py/aapis/py.typed
+        cp ${apis-fds} aapis_py/aapis_fds/aapis.desc
         ${bldCmd}
     '';
 }

@@ -3,7 +3,7 @@
 , protobuf
 , which
 , grpc
-, pkg-src # TODO grpc-support
+, pkg-src
 , grpc-support ? true
 }:
 let
