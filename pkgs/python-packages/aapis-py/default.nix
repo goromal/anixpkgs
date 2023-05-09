@@ -1,5 +1,5 @@
 { buildPythonPackage
-, buildPython
+, python
 , protobuf
 , apis-fds
 , pkg-src
@@ -8,7 +8,7 @@
 let
     bldCmd = if grpc-support then (
         let 
-            py = buildPython.withPackages(
+            py = python.withPackages(
                 p: with p; [ mypy-protobuf grpcio-tools ]
             );
         in ''
