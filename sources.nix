@@ -5,6 +5,11 @@
         rev = "13b1b596e5c8db91c6e52e09cdd3b79f31b400a6";
         ref = "master";
     };
+    aapis = builtins.fetchGit {
+        url = "git@github.com:goromal/aapis.git";
+        rev = "d6011aac0c36274c544ecf60ac98e10f717f9011";
+        ref = "master";
+    };
     ceres-factors = builtins.fetchGit {
         url = "git@github.com:goromal/ceres-factors.git";
         rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";

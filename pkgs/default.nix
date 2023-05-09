@@ -2,6 +2,21 @@ final: prev:
 with prev.lib;
 let
     pkgSources = import ../sources.nix;
+
+    aapis-fds = prev.stdenvNoCC.mkDerivation {
+        name = "aapis-fds";
+        nativeBuildInputs = [ prev.protobuf ];
+        src = "${pkgSources.aapis}/protos";
+        buildPhase = ''
+            includes=$(find ${prev.protobuf}/include/google/protobuf/*.proto)
+            files=$(find -name '*.proto')
+            protoc -I ${prev.protobuf}/include -I ./. --descriptor_set_out=./aapis.protoset $files $includes
+        '';
+        installPhase = ''
+            mv aapis.protoset $out  
+        '';
+    };
+
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
         jdk = minJDK;
@@ -31,6 +46,7 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            aapis-py = pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; };
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
@@ -90,6 +106,7 @@ in rec {
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
+    aapis-grpcurl = prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; };
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
@@ -121,6 +138,7 @@ in rec {
     devshell = prev.callPackage ./bash-packages/devshell { };
     providence = prev.callPackage ./bash-packages/providence { };
 
+    aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };

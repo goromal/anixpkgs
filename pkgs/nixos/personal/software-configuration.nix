@@ -174,6 +174,7 @@ with import ../dependencies.nix { inherit config; };
                 valentjn.vscode-ltex
                 llvm-vs-code-extensions.vscode-clangd
                 b4dm4n.vscode-nixpkgs-fmt
+                zxh404.vscode-proto3
             ] ++ vscode-utils.extensionsFromVscodeMarketplace [
                 {
                     name = "cmake";
