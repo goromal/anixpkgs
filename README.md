@@ -38,7 +38,7 @@ in
 python-with-my-packages.env
 ```
 
-or, if e.g., having to also use a ROS-based Python package concurrently:
+or:
 
 ```nix
 let
@@ -49,7 +49,6 @@ in pkgs.mkShell {
     pkgs.python39.pkgs.numpy
     pkgs.python39.pkgs.geometry
     pkgs.python39.pkgs.find_rotational_conventions
-    pkgs.rosPackages.noetic.tf-conversions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.

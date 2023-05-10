@@ -33,12 +33,10 @@ in
     nix.binaryCaches = [
         "https://cache.nixos.org/"
         "https://github-public.cachix.org"
-        "https://ros.cachix.org"
     ];
     nix.binaryCachePublicKeys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
-        "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
     ];
     nix.extraOptions = ''
         narinfo-cache-positive-ttl = 0
