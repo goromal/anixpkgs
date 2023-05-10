@@ -140,6 +140,7 @@ in rec {
 
     aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
+    mscpp = prev.callPackage ./cxx-packages/mscpp { pkg-src = pkgSources.mscpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
