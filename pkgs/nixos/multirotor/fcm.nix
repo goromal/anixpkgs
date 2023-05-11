@@ -4,7 +4,6 @@ with lib;
 {
     imports = [
         ../base.nix
-        ../../ros-packages/ros-core-modules/roscore-module.nix
     ];
 
     nix.nixPath = mkForce [
@@ -24,12 +23,5 @@ with lib;
     services.xserver.windowManager.icewm.enable = true;
 
     environment.systemPackages = [
-        rosPackages.noetic.rosnode
-        rosPackages.noetic.rostopic
-        rosPackages.noetic.roslaunch
     ];
-
-    services.roscore = {
-        enable = true;
-    };
 }
