@@ -47,4 +47,5 @@ nb simple-image-editor
 
 echo "Building Rust packages..."
 
+nb manif-geom-rs
 nb xv-lidar-rs

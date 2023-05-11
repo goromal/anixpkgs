@@ -156,6 +156,7 @@ in rec {
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
     simple-image-editor = prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; });
 
+    manif-geom-rs = prev.callPackage ./rust-packages/manif-geom-rs { pkg-src = pkgSources.manif-geom-rs; };
     xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; };
 
     aerowake = prev.callPackage ./ros-packages/aerowake { rosDistro = prev.rosPackages.noetic; };

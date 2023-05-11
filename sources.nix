@@ -139,6 +139,11 @@
         rev = "de3409a68fc8865c3d4902e2c6442555b77471f3";
         ref = "master";
     };
+    manif-geom-rs = builtins.fetchGit {
+        url = "git@github.com:goromal/manif-geom-rs.git";
+        rev = "641b52026a8594611324ce9134aad506f10965e8";
+        ref = "master";
+    };
     xv-lidar-rs = builtins.fetchGit {
         url = "git@github.com:goromal/xv-lidar-rs.git";
         rev = "6dea171e8871e660253bc12ba9f030a725162d1b";
