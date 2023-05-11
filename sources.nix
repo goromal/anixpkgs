@@ -30,6 +30,11 @@
         rev = "a46db67cb711f6d2033436114a2e9dbb9b2e87b3";
         ref = "master";
     };
+    mscpp = builtins.fetchGit {
+        url = "git@github.com:goromal/mscpp.git";
+        rev = "c2560bf1259965110c610a7d71bdd04a4076ce93";
+        ref = "master";
+    };
     rankserver-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/rankserver-cpp.git";
         rev = "4b0b1f4295e3e3ad45a84e6323fe4260964b2044";
