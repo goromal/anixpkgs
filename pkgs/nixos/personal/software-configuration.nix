@@ -48,9 +48,21 @@ with import ../dependencies.nix { inherit config; };
 
     services.lorri.enable = true;
 
-    sound.enable = true;
-    hardware.pulseaudio.enable = true;
-    nixpkgs.config.pulseaudio = true;
+    # Specialized bluetooth and sound settings for Apple AirPods
+    hardware.bluetooth.enable = true;
+    hardware.bluetooth.settings = {
+        General = {
+            ControllerMode = "bredr";
+        };
+    };
+    services.blueman.enable = true;
+    hardware.pulseaudio.enable = false;
+    security.rtkit.enable = true;
+    services.pipewire = {
+        enable = true;
+        alsa.enable = true;
+        pulse.enable = true;
+    };
 
     services.udev.packages = [ pkgs.dolphinEmu ];
 
