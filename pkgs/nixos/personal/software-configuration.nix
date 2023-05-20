@@ -48,21 +48,19 @@ with import ../dependencies.nix { inherit config; };
 
     services.lorri.enable = true;
 
+    # Specialized bluetooth and sound settings for Apple AirPods
     hardware.bluetooth.enable = true;
     hardware.bluetooth.settings = {
         General = {
             ControllerMode = "bredr";
         };
     };
-    systemd.services.bluetooth.serviceConfig.ExecStart = [
-        ""
-        "${pkgs.bluez}/libexec/bluetooth/bluetoothhd --noplugin=sap,avrcp"
-    ];
+    services.blueman.enable = true;
+    hardware.pulseaudio.enable = false;
     security.rtkit.enable = true;
     services.pipewire = {
         enable = true;
         alsa.enable = true;
-        alsa.support32Bit = true;
         pulse.enable = true;
     };
 
