@@ -48,9 +48,23 @@ with import ../dependencies.nix { inherit config; };
 
     services.lorri.enable = true;
 
-    sound.enable = true;
-    hardware.pulseaudio.enable = true;
-    nixpkgs.config.pulseaudio = true;
+    hardware.bluetooth.enable = true;
+    hardware.bluetooth.settings = {
+        General = {
+            ControllerMode = "bredr";
+        };
+    };
+    systemd.services.bluetooth.serviceConfig.ExecStart = [
+        ""
+        "${pkgs.bluez}/libexec/bluetooth/bluetoothhd --noplugin=sap,avrcp"
+    ];
+    security.rtkit.enable = true;
+    services.pipewire = {
+        enable = true;
+        alsa.enable = true;
+        alsa.support32Bit = true;
+        pulse.enable = true;
+    };
 
     services.udev.packages = [ pkgs.dolphinEmu ];
 
