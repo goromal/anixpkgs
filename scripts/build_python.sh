@@ -24,6 +24,7 @@ nb python39.pkgs.pysignals
 nb python39.pkgs.mesh-plotter
 nb python310.pkgs.gmail-parser
 nb python39.pkgs.trafficsim
+nb python39.pkgs.textual
 nb python39.pkgs.imutils-cv4
 nb python39.pkgs.vidstab-cv4
 nb python39.pkgs.flask-hello-world
