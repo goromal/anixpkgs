@@ -8,6 +8,7 @@ nix-build . -A $1
 
 echo "Building Bash packages..."
 
+nb aapis-grpcurl
 nb abc
 nb doku
 nb epub
@@ -37,6 +38,7 @@ nb listsources
 nb pkgshell
 nb devshell
 nb providence
+nb fixfname
 
 echo "Building Java packages..."
 
@@ -46,4 +48,5 @@ nb simple-image-editor
 
 echo "Building Rust packages..."
 
+nb manif-geom-rs
 nb xv-lidar-rs

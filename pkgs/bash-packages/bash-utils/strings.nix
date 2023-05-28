@@ -22,6 +22,14 @@ rec {
         line="$1"
         echo "$line" | sed 's/ /\\ /g'
     '';
+    dashSpaces = writeShellScript "dashSpaces" ''
+        line="$1"
+        echo "$line" | sed 's/ /-/g'
+    '';
+    removeListNotation = writeShellScript "removeListNotation" ''
+        line="$1"
+        echo "$line" | tr -d '[,],(,)'
+    '';
     kebabToSnake = writeShellScript "kebabToSnake" ''
         kebabstr="$1"
         echo "''${kebabstr//-/_}"

@@ -2,6 +2,21 @@ final: prev:
 with prev.lib;
 let
     pkgSources = import ../sources.nix;
+
+    aapis-fds = prev.stdenvNoCC.mkDerivation {
+        name = "aapis-fds";
+        nativeBuildInputs = [ prev.protobuf ];
+        src = "${pkgSources.aapis}/protos";
+        buildPhase = ''
+            includes=$(find ${prev.protobuf}/include/google/protobuf/*.proto)
+            files=$(find -name '*.proto')
+            protoc -I ${prev.protobuf}/include -I ./. --descriptor_set_out=./aapis.protoset $files $includes
+        '';
+        installPhase = ''
+            mv aapis.protoset $out  
+        '';
+    };
+
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
         jdk = minJDK;
@@ -31,6 +46,7 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
+            aapis-py = pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; };
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
             find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
@@ -90,6 +106,7 @@ in rec {
 
     manage-gmail = prev.callPackage ./bash-packages/manage-gmail { python = final.python310; };
 
+    aapis-grpcurl = prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; };
     strings = prev.callPackage ./bash-packages/bash-utils/strings.nix { };
     redirects = prev.callPackage ./bash-packages/bash-utils/redirects.nix { };
     color-prints = prev.callPackage ./bash-packages/color-prints { };
@@ -120,8 +137,11 @@ in rec {
     pkgshell = prev.callPackage ./bash-packages/pkgshell { };
     devshell = prev.callPackage ./bash-packages/devshell { };
     providence = prev.callPackage ./bash-packages/providence { };
+    fixfname = prev.callPackage ./bash-packages/fixfname { };
 
+    aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
+    mscpp = prev.callPackage ./cxx-packages/mscpp { pkg-src = pkgSources.mscpp; };
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };
@@ -138,9 +158,8 @@ in rec {
     spelling-corrector = prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; });
     simple-image-editor = prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; });
 
+    manif-geom-rs = prev.callPackage ./rust-packages/manif-geom-rs { pkg-src = pkgSources.manif-geom-rs; };
     xv-lidar-rs = prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; };
-
-    aerowake = prev.callPackage ./ros-packages/aerowake { rosDistro = prev.rosPackages.noetic; };
 
     nixos-machines = rec {
         personal = makeMachines "personal";
