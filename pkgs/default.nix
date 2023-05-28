@@ -137,6 +137,7 @@ in rec {
     pkgshell = prev.callPackage ./bash-packages/pkgshell { };
     devshell = prev.callPackage ./bash-packages/devshell { };
     providence = prev.callPackage ./bash-packages/providence { };
+    fixfname = prev.callPackage ./bash-packages/fixfname { };
 
     aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
     manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
