@@ -8,6 +8,7 @@ nix-build . -A $1
 
 echo "Building Python 3 packages (minus spleeter)..."
 
+nb python39.pkgs.aapis-py
 nb python39.pkgs.sunnyside
 nb python39.pkgs.find_rotational_conventions
 nb python39.pkgs.geometry
@@ -31,6 +32,7 @@ nb python39.pkgs.flask-url2mp4
 nb python39.pkgs.flask-mp4server
 nb python39.pkgs.flask-mp3server
 nb python39.pkgs.flask-smfserver
+nb python39.pkgs.flask-oatbox
 nb python39.pkgs.rankserver
 nb python310.pkgs.python-dokuwiki
 nb python310.pkgs.wiki-tools

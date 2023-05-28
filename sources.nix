@@ -5,6 +5,11 @@
         rev = "13b1b596e5c8db91c6e52e09cdd3b79f31b400a6";
         ref = "master";
     };
+    aapis = builtins.fetchGit {
+        url = "git@github.com:goromal/aapis.git";
+        rev = "d6011aac0c36274c544ecf60ac98e10f717f9011";
+        ref = "master";
+    };
     ceres-factors = builtins.fetchGit {
         url = "git@github.com:goromal/ceres-factors.git";
         rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";
@@ -23,6 +28,11 @@
     mfn = builtins.fetchGit {
         url = "git@github.com:goromal/mfn.git";
         rev = "a46db67cb711f6d2033436114a2e9dbb9b2e87b3";
+        ref = "master";
+    };
+    mscpp = builtins.fetchGit {
+        url = "git@github.com:goromal/mscpp.git";
+        rev = "c2560bf1259965110c610a7d71bdd04a4076ce93";
         ref = "master";
     };
     rankserver-cpp = builtins.fetchGit {
@@ -132,6 +142,11 @@
     wiki-tools = builtins.fetchGit {
         url = "git@github.com:goromal/wiki-tools.git";
         rev = "de3409a68fc8865c3d4902e2c6442555b77471f3";
+        ref = "master";
+    };
+    manif-geom-rs = builtins.fetchGit {
+        url = "git@github.com:goromal/manif-geom-rs.git";
+        rev = "641b52026a8594611324ce9134aad506f10965e8";
         ref = "master";
     };
     xv-lidar-rs = builtins.fetchGit {
