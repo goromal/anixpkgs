@@ -152,7 +152,14 @@ in
         dtc
         ncdu
         nmap
+        navi
         unstable.mprocs
+        bandwhich
+        bpytop
+        glances
+        gping
+        dog
+        rclone # TODO incorporate
         # https://github.com/utdemir/nix-tree
         (writeShellScriptBin "nix-deps" ''
         if [[ $# -ge 2 ]]; then
