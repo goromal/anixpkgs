@@ -35,5 +35,6 @@ nb python39.pkgs.flask-smfserver
 nb python39.pkgs.flask-oatbox
 nb python39.pkgs.rankserver
 nb python310.pkgs.python-dokuwiki
+nb python310.pkgs.task-tools
 nb python310.pkgs.wiki-tools
 nb python310.pkgs.book-notes-sync

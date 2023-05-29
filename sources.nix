@@ -134,6 +134,11 @@
         rev = "78949266ffb0a15f396004865631a44c84ac7257";
         ref = "master";
     };
+    task-tools = builtins.fetchGit {
+        url = "git@github.com:goromal/task-tools.git";
+        rev = "e48d9d05519e452b5257f655fcd0c35768ced4d8";
+        ref = "master";
+    };
     trafficsim = builtins.fetchGit {
         url = "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96.git";
         rev = "bd0d6741dbbd85d2951739c351dd501ac7e9af97";
