@@ -38,6 +38,7 @@ nb listsources
 nb pkgshell
 nb devshell
 nb providence
+nb providence-tasker
 nb fixfname
 
 echo "Building Java packages..."

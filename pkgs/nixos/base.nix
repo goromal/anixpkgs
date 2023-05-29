@@ -228,6 +228,7 @@ in
             anixpkgs.wiki-tools
             anixpkgs.book-notes-sync
             anixpkgs.providence
+            anixpkgs.providence-tasker
             anixpkgs.make-title
             anixpkgs.pb
             anixpkgs.manage-gmail

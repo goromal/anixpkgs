@@ -142,6 +142,7 @@ in rec {
     pkgshell = prev.callPackage ./bash-packages/pkgshell { };
     devshell = prev.callPackage ./bash-packages/devshell { };
     providence = prev.callPackage ./bash-packages/providence { };
+    providence-tasker = prev.callPackage ./bash-packages/providence/tasker.nix { };
     fixfname = prev.callPackage ./bash-packages/fixfname { };
 
     aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
