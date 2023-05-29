@@ -57,6 +57,7 @@ let
             pysorting = pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; };
             python-dokuwiki = pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = pkgSources.python-dokuwiki; };
             book-notes-sync = pySelf.callPackage ./python-packages/book-notes-sync { pkg-src = pkgSources.book-notes-sync; };
+            task-tools = pySelf.callPackage ./python-packages/task-tools { pkg-src = pkgSources.task-tools; };
             wiki-tools = pySelf.callPackage ./python-packages/wiki-tools { pkg-src = pkgSources.wiki-tools; };
             mavlog-utils = pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = pkgSources.mavlog-utils; };
             mesh-plotter = pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; };
@@ -104,6 +105,7 @@ in rec {
     flask-smfserver = final.python39.pkgs.flask-smfserver;
     flask-oatbox = final.python39.pkgs.flask-oatbox;
     rankserver = final.python39.pkgs.rankserver;
+    task-tools = final.python310.pkgs.task-tools;
     wiki-tools = final.python310.pkgs.wiki-tools;
     book-notes-sync = final.python310.pkgs.book-notes-sync;
 
