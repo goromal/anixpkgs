@@ -106,6 +106,8 @@ with import ../dependencies.nix { inherit config; };
                     "pinta.desktop"
                     "gimp.desktop"
                     "org.inkscape.Inkscape.desktop"
+                    "audacity.desktop"
+                    "blender.desktop"
                 ];
                 "enabled-extensions" = [
                     "Vitals@CoreCoding.com"
@@ -123,7 +125,7 @@ with import ../dependencies.nix { inherit config; };
             vlc
             evince
             zathura
-            inkscape
+            calibre
             maestral
             graphviz
             imagemagick
@@ -144,6 +146,9 @@ with import ../dependencies.nix { inherit config; };
             ## unstable
             unstable.google-chrome
             unstable.slack
+            unstable.inkscape
+            unstable.audacity
+            unstable.blender
             ## my packages
             anixpkgs.md2pdf
             anixpkgs.notabilify
