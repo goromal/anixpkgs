@@ -22,7 +22,7 @@
     };
     manif-geom-cpp = builtins.fetchGit {
         url = "git@github.com:goromal/manif-geom-cpp.git";
-        rev = "4d4c8781eaa5509a229ce6e04f751350cd0eb707";
+        rev = "e3497d2e04a109fcd1dedf8af02a89e76c853fde";
         ref = "master";
     };
     mfn = builtins.fetchGit {
