@@ -112,7 +112,7 @@
     };
     pyceres_factors = builtins.fetchGit {
         url = "https://github.com/goromal/pyceres_factors";
-        rev = "54f9a1dbb4fb9a5b74a72bb1377575bd0016d3c1";
+        rev = "ccfadca7f9f735571bb90adf60c18d29645bcdde";
         ref = "main";
     };
     pysignals = builtins.fetchGit {
