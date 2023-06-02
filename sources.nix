@@ -12,7 +12,7 @@
     };
     ceres-factors = builtins.fetchGit {
         url = "https://github.com/goromal/ceres-factors";
-        rev = "ee861da2f7f756046703cee2620ffdea7d71a5be";
+        rev = "8bff0917d7a05d25f86b23ff097bfebf10a987f9";
         ref = "main";
     };
     crowcpp = builtins.fetchGit {
