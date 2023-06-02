@@ -46,7 +46,7 @@ let
             done
         fi
         ${printGrn} "Generating Python package template for $makepkg..."
-        git clone git@github.com:goromal/example_py.git "$tmpdir/example-py" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example_py "$tmpdir/example-py" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-py" "$makepkg" ${redirects.suppress_all}
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/README.md"
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/setup.py"
@@ -84,7 +84,7 @@ let
             done
         fi
         ${printGrn} "Generating pybind wrapper library boilerplate for $pblname wrapping $cppname..."
-        git clone git@github.com:goromal/example_cpp_py.git "$tmpdir/example_cpp_py" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example_cpp_py "$tmpdir/example_cpp_py" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example_cpp_py" "$pblname" ${redirects.suppress_all}
         sed -i 's|example_cpp_py|'"$pblname"'|g' "$pblname/python_module.cpp"
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/python_module.cpp"
