@@ -54,7 +54,7 @@ let
             done
         fi
         ${printGrn} "Generating header-only boilerplate for $makehot..."
-        git clone git@github.com:goromal/example-cpp.git "$tmpdir/example-cpp" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example-cpp "$tmpdir/example-cpp" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-cpp" "$makehot" ${redirects.suppress_all}
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/CMakeLists.txt"
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/README.md"
@@ -75,7 +75,7 @@ let
             done
         fi
         ${printGrn} "Generating lib+exec package boilerplate for $makeexl..."
-        git clone git@github.com:goromal/example-cpp2.git "$tmpdir/example-cpp2" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example-cpp2 "$tmpdir/example-cpp2" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-cpp2" "$makeexl" ${redirects.suppress_all}
         sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/CMakeLists.txt"
         sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/README.md"
