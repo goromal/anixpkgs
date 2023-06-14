@@ -49,6 +49,7 @@ let
             aapis-py = pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; };
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
+            fqt = pySelf.callPackage ./python-packages/fqt { };
             find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
             geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; };
             pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
@@ -94,6 +95,7 @@ in rec {
     makepyshell = final.python39.pkgs.makepyshell;
     mavlog-utils = final.python39.pkgs.mavlog-utils;
     sunnyside = final.python39.pkgs.sunnyside;
+    fqt = final.python39.pkgs.fqt;
     scrape = final.python39.pkgs.scrape;
     spleeter = final.python39.pkgs.spleeter;
     find_rotational_conventions = final.python39.pkgs.find_rotational_conventions;

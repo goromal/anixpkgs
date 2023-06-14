@@ -167,6 +167,7 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.zipper
             anixpkgs.scrape
             anixpkgs.trafficsim
+            anixpkgs.fqt
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')

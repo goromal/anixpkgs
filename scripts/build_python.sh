@@ -10,6 +10,7 @@ echo "Building Python 3 packages (minus spleeter)..."
 
 nb python39.pkgs.aapis-py
 nb python39.pkgs.sunnyside
+nb python39.pkgs.fqt
 nb python39.pkgs.find_rotational_conventions
 nb python39.pkgs.geometry
 nb python39.pkgs.mavlog-utils
