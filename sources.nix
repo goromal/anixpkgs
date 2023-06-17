@@ -136,7 +136,7 @@
     };
     task-tools = builtins.fetchGit {
         url = "https://github.com/goromal/task-tools";
-        rev = "e48d9d05519e452b5257f655fcd0c35768ced4d8";
+        rev = "6f8891e62df97921f420f30d904037272b295edc";
         ref = "master";
     };
     trafficsim = builtins.fetchGit {
