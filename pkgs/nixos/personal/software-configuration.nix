@@ -120,6 +120,8 @@ with import ../dependencies.nix { inherit config; };
 
         home.packages = [
             ## upstream
+            pavucontrol # compatible with pipewire-pulse
+            kooha # wayland-compatible screen recorder
             gnome3.gnome-tweaks
             gnomeExtensions.vitals
             vlc
