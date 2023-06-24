@@ -83,7 +83,7 @@ let
         });
     }));
 in rec {
-    pkgData = import pkgSources.anixdata {};
+    pkgData = prev.callPackage pkgSources.anixdata {};
 
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;

@@ -1,6 +1,7 @@
 { config }:
 rec {
     local-build = false;
+    nixos-version = "23.05"; # Should match the channel in <nixpkgs>
     anix-version = "0.15.1";
     anixpkgs = import (if local-build then
         ../../default.nix else
