@@ -67,8 +67,6 @@ with import ../dependencies.nix { inherit config; };
     services.udev.packages = [ pkgs.dolphinEmu ];
 
     home-manager.users.andrew = {
-        home.stateVersion = nixos-version;
-
         # nixpkgs/pkgs/data/themes
         # nixpkgs/pkgs/data/icons
         gtk = {
