@@ -10,7 +10,7 @@ in
         (import "${home-manager}/nixos")
     ];
 
-    system.stateVersion = nixos-version;
+    system.stateVersion = nixos-state;
 
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.kernel.sysctl = {
@@ -217,6 +217,7 @@ in
 
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
+        home.stateVersion = homem-state;
 
         home.packages = [
             anixpkgs.color-prints
