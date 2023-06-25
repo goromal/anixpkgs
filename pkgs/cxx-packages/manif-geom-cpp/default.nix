@@ -19,9 +19,11 @@ clangStdenv.mkDerivation {
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
     '';
     meta = {
-        description = "test";
+        description = "Templated, header-only implementations for SO(2), SE(2), SO(3), SE(3).";
         longDescription = ''
-        Something something $SO(3)$ and $SE(3)$.
+            [Repository](https://github.com/goromal/manif-geom-cpp)
+
+            $$R(q)=I$$
         '';
-    }
+    };
 }

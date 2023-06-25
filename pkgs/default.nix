@@ -17,6 +17,30 @@ let
         '';
     };
 
+    addDoc = pkg-attr: pkg-attr // rec {
+        doc = prev.writeTextFile {
+            name = "doc.txt";
+            text = (if builtins.hasAttr "description" pkg-attr.meta then ''
+            ${pkg-attr.meta.description}
+
+            ${pkg-attr.meta.longDescription}
+            '' else ''
+            No package documentation currently provided.
+            '');
+        };
+    };
+
+    # docGen = pkg-attr: prev.writeTextFile {
+    #     name = "doc.txt";
+    #     text = (if builtins.hasAttr "description" pkg-attr.meta then ''
+    #     ${pkg-attr.meta.description}
+
+    #     ${pkg-attr.meta.longDescription}
+    #     '' else ''
+    #     No package documentation currently provided.
+    #     '');
+    # };
+
     minJDK = prev.jdk11_headless;
     minJRE = prev.jre_minimal.override {
         jdk = minJDK;
@@ -49,7 +73,7 @@ let
             aapis-py = pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; };
             gmail-parser = pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; };
             sunnyside = pySelf.callPackage ./python-packages/sunnyside { };
-            fqt = pySelf.callPackage ./python-packages/fqt { };
+            fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; };
             geometry = pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; };
             pyceres = pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; };
@@ -148,8 +172,13 @@ in rec {
     fixfname = prev.callPackage ./bash-packages/fixfname { };
 
     aapis-cpp = prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; };
-    manif-geom-cpp = prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; };
-    mscpp = prev.callPackage ./cxx-packages/mscpp { pkg-src = pkgSources.mscpp; };
+    
+    manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; });
+    # manif-geom-cpp-doc = docGen manif-geom-cpp;
+
+    mscpp = addDoc (prev.callPackage ./cxx-packages/mscpp { pkg-src = pkgSources.mscpp; });
+    # mscpp-doc = docGen "mscpp" mscpp;
+    
     ceres-factors = prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; };
     signals-cpp = prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; };
     secure-delete = prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; };

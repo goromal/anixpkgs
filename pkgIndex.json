@@ -1,0 +1,21 @@
+{
+    "pkgs": {
+        "misc": [],
+        "cpp": [
+            {
+                "attr": "manif-geom-cpp",
+                "ci": true
+            },
+            {
+                "attr": "mscpp",
+                "ci": true
+            }
+        ],
+        "python": [
+            {
+                "attr": "python39.pkgs.fqt",
+                "ci": true
+            }
+        ]
+    }
+}
