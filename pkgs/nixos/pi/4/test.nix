@@ -15,8 +15,6 @@ with import ../../dependencies.nix { inherit config; };
         "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/pi/4/test.nix"
     ];
 
-    system.stateVersion = "22.05";
-
     services.smfserver = {
         enable = true;
         package = anixpkgs.flask-smfserver;

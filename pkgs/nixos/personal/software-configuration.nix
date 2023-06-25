@@ -73,11 +73,11 @@ with import ../dependencies.nix { inherit config; };
             enable = true;
             iconTheme = {
                 name = "Nordzy";
-                package = pkgs.nordzy-icon-theme;
+                package = nordzy-icon-theme;
             };
             theme = {
                 name = "Nordic";
-                package = pkgs.nordic;
+                package = nordic;
             };
         };
         dconf.settings = {
@@ -92,6 +92,7 @@ with import ../dependencies.nix { inherit config; };
             };
             "org/gnome/desktop/interface" = {
                 "clock-format" = "12h";
+                "clock-show-weekday" = true;
             };
             "org/gnome/desktop/privacy" = {
                 "remember-recent-files" = false;
@@ -100,7 +101,6 @@ with import ../dependencies.nix { inherit config; };
                 "favorite-apps" = [
                     "org.gnome.Nautilus.desktop"
                     "google-chrome.desktop"
-                    "Alacritty.desktop"
                     "terminator.desktop"
                     "codium.desktop"
                     "pinta.desktop"
@@ -115,6 +115,10 @@ with import ../dependencies.nix { inherit config; };
             };
             "org/gnome/shell/extensions/dash-to-dock" = {
                 "dash-max-icon-size" = "16";
+            };
+            "org/gnome/desktop/peripherals/touchpad" = {
+                "tap-to-click" = true;
+                "two-finger-scrolling-enabled" = true;
             };
         };
 
@@ -143,7 +147,6 @@ with import ../dependencies.nix { inherit config; };
             docker
             meld
             libreoffice-qt
-            alacritty
             nixos-generators
             ## unstable
             unstable.google-chrome
@@ -179,7 +182,7 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.mfn
         ];
 
-        # https://search.nixos.org/packages?channel=22.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
+        # e.g., https://search.nixos.org/packages?channel=23.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
         programs.vscode = {
             enable = true;
             package = unstable.vscodium;
@@ -225,7 +228,6 @@ with import ../dependencies.nix { inherit config; };
             ".config/VSCodium/User/settings.json".source = ../res/vscode-settings.json;
             ".config/zathura/zathurarc".source = ../res/zathurarc;
             ".config/terminator/config".source = ../res/terminator-config; # https://rigel.netlify.app/#terminal
-            ".config/alacritty/alacritty.yml".source = ../res/alacritty.yml;
             "configs/${configs.book-notes.name}".source = configs.book-notes.data;
             "models/gender/${models.gender.proto.name}".source = models.gender.proto.data;
             "models/gender/${models.gender.weights.name}".source = models.gender.weights.data;
@@ -234,6 +236,9 @@ with import ../dependencies.nix { inherit config; };
             "spleeter/pretrained_models/2stems/${models.spleeter.model-index.name}".source = models.spleeter.model-index.data;
             "spleeter/pretrained_models/2stems/${models.spleeter.model-meta.name}".source = models.spleeter.model-meta.data;
             "records/${records.crypt.name}".source = records.crypt.data;
+            ".config/gtk-4.0/${themes.nordic-gtk4.css.name}".source = themes.nordic-gtk4.css.data;
+            ".config/gtk-4.0/${themes.nordic-gtk4.css-dark.name}".source = themes.nordic-gtk4.css-dark.data;
+            ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source = themes.nordic-gtk4.thumbnail.data;
         };
     }; 
 }

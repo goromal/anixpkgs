@@ -3,13 +3,14 @@ with pkgs;
 with lib;
 with import ./dependencies.nix { inherit config; };
 let
-    nixos-version = "22.05"; # Should match the channel in <nixpkgs>
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in
 {
     imports = [
         (import "${home-manager}/nixos")
     ];
+
+    system.stateVersion = nixos-state;
 
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.kernel.sysctl = {
@@ -23,27 +24,30 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
     };
 
-    nix.nixPath = [
-        "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-        "anixpkgs=/data/andrew/sources/anixpkgs"
-    ];
-
-    nix.autoOptimiseStore = true;
-    nix.buildCores = 4;
-    nix.binaryCaches = [
-        "https://cache.nixos.org/"
-        "https://github-public.cachix.org"
-    ];
-    nix.binaryCachePublicKeys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
-    ];
-    nix.extraOptions = ''
-        narinfo-cache-positive-ttl = 0
-        narinfo-cache-negative-ttl = 0
-        experimental-features = nix-command flakes
-    '';
-    nix.maxJobs = 4;
+    nix = {
+        nixPath = [
+            "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
+            "anixpkgs=/data/andrew/sources/anixpkgs"
+        ];
+        settings = {
+            auto-optimise-store = true;
+            max-jobs = 4;
+            cores = 4;
+            substituters = [
+                "https://cache.nixos.org/"
+                "https://github-public.cachix.org"
+            ];
+            trusted-public-keys = [
+                "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+                "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+            ];
+        };
+        extraOptions = ''
+            narinfo-cache-positive-ttl = 0
+            narinfo-cache-negative-ttl = 0
+            experimental-features = nix-command flakes
+        '';
+    };
     nixpkgs.config.allowUnfree = true;
 
     # Use the systemd-boot EFI boot loader.
@@ -69,7 +73,9 @@ in
     # Enable the OpenSSH daemon.
     services.openssh = {
         enable = true;
-        forwardX11 = true;
+        settings = {
+            X11Forwarding = true;
+        };
     };
     programs.ssh.startAgent = true;
     
@@ -155,7 +161,7 @@ in
         navi
         unstable.mprocs
         bandwhich
-        bpytop
+        btop
         glances
         gping
         dog
@@ -211,6 +217,7 @@ in
 
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
+        home.stateVersion = homem-state;
 
         home.packages = [
             anixpkgs.color-prints
