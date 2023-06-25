@@ -1,5 +1,3 @@
 # secure-delete
 
-TODO
-
-TODO
+No package documentation currently provided.
