@@ -6,48 +6,17 @@ nb() {
 nix-build . -A $1
 }
 
-echo "Building Bash packages..."
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+SOURCE="$(readlink "$SOURCE")"
+[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+cd "$DIR/.."
 
-nb aapis-grpcurl
-nb abc
-nb doku
-nb epub
-nb gif
-nb md
-nb mp3
-nb mp4
-nb pdf
-nb png
-nb svg
-nb zipper
-nb color-prints
-nb dirgroups
-nb manage-gmail
-nb md2pdf
-nb notabilify
-nb fix-perms
-nb make-title
-nb pb
-nb code2pdf
-nb cpp-helper
-nb py-helper
-nb mp4unite
-nb git-cc
-nb setupws
-nb listsources
-nb pkgshell
-nb devshell
-nb providence
-nb providence-tasker
-nb fixfname
+echo "Building miscellaneous packages..."
 
-echo "Building Java packages..."
-
-nb evil-hangman
-nb spelling-corrector
-nb simple-image-editor
-
-echo "Building Rust packages..."
-
-nb manif-geom-rs
-nb xv-lidar-rs
+for pkg in $(python3 scripts/filter_pkg_list.py misc); do
+    nb $pkg
+done

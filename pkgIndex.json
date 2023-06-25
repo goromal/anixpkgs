@@ -1,7 +1,160 @@
 {
     "pkgs": {
-        "misc": [],
+        "misc": [
+            {
+                "attr": "aapis-grpcurl",
+                "ci": true
+            },
+            {
+                "attr": "abc",
+                "ci": true
+            },
+            {
+                "attr": "doku",
+                "ci": true
+            },
+            {
+                "attr": "epub",
+                "ci": true
+            },
+            {
+                "attr": "gif",
+                "ci": true
+            },
+            {
+                "attr": "md",
+                "ci": true
+            },
+            {
+                "attr": "mp3",
+                "ci": true
+            },
+            {
+                "attr": "mp4",
+                "ci": true
+            },
+            {
+                "attr": "pdf",
+                "ci": true
+            },
+            {
+                "attr": "png",
+                "ci": true
+            },
+            {
+                "attr": "svg",
+                "ci": true
+            },
+            {
+                "attr": "zipper",
+                "ci": true
+            },
+            {
+                "attr": "color-prints",
+                "ci": true
+            },
+            {
+                "attr": "dirgroups",
+                "ci": true
+            },
+            {
+                "attr": "manage-gmail",
+                "ci": true
+            },
+            {
+                "attr": "md2pdf",
+                "ci": true
+            },
+            {
+                "attr": "notabilify",
+                "ci": true
+            },
+            {
+                "attr": "fix-perms",
+                "ci": true
+            },
+            {
+                "attr": "make-title",
+                "ci": true
+            },
+            {
+                "attr": "pb",
+                "ci": true
+            },
+            {
+                "attr": "code2pdf",
+                "ci": true
+            },
+            {
+                "attr": "cpp-helper",
+                "ci": true
+            },
+            {
+                "attr": "py-helper",
+                "ci": true
+            },
+            {
+                "attr": "mp4unite",
+                "ci": true
+            },
+            {
+                "attr": "git-cc",
+                "ci": true
+            },
+            {
+                "attr": "setupws",
+                "ci": true
+            },
+            {
+                "attr": "listsources",
+                "ci": true
+            },
+            {
+                "attr": "pkgshell",
+                "ci": true
+            },
+            {
+                "attr": "devshell",
+                "ci": true
+            },
+            {
+                "attr": "providence",
+                "ci": true
+            },
+            {
+                "attr": "providence-tasker",
+                "ci": true
+            },
+            {
+                "attr": "fixfname",
+                "ci": true
+            },
+            {
+                "attr": "evil-hangman",
+                "ci": true
+            },
+            {
+                "attr": "spelling-corrector",
+                "ci": true
+            },
+            {
+                "attr": "simple-image-editor",
+                "ci": true
+            },
+            {
+                "attr": "manif-geom-rs",
+                "ci": true
+            },
+            {
+                "attr": "xv-lidar-rs",
+                "ci": true
+            }
+        ],
         "cpp": [
+            {
+                "attr": "aapis-cpp",
+                "ci": true
+            },
             {
                 "attr": "manif-geom-cpp",
                 "ci": true
@@ -9,11 +162,159 @@
             {
                 "attr": "mscpp",
                 "ci": true
+            },
+            {
+                "attr": "ceres-factors",
+                "ci": true
+            },
+            {
+                "attr": "signals-cpp",
+                "ci": true
+            },
+            {
+                "attr": "secure-delete",
+                "ci": true
+            },
+            {
+                "attr": "sorting",
+                "ci": true
+            },
+            {
+                "attr": "crowcpp",
+                "ci": true
+            },
+            {
+                "attr": "rankserver-cpp",
+                "ci": true
+            },
+            {
+                "attr": "mfn",
+                "ci": true
             }
         ],
         "python": [
             {
+                "attr": "python39.pkgs.aapis-py",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.sunnyside",
+                "ci": true
+            },
+            {
                 "attr": "python39.pkgs.fqt",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.find_rotational_conventions",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.geometry",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.mavlog-utils",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.pyceres",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.pyceres_factors",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.pysorting",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.makepyshell",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.norbert",
+                "ci": true
+            },
+            {
+                "attr": "python38.pkgs.spleeter",
+                "ci": false
+            },
+            {
+                "attr": "python39.pkgs.ichabod",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.pysignals",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.mesh-plotter",
+                "ci": true
+            },
+            {
+                "attr": "python310.pkgs.gmail-parser",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.trafficsim",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.textual",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.imutils-cv4",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.vidstab-cv4",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-hello-world",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-url2mp4",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-mp4server",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-mp3server",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-smfserver",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.flask-oatbox",
+                "ci": true
+            },
+            {
+                "attr": "python39.pkgs.rankserver",
+                "ci": true
+            },
+            {
+                "attr": "python310.pkgs.python-dokuwiki",
+                "ci": true
+            },
+            {
+                "attr": "python310.pkgs.task-tools",
+                "ci": true
+            },
+            {
+                "attr": "python310.pkgs.wiki-tools",
+                "ci": true
+            },
+            {
+                "attr": "python310.pkgs.book-notes-sync",
                 "ci": true
             }
         ]

@@ -11,7 +11,7 @@ let
         mkdir -p $out/bin
         gcc -o $out/bin/${progName} $src/src.c
     '';
-in derivation {
+in derivation rec {
     name = progName;
     version = "0.0.1";
     builder = "${bash}/bin/bash";
@@ -19,4 +19,8 @@ in derivation {
     inherit gcc coreutils;
     src = pkg-src;
     system = builtins.currentSystem;
+    meta = {
+        description = "TODO";
+        longDescription = ''TODO'';
+    };
 }

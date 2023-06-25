@@ -19,5 +19,7 @@ python scripts/generate_docs.py
 To build all packages and run their respective tests, run
 
 ```bash
-python scripts/build_and_test.py
+bash scripts/build_misc.sh
+bash scripts/build_cpp.sh
+bash scripts/build_python.sh
 ```

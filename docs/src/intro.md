@@ -14,7 +14,7 @@ The philosophy for the library implementations (and, sometimes, re-implementatio
 - Seamless interoperability
 - Quick idea and calculation prototyping
 
-See the menu for individual package documentation.
+**See the menu for individual package documentation.**
 
 ## Example Usage
 
