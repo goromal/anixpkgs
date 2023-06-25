@@ -18,4 +18,10 @@ clangStdenv.mkDerivation {
     preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
     '';
+    meta = {
+        description = "test";
+        longDescription = ''
+        Something something $SO(3)$ and $SE(3)$.
+        '';
+    }
 }
