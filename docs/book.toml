@@ -1,0 +1,10 @@
+[book]
+authors = ["Andrew Torgesen"]
+language = "en"
+multilingual = false
+src = "src"
+title = "anixpkgs"
+
+[output.html]
+default-theme = "light"
+mathjax-support = true
