@@ -102,7 +102,7 @@
     };
     mesh-plotter = builtins.fetchGit {
         url = "https://github.com/goromal/mesh-plotter";
-        rev = "e973dd7abb45e64c509f712350399bcd2da372b5";
+        rev = "c20ac53f54b05b3ab155ede60c43022a61ae39b6";
         ref = "master";
     };
     pyceres = builtins.fetchGit {

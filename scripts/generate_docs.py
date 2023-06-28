@@ -26,6 +26,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
     miscfile.write(
         "Packages written in assorted languages like Bash, Rust, Java, etc.\n\n")
     for miscPkg in miscPkgs:
+        print(miscPkg["name"])
         pkgMdname = f"{miscPkg['name']}.md"
         summaryfile.write(f"  - [{miscPkg['attr']}](./misc/{pkgMdname})\n")
         miscfile.write(f"- [{miscPkg['attr']}](./{pkgMdname})\n")
@@ -47,6 +48,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
     cppfile.write(
         "Packages written in C++.\n\n")
     for cppPkg in cppPkgs:
+        print(cppPkg["name"])
         pkgMdname = f"{cppPkg['name']}.md"
         summaryfile.write(f"  - [{cppPkg['attr']}](./cpp/{pkgMdname})\n")
         cppfile.write(f"- [{cppPkg['attr']}](./{pkgMdname})\n")
@@ -68,6 +70,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
     pythonfile.write(
         "Packages written (or bound) in Python.\n\n")
     for pythonPkg in pythonPkgs:
+        print(pythonPkg["name"])
         pkgMdname = f"{pythonPkg['name']}.md"
         summaryfile.write(f"  - [{pythonPkg['attr']}](./python/{pkgMdname})\n")
         pythonfile.write(f"- [{pythonPkg['attr']}](./{pkgMdname})\n")

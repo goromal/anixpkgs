@@ -1,3 +1,5 @@
 # python39.pkgs.makepyshell
 
-No package documentation currently provided.
+Generate a nix-shell file for Python development.
+
+
