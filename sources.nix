@@ -102,8 +102,8 @@
     };
     mesh-plotter = builtins.fetchGit {
         url = "https://github.com/goromal/mesh-plotter";
-        rev = "7c555c5e2c98ff4cbe36a63ccefd6f393a4af9d3";
-        ref = "dev/2d";
+        rev = "c20ac53f54b05b3ab155ede60c43022a61ae39b6";
+        ref = "master";
     };
     pyceres = builtins.fetchGit {
         url = "https://github.com/Edwinem/ceres_python_bindings";
