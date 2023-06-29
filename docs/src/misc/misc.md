@@ -17,6 +17,7 @@ Packages written in assorted languages like Bash, Rust, Java, etc.
 - [color-prints](./color-prints.md)
 - [dirgroups](./dirgroups.md)
 - [manage-gmail](./manage-gmail.md)
+- [gantter](./gantter.md)
 - [md2pdf](./md2pdf.md)
 - [notabilify](./notabilify.md)
 - [fix-perms](./fix-perms.md)
