@@ -173,6 +173,7 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.scrape
             anixpkgs.trafficsim
             anixpkgs.fqt
+            anixpkgs.gantter
             (writeShellScriptBin "playzelda" ''
                 ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
             '')
@@ -220,7 +221,7 @@ with import ../dependencies.nix { inherit config; };
                 ${imagemagick}/bin/convert -font ${fonts.nexa.data} \
                    -pointsize 30 \
                    -fill black \
-                   -draw 'text 320,1343 "${if local-build then "Local Build" else "v${anix-version}"}"' \
+                   -draw 'text 320,1343 "${if local-build then "Local Build" else "v${anix-version}"}-${nixos-version}"' \
                    ${img.wallpaper.data} $out/wallpaper.png
             '') + "/wallpaper.png");
             ".face".source = img.ajt-logo-white.data;
