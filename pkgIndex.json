@@ -62,6 +62,10 @@
                 "ci": true
             },
             {
+                "attr": "gantter",
+                "ci": true
+            },
+            {
                 "attr": "md2pdf",
                 "ci": true
             },
