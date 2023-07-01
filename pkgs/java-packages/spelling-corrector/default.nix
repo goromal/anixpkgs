@@ -30,4 +30,17 @@ stdenv.mkDerivation {
     makeWrapper ${jre}/bin/java $out/bin/spelling-corrector \
         --add-flags "-cp $out/share spell.Main $out/dictionary.txt"
     '';
+
+    meta = {
+        description = "Offer up spelling corrections for provided mispelled words.";
+        longDescription = ''
+        Written in Java. [Repository](https://github.com/goromal/spelling-corrector)
+
+        The repository contains the text-file dictionary from which all word suggestions derive.
+
+        ```
+        usage: spelling-corrector <word>
+        ```
+        '';
+    };
 }

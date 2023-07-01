@@ -24,6 +24,7 @@ let
 
     Options:
         --transpose [+- # HALF STEPS]
+            Powered by https://github.com/breakfastquay/rubberband.
         --TODO
     '';
     optsWithVarsAndDefaults = [
@@ -90,4 +91,5 @@ let
 in callPackage ./mkConverter.nix {
     inherit writeShellScriptBin callPackage color-prints strings;
     inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+    description = "Generate (or modify) an MP3 file from similar formats.";
 }

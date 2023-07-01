@@ -31,4 +31,5 @@ let
 in callPackage ./mkConverter.nix {
     inherit writeShellScriptBin callPackage color-prints strings;
     inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+    description = "Generate GIF animations from similar media formats (*not finished yet!*).";
 }

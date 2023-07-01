@@ -14,7 +14,7 @@ let
     };
     printErr = "${color-prints}/bin/echo_red";
     printGrn = "${color-prints}/bin/echo_green";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [[ -z "$1" ]]; then
         ${printErr} "No dir provided."
@@ -23,4 +23,13 @@ in writeShellScriptBin pkgname ''
     find "$1" -type d -exec chmod 755 {} \;
     find "$1" -type f -exec chmod 644 {} \;
     ${printGrn} "Done!"
-''
+'') // {
+    meta = {
+        description = "Recursively claim ownership of all files and folders in dir.";
+        longDescription = ''
+        ```
+        usage: fix-perms dir
+        ```
+        '';
+    };
+}

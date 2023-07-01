@@ -38,7 +38,7 @@ let
     printErr = "${color-prints}/bin/echo_red";
     printYlw = "${color-prints}/bin/echo_yellow";
     printGrn = "${color-prints}/bin/echo_green";
-in writeShellScriptBin "setupws" ''
+in (writeShellScriptBin "setupws" ''
     ${argparse}
 
     set -euo pipefail
@@ -85,4 +85,24 @@ in writeShellScriptBin "setupws" ''
     done
 
     ${printGrn} "Done"
-''
+'') // {
+    meta = {
+        description = "Create standalone development workspaces.";
+        longDescription = ''
+        Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI:
+
+        ```
+        usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...]
+
+        Create a development workspace with specified git sources.
+
+        Options:
+            --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
+                                       directory will be created (default: ${default-dev-dir})
+
+            --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
+                                       data will be stored (default: ${default-data-dir})
+        ```
+        '';
+    };
+}

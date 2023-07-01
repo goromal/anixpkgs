@@ -1,3 +1,11 @@
 # md2pdf
 
-No package documentation currently provided.
+Convert Markdown files into formatted PDF files, powered by LaTeX.
+
+```
+usage: md2pdf input.md output.pdf
+
+Use LaTeX to convert a markdown file into a formatted pdf.
+
+```
+

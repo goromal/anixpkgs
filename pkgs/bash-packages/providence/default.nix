@@ -17,7 +17,7 @@ let
     };
     printErr = "${color-prints}/bin/echo_red";
     wikitools = "${wiki-tools}/bin/wiki-tools";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [[ -z "$1" ]]; then
         ${printErr} "No domain chosen."
@@ -44,4 +44,19 @@ in writeShellScriptBin pkgname ''
         ${printErr} "Unrecognized domain: $domain."
         exit 1
     fi
-''
+'') // {
+    meta = {
+        description = "Be randomly dictated to from passages of importance.";
+        longDescription = ''
+        ```
+        usage: providence domain
+
+        Pick randomly from a specified domain:
+        - patriarchal
+        - passage
+        ```
+
+        Requires a wiki secrets file at `~/secrets/wiki/secrets.json`.
+        '';
+    };
+}

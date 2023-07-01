@@ -113,4 +113,5 @@ let
 in callPackage ./mkConverter.nix {
   inherit writeShellScriptBin callPackage color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  description = "Generate and edit SVG files from a variety of source formats.";
 }

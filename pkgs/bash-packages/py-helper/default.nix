@@ -93,7 +93,7 @@ let
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/CMakeLists.txt"
     fi
     '';
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     set -e
     ${argparse}
     tmpdir=$(mktemp -d)
@@ -101,4 +101,18 @@ in writeShellScriptBin pkgname ''
     ${makepblRule}
     ${makenixRule}
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Developer tools for creating Python packages.";
+        longDescription = ''
+        ```
+        usage: py-helper [options]
+
+        Options:
+        --make-pkg        NAME         Generate a template python package
+        --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
+        --make-nix                     Dump template default.nix and shell.nix files
+        ```
+        '';
+    };
+}

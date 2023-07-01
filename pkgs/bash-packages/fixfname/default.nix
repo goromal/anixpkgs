@@ -12,7 +12,7 @@ let
         '';
         optsWithVarsAndDefaults = [];
     };
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     fname="$1"
     pt1=$(${strings.dashSpaces} "$fname")
@@ -20,4 +20,15 @@ in writeShellScriptBin pkgname ''
     newfname="$pt2"
     echo "$fname -> $newfname"
     mv "$fname" "$newfname"
-''
+'') // {
+    meta = {
+        description = "Unix-ify filenames.";
+        longDescription = ''
+        ```
+        usage: fixfname FILE
+
+        Replace spaces and remove [], () characters from a filename (in place).
+        ```
+        '';
+    };
+}
