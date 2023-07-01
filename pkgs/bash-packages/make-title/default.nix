@@ -27,7 +27,7 @@ let
         ];
     };
     printErr = "${color-prints}/bin/echo_red";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [[ -z "$1" ]]; then
         ${printErr} "No title provided."
@@ -74,4 +74,31 @@ in writeShellScriptBin pkgname ''
     echoPaddingWithLengthOf $PADCHAR $TITLEBUFFER1
     echoPaddingWithLengthOf $PADCHAR $TITLEBUFFER2
     echo
-''
+'') // {
+    meta = {
+        description = "Print decorated titles.";
+        longDescription = ''
+        ```
+        usage: make-title [options] title
+
+        Prints out a decorated title.
+
+        Options:
+        -h | --help     Print out the help documentation.
+        -c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
+
+        Arguments:
+        title           word or phrase making up the title
+        ```
+
+        Example:
+
+        ```
+        $ make-title "Hello, World"
+        ========================
+        ===== Hello, World =====
+        ========================
+        ```
+        '';
+    };
+}

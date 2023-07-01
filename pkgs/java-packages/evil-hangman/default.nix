@@ -30,4 +30,15 @@ stdenv.mkDerivation {
     makeWrapper ${jre}/bin/java $out/bin/evil-hangman \
         --add-flags "-cp $out/share hangman.EvilHangman $out/dictionary.txt"
     '';
+
+    meta = {
+        description = "Interactive hangman game where you'll probably lose (because the computer is cheating).";
+        longDescription = ''
+        Written in Java. [Repository](https://github.com/goromal/evil-hangman)
+
+        ```
+        usage: evil-hangman <word-length> <num-guesses>
+        ```
+        '';
+    };
 }

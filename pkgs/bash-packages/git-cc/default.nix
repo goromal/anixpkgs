@@ -16,7 +16,7 @@ let
     };
     printErr = "${color-prints}/bin/echo_red";
     printGrn = "${color-prints}/bin/echo_green";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [[ -z "$1" ]]; then
         ${printErr} "No repo_dir provided."
@@ -87,4 +87,16 @@ in writeShellScriptBin pkgname ''
     while [ ''${#BASEDIRS[@]} -ne 0 ] ; do
         image_repo BASEDIRS "''${MS_BASEDIR}" "''${MS_DESTDIR}"
     done
-''
+'') // {
+    meta = {
+        description = "Create a carbon copy of a Git repo, but with Git removed.";
+        longDescription = ''
+        ```
+        usage: git-cc repo_dir des_dir
+
+        Recursively backup a git repository (and its submodules) to a new, git-less source tree.
+        Effectively wraps up an arbitrarily complex git repo into a flat-packaged mass of code.
+        ```
+        '';
+    };
+}

@@ -23,7 +23,7 @@ let
     };
     printErr = "${color-prints}/bin/echo_red";
     printGrn = "${color-prints}/bin/echo_green";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     set -e
     ${argparse}
     if [[ -z "$group_size" ]]; then
@@ -61,4 +61,17 @@ in writeShellScriptBin pkgname ''
         i=$((i+1))
     done
     ${printGrn} "Split $dirtosplit into $d groups of <= $n."
-''
+'') // {
+    meta = {
+        description = "Split directories into smaller ones.";
+        longDescription = ''
+        ```
+        usage: dirgroups num_groups dir
+                        OR
+               dirgroups --of group_size dir
+
+        Split a large directory of files into smaller directories with evenly distributed files (not counting remainders). 
+        ```
+        '';
+    };
+}

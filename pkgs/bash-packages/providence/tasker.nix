@@ -17,7 +17,7 @@ let
     printErr = "${color-prints}/bin/echo_red";
     prexe = "${providence}/bin/providence";
     ttexe = "${task-tools}/bin/task-tools";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [[ -z "$1" ]]; then
         ${printErr} "num_days not specified."
@@ -31,4 +31,20 @@ in writeShellScriptBin pkgname ''
         tasknotes="$(${prexe} patriarchal)"
         ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
     done
-''
+'') // {
+    meta = {
+        description = "Providence + Google Tasks integration.";
+        longDescription = ''
+        Takes output from `providence` and places it into `[num_days]` consecutive days of Google Tasks.
+
+        ```
+        usage: providence-tasker num_days
+
+        Generate [num_days] tasks derived from providence output.
+        ```
+
+        Requires a wiki secrets file at `~/secrets/wiki/secrets.json` and a Google Tasks secrets file
+        at `~/secrets/task/secrets.json`.
+        '';
+    };
+}

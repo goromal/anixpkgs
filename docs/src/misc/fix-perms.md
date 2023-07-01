@@ -1,3 +1,8 @@
 # fix-perms
 
-No package documentation currently provided.
+Recursively claim ownership of all files and folders in dir.
+
+```
+usage: fix-perms dir
+```
+

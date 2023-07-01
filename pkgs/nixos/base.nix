@@ -240,6 +240,7 @@ in
             anixpkgs.pb
             anixpkgs.manage-gmail
             anixpkgs.dirgroups
+            anixpkgs.fixfname
         ];
 
         programs.git = {

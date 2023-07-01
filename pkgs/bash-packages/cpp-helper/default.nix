@@ -83,7 +83,7 @@ let
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
     '';
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     set -e
     ${argparse}
     tmpdir=$(mktemp -d)
@@ -92,4 +92,19 @@ in writeShellScriptBin pkgname ''
     ${makeexlRule}
     ${makenixRule}
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Convenience tools for setting up C++ projects.";
+        longDescription = ''
+        ```
+        usage: cpp-helper [options]
+
+        Options:
+        --make-format-file             Dumps a format rules file into .clang-format
+        --make-nix                     Dump template default.nix and shell.nix files
+        --make-exec-lib   CPPNAME      Generate a lib+exec package template
+        --make-header-lib CPPNAME      Generate a header-only library template
+        ```
+        '';
+    };
+}

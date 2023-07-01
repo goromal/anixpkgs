@@ -30,4 +30,5 @@ let
 in callPackage ./mkConverter.nix {
     inherit writeShellScriptBin callPackage color-prints strings;
     inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+    description = "Generate a DokuWiki text page from similar formats (*not finished yet!*).";
 }
