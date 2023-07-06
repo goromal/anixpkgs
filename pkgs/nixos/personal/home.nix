@@ -6,6 +6,8 @@ with import ../dependencies.nix { inherit config; };
     home.stateVersion = nixos-version;
     programs.home-manager.enable = true;
 
+    # TODO Nix config setup? e.g., cachix
+
     imports = [
         ../home-mods/base-anixpkgs.nix
         ../home-mods/git.nix
