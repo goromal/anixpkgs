@@ -46,8 +46,6 @@ with import ../dependencies.nix { inherit config; };
         atomix
     ]);
 
-    # services.lorri.enable = true;
-
     # Specialized bluetooth and sound settings for Apple AirPods
     hardware.bluetooth.enable = true;
     hardware.bluetooth.settings = {
