@@ -97,7 +97,6 @@ in
         duf
         gcc
         gdb
-        git
         tig
         scc
         most
@@ -136,7 +135,6 @@ in
         tcpdump
         gparted
         logkeys
-        tmux
         traceroute
         mtr
         fish
@@ -166,16 +164,6 @@ in
         gping
         dog
         rclone # TODO incorporate
-        # https://github.com/utdemir/nix-tree
-        (writeShellScriptBin "nix-deps" ''
-        if [[ $# -ge 2 ]]; then
-            nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree
-        elif [[ $# -eq 1 ]]; then
-            ${nix-tree}/bin/nix-tree "$1"
-        else
-            ${anixpkgs.color-prints}/bin/echo_red "Must specify either a store path or nix-build rules."
-        fi
-        '')
         (writeShellScriptBin "anix-version" ''echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${if local-build then "Local Build" else "v${anix-version}"})"'')
     ];
 
@@ -218,102 +206,13 @@ in
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
         home.stateVersion = homem-state;
-
-        home.packages = [
-            anixpkgs.color-prints
-            anixpkgs.git-cc
-            anixpkgs.fix-perms
-            anixpkgs.secure-delete
-            anixpkgs.sunnyside
-            anixpkgs.setupws
-            anixpkgs.listsources
-            anixpkgs.pkgshell
-            anixpkgs.devshell
-            anixpkgs.cpp-helper
-            anixpkgs.py-helper
-            anixpkgs.makepyshell
-            anixpkgs.wiki-tools
-            anixpkgs.book-notes-sync
-            anixpkgs.providence
-            anixpkgs.providence-tasker
-            anixpkgs.make-title
-            anixpkgs.pb
-            anixpkgs.manage-gmail
-            anixpkgs.dirgroups
-            anixpkgs.fixfname
-        ];
-
-        programs.git = {
-            package = gitAndTools.gitFull;
-            enable = true;
-            userName = "Andrew Torgesen";
-            userEmail = "andrew.torgesen@gmail.com";
-            aliases = {
-                aa = "add -A";
-                cm = "commit -m";
-                co = "checkout";
-                s = "status";
-                d = "diff";
-            };
-            extraConfig = {
-                init = {
-                    defaultBranch = "master";
-                };
-                push = {
-                    default = "current";
-                };
-                pull = {
-                    default = "current";
-                };
-            };
-        };
-
         programs.command-not-found.enable = true;
 
-        programs.vim = {
-            enable = true;
-            extraConfig = ''
-                if has('gui_running')
-                    set guifont=Iosevka
-                endif
-                set expandtab
-                " open NERDTree automatically if no file specified
-                "autocmd StdinReadPre * let s:std_in=1
-                "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-                " open NERDTree on Ctrl-n
-                map <C-n> :NERDTreeToggle<CR>
-                set wildignore+=*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,\~$,*/.log,*/.aux,*/.cls,*/.aux,*/.bbl,*/.blg,*/.fls,*/.fdb*/,*/.toc,*/.out,*/.glo,*/.log,*/.ist,*/.fdb_latexmk
-                set encoding=utf-8
-                set termguicolors
-                set background=dark
-                let g:mix_format_on_save = 1
-                let g:mix_format_options = '--check-equivalent'
-            '';
-            settings = {
-                number = true;
-            };
-            plugins = with vimPlugins; [
-                vim-elixir
-                sensible
-                vim-airline
-                The_NERD_tree
-                fugitive
-                vim-gitgutter
-                YouCompleteMe
-                vim-abolish
-                command-t
-            ];
-        };
-
-        home.file = {
-            ".tmux.conf" = {
-                text = ''
-                    set-option -g default-shell /run/current-system/sw/bin/fish
-                    set-window-option -g mode-keys vi
-                    set -g default-terminal "screen-256color"
-                    set -ga terminal-overrides ',screen-256color:Tc'
-                '';
-            };
-        };
+        imports = [
+            ./home-mods/base-anixpkgs.nix
+            ./home-mods/git.nix
+            ./home-mods/vim.nix
+            ./home-mods/tmux.nix
+        ];
     };
 }

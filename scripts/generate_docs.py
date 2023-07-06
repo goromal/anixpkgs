@@ -20,28 +20,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
         open(os.path.join(ANIXDIR, "docs", "src", "python", "python.md"), "w") as pythonfile:
     summaryfile.write("# Summary\n\n")
     summaryfile.write("- [anixpkgs Overview](./intro.md)\n")
-
-    summaryfile.write("- [Miscellaneous Packages](./misc/misc.md)\n")
-    miscfile.write("# Miscellaneous Packages\n\n")
-    miscfile.write(
-        "Packages written in assorted languages like Bash, Rust, Java, etc.\n\n")
-    for miscPkg in miscPkgs:
-        print(miscPkg["name"])
-        pkgMdname = f"{miscPkg['name']}.md"
-        summaryfile.write(f"  - [{miscPkg['attr']}](./misc/{pkgMdname})\n")
-        miscfile.write(f"- [{miscPkg['attr']}](./{pkgMdname})\n")
-        with open(os.path.join(ANIXDIR, "docs", "src", "misc", pkgMdname), "w") as pkgfile:
-            pkgfile.write(f"# {miscPkg['attr']}\n\n")
-            try:
-                docf = check_output(
-                    ["nix-build", ".", "-A", f"{miscPkg['attr']}.doc", "--no-out-link"])
-            except CalledProcessError:
-                print(
-                    f"ERROR: {miscPkg['attr']} does not appear to have a doc attribute defined.")
-                exit(1)
-            with open(docf.decode().strip(), "r") as docfile:
-                docstr = docfile.read()
-                pkgfile.write(docstr)
+    summaryfile.write("- [Machine Management](./machines.md)\n")
 
     summaryfile.write("- [C++ Packages](./cpp/cpp.md)\n")
     cppfile.write("# C++ Packages\n\n")
@@ -82,6 +61,28 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
             except CalledProcessError:
                 print(
                     f"ERROR: {pythonPkg['attr']} does not appear to have a doc attribute defined.")
+                exit(1)
+            with open(docf.decode().strip(), "r") as docfile:
+                docstr = docfile.read()
+                pkgfile.write(docstr)
+
+    summaryfile.write("- [Miscellaneous Packages](./misc/misc.md)\n")
+    miscfile.write("# Miscellaneous Packages\n\n")
+    miscfile.write(
+        "Packages written in assorted languages like Bash, Rust, Java, etc.\n\n")
+    for miscPkg in miscPkgs:
+        print(miscPkg["name"])
+        pkgMdname = f"{miscPkg['name']}.md"
+        summaryfile.write(f"  - [{miscPkg['attr']}](./misc/{pkgMdname})\n")
+        miscfile.write(f"- [{miscPkg['attr']}](./{pkgMdname})\n")
+        with open(os.path.join(ANIXDIR, "docs", "src", "misc", pkgMdname), "w") as pkgfile:
+            pkgfile.write(f"# {miscPkg['attr']}\n\n")
+            try:
+                docf = check_output(
+                    ["nix-build", ".", "-A", f"{miscPkg['attr']}.doc", "--no-out-link"])
+            except CalledProcessError:
+                print(
+                    f"ERROR: {miscPkg['attr']} does not appear to have a doc attribute defined.")
                 exit(1)
             with open(docf.decode().strip(), "r") as docfile:
                 docstr = docfile.read()
