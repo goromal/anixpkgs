@@ -2,7 +2,7 @@
 with import ../dependencies.nix { inherit config; };
 {
     home.username = "andrew";
-    home.homeDirectory = "/home/${username}";
+    home.homeDirectory = "/home/andrew";
     home.stateVersion = nixos-version;
     programs.home-manager.enable = true;
 
@@ -18,6 +18,6 @@ with import ../dependencies.nix { inherit config; };
         ../home-mods/gnome-wallpaper.nix
     ];
 
-    mods.vscodium.package = unstable.vscodium;
     mods.gnome-wallpaper.standalone = true;
+    mods.gnome-wallpaper.homeDir = "/home/andrew";
 }

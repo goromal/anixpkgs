@@ -9,15 +9,20 @@ in with pkgs; with import ../dependencies.nix { inherit config; };
             description = "Whether this is a standalone Nix installation (default: false)";
             default = false;
         };
+        homeDir = lib.mkOption {
+            type = lib.types.str;
+            description = "Home directory to put the wallpaper in (default: /data/andrew)";
+            default = "/data/andrew";
+        };
     };
 
     config = {
         dconf.settings = {
             "org/gnome/desktop/background" = {
-                "picture-uri" = "/data/andrew/.background-image";
+                "picture-uri" = "${cfg.homeDir}/.background-image";
             };
             "org/gnome/desktop/screensaver" = {
-                "picture-uri" = "/data/andrew/.background-image";
+                "picture-uri" = "${cfg.homeDir}/.background-image";
             };
         };
 
