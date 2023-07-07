@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-A collection of personal (or otherwise personally useful) repositories packaged as Nix overlays.
+A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as Nix overlays.
 
 ## Docs
 
