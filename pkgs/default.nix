@@ -126,6 +126,7 @@ in rec {
 
     manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail { python = final.python310; });
     gantter = addDoc (prev.callPackage ./bash-packages/gantter { python = final.python39; blank-svg = pkgData.img.blank-svg; });
+    la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz { python = final.python39; });
 
     aapis-grpcurl = addDoc (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
     strings = addDoc (prev.callPackage ./bash-packages/bash-utils/strings.nix { });

@@ -2,7 +2,7 @@
     # TODO replace with flake.nix
     anixdata = builtins.fetchGit {
         url = "https://github.com/goromal/anixdata";
-        rev = "dc0da032a9592580d48f14932d00091452c02a39";
+        rev = "1cf9479ab29fdd50d1771dfaf83ebfeb2330dec6";
         ref = "master";
     };
     aapis = builtins.fetchGit {

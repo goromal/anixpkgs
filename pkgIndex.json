@@ -66,6 +66,10 @@
                 "ci": true
             },
             {
+                "attr": "la-quiz",
+                "ci": true
+            },
+            {
                 "attr": "md2pdf",
                 "ci": true
             },
