@@ -172,6 +172,8 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.scrape
             anixpkgs.trafficsim
             anixpkgs.manage-gmail
+            anixpkgs.la-quiz
+            anixpkgs.budget_report
             anixpkgs.fqt
             anixpkgs.wiki-tools
             anixpkgs.book-notes-sync
