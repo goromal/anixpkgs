@@ -62,6 +62,7 @@
   - [dirgroups](./misc/dirgroups.md)
   - [manage-gmail](./misc/manage-gmail.md)
   - [gantter](./misc/gantter.md)
+  - [la-quiz](./misc/la-quiz.md)
   - [md2pdf](./misc/md2pdf.md)
   - [notabilify](./misc/notabilify.md)
   - [fix-perms](./misc/fix-perms.md)
