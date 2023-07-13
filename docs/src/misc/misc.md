@@ -19,6 +19,7 @@ Packages written in assorted languages like Bash, Rust, Java, etc.
 - [manage-gmail](./manage-gmail.md)
 - [gantter](./gantter.md)
 - [la-quiz](./la-quiz.md)
+- [budget_report](./budget_report.md)
 - [md2pdf](./md2pdf.md)
 - [notabilify](./notabilify.md)
 - [fix-perms](./fix-perms.md)

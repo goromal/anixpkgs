@@ -60,6 +60,7 @@ let
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
             aapis-py = addDoc (pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; });
+            budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
             gmail-parser = addDoc (pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; });
             sunnyside = addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -105,6 +106,7 @@ in rec {
 
     # python3 = final.python39; # causes loads of re-builds for clangStdenv
  
+    budget_report = final.python39.pkgs.budget_report;
     makepyshell = final.python39.pkgs.makepyshell;
     mavlog-utils = final.python39.pkgs.mavlog-utils;
     sunnyside = final.python39.pkgs.sunnyside;

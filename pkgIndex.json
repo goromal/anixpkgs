@@ -70,6 +70,10 @@
                 "ci": true
             },
             {
+                "attr": "budget_report",
+                "ci": true
+            },
+            {
                 "attr": "md2pdf",
                 "ci": true
             },
