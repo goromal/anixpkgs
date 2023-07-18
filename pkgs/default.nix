@@ -163,6 +163,7 @@ in rec {
     providence = addDoc (prev.callPackage ./bash-packages/providence { });
     providence-tasker = addDoc (prev.callPackage ./bash-packages/providence/tasker.nix { });
     fixfname = addDoc (prev.callPackage ./bash-packages/fixfname { });
+    rcdo = addDoc (prev.callPackage ./bash-packages/rcdo { });
 
     aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; });
     manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; });
