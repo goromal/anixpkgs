@@ -167,7 +167,10 @@ in
         (writeShellScriptBin "anix-version" ''echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${if local-build then "Local Build" else "v${anix-version}"})"'')
     ];
 
-    programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
+    programs.bash.interactiveShellInit = ''
+        eval "$(direnv hook bash)"
+        set +o history
+    '';
 
     environment.shellAliases = {
         jfu = "journalctl -fu";
