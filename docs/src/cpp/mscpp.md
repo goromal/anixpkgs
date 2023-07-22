@@ -1,3 +1,8 @@
 # mscpp
 
-No package documentation currently provided.
+Useful template classes for creating multithreaded, interdependent microservices in C++.
+
+[Repository](https://github.com/goromal/mscpp)
+
+**Use cases pending.**
+

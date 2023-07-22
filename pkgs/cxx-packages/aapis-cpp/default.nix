@@ -31,4 +31,8 @@ in clangStdenv.mkDerivation {
         echo "set(sources" > ./src.cmake; find . -name "*.cc" >> ./src.cmake; echo ")" >> ./src.cmake;
         echo "set(headers" > ./include.cmake; find . -name "*.h" >> ./include.cmake; echo ")" >> ./include.cmake
     '';
+    meta = {
+        description = "C++ bindings for [my custom APIs](https://github.com/goromal/aapis).";
+        longDescription = "";
+    };
 }

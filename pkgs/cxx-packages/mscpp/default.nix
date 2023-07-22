@@ -16,4 +16,12 @@ clangStdenv.mkDerivation {
     preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
     '';
+    meta = {
+        description = "Useful template classes for creating multithreaded, interdependent microservices in C++.";
+        longDescription = ''
+        [Repository](https://github.com/goromal/mscpp)
+
+        **Use cases pending.**
+        '';
+    };
 }
