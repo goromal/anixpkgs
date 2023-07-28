@@ -169,7 +169,6 @@ in
 
     programs.bash.interactiveShellInit = ''
         eval "$(direnv hook bash)"
-        set +o history
     '';
 
     environment.shellAliases = {
@@ -177,6 +176,7 @@ in
         nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
         nrb = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot";
         code = "codium";
+        nohistory = "set +o history";
     };
     environment.noXlibs = false;
 
