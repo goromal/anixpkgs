@@ -4,7 +4,7 @@ rec {
     nixos-version = "23.05"; # Should match the channel in <nixpkgs>
     nixos-state = "23.05";
     homem-state = "23.05";
-    anix-version = "1.4.0";
+    anix-version = "1.5.0";
     anixpkgs = import (if local-build then
         ../../default.nix else
         (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz"))
