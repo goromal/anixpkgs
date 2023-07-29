@@ -1,12 +1,11 @@
-final: prev: 
+final: prev:
 with prev.lib;
 let
-    pkgSources = import ../sources.nix;
-
+    flakeInputs = final.flakeInputs;
     aapis-fds = prev.stdenvNoCC.mkDerivation {
         name = "aapis-fds";
         nativeBuildInputs = [ prev.protobuf ];
-        src = "${pkgSources.aapis}/protos";
+        src = "${flakeInputs.aapis}/protos";
         buildPhase = ''
             includes=$(find ${prev.protobuf}/include/google/protobuf/*.proto)
             files=$(find -name '*.proto')
@@ -59,28 +58,28 @@ let
     }: {
         self = python;
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
-            aapis-py = addDoc (pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = pkgSources.aapis; });
+            aapis-py = addDoc (pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = flakeInputs.aapis; });
             budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
-            gmail-parser = addDoc (pySelf.callPackage ./python-packages/gmail-parser { pkg-src = pkgSources.gmail-parser; });
+            gmail-parser = addDoc (pySelf.callPackage ./python-packages/gmail-parser { pkg-src = flakeInputs.gmail-parser; });
             sunnyside = addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
-            find_rotational_conventions = addDoc (pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = pkgSources.find_rotational_conventions; });
-            geometry = addDoc (pySelf.callPackage ./python-packages/geometry { pkg-src = pkgSources.geometry; });
-            pyceres = addDoc (pySelf.callPackage ./python-packages/pyceres { pkg-src = pkgSources.pyceres; });
-            pyceres_factors = addDoc (pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = pkgSources.pyceres_factors; });
-            pysignals = addDoc (pySelf.callPackage ./python-packages/pysignals { pkg-src = pkgSources.pysignals; });
-            pysorting = addDoc (pySelf.callPackage ./python-packages/pysorting { pkg-src = pkgSources.pysorting; });
-            python-dokuwiki = addDoc (pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = pkgSources.python-dokuwiki; });
-            book-notes-sync = addDoc (pySelf.callPackage ./python-packages/book-notes-sync { pkg-src = pkgSources.book-notes-sync; });
-            task-tools = addDoc (pySelf.callPackage ./python-packages/task-tools { pkg-src = pkgSources.task-tools; });
-            wiki-tools = addDoc (pySelf.callPackage ./python-packages/wiki-tools { pkg-src = pkgSources.wiki-tools; });
-            mavlog-utils = addDoc (pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = pkgSources.mavlog-utils; });
-            mesh-plotter = addDoc (pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = pkgSources.mesh-plotter; });
-            makepyshell = addDoc (pySelf.callPackage ./python-packages/makepyshell { pkg-src = pkgSources.makepyshell; });
+            find_rotational_conventions = addDoc (pySelf.callPackage ./python-packages/find_rotational_conventions { pkg-src = flakeInputs.find_rotational_conventions; });
+            geometry = addDoc (pySelf.callPackage ./python-packages/geometry { pkg-src = flakeInputs.geometry; });
+            pyceres = addDoc (pySelf.callPackage ./python-packages/pyceres { pkg-src = flakeInputs.pyceres; });
+            pyceres_factors = addDoc (pySelf.callPackage ./python-packages/pyceres_factors { pkg-src = flakeInputs.pyceres_factors; });
+            pysignals = addDoc (pySelf.callPackage ./python-packages/pysignals { pkg-src = flakeInputs.pysignals; });
+            pysorting = addDoc (pySelf.callPackage ./python-packages/pysorting { pkg-src = flakeInputs.pysorting; });
+            python-dokuwiki = addDoc (pySelf.callPackage ./python-packages/python-dokuwiki { pkg-src = flakeInputs.python-dokuwiki; });
+            book-notes-sync = addDoc (pySelf.callPackage ./python-packages/book-notes-sync { pkg-src = flakeInputs.book-notes-sync; });
+            task-tools = addDoc (pySelf.callPackage ./python-packages/task-tools { pkg-src = flakeInputs.task-tools; });
+            wiki-tools = addDoc (pySelf.callPackage ./python-packages/wiki-tools { pkg-src = flakeInputs.wiki-tools; });
+            mavlog-utils = addDoc (pySelf.callPackage ./python-packages/mavlog-utils { pkg-src = flakeInputs.mavlog-utils; });
+            mesh-plotter = addDoc (pySelf.callPackage ./python-packages/mesh-plotter { pkg-src = flakeInputs.mesh-plotter; });
+            makepyshell = addDoc (pySelf.callPackage ./python-packages/makepyshell { pkg-src = flakeInputs.makepyshell; });
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
-            scrape = addDoc (pySelf.callPackage ./python-packages/scrape { pkg-src = pkgSources.scrape; });
+            scrape = addDoc (pySelf.callPackage ./python-packages/scrape { pkg-src = flakeInputs.scrape; });
             spleeter = addDoc (pySelf.callPackage ./python-packages/spleeter { });
-            trafficsim = addDoc (pySelf.callPackage ./python-packages/trafficsim { pkg-src = pkgSources.trafficsim; });
+            trafficsim = addDoc (pySelf.callPackage ./python-packages/trafficsim { pkg-src = flakeInputs.trafficsim; });
             ichabod = addDoc (pySelf.callPackage ./python-packages/ichabod { });
             imutils-cv4 = addDoc (pySelf.callPackage ./python-packages/imutils-cv4 { });
             vidstab-cv4 = addDoc (pySelf.callPackage ./python-packages/vidstab-cv4 { });
@@ -97,7 +96,7 @@ let
         });
     }));
 in rec {
-    pkgData = prev.callPackage pkgSources.anixdata {};
+    pkgData = prev.callPackage flakeInputs.anixdata {};
 
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
@@ -164,27 +163,27 @@ in rec {
     providence-tasker = addDoc (prev.callPackage ./bash-packages/providence/tasker.nix { });
     fixfname = addDoc (prev.callPackage ./bash-packages/fixfname { });
 
-    aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = pkgSources.aapis; });
-    manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = pkgSources.manif-geom-cpp; });
-    mscpp = addDoc (prev.callPackage ./cxx-packages/mscpp { pkg-src = pkgSources.mscpp; });    
-    ceres-factors = addDoc (prev.callPackage ./cxx-packages/ceres-factors { pkg-src = pkgSources.ceres-factors; });
-    signals-cpp = addDoc (prev.callPackage ./cxx-packages/signals-cpp { pkg-src = pkgSources.signals-cpp; });
-    secure-delete = addDoc (prev.callPackage ./cxx-packages/secure-delete { pkg-src = pkgSources.secure-delete; });
-    sorting = addDoc (prev.callPackage ./cxx-packages/sorting { pkg-src = pkgSources.sorting; });
-    rankserver-cpp = addDoc (prev.callPackage ./cxx-packages/rankserver-cpp { pkg-src = pkgSources.rankserver-cpp; });
-    crowcpp = addDoc (prev.callPackage ./cxx-packages/crowcpp { pkg-src = pkgSources.crowcpp; });
+    aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp { pkg-src = flakeInputs.aapis; });
+    manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp { pkg-src = flakeInputs.manif-geom-cpp; });
+    mscpp = addDoc (prev.callPackage ./cxx-packages/mscpp { pkg-src = flakeInputs.mscpp; });    
+    ceres-factors = addDoc (prev.callPackage ./cxx-packages/ceres-factors { pkg-src = flakeInputs.ceres-factors; });
+    signals-cpp = addDoc (prev.callPackage ./cxx-packages/signals-cpp { pkg-src = flakeInputs.signals-cpp; });
+    secure-delete = addDoc (prev.callPackage ./cxx-packages/secure-delete { pkg-src = flakeInputs.secure-delete; });
+    sorting = addDoc (prev.callPackage ./cxx-packages/sorting { pkg-src = flakeInputs.sorting; });
+    rankserver-cpp = addDoc (prev.callPackage ./cxx-packages/rankserver-cpp { pkg-src = flakeInputs.rankserver-cpp; });
+    crowcpp = addDoc (prev.callPackage ./cxx-packages/crowcpp { pkg-src = flakeInputs.crowcpp; });
     mfn = addDoc (prev.callPackage ./cxx-packages/mfn {
-        pkg-src = pkgSources.mfn;
+        pkg-src = flakeInputs.mfn;
         model-proto = pkgData.models.gender.proto.data;
         model-weights = pkgData.models.gender.weights.data;
     });
 
-    evil-hangman = addDoc (prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = pkgSources.evil-hangman; }));
-    spelling-corrector = addDoc (prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = pkgSources.spelling-corrector; }));
-    simple-image-editor = addDoc (prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = pkgSources.simple-image-editor; }));
+    evil-hangman = addDoc (prev.callPackage ./java-packages/evil-hangman (baseJavaArgs // { pkg-src = flakeInputs.evil-hangman; }));
+    spelling-corrector = addDoc (prev.callPackage ./java-packages/spelling-corrector (baseJavaArgs // { pkg-src = flakeInputs.spelling-corrector; }));
+    simple-image-editor = addDoc (prev.callPackage ./java-packages/simple-image-editor (baseJavaArgs // { pkg-src = flakeInputs.simple-image-editor; }));
 
-    manif-geom-rs = addDoc (prev.callPackage ./rust-packages/manif-geom-rs { pkg-src = pkgSources.manif-geom-rs; });
-    xv-lidar-rs = addDoc (prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = pkgSources.xv-lidar-rs; });
+    manif-geom-rs = addDoc (prev.callPackage ./rust-packages/manif-geom-rs { pkg-src = flakeInputs.manif-geom-rs; });
+    xv-lidar-rs = addDoc (prev.callPackage ./rust-packages/xv-lidar-rs { pkg-src = flakeInputs.xv-lidar-rs; });
 
     nixos-machines = rec {
         personal = makeMachines "personal";
