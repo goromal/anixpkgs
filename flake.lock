@@ -1,0 +1,624 @@
+{
+  "nodes": {
+    "aapis": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683680726,
+        "narHash": "sha256-Cl36ownlhh1eIkzKHNryEWOXcwdmtnLbChK8O5U5dKk=",
+        "owner": "goromal",
+        "repo": "aapis",
+        "rev": "467bfc735b218ffda18643587b5c116904dc974c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "aapis",
+        "type": "github"
+      }
+    },
+    "anixdata": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1689519944,
+        "narHash": "sha256-OWeVfS/mDwJ5D6pHhJ4M+UltjrUBWczeqvHSa/Fz4NE=",
+        "owner": "goromal",
+        "repo": "anixdata",
+        "rev": "0d45a89cdbc3d86e6dc6d890a1982ede7a351d8f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "anixdata",
+        "type": "github"
+      }
+    },
+    "book-notes-sync": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694698,
+        "narHash": "sha256-CtQ93/o1Cg2U7gcAOBpKdV83hUDUvCsOsJcY/1CP+YM=",
+        "owner": "goromal",
+        "repo": "book-notes-sync",
+        "rev": "84a05c01e067d29ec82722bace89ccd4590df2c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "book-notes-sync",
+        "type": "github"
+      }
+    },
+    "ceres-factors": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1685683097,
+        "narHash": "sha256-PXKJRTIt6LO08HGsKaR+tKT6MVTNYcz3p7Q/vWIPA3E=",
+        "owner": "goromal",
+        "repo": "ceres-factors",
+        "rev": "8bff0917d7a05d25f86b23ff097bfebf10a987f9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "ceres-factors",
+        "type": "github"
+      }
+    },
+    "crowcpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1681531350,
+        "narHash": "sha256-IRlrNDLbYAOT4WlnX68FB4FBHKS1FC1uUTeVfIpfZDM=",
+        "owner": "goromal",
+        "repo": "Crow",
+        "rev": "8405788649538e5a45c791af5db5df5e171a8844",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "Crow",
+        "type": "github"
+      }
+    },
+    "evil-hangman": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683693382,
+        "narHash": "sha256-uu1Fuvfh1Gq9Hl9MnG4Zy8V4Ad94FQACI/QAI5/S1FQ=",
+        "owner": "goromal",
+        "repo": "evil-hangman",
+        "rev": "fbd190eec9b5f0b28d316e2db4eabb4e35347dfd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "evil-hangman",
+        "type": "github"
+      }
+    },
+    "find_rotational_conventions": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1671856051,
+        "narHash": "sha256-05G17dnw93IejeHfvxM5F99f5Gc50fhTwl8MmDbvUv8=",
+        "ref": "refs/heads/main",
+        "rev": "f783b777f1c6dcea21a7a1d30519be2f56a810c3",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e"
+      }
+    },
+    "flake-compat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1673956053,
+        "narHash": "sha256-4gtG9iQuiKITOjNQQeQIpoIB6b16fm+504Ch3sNKLd8=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "35bb57c0c8d8b62bbfd284272c928ceb64ddbde9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "inputs": {
+        "systems": "systems"
+      },
+      "locked": {
+        "lastModified": 1689068808,
+        "narHash": "sha256-6ixXo3wt24N/melDWjq70UuHQLxGV8jZvooRanIHXw0=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "919d646de7be200f3bf08cb76ae1f09402b6f9b4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "geometry": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683347528,
+        "narHash": "sha256-aK7DiaHqXG/RfTzACi46s3RwBuHddEyXDIJpAughfuw=",
+        "owner": "goromal",
+        "repo": "geometry",
+        "rev": "a87b47c1a479ce0cf2ebaea7202b08a62150a7cc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "geometry",
+        "type": "github"
+      }
+    },
+    "gmail-parser": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694411,
+        "narHash": "sha256-R042pUm6ITISO/cQGtDtKuUb+XJfdpgLzJRyG8Mx7mw=",
+        "owner": "goromal",
+        "repo": "gmail_parser",
+        "rev": "d8861327331b8d4e4eb3ac209569d9196f37d65b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "gmail_parser",
+        "type": "github"
+      }
+    },
+    "makepyshell": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1670691921,
+        "narHash": "sha256-0XSdKK5Zl+sPkONQS6ajmK/0XipDLvUM/IUqIW48mdQ=",
+        "ref": "refs/heads/main",
+        "rev": "9006a586bfc6233ea069c2c6975e57e42f470a17",
+        "revCount": 2,
+        "type": "git",
+        "url": "https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31"
+      }
+    },
+    "manif-geom-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1685596570,
+        "narHash": "sha256-oE/g9Rt13lttRDZOFZeb0darT+/Z8oXTrN2Y5Pl6MKU=",
+        "owner": "goromal",
+        "repo": "manif-geom-cpp",
+        "rev": "e3497d2e04a109fcd1dedf8af02a89e76c853fde",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "manif-geom-cpp",
+        "type": "github"
+      }
+    },
+    "manif-geom-rs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683782659,
+        "narHash": "sha256-oJUwIwbyEaYMdUy8Yz3UH/zuiD6PEvXE7eHzlEsnGSw=",
+        "owner": "goromal",
+        "repo": "manif-geom-rs",
+        "rev": "641b52026a8594611324ce9134aad506f10965e8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "manif-geom-rs",
+        "type": "github"
+      }
+    },
+    "mavlog-utils": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694240,
+        "narHash": "sha256-0Jn0QdvBhC8Qh0PQmEkhIedslSmeGGfv/UJzvowZsS0=",
+        "owner": "goromal",
+        "repo": "mavlog-utils",
+        "rev": "516bc15b3cf5bbdcc82ea84548202d1f72fe56ef",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "mavlog-utils",
+        "type": "github"
+      }
+    },
+    "mesh-plotter": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1687924031,
+        "narHash": "sha256-rEGMxUzuRRRGIjS36WMEkwwCFsbfGPnrL/CgxwwemaE=",
+        "owner": "goromal",
+        "repo": "mesh-plotter",
+        "rev": "c20ac53f54b05b3ab155ede60c43022a61ae39b6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "mesh-plotter",
+        "type": "github"
+      }
+    },
+    "mfn": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694742,
+        "narHash": "sha256-KKFPtRNGNYQ1fhsaxOhTeBnqf4FMIwEGlgRaIMgIFLY=",
+        "owner": "goromal",
+        "repo": "mfn",
+        "rev": "134850ca2140abc8b0cd8e37e62b6f70ba7b50ae",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "mfn",
+        "type": "github"
+      }
+    },
+    "mscpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683696296,
+        "narHash": "sha256-T26p1qRETYRBB9HxyjyVeBHAF1bROw5roKDYCqgy9wI=",
+        "owner": "goromal",
+        "repo": "mscpp",
+        "rev": "747f612e32aaa6c9e31285c69830d9d224c23b4b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "mscpp",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1673217689,
+        "narHash": "sha256-I04o01OKnHjqeR4SKoE1qjNFOrrRz8Ha40fgPyo594Q=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4b7664384c7600dadb4dc8d1708626d073681b40",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4b7664384c7600dadb4dc8d1708626d073681b40",
+        "type": "github"
+      }
+    },
+    "pyceres": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1628219054,
+        "narHash": "sha256-MV2FvKhASlvB2NKJuRmBggMYN/ufQQabeiXJmRXdcT8=",
+        "owner": "Edwinem",
+        "repo": "ceres_python_bindings",
+        "rev": "2106d043bce37adcfef450dd23d3005480948c37",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Edwinem",
+        "repo": "ceres_python_bindings",
+        "rev": "2106d043bce37adcfef450dd23d3005480948c37",
+        "type": "github"
+      }
+    },
+    "pyceres_factors": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1685686456,
+        "narHash": "sha256-vrrYGIxSK7RJoC7knEwBZXawerqeKcZEpOmMgCm/aG0=",
+        "owner": "goromal",
+        "repo": "pyceres_factors",
+        "rev": "ccfadca7f9f735571bb90adf60c18d29645bcdde",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "pyceres_factors",
+        "type": "github"
+      }
+    },
+    "pysignals": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683346322,
+        "narHash": "sha256-8tA0TAeEx3eYU2OWQr2gptZ1kJoXVyIhw+jV9JO6ZQ4=",
+        "owner": "goromal",
+        "repo": "pysignals",
+        "rev": "4362eed73014ad9f0bdf1b6467033cfd35cbee21",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "pysignals",
+        "type": "github"
+      }
+    },
+    "pysorting": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694136,
+        "narHash": "sha256-nP9sUskrz3v69gFrBVJzLp5yoeZyZR0z2Bn6cchLBGI=",
+        "owner": "goromal",
+        "repo": "pysorting",
+        "rev": "09b008e7073e944c67f523d75e606a32c1ca7ae5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "pysorting",
+        "type": "github"
+      }
+    },
+    "python-dokuwiki": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1656426654,
+        "narHash": "sha256-kSnE4ni4xOZ1CzuIe6DnSWZ7+fPYEvQsVL3glv/7iiw=",
+        "owner": "fmenabe",
+        "repo": "python-dokuwiki",
+        "rev": "fc0d5e90058913d8e17f5e6bf0af0a78e8c16685",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fmenabe",
+        "ref": "refs/tags/1.3.3",
+        "repo": "python-dokuwiki",
+        "type": "github"
+      }
+    },
+    "rankserver-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683695376,
+        "narHash": "sha256-Q4c95UnXA3UCxWo2TlCmEpBuow0aim71hL5396KDxZo=",
+        "owner": "goromal",
+        "repo": "rankserver-cpp",
+        "rev": "bf26d1e84109118274a760390c7fcdda26012fd9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "rankserver-cpp",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "aapis": "aapis",
+        "anixdata": "anixdata",
+        "book-notes-sync": "book-notes-sync",
+        "ceres-factors": "ceres-factors",
+        "crowcpp": "crowcpp",
+        "evil-hangman": "evil-hangman",
+        "find_rotational_conventions": "find_rotational_conventions",
+        "flake-compat": "flake-compat",
+        "flake-utils": "flake-utils",
+        "geometry": "geometry",
+        "gmail-parser": "gmail-parser",
+        "makepyshell": "makepyshell",
+        "manif-geom-cpp": "manif-geom-cpp",
+        "manif-geom-rs": "manif-geom-rs",
+        "mavlog-utils": "mavlog-utils",
+        "mesh-plotter": "mesh-plotter",
+        "mfn": "mfn",
+        "mscpp": "mscpp",
+        "nixpkgs": "nixpkgs",
+        "pyceres": "pyceres",
+        "pyceres_factors": "pyceres_factors",
+        "pysignals": "pysignals",
+        "pysorting": "pysorting",
+        "python-dokuwiki": "python-dokuwiki",
+        "rankserver-cpp": "rankserver-cpp",
+        "scrape": "scrape",
+        "secure-delete": "secure-delete",
+        "signals-cpp": "signals-cpp",
+        "simple-image-editor": "simple-image-editor",
+        "sorting": "sorting",
+        "spelling-corrector": "spelling-corrector",
+        "task-tools": "task-tools",
+        "trafficsim": "trafficsim",
+        "wiki-tools": "wiki-tools",
+        "xv-lidar-rs": "xv-lidar-rs"
+      }
+    },
+    "scrape": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683693925,
+        "narHash": "sha256-KtDoL+CxrCbH9B5qw9KY3VZIq91NY9tvElno5rDOxQ0=",
+        "owner": "goromal",
+        "repo": "scrape",
+        "rev": "53ff39ed758d684945d6282f7048b8760e8082b3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "scrape",
+        "type": "github"
+      }
+    },
+    "secure-delete": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683693681,
+        "narHash": "sha256-9s4rDjp0Mfz3eg4pLe7JRr+rzN61liri6NKcD7Sd6Kw=",
+        "owner": "goromal",
+        "repo": "secure-delete",
+        "rev": "1c87b16e4dee245a8a8c04ec9746031dffdc0aca",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "secure-delete",
+        "type": "github"
+      }
+    },
+    "signals-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1672599560,
+        "narHash": "sha256-KIAvkkTJ0zhidOJljtUaEKe94wiybC0LafRItR0TBcY=",
+        "owner": "goromal",
+        "repo": "signals-cpp",
+        "rev": "40b1aaebb651fe1fcbe5f8fdad545567fe8971c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "signals-cpp",
+        "type": "github"
+      }
+    },
+    "simple-image-editor": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683693423,
+        "narHash": "sha256-y9vqK+ItS0bUWMWIEPoUb3LFpXNdlFx6yCJIwT0KNyg=",
+        "owner": "goromal",
+        "repo": "simple-image-editor",
+        "rev": "64160a1901a91ae941dabcff069d00057d318e06",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "simple-image-editor",
+        "type": "github"
+      }
+    },
+    "sorting": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1680415014,
+        "narHash": "sha256-7nPfrUJDiocZdNhR5cB/wutJgaTQ8Rwa7OXzDAtdBiw=",
+        "owner": "goromal",
+        "repo": "sorting",
+        "rev": "b254d4c895afcbc551fb0b55eefe9c9cec388d80",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "sorting",
+        "type": "github"
+      }
+    },
+    "spelling-corrector": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683693401,
+        "narHash": "sha256-mwncICz15GKpR/Cxe4w8koG9bHBsUdKH0ps32dxiFnw=",
+        "owner": "goromal",
+        "repo": "spelling-corrector",
+        "rev": "8a4a1bf61aa8bb08fae09dd403ebfdf9980684fc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "spelling-corrector",
+        "type": "github"
+      }
+    },
+    "systems": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "task-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1687036716,
+        "narHash": "sha256-sO8Vr113s0ca2cWCuXdGrJJAHhn4cWHv7MQZdzD7zxg=",
+        "owner": "goromal",
+        "repo": "task-tools",
+        "rev": "6f8891e62df97921f420f30d904037272b295edc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "task-tools",
+        "type": "github"
+      }
+    },
+    "trafficsim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1670693563,
+        "narHash": "sha256-Vk0ReIWjbhUTa/6AtPWhwgiyUF6fPvPEJSqiCfotncI=",
+        "ref": "refs/heads/main",
+        "rev": "bd0d6741dbbd85d2951739c351dd501ac7e9af97",
+        "revCount": 5,
+        "type": "git",
+        "url": "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96"
+      }
+    },
+    "wiki-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694858,
+        "narHash": "sha256-oJBcpzBOp620HXGhk+0Y1gj3HrpNz0ocCB1EiaEMIOs=",
+        "owner": "goromal",
+        "repo": "wiki-tools",
+        "rev": "56cceeadda9f21ba4a551359be384594d9f64bbe",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "wiki-tools",
+        "type": "github"
+      }
+    },
+    "xv-lidar-rs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1683694118,
+        "narHash": "sha256-2PaEbjtBO5o09jGIU09shZ/SjAQoh2pyJyJ0Izj2RjU=",
+        "owner": "goromal",
+        "repo": "xv-lidar-rs",
+        "rev": "b6e3128cafea69614bbbcbeddaa46a5592c749cf",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "xv-lidar-rs",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

@@ -26,4 +26,5 @@ let
 in callPackage ./mkConverter.nix {
     inherit writeShellScriptBin callPackage color-prints strings;
     inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+    description = "Make any PDF document suitable for note taking in e.g., Notability.";
 }

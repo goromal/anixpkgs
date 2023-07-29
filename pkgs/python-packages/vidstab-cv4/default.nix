@@ -27,6 +27,7 @@ buildPythonPackage rec {
   meta = with lib; {
     homepage = "https://github.com/AdamSpannbauer/python_video_stab";
     description = "Video Stabilization using OpenCV";
+    longDescription = "[Homepage](https://github.com/AdamSpannbauer/python_video_stab)";
     license = licenses.mit;
     maintainers = [ maintainers.costrouc ];
   };

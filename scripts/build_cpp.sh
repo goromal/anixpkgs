@@ -6,13 +6,17 @@ nb() {
 nix-build . -A $1
 }
 
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+SOURCE="$(readlink "$SOURCE")"
+[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+cd "$DIR/.."
+
 echo "Building C++ packages..."
 
-nb manif-geom-cpp
-nb ceres-factors
-nb signals-cpp
-nb secure-delete
-nb sorting
-nb crowcpp
-nb rankserver-cpp
-nb mfn
+for pkg in $(python3 scripts/filter_pkg_list.py cpp); do
+    nb $pkg
+done

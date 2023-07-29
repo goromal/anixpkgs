@@ -54,7 +54,7 @@ let
             done
         fi
         ${printGrn} "Generating header-only boilerplate for $makehot..."
-        git clone git@github.com:goromal/example-cpp.git "$tmpdir/example-cpp" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example-cpp "$tmpdir/example-cpp" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-cpp" "$makehot" ${redirects.suppress_all}
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/CMakeLists.txt"
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/README.md"
@@ -75,7 +75,7 @@ let
             done
         fi
         ${printGrn} "Generating lib+exec package boilerplate for $makeexl..."
-        git clone git@github.com:goromal/example-cpp2.git "$tmpdir/example-cpp2" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example-cpp2 "$tmpdir/example-cpp2" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-cpp2" "$makeexl" ${redirects.suppress_all}
         sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/CMakeLists.txt"
         sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/README.md"
@@ -83,7 +83,7 @@ let
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
     '';
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     set -e
     ${argparse}
     tmpdir=$(mktemp -d)
@@ -92,4 +92,19 @@ in writeShellScriptBin pkgname ''
     ${makeexlRule}
     ${makenixRule}
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Convenience tools for setting up C++ projects.";
+        longDescription = ''
+        ```
+        usage: cpp-helper [options]
+
+        Options:
+        --make-format-file             Dumps a format rules file into .clang-format
+        --make-nix                     Dump template default.nix and shell.nix files
+        --make-exec-lib   CPPNAME      Generate a lib+exec package template
+        --make-header-lib CPPNAME      Generate a header-only library template
+        ```
+        '';
+    };
+}

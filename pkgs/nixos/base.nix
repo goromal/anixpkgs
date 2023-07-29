@@ -3,13 +3,14 @@ with pkgs;
 with lib;
 with import ./dependencies.nix { inherit config; };
 let
-    nixos-version = "22.05"; # Should match the channel in <nixpkgs>
     home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in
 {
     imports = [
         (import "${home-manager}/nixos")
     ];
+
+    system.stateVersion = nixos-state;
 
     boot.kernelPackages = pkgs.linuxPackages_latest;
     boot.kernel.sysctl = {
@@ -23,29 +24,30 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
     };
 
-    nix.nixPath = [
-        "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-        "anixpkgs=/data/andrew/sources/anixpkgs"
-    ];
-
-    nix.autoOptimiseStore = true;
-    nix.buildCores = 4;
-    nix.binaryCaches = [
-        "https://cache.nixos.org/"
-        "https://github-public.cachix.org"
-        "https://ros.cachix.org"
-    ];
-    nix.binaryCachePublicKeys = [
-        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-        "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
-        "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
-    ];
-    nix.extraOptions = ''
-        narinfo-cache-positive-ttl = 0
-        narinfo-cache-negative-ttl = 0
-        experimental-features = nix-command flakes
-    '';
-    nix.maxJobs = 4;
+    nix = {
+        nixPath = [
+            "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
+            "anixpkgs=/data/andrew/sources/anixpkgs"
+        ];
+        settings = {
+            auto-optimise-store = true;
+            max-jobs = 4;
+            cores = 4;
+            substituters = [
+                "https://cache.nixos.org/"
+                "https://github-public.cachix.org"
+            ];
+            trusted-public-keys = [
+                "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+                "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+            ];
+        };
+        extraOptions = ''
+            narinfo-cache-positive-ttl = 0
+            narinfo-cache-negative-ttl = 0
+            experimental-features = nix-command flakes
+        '';
+    };
     nixpkgs.config.allowUnfree = true;
 
     # Use the systemd-boot EFI boot loader.
@@ -71,7 +73,9 @@ in
     # Enable the OpenSSH daemon.
     services.openssh = {
         enable = true;
-        forwardX11 = true;
+        settings = {
+            X11Forwarding = true;
+        };
     };
     programs.ssh.startAgent = true;
     
@@ -84,22 +88,42 @@ in
 
     environment.systemPackages = [
         ack
+        procs
+        tldr
+        fzf
+        fdupes
+        exa # TODO ls (or l) alias?
+        zoxide # z, ...
+        duf
         gcc
         gdb
-        git
+        tig
+        scc
+        most
         gnumake
+        just
+        hyperfine
         cmake
         direnv
         valgrind
         iotop
         iperf
+        iftop
         python3
+        xsel
         htop
         jq
         libpwquality
         libinput
+        rsync
         lsof
+        mc
         coreutils
+        ripgrep
+        diff-so-fancy
+        entr
+        bat
+        sd
         clang
         clang-tools
         neofetch
@@ -110,11 +134,13 @@ in
         nethogs
         tcpdump
         gparted
-        tmux
+        logkeys
         traceroute
+        mtr
         fish
         screen
         minicom
+        exiftool
         dhcpcd
         dnsutils
         v4l_utils
@@ -123,31 +149,34 @@ in
         chrony
         unzip
         wget
+        aria2
+        httpie
         ethtool
         arp-scan
         dtc
         ncdu
         nmap
-        # https://github.com/utdemir/nix-tree
-        (writeShellScriptBin "nix-deps" ''
-        if [[ $# -ge 2 ]]; then
-            nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree
-        elif [[ $# -eq 1 ]]; then
-            ${nix-tree}/bin/nix-tree "$1"
-        else
-            ${anixpkgs.color-prints}/bin/echo_red "Must specify either a store path or nix-build rules."
-        fi
-        '')
+        navi
+        unstable.mprocs
+        bandwhich
+        btop
+        glances
+        gping
+        dog
+        rclone # TODO incorporate
         (writeShellScriptBin "anix-version" ''echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${if local-build then "Local Build" else "v${anix-version}"})"'')
     ];
 
-    programs.bash.interactiveShellInit = ''eval "$(direnv hook bash)"'';
+    programs.bash.interactiveShellInit = ''
+        eval "$(direnv hook bash)"
+    '';
 
     environment.shellAliases = {
         jfu = "journalctl -fu";
         nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
         nrb = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot";
         code = "codium";
+        nohistory = "set +o history";
     };
     environment.noXlibs = false;
 
@@ -179,100 +208,14 @@ in
 
     home-manager.users.andrew = {
         programs.home-manager.enable = true;
-
-        home.packages = [
-            anixpkgs.color-prints
-            anixpkgs.git-cc
-            anixpkgs.fix-perms
-            anixpkgs.secure-delete
-            anixpkgs.sunnyside
-            anixpkgs.setupws
-            anixpkgs.listsources
-            anixpkgs.pkgshell
-            anixpkgs.devshell
-            anixpkgs.cpp-helper
-            anixpkgs.py-helper
-            anixpkgs.makepyshell
-            anixpkgs.wiki-tools
-            anixpkgs.book-notes-sync
-            anixpkgs.providence
-            anixpkgs.make-title
-            anixpkgs.pb
-            anixpkgs.manage-gmail
-            anixpkgs.dirgroups
-        ];
-
-        programs.git = {
-            package = gitAndTools.gitFull;
-            enable = true;
-            userName = "Andrew Torgesen";
-            userEmail = "andrew.torgesen@gmail.com";
-            aliases = {
-                aa = "add -A";
-                cm = "commit -m";
-                co = "checkout";
-                s = "status";
-                d = "diff";
-            };
-            extraConfig = {
-                init = {
-                    defaultBranch = "master";
-                };
-                push = {
-                    default = "current";
-                };
-                pull = {
-                    default = "current";
-                };
-            };
-        };
-
+        home.stateVersion = homem-state;
         programs.command-not-found.enable = true;
 
-        programs.vim = {
-            enable = true;
-            extraConfig = ''
-                if has('gui_running')
-                    set guifont=Iosevka
-                endif
-                set expandtab
-                " open NERDTree automatically if no file specified
-                "autocmd StdinReadPre * let s:std_in=1
-                "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
-                " open NERDTree on Ctrl-n
-                map <C-n> :NERDTreeToggle<CR>
-                set wildignore+=*/node_modules/*,_site,*/__pycache__/,*/venv/*,*/target/*,*/.vim$,\~$,*/.log,*/.aux,*/.cls,*/.aux,*/.bbl,*/.blg,*/.fls,*/.fdb*/,*/.toc,*/.out,*/.glo,*/.log,*/.ist,*/.fdb_latexmk
-                set encoding=utf-8
-                set termguicolors
-                set background=dark
-                let g:mix_format_on_save = 1
-                let g:mix_format_options = '--check-equivalent'
-            '';
-            settings = {
-                number = true;
-            };
-            plugins = with vimPlugins; [
-                vim-elixir
-                sensible
-                vim-airline
-                The_NERD_tree
-                fugitive
-                vim-gitgutter
-                YouCompleteMe
-                vim-abolish
-                command-t
-            ];
-        };
-
-        home.file = {
-            ".tmux.conf" = {
-                text = ''
-                    set-option -g default-shell /run/current-system/sw/bin/fish
-                    set-window-option -g mode-keys vi
-                    set -g default-terminal "screen-256color"
-                    set -ga terminal-overrides ',screen-256color:Tc'
-                '';
-            };
-        };
+        imports = [
+            ./home-mods/base-anixpkgs.nix
+            ./home-mods/git.nix
+            ./home-mods/vim.nix
+            ./home-mods/tmux.nix
+        ];
     };
 }

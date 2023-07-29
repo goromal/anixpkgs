@@ -14,8 +14,6 @@ with import ../../dependencies.nix { inherit config; };
         "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/pi/4/rankserver.nix"
     ];
     
-    system.stateVersion = "22.05";
-    
     services.rankserver = {
         enable = true;
         package = anixpkgs.rankserver-cpp;

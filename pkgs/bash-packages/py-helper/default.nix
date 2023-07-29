@@ -46,7 +46,7 @@ let
             done
         fi
         ${printGrn} "Generating Python package template for $makepkg..."
-        git clone git@github.com:goromal/example_py.git "$tmpdir/example-py" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example_py "$tmpdir/example-py" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-py" "$makepkg" ${redirects.suppress_all}
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/README.md"
         sed -i 's|example-py|'"$makepkg"'|g' "$makepkg/setup.py"
@@ -84,7 +84,7 @@ let
             done
         fi
         ${printGrn} "Generating pybind wrapper library boilerplate for $pblname wrapping $cppname..."
-        git clone git@github.com:goromal/example_cpp_py.git "$tmpdir/example_cpp_py" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example_cpp_py "$tmpdir/example_cpp_py" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example_cpp_py" "$pblname" ${redirects.suppress_all}
         sed -i 's|example_cpp_py|'"$pblname"'|g' "$pblname/python_module.cpp"
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/python_module.cpp"
@@ -93,7 +93,7 @@ let
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/CMakeLists.txt"
     fi
     '';
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     set -e
     ${argparse}
     tmpdir=$(mktemp -d)
@@ -101,4 +101,18 @@ in writeShellScriptBin pkgname ''
     ${makepblRule}
     ${makenixRule}
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Developer tools for creating Python packages.";
+        longDescription = ''
+        ```
+        usage: py-helper [options]
+
+        Options:
+        --make-pkg        NAME         Generate a template python package
+        --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
+        --make-nix                     Dump template default.nix and shell.nix files
+        ```
+        '';
+    };
+}
