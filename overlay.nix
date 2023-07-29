@@ -8,7 +8,7 @@ let
         sha256 = lock.nodes.flake-compat.locked.narHash;
       }
     );
-    in self.config.flakeInputs or (flake-compat { src = self.lib.cleanSource ./.; }).defaultNix.inputs;
-in foldr composeExtensions (_: _: _: {}) [
+    in final.config.flakeInputs or (flake-compat { src = final.lib.cleanSource ./.; }).defaultNix.inputs;
+in (foldr composeExtensions (_: _: {}) [
   (import ./pkgs)
-] final prev flakeInputs
+] final prev) // { inherit flakeInputs; }

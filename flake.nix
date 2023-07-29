@@ -60,7 +60,7 @@
         geometry.url = "github:goromal/geometry";
         geometry.flake = false;
 
-        gmail-parser.url = "github:goromal/gmail-parser";
+        gmail-parser.url = "github:goromal/gmail_parser";
         gmail-parser.flake = false;
 
         makepyshell.url = "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";

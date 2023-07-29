@@ -1,6 +1,7 @@
-final: prev: flakeInputs:
+final: prev:
 with prev.lib;
 let
+    flakeInputs = final.flakeInputs;
     aapis-fds = prev.stdenvNoCC.mkDerivation {
         name = "aapis-fds";
         nativeBuildInputs = [ prev.protobuf ];
