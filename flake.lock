@@ -4,7 +4,7 @@
       "flake": false,
       "locked": {
         "lastModified": 1683680726,
-        "narHash": "sha256-Cl36ownlhh1eIkzKHNryEWOXcwdmtnLbChK8O5U5dKk=",
+        "narHash": "sha256-Cl36ownlhh1eIdkzKHNryEWOXcwdmtnLbChK8O5U5dKk=",
         "owner": "goromal",
         "repo": "aapis",
         "rev": "467bfc735b218ffda18643587b5c116904dc974c",
