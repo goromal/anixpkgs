@@ -146,6 +146,7 @@ with import ../dependencies.nix { inherit config; };
             meld
             libreoffice-qt
             nixos-generators
+            sage
             ## unstable
             unstable.google-chrome
             unstable.slack
