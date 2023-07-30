@@ -1,6 +1,6 @@
 import json
 import os
-from subprocess import check_output, CalledProcessError
+from subprocess import check_output, CalledProcessError, DEVNULL
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -35,7 +35,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
             pkgfile.write(f"# {cppPkg['attr']}\n\n")
             try:
                 docf = check_output(
-                    ["nix-build", ".", "-A", f"{cppPkg['attr']}.doc", "--no-out-link"])
+                    ["nix-build", ".", "-A", f"{cppPkg['attr']}.doc", "--no-out-link"], stderr=DEVNULL)
             except CalledProcessError:
                 print(
                     f"ERROR: {cppPkg['attr']} does not appear to have a doc attribute defined.")
@@ -57,7 +57,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
             pkgfile.write(f"# {pythonPkg['attr']}\n\n")
             try:
                 docf = check_output(
-                    ["nix-build", ".", "-A", f"{pythonPkg['attr']}.doc", "--no-out-link"])
+                    ["nix-build", ".", "-A", f"{pythonPkg['attr']}.doc", "--no-out-link"], stderr=DEVNULL)
             except CalledProcessError:
                 print(
                     f"ERROR: {pythonPkg['attr']} does not appear to have a doc attribute defined.")
@@ -79,7 +79,7 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
             pkgfile.write(f"# {miscPkg['attr']}\n\n")
             try:
                 docf = check_output(
-                    ["nix-build", ".", "-A", f"{miscPkg['attr']}.doc", "--no-out-link"])
+                    ["nix-build", ".", "-A", f"{miscPkg['attr']}.doc", "--no-out-link"], stderr=DEVNULL)
             except CalledProcessError:
                 print(
                     f"ERROR: {miscPkg['attr']} does not appear to have a doc attribute defined.")
