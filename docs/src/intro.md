@@ -25,7 +25,17 @@ These docs provide an overview of how I manage the OS’s of my [machines](./mac
 The packages defined in this repo are accessible to anyone who uses [Nix](https://nixos.org), which can be [installed](https://nixos.org/download.html) in two forms:
 
 - **“Standalone” Nix:** This will just install the package manager and is the easiest option if you just want access to the packages in this repo. This option could be augmented with a tool called [home-manager](https://nix-community.github.io/home-manager/) to at least be able to use *some* of the closure components alongside your normal OS as well.
-- ***TODO***
+- **NixOS:** This option is much more invasive as it wholesale replaces your entire operating system, and should only be done if you really know what you’re doing (and love Nix). More instructions in the [machines](./machines.md) documentation.
+
+For either method, ensure that your Nix version is `>= 2.4`.
+
+The software packaged in `anixpkgs` is buildable both through [Nix flakes](https://nixos.wiki/wiki/Flakes) as well as through traditional Nix shells. It’s recommended to use flakes, as that method is more "pure" and allows for more portable integration with the public cache.
+
+### Accessing the Packages Using Flakes
+
+***TODO***
+
+### Accessing the Packages Using shell.nix
 
 ***TODO***
 
