@@ -1,17 +1,21 @@
-#!/usr/bin/env python
-
-import argparse
+import json
 import os
-import re
+from subprocess import check_output, CalledProcessError, DEVNULL
 
-ROOTDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-def get_sources_info():
-    urls = []
-    with open(os.path.join(ROOTDIR, "sources.nix"), "r") as sources_file:
-        url_pattern = re.compile(r"builtins.fetchGit\s*\{\s*\n\s*url\s*=\s*\"(.+)\";", re.MULTILINE)
-        print(re.findall(url_pattern, sources_file.read()))
-    # TODO
+with open(os.path.join(ANIXDIR, "flake.lock"), "r") as lockfile:
+    lock = json.loads(lockfile.read())
 
-if __name__ == "__main__":
-    get_sources_info()
+print("Checking for auto-updateable sources...")
+for src in lock["nodes"]:
+    if "original" in lock["nodes"][src]:
+        original = lock["nodes"][src]["original"]
+        if ("owner" in original and original["owner"] == "goromal") or ("url" in original and "gist" in original["url"]):
+            print(f"  {src}")
+            try:
+                output = check_output(["nix", "flake", "lock", "--update-input", src], stderr=DEVNULL)
+            except CalledProcessError:
+                print(f"  ERROR updating flake input {src}")
+                exit(1)
+print("...done.")

@@ -23,3 +23,11 @@ bash scripts/build_misc.sh
 bash scripts/build_cpp.sh
 bash scripts/build_python.sh
 ```
+
+## Update Dependencies
+
+To systematically update all (self-owned) dependencies, run
+
+```bash
+python scripts/update_deps.py
+```
