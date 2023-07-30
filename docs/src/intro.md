@@ -33,28 +33,46 @@ The software packaged in `anixpkgs` is buildable both through [Nix flakes](https
 
 ### Accessing the Packages Using Flakes
 
-***TODO***
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v1.5.0`) while also giving you access to the public cache to avoid building from source on your machine:
+
+```nix
+{
+  description = "Nix shell for anixpkgs.";
+  nixConfig.substituters = [
+    "https://cache.nixos.org/"
+    "https://github-public.cachix.org"
+  ];
+  nixConfig.trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+  ];
+  inputs = {
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v1.5.0";
+  };
+  outputs = { self, nixpkgs }:
+    let pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    in with pkgs; {
+      devShell.x86_64-linux = mkShell {
+        buildInputs = [
+          pb
+          fixfname
+          pkgshell
+        ];
+      };
+    };
+}
+```
+
+Access the packages with `nix develop`.
 
 ### Accessing the Packages Using shell.nix
 
-***TODO***
-
-To use, clone this repo and add to `~/.bashrc`:
-
-```bash
-export NIX_PATH=nixpkgs=/your/path/to/anixpkgs
-```
-
-and in your Nix derivations:
+Here are some `shell.nix` files to access Python packages (using version `v1.5.0` of the packages):
 
 ```nix
-let pkgs = import <nixpkgs> {};
-```
-An example Nix shell for trying out Python packages:
-
-```nix
-{ pkgs ? import <nixpkgs> {} }:
 let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
   python-with-my-packages = pkgs.python39.withPackages (p: with p; [
     numpy
     matplotlib
@@ -69,7 +87,8 @@ or:
 
 ```nix
 let
-  pkgs = import <anixpkgs> {};
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
     pkgs.python39
@@ -87,3 +106,20 @@ in pkgs.mkShell {
   '';
 }
 ```
+
+And for general software packages:
+
+```nix
+let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
+in with pkgs; mkShell {
+  buildInputs = [
+    pb
+    fixfname
+    pkgshell
+  ];
+}
+```
+
+Access the packages with `nix-shell`.

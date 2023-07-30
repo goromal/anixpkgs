@@ -1,6 +1,6 @@
 # Machine Management
 
-***TODO***
+***These notes are still a work-in-progress and are currently largely for my personal use only.***
 
 ## Build a Raspberry Pi NixOS SD Installer Image
 
