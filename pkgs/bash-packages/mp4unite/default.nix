@@ -22,7 +22,7 @@ let
         ];
     };
     printErr = "${color-prints}/bin/echo_red";
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     if [ "$#" -lt "3" ]; then
         ${printErr} "Insufficient arguments provided"
@@ -77,4 +77,19 @@ in writeShellScriptBin pkgname ''
     fi
 
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Unite mp4 files, much like with the `pdfunite` tool.";
+        longDescription = ''
+        ```
+        usage: mp4unite [options] <MP4-sourcefile-1>..<MP4-sourcefile-n> <MP4-destfile>
+
+        Combine MP4 source files into a single destination MP4 file.
+
+        Options:
+        -h | --help     Print out the help documentation.
+        -v | --verbose  Print verbose output from ffmpeg
+        ```
+        '';
+    };
+}

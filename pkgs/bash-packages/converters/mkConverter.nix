@@ -7,6 +7,8 @@
 , usage_str
 , optsWithVarsAndDefaults
 , convOptCmds
+, description ? ""
+, longDescription ? null
 }:
 let
     argparse = callPackage ../bash-utils/argparse.nix {
@@ -25,7 +27,7 @@ let
 ${usage_str}
 EOF
     ''; # ${argparse}
-in writeShellScriptBin name ''
+in (writeShellScriptBin name ''
     ${argparse}
     infile="$1"
     if [[ -z "$infile" ]]; then
@@ -48,4 +50,13 @@ in writeShellScriptBin name ''
     exit
     ;;
     esac
-''
+'') // {
+    meta = {
+        inherit description;
+        longDescription = (if longDescription != null then longDescription else ''
+        ```
+        ${usage_str}
+        ```
+        '');
+    };
+}

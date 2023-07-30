@@ -37,7 +37,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
                 print('Operation complete.')
             
             if not mp3name is None:
-                return flask.send_file(mp3name, attachment_filename=os.path.basename(mp3name))
+                return flask.send_file(mp3name, download_name=os.path.basename(mp3name))
     '';
     templateText = ''
         <!DOCTYPE html>

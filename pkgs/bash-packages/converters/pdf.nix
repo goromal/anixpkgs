@@ -3,6 +3,7 @@
 , color-prints
 , strings
 , redirects
+, inkscape
 }:
 let
     name = "pdf";
@@ -26,11 +27,12 @@ let
         
     ];
     convOptCmds = [
-        { extension = "*"; commands = ''
-        echo_yellow "NOT IMPLEMENTED YET"
+        { extension = "svg|SVG"; commands = ''
+        ${inkscape}/bin/inkscape --export-area-drawing --without-gui --export-pdf="$outfile" "$infile" ${redirects.suppress_all}
         ''; }
     ];
 in callPackage ./mkConverter.nix {
     inherit writeShellScriptBin callPackage color-prints strings;
     inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+    description = "Create and edit PDF files from similar formats (*under construction*).";
 }

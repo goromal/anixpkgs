@@ -1,6 +1,7 @@
 { pname
 , version
 , description
+, longDescription ? ""
 , script-file
 , is-exec ? true
 , test-dir ? null
@@ -32,4 +33,7 @@ in buildPythonPackage rec {
         sed -i 's|_tmpversion|${version}|g' __version__.py
         ${testsCpyCmd}
     '';
+    meta = {
+        inherit description longDescription;
+    };
 }

@@ -55,4 +55,19 @@ in stdenv.mkDerivation {
         cp ${echo-cyan}/bin/echo_cyan       $out/bin
         cp ${echo-white}/bin/echo_white     $out/bin
     '';
+    meta = {
+        description = "Color-formatted wrapped `echo` commands.";
+        longDescription = ''
+        ANSI color codes referenced from [Wikipedia](https://en.wikipedia.org/wiki/ANSI_escape_code).
+
+        - `echo_black`
+        - `echo_red`
+        - `echo_green`
+        - `echo_yellow`
+        - `echo_blue`
+        - `echo_magenta`
+        - `echo_cyan`
+        - `echo_white`
+        '';
+    };
 }

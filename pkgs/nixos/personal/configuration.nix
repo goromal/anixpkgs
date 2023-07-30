@@ -10,6 +10,4 @@
     nix.nixPath = [
         "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/personal/configuration.nix"
     ];
-
-    system.stateVersion = "22.05";
 }

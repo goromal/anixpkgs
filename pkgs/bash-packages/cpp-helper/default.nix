@@ -12,22 +12,33 @@ let
 
         Options:
         --make-format-file             Dumps a format rules file into .clang-format
+        --make-nix                     Dump template default.nix and shell.nix files
+        --make-exec-lib   CPPNAME      Generate a lib+exec package template
         --make-header-lib CPPNAME      Generate a header-only library template
-        --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
         '';
         optsWithVarsAndDefaults = [
-            { var = "makeff"; isBool = true; default = "0"; flags = "--make-format-file"; }
-            { var = "makehot"; isBool = false; default = ""; flags = "--make-header-lib"; }
-            { var = "makepbl"; isBool = false; default = ""; flags = "--make-pybind-lib"; }
+            { var = "makeff";  isBool = true;  default = "0"; flags = "--make-format-file"; }
+            { var = "makehot"; isBool = false; default = "";  flags = "--make-header-lib"; }
+            { var = "makeexl"; isBool = false; default = "";  flags = "--make-exec-lib"; }
+            { var = "makenix"; isBool = true;  default = "0"; flags = "--make-nix"; }
         ];
     };
     printErr = "${color-prints}/bin/echo_red";
     printGrn = "${color-prints}/bin/echo_green";
     formatFile = ./res/clang-format;
+    shellFile = ./res/_shell.nix;
+    defaultFile = ./res/_default.nix;
     makeffRule = ''
     if [[ "$makeff" == "1" ]]; then
         ${printGrn} "Generating .clang-format..."
         cat ${formatFile} > .clang-format
+    fi
+    '';
+    makenixRule = ''
+    if [[ "$makenix" == "1" ]]; then
+        ${printGrn} "Generating template default.nix and shell.nix files..."
+        cat ${defaultFile} > default.nix
+        cat ${shellFile} > shell.nix
     fi
     '';
     makehotRule = ''
@@ -43,7 +54,7 @@ let
             done
         fi
         ${printGrn} "Generating header-only boilerplate for $makehot..."
-        git clone git@github.com:goromal/example-cpp.git "$tmpdir/example-cpp" ${redirects.suppress_all}
+        git clone https://github.com/goromal/example-cpp "$tmpdir/example-cpp" ${redirects.suppress_all}
         ${git-cc}/bin/git-cc "$tmpdir/example-cpp" "$makehot" ${redirects.suppress_all}
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/CMakeLists.txt"
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/README.md"
@@ -51,48 +62,49 @@ let
         mv "$makehot/cmake/example-cppConfig.cmake.in" "$makehot/cmake/''${makehot}Config.cmake.in"
     fi
     '';
-    makepblRule = ''
-    if [[ ! -z "$makepbl" ]]; then
-        if [[ "$makepbl" != *","* ]]; then
-            ${printErr} "Pybind names not delimited by a comma"
-            exit 1
-        fi
-        IFS=',' read -ra pblargs <<< "$makepbl"
-        pblname="''${pblargs[0]}"
-        cppname="''${pblargs[1]}"
-        if [[ -z "$pblname" ]]; then
-            ${printErr} "Pybind library name not specified"
-            exit 1
-        fi
-        if [[ -z "$cppname" ]]; then
-            ${printErr} "Wrapped c++ library name not specified"
-            exit 1
-        fi
-        if [[ -d "$pblname" ]]; then
+    makeexlRule = ''
+    if [[ ! -z "$makeexl" ]]; then
+        if [[ -d "$makeexl" ]]; then
             while true; do
-                read -p "Destination directory exists ($pblname); remove? [yn] " yn
+                read -p "Destination directory exists ($makeexl); remove? [yn] " yn
                 case $yn in
-                    [Yy]* ) rm -rf "$pblname"; break;;
+                    [Yy]* ) rm -rf "$makeexl"; break;;
                     [Nn]* ) echo "Aborting."; exit;;
                     * ) ${printErr} "Please respond y or n";;
                 esac
             done
         fi
-        ${printGrn} "Generating pybind wrapper library boilerplate for $pblname wrapping $cppname..."
-        git clone git@github.com:goromal/example_cpp_py.git "$tmpdir/example_cpp_py" ${redirects.suppress_all}
-        ${git-cc}/bin/git-cc "$tmpdir/example_cpp_py" "$pblname" ${redirects.suppress_all}
-        sed -i 's|example_cpp_py|'"$pblname"'|g' "$pblname/python_module.cpp"
-        sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/python_module.cpp"
-        sed -i 's|example_cpp_py|'"$pblname"'|g' "$pblname/README.md"
-        sed -i 's|example_cpp_py|'"$pblname"'|g' "$pblname/CMakeLists.txt"
-        sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/CMakeLists.txt"
+        ${printGrn} "Generating lib+exec package boilerplate for $makeexl..."
+        git clone https://github.com/goromal/example-cpp2 "$tmpdir/example-cpp2" ${redirects.suppress_all}
+        ${git-cc}/bin/git-cc "$tmpdir/example-cpp2" "$makeexl" ${redirects.suppress_all}
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/CMakeLists.txt"
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/README.md"
+        sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/cmake/example-cppConfig.cmake.in"
+        mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
     '';
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
+    set -e
     ${argparse}
     tmpdir=$(mktemp -d)
     ${makeffRule}
     ${makehotRule}
-    ${makepblRule}
+    ${makeexlRule}
+    ${makenixRule}
     rm -rf "$tmpdir"
-''
+'') // {
+    meta = {
+        description = "Convenience tools for setting up C++ projects.";
+        longDescription = ''
+        ```
+        usage: cpp-helper [options]
+
+        Options:
+        --make-format-file             Dumps a format rules file into .clang-format
+        --make-nix                     Dump template default.nix and shell.nix files
+        --make-exec-lib   CPPNAME      Generate a lib+exec package template
+        --make-header-lib CPPNAME      Generate a header-only library template
+        ```
+        '';
+    };
+}

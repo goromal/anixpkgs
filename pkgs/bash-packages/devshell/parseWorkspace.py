@@ -1,18 +1,24 @@
+import json
 import os
 import re
 import sys
 
 def get_url_from_dep(dep, attr):
-    with open(f"{dep}/sources.nix", "r") as sources_file:
-        url_pattern = re.compile(r"\s*" + attr + r"\s*=\s*builtins.fetchGit\s*\{\s*\n\s*url\s*=\s*\"(.+)\";", re.MULTILINE)
-        url_search = url_pattern.search(sources_file.read())
-    if not url_search:
+    with open(f"{dep}/flake.lock", "r") as lock_file:
+        lock = json.loads(lock_file.read())
+    if attr not in lock["nodes"] or "original" not in lock["nodes"][attr]:
         raise Exception
-    return url_search.group(1)
+    original = lock["nodes"][attr]["original"]
+    if "type" in original and original["type"] == "github":
+        return f"https://github.com/{original['owner']}/{original['repo']}"
+    elif "url" in original:
+        return original["url"]
+    else:
+        raise Exception
 
 def get_deps_from_dep(dep, attr):
     with open(f"{dep}/pkgs/default.nix", "r") as pkgs_file:
-        pkg_pattern = re.compile(r"\s*" + attr + r"\s*=\s*\S*callPackage\s*(\S*)s*")
+        pkg_pattern = re.compile(r"\s*" + attr + r"\s*=\s*addDoc\s*\(\s*\S*callPackage\s*(\S*)s*")
         pkg_search = pkg_pattern.search(pkgs_file.read())
     if not pkg_search:
         raise Exception

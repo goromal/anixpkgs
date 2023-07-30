@@ -19,6 +19,7 @@ in {
             nmcli d wifi connect LANtasia password 2292238177 ifname wlp1s0u1u1
         '')
         (writeShellScriptBin "switch-rpi4-configuration" ''
+            set -e
             configPath="$1"
             if [[ -z "$configPath" ]]; then
                 echo_red "Path to configuration.nix file not provided."

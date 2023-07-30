@@ -19,7 +19,7 @@ let
     };
     printErr = "${color-prints}/bin/echo_red";
     shellFile = ../bash-utils/customShell.nix;
-in writeShellScriptBin pkgname ''
+in (writeShellScriptBin pkgname ''
     ${argparse}
     pkgs="$1"
     attr="$2"
@@ -40,4 +40,18 @@ in writeShellScriptBin pkgname ''
       --arg pkgList "[ $pkgpath ]" \
       --argstr shellName "pkgshell=$attr" \
       --arg colorCode 35
-''
+'') // {
+    meta = {
+        description = "Flexible Nix shell.";
+        longDescription = ''
+        ```
+        usage: pkgshell [options] pkgs attr
+
+        Make a nix shell with package [attr] from [pkgs] (e.g., '<nixpkgs>').
+
+        Options:
+        -v|--verbose    Print verbose output.
+        ```
+        '';
+    };
+}
