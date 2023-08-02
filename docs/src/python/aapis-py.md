@@ -1,3 +1,5 @@
 # python39.pkgs.aapis-py
 
-No package documentation currently provided.
+Python bindings for [my custom APIs](https://github.com/goromal/aapis).
+
+

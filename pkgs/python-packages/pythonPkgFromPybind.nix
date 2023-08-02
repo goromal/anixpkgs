@@ -1,6 +1,7 @@
 { pname
 , version
 , description
+, longDescription
 , clangStdenv
 , pkg-src
 , cppNativeBuildInputs
@@ -56,4 +57,5 @@ in buildPythonPackage rec {
         cp ${pyboundTarget} $out/${pythonLibDir}/
         chmod -R 777 $out/${pythonLibDir}
     '';
+    meta = { inherit description longDescription; };
 }

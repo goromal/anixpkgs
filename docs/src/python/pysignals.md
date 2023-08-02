@@ -1,3 +1,6 @@
 # python39.pkgs.pysignals
 
-No package documentation currently provided.
+Python bindings of signals-cpp.
+
+[Repository](https://github.com/goromal/pysignals)
+
