@@ -1,3 +1,8 @@
 # python39.pkgs.pyceres_factors
 
-No package documentation currently provided.
+Python bindings of ceres-factors.
+
+[Repository](https://github.com/goromal/pyceres_factors)
+
+**[Tutorial](https://notes.andrewtorgesen.com/doku.php?id=public:ceres)** on how to use the library in conjunction with [pyceres](./pyceres.md) and [geometry](./geometry.md).
+

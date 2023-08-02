@@ -181,11 +181,11 @@
     "makepyshell": {
       "flake": false,
       "locked": {
-        "lastModified": 1690691590,
-        "narHash": "sha256-E7frGg8dw9ydbi5WfazQbEgp2yMWVb3mYanAuewutFo=",
+        "lastModified": 1690955602,
+        "narHash": "sha256-Q3Mlqmiklk77ezqb3wvjcQq9iB3ovAggFm15i4KrL3U=",
         "ref": "refs/heads/main",
-        "rev": "67d0f9d4320c06d0d8c019a53ee56582f1d5e535",
-        "revCount": 3,
+        "rev": "f9205485cc2f073cb3caa35e2fffeb2cc1ed6c1d",
+        "revCount": 4,
         "type": "git",
         "url": "https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31"
       },

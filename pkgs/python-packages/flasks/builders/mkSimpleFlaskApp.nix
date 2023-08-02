@@ -10,6 +10,8 @@
 , writeShellScript
 , scriptPropagatedBuildInputs
 , python
+, description
+, longDescription ? ""
 }:
 let
     use_template = templateText != null;
@@ -81,4 +83,5 @@ in buildPythonPackage rec {
         cp ${script_file} ${pname}.py
     '';
     propagatedBuildInputs = [ flask ] ++ scriptPropagatedBuildInputs;
+    meta = { inherit description longDescription; };
 }

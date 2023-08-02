@@ -57,6 +57,14 @@ in buildPythonPackage rec {
         sha256 = "b8b07a021c9b600c1e8aec73e5ff3fd4cce01b493f0661e77e2195f0c105bc59";
     };
     doCheck = false;
+    meta = {
+        description = "Deezer source separation library including pretrained models.";
+        longDescription = ''
+        [Third-party library](https://github.com/deezer/spleeter) packaged in Nix. It allows you to separate vocals from background instrumentation in audio files.
+
+        ***Note:*** As of this writing, this package is broken on master. There is a pinned version that builds on the [spleeter-legacy tag](https://github.com/goromal/anixpkgs/releases/tag/spleeter-legacy).
+        '';
+    };
 }
 # mkdir -p ~/spleeter/pretrained_models/2stems
 # wget -qO- https://github.com/deezer/spleeter/releases/download/v1.4.0/2stems.tar.gz | tar xvz -C ~/spleeter/pretrained_models/2stems
