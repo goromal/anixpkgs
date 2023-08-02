@@ -43,4 +43,8 @@ in buildPythonPackage rec {
         cp ${apis-fds} aapis_py/aapis_fds/aapis.desc
         ${bldCmd}
     '';
+    meta = {
+        description = "Python bindings for [my custom APIs](https://github.com/goromal/aapis).";
+        longDescription = "";
+    };
 }

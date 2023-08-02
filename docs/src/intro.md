@@ -25,26 +25,54 @@ These docs provide an overview of how I manage the OS’s of my [machines](./mac
 The packages defined in this repo are accessible to anyone who uses [Nix](https://nixos.org), which can be [installed](https://nixos.org/download.html) in two forms:
 
 - **“Standalone” Nix:** This will just install the package manager and is the easiest option if you just want access to the packages in this repo. This option could be augmented with a tool called [home-manager](https://nix-community.github.io/home-manager/) to at least be able to use *some* of the closure components alongside your normal OS as well.
-- ***TODO***
+- **NixOS:** This option is much more invasive as it wholesale replaces your entire operating system, and should only be done if you really know what you’re doing (and love Nix). More instructions in the [machines](./machines.md) documentation.
 
-***TODO***
+For either method, ensure that your Nix version is `>= 2.4`.
 
-To use, clone this repo and add to `~/.bashrc`:
+The software packaged in `anixpkgs` is buildable both through [Nix flakes](https://nixos.wiki/wiki/Flakes) as well as through traditional Nix shells. It’s recommended to use flakes, as that method is more "pure" and allows for more portable integration with the public cache.
 
-```bash
-export NIX_PATH=nixpkgs=/your/path/to/anixpkgs
-```
+### Accessing the Packages Using Flakes
 
-and in your Nix derivations:
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v1.5.0`) while also giving you access to the public cache to avoid building from source on your machine:
 
 ```nix
-let pkgs = import <nixpkgs> {};
+{
+  description = "Nix shell for anixpkgs.";
+  nixConfig.substituters = [
+    "https://cache.nixos.org/"
+    "https://github-public.cachix.org"
+  ];
+  nixConfig.trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+  ];
+  inputs = {
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v1.5.0";
+  };
+  outputs = { self, nixpkgs }:
+    let pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    in with pkgs; {
+      devShell.x86_64-linux = mkShell {
+        buildInputs = [
+          pb
+          fixfname
+          pkgshell
+        ];
+      };
+    };
+}
 ```
-An example Nix shell for trying out Python packages:
+
+Access the packages with `nix develop`.
+
+### Accessing the Packages Using shell.nix
+
+Here are some `shell.nix` files to access Python packages (using version `v1.5.0` of the packages):
 
 ```nix
-{ pkgs ? import <nixpkgs> {} }:
 let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
   python-with-my-packages = pkgs.python39.withPackages (p: with p; [
     numpy
     matplotlib
@@ -59,7 +87,8 @@ or:
 
 ```nix
 let
-  pkgs = import <anixpkgs> {};
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
     pkgs.python39
@@ -77,3 +106,20 @@ in pkgs.mkShell {
   '';
 }
 ```
+
+And for general software packages:
+
+```nix
+let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
+in with pkgs; mkShell {
+  buildInputs = [
+    pb
+    fixfname
+    pkgshell
+  ];
+}
+```
+
+Access the packages with `nix-shell`.

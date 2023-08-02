@@ -1,3 +1,6 @@
 # python39.pkgs.mavlog-utils
 
-No package documentation currently provided.
+Assorted tools for processing mavlink .bin logs.
+
+[Repository](https://github.com/goromal/mavlog-utils)
+

@@ -44,4 +44,7 @@ callPackage ../pythonPkgFromPybind.nix {
     inherit buildPythonPackage;
     propagatedBuildInputs = [];
     checkPkgs = [];
+    longDescription = ''
+    **[Tutorial](https://notes.andrewtorgesen.com/doku.php?id=public:ceres)** on how to use the library in conjunction with [pyceres_factors](./pyceres_factors.md) and [geometry](./geometry.md).
+    '';
 }

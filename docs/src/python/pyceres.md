@@ -1,3 +1,6 @@
 # python39.pkgs.pyceres
 
-No package documentation currently provided.
+Python bindings for the Ceres Solver.
+
+**[Tutorial](https://notes.andrewtorgesen.com/doku.php?id=public:ceres)** on how to use the library in conjunction with [pyceres_factors](./pyceres_factors.md) and [geometry](./geometry.md).
+

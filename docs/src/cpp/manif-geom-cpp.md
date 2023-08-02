@@ -27,6 +27,92 @@ target_link_libraries(target INTERFACE manif-geom-cpp)
 
 ```
 
+## Example Usage
+
+Example usage of SO(3):
+
+```cpp
+// action
+SO3d     q = SO3d::random();
+Vector3d v;
+v.setRandom();
+
+Vector3d qv1 = q * v;
+Vector3d qv2 = q.R() * v;
+BOOST_CHECK_CLOSE(qv1.x(), qv2.x(), 1e-8);
+BOOST_CHECK_CLOSE(qv1.y(), qv2.y(), 1e-8);
+BOOST_CHECK_CLOSE(qv1.z(), qv2.z(), 1e-8);
+
+// inversion and composition
+SO3d q1    = SO3d::random();
+SO3d q2    = SO3d::random();
+SO3d q2inv = q2.inverse();
+SO3d q1p   = q1 * q2 * q2inv;
+
+BOOST_CHECK_CLOSE(q1.w(), q1p.w(), 1e-8);
+BOOST_CHECK_CLOSE(q1.x(), q1p.x(), 1e-8);
+BOOST_CHECK_CLOSE(q1.y(), q1p.y(), 1e-8);
+BOOST_CHECK_CLOSE(q1.z(), q1p.z(), 1e-8);
+
+// Euler conversions
+Vector3d euler;
+euler.setRandom();
+euler *= M_PI;
+SO3d q  = SO3d::fromEuler(euler.x(), euler.y(), euler.z());
+SO3d q2 = SO3d::fromEuler(q.roll(), q.pitch(), q.yaw());
+
+BOOST_CHECK_CLOSE(q.w(), q2.w(), 1e-8);
+BOOST_CHECK_CLOSE(q.x(), q2.x(), 1e-8);
+BOOST_CHECK_CLOSE(q.y(), q2.y(), 1e-8);
+BOOST_CHECK_CLOSE(q.z(), q2.z(), 1e-8);
+
+// plus / minus
+SO3d     q1 = SO3d::random();
+Vector3d q12;
+q12.setRandom();
+SO3d     q2   = q1 + q12;
+Vector3d q12p = q2 - q1;
+BOOST_CHECK_CLOSE(q12.x(), q12p.x(), 1e-8);
+BOOST_CHECK_CLOSE(q12.y(), q12p.y(), 1e-8);
+BOOST_CHECK_CLOSE(q12.z(), q12p.z(), 1e-8);
+
+// chart maps
+SO3d     q = SO3d::random();
+Vector3d w;
+w.setRandom();
+Vector3d qLog = SO3d::Log(q);
+SO3d     q2   = SO3d::Exp(qLog);
+BOOST_CHECK_CLOSE(q.w(), q2.w(), 1e-8);
+BOOST_CHECK_CLOSE(q.x(), q2.x(), 1e-8);
+BOOST_CHECK_CLOSE(q.y(), q2.y(), 1e-8);
+BOOST_CHECK_CLOSE(q.z(), q2.z(), 1e-8);
+
+SO3d     wExp = SO3d::Exp(w);
+Vector3d w2   = SO3d::Log(wExp);
+BOOST_CHECK_CLOSE(w.x(), w2.x(), 1e-8);
+BOOST_CHECK_CLOSE(w.y(), w2.y(), 1e-8);
+BOOST_CHECK_CLOSE(w.z(), w2.z(), 1e-8);
+
+// scaling
+SO3d qI  = SO3d::identity();
+SO3d qIs = 5.0 * qI;
+BOOST_CHECK_CLOSE(qIs.w(), qI.w(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.x(), qI.x(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.y(), qI.y(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.z(), qI.z(), 1e-8);
+
+SO3d qr  = SO3d::random();
+SO3d qr2 = qr * 0.2; // if scale is too big, then the rotation will
+                    // wrap around the sphere, resulting in a reversed
+                    // or truncated tangent vector which can't be inverted
+                    // through scalar division
+SO3d qr3 = qr2 / 0.2;
+BOOST_CHECK_CLOSE(qr.w(), qr3.w(), 1e-8);
+BOOST_CHECK_CLOSE(qr.x(), qr3.x(), 1e-8);
+BOOST_CHECK_CLOSE(qr.y(), qr3.y(), 1e-8);
+BOOST_CHECK_CLOSE(qr.z(), qr3.z(), 1e-8);
+```
+
 ## Conventions
 
 ### Ordering
