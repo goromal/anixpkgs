@@ -38,4 +38,7 @@ callPackage ../pythonPkgFromPybind.nix {
         numpy
         geometry
     ];
+    longDescription = ''
+    [Repository](https://github.com/goromal/pysignals)
+    '';
 }
