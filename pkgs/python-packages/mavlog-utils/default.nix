@@ -11,4 +11,10 @@ buildPythonPackage rec {
         progressbar2
     ];
     src = pkg-src;
+    meta = {
+        description = "Assorted tools for processing mavlink .bin logs.";
+        longDescription = ''
+        [Repository](https://github.com/goromal/mavlog-utils)
+        '';
+    };
 }
