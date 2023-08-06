@@ -98,8 +98,6 @@ let
 in rec {
     pkgData = prev.callPackage flakeInputs.anixdata {};
 
-    legacypkgs = flakeInputs.legacypkgs;
-
     python38 = pythonOverridesFor prev.python38;
     python39 = pythonOverridesFor prev.python39;
     python310 = pythonOverridesFor prev.python310;

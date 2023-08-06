@@ -6,10 +6,6 @@ in
 {
   options.mods.playzelda = with types; {
     enable = mkEnableOption "enable playzelda";
-    packages = mkOption {
-      type = types.package;
-      description = "The nixpkgs to use";
-    };
     zeldaRom = mkOption {
       type = types.str;
       description = "Path to Zelda ROM";
@@ -18,10 +14,9 @@ in
   };
 
   config = mkIf cfg.enable {
-    # services.udev.packages = [ cfg.packages.dolphinEmu ];
     home.packages = [
       (writeShellScriptBin "playzelda" ''
-        ${builtins.getAttr "dolphinEmu" (import cfg.packages {})}/bin/dolphin-emu -a LLE -e ${cfg.zeldaRom}
+        ${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e ${cfg.zeldaRom}
       '')
     ];
   };

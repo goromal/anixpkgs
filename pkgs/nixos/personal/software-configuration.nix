@@ -75,10 +75,7 @@ with import ../dependencies.nix { inherit config; };
         ];
 
         mods.vscodium.package = unstable.vscodium;
-        mods.playzelda = {
-            enable = true;
-            packages = anixpkgs.legacypkgs;
-        };
+        mods.playzelda.enable = true;
 
         gtk = {
             enable = true;
