@@ -71,9 +71,14 @@ with import ../dependencies.nix { inherit config; };
             # ../home-mods/zathura.nix
             ../home-mods/nautilus.nix
             ../home-mods/gnome-wallpaper.nix
+            ../home-mods/zelda.nix
         ];
 
         mods.vscodium.package = unstable.vscodium;
+        mods.playzelda = {
+            enable = true;
+            packages = anixpkgs.legacypkgs;
+        };
 
         gtk = {
             enable = true;
@@ -181,9 +186,6 @@ with import ../dependencies.nix { inherit config; };
             anixpkgs.providence
             anixpkgs.providence-tasker
             anixpkgs.gantter
-            (writeShellScriptBin "playzelda" ''
-                ${dolphinEmu}/bin/dolphin-emu -a LLE -e /data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso
-            '')
             (anixpkgs.callPackage ../../bash-packages/browser-aliases {
                 browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
             })
