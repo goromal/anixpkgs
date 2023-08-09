@@ -250,6 +250,10 @@
                 "ci": true
             },
             {
+                "attr": "python39.pkgs.scrape",
+                "ci": true
+            },
+            {
                 "attr": "python38.pkgs.spleeter",
                 "ci": false
             },
