@@ -97,4 +97,4 @@ jobs:
         name: github-public
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
-      cd test && nix-shell --run "bash test.sh"
+        cd test && nix-shell --run "bash test.sh"
