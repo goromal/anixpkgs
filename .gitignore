@@ -1,5 +1,4 @@
 .envrc
 result*
-test.sh
 build/*
 *.log

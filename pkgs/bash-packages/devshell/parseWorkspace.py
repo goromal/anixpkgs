@@ -48,18 +48,18 @@ def main():
     DATADIR = os.path.expanduser("~/data")
     PKGSDIR = os.path.expanduser("~/sources/nixpkgs")
     PKGSVAR = "<nixpkgs>"
-    DEVRCFILE = os.path.expanduser("~/.devrc")
+    DEVRCFILE = os.path.expanduser(sys.argv[1])
     # DEVRCFILE = "devrc_ex"
 
     if not os.path.exists(DEVRCFILE):
         print("_NODEVRC_")
         exit()
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 3:
         print("_NOWSGIVEN_")
         exit()
 
-    wsname = sys.argv[1]
+    wsname = sys.argv[2]
     repos = {}
     attrs = {}
     urls = {}
