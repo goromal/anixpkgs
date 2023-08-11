@@ -20,6 +20,6 @@ in pkgs.mkShell {
         export PS1='\n\[\033[1;36m\][devshell=${wsname}:\w]\$\[\033[0m\] '
         alias godev='cd ${devDir}/${wsname}'
         setupcurrentws
-        godev
+        cd ${devDir}/${wsname}
     '';
 }
