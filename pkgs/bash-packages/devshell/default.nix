@@ -91,7 +91,7 @@ in (writeShellScriptBin pkgname ''
               --argstr pkgsVar "$pkgs_var" \
               --arg shellSetupScript ${shellSetupScript} \
               --arg repoSpecList "$sources_list" \
-              --run "$runcmd"
+              --command "$runcmd"
         fi 
     fi
 '') // {
