@@ -17,12 +17,13 @@ make-title -c yellow "Testing workspace tools"
 echo "dev_dir = $tmpdir/dev" >> data/devrc
 echo "data_dir = $tmpdir/data" >> data/devrc
 echo "pkgs_dir = $anixdir" >> data/devrc
-devshell -d data/devrc test --run "setupcurrentws"
-pushd dev/test
-touch sources/test1 && mkdir sources/test2
-export WSROOT="$tmpdir/dev/test"
-listsources
-popd
+devshell -d data/devrc test --run "setupcurrentws && godev && touch sources/test1 && mkdir sources/test2 && listsources"
+# devshell -d data/devrc test --run "setupcurrentws"
+# pushd dev/test
+# touch sources/test1 && mkdir sources/test2
+# export WSROOT="$tmpdir/dev/test"
+# listsources
+# popd
 
 make-title -c yellow "Clean up"
 cd "$anixdir/test"

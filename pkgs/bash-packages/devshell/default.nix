@@ -12,7 +12,7 @@ let
 
         Enter [workspace_name]'s development shell as defined in ~/.devrc
         (can specify an alternate path with -d DEVRC).
-        Optionally run a one-off (single) command with --run CMD.
+        Optionally run a one-off command with --run CMD.
 
         Example ~/.devrc:
         =================================================================
@@ -73,15 +73,26 @@ in (writeShellScriptBin pkgname ''
         data_dir="''${rcinfoarray[1]}"
         pkgs_var="''${rcinfoarray[2]}"
         sources_list="''${rcinfoarray[3]}"
-        nix-shell ${shellFile} \
-          --arg setupws ${setupws} \
-          --argstr wsname "$wsname" \
-          --argstr devDir "$dev_dir" \
-          --argstr dataDir "$data_dir" \
-          --argstr pkgsVar "$pkgs_var" \
-          --arg shellSetupScript ${shellSetupScript} \
-          --arg repoSpecList "$sources_list" \
-          ''${runargstr}
+        if [[ -z "$runcmd"  ]]; then
+            nix-shell ${shellFile} \
+              --arg setupws ${setupws} \
+              --argstr wsname "$wsname" \
+              --argstr devDir "$dev_dir" \
+              --argstr dataDir "$data_dir" \
+              --argstr pkgsVar "$pkgs_var" \
+              --arg shellSetupScript ${shellSetupScript} \
+              --arg repoSpecList "$sources_list"
+        else
+            nix-shell ${shellFile} \
+              --arg setupws ${setupws} \
+              --argstr wsname "$wsname" \
+              --argstr devDir "$dev_dir" \
+              --argstr dataDir "$data_dir" \
+              --argstr pkgsVar "$pkgs_var" \
+              --arg shellSetupScript ${shellSetupScript} \
+              --arg repoSpecList "$sources_list" \
+              --run "$runcmd"
+        fi 
     fi
 '') // {
     meta = {
