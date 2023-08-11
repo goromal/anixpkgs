@@ -27,6 +27,5 @@ popd
 make-title -c yellow "Clean up"
 cd "$anixdir/test"
 rm -rf $tmpdir
-echod # ^^^^ REMOVEME
 
 make-title -c green PASSED
