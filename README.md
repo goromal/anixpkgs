@@ -24,6 +24,13 @@ bash scripts/build_cpp.sh
 bash scripts/build_python.sh
 ```
 
+To run regression tests, run
+
+```bash
+cd test
+nix-shell --run "bash test.sh"
+```
+
 ## Update Dependencies
 
 To systematically update all (self-owned) dependencies, run

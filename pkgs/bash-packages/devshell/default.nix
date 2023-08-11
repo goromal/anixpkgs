@@ -8,9 +8,11 @@ let
     pkgname = "devshell";
     argparse = callPackage ../bash-utils/argparse.nix {
         usage_str = ''
-        usage: ${pkgname} workspace_name
+        usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
 
         Enter [workspace_name]'s development shell as defined in ~/.devrc
+        (can specify an alternate path with -d DEVRC).
+        Optionally run a one-off (single) command with --run CMD.
 
         Example ~/.devrc:
         =================================================================
@@ -29,7 +31,10 @@ let
         signals = manif-geom-cpp geometry pyvitools
         =================================================================
         '';
-        optsWithVarsAndDefaults = [];
+        optsWithVarsAndDefaults = [
+            { var = "devrc"; isBool = false; default = "~/.devrc"; flags = "-d"; }
+            { var = "runcmd"; isBool = false; default = ""; flags = "--run"; }
+        ];
     };
     printErr = "${color-prints}/bin/echo_red";
     parseScript = ./parseWorkspace.py;
@@ -44,18 +49,23 @@ in (writeShellScriptBin pkgname ''
         exit 1
     fi
 
-    rcinfo=$(${python3}/bin/python ${parseScript} $wsname)
+    runargstr=""
+    if [[ ! -z "$runcmd" ]]; then
+        runargstr="--run \"''${runcmd}\""
+    fi
+
+    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
     if [[ "$rcinfo" == "_NODEVRC_" ]]; then
-        ${printErr} "ERROR: no ~/.devrc file found"
+        ${printErr} "ERROR: no $devrc file found"
         exit 1
     elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
         ${printErr} "ERROR: no workspace name provided."
         exit 1
     elif [[ "$rcinfo" == "_BADDEVRC_" ]]; then
-        ${printErr} "ERROR: mal-formed ~/.devrc"
+        ${printErr} "ERROR: mal-formed $devrc"
         exit 1
     elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
-        ${printErr} "ERROR: workspace $wsname not found in ~/.devrc"
+        ${printErr} "ERROR: workspace $wsname not found in $devrc"
         exit 1
     else
         IFS='|' read -ra rcinfoarray <<< "$rcinfo"
@@ -70,7 +80,8 @@ in (writeShellScriptBin pkgname ''
           --argstr dataDir "$data_dir" \
           --argstr pkgsVar "$pkgs_var" \
           --arg shellSetupScript ${shellSetupScript} \
-          --arg repoSpecList "$sources_list"
+          --arg repoSpecList "$sources_list" \
+          ''${runargstr}
     fi
 '') // {
     meta = {

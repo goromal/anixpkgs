@@ -23,7 +23,6 @@ in (writeShellScriptBin pkgname ''
         exit 1
     fi
     cd "$WSROOT/sources"
-    clear
     for proj in *; do
         if [[ -d $proj ]] && [[ -d $proj/.git ]]; then
             ${printWht} "======= $proj ======="

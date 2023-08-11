@@ -1,0 +1,7 @@
+# dev_dir = ~/dev
+# data_dir = ~/data
+# pkgs_dir = ~/sources/anixpkgs
+pkgs_var = <anixpkgs>
+
+[manif-geom-cpp] = pkgs manif-geom-cpp
+test = manif-geom-cpp
