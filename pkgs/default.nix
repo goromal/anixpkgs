@@ -197,5 +197,7 @@ in rec {
         ];
     };
 
-    multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+    multirotor-sim = prev.callPackage ./nixos/sitl/multirotor/run.nix baseModuleArgs;
+
+    simple-sim = prev.callPackage ./nixos/sitl/simple-sim/run.nix { };
 }

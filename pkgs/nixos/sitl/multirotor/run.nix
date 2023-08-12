@@ -11,7 +11,7 @@ let
 
     Run a SITL emulation for the multirotor sim.
     '';
-    argparse = callPackage ../../bash-packages/bash-utils/argparse.nix {
+    argparse = callPackage ../../../bash-packages/bash-utils/argparse.nix {
         inherit usage_str;
         optsWithVarsAndDefaults = [];
     };
