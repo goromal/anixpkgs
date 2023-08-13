@@ -13,6 +13,7 @@ Packages written (or bound) in Python.
 - [python39.pkgs.pysorting](./pysorting.md)
 - [python39.pkgs.makepyshell](./makepyshell.md)
 - [python39.pkgs.norbert](./norbert.md)
+- [python39.pkgs.scrape](./scrape.md)
 - [python38.pkgs.spleeter](./spleeter.md)
 - [python39.pkgs.ichabod](./ichabod.md)
 - [python39.pkgs.pysignals](./pysignals.md)

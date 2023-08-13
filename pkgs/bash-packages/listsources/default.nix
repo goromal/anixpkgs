@@ -23,14 +23,15 @@ in (writeShellScriptBin pkgname ''
         exit 1
     fi
     cd "$WSROOT/sources"
-    clear
     for proj in *; do
-        ${printWht} "======= $proj ======="
-        cd $proj
-        ${printWht} $(git log | head -1)
-        git status
-        cd ..
-        echo ""
+        if [[ -d $proj ]] && [[ -d $proj/.git ]]; then
+            ${printWht} "======= $proj ======="
+            cd $proj
+            ${printWht} $(git log | head -1)
+            git status
+            cd ..
+            echo ""
+        fi 
     done
 '') // {
     meta = {

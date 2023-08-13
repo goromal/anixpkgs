@@ -25,6 +25,7 @@
   - [python39.pkgs.pysorting](./python/pysorting.md)
   - [python39.pkgs.makepyshell](./python/makepyshell.md)
   - [python39.pkgs.norbert](./python/norbert.md)
+  - [python39.pkgs.scrape](./python/scrape.md)
   - [python38.pkgs.spleeter](./python/spleeter.md)
   - [python39.pkgs.ichabod](./python/ichabod.md)
   - [python39.pkgs.pysignals](./python/pysignals.md)
