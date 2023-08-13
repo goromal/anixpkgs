@@ -278,10 +278,6 @@
                 "ci": true
             },
             {
-                "attr": "python39.pkgs.textual",
-                "ci": true
-            },
-            {
                 "attr": "python39.pkgs.imutils-cv4",
                 "ci": true
             },
