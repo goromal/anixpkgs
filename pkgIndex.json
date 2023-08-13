@@ -142,6 +142,10 @@
                 "ci": true
             },
             {
+                "attr": "rcdo",
+                "ci": true
+            },
+            {
                 "attr": "evil-hangman",
                 "ci": true
             },
