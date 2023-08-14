@@ -2,7 +2,7 @@
     description = "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs?rev=4b7664384c7600dadb4dc8d1708626d073681b40"; # 01-08-23
+        nixpkgs.url = "github:NixOS/nixpkgs??ref=refs/tags/23.05";
 
         flake-compat.url = "github:edolstra/flake-compat";
         flake-compat.flake = false;

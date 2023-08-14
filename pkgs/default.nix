@@ -85,7 +85,7 @@ let
             vidstab-cv4 = addDoc (pySelf.callPackage ./python-packages/vidstab-cv4 { });
             rich = addDoc (pySelf.callPackage ./python-packages/rich { });
             syrupy = addDoc (pySelf.callPackage ./python-packages/syrupy { });
-            textual = addDoc (pySelf.callPackage ./python-packages/textual { });
+            # textual = addDoc (pySelf.callPackage ./python-packages/textual { });
             flask-hello-world = addDoc (pySelf.callPackage ./python-packages/flasks/hello-world { });
             flask-url2mp4 = addDoc (pySelf.callPackage ./python-packages/flasks/url2mp4 { wget-pkg = prev.wget; });
             flask-mp4server = addDoc (pySelf.callPackage ./python-packages/flasks/mp4server { });
