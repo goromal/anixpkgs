@@ -1,9 +1,6 @@
 { buildPythonPackage
 , click
-, google-api-python-client
-, google-auth
-, google-auth-oauthlib
-, oauth2client
+, easy-google-auth
 , pkg-src
 }:
 buildPythonPackage rec {
@@ -12,10 +9,7 @@ buildPythonPackage rec {
   src = pkg-src;
   propagatedBuildInputs = [
     click
-    google-api-python-client
-    google-auth
-    google-auth-oauthlib
-    oauth2client
+    easy-google-auth
   ];
   doCheck = false;
   meta = {

@@ -60,6 +60,7 @@ let
         packageOverrides = composeExtensions packageOverrides (pySelf: pySuper: {
             aapis-py = addDoc (pySelf.callPackage ./python-packages/aapis-py { apis-fds = aapis-fds; pkg-src = flakeInputs.aapis; });
             budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
+            easy-google-auth = addDoc (pySelf.callPackage ./python-packages/easy-google-auth { pkg-src = flakeInputs.easy-google-auth; });
             gmail-parser = addDoc (pySelf.callPackage ./python-packages/gmail-parser { pkg-src = flakeInputs.gmail-parser; });
             sunnyside = addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });

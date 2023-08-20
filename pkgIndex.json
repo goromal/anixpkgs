@@ -314,6 +314,10 @@
                 "ci": true
             },
             {
+                "attr": "python310.pkgs.easy-google-auth",
+                "ci": true
+            },
+            {
                 "attr": "python310.pkgs.python-dokuwiki",
                 "ci": true
             },

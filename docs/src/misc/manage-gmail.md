@@ -2,40 +2,35 @@
 
 Interactively manage your GMail inbox from the command line.
 
-```
+Powered by [gmail-parser](../python/gmail-parser.md).
+
+```bash
 usage: manage-gmail
 
 Enter an interactive shell for managing a GMail inbox.
 
 Examples:
 
->> from gmail_parser.corpus import GMailCorpus
+    [Deleting promotions and social network emails]
+      
+    >> baseInbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+    >> baseInbox.clean()
+    >> baseInbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
 
-[Deleting promotions and social network emails]
+    [Get all senders of unread emails]
 
->> inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
->> inbox.clean()
->> inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+    >> unreadInbox = baseInbox.fromUnread()
+    >> print(unreadInbox.getSenders())
 
-[Get all senders of unread emails]
+    [Read all unread emails from specific senders]
 
->> unreadInbox = inbox.fromUnread()
->> print(unreadInbox.getSenders())
+    >> msgs = unreadInbox.fromSenders(['his@email.com', 'her@email.com']).getMessages()
+    >> for msg in msgs:
+    >>   print(msg.getText())
 
-[Read all unread emails from specific senders]
+    [Mark an entire sub-inbox as read]
 
->> msgs = unreadInbox.fromSenders(['his@email.com', 'her@email.com']).getMessages()
->> for msg in msgs:
->>   print(msg.getText())
+    >> subInbox.markAllAsRead()
 
-[Mark an entire sub-inbox as read]
-
->> subInbox.markAllAsRead()
-
-Setup:
-
-    You at least need a Google Drive secrets file:
-
-    ~/secrets/pydrive/client_secrets.json
 ```
 

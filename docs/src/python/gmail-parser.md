@@ -4,10 +4,6 @@ Assorted Python tools for semi-automated processing of GMail messages.
 
 [Repository](https://github.com/goromal/gmail_parser)
 
-## Setup
-
-You at least need a Google Drive API secrets file set up at `~/secrets/pydrive/client_secrets.json`.
-
 ## Usage Examples
 
 Import with
