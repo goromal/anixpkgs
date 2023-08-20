@@ -1,11 +1,7 @@
 { buildPythonPackage
 , click
 , wiki-tools
-, google-api-python-client
-, pydrive2
-, google-auth
-, google-auth-oauthlib
-, oauth2client
+, easy-google-auth
 , pkg-src
 }:
 buildPythonPackage rec {
@@ -15,11 +11,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     click
     wiki-tools
-    google-api-python-client
-    pydrive2
-    google-auth
-    google-auth-oauthlib
-    oauth2client
+    easy-google-auth
   ];
   doCheck = false;
   meta = {

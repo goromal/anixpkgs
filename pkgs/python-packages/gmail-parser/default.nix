@@ -1,10 +1,6 @@
 { buildPythonPackage
 , pythonOlder
-, google-api-python-client
-, pydrive2
-, google-auth
-, google-auth-oauthlib
-, oauth2client
+, easy-google-auth
 , html2text
 , progressbar2
 , pkg-src
@@ -14,11 +10,7 @@ buildPythonPackage rec {
     version = "0.0.0";
     disabled = pythonOlder "3.8";
     propagatedBuildInputs = [
-        google-api-python-client
-        pydrive2
-        google-auth
-        google-auth-oauthlib
-        oauth2client
+        easy-google-auth
         html2text
         progressbar2
     ];
@@ -27,10 +19,6 @@ buildPythonPackage rec {
         description = "Assorted Python tools for semi-automated processing of GMail messages.";
         longDescription = ''
         [Repository](https://github.com/goromal/gmail_parser)
-
-        ## Setup
-
-        You at least need a Google Drive API secrets file set up at `~/secrets/pydrive/client_secrets.json`.
 
         ## Usage Examples
 

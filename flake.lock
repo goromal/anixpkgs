@@ -35,11 +35,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694698,
-        "narHash": "sha256-CtQ93/o1Cg2U7gcAOBpKdV83hUDUvCsOsJcY/1CP+YM=",
+        "lastModified": 1692548975,
+        "narHash": "sha256-pCjAmmpbQCYCLNp0yiXaenQB5T38RiTl9nHyDVPkn/0=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "84a05c01e067d29ec82722bace89ccd4590df2c5",
+        "rev": "7a5dc5b68abda9b7ccc2e0857d2b86bc14671ae8",
         "type": "github"
       },
       "original": {
@@ -77,6 +77,22 @@
       "original": {
         "owner": "goromal",
         "repo": "Crow",
+        "type": "github"
+      }
+    },
+    "easy-google-auth": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1692505790,
+        "narHash": "sha256-60HI+ymKCjTsiZHNd2zW6bHPbIcN+6x9YOcs1CFrSic=",
+        "owner": "goromal",
+        "repo": "easy-google-auth",
+        "rev": "56128094ff061ef22c9c720b9c274e5087283d98",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "easy-google-auth",
         "type": "github"
       }
     },
@@ -165,11 +181,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694411,
-        "narHash": "sha256-R042pUm6ITISO/cQGtDtKuUb+XJfdpgLzJRyG8Mx7mw=",
+        "lastModified": 1692548783,
+        "narHash": "sha256-S3wYEmnahDTFkHbQh2VS5fRiE/MDqdojOYrWoWO6aic=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "d8861327331b8d4e4eb3ac209569d9196f37d65b",
+        "rev": "386b25cd5c5d4d3cadaf7f7b3d3496a9ae296cf5",
         "type": "github"
       },
       "original": {
@@ -410,6 +426,7 @@
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
+        "easy-google-auth": "easy-google-auth",
         "evil-hangman": "evil-hangman",
         "find_rotational_conventions": "find_rotational_conventions",
         "flake-compat": "flake-compat",
@@ -556,11 +573,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1687036716,
-        "narHash": "sha256-sO8Vr113s0ca2cWCuXdGrJJAHhn4cWHv7MQZdzD7zxg=",
+        "lastModified": 1692548880,
+        "narHash": "sha256-Bo1yWFg9LkxbUfhDpFsWnly6P0NLpPRgizlV/B5EkXw=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "6f8891e62df97921f420f30d904037272b295edc",
+        "rev": "f72cffc8bef0a3ef3ad4572d10807ef47521238d",
         "type": "github"
       },
       "original": {
