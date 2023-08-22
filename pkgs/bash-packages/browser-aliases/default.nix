@@ -3,6 +3,7 @@
 , writeShellScriptBin
 , color-prints
 , redirects
+, wiki-tools
 , browserExec
 }:
 let
@@ -44,6 +45,36 @@ let
         urls=$(for i in $@; do echo "https://notes.andrewtorgesen.com/doku.php?id=$i"; done)
         ${browserExec} $urls ${redirects.suppress_all}
     '';
+    a4s-argparse = callPackage ../bash-utils/argparse.nix {
+        usage_str = ''
+        usage: a4s PRIORITY DESCRIPTION
+
+        Create an A4S ticket with priority level PRIORITY (e.g., 0, 1, 2, ...) and
+        description DESCRIPTION. Also open up a link to the ticket in the browser.
+        '';
+        optsWithVarsAndDefaults = [];
+    };
+    a4s = writeShellScriptBin "a4s" ''
+        ${a4s-argparse}
+        if [[ -z $1 ]]; then
+            ${printErr} "No priority specified."
+            exit 1
+        fi
+        if [[ -z "$2" ]]; then
+            ${printErr} "No ticket description given."
+            exit 1
+        fi
+        idx=$(${wiki-tools}/bin/wiki-tools get --page-id a4s:internal:idx)
+        idx=$((idx+1))
+        tmpdir=$(mktemp -d)
+        echo "====== [P''${1}] A4S-''${idx}: ''${2} ======" > $tmpdir/ticket.txt
+        echo -e "\n" >> $tmpdir/ticket.txt
+        echo -e "==== Description ====\n\n  * ...\n\n==== Requirements ====\n\n  * ...\n\n==== PRs ====\n\n  * ...\n\n==== Miscellaneous ====\n\n  * ...\n\n" >> $tmpdir/ticket.txt
+        ${wiki-tools}/bin/wiki-tools put --page-id a4s:backlog:a4s''${idx} --file $tmpdir/ticket.txt
+        ${wiki-tools}/bin/wiki-tools put --page-id a4s:internal:idx --content "$idx"
+        rm -rf $tmpdir
+        ${browserExec} "https://notes.andrewtorgesen.com/doku.php?id=a4s:backlog:a4s''${idx}" ${redirects.suppress_all}
+    '';
 in stdenv.mkDerivation {
     name = "browser-aliases";
     version = "1.0.0";
@@ -52,5 +83,6 @@ in stdenv.mkDerivation {
         mkdir -p                            $out/bin
         cp ${anix-compare}/bin/anix-compare $out/bin
         cp ${open-notes}/bin/open-notes     $out/bin
+        cp ${a4s}/bin/a4s                   $out/bin
     '';
 }
