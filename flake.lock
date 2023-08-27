@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1683680726,
-        "narHash": "sha256-Cl36ownlhh1eIkzKHNryEWOXcwdmtnLbChK8O5U5dKk=",
+        "lastModified": 1693114809,
+        "narHash": "sha256-E66sKUZp5CBviD48xnIM7jkpplNypUcruIWNQ75eQfo=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "467bfc735b218ffda18643587b5c116904dc974c",
+        "rev": "7adf18138d15d7c96fd7698099a5d1dceb29b699",
         "type": "github"
       },
       "original": {
@@ -181,11 +181,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1692548783,
+        "lastModified": 1692552167,
         "narHash": "sha256-S3wYEmnahDTFkHbQh2VS5fRiE/MDqdojOYrWoWO6aic=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "386b25cd5c5d4d3cadaf7f7b3d3496a9ae296cf5",
+        "rev": "2af757f3ee5dee716ebcc98b9be1ede6d8083806",
         "type": "github"
       },
       "original": {
