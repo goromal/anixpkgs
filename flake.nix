@@ -10,7 +10,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-       anixdata.url = "github:goromal/anixdata";
+    anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
     aapis.url = "github:goromal/aapis";
