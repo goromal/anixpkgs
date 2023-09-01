@@ -11,7 +11,7 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd "$DIR/.."
 
-if [[ "$1" == "check" ]]; then
+if [[ "$1"=="check" ]]; then
     echo "Validating format of .nix files..."
     for nixfile in $(find . -type f -name "*.nix"); do
         echo "== $nixfile"
