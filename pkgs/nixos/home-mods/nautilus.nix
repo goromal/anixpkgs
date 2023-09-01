@@ -1,6 +1,3 @@
-{ pkgs, config, lib, ... }:
-{
-    home.file = {
-        "Templates/EmptyDocument".text = "";
-    };
+{ pkgs, config, lib, ... }: {
+  home.file = { "Templates/EmptyDocument".text = ""; };
 }

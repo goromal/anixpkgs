@@ -1,11 +1,6 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-{
-    home.packages = [
-        zathura
-    ];
+with pkgs; {
+  home.packages = [ zathura ];
 
-    home.file = {
-        ".config/zathura/zathurarc".source = ../res/zathurarc;
-    };
+  home.file = { ".config/zathura/zathurarc".source = ../res/zathurarc; };
 }

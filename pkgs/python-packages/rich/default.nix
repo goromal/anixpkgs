@@ -1,20 +1,8 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
-, markdown-it-py
-, poetry-core
-, pygments
-, typing-extensions
-, ipywidgets
-, pytestCheckHook
+{ lib, buildPythonPackage, fetchFromGitHub, pythonOlder, markdown-it-py
+, poetry-core, pygments, typing-extensions, ipywidgets, pytestCheckHook
 
 # for passthru.tests
-, enrich
-, httpie
-, rich-rst
-, textual
-}:
+, enrich, httpie, rich-rst, textual }:
 
 buildPythonPackage rec {
   pname = "rich";
@@ -32,35 +20,26 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ poetry-core ];
 
-  propagatedBuildInputs = [
-    ipywidgets
-    markdown-it-py
-    pygments
-  ] ++ lib.optionals (pythonOlder "3.9") [
-    typing-extensions
-  ];
+  propagatedBuildInputs = [ ipywidgets markdown-it-py pygments ]
+    ++ lib.optionals (pythonOlder "3.9") [ typing-extensions ];
 
-  nativeCheckInputs = [
-    pytestCheckHook
-  ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   postPatch = ''
     substituteInPlace pyproject.toml \
       --replace 'markdown-it-py = "^2.2.0"' 'markdown-it-py = "*"'
   '';
 
-  pythonImportsCheck = [
-    "rich"
-  ];
+  pythonImportsCheck = [ "rich" ];
 
-  passthru.tests = {
-    inherit enrich httpie rich-rst textual;
-  };
+  passthru.tests = { inherit enrich httpie rich-rst textual; };
 
   meta = with lib; {
-    description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal";
+    description =
+      "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal";
     homepage = "https://github.com/Textualize/rich";
-    changelog = "https://github.com/Textualize/rich/blob/v${version}/CHANGELOG.md";
+    changelog =
+      "https://github.com/Textualize/rich/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ ris joelkoen ];
   };

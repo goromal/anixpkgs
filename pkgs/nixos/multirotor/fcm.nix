@@ -1,27 +1,21 @@
 { config, pkgs, lib, ... }:
 with pkgs;
-with lib;
-{
-    imports = [
-        ../base.nix
-    ];
+with lib; {
+  imports = [ ../base.nix ];
 
-    nix.nixPath = mkForce [
-        "nixpkgs=${cleanSource ../../..}"
-    ];
+  nix.nixPath = mkForce [ "nixpkgs=${cleanSource ../../..}" ];
 
-    networking.hostName = "multirotorFcm";
-    services.xserver.enable = true;
-    services.xserver.displayManager = {
-        lightdm.enable = true;
-        defaultSession = lib.mkDefault "none+icewm";
-        autoLogin = {
-            enable = true;
-            user = "andrew";
-        };
+  networking.hostName = "multirotorFcm";
+  services.xserver.enable = true;
+  services.xserver.displayManager = {
+    lightdm.enable = true;
+    defaultSession = lib.mkDefault "none+icewm";
+    autoLogin = {
+      enable = true;
+      user = "andrew";
     };
-    services.xserver.windowManager.icewm.enable = true;
+  };
+  services.xserver.windowManager.icewm.enable = true;
 
-    environment.systemPackages = [
-    ];
+  environment.systemPackages = [ ];
 }

@@ -1,16 +1,9 @@
-{ writeShellScriptBin
-, callPackage
-, color-prints
-, strings
-, redirects
-, imagemagick
-, libheif
-, exiftool
-}:
+{ writeShellScriptBin, callPackage, color-prints, strings, redirects
+, imagemagick, libheif, exiftool }:
 let
-    name = "png";
-    extension = "png";
-    usage_str = ''
+  name = "png";
+  extension = "png";
+  usage_str = ''
     usage: png inputfile outputfile
 
     Create a png file.
@@ -26,33 +19,35 @@ let
     Options:
         -r|--resize [e.g., 50%]  Resize the image.
         -s|--scrub               Scrub image metadata.
-    '';
-    optsWithVarsAndDefaults = [
-        {
-            var = "resize";
-            isBool = false;
-            default = "";
-            flags = "-r|--resize";
-        }
-        {
-            var = "scrub";
-            isBool = true;
-            default = "0";
-            flags = "-s|--scrub";
-        }
-    ];
-    printWarn = "${color-prints}/bin/echo_yellow";
-    printErr = "${color-prints}/bin/echo_red";
-    apply_resize = tmpdir_var: infile_var: outfile_varname: ''
+  '';
+  optsWithVarsAndDefaults = [
+    {
+      var = "resize";
+      isBool = false;
+      default = "";
+      flags = "-r|--resize";
+    }
+    {
+      var = "scrub";
+      isBool = true;
+      default = "0";
+      flags = "-s|--scrub";
+    }
+  ];
+  printWarn = "${color-prints}/bin/echo_yellow";
+  printErr = "${color-prints}/bin/echo_red";
+  apply_resize = tmpdir_var: infile_var: outfile_varname: ''
     ${outfile_varname}="${tmpdir_var}/__postresize.png"
     ${imagemagick}/bin/convert -resize $resize ${infile_var} "''${${outfile_varname}}" ${redirects.suppress_all}
-    '';
-    apply_scrub = tmpdir_var: infile_var: outfile_varname: ''
+  '';
+  apply_scrub = tmpdir_var: infile_var: outfile_varname: ''
     ${outfile_varname}="${tmpdir_var}/__postscrub.png"
     ${exiftool}/bin/exiftool -all= ${infile_var} -o "''${${outfile_varname}}" ${redirects.suppress_all}
-    '';
-    convOptCmds = [
-        { extension = "png|PNG|jpeg|JPEG|jpg|JPG|tiff|TIFF"; commands = ''
+  '';
+  convOptCmds = [
+    {
+      extension = "png|PNG|jpeg|JPEG|jpg|JPG|tiff|TIFF";
+      commands = ''
         tmpdir=$(mktemp -d)
         _stp1="$tmpdir/_stp1.png"
         ${imagemagick}/bin/convert "$infile" "$_stp1" ${redirects.suppress_all}
@@ -68,8 +63,11 @@ let
         fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
-        ''; }
-        { extension = "heic|HEIC"; commands = ''
+      '';
+    }
+    {
+      extension = "heic|HEIC";
+      commands = ''
         tmpdir=$(mktemp -d)
         _stp1="$tmpdir/_stp1.png"
         ${libheif}/bin/heif-convert "$infile" "$_stp1" ${redirects.suppress_all}
@@ -85,13 +83,17 @@ let
         fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
-        ''; }
-        { extension = "gif|GIF|svg|SVG"; commands = ''
+      '';
+    }
+    {
+      extension = "gif|GIF|svg|SVG";
+      commands = ''
         ${printWarn} "NOT IMPLEMENTED YET"
-        ''; }
-    ];
+      '';
+    }
+  ];
 in callPackage ./mkConverter.nix {
-    inherit writeShellScriptBin callPackage color-prints strings;
-    inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
-    description = "Generate PNG images from a variety of similar formats.";
+  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  description = "Generate PNG images from a variety of similar formats.";
 }

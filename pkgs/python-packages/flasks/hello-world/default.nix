@@ -1,22 +1,17 @@
-{ buildPythonPackage
-, flask
-, writeTextFile
-, callPackage
-, writeShellScript
-, python
-}:
+{ buildPythonPackage, flask, writeTextFile, callPackage, writeShellScript
+, python }:
 callPackage ../builders/mkSimpleFlaskApp.nix {
-    pname = "flask_hello_world";
-    version = "0.0.0";
-    inherit buildPythonPackage flask writeTextFile writeShellScript python;
-    scriptPropagatedBuildInputs = [];
-    flaskScript = ''
-        @app.route('/')
-        def hello_world():
-            return 'Hello, World! Oh, the places we will go!'
-    '';
-    description = "Spawn a trivial website, powered by Python's flask library.";
-    longDescription = ''
+  pname = "flask_hello_world";
+  version = "0.0.0";
+  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  scriptPropagatedBuildInputs = [ ];
+  flaskScript = ''
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World! Oh, the places we will go!'
+  '';
+  description = "Spawn a trivial website, powered by Python's flask library.";
+  longDescription = ''
     ```bash
     usage: flask_hello_world [-h] [--port PORT]
 
@@ -24,5 +19,5 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     -h, --help   show this help message and exit
     --port PORT  Port to run the server on
     ```
-    '';
+  '';
 }
