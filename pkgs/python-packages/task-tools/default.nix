@@ -1,68 +1,61 @@
-{ buildPythonPackage
-, click
-, easy-google-auth
-, pkg-src
-}:
+{ buildPythonPackage, click, easy-google-auth, pkg-src }:
 buildPythonPackage rec {
   pname = "task-tools";
   version = "0.0.0";
   src = pkg-src;
-  propagatedBuildInputs = [
-    click
-    easy-google-auth
-  ];
+  propagatedBuildInputs = [ click easy-google-auth ];
   doCheck = false;
   meta = {
     description = "CLI tools for managing Google Tasks.";
     longDescription = ''
-    [Repository](https://github.com/goromal/task-tools)
-    
-    ## Usage
+      [Repository](https://github.com/goromal/task-tools)
 
-    ```bash
-    Usage: task-tools [OPTIONS] COMMAND [ARGS]...
+      ## Usage
 
-      Manage Google Tasks.
+      ```bash
+      Usage: task-tools [OPTIONS] COMMAND [ARGS]...
 
-    Options:
-      --task-secrets-file PATH   Google Tasks client secrets file.  [default:
-                                /data/andrew/secrets/task/secrets.json]
-      --task-refresh-token PATH  Google Tasks refresh file (if it exists).
-                                [default: /data/andrew/secrets/task/token.json]
-      --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
-      --help                     Show this message and exit.
+        Manage Google Tasks.
 
-    Commands:
-      list  List pending tasks.
-      put   Upload a task.
-    ```
+      Options:
+        --task-secrets-file PATH   Google Tasks client secrets file.  [default:
+                                  /data/andrew/secrets/task/secrets.json]
+        --task-refresh-token PATH  Google Tasks refresh file (if it exists).
+                                  [default: /data/andrew/secrets/task/token.json]
+        --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
+        --help                     Show this message and exit.
 
-    ### List Pending Tasks
+      Commands:
+        list  List pending tasks.
+        put   Upload a task.
+      ```
 
-    ```bash
-    Usage: task-tools list [OPTIONS]
+      ### List Pending Tasks
 
-      List pending tasks.
+      ```bash
+      Usage: task-tools list [OPTIONS]
 
-    Options:
-      --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
-                        2023-07-29 22:47:50.042434]
-      --help             Show this message and exit.
-    ```
+        List pending tasks.
 
-    ### Upload a Task
+      Options:
+        --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
+                          2023-07-29 22:47:50.042434]
+        --help             Show this message and exit.
+      ```
 
-    ```bash
-    Usage: task-tools put [OPTIONS]
+      ### Upload a Task
 
-      Upload a task.
+      ```bash
+      Usage: task-tools put [OPTIONS]
 
-    Options:
-      --name TEXT        Name of the task.  [required]
-      --notes TEXT       Notes to add to the task description.
-      --date [%Y-%m-%d]  Task due date.  [default: 2023-07-29 22:48:57.751860]
-      --help             Show this message and exit.
-    ```
+        Upload a task.
+
+      Options:
+        --name TEXT        Name of the task.  [required]
+        --notes TEXT       Notes to add to the task description.
+        --date [%Y-%m-%d]  Task due date.  [default: 2023-07-29 22:48:57.751860]
+        --help             Show this message and exit.
+      ```
     '';
   };
 }

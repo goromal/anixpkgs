@@ -1,23 +1,13 @@
-{ callPackage
-, pytestCheckHook
-, buildPythonPackage
-, pandas
-, scipy
-, matplotlib
-}:
+{ callPackage, pytestCheckHook, buildPythonPackage, pandas, scipy, matplotlib }:
 callPackage ../pythonPkgFromScript.nix {
-    pname = "budget_report";
-    version = "1.0.0";
-    description = "Generate a budget report.";
-    script-file = ./report.py;
-    inherit pytestCheckHook buildPythonPackage;
-    propagatedBuildInputs = [
-        pandas
-        scipy
-        matplotlib
-    ];
-    checkPkgs = [];
-    longDescription = ''
+  pname = "budget_report";
+  version = "1.0.0";
+  description = "Generate a budget report.";
+  script-file = ./report.py;
+  inherit pytestCheckHook buildPythonPackage;
+  propagatedBuildInputs = [ pandas scipy matplotlib ];
+  checkPkgs = [ ];
+  longDescription = ''
     ```
     usage: budget_report [-h] [-c CONFIG] transactions
 
@@ -32,5 +22,5 @@ callPackage ../pythonPkgFromScript.nix {
                             JSON config file with budget names and limits (default:
                             /data/andrew/configs/budgets.json)
     ```
-    '';
+  '';
 }

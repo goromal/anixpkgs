@@ -1,38 +1,37 @@
-{ callPackage
-, writeShellScriptBin
-, python
-, color-prints
-, pkgData
-}:
+{ callPackage, writeShellScriptBin, python, color-prints, pkgData }:
 let
   pkgname = "la-quiz";
-  quiz = with python.pkgs; (callPackage ../../python-packages/pythonPkgFromScript.nix {
-    pname = "quiz";
-    version = "0.0.0";
-    description = "LA quiz driver.";
-    script-file = ./quiz.py;
-    inherit pytestCheckHook buildPythonPackage;
-    propagatedBuildInputs = [ tkinter pillow ];
-    checkPkgs = [];
-  });
+  quiz = with python.pkgs;
+    (callPackage ../../python-packages/pythonPkgFromScript.nix {
+      pname = "quiz";
+      version = "0.0.0";
+      description = "LA quiz driver.";
+      script-file = ./quiz.py;
+      inherit pytestCheckHook buildPythonPackage;
+      propagatedBuildInputs = [ tkinter pillow ];
+      checkPkgs = [ ];
+    });
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
-    usage: ${pkgname} [options] [N|C|E|S]
+      usage: ${pkgname} [options] [N|C|E|S]
 
-    Spawn a LA geography quiz! Will pull up the general region you specify:
+      Spawn a LA geography quiz! Will pull up the general region you specify:
 
-        N = North
-        C = Central
-        E = East
-        S = South
+          N = North
+          C = Central
+          E = East
+          S = South
 
-    Options:
+      Options:
 
-    --debug|-d    Open in debug mode (will print click positions to the screen).
+      --debug|-d    Open in debug mode (will print click positions to the screen).
     '';
-    optsWithVarsAndDefaults = [
-      { var = "isdebug"; isBool = true; default = "0"; flags = "--debug|-d"; }
-    ];
+    optsWithVarsAndDefaults = [{
+      var = "isdebug";
+      isBool = true;
+      default = "0";
+      flags = "--debug|-d";
+    }];
   };
   printErr = "${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
@@ -66,20 +65,20 @@ in (writeShellScriptBin pkgname ''
   meta = {
     description = "Spawn a LA geography quiz.";
     longDescription = ''
-    ```
-    usage: ${pkgname} [options] [N|C|E|S]
+      ```
+      usage: ${pkgname} [options] [N|C|E|S]
 
-    Spawn a LA geography quiz! Will pull up the general region you specify:
+      Spawn a LA geography quiz! Will pull up the general region you specify:
 
-        N = North
-        C = Central
-        E = East
-        S = South
+          N = North
+          C = Central
+          E = East
+          S = South
 
-    Options:
+      Options:
 
-    --debug|-d    Open in debug mode (will print click positions to the screen).
-    ```
+      --debug|-d    Open in debug mode (will print click positions to the screen).
+      ```
     '';
   };
 }

@@ -4,24 +4,23 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
-    ];
+  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
+  boot.initrd.availableKernelModules =
+    [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/e30f7381-0470-4882-b2f9-8c0d5cc4a98f";
-      fsType = "ext4";
-    };
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/e30f7381-0470-4882-b2f9-8c0d5cc4a98f";
+    fsType = "ext4";
+  };
 
-  fileSystems."/boot/efi" =
-    { device = "/dev/disk/by-uuid/04B3-A3DD";
-      fsType = "vfat";
-    };
+  fileSystems."/boot/efi" = {
+    device = "/dev/disk/by-uuid/04B3-A3DD";
+    fsType = "vfat";
+  };
 
   swapDevices = [ ];
 
@@ -33,7 +32,8 @@
   # networking.interfaces.wlp1s0.useDHCP = lib.mkDefault true;
 
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  hardware.cpu.intel.updateMicrocode =
+    lib.mkDefault config.hardware.enableRedistributableFirmware;
 
   # Inspiron Touchpad
   # boot.kernelModules = [ "psmouse" ]; redundant
