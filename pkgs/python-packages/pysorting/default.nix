@@ -1,37 +1,24 @@
-{ callPackage
-, clangStdenv
-, cmake
-, sorting
-, pybind11
-, python
-, pythonOlder
-, pytestCheckHook
-, buildPythonPackage
-, pkg-src
-}:
+{ callPackage, clangStdenv, cmake, sorting, pybind11, python, pythonOlder
+, pytestCheckHook, buildPythonPackage, pkg-src }:
 callPackage ../pythonPkgFromPybind.nix {
-    pname = "pysorting";
-    version = "1.0.0";
-    description = "RESTful incremental sorting with client-side comparators.";
-    inherit clangStdenv;
-    inherit pkg-src;
-    cppNativeBuildInputs = [
-        cmake
-    ];
-    cppBuildInputs = [
-        sorting
-    ];
-    hasTests = true;
-    inherit pybind11;
-    inherit python;
-    inherit pythonOlder;
-    inherit pytestCheckHook;
-    inherit buildPythonPackage;
-    propagatedBuildInputs = [];
-    checkPkgs = [];
-    longDescription = ''
+  pname = "pysorting";
+  version = "1.0.0";
+  description = "RESTful incremental sorting with client-side comparators.";
+  inherit clangStdenv;
+  inherit pkg-src;
+  cppNativeBuildInputs = [ cmake ];
+  cppBuildInputs = [ sorting ];
+  hasTests = true;
+  inherit pybind11;
+  inherit python;
+  inherit pythonOlder;
+  inherit pytestCheckHook;
+  inherit buildPythonPackage;
+  propagatedBuildInputs = [ ];
+  checkPkgs = [ ];
+  longDescription = ''
     [Repository](https://github.com/goromal/pysorting)
-    
+
     This library is a Python-wrapped version of the C++ [sorting](../cpp/sorting.md) library. As such, it is meant to be used in conjunction with a client that can solicit answers to binary comparisons for the purpose of incremental sorting.
 
     Example usage in a Python script:
@@ -71,5 +58,5 @@ callPackage ../pythonPkgFromPybind.nix {
     # sorted keys
     # state.arr == [2, 3, 0, 4, 1]
     ```
-    '';
+  '';
 }

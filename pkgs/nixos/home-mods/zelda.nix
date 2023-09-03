@@ -1,9 +1,8 @@
 { pkgs, config, lib, ... }:
-with pkgs; with lib;
-let
-  cfg = config.mods.playzelda;
-in
-{
+with pkgs;
+with lib;
+let cfg = config.mods.playzelda;
+in {
   options.mods.playzelda = with types; {
     enable = mkEnableOption "enable playzelda";
     zeldaRom = mkOption {

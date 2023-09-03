@@ -1,13 +1,10 @@
-{ config, pkgs, lib, ... }:
-{
-    imports = [
-        ./hardware-configuration-inspiron.nix
-        ./software-configuration.nix
-    ];
+{ config, pkgs, lib, ... }: {
+  imports =
+    [ ./hardware-configuration-inspiron.nix ./software-configuration.nix ];
 
-    networking.hostName = "atorgesen-inspiron";
+  networking.hostName = "atorgesen-inspiron";
 
-    nix.nixPath = [
-        "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/personal/configuration.nix"
-    ];
+  nix.nixPath = [
+    "nixos-config=/data/andrew/sources/anixpkgs/pkgs/nixos/personal/configuration.nix"
+  ];
 }

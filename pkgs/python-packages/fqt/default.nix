@@ -1,17 +1,13 @@
-{ callPackage
-, pytestCheckHook
-, buildPythonPackage
-, click
-}:
+{ callPackage, pytestCheckHook, buildPythonPackage, click }:
 callPackage ../pythonPkgFromScript.nix {
-    pname = "fqt";
-    version = "1.0.0";
-    description = "Four-quadrant tasking.";
-    script-file = ./fqt.py;
-    inherit pytestCheckHook buildPythonPackage;
-    propagatedBuildInputs = [ click ];
-    checkPkgs = [];
-    longDescription = ''
+  pname = "fqt";
+  version = "1.0.0";
+  description = "Four-quadrant tasking.";
+  script-file = ./fqt.py;
+  inherit pytestCheckHook buildPythonPackage;
+  propagatedBuildInputs = [ click ];
+  checkPkgs = [ ];
+  longDescription = ''
     ```bash
     Usage: fqt [OPTIONS] COMMAND [ARGS]...
 
@@ -37,5 +33,5 @@ callPackage ../pythonPkgFromScript.nix {
     Fun:10
     Family:30
     ```
-    '';
+  '';
 }

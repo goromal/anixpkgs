@@ -31,6 +31,14 @@ cd test
 nix-shell --run "bash test.sh"
 ```
 
+## Lint
+
+To lint all `.nix` files, run
+
+```bash
+nix-shell -p nixfmt --run "bash scripts/lint.sh"
+```
+
 ## Update Dependencies
 
 To systematically update all (self-owned) dependencies, run

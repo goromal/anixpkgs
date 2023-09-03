@@ -1,16 +1,13 @@
-{ callPackage
-, pytestCheckHook
-, buildPythonPackage
-}:
+{ callPackage, pytestCheckHook, buildPythonPackage }:
 callPackage ../pythonPkgFromScript.nix {
-    pname = "sunnyside";
-    version = "1.0.0";
-    description = "Make scrambled eggs.";
-    script-file = ./sunnyside.py;
-    inherit pytestCheckHook buildPythonPackage;
-    propagatedBuildInputs = [];
-    checkPkgs = [];
-    longDescription = ''
+  pname = "sunnyside";
+  version = "1.0.0";
+  description = "Make scrambled eggs.";
+  script-file = ./sunnyside.py;
+  inherit pytestCheckHook buildPythonPackage;
+  propagatedBuildInputs = [ ];
+  checkPkgs = [ ];
+  longDescription = ''
     ```
     usage: sunnyside [-h] target shift key
 
@@ -24,5 +21,5 @@ callPackage ../pythonPkgFromScript.nix {
     optional arguments:
     -h, --help  show this help message and exit
     ```
-    '';
+  '';
 }
