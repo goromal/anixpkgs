@@ -270,6 +270,10 @@
                 "ci": true
             },
             {
+                "attr": "python39.pkgs.orchestrator",
+                "ci": true
+            },
+            {
                 "attr": "python310.pkgs.gmail-parser",
                 "ci": true
             },

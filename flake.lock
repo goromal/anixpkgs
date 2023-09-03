@@ -321,6 +321,22 @@
         "type": "github"
       }
     },
+    "orchestrator": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1693716990,
+        "narHash": "sha256-Ho2vH3np7K/eQ2Kk+e19O+IDpOgw3KqZvNPlIUh7WlY=",
+        "owner": "goromal",
+        "repo": "orchestrator",
+        "rev": "0b5f52a20eaea07334510f9ebe81883cd4e4d725",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "orchestrator",
+        "type": "github"
+      }
+    },
     "pyceres": {
       "flake": false,
       "locked": {
@@ -441,6 +457,7 @@
         "mfn": "mfn",
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs",
+        "orchestrator": "orchestrator",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
         "pysignals": "pysignals",

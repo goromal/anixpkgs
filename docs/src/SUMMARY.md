@@ -30,6 +30,7 @@
   - [python39.pkgs.ichabod](./python/ichabod.md)
   - [python39.pkgs.pysignals](./python/pysignals.md)
   - [python39.pkgs.mesh-plotter](./python/mesh-plotter.md)
+  - [python39.pkgs.orchestrator](./python/orchestrator.md)
   - [python310.pkgs.gmail-parser](./python/gmail-parser.md)
   - [python39.pkgs.trafficsim](./python/trafficsim.md)
   - [python39.pkgs.imutils-cv4](./python/imutils-cv4.md)

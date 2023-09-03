@@ -18,6 +18,7 @@ Packages written (or bound) in Python.
 - [python39.pkgs.ichabod](./ichabod.md)
 - [python39.pkgs.pysignals](./pysignals.md)
 - [python39.pkgs.mesh-plotter](./mesh-plotter.md)
+- [python39.pkgs.orchestrator](./orchestrator.md)
 - [python310.pkgs.gmail-parser](./gmail-parser.md)
 - [python39.pkgs.trafficsim](./trafficsim.md)
 - [python39.pkgs.imutils-cv4](./imutils-cv4.md)

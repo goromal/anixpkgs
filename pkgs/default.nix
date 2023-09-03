@@ -123,6 +123,10 @@ let
                 pkg-src = flakeInputs.makepyshell;
               });
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
+            orchestrator = addDoc
+              (pySelf.callPackage ./python-packages/orchestrator {
+                pkg-src = flakeInputs.orchestrator;
+              });
             scrape = addDoc (pySelf.callPackage ./python-packages/scrape {
               pkg-src = flakeInputs.scrape;
             });
