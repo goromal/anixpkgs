@@ -159,10 +159,11 @@ with import ../dependencies.nix { inherit config; }; {
       anixpkgs.zipper
       anixpkgs.scrape
       anixpkgs.trafficsim
-      anixpkgs.manage-gmail
       anixpkgs.la-quiz
       anixpkgs.budget_report
       anixpkgs.fqt
+      anixpkgs.authm
+      anixpkgs.manage-gmail
       anixpkgs.wiki-tools
       anixpkgs.book-notes-sync
       anixpkgs.providence
