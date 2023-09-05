@@ -3,7 +3,7 @@
   nixos-version = "23.05"; # Should match the channel in <nixpkgs>
   nixos-state = "23.05";
   homem-state = "23.05";
-  anix-version = "1.8.0";
+  anix-version = "1.9.0";
   anixpkgs = import (if local-build then
     ../../default.nix
   else
