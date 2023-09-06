@@ -8,8 +8,8 @@ let
     builtins.concatStringsSep " " (map (x: "${x.name}:${x.url}") repoSpecList);
   setupcurrentws = pkgs.writeShellScriptBin "setupcurrentws" ''
     mkdir -p ${devDir}/${wsname}
-    ${setupws}/bin/setupws --dev_dir ${devDir} --data_dir ${dataDir} ${wsname} ${reposWithUrls}
     ${pkgs.python3}/bin/python ${shellSetupScript} ${devDir}/${wsname} '${pkgsVar}' ${shellSetupArgs}
+    ${setupws}/bin/setupws --dev_dir ${devDir} --data_dir ${dataDir} ${wsname} ${reposWithUrls}
   '';
 in pkgs.mkShell {
   nativeBuildInputs = [ setupcurrentws ];
