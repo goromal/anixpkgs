@@ -1,10 +1,10 @@
-{ buildPythonPackage, pythonOlder, easy-google-auth, html2text, progressbar2
-, pkg-src }:
+{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text
+, progressbar2, pkg-src }:
 buildPythonPackage rec {
   pname = "gmail_parser";
   version = "0.0.0";
   disabled = pythonOlder "3.8";
-  propagatedBuildInputs = [ easy-google-auth html2text progressbar2 ];
+  propagatedBuildInputs = [ click easy-google-auth html2text progressbar2 ];
   src = pkg-src;
   meta = {
     description =
@@ -12,7 +12,28 @@ buildPythonPackage rec {
     longDescription = ''
       [Repository](https://github.com/goromal/gmail_parser)
 
-      ## Usage Examples
+      This package may be used either in CLI form or via an interactive Python shell.
+
+      ## Usage Examples (CLI)
+
+      ```bash
+      Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
+
+        Manage GMail.
+
+      Options:
+        --gmail-secrets-json PATH  GMail client secrets file.  [default:
+                                  /data/andrew/secrets/gmail/secrets.json]
+        --gmail-refresh-file PATH  GMail refresh file (if it exists).  [default:
+                                  /data/andrew/secrets/gmail/refresh.json]
+        --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
+        --help                     Show this message and exit.
+
+      Commands:
+        clean  Clean out promotions and social emails.
+      ```
+
+      ## Usage Examples (Interactive Shell)
 
       Import with
 
