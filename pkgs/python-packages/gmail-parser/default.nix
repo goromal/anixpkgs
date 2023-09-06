@@ -1,5 +1,5 @@
-{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text, progressbar2
-, pkg-src }:
+{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text
+, progressbar2, pkg-src }:
 buildPythonPackage rec {
   pname = "gmail_parser";
   version = "0.0.0";
