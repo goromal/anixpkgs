@@ -13,7 +13,7 @@ let
   printErr = "${color-prints}/bin/echo_red";
   printWht = "${color-prints}/bin/echo_white";
 in (writeShellScriptBin pkgname ''
-  set -e pipefail
+  set -eo pipefail
   ${argparse}
   if [[ -z "$WSROOT" ]]; then
       ${printErr} "ERROR: \$WSROOT not set. Are you in a directory set up by setupws?"

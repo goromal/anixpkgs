@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e pipefail
+set -eo pipefail
 
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do
