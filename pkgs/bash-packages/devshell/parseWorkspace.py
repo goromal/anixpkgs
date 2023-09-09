@@ -7,21 +7,21 @@ def get_url_from_dep(dep, attr):
     with open(f"{dep}/flake.lock", "r") as lock_file:
         lock = json.loads(lock_file.read())
     if attr not in lock["nodes"] or "original" not in lock["nodes"][attr]:
-        raise Exception
+        raise Exception(f"Attribute {attr} not found in lockfile")
     original = lock["nodes"][attr]["original"]
     if "type" in original and original["type"] == "github":
         return f"https://github.com/{original['owner']}/{original['repo']}"
     elif "url" in original:
         return original["url"]
     else:
-        raise Exception
+        raise Exception(f"Unknown source type for attribute {attr}")
 
 def get_deps_from_dep(dep, attr):
     with open(f"{dep}/pkgs/default.nix", "r") as pkgs_file:
         pkg_pattern = re.compile(r"\s*" + attr + r"\s*=\s*addDoc\s*\(\s*\S*callPackage\s*(\S*)s*")
         pkg_search = pkg_pattern.search(pkgs_file.read())
     if not pkg_search:
-        raise Exception
+        raise Exception(f"Unable to locate derivation for attribute {attr}")
     pkg_rel_path = pkg_search.group(1)
     if ".nix" not in pkg_rel_path:
         pkg_rel_path += "/default.nix"
@@ -111,8 +111,8 @@ def main():
         
         sources = "[{}]".format("".join(source_sets))
 
-    except Exception:
-        print("_BADDEVRC_")
+    except Exception as e:
+        print("ERROR:", e)
         exit()
 
     print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{sources}")
