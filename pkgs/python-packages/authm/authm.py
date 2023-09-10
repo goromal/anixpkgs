@@ -13,7 +13,7 @@ def cli():
 @cli.command()
 def refresh():
     """Refresh all auth tokens one-by-one."""
-    print(Fore.YELLOW + "Refreshing GMail token #1..." + Style.RESET_ALL)
+    print(Fore.YELLOW + "Refreshing GMail token (personal)..." + Style.RESET_ALL)
     _ = getGoogleService(
         "gmail",
         "v1",
@@ -21,8 +21,22 @@ def refresh():
         GPD.getKwargsOrDefault("gmail_refresh_file"),
         GPD.getKwargsOrDefault("gmail_corpus_scope")
     )
-    print(Fore.YELLOW + "Refreshing GMail token #2..." + Style.RESET_ALL)
-    _ = 0 # TODO
+    print(Fore.YELLOW + "Refreshing GMail token (gbot)..." + Style.RESET_ALL)
+    _ = getGoogleService(
+        "gmail",
+        "v1",
+        GPD.getKwargsOrDefault("gmail_secrets_json"),
+        GPD.getKwargsOrDefault("gbot_refresh_file"),
+        GPD.getKwargsOrDefault("gmail_corpus_scope")
+    )
+    print(Fore.YELLOW + "Refreshing GMail token (journal)..." + Style.RESET_ALL)
+    _ = getGoogleService(
+        "gmail",
+        "v1",
+        GPD.getKwargsOrDefault("gmail_secrets_json"),
+        GPD.getKwargsOrDefault("journal_refresh_file"),
+        GPD.getKwargsOrDefault("gmail_corpus_scope")
+    )
     print(Fore.YELLOW + "Refreshing Docs token..." + Style.RESET_ALL)
     _ = getGoogleService(
         "docs",

@@ -47,6 +47,7 @@
   - [python310.pkgs.wiki-tools](./python/wiki-tools.md)
   - [python310.pkgs.book-notes-sync](./python/book-notes-sync.md)
   - [python310.pkgs.authm](./python/authm.md)
+  - [python310.pkgs.gbjmail](./python/gbjmail.md)
 - [Miscellaneous Packages](./misc/misc.md)
   - [aapis-grpcurl](./misc/aapis-grpcurl.md)
   - [abc](./misc/abc.md)
