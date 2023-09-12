@@ -338,7 +338,7 @@
                 "ci": true
             },
             {
-                "attr": "python310.pkgs.gbjmail",
+                "attr": "python310.pkgs.goromail",
                 "ci": true
             }
         ]

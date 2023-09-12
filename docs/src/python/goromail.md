@@ -1,4 +1,4 @@
-# python310.pkgs.gbjmail
+# python310.pkgs.goromail
 
 Manage mail for GBot and Journal.
 
@@ -15,7 +15,7 @@ The following workflows are supported, all via text messaging:
 - Any pattern will be added to the journal according to the date *in which the message was sent*.
 
 ```bash
-Usage: gbjmail [OPTIONS] COMMAND [ARGS]...
+Usage: goromail [OPTIONS] COMMAND [ARGS]...
 
   Manage the mail for GBot and Journal.
 

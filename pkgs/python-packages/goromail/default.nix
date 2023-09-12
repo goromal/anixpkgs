@@ -1,7 +1,7 @@
 { callPackage, pytestCheckHook, buildPythonPackage, click, colorama
 , gmail-parser, task-tools, wiki-tools }:
 callPackage ../pythonPkgFromScript.nix {
-  pname = "gbjmail";
+  pname = "goromail";
   version = "1.0.0";
   description = "Manage mail for GBot and Journal.";
   script-file = ./cli.py;
@@ -22,7 +22,7 @@ callPackage ../pythonPkgFromScript.nix {
     - Any pattern will be added to the journal according to the date *in which the message was sent*.
 
     ```bash
-    Usage: gbjmail [OPTIONS] COMMAND [ARGS]...
+    Usage: goromail [OPTIONS] COMMAND [ARGS]...
 
       Manage the mail for GBot and Journal.
 
