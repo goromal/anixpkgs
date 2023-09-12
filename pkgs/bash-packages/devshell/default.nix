@@ -66,8 +66,8 @@ in (writeShellScriptBin pkgname ''
   elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
       ${printErr} "ERROR: no workspace name provided."
       exit 1
-  elif [[ "$rcinfo" == "_BADDEVRC_" ]]; then
-      ${printErr} "ERROR: mal-formed $devrc"
+  elif [[ "$rcinfo" == ERROR* ]]; then
+      ${printErr} "''${rcinfo}"
       exit 1
   elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
       ${printErr} "ERROR: workspace $wsname not found in $devrc"

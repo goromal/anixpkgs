@@ -336,6 +336,10 @@
             {
                 "attr": "python310.pkgs.book-notes-sync",
                 "ci": true
+            },
+            {
+                "attr": "python310.pkgs.authm",
+                "ci": true
             }
         ]
     }
