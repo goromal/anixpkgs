@@ -1,5 +1,5 @@
 { config }: rec {
-  local-build = true;
+  local-build = false;
   nixos-version = "23.05"; # Should match the channel in <nixpkgs>
   nixos-state = "23.05";
   homem-state = "23.05";
