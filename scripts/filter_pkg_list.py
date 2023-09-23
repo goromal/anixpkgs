@@ -4,7 +4,7 @@ import sys
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-with open(os.path.join(ANIXDIR, "pkgIndex.json"), "r") as idxfile:
+with open(os.path.join(ANIXDIR, "index.json"), "r") as idxfile:
     pkgs = json.loads(idxfile.read())
 
 if len(sys.argv) > 1 and (sys.argv[1] == "misc" or sys.argv[1] == "cpp" or sys.argv[1] == "python"):

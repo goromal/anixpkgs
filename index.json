@@ -342,5 +342,15 @@
                 "ci": true
             }
         ]
-    }
+    },
+    "rfcs": [
+        {
+            "file": "001.orchestrator",
+            "title": "Orchestrator Daemon"
+        },
+        {
+            "file": "002.oscd",
+            "title": "Continuous OS Deployment"
+        }
+    ]
 }
