@@ -336,6 +336,10 @@
             {
                 "attr": "python310.pkgs.authm",
                 "ci": true
+            },
+            {
+                "attr": "python310.pkgs.goromail",
+                "ci": true
             }
         ]
     }

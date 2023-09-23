@@ -163,6 +163,7 @@ with import ../dependencies.nix { inherit config; }; {
       anixpkgs.budget_report
       anixpkgs.fqt
       anixpkgs.authm
+      anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.wiki-tools
       anixpkgs.book-notes-sync
