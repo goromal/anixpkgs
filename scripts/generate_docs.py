@@ -27,10 +27,11 @@ with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfil
     rfcsfile.write("# RFCs\n\n")
     rfcsfile.write("Request For Comments (RFC) documents are convenient for organizing and iterating on designs for pieces of software. " + 
     "They can serve as north stars for the implementation of more complex software. Below are some examples of RFCs that I've used to " +
-    "guide the development of certain pieces of software.\n\n")
+    "guide some personal projects.\n\n")
     for rfc in pkgs["rfcs"]:
-        print(rfc)
-        rfcsfile.write(f"- [{rfc['title']}]({rfc['file']}.md)\n")
+        print(rfc["file"])
+        rfcsfile.write(f"- [{rfc['title']}](./{rfc['file']}.md)\n")
+        summaryfile.write(f"  - [{rfc['title']}](./rfcs/{rfc['file']}.md)\n")
 
     summaryfile.write("- [C++ Packages](./cpp/cpp.md)\n")
     cppfile.write("# C++ Packages\n\n")
