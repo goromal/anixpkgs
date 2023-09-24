@@ -36,3 +36,4 @@ Packages written (or bound) in Python.
 - [python310.pkgs.wiki-tools](./wiki-tools.md)
 - [python310.pkgs.book-notes-sync](./book-notes-sync.md)
 - [python310.pkgs.authm](./authm.md)
+- [python310.pkgs.goromail](./goromail.md)

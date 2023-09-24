@@ -72,6 +72,8 @@ let
               (pySelf.callPackage ./python-packages/gmail-parser {
                 pkg-src = flakeInputs.gmail-parser;
               });
+            goromail =
+              addDoc (pySelf.callPackage ./python-packages/goromail { });
             sunnyside =
               addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -194,6 +196,7 @@ in rec {
   book-notes-sync = final.python310.pkgs.book-notes-sync;
   gmail-parser = final.python310.pkgs.gmail-parser;
   authm = final.python310.pkgs.authm;
+  goromail = final.python310.pkgs.goromail;
 
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python310;
