@@ -9,6 +9,8 @@ def increment_version(idx):
         anixvers = anixversfile.read()
     anixvers_split = anixvers.split(".")
     anixvers_split[idx] = str(int(anixvers_split[idx]) + 1)
+    for i in range(idx + 1, 3):
+        anixvers_split[i] = "0"
     with open(ANIXVERSFILE, "w") as anixversfile:
         anixversfile.write(".".join(anixvers_split))
 
