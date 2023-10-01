@@ -1,10 +1,11 @@
-let nixos-version = (builtins.readFile ./NIXOS_VERSION);
-in {
+{
   description =
     "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs??ref=refs/tags/${nixos-version}";
+    nixpkgs.url = "github:NixOS/nixpkgs??ref=refs/tags/${
+        builtins.readFile ./NIXOS_VERSION
+      }";
 
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
