@@ -11,4 +11,4 @@ jobs:
     steps:
     - name: TODO
       run: |
-        echo "RELEASE"
+        echo "IS RELEASE"
