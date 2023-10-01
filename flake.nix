@@ -3,8 +3,7 @@
     "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url =
-      "github:NixOS/nixpkgs?ref=refs/tags/${builtins.readFile ./NIXOS_VERSION}";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/23.05";
 
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
