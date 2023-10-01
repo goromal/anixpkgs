@@ -1,16 +1,14 @@
 name: Release
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - closed
 
 jobs:
   release:
-    # if: ${{ github.event.label.name == 'Release' }}
+    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'Release')) }}
     runs-on: ubuntu-latest
     steps:
-    - name: Dump GitHub context
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+    - name: TODO
       run: |
-        echo "$GITHUB_CONTEXT"
+        echo "RELEASE"
