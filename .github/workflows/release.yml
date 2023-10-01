@@ -1,0 +1,14 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    if: ${{ github.event.label.name == 'Release' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Test the trigger
+      run: echo Hello, world!
