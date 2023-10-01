@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - name: Tag Major Release
       run: |
         git config user.name "Deploy from CI"
@@ -25,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - name: Tag Minor Release
       run: |
         git config user.name "Deploy from CI"
@@ -40,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - name: Tag Patch Release
       run: |
         git config user.name "Deploy from CI"
