@@ -6,9 +6,11 @@ on:
 
 jobs:
   release:
-    if: ${{ github.event.label.name == 'Release' }}
+    # if: ${{ github.event.label.name == 'Release' }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Test the trigger
-      run: echo Hello, world!
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
