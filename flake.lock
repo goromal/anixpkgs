@@ -463,11 +463,11 @@
     "scrape": {
       "flake": false,
       "locked": {
-        "lastModified": 1691896967,
-        "narHash": "sha256-+WNmD3qFBr+5q3dXZz+CBfaIE5rx5eBEzlWeIz4RKKQ=",
+        "lastModified": 1695353119,
+        "narHash": "sha256-P4YdyhYVcskHEHe2qMBBP/j/wdWasmms/XNCZbb3bR0=",
         "owner": "goromal",
         "repo": "scrape",
-        "rev": "b6eb82d6a2a1e8a06adb3de7c50a53e3c6e1fc23",
+        "rev": "36830cf6f58dd203bbc85f35dcd9523ae1804d3d",
         "type": "github"
       },
       "original": {
