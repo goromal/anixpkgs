@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1693622560,
-        "narHash": "sha256-Ua+QI2kETsnifLG9vwkrswMdphQ/eMd8op2WR3DuqJk=",
+        "lastModified": 1696478736,
+        "narHash": "sha256-fKvXU3PaMYnLCdw4zGciPZML6WJcOuBqqOKntpGvZFc=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "fdfd54015feeeed96bed8701dae65e27dc871f20",
+        "rev": "929703ddf7b144bd762742576bae1d5964f9598c",
         "type": "github"
       },
       "original": {
@@ -480,11 +480,11 @@
     "scrape": {
       "flake": false,
       "locked": {
-        "lastModified": 1695353119,
+        "lastModified": 1694496782,
         "narHash": "sha256-P4YdyhYVcskHEHe2qMBBP/j/wdWasmms/XNCZbb3bR0=",
         "owner": "goromal",
         "repo": "scrape",
-        "rev": "36830cf6f58dd203bbc85f35dcd9523ae1804d3d",
+        "rev": "0a501286de10088f7c354e257a7aa1ea149943d0",
         "type": "github"
       },
       "original": {
