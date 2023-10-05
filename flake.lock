@@ -308,15 +308,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1691815497,
-        "narHash": "sha256-BXNg4fXj/aqHEVIsAI1mpMyPvaA5aW2Ri7XE/w4SZlM=",
+        "lastModified": 1685566663,
+        "narHash": "sha256-btHN1czJ6rzteeCuE/PNrdssqYD2nIA4w48miQAFloM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ac7f4710983438113882e2c6b98245253009b367",
+        "rev": "4ecab3273592f27479a583fb6d975d4aba3486fe",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
+        "ref": "refs/tags/23.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -479,11 +480,11 @@
     "scrape": {
       "flake": false,
       "locked": {
-        "lastModified": 1694496782,
+        "lastModified": 1695353119,
         "narHash": "sha256-P4YdyhYVcskHEHe2qMBBP/j/wdWasmms/XNCZbb3bR0=",
         "owner": "goromal",
         "repo": "scrape",
-        "rev": "0a501286de10088f7c354e257a7aa1ea149943d0",
+        "rev": "36830cf6f58dd203bbc85f35dcd9523ae1804d3d",
         "type": "github"
       },
       "original": {

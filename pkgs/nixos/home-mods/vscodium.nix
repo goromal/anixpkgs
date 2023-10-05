@@ -12,7 +12,7 @@ in with pkgs; {
   config = {
     home.packages = [ clang-tools black ];
 
-    # e.g., https://search.nixos.org/packages?channel=23.05&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
+    # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
     programs.vscode = {
       enable = true;
       package = cfg.package;

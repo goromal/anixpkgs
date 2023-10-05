@@ -1,9 +1,13 @@
-{ config }: rec {
+{ config }:
+let
+  nixos-version = (builtins.readFile ../../NIXOS_VERSION);
+  anix-version = (builtins.readFile ../../ANIX_VERSION);
+in rec {
   local-build = false;
-  nixos-version = "23.05"; # Should match the channel in <nixpkgs>
-  nixos-state = "23.05";
-  homem-state = "23.05";
-  anix-version = "1.10.0";
+  inherit nixos-version; # Should match the channel in <nixpkgs>
+  nixos-state = nixos-version;
+  homem-state = nixos-version;
+  inherit anix-version;
   anixpkgs = import (if local-build then
     ../../default.nix
   else
