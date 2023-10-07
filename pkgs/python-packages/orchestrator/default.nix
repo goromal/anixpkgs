@@ -1,9 +1,16 @@
-{ buildPythonPackage, click, aapis-py, grpcio, colorama, pkg-src }:
+{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, service-ports, pkg-src }:
 buildPythonPackage rec {
   pname = "orchestrator";
   version = "0.0.0";
   src = pkg-src;
+  buildInputs = [ makeWrapper ];
   propagatedBuildInputs = [ click aapis-py grpcio colorama ];
+  postInstall = ''
+    wrapProgram $out/bin/orchestratord \
+      --add-flags "--port ${builtins.toString service-ports.orchestrator}"
+    wrapProgram $out/bin/orchestrator \
+      --add-flags "--port ${builtins.toString service-ports.orchestrator}"
+  '';
   doCheck = false;
   meta = {
     description =
