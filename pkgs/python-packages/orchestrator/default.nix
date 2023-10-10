@@ -1,10 +1,12 @@
-{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, service-ports, pkg-src }:
+{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, mp4
+, mp4unite, scrape, service-ports, pkg-src }:
 buildPythonPackage rec {
   pname = "orchestrator";
   version = "0.0.0";
   src = pkg-src;
   buildInputs = [ makeWrapper ];
-  propagatedBuildInputs = [ click aapis-py grpcio colorama ];
+  propagatedBuildInputs =
+    [ click aapis-py grpcio colorama mp4 mp4unite scrape ];
   postInstall = ''
     wrapProgram $out/bin/orchestratord \
       --add-flags "--port ${builtins.toString service-ports.orchestrator}"

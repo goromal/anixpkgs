@@ -129,6 +129,9 @@ let
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
             orchestrator = addDoc
               (pySelf.callPackage ./python-packages/orchestrator {
+                mp4 = final.mp4;
+                mp4unite = final.mp4;
+                scrape = final.scrape;
                 inherit service-ports;
                 pkg-src = flakeInputs.orchestrator;
               });
