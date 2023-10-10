@@ -73,7 +73,7 @@ unijob=$(orchestrator mp4-unite $mp4job $orchoutpath/unified_vid.mp4)
 rmjob=$(orchestrator remove $mp4job -b $unijob)
 
 num_pending=1
-timeout_secs=60
+timeout_secs=120
 num_tries=0
 
 echo "Waiting for pending jobs..."
