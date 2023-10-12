@@ -4,7 +4,7 @@ from subprocess import check_output, CalledProcessError, DEVNULL
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-with open(os.path.join(ANIXDIR, "pkgIndex.json"), "r") as idxfile:
+with open(os.path.join(ANIXDIR, "index.json"), "r") as idxfile:
     pkgs = json.loads(idxfile.read())
 
 miscPkgs = [{"name": pkg["attr"].split(
@@ -15,12 +15,23 @@ pythonPkgs = [{"name": pkg["attr"].split(
     ".")[-1], "attr": pkg["attr"]} for pkg in pkgs["pkgs"]["python"]]
 
 with open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w") as summaryfile, \
+        open(os.path.join(ANIXDIR, "docs", "src", "rfcs", "rfcs.md"), "w") as rfcsfile, \
         open(os.path.join(ANIXDIR, "docs", "src", "misc", "misc.md"), "w") as miscfile, \
         open(os.path.join(ANIXDIR, "docs", "src", "cpp", "cpp.md"), "w") as cppfile, \
         open(os.path.join(ANIXDIR, "docs", "src", "python", "python.md"), "w") as pythonfile:
     summaryfile.write("# Summary\n\n")
     summaryfile.write("- [anixpkgs Overview](./intro.md)\n")
     summaryfile.write("- [Machine Management](./machines.md)\n")
+
+    summaryfile.write("- [RFCs](./rfcs/rfcs.md)\n")
+    rfcsfile.write("# RFCs\n\n")
+    rfcsfile.write("Request For Comments (RFC) documents are convenient for organizing and iterating on designs for pieces of software. " + 
+    "They can serve as north stars for the implementation of more complex software. Below are some examples of RFCs that I've used to " +
+    "guide some personal projects.\n\n")
+    for rfc in pkgs["rfcs"]:
+        print(rfc["file"])
+        rfcsfile.write(f"- [{rfc['title']}](./{rfc['file']}.md)\n")
+        summaryfile.write(f"  - [{rfc['title']}](./rfcs/{rfc['file']}.md)\n")
 
     summaryfile.write("- [C++ Packages](./cpp/cpp.md)\n")
     cppfile.write("# C++ Packages\n\n")

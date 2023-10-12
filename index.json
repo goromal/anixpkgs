@@ -270,6 +270,10 @@
                 "ci": true
             },
             {
+                "attr": "python39.pkgs.orchestrator",
+                "ci": true
+            },
+            {
                 "attr": "python310.pkgs.gmail-parser",
                 "ci": true
             },
@@ -342,5 +346,15 @@
                 "ci": true
             }
         ]
-    }
+    },
+    "rfcs": [
+        {
+            "file": "001.orchestrator",
+            "title": "Orchestrator Daemon"
+        },
+        {
+            "file": "002.oscd",
+            "title": "Continuous OS Deployment"
+        }
+    ]
 }

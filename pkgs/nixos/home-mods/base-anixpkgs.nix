@@ -27,6 +27,7 @@ with import ../dependencies.nix { inherit config; }; {
           ${anixpkgs.color-prints}/bin/echo_red "Must specify either a store path or nix-build rules."
       fi
     '')
+    anixpkgs.orchestrator
   ];
 
   services.lorri.enable = true;

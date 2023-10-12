@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1693622560,
-        "narHash": "sha256-Ua+QI2kETsnifLG9vwkrswMdphQ/eMd8op2WR3DuqJk=",
+        "lastModified": 1696822882,
+        "narHash": "sha256-A0LawGSHdP19i5MYBhvnDHN3X1wySxx8TxiYJosmQBg=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "fdfd54015feeeed96bed8701dae65e27dc871f20",
+        "rev": "5cb117c2f3e8a7c96d329a030fa554afa810ae8a",
         "type": "github"
       },
       "original": {
@@ -322,6 +322,22 @@
         "type": "github"
       }
     },
+    "orchestrator": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1696916689,
+        "narHash": "sha256-kl2CpSvgWVg4f6JTW8NGfNhZtuZ6dIAZLDGlcZLZ2ZQ=",
+        "owner": "goromal",
+        "repo": "orchestrator",
+        "rev": "2e0ce42d579089cd2a704a1f587478907c9555e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "orchestrator",
+        "type": "github"
+      }
+    },
     "pyceres": {
       "flake": false,
       "locked": {
@@ -442,6 +458,7 @@
         "mfn": "mfn",
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs",
+        "orchestrator": "orchestrator",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
         "pysignals": "pysignals",

@@ -2,6 +2,7 @@ final: prev:
 with prev.lib;
 let
   flakeInputs = final.flakeInputs;
+  service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
     nativeBuildInputs = [ prev.protobuf ];
@@ -126,6 +127,14 @@ let
                 pkg-src = flakeInputs.makepyshell;
               });
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
+            orchestrator = addDoc
+              (pySelf.callPackage ./python-packages/orchestrator {
+                mp4 = final.mp4;
+                mp4unite = final.mp4;
+                scrape = final.scrape;
+                inherit service-ports;
+                pkg-src = flakeInputs.orchestrator;
+              });
             scrape = addDoc (pySelf.callPackage ./python-packages/scrape {
               pkg-src = flakeInputs.scrape;
             });
@@ -193,6 +202,7 @@ in rec {
   gmail-parser = final.python310.pkgs.gmail-parser;
   authm = final.python310.pkgs.authm;
   goromail = final.python310.pkgs.goromail;
+  orchestrator = final.python39.pkgs.orchestrator;
 
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python310;
