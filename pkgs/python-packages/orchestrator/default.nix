@@ -20,7 +20,7 @@ buildPythonPackage rec {
     longDescription = ''
       [Repository](https://github.com/goromal/orchestrator)
 
-      ***Work in progress***
+      ***Work in progress. Detailed description to come.***
     '';
   };
 }
