@@ -17,16 +17,8 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.pb
     anixpkgs.dirgroups
     anixpkgs.fixfname
-    # https://github.com/utdemir/nix-tree
-    (pkgs.writeShellScriptBin "nix-deps" ''
-      if [[ $# -ge 2 ]]; then
-          nix-build $@ --no-out-link | xargs -o ${pkgs.nix-tree}/bin/nix-tree
-      elif [[ $# -eq 1 ]]; then
-          ${pkgs.nix-tree}/bin/nix-tree "$1"
-      else
-          ${anixpkgs.color-prints}/bin/echo_red "Must specify either a store path or nix-build rules."
-      fi
-    '')
+    anixpkgs.nix-deps
+    anixpkgs.nix-diffs
     anixpkgs.orchestrator
   ];
 

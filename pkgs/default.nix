@@ -255,6 +255,10 @@ in rec {
   providence-tasker =
     addDoc (prev.callPackage ./bash-packages/providence/tasker.nix { });
   fixfname = addDoc (prev.callPackage ./bash-packages/fixfname { });
+  nix-deps =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/nix-deps.nix { });
+  nix-diffs =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/nix-diffs.nix { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;

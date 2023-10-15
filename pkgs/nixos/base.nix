@@ -3,9 +3,34 @@ with pkgs;
 with lib;
 with import ./dependencies.nix { inherit config; };
 let
+  cfg = options.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
+  options.machines.base = {
+    machineType = lib.mkOption {
+      type = lib.types.enum [ "x86_linux" "pi4" ];
+      description = "Machine type that the closure is targeting.";
+    };
+    isNixOS = lib.mkOption {
+      type = lib.types.bool;
+      description =
+        "Whether the closure targets NixOS (if not, then home-manager).";
+    };
+    graphical = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure includes a graphical interface.";
+    };
+    recreational = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure includes recreational packages.";
+    };
+  };
+
+  config = {
+    # ^^^^ TODO
+  };
+
   imports = [ (import "${home-manager}/nixos") ];
 
   system.stateVersion = nixos-state;
@@ -161,7 +186,7 @@ in {
     (writeShellScriptBin "anix-version" ''
       echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${
         if local-build then "Local Build" else "v${anix-version}"
-      })"'')
+      })"'') # ^^^^ TODO move
   ];
 
   programs.bash.interactiveShellInit = ''

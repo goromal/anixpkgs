@@ -154,6 +154,14 @@
                 "ci": true
             },
             {
+                "attr": "nix-deps",
+                "ci": true
+            },
+            {
+                "attr": "nix-diffs",
+                "ci": true
+            },
+            {
                 "attr": "manif-geom-rs",
                 "ci": true
             },
