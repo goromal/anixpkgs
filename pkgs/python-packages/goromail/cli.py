@@ -8,6 +8,19 @@ from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.manage import TaskManager
 from task_tools.defaults import TaskToolsDefaults as TTD
 
+def append_text_to_wiki_page(wiki, id, msg, text):
+    doku = None
+    doku = wiki.getPage(id=id)
+    new_doku = f"""{doku}
+
+---- 
+
+{text}
+"""
+    wiki.putPage(id=id, content=new_doku)
+    if doku is not None:
+        msg.moveToTrash()
+
 @click.group()
 @click.pass_context
 @click.option(
@@ -85,10 +98,15 @@ from task_tools.defaults import TaskToolsDefaults as TTD
 def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refresh_file, num_messages, wiki_url, wiki_secrets_file, task_secrets_file, task_refresh_token, enable_logging):
     """Manage the mail for GBot and Journal."""
     ctx.obj = {
-        "gbot": GBotCorpus("goromal.bot@gmail.com", gmail_secrets_json=gmail_secrets_json, gbot_refresh_file=gbot_refresh_file, enable_logging=enable_logging).Inbox(num_messages),
-        "jnal": JournalCorpus("goromal.journal@gmail.com", gmail_secrets_json=gmail_secrets_json, journal_refresh_file=journal_refresh_file, enable_logging=enable_logging).Inbox(num_messages),
-        "wiki": WikiTools(wiki_url=wiki_url, wiki_secrets_file=wiki_secrets_file, enable_logging=enable_logging),
-        "task": TaskManager(task_secrets_file=task_secrets_file, task_refresh_token=task_refresh_token, enable_logging=enable_logging)
+        "enable_logging": enable_logging,
+        "gmail_secrets_json": gmail_secrets_json,
+        "gbot_refresh_file": gbot_refresh_file,
+        "journal_refresh_file": journal_refresh_file,
+        "num_messages": num_messages,
+        "wiki_url": wiki_url,
+        "wiki_secrets_file": wiki_secrets_file,
+        "task_secrets_file": task_secrets_file,
+        "task_refresh_token": task_refresh_token
     }
 
 @cli.command()
@@ -99,10 +117,26 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
     is_flag=True,
     help="Do a dry run; no message deletions.",
 )
-def process(ctx: click.Context, dry_run):
-    """Process all pending commands."""
+def bot(ctx: click.Context, dry_run):
+    """Process all pending bot commands."""
+    gbot = GBotCorpus(
+        "goromal.bot@gmail.com",
+        gmail_secrets_json=ctx.obj["gmail_secrets_json"],
+        gbot_refresh_file=ctx.obj["gbot_refresh_file"],
+        enable_logging=ctx.obj["enable_logging"]
+    ).Inbox(ctx.obj["num_messages"])
+    wiki = WikiTools(
+        wiki_url=ctx.obj["wiki_url"],
+        wiki_secrets_file=ctx.obj["wiki_secrets_file"],
+        enable_logging=ctx.obj["enable_logging"]
+    )
+    task = TaskManager(
+        task_secrets_file=ctx.obj["task_secrets_file"],
+        task_refresh_token=ctx.obj["task_refresh_token"],
+        enable_logging=ctx.obj["enable_logging"]
+    )
     print(Fore.YELLOW + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
-    msgs = ctx.obj["gbot"].fromSenders(['6612105214@vzwpix.com']).getMessages()
+    msgs = gbot.fromSenders(['6612105214@vzwpix.com']).getMessages()
     for msg in reversed(msgs):
         text = msg.getText()
         date = msg.getDate()
@@ -110,35 +144,61 @@ def process(ctx: click.Context, dry_run):
             print(f"  Calorie intake on {date}: {text}")
             if not dry_run:
                 caljo_doku = None
-                caljo_doku = ctx.obj["wiki"].getPage(id="calorie-journal")
+                caljo_doku = wiki.getPage(id="calorie-journal")
                 new_caljo_doku = f"""{caljo_doku}
   * ({date}) {text}"""
-                ctx.obj["wiki"].putPage(id="calorie-journal", content=new_caljo_doku)
+                wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                 if caljo_doku is not None:
                     msg.moveToTrash()
-        elif text[:9].lower() == "remind me":
-            print(f"  Reminder from {date}: {text}")
+        elif text[:3].lower() == "p0:" or text[:3].lower() == "p1:" or text[:3].lower() == "p2:" or text[:3].lower() == "p3:":
+            print(f"  {text[:2]} task for {date}: {text[3:]}")
             if not dry_run:
-                ctx.obj["task"].putTask(text, "", datetime.today())
+                task.putTask(text, "", datetime.today())
                 msg.moveToTrash()
+        elif text[:6].lower() == "house:":
+            print(f"  House offload item: {text[6:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "house", msg, text[6:])
+        elif text[:9].lower() == "kathleen:":
+            print(f"  Kathleen offload item: {text[9:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "kathleen", msg, text[9:])
+        elif text[:8].lower() == "grayson:":
+            print(f"  Grayson offload item: {text[8:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "grayson", msg, text[8:])
+        elif text[:9].lower() == "harrison:":
+            print(f"  Harrison offload item: {text[9:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "harrison", msg, text[9:])
+        elif text[:7].lower() == "church:":
+            print(f"  Church offload item: {text[7:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "church", msg, text[7:])
         else:
             print(f"  ITNS from {date}: {text}")
             if not dry_run:
-                itns_doku = None
-                itns_doku = ctx.obj["wiki"].getPage(id="itns")
-                new_itns_doku = f"""{itns_doku}
-                
-----
+                append_text_to_wiki_page(wiki, "itns", msg, text)
+    print(Fore.GREEN + f"Done." + Style.RESET_ALL)
 
-{text}
-"""
-                ctx.obj["wiki"].putPage(id="itns", content=new_itns_doku)
-                if itns_doku is not None:
-                    msg.moveToTrash()
+@cli.command()
+@click.pass_context
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Do a dry run; no message deletions.",
+)
+def journal(ctx: click.Context, dry_run):
+    """Process all pending journal entries."""
+    journal = JournalCorpus(
+        "goromal.journal@gmail.com",
+        gmail_secrets_json=ctx.obj["gmail_secrets_json"],
+        journal_refresh_file=ctx.obj["journal_refresh_file"],
+        enable_logging=ctx.obj["enable_logging"]
+    ).Inbox(ctx.obj["num_messages"])
     print(Fore.YELLOW + f"Journal processing functionality STILL PENDING." + Style.RESET_ALL)
     # TODO
-    print(Fore.GREEN + f"Done." + Style.RESET_ALL)
-    
 
 def main():
     cli()
