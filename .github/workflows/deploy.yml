@@ -54,6 +54,7 @@ jobs:
         git config user.name "Deploy from CI"
         git config user.email ""
         git checkout master
+        git pull origin master
         cd docs
         mdbook build
         git worktree add gh-pages
