@@ -153,7 +153,7 @@ def bot(ctx: click.Context, dry_run):
         elif text[:3].lower() == "p0:" or text[:3].lower() == "p1:" or text[:3].lower() == "p2:" or text[:3].lower() == "p3:":
             print(f"  {text[:2]} task for {date}: {text[3:]}")
             if not dry_run:
-                task.putTask(text, "", datetime.today())
+                task.putTask(text, f"Generated: {datetime.now().strftime('%m/%d/%Y')}", datetime.today())
                 msg.moveToTrash()
         elif text[:6].lower() == "house:":
             print(f"  House offload item: {text[6:]}")
