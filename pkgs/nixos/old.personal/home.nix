@@ -8,13 +8,13 @@ with import ../dependencies.nix { inherit config; }; {
   # TODO Nix config setup? e.g., cachix
 
   imports = [
-    ../home-mods/base-anixpkgs.nix
-    ../home-mods/git.nix
-    ../home-mods/vim.nix
-    ../home-mods/vscodium.nix
-    ../home-mods/terminator.nix
-    ../home-mods/nautilus.nix
-    ../home-mods/gnome-wallpaper.nix
+    ../components/base-anixpkgs.nix
+    ../components/git.nix
+    ../components/vim.nix
+    ../components/vscodium.nix
+    ../components/terminator.nix
+    ../components/nautilus.nix
+    ../components/gnome-wallpaper.nix
   ];
 
   mods.gnome-wallpaper.standalone = true;

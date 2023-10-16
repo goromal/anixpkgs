@@ -258,10 +258,10 @@ in {
     programs.command-not-found.enable = true;
 
     imports = [
-      ./home-mods/base-anixpkgs.nix
-      ./home-mods/git.nix
-      ./home-mods/vim.nix
-      ./home-mods/tmux.nix
+      ./components/base-anixpkgs.nix
+      ./components/git.nix
+      ./components/vim.nix
+      ./components/tmux.nix
     ];
   };
 }

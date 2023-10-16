@@ -55,12 +55,12 @@ with import ../dependencies.nix { inherit config; }; {
 
   home-manager.users.andrew = {
     imports = [
-      ../home-mods/vscodium.nix
-      ../home-mods/terminator.nix
-      # ../home-mods/zathura.nix
-      ../home-mods/nautilus.nix
-      ../home-mods/gnome-wallpaper.nix
-      ../home-mods/zelda.nix
+      ../components/vscodium.nix
+      ../components/terminator.nix
+      # ../components/zathura.nix
+      ../components/nautilus.nix
+      ../components/gnome-wallpaper.nix
+      ../components/zelda.nix
     ];
 
     mods.vscodium.package = unstable.vscodium;
