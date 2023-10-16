@@ -129,7 +129,7 @@ let
   convOptCmds = [{
     extension = "mp4|MP4|gif|GIF|mpeg|MPEG|mkv|MKV|mov|MOV|avi|AVI|webm|WEBM";
     commands = ''
-      ffmpeg_args=("-vcodec" "libx264")
+      ffmpeg_args=("-y" "-vcodec" "libx264")
       ${qualityRule}
       ${widthRule}
       ${labelRule}
