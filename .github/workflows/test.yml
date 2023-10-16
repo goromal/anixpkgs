@@ -11,6 +11,19 @@ env:
   NIXOS_VERSION: 23.05
 
 jobs:
+  generate-docs-dry:
+    name: Generate Docs (Dry Run)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        python scripts/generate_docs.py
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          echo "Found changes to $num_changes docs"
+        else
+          echo "No detected changes to auto-generated docs"
+        fi
   lint:
     name: Lint Nix Files
     runs-on: ubuntu-latest

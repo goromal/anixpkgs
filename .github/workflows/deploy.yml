@@ -1,11 +1,36 @@
 name: Deploy
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - closed
 
 jobs:
-  deploy:
+  generate-docs:
+    name: Generate Docs
+    if: ${{ (github.event.pull_request.merged == true) }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "Deploy from CI"
+        git config user.email ""
+        git checkout master
+        python scripts/generate_docs.py
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          echo "Committing changes to $num_changes docs"
+          git add .
+          git commit -m "Generate updated docs"
+          git push origin master
+        else
+          echo "No docs changes to commit"
+        fi
+  publish-docs:
+    name: Publish Docs
+    if: ${{ (github.event.pull_request.merged == true) }}
+    needs: generate-docs
     runs-on: ubuntu-latest
     permissions:
       contents: write  # To push a branch 
@@ -23,11 +48,12 @@ jobs:
         echo `pwd`/mdbook >> $GITHUB_PATH
     - name: Deploy GitHub Pages
       run: |
+        git config user.name "Deploy from CI"
+        git config user.email ""
+        git checkout master
         cd docs
         mdbook build
         git worktree add gh-pages
-        git config user.name "Deploy from CI"
-        git config user.email ""
         cd gh-pages
         # Delete the ref to avoid keeping history.
         git update-ref -d refs/heads/gh-pages
@@ -36,3 +62,57 @@ jobs:
         git add .
         git commit -m "Deploy $GITHUB_SHA to gh-pages"
         git push --force --set-upstream origin gh-pages
+  major-release:
+    name: Tag Major Release
+    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MajorRelease')) }}
+    needs: generate-docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "Deploy from CI"
+        git config user.email ""
+        git checkout master
+        python scripts/increment_anix.py major
+        git add .
+        git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
+        git tag v$(cat ANIX_VERSION) HEAD
+        git push origin master && git push --tags
+  minor-release:
+    name: Tag Minor Release
+    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MinorRelease')) }}
+    needs: generate-docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "Deploy from CI"
+        git config user.email ""
+        git checkout master
+        python scripts/increment_anix.py minor
+        git add .
+        git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
+        git tag v$(cat ANIX_VERSION) HEAD
+        git push origin master && git push --tags
+  patch-release:
+    name: Tag Patch Release
+    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'PatchRelease')) }}
+    needs: generate-docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "Deploy from CI"
+        git config user.email ""
+        git checkout master
+        python scripts/increment_anix.py patch
+        git add .
+        git commit -m "Bump patch ANIX_VERSION -> $(cat ANIX_VERSION)"
+        git tag v$(cat ANIX_VERSION) HEAD
+        git push origin master && git push --tags
