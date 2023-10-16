@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v20
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: |
         python scripts/generate_docs.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
