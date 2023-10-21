@@ -107,6 +107,15 @@ sudo nixos-rebuild boot
 sudo reboot
 ```
 
+### Cloud Syncing
+
+The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
+
+- `dropbox:secrets` -> `rclone copy` -> `~/secrets`
+- `dropbox:Games` -> `rclone copy` -> `~/games`
+- `box:data` -> `rclone copy` -> `~/data`
+- `drive:Documents` -> `rclone copy` -> `~/Documents`
+
 ## Build a NixOS ISO Image
 
 ***TODO (untested)***; work out hardware configuration portion.
