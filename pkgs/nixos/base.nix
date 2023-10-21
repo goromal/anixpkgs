@@ -157,7 +157,7 @@ in {
     glances
     gping
     dog
-    rclone # TODO incorporate
+    rclone
     (writeShellScriptBin "anix-version" ''
       echo "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (${
         if local-build then "Local Build" else "v${anix-version}"
