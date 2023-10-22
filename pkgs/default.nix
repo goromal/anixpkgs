@@ -171,6 +171,18 @@ let
           });
       }));
 in rec {
+  pkgSource = prev.stdenvNoCC.mkDerivation {
+    name = "anixpkgs-src";
+    src = builtins.fetchGit {
+      url = "https://github.com/goromal/anixpkgs";
+      ref = "master";
+    };
+    buildPhase = "";
+    installPhase = ''
+      mkdir -p $out
+      cp -r * $out/
+    '';
+  };
   pkgData = prev.callPackage flakeInputs.anixdata { };
 
   python38 = pythonOverridesFor prev.python38;
