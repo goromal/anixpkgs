@@ -114,6 +114,7 @@ The following mount points are recommended (using [rclone](https://rclone.org/) 
 - `dropbox:secrets` -> `rclone copy` -> `~/secrets`
 - `dropbox:Games` -> `rclone copy` -> `~/games`
 - `box:data` -> `rclone copy` -> `~/data`
+- `box:.devrc` -> `rclone copy` -> `~/.devrc`
 - `drive:Documents` -> `rclone copy` -> `~/Documents`
 
 ## Build a NixOS ISO Image
