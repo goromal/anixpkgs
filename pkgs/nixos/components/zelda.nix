@@ -8,7 +8,7 @@ in {
     zeldaRom = mkOption {
       type = types.str;
       description = "Path to Zelda ROM";
-      default = "/data/andrew/Dropbox/Games/LegendOfZeldaCollectorsEdition.iso";
+      default = "/data/andrew/games/LegendOfZeldaCollectorsEdition.iso";
     };
   };
 
