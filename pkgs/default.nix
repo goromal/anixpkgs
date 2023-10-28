@@ -171,13 +171,16 @@ let
           });
       }));
 in rec {
-  pkgSource = prev.stdenvNoCC.mkDerivation {
+  pkgsSource = { local ? false, rev ? null, ref ? null }:
+  prev.stdenvNoCC.mkDerivation {
     name = "anixpkgs-src";
     src = builtins.fetchGit {
       url = "https://github.com/goromal/anixpkgs";
-      ref = "master";
-    };
-    buildPhase = "";
+    } // (if rev != null then { inherit rev; } else (if ref != null then { inherit ref; } else { ref = "master"; }));
+    nativeBuildInputs = [ prev.git ];
+    buildPhase = (if local then ''
+  sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
+  '' else "");
     installPhase = ''
       mkdir -p $out
       cp -r * $out/
