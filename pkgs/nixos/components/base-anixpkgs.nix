@@ -20,6 +20,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
     anixpkgs.anix-version
+    anixpkgs.anix-upgrade
     anixpkgs.orchestrator
   ];
 
