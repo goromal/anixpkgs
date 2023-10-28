@@ -274,6 +274,10 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/nix-deps.nix { });
   nix-diffs =
     addDoc (prev.callPackage ./bash-packages/nix-tools/nix-diffs.nix { });
+  anix-version =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
+  anix-upgrade =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;

@@ -19,8 +19,13 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.fixfname
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
+    anixpkgs.anix-version
     anixpkgs.orchestrator
   ];
+
+  home.file = {
+    ".anix-version".text = if local-build then "Local Build" else "v${anix-version}"
+  };
 
   services.lorri.enable = true;
 }
