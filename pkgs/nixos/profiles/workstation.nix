@@ -5,6 +5,6 @@
   machines.base = {
     machineType = "x86_linux";
     graphical = true;
-    recreational = true;
+    recreational = false;
   };
 }

@@ -1,6 +1,7 @@
 { pkgs, config, lib, ... }:
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
+    docker
     anixpkgs.color-prints
     anixpkgs.git-cc
     anixpkgs.fix-perms
@@ -25,7 +26,8 @@ with import ../dependencies.nix { inherit config; }; {
   ];
 
   home.file = {
-    ".anix-version".text = if local-build then "Local Build" else "v${anix-version}"
+    ".anix-version".text =
+      if local-build then "Local Build" else "v${anix-version}";
   };
 
   services.lorri.enable = true;

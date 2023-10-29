@@ -1,1 +1,4 @@
-{ orchestrator = 40040; }
+{
+  orchestrator = 40040;
+  rankserver = 4018;
+}
