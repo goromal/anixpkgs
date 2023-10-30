@@ -1,4 +1,5 @@
 { pkgs, config, lib, ... }:
+with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     kooha # wayland-compatible screen recorder

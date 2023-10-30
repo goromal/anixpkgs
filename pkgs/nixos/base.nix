@@ -3,7 +3,7 @@ with pkgs;
 with lib;
 with import ./dependencies.nix { inherit config; };
 let
-  cfg = options.machines.base;
+  cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   lookup = attrs: key: default: if attrs ? key then attrs."${key}" else default;
@@ -23,8 +23,9 @@ in {
     };
   };
 
+  imports = [ (import "${home-manager}/nixos") ];
+
   config = {
-    imports = [ (import "${home-manager}/nixos") ];
     system.stateVersion = nixos-state;
 
     boot = {
@@ -51,13 +52,13 @@ in {
         } cfg.machineType true;
         efi = {
           canTouchEfiVariables = true;
-          efiSysMountPoint = lib.mkIf cfg.machineType
-            == "x86_linux" "/boot/efi";
+          efiSysMountPoint = lib.mkIf (cfg.machineType
+            == "x86_linux") "/boot/efi";
         };
       };
-      supportedFilesystems = lib.mkIf cfg.machineType == "x86_linux" [ "ntfs" ];
-      binfmt.emulatedSystems = lib.mkIf cfg.machineType
-        == "x86_linux" [ "aarch64-linux" ];
+      supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
+      binfmt.emulatedSystems = lib.mkIf (cfg.machineType
+        == "x86_linux") [ "aarch64-linux" ];
 
       postBootCommands =
         lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (let
@@ -73,20 +74,18 @@ in {
         '');
     };
 
-    nixpkgs = {
-      config.allowUnfree = true;
-      # https://github.com/NixOS/nixpkgs/issues/154163
-      overlays = lib.mkIf cfg.machineType == "pi4" [
-        (final: super: {
+    # https://github.com/NixOS/nixpkgs/issues/154163
+    nixpkgs.overlays = lib.mkIf (cfg.machineType == "pi4") [
+      (final: super: {
           # modprobe: FATAL: Module sun4i-drm not found
           makeModulesClosure = x:
             super.makeModulesClosure (x // { allowMissing = true; });
         })
-      ];
-    };
+    ];
 
     nix = {
       nixPath = [
+        "nixos-config=/etc/nixos/configuration.nix"
         "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
         "anixpkgs=/data/andrew/sources/anixpkgs"
       ];

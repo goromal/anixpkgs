@@ -54,9 +54,9 @@ in (writeShellScriptBin pkgname ''
   fi
   if [[ ! -z "$version" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "refs/heads/v'"''${version}"'"; }' -o anixpkgs
-  elseif [[ ! -z "$commit" ]]; then
+  elif [[ ! -z "$commit" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "'"$commit"'"; }' -o anixpkgs
-  elseif [[ ! -z "$branch" ]]; then
+  elif [[ ! -z "$branch" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "'"$branch"'"; }' -o anixpkgs
   else
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "master"; }' -o anixpkgs
