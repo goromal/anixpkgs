@@ -63,9 +63,9 @@ in (writeShellScriptBin pkgname ''
   fi
   ${printYellow} "Upgrading to NixOS $(cat anixpkgs/NIXOS_VERSION) with anixpkgs version $(cat anixpkgs/ANIX_VERSION)..."
   if [[ "$boot" == "1" ]]; then
-    nrb && ${printYellow} "Reboot for changes to take effect."
+    sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
   else
-    nrs && ${printYellow} "Done."
+    sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
   fi
 '') // {
   meta = {
