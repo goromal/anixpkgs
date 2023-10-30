@@ -10,7 +10,6 @@ with import ../dependencies.nix { inherit config; }; {
     calibre
     xclip
     graphviz
-
     gimp
     simplescreenrecorder
     pinta
@@ -27,7 +26,6 @@ with import ../dependencies.nix { inherit config; }; {
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
     })
-
     anixpkgs.authm
     anixpkgs.goromail
     anixpkgs.manage-gmail

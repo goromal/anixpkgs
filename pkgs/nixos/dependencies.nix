@@ -12,9 +12,8 @@ in rec {
     ../../default.nix
   else
     (builtins.fetchTarball
-      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz")) {
-      };
+      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz"))
+    { };
   unstable = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
-    };
+    "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
 }

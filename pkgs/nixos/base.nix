@@ -52,13 +52,14 @@ in {
         } cfg.machineType true;
         efi = {
           canTouchEfiVariables = true;
-          efiSysMountPoint = lib.mkIf (cfg.machineType
-            == "x86_linux") "/boot/efi";
+          efiSysMountPoint =
+            lib.mkIf (cfg.machineType == "x86_linux") "/boot/efi";
         };
       };
-      supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
-      binfmt.emulatedSystems = lib.mkIf (cfg.machineType
-        == "x86_linux") [ "aarch64-linux" ];
+      supportedFilesystems =
+        lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
+      binfmt.emulatedSystems =
+        lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
 
       postBootCommands =
         lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (let
@@ -77,10 +78,10 @@ in {
     # https://github.com/NixOS/nixpkgs/issues/154163
     nixpkgs.overlays = lib.mkIf (cfg.machineType == "pi4") [
       (final: super: {
-          # modprobe: FATAL: Module sun4i-drm not found
-          makeModulesClosure = x:
-            super.makeModulesClosure (x // { allowMissing = true; });
-        })
+        # modprobe: FATAL: Module sun4i-drm not found
+        makeModulesClosure = x:
+          super.makeModulesClosure (x // { allowMissing = true; });
+      })
     ];
 
     nix = {

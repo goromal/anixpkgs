@@ -5,11 +5,9 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.mfn
     anixpkgs.providence
     anixpkgs.providence-tasker
-
   ];
 
   home.file = with anixpkgs.pkgData; {
-
     "models/gender/${models.gender.proto.name}".source =
       models.gender.proto.data;
     "models/gender/${models.gender.weights.name}".source =
@@ -22,6 +20,5 @@ with import ../dependencies.nix { inherit config; }; {
       models.spleeter.model-index.data;
     "spleeter/pretrained_models/2stems/${models.spleeter.model-meta.name}".source =
       models.spleeter.model-meta.data;
-
   };
 }

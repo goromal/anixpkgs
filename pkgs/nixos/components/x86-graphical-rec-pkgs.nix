@@ -7,5 +7,4 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.la-quiz
     anixpkgs.budget_report
   ];
-
 }

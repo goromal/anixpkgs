@@ -1,4 +1,4 @@
 { config, pkgs, lib, ... }: {
-  imports = [ ../hardware/inspiron.nix ../profiles/personal.nix ];
+  imports = [ ../profiles/personal.nix ../hardware/inspiron.nix ];
   networking.hostName = "atorgesen-inspiron";
 }

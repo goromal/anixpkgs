@@ -1,4 +1,4 @@
 { config, pkgs, lib, ... }: {
-  imports = [ ../hardware/pi4.nix ../profiles/rankserver.nix ];
+  imports = [ ../profiles/rankserver.nix ../hardware/pi4.nix ];
   networking.hostName = "rankserver-pi4";
 }
