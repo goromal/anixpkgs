@@ -93,5 +93,7 @@
   - [simple-image-editor](./misc/simple-image-editor.md)
   - [nix-deps](./misc/nix-deps.md)
   - [nix-diffs](./misc/nix-diffs.md)
+  - [anix-version](./misc/anix-version.md)
+  - [anix-upgrade](./misc/anix-upgrade.md)
   - [manif-geom-rs](./misc/manif-geom-rs.md)
   - [xv-lidar-rs](./misc/xv-lidar-rs.md)
