@@ -18,4 +18,4 @@ export NIXPKGS_ALLOW_UNFREE=1
 
 echo "Building personal machine image..."
 
-nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=$DIR/../pkgs/nixos/personal/configuration.nix --no-out-link
+nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=$DIR/../pkgs/nixos/configurations/personal-inspiron.nix --no-out-link
