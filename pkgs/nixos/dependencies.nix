@@ -12,11 +12,8 @@ in rec {
     ../../default.nix
   else
     (builtins.fetchTarball
-      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz")) {
-        config.allowUnfree = true;
-      };
+      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz"))
+    { };
   unstable = import (builtins.fetchTarball
-    "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {
-      config = config.nixpkgs.config;
-    };
+    "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
 }

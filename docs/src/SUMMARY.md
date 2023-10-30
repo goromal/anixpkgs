@@ -91,5 +91,7 @@
   - [evil-hangman](./misc/evil-hangman.md)
   - [spelling-corrector](./misc/spelling-corrector.md)
   - [simple-image-editor](./misc/simple-image-editor.md)
+  - [nix-deps](./misc/nix-deps.md)
+  - [nix-diffs](./misc/nix-diffs.md)
   - [manif-geom-rs](./misc/manif-geom-rs.md)
   - [xv-lidar-rs](./misc/xv-lidar-rs.md)

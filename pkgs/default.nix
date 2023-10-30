@@ -171,26 +171,30 @@ let
           });
       }));
 in rec {
-  pkgSource = prev.stdenvNoCC.mkDerivation {
-    name = "anixpkgs-src";
-    src = builtins.fetchGit {
-      url = "https://github.com/goromal/anixpkgs";
-      ref = "master";
+  pkgsSource = { local ? false, rev ? null, ref ? null }:
+    prev.stdenvNoCC.mkDerivation {
+      name = "anixpkgs-src";
+      src = builtins.fetchGit { url = "https://github.com/goromal/anixpkgs"; }
+        // (if rev != null then {
+          inherit rev;
+        } else
+          (if ref != null then { inherit ref; } else { ref = "master"; }));
+      nativeBuildInputs = [ prev.git ];
+      buildPhase = (if local then ''
+        sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
+      '' else
+        "");
+      installPhase = ''
+        mkdir -p $out
+        cp -r * $out/
+      '';
     };
-    buildPhase = "";
-    installPhase = ''
-      mkdir -p $out
-      cp -r * $out/
-    '';
-  };
   pkgData = prev.callPackage flakeInputs.anixdata { };
 
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
-
-  # python3 = final.python39; # causes loads of re-builds for clangStdenv
 
   budget_report = final.python39.pkgs.budget_report;
   makepyshell = final.python39.pkgs.makepyshell;
@@ -267,6 +271,14 @@ in rec {
   providence-tasker =
     addDoc (prev.callPackage ./bash-packages/providence/tasker.nix { });
   fixfname = addDoc (prev.callPackage ./bash-packages/fixfname { });
+  nix-deps =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/nix-deps.nix { });
+  nix-diffs =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/nix-diffs.nix { });
+  anix-version =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
+  anix-upgrade =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;

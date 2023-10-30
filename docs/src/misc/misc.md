@@ -40,5 +40,7 @@ Packages written in assorted languages like Bash, Rust, Java, etc.
 - [evil-hangman](./evil-hangman.md)
 - [spelling-corrector](./spelling-corrector.md)
 - [simple-image-editor](./simple-image-editor.md)
+- [nix-deps](./nix-deps.md)
+- [nix-diffs](./nix-diffs.md)
 - [manif-geom-rs](./manif-geom-rs.md)
 - [xv-lidar-rs](./xv-lidar-rs.md)

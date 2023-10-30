@@ -154,6 +154,22 @@
                 "ci": true
             },
             {
+                "attr": "nix-deps",
+                "ci": true
+            },
+            {
+                "attr": "nix-diffs",
+                "ci": true
+            },
+            {
+                "attr": "anix-version",
+                "ci": true
+            },
+            {
+                "attr": "anix-upgrade",
+                "ci": true
+            },
+            {
                 "attr": "manif-geom-rs",
                 "ci": true
             },

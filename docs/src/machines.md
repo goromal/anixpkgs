@@ -96,10 +96,10 @@ reboot
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
-cat /etc/nixos/hardware-configuration.nix > /data/andrew/sources/anixpkgs/pkgs/nixos/personal/[hardware-configuration.nix] # update link/headings in configuration.nix
+cat /etc/nixos/hardware-configuration.nix > /data/andrew/sources/anixpkgs/pkgs/nixos/hardware/[hardware-configuration.nix] # update link/headings in configuration.nix
 sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
 sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
-sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/personal/configuration.nix /etc/nixos/configuration.nix
+sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
 ```
 14. Make other needed updates to the configuration, then apply:
 ```bash
