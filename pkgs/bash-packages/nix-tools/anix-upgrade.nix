@@ -53,13 +53,13 @@ in (writeShellScriptBin pkgname ''
     localVar=false
   fi
   if [[ ! -z "$version" ]]; then
-    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "refs/heads/v'"''${version}"'"; }' -o anixpkgs
+    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
   elif [[ ! -z "$commit" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "'"$commit"'"; }' -o anixpkgs
   elif [[ ! -z "$branch" ]]; then
-    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "'"$branch"'"; }' -o anixpkgs
+    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
   else
-    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "master"; }' -o anixpkgs
+    nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
   ${printYellow} "Upgrading to NixOS $(cat anixpkgs/NIXOS_VERSION) with anixpkgs version $(cat anixpkgs/ANIX_VERSION)..."
   if [[ "$boot" == "1" ]]; then
