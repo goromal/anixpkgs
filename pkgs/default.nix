@@ -174,11 +174,14 @@ in rec {
   pkgsSource = { local ? false, rev ? null, ref ? null }:
     prev.stdenvNoCC.mkDerivation {
       name = "anixpkgs-src";
-      src = builtins.fetchGit { url = "https://github.com/goromal/anixpkgs"; }
-        // (if rev != null then {
+      src = if rev == null then
+        (builtins.fetchTarball
+          "https://github.com/goromal/anixpkgs/archive/${ref}.tar.gz")
+      else
+        (builtins.fetchGit {
+          url = "https://github.com/goromal/anixpkgs";
           inherit rev;
-        } else
-          (if ref != null then { inherit ref; } else { ref = "master"; }));
+        });
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
