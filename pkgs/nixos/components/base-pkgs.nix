@@ -24,6 +24,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.anix-version
     anixpkgs.anix-upgrade
     anixpkgs.orchestrator
+    anixpkgs.rankserver-cpp
   ];
 
   home.file = {

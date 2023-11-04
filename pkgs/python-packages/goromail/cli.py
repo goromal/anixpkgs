@@ -91,7 +91,7 @@ def append_text_to_wiki_page(wiki, id, msg, text):
     "--enable-logging",
     "enable_logging",
     type=bool,
-    default=True,
+    default=False,
     show_default=True,
     help="Whether to enable logging.",
 )
