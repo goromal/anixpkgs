@@ -278,6 +278,7 @@ in {
       nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
       nrb = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot";
       code = "codium";
+      cap = "codium ~/dev/anixpkgs";
       nohistory = "set +o history";
     };
     environment.noXlibs = false;
