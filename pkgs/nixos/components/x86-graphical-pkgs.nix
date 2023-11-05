@@ -29,6 +29,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.authm
     anixpkgs.goromail
     anixpkgs.manage-gmail
+    anixpkgs.gmail-parser
     anixpkgs.wiki-tools
     anixpkgs.book-notes-sync
     anixpkgs.gantter
