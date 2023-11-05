@@ -8,6 +8,10 @@
 
 This repository of personally maintained Nix derivations, overlays, and machine closures is essentially the centralized mechanism by which I maintain all of the software I write and use for both personal projects and recreation. In other words, I employ [Nix](https://nixos.org) as both a package manager for my software as well as an operating system for all of my computers, Raspberry Pi’s, etc.
 
+These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the [C++](./cpp/cpp.md), [Python](./python/python.md), and [miscellaneous](./misc/misc.md) software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
+
+## Why Nix?
+
 Some of the main reasons why I prefer Nix as a package manager:
 
 - I highly value code that is not only compelling in its application but that is also **maintainable**. Code that is subject to compiler/interpreter and external dependency changes over time must be designed with the future in mind. Nix provides me an almost trivial mechanism to incrementally update (and roll back) external dependencies, compilers, or anything else pertaining to a software ecosystem that you can think of.
@@ -17,8 +21,6 @@ Some of the main reasons why I prefer NixOS as an operating system for all of my
 
 - The same things I value in packaging software, I also value in “packaging an operating system.” NixOS allows me to have **total control** over every single package in my OS, allowing me to customize every aspect and make changes with the peace of mind that I can always roll back breaking changes.
 - There is something very satisfying and empowering to me about being able to **declaratively define the OS closures for all of my machines in just several text files.** The overlay-focused design of NixOS modules makes it so that I can design the OS’s of my machines hierarchically, defining packages that are shared between *all* of my computers as well as packages that are specific to certain computers only. Moreover, when I buy a replacement computer it takes a minimal amount of steps to turn that new computer into an *all-intents-and-purposes clone* of my old one, which is a capability I value very highly for a lot of reasons.
-
-These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the [C++](./cpp/cpp.md), [Python](./python/python.md), and [miscellaneous](./misc/misc.md) software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
 
 ## Installation and Usage Patterns
 
