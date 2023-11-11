@@ -25,7 +25,7 @@ Some of the main reasons why I prefer NixOS as an operating system for all of my
 Given the above, why do I prefer Nix over Docker?
 
 - To be clear, I do think that Nix and Docker can be used together effectively. However:
-- In general, one will require a mishmash of custom or third-party build and deployment tooling to construct and glue a bunch of Docker containers together if one is trying to architect a complete *system* using Docker (as could be the case with code running on a robot). Nix provides more of a unified framework to achieve the same benefits, and that ecosystem is much more aesthetically pleasing to me than e.g., "YAML engineering."
+- In general, one will require a mishmash of custom or third-party build and deployment tooling to construct and glue a bunch of Docker containers together if one is trying to architect a complete *system* using Docker (as could be the case with code running on a robot). Nix provides more of a unified framework to achieve the same benefits, and that ecosystem is much more aesthetically pleasing to me than e.g., "[YAML engineering](https://media.ccc.de/v/nixcon-2023-35290-nix-and-kubernetes-deployments-done-right#t=2)."
 - Docker containers sit atop an already existing, fully fleshed out operating system. Nix allows me to (once agin, within a unified framework) control literally everything about even the operating system in an attempt to avoid unintended side effects at all levels of integration.
 
 ## Installation and Usage Patterns
