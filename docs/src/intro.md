@@ -22,6 +22,12 @@ Some of the main reasons why I prefer NixOS as an operating system for all of my
 - The same things I value in packaging software, I also value in “packaging an operating system.” NixOS allows me to have **total control** over every single package in my OS, allowing me to customize every aspect and make changes with the peace of mind that I can always roll back breaking changes.
 - There is something very satisfying and empowering to me about being able to **declaratively define the OS closures for all of my machines in just several text files.** The overlay-focused design of NixOS modules makes it so that I can design the OS’s of my machines hierarchically, defining packages that are shared between *all* of my computers as well as packages that are specific to certain computers only. Moreover, when I buy a replacement computer it takes a minimal amount of steps to turn that new computer into an *all-intents-and-purposes clone* of my old one, which is a capability I value very highly for a lot of reasons.
 
+Given the above, why do I prefer Nix over Docker?
+
+- To be clear, I do think that Nix and Docker can be used together effectively. However:
+- In general, one will require a mishmash of custom or third-party build and deployment tooling to construct and glue a bunch of Docker containers together if one is trying to architect a complete *system* using Docker (as could be the case with code running on a robot). Nix provides more of a unified framework to achieve the same benefits, and that ecosystem is much more aesthetically pleasing to me than e.g., "YAML engineering."
+- Docker containers sit atop an already existing, fully fleshed out operating system. Nix allows me to (once agin, within a unified framework) control literally everything about even the operating system in an attempt to avoid unintended side effects at all levels of integration.
+
 ## Installation and Usage Patterns
 
 The packages defined in this repo are accessible to anyone who uses [Nix](https://nixos.org), which can be [installed](https://nixos.org/download.html) in two forms:
