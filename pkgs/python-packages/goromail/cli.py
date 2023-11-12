@@ -1,4 +1,5 @@
 import click
+import re
 from colorama import Fore, Style
 from datetime import datetime
 from gmail_parser.corpus import GBotCorpus, JournalCorpus
@@ -18,6 +19,50 @@ def append_text_to_wiki_page(wiki, id, msg, text):
 {text}
 """
     wiki.putPage(id=id, content=new_doku)
+    if doku is not None:
+        msg.moveToTrash()
+
+def add_journal_entry_to_wiki(wiki, msg, date, text):
+    new_entry = (date, date.strftime("%B %d"), "FIXME\n\n" + text + "\n\n")
+    doku = None
+    doku = wiki.getPage(id=f"journals:{date.year}")
+    if not doku:
+        print(f"  Creating new journal page for {date.year}")
+        doku = f"""====== {date.year} ======
+
+"""
+    entries = re.findall(r"===== (\w+\s\w+) =====\n\n([^=====]*)", doku, re.MULTILINE | re.DOTALL)
+    annotated_entries = [[datetime.strptime(f"{entry[0]} {date.year}", "%B %d %Y"), entry[0], entry[1]] for entry in entries]
+    final_entries = []
+    inserted_new = False
+    for entry in annotated_entries:
+        entry[2] = entry[2].rstrip()
+        entry[2] += "\n\n"
+        if not inserted_new:
+            if new_entry[0].date() < entry[0].date():
+                final_entries.append(new_entry)
+                inserted_new = True
+            elif new_entry[0].date() == entry[0].date():
+                entry[2] += f"""
+
+{new_entry[2]}
+
+
+"""
+                inserted_new = True
+        final_entries.append(entry)
+    if not inserted_new:
+        final_entries.append(new_entry)
+        inserted_new = True
+
+    string_entries = [f"===== {entry[1]} =====\n\n{entry[2]}" for entry in final_entries]
+
+    new_doku = f"""====== {date.year} ======
+
+{''.join(string_entries)}
+"""
+
+    wiki.putPage(id=f"journals:{date.year}", content=new_doku)
     if doku is not None:
         msg.moveToTrash()
 
@@ -197,8 +242,20 @@ def journal(ctx: click.Context, dry_run):
         journal_refresh_file=ctx.obj["journal_refresh_file"],
         enable_logging=ctx.obj["enable_logging"]
     ).Inbox(ctx.obj["num_messages"])
-    print(Fore.YELLOW + f"Journal processing functionality STILL PENDING." + Style.RESET_ALL)
-    # TODO
+    wiki = WikiTools(
+        wiki_url=ctx.obj["wiki_url"],
+        wiki_secrets_file=ctx.obj["wiki_secrets_file"],
+        enable_logging=ctx.obj["enable_logging"]
+    )
+    print(Fore.YELLOW + f"Processing pending journal entries{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
+    msgs = journal.fromSenders(['6612105214@vzwpix.com']).getMessages()
+    for msg in reversed(msgs):
+        text = msg.getText()
+        date = msg.getDate()
+        print(f"  Journal entry for {date}")
+        if not dry_run:
+            add_journal_entry_to_wiki(wiki, msg, date, text)
+    print(Fore.GREEN + f"Done." + Style.RESET_ALL)
 
 def main():
     cli()

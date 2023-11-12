@@ -6,6 +6,7 @@ with import ../dependencies.nix { inherit config; }; {
   programs.home-manager.enable = true;
 
   # TODO Nix config setup? e.g., cachix
+  # TODO remove this and homes directory; just atomize the components packaging
 
   imports = [
     ../components/base-pkgs.nix
