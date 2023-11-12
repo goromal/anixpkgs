@@ -11,6 +11,8 @@ with pkgs; {
       co = "checkout";
       s = "status";
       d = "diff";
+      com = "checkout master";
+      pom = "pull origin master";
     };
     extraConfig = {
       init = { defaultBranch = "master"; };
