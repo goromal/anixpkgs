@@ -1,5 +1,6 @@
 { pkgs, config, lib, ... }:
 with pkgs;
+with lib;
 with import ../dependencies.nix { inherit config; };
 let cfg = config.mods.x86-graphical-rec;
 in {
