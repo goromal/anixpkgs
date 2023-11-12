@@ -8,16 +8,8 @@ with import ../dependencies.nix { inherit config; }; {
   # TODO Nix config setup? e.g., cachix
   # TODO remove this and homes directory; just atomize the components packaging
 
-  imports = [
-    ../components/base-pkgs.nix
-    ../components/git.nix
-    ../components/vim.nix
-    ../components/vscodium.nix
-    ../components/terminator.nix
-    ../components/nautilus.nix
-    ../components/gnome-wallpaper.nix
-  ];
+  imports = [ ../components/base-pkgs.nix ];
 
-  mods.gnome-wallpaper.standalone = true;
-  mods.gnome-wallpaper.homeDir = "/home/andrew";
+  mods.x86-graphical.standalone = true;
+  mods.x86-graphical.homeDir = "/home/andrew";
 }

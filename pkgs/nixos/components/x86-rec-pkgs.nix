@@ -5,6 +5,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.mfn
     anixpkgs.providence
     anixpkgs.providence-tasker
+    # TODO spleeter docker?
   ];
 
   home.file = with anixpkgs.pkgData; {

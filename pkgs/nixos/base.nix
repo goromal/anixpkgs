@@ -338,43 +338,28 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [
-        ./components/base-nixos-pkgs.nix
-        ./components/git.nix
-        ./components/vim.nix
-        ./components/tmux.nix
-      ] ++ (if cfg.machineType == "pi4" then
-        [ ./components/pi-pkgs.nix ]
-      else
-        [ ]) ++ (if cfg.machineType == "x86_linux" then
-          ([ ./components/x86-pkgs.nix ] ++ (if cfg.recreational then
-            [ ./components/x86-rec-pkgs.nix ]
-          else
-            [ ]) ++ (if cfg.graphical then
-              ([
-                ./components/x86-graphical-pkgs.nix
-                ./components/vscodium.nix
-                ./components/terminator.nix
-                ./components/nautilus.nix
-                ./components/gnome-wallpaper.nix
-              ] ++ (if cfg.recreational then [
-                ./components/x86-graphical-rec-pkgs.nix
-                ./components/zelda.nix
-              ] else
-                [ ]))
-            else
-              [ ]))
+      imports = [ ./components/base-nixos-pkgs.nix ]
+        ++ (if cfg.machineType == "pi4" then
+          [ ./components/pi-pkgs.nix ]
         else
-          [ ]);
+          [ ]) ++ (if cfg.machineType == "x86_linux" then
+            ([ ./components/x86-nixos-pkgs.nix ] ++ (if cfg.recreational then
+              [ ./components/x86-rec-nixos-pkgs.nix ]
+            else
+              [ ]) ++ (if cfg.graphical then
+                ([ ./components/x86-graphical-nixos-pkgs.nix ]
+                  ++ (if cfg.recreational then
+                    [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                  else
+                    [ ]))
+              else
+                [ ]))
+          else
+            [ ]);
 
-      mods.vscodium =
+      mods.x86-graphical =
         lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-          package = unstable.vscodium;
-        };
-
-      mods.playzelda = lib.mkIf
-        (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational) {
-          enable = true;
+          vscodium-package = unstable.vscodium;
         };
 
     };
