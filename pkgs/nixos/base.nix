@@ -339,7 +339,7 @@ in {
       programs.command-not-found.enable = true;
 
       imports = [
-        ./components/base-pkgs.nix
+        ./components/base-nixos-pkgs.nix
         ./components/git.nix
         ./components/vim.nix
         ./components/tmux.nix
