@@ -181,6 +181,7 @@ in rec {
         (builtins.fetchGit {
           url = "https://github.com/goromal/anixpkgs";
           inherit rev;
+          allRefs = true;
         });
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
