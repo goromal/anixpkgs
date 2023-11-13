@@ -2,6 +2,7 @@
 with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
+    rclone
     anixpkgs.color-prints
     anixpkgs.git-cc
     anixpkgs.fix-perms
