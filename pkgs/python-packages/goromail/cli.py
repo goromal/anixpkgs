@@ -220,6 +220,10 @@ def bot(ctx: click.Context, dry_run):
             print(f"  Church offload item: {text[7:]}")
             if not dry_run:
                 append_text_to_wiki_page(wiki, "church", msg, text[7:])
+        elif text[:4].lower() == "car:":
+            print(f"  Car offset item: {text[4:]}")
+            if not dry_run:
+                append_text_to_wiki_page(wiki, "car", msg, text[4:])
         else:
             print(f"  ITNS from {date}: {text}")
             if not dry_run:
