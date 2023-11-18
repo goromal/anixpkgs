@@ -98,7 +98,6 @@ in {
 
     home.file = with anixpkgs.pkgData; {
       "records/${records.crypt.name}".source = records.crypt.data;
-      "configs/${configs.book-notes.name}".source = configs.book-notes.data;
       ".config/terminator/config".source =
         ../res/terminator-config; # https://rigel.netlify.app/#terminal
       "Templates/EmptyDocument".text = "";

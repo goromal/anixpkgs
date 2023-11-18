@@ -1,5 +1,6 @@
 import click
 import re
+import os
 from colorama import Fore, Style
 from datetime import datetime
 from gmail_parser.corpus import GBotCorpus, JournalCorpus
@@ -21,6 +22,15 @@ def append_text_to_wiki_page(wiki, id, msg, text):
     wiki.putPage(id=id, content=new_doku)
     if doku is not None:
         msg.moveToTrash()
+
+def process_keyword(text, keyword, page_id, wiki, msg, dry_run):
+    n = len(keyword)
+    if text[:(n+1)].lower() == f"{keyword}:":
+        print(f"  {keyword} offload item: {text[(n+1):]}")
+        if not dry_run:
+            append_text_to_wiki_page(wiki, page_id, msg, text[(n+1):])
+        return True
+    return False
 
 def add_journal_entry_to_wiki(wiki, msg, date, text):
     new_entry = (date, date.strftime("%B %d"), "FIXME\n\n" + text + "\n\n")
@@ -157,12 +167,20 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
 @cli.command()
 @click.pass_context
 @click.option(
+    "--categories-csv",
+    "categories_csv",
+    type=click.Path(exists=True),
+    default=os.path.expanduser("~/configs/goromail-categories.csv"),
+    show_default=True,
+    help="CSV that maps keywords to wiki pages.",
+)
+@click.option(
     "--dry-run",
     "dry_run",
     is_flag=True,
     help="Do a dry run; no message deletions.",
 )
-def bot(ctx: click.Context, dry_run):
+def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
     gbot = GBotCorpus(
         "goromal.bot@gmail.com",
@@ -185,6 +203,16 @@ def bot(ctx: click.Context, dry_run):
     for msg in reversed(msgs):
         text = msg.getText()
         date = msg.getDate()
+        matched = False
+        if categories_csv is not None:
+            with open(categories_csv, "r") as categories:
+                for line in categories:
+                    keyword, page_id = line.split(",")[0], line.split(",")[1]
+                    matched = process_keyword(text, keyword, page_id, wiki, msg, dry_run)
+                    if matched:
+                        break
+        if matched:
+            continue
         if text.isnumeric():
             print(f"  Calorie intake on {date}: {text}")
             if not dry_run:
@@ -200,26 +228,6 @@ def bot(ctx: click.Context, dry_run):
             if not dry_run:
                 task.putTask(text, f"Generated: {datetime.now().strftime('%m/%d/%Y')}", datetime.today())
                 msg.moveToTrash()
-        elif text[:6].lower() == "house:":
-            print(f"  House offload item: {text[6:]}")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "house", msg, text[6:])
-        elif text[:9].lower() == "kathleen:":
-            print(f"  Kathleen offload item: {text[9:]}")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "kathleen", msg, text[9:])
-        elif text[:8].lower() == "grayson:":
-            print(f"  Grayson offload item: {text[8:]}")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "grayson", msg, text[8:])
-        elif text[:9].lower() == "harrison:":
-            print(f"  Harrison offload item: {text[9:]}")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "harrison", msg, text[9:])
-        elif text[:7].lower() == "church:":
-            print(f"  Church offload item: {text[7:]}")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "church", msg, text[7:])
         else:
             print(f"  ITNS from {date}: {text}")
             if not dry_run:
