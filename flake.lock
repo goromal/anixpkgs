@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1689519944,
-        "narHash": "sha256-OWeVfS/mDwJ5D6pHhJ4M+UltjrUBWczeqvHSa/Fz4NE=",
+        "lastModified": 1700274588,
+        "narHash": "sha256-ukW6mrwdF7H/EvmaO8OAAGdy/9ssemgsHMv0UfnZHus=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "0d45a89cdbc3d86e6dc6d890a1982ede7a351d8f",
+        "rev": "584f7bb69dca769ffb97bc64f1def5416ca76cac",
         "type": "github"
       },
       "original": {
@@ -35,11 +35,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1692548975,
-        "narHash": "sha256-pCjAmmpbQCYCLNp0yiXaenQB5T38RiTl9nHyDVPkn/0=",
+        "lastModified": 1700276740,
+        "narHash": "sha256-ueNF/AkrE+TcYJb+kZ6SiRjJS8sjzyTJUGeJN3zgds4=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "7a5dc5b68abda9b7ccc2e0857d2b86bc14671ae8",
+        "rev": "0918805684dbafa1621ea81743ae1e5e7171f34e",
         "type": "github"
       },
       "original": {

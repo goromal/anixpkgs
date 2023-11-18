@@ -112,6 +112,7 @@ sudo reboot
 The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
 
 - `dropbox:secrets` -> `rclone copy` -> `~/secrets`
+- `dropbox:configs`-> `rclone copy` -> `~/configs`
 - `dropbox:Games` -> `rclone copy` -> `~/games`
 - `box:data` -> `rclone copy` -> `~/data`
 - `box:.devrc` -> `rclone copy` -> `~/.devrc`
