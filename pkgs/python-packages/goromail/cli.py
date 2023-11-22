@@ -28,9 +28,9 @@ def process_keyword(text, keyword, page_id, wiki, msg, dry_run):
     if text[:(n+1)].lower() == f"{keyword}:":
         matter = text[(n+1):].strip()
         print(f"  {keyword} offload item: {matter}")
-        if matter[:3].lower() == "p0:"
+        if matter[:3].lower() == "p0:":
             matter = f"::::{matter[3:].strip()}::::"
-        elif matter[:3].lower() == "p1:"
+        elif matter[:3].lower() == "p1:":
             matter = f":::{matter[3:].strip()}:::"
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, matter)
@@ -206,7 +206,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
     print(Fore.YELLOW + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
     msgs = gbot.fromSenders(['6612105214@vzwpix.com']).getMessages()
     for msg in reversed(msgs):
-        text = msg.getText()
+        text = msg.getText().strip()
         date = msg.getDate()
         matched = False
         if categories_csv is not None:
