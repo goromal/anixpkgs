@@ -19,12 +19,7 @@ callPackage ../pythonPkgFromScript.nix {
       - `P1` = "Must do in e.g., next few days"
       - `P2` = "Must do in e.g., next 1-2 weeks"
       - `P3` = "Should do eventually"
-    - Keyword matchers for routing to specific Wiki pages:
-      - `House: ...`
-      - `Kathleen: ...`
-      - `Grayson: ...`
-      - `Harrison: ...`
-      - `Church: ...`
+    - Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the `bot` command
     - ITNS additions via any other pattern
 
     **Journal (*goromal.journal@gmail.com*):**
