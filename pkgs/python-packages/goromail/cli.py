@@ -26,9 +26,14 @@ def append_text_to_wiki_page(wiki, id, msg, text):
 def process_keyword(text, keyword, page_id, wiki, msg, dry_run):
     n = len(keyword)
     if text[:(n+1)].lower() == f"{keyword}:":
-        print(f"  {keyword} offload item: {text[(n+1):]}")
+        matter = text[(n+1):].strip()
+        print(f"  {keyword} offload item: {matter}")
+        if matter[:3].lower() == "p0:"
+            matter = f"::::{matter[3:].strip()}::::"
+        elif matter[:3].lower() == "p1:"
+            matter = f":::{matter[3:].strip()}:::"
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, text[(n+1):])
+            append_text_to_wiki_page(wiki, page_id, msg, matter)
         return True
     return False
 
