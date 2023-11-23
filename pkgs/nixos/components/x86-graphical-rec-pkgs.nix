@@ -40,11 +40,11 @@ in {
             mv "$MMCRD_DSK" "''${MMCRD_DSK}.bak"
         fi
         cp "$MEMRY_CRD" "$MMCRD_DSK"
-        ${
-          if cfg.isNixOS then "" else "nixGL "
-        }${pkgs.dolphinEmu}/bin/dolphin-emu ${
-          if cfg.isNixOS then "-a LLE" else ""
-        } -e "$ZELDA_ROM"
+        ${anixpkgs.color-prints}/bin/echo_cyan "Launching the emulator..."
+        ${if cfg.isNixOS then
+          "${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e $ZELDA_ROM"
+        else
+          "nixGL ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"}
         ${anixpkgs.color-prints}/bin/echo_cyan "Copying memory card from disk to cloud..."
         cp "$MMCRD_DSK" "$MEMRY_CRD"
         ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
