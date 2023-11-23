@@ -40,14 +40,14 @@ in {
         if [[ -f "$MMCRD_DSK" ]]; then
             mv "$MMCRD_DSK" "''${MMCRD_DSK}.bak"
         fi
-        cp "$MEMRY_CRD" "$MMCRD_DSK"
+        cp "$MEMRY_CRD" "$MMCRD_DSK" || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Copy failed!"; }
         ${anixpkgs.color-prints}/bin/echo_cyan "Launching the emulator..."
         ${if cfg.standalone then
           "nixGL ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"
         else
           "${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e $ZELDA_ROM"}
         ${anixpkgs.color-prints}/bin/echo_cyan "Copying memory card from disk to cloud..."
-        cp "$MMCRD_DSK" "$MEMRY_CRD"
+        cp "$MMCRD_DSK" "$MEMRY_CRD" || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Copy failed!"; }
         ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
         rclone bisync dropbox:Games ~/games || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Sync failed!"; }
       '')
