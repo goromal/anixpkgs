@@ -8,6 +8,9 @@ with import ../dependencies.nix { inherit config; }; {
   # TODO Nix config setup? e.g., cachix
   # TODO remove this and homes directory; just atomize the components packaging
 
+  # $ nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl && nix-channel --update
+  # $ nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
+
   imports = [
     ../components/base-pkgs.nix
     ../components/x86-graphical-pkgs.nix

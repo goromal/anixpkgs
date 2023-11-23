@@ -199,6 +199,10 @@ in rec {
   python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
+  python38Full = pythonOverridesFor prev.python38Full;
+  python39Full = pythonOverridesFor prev.python39Full;
+  python310Full = pythonOverridesFor prev.python310Full;
+  python311Full = pythonOverridesFor prev.python311Full;
 
   budget_report = final.python39.pkgs.budget_report;
   makepyshell = final.python39.pkgs.makepyshell;
@@ -231,8 +235,9 @@ in rec {
     python = final.python39;
     blank-svg = pkgData.img.blank-svg;
   });
-  la-quiz = addDoc
-    (prev.callPackage ./bash-packages/la-quiz { python = final.python39; });
+  la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz {
+    python = final.python311Full;
+  });
 
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
