@@ -25,6 +25,13 @@ let
       Options:
 
       --debug|-d    Open in debug mode (will print click positions to the screen).
+
+      NOTE: This program assumes that you have the place location JSON files stored in
+
+        ~/games/la-quiz/GLAA-C.json
+                        GLAA-E.json
+                        GLAA-N.json
+                        GLAA-S.json
     '';
     optsWithVarsAndDefaults = [{
       var = "isdebug";
@@ -42,16 +49,16 @@ in (writeShellScriptBin pkgname ''
   fi
   if [[ "$1" == "N" ]]; then
     imgfile=${pkgData.apps.la-quiz.N-img.data}
-    jsonfile=${pkgData.apps.la-quiz.N-json.data}
+    jsonfile="$HOME/games/la-quiz/GLAA-N.json"
   elif [[ "$1" == "C" ]]; then
     imgfile=${pkgData.apps.la-quiz.C-img.data}
-    jsonfile=${pkgData.apps.la-quiz.C-json.data}
+    jsonfile="$HOME/games/la-quiz/GLAA-C.json"
   elif [[ "$1" == "E" ]]; then
     imgfile=${pkgData.apps.la-quiz.E-img.data}
-    jsonfile=${pkgData.apps.la-quiz.E-json.data}
+    jsonfile="$HOME/games/la-quiz/GLAA-E.json"
   elif [[ "$1" == "S" ]]; then
     imgfile=${pkgData.apps.la-quiz.S-img.data}
-    jsonfile=${pkgData.apps.la-quiz.S-json.data}
+    jsonfile="$HOME/games/la-quiz/GLAA-S.json"
   else
     ${printErr} "Unrecognized region option: $1"
     exit 1
@@ -78,6 +85,13 @@ in (writeShellScriptBin pkgname ''
       Options:
 
       --debug|-d    Open in debug mode (will print click positions to the screen).
+
+      NOTE: This program assumes that you have the place location JSON files stored in
+
+        ~/games/la-quiz/GLAA-C.json
+                        GLAA-E.json
+                        GLAA-N.json
+                        GLAA-S.json
       ```
     '';
   };
