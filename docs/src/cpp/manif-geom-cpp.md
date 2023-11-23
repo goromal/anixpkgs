@@ -6,7 +6,7 @@ Templated, header-only implementations for SO(2), SE(2), SO(3), SE(3).
 
 Operationally very similar to variations on Eigen's `Quaternion<T>` class, but with added chart maps and rules for addition and subtraction on tangent spaces. Meant to be used with nonlinear least-squares solvers like Ceres Solver which take advantage of templating to implement auto-differentiation on arbitrary mathematical formulations in code.
 
-The SO(3) math is based on [my notes](https://notes.andrewtorgesen.com/doku.php?id=public:implementing-rotations) on 3D rotation representations.
+The SO(3) math is based on [my notes](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:3d-geometry:implementing-rotations) on 3D rotation representations.
 
 ## Including in Your Project With CMake
 
