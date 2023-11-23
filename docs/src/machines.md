@@ -2,6 +2,23 @@
 
 ***These notes are still a work-in-progress and are currently largely for my personal use only.***
 
+## Home-Manager Example
+
+```nix
+# home.nix
+{ config, pkgs, ... }:
+let
+   anixsrc = ...; 
+   unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
+in {
+    imports = [
+        "${anixsrc}/pkgs/nixos/homes/personal.nix"
+    ];
+
+    mods.x86-graphical.vscodium-package = unstable.vscodium;
+}
+```
+
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
