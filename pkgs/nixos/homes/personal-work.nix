@@ -8,11 +8,8 @@ with import ../dependencies.nix { inherit config; }; {
   # TODO Nix config setup? e.g., cachix
   # TODO remove this and homes directory; just atomize the components packaging
 
-  imports = [
-    ../components/base-pkgs.nix
-    ../components/x86-graphical-pkgs.nix
-    ../components/x86-graphical-rec-pkgs.nix
-  ];
+  imports =
+    [ ../components/base-pkgs.nix ../components/x86-graphical-pkgs.nix ];
 
   mods.x86-graphical.standalone = true;
   mods.x86-graphical.homeDir = "/home/andrew";
