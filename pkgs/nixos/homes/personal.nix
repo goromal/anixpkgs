@@ -19,4 +19,5 @@ with import ../dependencies.nix { inherit config; }; {
 
   mods.x86-graphical.standalone = true;
   mods.x86-graphical.homeDir = "/home/andrew";
+  mods.x86-graphical-rec.standalone = true;
 }

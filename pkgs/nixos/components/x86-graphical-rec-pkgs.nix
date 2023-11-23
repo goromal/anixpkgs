@@ -5,10 +5,11 @@ with import ../dependencies.nix { inherit config; };
 let cfg = config.mods.x86-graphical-rec;
 in {
   options.mods.x86-graphical-rec = with types; {
-    isNixOS = mkOption {
-      type = types.bool;
-      description = "Whether these packages are running on NixOS.";
-      default = true;
+    standalone = lib.mkOption {
+      type = lib.types.bool;
+      description =
+        "Whether this is a standalone Nix installation (default: false)";
+      default = false;
     };
   };
 
@@ -41,10 +42,10 @@ in {
         fi
         cp "$MEMRY_CRD" "$MMCRD_DSK"
         ${anixpkgs.color-prints}/bin/echo_cyan "Launching the emulator..."
-        ${if cfg.isNixOS then
-          "${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e $ZELDA_ROM"
+        ${if cfg.standalone then
+          "nixGL ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"
         else
-          "nixGL ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"}
+          "${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e $ZELDA_ROM"}
         ${anixpkgs.color-prints}/bin/echo_cyan "Copying memory card from disk to cloud..."
         cp "$MMCRD_DSK" "$MEMRY_CRD"
         ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
