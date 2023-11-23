@@ -21,7 +21,7 @@ in {
         GAMES_DIR="$HOME/games"
         ZELDA_ROM="$GAMES_DIR/LegendOfZeldaCollectorsEdition.iso"
         MEMRY_CRD="$GAMES_DIR/MemoryCardA.USA.raw"
-        MMCRD_DSK="~/.local/share/dolphin-emu/GC/MemoryCardA.USA.raw"
+        MMCRD_DSK="$HOME/.local/share/dolphin-emu/GC/MemoryCardA.USA.raw"
         if [[ ! -d "$GAMES_DIR" ]]; then
             ${anixpkgs.color-prints}/bin/echo_red "Games directory $GAMES_DIR not present. Exiting."
             exit 1
