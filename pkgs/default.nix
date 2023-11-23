@@ -231,9 +231,8 @@ in rec {
     python = final.python39;
     blank-svg = pkgData.img.blank-svg;
   });
-  la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz {
-    python = final.python39;
-  });
+  la-quiz = addDoc
+    (prev.callPackage ./bash-packages/la-quiz { python = final.python39; });
 
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
