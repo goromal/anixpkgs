@@ -17,19 +17,19 @@ jobs:
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
         git checkout master
-        if [[ ${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}==true ]]; then
+        if [[ "${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}" == "true" ]]; then
             python scripts/increment_anix.py major
             git pull origin master
             git add .
             git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
             git push origin master
-        elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }}==true ]]; then
+        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }}" == "true" ]]; then
             python scripts/increment_anix.py minor
             git pull origin master
             git add .
             git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
             git push origin master
-        elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }}==true ]]; then
+        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }}" == "true" ]]; then
             python scripts/increment_anix.py patch
             git pull origin master
             git add .
