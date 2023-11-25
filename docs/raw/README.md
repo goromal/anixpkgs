@@ -8,7 +8,7 @@
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
-A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as Nix overlays.
+A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as a [nixpkgs](https://github.com/NixOS/nixpkgs) overlay.
 
 ## Update Dependencies
 
