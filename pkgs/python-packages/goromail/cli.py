@@ -23,17 +23,19 @@ def append_text_to_wiki_page(wiki, id, msg, text):
     if doku is not None:
         msg.moveToTrash()
 
-def process_keyword(text, keyword, page_id, wiki, msg, dry_run):
+def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run):
     n = len(keyword)
     if text[:(n+1)].lower() == f"{keyword}:":
         matter = text[(n+1):].strip()
         print(f"  {keyword} offload item: {matter}")
         if matter[:3].lower() == "p0:":
-            matter = f"::::{matter[3:].strip()}::::"
+            item = f"[::::{datestr}::::] {matter[3:].strip()}"
         elif matter[:3].lower() == "p1:":
-            matter = f":::{matter[3:].strip()}:::"
+            item = f"[:::{datestr}:::] {matter[3:].strip()}"
+        else:
+            item = f"[**{datestr}**] {matter.strip()}"
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, matter)
+            append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
     return False
 
@@ -213,7 +215,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             with open(categories_csv, "r") as categories:
                 for line in categories:
                     keyword, page_id = line.split(",")[0], line.split(",")[1]
-                    matched = process_keyword(text, keyword, page_id, wiki, msg, dry_run)
+                    matched = process_keyword(text, date.strftime('%m/%d/%Y'), keyword, page_id, wiki, msg, dry_run)
                     if matched:
                         break
         if matched:
