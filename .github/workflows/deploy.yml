@@ -17,7 +17,6 @@ jobs:
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
         git checkout master
-        echo "====${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}===="
         if [[ "${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}" == "true" ]]; then
             python scripts/increment_anix.py major
             git pull origin master
