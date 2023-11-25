@@ -4,6 +4,8 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
+**LATEST RELEASE: [v3.4.2](https://github.com/goromal/anixpkgs/tree/v3.4.2)**
+
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
 A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as Nix overlays.
