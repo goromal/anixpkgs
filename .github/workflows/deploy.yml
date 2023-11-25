@@ -73,6 +73,7 @@ jobs:
         git config user.email "goromal.bot@gmail.com"
         git checkout master
         python scripts/generate_docs.py
+        git pull origin master
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
           echo "Committing changes to $num_changes docs"
