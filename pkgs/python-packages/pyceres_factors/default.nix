@@ -20,6 +20,6 @@ callPackage ../pythonPkgFromPybind.nix {
   longDescription = ''
     [Repository](https://github.com/goromal/pyceres_factors)
 
-    **[Tutorial](https://notes.andrewtorgesen.com/doku.php?id=public:ceres)** on how to use the library in conjunction with [pyceres](./pyceres.md) and [geometry](./geometry.md).
+    **[Tutorial](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres)** on how to use the library in conjunction with [pyceres](./pyceres.md) and [geometry](./geometry.md).
   '';
 }
