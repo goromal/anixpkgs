@@ -5,9 +5,9 @@ on:
       - closed
 
 jobs:
-  bump-major:
-    name: Major Version Bump
-    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MajorRelease')) }}
+  bump-version:
+    name: Version Bump
+    if: ${{ (github.event.pull_request.merged == true) }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -17,49 +17,29 @@ jobs:
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
         git checkout master
-        python scripts/increment_anix.py major
-        git pull origin master
-        git add .
-        git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
-        git push origin master
-  bump-minor:
-    name: Minor Version Bump
-    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MinorRelease')) }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
-    - run: |
-        git config user.name "goromal (bot)"
-        git config user.email "goromal.bot@gmail.com"
-        git checkout master
-        python scripts/increment_anix.py minor
-        git pull origin master
-        git add .
-        git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
-        git push origin master
-  bump-patch:
-    name: Patch Version Bump
-    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'PatchRelease')) }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
-    - run: |
-        git config user.name "goromal (bot)"
-        git config user.email "goromal.bot@gmail.com"
-        git checkout master
-        python scripts/increment_anix.py patch
-        git pull origin master
-        git add .
-        git commit -m "Bump patch ANIX_VERSION -> $(cat ANIX_VERSION)"
-        git push origin master
+        if [[ ${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }} ]]; then
+            python scripts/increment_anix.py major
+            git pull origin master
+            git add .
+            git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }} ]]; then
+            python scripts/increment_anix.py minor
+            git pull origin master
+            git add .
+            git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }} ]]; then
+            python scripts/increment_anix.py patch
+            git pull origin master
+            git add .
+            git commit -m "Bump patch ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        fi
   generate-docs:
     name: Generate Docs
-    if: ${{ (github.event.pull_request.merged == true) && always() }}
-    needs: [bump-major, bump-minor, bump-patch]
+    if: ${{ (github.event.pull_request.merged == true) }}
+    needs: bump-version
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
