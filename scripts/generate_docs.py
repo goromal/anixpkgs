@@ -4,6 +4,19 @@ from subprocess import check_output, CalledProcessError, DEVNULL
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+with open(os.path.join(ANIXDIR, "ANIX_VERSION"), "r") as version_file:
+    version_tag = version_file.read()
+
+with open(os.path.join(ANIXDIR, "docs", "raw", "README.md"), "r") as raw_readme, \
+        open(os.path.join(ANIXDIR, "README.md"), "w") as readme:
+    readme_text_raw = raw_readme.read()
+    readme.write(readme_text_raw.replace("RELEASETAGREPLACE", version_tag))
+
+with open(os.path.join(ANIXDIR, "docs", "raw", "intro.md"), "r") as raw_intro, \
+        open(os.path.join(ANIXDIR, "docs", "src", "intro.md"), "w") as intro:
+    intro_text_raw = raw_intro.read()
+    intro.write(intro_text_raw.replace("RELEASETAGREPLACE", version_tag))
+
 with open(os.path.join(ANIXDIR, "index.json"), "r") as idxfile:
     pkgs = json.loads(idxfile.read())
 
