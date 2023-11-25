@@ -1,6 +1,6 @@
 # anixpkgs
 
-![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
+![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml)
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
