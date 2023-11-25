@@ -51,11 +51,11 @@
     "ceres-factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1685683097,
-        "narHash": "sha256-PXKJRTIt6LO08HGsKaR+tKT6MVTNYcz3p7Q/vWIPA3E=",
+        "lastModified": 1700917591,
+        "narHash": "sha256-TQk8i34V8Eu+cTj42Id2PclOmPHzBl3wBDwKr6Yy/M0=",
         "owner": "goromal",
         "repo": "ceres-factors",
-        "rev": "8bff0917d7a05d25f86b23ff097bfebf10a987f9",
+        "rev": "6ebf9d59edb2319fb786f7b2a1e62ff21ca4ff20",
         "type": "github"
       },
       "original": {
@@ -213,11 +213,11 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1685596570,
-        "narHash": "sha256-oE/g9Rt13lttRDZOFZeb0darT+/Z8oXTrN2Y5Pl6MKU=",
+        "lastModified": 1700917726,
+        "narHash": "sha256-p0oRBEr2WWfysk/rrJxh1B4Wjy6dkrKXhkYFW0A52Vk=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "e3497d2e04a109fcd1dedf8af02a89e76c853fde",
+        "rev": "18b04007773561bad6f43d365134da61e17c304e",
         "type": "github"
       },
       "original": {
@@ -358,11 +358,11 @@
     "pyceres_factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1685686456,
-        "narHash": "sha256-vrrYGIxSK7RJoC7knEwBZXawerqeKcZEpOmMgCm/aG0=",
+        "lastModified": 1700917664,
+        "narHash": "sha256-72lOVW6SGFCHjG/BRPqA6Xh1eV+3tYwm+T3h060knqM=",
         "owner": "goromal",
         "repo": "pyceres_factors",
-        "rev": "ccfadca7f9f735571bb90adf60c18d29645bcdde",
+        "rev": "5fee04d810bb954b90238a01f3bb1aea3edfc632",
         "type": "github"
       },
       "original": {

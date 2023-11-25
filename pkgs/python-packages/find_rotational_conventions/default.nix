@@ -10,7 +10,7 @@ callPackage ../pythonPkgFromScript.nix {
   longDescription = ''
     [Gist](https://gist.github.com/goromal/fb15f44150ca4e0951acaee443f72d3e)
 
-    Conventions are defined in my [notes on rotations](https://notes.andrewtorgesen.com/doku.php?id=public:implementing-rotations). Example deduction of conventions used in the [geometry](./geometry.md) library:
+    Conventions are defined in my [notes on rotations](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:math:3d-geometry:implementing-rotations). Example deduction of conventions used in the [geometry](./geometry.md) library:
 
     ```python
     from find_rotational_conventions import (                                
