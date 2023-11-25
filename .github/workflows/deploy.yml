@@ -120,7 +120,7 @@ jobs:
         git push --force --set-upstream origin gh-pages
   tag-release:
     name: Tag Release
-    if: ${{ (github.event.pull_request.merged == true) && ((contains(github.event.pull_request.labels.*.name, 'MajorRelease') || (contains(github.event.pull_request.labels.*.name, 'MinorRelease') || (contains(github.event.pull_request.labels.*.name, 'PatchRelease')) }}
+    if: ${{ (github.event.pull_request.merged == true) && ((contains(github.event.pull_request.labels.*.name, 'MajorRelease') || (contains(github.event.pull_request.labels.*.name, 'MinorRelease') || (contains(github.event.pull_request.labels.*.name, 'PatchRelease'))) }}
     needs: generate-docs
     runs-on: ubuntu-latest
     steps:
