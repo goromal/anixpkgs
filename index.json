@@ -192,6 +192,10 @@
                 "ci": true
             },
             {
+                "attr": "quad-sim-cpp",
+                "ci": true
+            },
+            {
                 "attr": "ceres-factors",
                 "ci": true
             },
