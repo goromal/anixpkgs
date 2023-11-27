@@ -31,6 +31,9 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
+    quad-sim-cpp.url = "github:goromal/quad-sim-cpp";
+    quad-sim-cpp.flake = false;
+
     rankserver-cpp.url = "github:goromal/rankserver-cpp";
     rankserver-cpp.flake = false;
 

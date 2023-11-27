@@ -420,6 +420,22 @@
         "type": "github"
       }
     },
+    "quad-sim-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1701050582,
+        "narHash": "sha256-atDh5gzIbzA37GwbFbnLadyLvk01AnINvOuyMX71r4Y=",
+        "owner": "goromal",
+        "repo": "quad-sim-cpp",
+        "rev": "1cc34b737cf243c8b0b9794f35d0444271d31574",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "quad-sim-cpp",
+        "type": "github"
+      }
+    },
     "rankserver-cpp": {
       "flake": false,
       "locked": {
@@ -464,6 +480,7 @@
         "pysignals": "pysignals",
         "pysorting": "pysorting",
         "python-dokuwiki": "python-dokuwiki",
+        "quad-sim-cpp": "quad-sim-cpp",
         "rankserver-cpp": "rankserver-cpp",
         "scrape": "scrape",
         "secure-delete": "secure-delete",

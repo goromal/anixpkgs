@@ -290,6 +290,9 @@ in rec {
   manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp {
     pkg-src = flakeInputs.manif-geom-cpp;
   });
+  quad-sim-cpp = addDoc (prev.callPackage ./cxx-packages/quad-sim-cpp {
+    pkg-src = flakeInputs.quad-sim-cpp;
+  });
   mscpp = addDoc
     (prev.callPackage ./cxx-packages/mscpp { pkg-src = flakeInputs.mscpp; });
   ceres-factors = addDoc (prev.callPackage ./cxx-packages/ceres-factors {
