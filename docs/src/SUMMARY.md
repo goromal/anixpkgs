@@ -9,6 +9,7 @@
   - [aapis-cpp](./cpp/aapis-cpp.md)
   - [manif-geom-cpp](./cpp/manif-geom-cpp.md)
   - [mscpp](./cpp/mscpp.md)
+  - [quad-sim-cpp](./cpp/quad-sim-cpp.md)
   - [ceres-factors](./cpp/ceres-factors.md)
   - [signals-cpp](./cpp/signals-cpp.md)
   - [secure-delete](./cpp/secure-delete.md)
