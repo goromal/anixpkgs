@@ -198,6 +198,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         ).Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
@@ -263,6 +264,7 @@ def journal(ctx: click.Context, dry_run):
         ).Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
