@@ -189,12 +189,15 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
 )
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
-    gbot = GBotCorpus(
-        "goromal.bot@gmail.com",
-        gmail_secrets_json=ctx.obj["gmail_secrets_json"],
-        gbot_refresh_file=ctx.obj["gbot_refresh_file"],
-        enable_logging=ctx.obj["enable_logging"]
-    ).Inbox(ctx.obj["num_messages"])
+    try:
+        gbot = GBotCorpus(
+            "goromal.bot@gmail.com",
+            gmail_secrets_json=ctx.obj["gmail_secrets_json"],
+            gbot_refresh_file=ctx.obj["gbot_refresh_file"],
+            enable_logging=ctx.obj["enable_logging"]
+        ).Inbox(ctx.obj["num_messages"])
+    except KeyError:
+        print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
@@ -251,12 +254,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 )
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
-    journal = JournalCorpus(
-        "goromal.journal@gmail.com",
-        gmail_secrets_json=ctx.obj["gmail_secrets_json"],
-        journal_refresh_file=ctx.obj["journal_refresh_file"],
-        enable_logging=ctx.obj["enable_logging"]
-    ).Inbox(ctx.obj["num_messages"])
+    try:
+        journal = JournalCorpus(
+            "goromal.journal@gmail.com",
+            gmail_secrets_json=ctx.obj["gmail_secrets_json"],
+            journal_refresh_file=ctx.obj["journal_refresh_file"],
+            enable_logging=ctx.obj["enable_logging"]
+        ).Inbox(ctx.obj["num_messages"])
+    except KeyError:
+        print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
