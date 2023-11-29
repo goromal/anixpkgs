@@ -82,6 +82,7 @@
   - [py-helper](./misc/py-helper.md)
   - [mp4unite](./misc/mp4unite.md)
   - [git-cc](./misc/git-cc.md)
+  - [gitcop](./misc/gitcop.md)
   - [setupws](./misc/setupws.md)
   - [listsources](./misc/listsources.md)
   - [pkgshell](./misc/pkgshell.md)

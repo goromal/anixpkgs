@@ -30,6 +30,7 @@ Packages written in assorted languages like Bash, Rust, Java, etc.
 - [py-helper](./py-helper.md)
 - [mp4unite](./mp4unite.md)
 - [git-cc](./git-cc.md)
+- [gitcop](./gitcop.md)
 - [setupws](./setupws.md)
 - [listsources](./listsources.md)
 - [pkgshell](./pkgshell.md)
