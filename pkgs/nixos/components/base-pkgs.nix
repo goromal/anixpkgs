@@ -5,6 +5,7 @@ with import ../dependencies.nix { inherit config; }; {
     rclone
     anixpkgs.color-prints
     anixpkgs.git-cc
+    anixpkgs.gitcop
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
