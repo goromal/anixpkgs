@@ -245,6 +245,7 @@ in rec {
   py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
+  gitcop = addDoc (prev.callPackage ./bash-packages/gitcop { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
   notabilify =

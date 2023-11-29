@@ -114,6 +114,10 @@
                 "ci": true
             },
             {
+                "attr": "gitcop",
+                "ci": true
+            },
+            {
                 "attr": "setupws",
                 "ci": true
             },
