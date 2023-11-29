@@ -5,6 +5,7 @@ with import ../dependencies.nix { inherit config; }; {
     rclone
     anixpkgs.color-prints
     anixpkgs.git-cc
+    anixpkgs.gitcop
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
@@ -36,8 +37,6 @@ with import ../dependencies.nix { inherit config; }; {
       co = "checkout";
       s = "status";
       d = "diff";
-      com = "checkout master";
-      pom = "pull origin master";
     };
     extraConfig = {
       init = { defaultBranch = "master"; };
