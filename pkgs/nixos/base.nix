@@ -207,7 +207,6 @@ in {
       just
       hyperfine
       cmake
-      direnv
       valgrind
       iotop
       iperf

@@ -3,6 +3,7 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     rclone
+    direnv
     anixpkgs.color-prints
     anixpkgs.git-cc
     anixpkgs.gitcop
