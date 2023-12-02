@@ -5,11 +5,12 @@ let
     usage_str = ''
       usage: ${pkgname} dir
 
-      Recursively claim ownership of all files and folders in dir.
+      Recursively claim ownership of all files and folders in dir. Attempts to deduce special cases such as ~/.ssh/*.
     '';
     optsWithVarsAndDefaults = [ ];
   };
   printErr = "${color-prints}/bin/echo_red";
+  printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
 in (writeShellScriptBin pkgname ''
   ${argparse}
@@ -28,6 +29,8 @@ in (writeShellScriptBin pkgname ''
       ```
       usage: fix-perms dir
       ```
+
+      Attempts to deduce special cases such as `~/.ssh/*`.
     '';
   };
 }
