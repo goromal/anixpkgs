@@ -18,8 +18,14 @@ in (writeShellScriptBin pkgname ''
       ${printErr} "No dir provided."
       exit 1
   fi
-  find "$1" -type d -exec chmod 755 {} \;
-  find "$1" -type f -exec chmod 644 {} \;
+  if [[ "$(readlink -f $1)" == *.ssh* ]]; then
+      ${printYlw} "Deducing SSH perms rules."
+      # TODO
+  else
+      ${printYlw} "Applying standard file + dir perms."
+      find "$1" -type d -exec chmod 755 {} \;
+      find "$1" -type f -exec chmod 644 {} \;
+  fi
   ${printGrn} "Done!"
 '') // {
   meta = {
