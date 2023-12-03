@@ -20,10 +20,12 @@ in (writeShellScriptBin pkgname ''
   fi
   if [[ "$(readlink -f $1)" == *.ssh* ]]; then
       ${printYlw} "Deducing SSH perms rules."
-      # TODO
+      find "$1" -type d -exec chmod 700 {} \;
+      find "$1" -type f -exec chmod 600 {} \;
+      find "$1" -type f -name \*.pub -exec chmod 644 {} \;
   else
       ${printYlw} "Applying standard file + dir perms."
-      find "$1" -type d -exec chmod 755 {} \;
+      find "$1" -type d -exec chmod 755 {} \; 
       find "$1" -type f -exec chmod 644 {} \;
   fi
   ${printGrn} "Done!"
