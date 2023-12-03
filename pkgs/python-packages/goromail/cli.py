@@ -275,9 +275,13 @@ def journal(ctx: click.Context, dry_run):
     for msg in reversed(msgs):
         text = msg.getText()
         date = msg.getDate()
-        if re.match(r"\d\d?/\d\d?/\d\d\d\d:", text):
-            # TODO
+        predate = re.match(r"\d\d?/\d\d?/\d\d\d\d:", text)
+        if predate:
+            date = datetime.strptime(re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y")
+            text = text.split(":")[1].strip()
         print(f"  Journal entry for {date}")
+        if dry_run:
+            print(text)
         if not dry_run:
             add_journal_entry_to_wiki(wiki, msg, date, text)
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
