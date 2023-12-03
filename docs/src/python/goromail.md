@@ -17,7 +17,7 @@ The following workflows are supported, all via text messaging:
 
 **Journal (*goromal.journal@gmail.com*):**
 
-- Any pattern will be added to the journal according to the date *in which the message was sent*.
+- Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
 
 ```bash
 Usage: goromail [OPTIONS] COMMAND [ARGS]...
