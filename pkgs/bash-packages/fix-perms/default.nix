@@ -5,11 +5,12 @@ let
     usage_str = ''
       usage: ${pkgname} dir
 
-      Recursively claim ownership of all files and folders in dir.
+      Recursively claim ownership of all files and folders in dir. Attempts to deduce special cases such as ~/.ssh/*.
     '';
     optsWithVarsAndDefaults = [ ];
   };
   printErr = "${color-prints}/bin/echo_red";
+  printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
 in (writeShellScriptBin pkgname ''
   ${argparse}
@@ -17,8 +18,16 @@ in (writeShellScriptBin pkgname ''
       ${printErr} "No dir provided."
       exit 1
   fi
-  find "$1" -type d -exec chmod 755 {} \;
-  find "$1" -type f -exec chmod 644 {} \;
+  if [[ "$(readlink -f $1)" == *.ssh* ]]; then
+      ${printYlw} "Deducing SSH perms rules."
+      find "$1" -type d -exec chmod 700 {} \;
+      find "$1" -type f -exec chmod 600 {} \;
+      find "$1" -type f -name \*.pub -exec chmod 644 {} \;
+  else
+      ${printYlw} "Applying standard file + dir perms."
+      find "$1" -type d -exec chmod 755 {} \; 
+      find "$1" -type f -exec chmod 644 {} \;
+  fi
   ${printGrn} "Done!"
 '') // {
   meta = {
@@ -28,6 +37,8 @@ in (writeShellScriptBin pkgname ''
       ```
       usage: fix-perms dir
       ```
+
+      Attempts to deduce special cases such as `~/.ssh/*`.
     '';
   };
 }
