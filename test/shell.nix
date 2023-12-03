@@ -10,6 +10,7 @@ mkShell {
     color-prints
     mp4unite
     orchestrator
+    fix-perms
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."
