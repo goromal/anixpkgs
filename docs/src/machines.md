@@ -19,6 +19,15 @@ in {
 }
 ```
 
+Corresponding `~/.bashrc`:
+
+```bash
+. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+export NIXPKGS_ALLOW_UNFREE=1
+alias code='codium'
+eval "$(direnv hook bash)"
+```
+
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
