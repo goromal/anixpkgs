@@ -111,7 +111,7 @@ in (writeShellScriptBin pkgname ''
   meta = {
     description = "Convenience tools for setting up C++ projects.";
     longDescription = ''
-      ```
+      ```bash
       usage: cpp-helper [options]
 
       Options:

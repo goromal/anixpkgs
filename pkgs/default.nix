@@ -276,6 +276,7 @@ in rec {
   providence-tasker =
     addDoc (prev.callPackage ./bash-packages/providence/tasker.nix { });
   fixfname = addDoc (prev.callPackage ./bash-packages/fixfname { });
+  cloud-manager = addDoc (prev.callPackage ./bash-packages/cloud-manager { });
   nix-deps =
     addDoc (prev.callPackage ./bash-packages/nix-tools/nix-deps.nix { });
   nix-diffs =

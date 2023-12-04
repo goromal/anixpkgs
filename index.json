@@ -146,6 +146,10 @@
                 "ci": true
             },
             {
+                "attr": "cloud-manager",
+                "ci": true
+            },
+            {
                 "attr": "evil-hangman",
                 "ci": true
             },
