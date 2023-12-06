@@ -25,6 +25,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.nix-diffs
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
+    anixpkgs.stampserver
   ];
 
   programs.git = {
