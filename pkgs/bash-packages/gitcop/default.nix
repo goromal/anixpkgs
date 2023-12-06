@@ -22,12 +22,13 @@ in (writeShellScriptBin pkgname ''
       ${printError} "No branch name provided."
       exit 1
   fi
+  pause_secs=1
   if [[ "$fetch" == "1" ]]; then
       ${printYellow} "git fetch origin $1 && git checkout $1 && git pull origin $1"
-      git fetch origin "$1" && git checkout "$1" && git pull origin "$1"
+      git fetch origin "$1" && sleep $pause_secs && git checkout "$1" && sleep $pause_secs && git pull origin "$1"
   else
       ${printYellow} "git checkout $1 && git pull origin $1"
-      git checkout "$1" && git pull origin "$1"
+      git checkout "$1" && sleep $pause_secs && git pull origin "$1"
   fi
 '') // {
   meta = {
