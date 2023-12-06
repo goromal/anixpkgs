@@ -342,6 +342,10 @@
                 "ci": true
             },
             {
+                "attr": "python39.pkgs.stampserver",
+                "ci": true
+            },
+            {
                 "attr": "python310.pkgs.easy-google-auth",
                 "ci": true
             },
