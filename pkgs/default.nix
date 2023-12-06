@@ -168,6 +168,7 @@ let
               addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
             rankserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
+            stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
           });
       }));
 in rec {
@@ -216,6 +217,7 @@ in rec {
   flask-smfserver = final.python39.pkgs.flask-smfserver;
   flask-oatbox = final.python39.pkgs.flask-oatbox;
   rankserver = final.python39.pkgs.rankserver;
+  stampserver = final.python39.pkgs.stampserver;
   task-tools = final.python310.pkgs.task-tools;
   wiki-tools = final.python310.pkgs.wiki-tools;
   book-notes-sync = final.python310.pkgs.book-notes-sync;
