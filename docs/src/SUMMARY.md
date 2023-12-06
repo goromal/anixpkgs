@@ -46,6 +46,7 @@
   - [python39.pkgs.flask-smfserver](./python/flask-smfserver.md)
   - [python39.pkgs.flask-oatbox](./python/flask-oatbox.md)
   - [python39.pkgs.rankserver](./python/rankserver.md)
+  - [python39.pkgs.stampserver](./python/stampserver.md)
   - [python310.pkgs.easy-google-auth](./python/easy-google-auth.md)
   - [python310.pkgs.python-dokuwiki](./python/python-dokuwiki.md)
   - [python310.pkgs.task-tools](./python/task-tools.md)

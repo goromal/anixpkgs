@@ -30,6 +30,7 @@ Packages written (or bound) in Python.
 - [python39.pkgs.flask-smfserver](./flask-smfserver.md)
 - [python39.pkgs.flask-oatbox](./flask-oatbox.md)
 - [python39.pkgs.rankserver](./rankserver.md)
+- [python39.pkgs.stampserver](./stampserver.md)
 - [python310.pkgs.easy-google-auth](./easy-google-auth.md)
 - [python310.pkgs.python-dokuwiki](./python-dokuwiki.md)
 - [python310.pkgs.task-tools](./task-tools.md)
