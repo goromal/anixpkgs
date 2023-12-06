@@ -1,7 +1,7 @@
-{ buildPythonPackage, flask, strings
-, writeTextFile, callPackage, writeShellScript, python }:
+{ buildPythonPackage, flask, strings, writeTextFile, callPackage
+, writeShellScript, python }:
 callPackage ../builders/mkSimpleFlaskApp.nix {
-  pname = "flask_stamper";
+  pname = "stampserver";
   version = "0.0.0";
   inherit buildPythonPackage flask writeTextFile writeShellScript python;
   scriptPropagatedBuildInputs = [ ];
@@ -10,6 +10,13 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
   templateText = builtins.readFile ./index.html;
   description = "Provides an interface for stamping metadata on PNGs and MP4s.";
   longDescription = ''
-    ^^^^ TODO
+    ```bash
+    usage: stampserver [-h] [--port PORT] [--data-dir DATA_DIR]
+
+    optional arguments:
+      -h, --help           show this help message and exit
+      --port PORT          Port to run the server on
+      --data-dir DATA_DIR  Directory containing the stampable elements
+    ```
   '';
 }

@@ -23,7 +23,7 @@ class StampServer:
     def load(self):
         if not os.path.isdir(RES_DIR):
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
-        if len(self.filelist) == 0::
+        if len(self.filelist) == 0:
             for file in os.listdir(RES_DIR):
                 if file.startswith("stamped."):
                     continue

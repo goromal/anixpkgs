@@ -168,7 +168,8 @@ let
               addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
             rankserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
-            stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
+            stampserver = addDoc
+              (pySelf.callPackage ./python-packages/flasks/stampserver { });
           });
       }));
 in rec {
