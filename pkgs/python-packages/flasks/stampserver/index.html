@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stamp Server</title>
+</head>
+
+<body>
+    <h1>Stamp Server</h1>
+    {% if err %}
+    <p>{{ msg }}</p>
+    {% else %}
+    {% if ftype == "PNG" %}
+    <img src="/{{ file }}" alt="" />
+    {% elif ftype == "MP4" %}
+    <video controls width="250">
+        <source src="/{{ file }}" type="video/mp4" />
+    </video>
+    {% endif %}
+    <form action="/" method="POST">
+        <textarea id="text" name="text" rows="1" cols="10"></textarea>
+        <br><br>
+        <input type="submit" value="Submit!">
+    </form>
+    {% endif %}
+</body>
+
+</html>
