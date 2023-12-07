@@ -75,7 +75,7 @@ in (writeShellScriptBin pkgname ''
       if browser-aliases != null then
         "${browser-aliases}/bin/anix-compare $vcurr $vdest"
       else
-        ""
+        "echo ''"
     }
   fi
 '') // {
