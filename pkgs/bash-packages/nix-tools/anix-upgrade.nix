@@ -74,7 +74,7 @@ in (writeShellScriptBin pkgname ''
   else
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
   fi
-  if [[ "$vcurrfull" != "Local Build" && "$local" == "0" ]]; then
+  if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then
     ${
       if browser-aliases != null then
         "${browser-aliases}/bin/anix-compare $vcurr $vdest"
