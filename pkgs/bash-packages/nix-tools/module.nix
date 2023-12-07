@@ -24,8 +24,7 @@ in {
   config = lib.mkIf cfg.enable {
     home.packages = with cfg; [
       anixpkgs.anix-version
-      anixpkgs.anix-upgrade.override
-      { inherit browser-aliases; }
+      (anixpkgs.anix-upgrade.override { inherit browser-aliases; })
     ];
   };
 }

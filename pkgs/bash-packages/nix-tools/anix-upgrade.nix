@@ -1,7 +1,9 @@
 { writeShellScriptBin, callPackage, color-prints, browser-aliases ? null }:
 let
   pkgname = "anix-upgrade";
-  description = "Upgrade the operating system${if browser-aliases == null then "." else "and view the delta."}";
+  description = "Upgrade the operating system${
+      if browser-aliases == null then "." else "and view the delta."
+    }";
   long-description = ''
     usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH] [--local] [--boot]
   '';
