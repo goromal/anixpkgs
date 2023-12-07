@@ -10,7 +10,7 @@ in {
       default = false;
     };
     anixpkgs = lib.mkOption {
-      type = lib.types.package;
+      type = lib.types.attrs;
       description = "anixpkgs version to grab the tools from";
       default = null;
     };
