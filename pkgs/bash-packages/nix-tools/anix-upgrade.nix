@@ -1,7 +1,9 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeShellScriptBin, callPackage, color-prints, browser-aliases ? null }:
 let
   pkgname = "anix-upgrade";
-  description = "Upgrade the operating system.";
+  description = "Upgrade the operating system${
+      if browser-aliases == null then "." else " and view the delta."
+    }";
   long-description = ''
     usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH] [--local] [--boot]
   '';
@@ -47,6 +49,10 @@ let
 in (writeShellScriptBin pkgname ''
   ${argparse}
   cd ~/sources
+  vcurr=$(cat ~/.anix-version)
+  if [[ "$vcurr" != "Local Build" ]]; then
+    vcurr=''${vcurr:1}
+  fi
   if [[ "$local" == "1" ]]; then
     localVar=true
   else
@@ -61,11 +67,20 @@ in (writeShellScriptBin pkgname ''
   else
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
-  ${printYellow} "Upgrading to NixOS $(cat anixpkgs/NIXOS_VERSION) with anixpkgs version $(cat anixpkgs/ANIX_VERSION)..."
+  vdest=$(cat anixpkgs/ANIX_VERSION)
+  ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $(cat anixpkgs/NIXOS_VERSION))..."
   if [[ "$boot" == "1" ]]; then
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
   else
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
+  fi
+  if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then
+    ${
+      if browser-aliases != null then
+        "${browser-aliases}/bin/anix-compare $vcurr $vdest"
+      else
+        "echo ''"
+    }
   fi
 '') // {
   meta = {

@@ -1,9 +1,14 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with import ../dependencies.nix { inherit config; }; {
-  imports = [ ./base-pkgs.nix ];
+  imports = [ ./base-pkgs.nix ../../bash-packages/nix-tools/module.nix ];
 
-  home.packages = [ docker tmux anixpkgs.anix-version anixpkgs.anix-upgrade ];
+  home.packages = [ docker tmux ];
+
+  programs.anix-tools = {
+    enable = true;
+    inherit anixpkgs;
+  };
 
   home.file = {
     ".anix-version".text =
