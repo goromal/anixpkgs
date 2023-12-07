@@ -2,7 +2,7 @@
 let
   pkgname = "anix-upgrade";
   description = "Upgrade the operating system${
-      if browser-aliases == null then "." else "and view the delta."
+      if browser-aliases == null then "." else " and view the delta."
     }";
   long-description = ''
     usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH] [--local] [--boot]
@@ -49,8 +49,10 @@ let
 in (writeShellScriptBin pkgname ''
   ${argparse}
   cd ~/sources
-  vcurrfull=$(cat ~/.anix-version)
-  vcurr=''${vcurrfull:1}
+  vcurr=$(cat ~/.anix-version)
+  if [[ "$vcurr" != "Local Build" ]]; then
+    vcurr=''${vcurr:1}
+  fi
   if [[ "$local" == "1" ]]; then
     localVar=true
   else
@@ -66,7 +68,7 @@ in (writeShellScriptBin pkgname ''
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
   vdest=$(cat anixpkgs/ANIX_VERSION)
-  ${printYellow} "Upgrading anixpkgs from v$vcurr -> v$vdest (NixOS $(cat anixpkgs/NIXOS_VERSION))..."
+  ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $(cat anixpkgs/NIXOS_VERSION))..."
   if [[ "$boot" == "1" ]]; then
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
   else
