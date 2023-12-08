@@ -60,9 +60,6 @@ in {
       "clock-format" = "12h";
       "clock-show-weekday" = true;
     };
-    "org/gnome/desktop/default-applications/terminal" = {
-      "exec" = "${terminator}/bin/terminator";
-    };
     "org/gnome/desktop/privacy" = { "remember-recent-files" = false; };
     "org/gnome/shell" = {
       "favorite-apps" = [
