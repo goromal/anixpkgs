@@ -105,7 +105,8 @@ in {
       "records/${records.crypt.name}".source = records.crypt.data;
       ".config/terminator/config".source =
         ../res/terminator-config; # https://rigel.netlify.app/#terminal
-      ".local/share/nautilus/scripts/terminal".source = (writeShellScript "terminal" "terminator");
+      ".local/share/nautilus/scripts/terminal".source =
+        (writeShellScript "terminal" "terminator");
       ".config/nautilus/scripts-accels".text = "F4 terminal";
       "Templates/EmptyDocument".text = "";
       ".config/VSCodium/User/settings.json".source =
