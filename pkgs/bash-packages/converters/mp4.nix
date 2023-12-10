@@ -18,6 +18,7 @@ let
 
     Options:
         -v | --verbose               Print verbose output from ffmpeg
+        -m | --mute                  Remove audio
         -q | --quality CHAR          - for low, = for medium, + for high bit rate quality
         -w | --width WIDTH           Constrain the video width (pixels)
         -l | --label "STR"           Add label to bottom left corner of video
@@ -33,6 +34,12 @@ let
       isBool = true;
       default = "0";
       flags = "-v|--verbose";
+    }
+    {
+      var = "mute";
+      isBool = true;
+      default = "0";
+      flags = "-m|--mute";
     }
     {
       var = "quality";
@@ -94,6 +101,11 @@ let
         fi
     fi
   '';
+  
+  audioRule = ''
+    if [[ "$mute" == "1" ]]; then
+        ffmpeg_args+=( "-an" )
+  '';
 
   widthRule = ''
     if [[ ! -z "$width" ]]; then
@@ -131,6 +143,7 @@ let
     commands = ''
       ffmpeg_args=("-y" "-vcodec" "libx264")
       ${qualityRule}
+      ${audioRule}
       ${widthRule}
       ${labelRule}
       ${cropRule}

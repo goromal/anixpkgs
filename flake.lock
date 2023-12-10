@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1696822882,
-        "narHash": "sha256-A0LawGSHdP19i5MYBhvnDHN3X1wySxx8TxiYJosmQBg=",
+        "lastModified": 1702191829,
+        "narHash": "sha256-DbAqX0krvqvwinOdcKA3/OXEE5+nUsNUmICsN/ifgQU=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "5cb117c2f3e8a7c96d329a030fa554afa810ae8a",
+        "rev": "bf921096de51666274b56ba8e3565b2759ee1a44",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/mp4-job-mute",
         "repo": "aapis",
         "type": "github"
       }
@@ -325,15 +326,16 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1696916689,
-        "narHash": "sha256-kl2CpSvgWVg4f6JTW8NGfNhZtuZ6dIAZLDGlcZLZ2ZQ=",
+        "lastModified": 1702193303,
+        "narHash": "sha256-L87fZX2UHdCwY8934DST3hfY3V9nQ0j48zg71DB8yG0=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "2e0ce42d579089cd2a704a1f587478907c9555e5",
+        "rev": "cf2ea9fa934025b8760ef0bd155a8294a06fdf5e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/mp4-mute",
         "repo": "orchestrator",
         "type": "github"
       }
