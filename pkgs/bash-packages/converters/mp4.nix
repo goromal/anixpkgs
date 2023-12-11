@@ -101,7 +101,7 @@ let
         fi
     fi
   '';
-  
+
   audioRule = ''
     if [[ "$mute" == "1" ]]; then
         ffmpeg_args+=( "-an" )

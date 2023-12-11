@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1702191829,
+        "lastModified": 1702253759,
         "narHash": "sha256-DbAqX0krvqvwinOdcKA3/OXEE5+nUsNUmICsN/ifgQU=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "bf921096de51666274b56ba8e3565b2759ee1a44",
+        "rev": "a05b81f18afb9abf21fba2e404426a40c54fcf1f",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/mp4-job-mute",
         "repo": "aapis",
         "type": "github"
       }
@@ -326,16 +325,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1702193303,
+        "lastModified": 1702254798,
         "narHash": "sha256-L87fZX2UHdCwY8934DST3hfY3V9nQ0j48zg71DB8yG0=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "cf2ea9fa934025b8760ef0bd155a8294a06fdf5e",
+        "rev": "74471ef7bcb9dd6b78b2206649b87df019e653d6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/mp4-mute",
         "repo": "orchestrator",
         "type": "github"
       }
@@ -425,11 +423,11 @@
     "quad-sim-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1701050582,
-        "narHash": "sha256-atDh5gzIbzA37GwbFbnLadyLvk01AnINvOuyMX71r4Y=",
+        "lastModified": 1701052458,
+        "narHash": "sha256-Bn2lmyibi31vePIMQXF/V1vvK0CgAUG1eFqtT3bolaA=",
         "owner": "goromal",
         "repo": "quad-sim-cpp",
-        "rev": "1cc34b737cf243c8b0b9794f35d0444271d31574",
+        "rev": "ec16789bc808096154cf452d7df3cf4a78e514d4",
         "type": "github"
       },
       "original": {

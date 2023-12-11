@@ -13,7 +13,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis?ref=dev/mp4-job-mute";
+    aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
@@ -81,7 +81,7 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator?ref=dev/mp4-mute";
+    orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
     pyceres.url =
