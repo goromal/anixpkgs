@@ -18,6 +18,7 @@ Inputs:
 
 Options:
     -v | --verbose               Print verbose output from ffmpeg
+    -m | --mute                  Remove audio
     -q | --quality CHAR          - for low, = for medium, + for high bit rate quality
     -w | --width WIDTH           Constrain the video width (pixels)
     -l | --label "STR"           Add label to bottom left corner of video
