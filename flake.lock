@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1696822882,
-        "narHash": "sha256-A0LawGSHdP19i5MYBhvnDHN3X1wySxx8TxiYJosmQBg=",
+        "lastModified": 1702253759,
+        "narHash": "sha256-DbAqX0krvqvwinOdcKA3/OXEE5+nUsNUmICsN/ifgQU=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "5cb117c2f3e8a7c96d329a030fa554afa810ae8a",
+        "rev": "a05b81f18afb9abf21fba2e404426a40c54fcf1f",
         "type": "github"
       },
       "original": {
@@ -325,11 +325,11 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1696916689,
-        "narHash": "sha256-kl2CpSvgWVg4f6JTW8NGfNhZtuZ6dIAZLDGlcZLZ2ZQ=",
+        "lastModified": 1702254798,
+        "narHash": "sha256-L87fZX2UHdCwY8934DST3hfY3V9nQ0j48zg71DB8yG0=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "2e0ce42d579089cd2a704a1f587478907c9555e5",
+        "rev": "74471ef7bcb9dd6b78b2206649b87df019e653d6",
         "type": "github"
       },
       "original": {
@@ -423,11 +423,11 @@
     "quad-sim-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1701050582,
-        "narHash": "sha256-atDh5gzIbzA37GwbFbnLadyLvk01AnINvOuyMX71r4Y=",
+        "lastModified": 1701052458,
+        "narHash": "sha256-Bn2lmyibi31vePIMQXF/V1vvK0CgAUG1eFqtT3bolaA=",
         "owner": "goromal",
         "repo": "quad-sim-cpp",
-        "rev": "1cc34b737cf243c8b0b9794f35d0444271d31574",
+        "rev": "ec16789bc808096154cf452d7df3cf4a78e514d4",
         "type": "github"
       },
       "original": {
