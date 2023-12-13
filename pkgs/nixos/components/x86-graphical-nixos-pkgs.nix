@@ -26,7 +26,6 @@ in {
     poppler_utils
     meld
     libreoffice-qt
-    sage
     unstable.google-chrome
     unstable.inkscape
     unstable.audacity
