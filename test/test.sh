@@ -87,6 +87,7 @@ done
 if [ $num_pending -ne 0 ]; then
     echo_red "ERROR: orchestrator timed out at $timeout_secs seconds with $num_pending unfinished jobs:"
     orchestrator status all
+    ls $orchoutpath
     kill $serverPID
     exit 1
 fi
