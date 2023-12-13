@@ -79,6 +79,9 @@ num_tries=0
 echo "Waiting for pending jobs..."
 
 while (( num_pending > 0 )) && (( num_tries < timeout_secs )); do
+    echo "Filesystem: ----"
+    ls $orchoutpath
+    echo "----------------"
     num_pending=$(orchestrator status count-pending)
     num_tries=$(( num_tries+1 ))
     sleep 1
