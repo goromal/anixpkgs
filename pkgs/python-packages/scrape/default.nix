@@ -14,18 +14,20 @@ buildPythonPackage rec {
       This is a simple tool that assumes you want to download files from a straightforwardly-constructed HTML page. You'll need an XPath specification to help narrow down the scraping.
 
       ```bash
-      usage: scrape [-h] [-o DIRNAME] {simple-link-scraper,simple-image-scraper} page
+      usage: scrape [-h] [--xpath XPATH] [--ext EXT] [-o DIRNAME] {simple-link-scraper,simple-image-scraper} page
 
       Scrape content off the internet, quickly.
 
       positional arguments:
-      {simple-link-scraper,simple-image-scraper}
+        {simple-link-scraper,simple-image-scraper}
                               The type of content to be scraped.
-      page                  Webpage url.
+        page                  Webpage url.
 
       optional arguments:
-      -h, --help            show this help message and exit
-      -o DIRNAME, --output DIRNAME
+        -h, --help            show this help message and exit
+        --xpath XPATH         Optionally specify the XPath
+        --ext EXT             Optionally specify the file extension
+        -o DIRNAME, --output DIRNAME
                               Output directory.
       ```
 

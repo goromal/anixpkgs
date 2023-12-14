@@ -48,8 +48,22 @@ fi
 make-title -c yellow "Testing orchestrator"
 mkdir orch_data
 orchoutpath="$tmpdir/orch_data"
+oinf1="$orchoutpath/sample_960x400_ocean_with_audio.webm"
+oinf2="$orchoutpath/sample_1280x720.webm"
+oinf3="$orchoutpath/sample_1920x1080.webm"
+oinf4="$orchoutpath/sample_2560x1440.webm"
+oinf5="$orchoutpath/sample_3840x2160.webm"
+oinf6="$orchoutpath/sample_640x360.webm"
+oinf7="$orchoutpath/sample_960x540.webm"
 
 num_server_threads=2
+
+echo "Using scrape to obtain input files..."
+
+scrape --xpath body/div --ext webm --output $orchoutpath simple-link-scraper https://goromal.github.io/anixpkgs/python/scrape.html
+for f in "$oinf1" "$oinf2" "$oinf3" "$oinf4" "$oinf5" "$oinf6" "$oinf7"; do
+    [[ -f "$f" ]] || { echo_red "Expected scraped file $f not present"; exit 1;  }
+done
 
 echo "Spawning server with $num_server_threads threads"
 
@@ -60,8 +74,7 @@ sleep 4
 
 echo "Spawning jobs"
 
-dljob=$(orchestrator scrape https://filesamples.com/formats/webm body/div webm $orchoutpath)
-rmjob=$(orchestrator remove -b $dljob $orchoutpath/sample_960x400_ocean_with_audio.webm)
+rmjob=$(orchestrator remove $orchoutpath/sample_960x400_ocean_with_audio.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1280x720.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1920x1080.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_2560x1440.webm)
@@ -80,6 +93,9 @@ echo "Waiting for pending jobs..."
 
 while (( num_pending > 0 )) && (( num_tries < timeout_secs )); do
     num_pending=$(orchestrator status count-pending)
+    echo "Filesystem: ($num_pending)"
+    ls $orchoutpath
+    echo "----------------"
     num_tries=$(( num_tries+1 ))
     sleep 1
 done
@@ -87,6 +103,9 @@ done
 if [ $num_pending -ne 0 ]; then
     echo_red "ERROR: orchestrator timed out at $timeout_secs seconds with $num_pending unfinished jobs:"
     orchestrator status all
+    echo "----"
+    ls $orchoutpath
+    echo "----"
     kill $serverPID
     exit 1
 fi
