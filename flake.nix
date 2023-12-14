@@ -100,7 +100,7 @@
     python-dokuwiki.url = "github:fmenabe/python-dokuwiki?ref=refs/tags/1.3.3";
     python-dokuwiki.flake = false;
 
-    scrape.url = "github:goromal/scrape?ref=dev/debug";
+    scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
     task-tools.url = "github:goromal/task-tools";
