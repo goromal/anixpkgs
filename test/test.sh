@@ -60,7 +60,7 @@ num_server_threads=2
 
 echo "Using scrape to obtain input files..."
 
-scrape --xpath body/div --ext webm --output $orchoutpath simple-link-scraper https://filesamples.com/formats/webm
+scrape --xpath body/div --ext webm --output $orchoutpath simple-link-scraper https://goromal.github.io/anixpkgs/python/scrape.html
 for f in "$oinf1" "$oinf2" "$oinf3" "$oinf4" "$oinf5" "$oinf6" "$oinf7"; do
     [[ -f "$f" ]] || { echo_red "Expected scraped file $f not present"; exit 1;  }
 done
