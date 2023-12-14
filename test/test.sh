@@ -51,6 +51,10 @@ orchoutpath="$tmpdir/orch_data"
 
 num_server_threads=2
 
+echo "Using scrape to obtain input files..."
+
+scrape --xpath body/div --ext webm --output $orchoutpath simple-link-scraper https://filesamples.com/formats/webm
+
 echo "Spawning server with $num_server_threads threads"
 
 nohup orchestratord -n $num_server_threads > /dev/null 2>&1 &
@@ -60,8 +64,8 @@ sleep 4
 
 echo "Spawning jobs"
 
-dljob=$(orchestrator scrape https://filesamples.com/formats/webm body/div webm $orchoutpath)
-rmjob=$(orchestrator remove -b $dljob $orchoutpath/sample_960x400_ocean_with_audio.webm)
+#dljob=$(orchestrator scrape https://filesamples.com/formats/webm body/div webm $orchoutpath)
+rmjob=$(orchestrator remove $orchoutpath/sample_960x400_ocean_with_audio.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1280x720.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1920x1080.webm)
 rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_2560x1440.webm)
