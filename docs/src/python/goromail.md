@@ -12,7 +12,9 @@ The following workflows are supported, all via text messaging:
   - `P1` = "Must do in e.g., next few days"
   - `P2` = "Must do in e.g., next 1-2 weeks"
   - `P3` = "Should do eventually"
-- Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the `bot` command
+- Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the `bot` command:
+  - `KEYWORD: [P0-1:] ...`
+  - `Sort KEYWORD. [P0-1:] ...`
 - ITNS additions via any other pattern
 
 **Journal (*goromal.journal@gmail.com*):**
