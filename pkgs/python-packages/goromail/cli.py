@@ -37,6 +37,18 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run):
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
+    elif text[:(n+6)].lower() == f"sort {keyword}.":
+        matter = text[(n+6):].strip()
+        print(f"  {keyword} offload item: {matter}")
+        if matter[:3].lower() == "p0:":
+            item = f"[::::{datestr}::::] {matter[3:].strip()}"
+        elif matter[:3].lower() == "p1:":
+            item = f"[:::{datestr}:::] {matter[3:].strip()}"
+        else:
+            item = f"[**{datestr}**] {matter.strip()}"
+        if not dry_run:
+            append_text_to_wiki_page(wiki, page_id, msg, item)
+        return True 
     return False
 
 def add_journal_entry_to_wiki(wiki, msg, date, text):
