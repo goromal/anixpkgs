@@ -4,6 +4,11 @@
 
 ## Home-Manager Example
 
+1. Install Nix standalone: TODO
+2. Set proper Nix settings: TODO
+
+3. Install home-manager: https://rycee.gitlab.io/home-manager/index.html#sec-install-standalone
+
 ```nix
 # home.nix
 { config, pkgs, ... }:
@@ -28,6 +33,16 @@ export NIXPKGS_ALLOW_UNFREE=1
 alias code='codium'
 eval "$(direnv hook bash)"
 ```
+
+Channels:
+
+```bash
+$ nix-channel --list
+home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-23.05
+```
+
+Symlink to `~/.config/nixpkgs/home.nix`.
 
 ## Build a Raspberry Pi NixOS SD Installer Image
 
