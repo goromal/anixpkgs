@@ -4,10 +4,27 @@
 
 ## Home-Manager Example
 
-1. Install Nix standalone: TODO
-2. Set proper Nix settings: TODO
+1. Install Nix standalone:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
+3. Set proper Nix settings in `/etc/nix/nix.conf`:
+```
+substituters = https://cache.nixos.org/ https://github-public.cachix.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+narinfo-cache-positive-ttl = 0
+narinfo-cache-negative-ttl = 0
+experimental-features = nix-command flakes auto-allocate-uids
+```
+4. Add these Nix channels via `nix-channel --add URL NAME`:
+```bash
+$ nix-channel --list
+home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-23.05
+```
+5. Install home-manager: https://rycee.gitlab.io/home-manager/index.html#sec-install-standalone
 
-3. Install home-manager: https://rycee.gitlab.io/home-manager/index.html#sec-install-standalone
+Example home import (if necessary):
 
 ```nix
 # home.nix
@@ -32,14 +49,6 @@ export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/
 export NIXPKGS_ALLOW_UNFREE=1
 alias code='codium'
 eval "$(direnv hook bash)"
-```
-
-Channels:
-
-```bash
-$ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-23.05
 ```
 
 Symlink to `~/.config/nixpkgs/home.nix`.
