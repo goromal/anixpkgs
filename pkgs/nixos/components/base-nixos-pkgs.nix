@@ -1,7 +1,11 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with import ../dependencies.nix { inherit config; }; {
-  imports = [ ./base-pkgs.nix ../../bash-packages/nix-tools/module.nix ];
+  imports = [
+    ./base-pkgs.nix
+    ./base-dev-pkgs.nix
+    ../../bash-packages/nix-tools/module.nix
+  ];
 
   home.packages = [ docker tmux ];
 

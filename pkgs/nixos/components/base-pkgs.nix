@@ -3,20 +3,10 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     rclone
-    direnv
     anixpkgs.color-prints
-    anixpkgs.git-cc
-    anixpkgs.gitcop
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
-    anixpkgs.setupws
-    anixpkgs.listsources
-    anixpkgs.pkgshell
-    anixpkgs.devshell
-    anixpkgs.cpp-helper
-    anixpkgs.py-helper
-    anixpkgs.makepyshell
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
@@ -27,25 +17,6 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
   ];
-
-  programs.git = {
-    package = gitAndTools.gitFull;
-    enable = true;
-    userName = "Andrew Torgesen";
-    userEmail = "andrew.torgesen@gmail.com";
-    aliases = {
-      aa = "add -A";
-      cm = "commit -m";
-      co = "checkout";
-      s = "status";
-      d = "diff";
-    };
-    extraConfig = {
-      init = { defaultBranch = "master"; };
-      push = { default = "current"; };
-      pull = { default = "current"; };
-    };
-  };
 
   programs.vim = {
     enable = true;
@@ -79,6 +50,4 @@ with import ../dependencies.nix { inherit config; }; {
       command-t
     ];
   };
-
-  services.lorri.enable = true;
 }
