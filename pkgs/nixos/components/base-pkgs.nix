@@ -44,7 +44,7 @@ with import ../dependencies.nix { inherit config; }; {
       vim-airline
       The_NERD_tree
       fugitive
-      vim-gitgutter
+      # vim-gitgutter
       YouCompleteMe
       vim-abolish
       command-t
