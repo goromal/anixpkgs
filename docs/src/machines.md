@@ -41,7 +41,7 @@ in {
 }
 ```
 
-Symlink to `~/.config/nixpkgs/home.nix`.
+Symlink to `~/.config/home-manager/home.nix`.
 
 Corresponding `~/.bashrc`:
 
