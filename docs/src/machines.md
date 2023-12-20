@@ -49,8 +49,8 @@ Corresponding `~/.bashrc`:
 export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 export NIXPKGS_ALLOW_UNFREE=1
-alias code='codium'
-eval "$(direnv hook bash)"
+# alias code='codium'
+# eval "$(direnv hook bash)"
 ```
 
 ## Build a Raspberry Pi NixOS SD Installer Image
