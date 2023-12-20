@@ -15,6 +15,7 @@ with import ../dependencies.nix { inherit config; }; {
     ../components/base-pkgs.nix
     ../components/base-dev-pkgs.nix
     ../components/x86-graphical-pkgs.nix
+    ../components/x86-graphical-dev-pkgs.nix
     ../components/x86-graphical-rec-pkgs.nix
   ];
 

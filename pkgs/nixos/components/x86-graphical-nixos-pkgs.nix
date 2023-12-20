@@ -6,8 +6,11 @@ let
     browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
   });
 in {
-  imports =
-    [ ./x86-graphical-pkgs.nix ../../bash-packages/nix-tools/module.nix ];
+  imports = [
+    ./x86-graphical-pkgs.nix
+    ./x86-graphical-dev-pkgs.nix
+    ../../bash-packages/nix-tools/module.nix
+  ];
 
   home.packages = [
     kooha # wayland-compatible screen recorder
