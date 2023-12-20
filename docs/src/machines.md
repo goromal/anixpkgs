@@ -41,6 +41,8 @@ in {
 }
 ```
 
+Symlink to `~/.config/nixpkgs/home.nix`.
+
 Corresponding `~/.bashrc`:
 
 ```bash
@@ -50,8 +52,6 @@ export NIXPKGS_ALLOW_UNFREE=1
 alias code='codium'
 eval "$(direnv hook bash)"
 ```
-
-Symlink to `~/.config/nixpkgs/home.nix`.
 
 ## Build a Raspberry Pi NixOS SD Installer Image
 
