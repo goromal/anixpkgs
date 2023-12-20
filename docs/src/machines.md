@@ -22,7 +22,7 @@ $ nix-channel --list
 home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
 nixpkgs https://nixos.org/channels/nixos-23.05
 ```
-5. Install home-manager: https://rycee.gitlab.io/home-manager/index.html#sec-install-standalone
+5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
 Example home import (if necessary):
 
