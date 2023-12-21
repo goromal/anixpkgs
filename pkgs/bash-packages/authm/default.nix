@@ -45,9 +45,13 @@ let
         exit 1
       fi
       ${color-prints}/bin/echo_cyan "Syncing the secrets directory..."
-      if [[ ! $(rclone bisync dropbox:secrets "$SECRETS_DIR") ]]; then
+      _success=1
+      rclone bisync dropbox:secrets "$SECRETS_DIR" || { _success=0; }
+      if [[ "$_success" == "0" ]]; then
         ${color-prints}/bin/echo_yellow "Bisync failed; attempting with --resync..."
-        if [[ ! $(rclone bisync --resync dropbox:secrets "$SECRETS_DIR") ]]; then
+        _success=1
+        rclone bisync --resync dropbox:secrets "$SECRETS_DIR" || { _success=0; }
+        if [[ "$_success" == "0" ]]; then
           ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
           exit 1
         fi
