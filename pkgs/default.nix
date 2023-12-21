@@ -225,9 +225,8 @@ in rec {
   goromail = final.python310.pkgs.goromail;
   orchestrator = final.python39.pkgs.orchestrator;
 
-  authm = addDoc (prev.callPackage ./bash-packages/authm {
-    python = python310;
-  });
+  authm =
+    addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python310;
   });
