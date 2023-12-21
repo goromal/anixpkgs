@@ -1,24 +1,11 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, click, colorama
+{ writeShellScriptBin, color-prints, callPackage, pytestCheckHook, buildPythonPackage, click, colorama
 , easy-google-auth, gmail-parser, task-tools, wiki-tools, book-notes-sync }:
-callPackage ../pythonPkgFromScript.nix {
-  pname = "authm";
-  version = "1.0.0";
+let
+  pkgname = "authm";
   description = "Manage secrets.";
-  script-file = ./authm.py;
-  inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs = [
-    click
-    colorama
-    easy-google-auth
-    gmail-parser
-    task-tools
-    wiki-tools
-    book-notes-sync
-  ];
-  checkPkgs = [ ];
   longDescription = ''
     ```
-    Usage: authm [OPTIONS] COMMAND [ARGS]...
+    Usage: ${pkgname} [OPTIONS] COMMAND [ARGS]...
 
       Manage secrets.
 
@@ -28,6 +15,51 @@ callPackage ../pythonPkgFromScript.nix {
     Commands:
       refresh   Refresh all auth tokens one-by-one.
       validate  Validate the secrets files present on the filesystem.
+    
+    NOTE: This program will perform a bi-directional sync of the ~/secrets directory
+    before and after the selected command.
     ```
   '';
+  authm = callPackage ../pythonPkgFromScript.nix {
+    pname = pkgname;
+    version = "1.0.0";
+    inherit description longDescription;
+    script-file = ./authm.py;
+    inherit pytestCheckHook buildPythonPackage;
+    propagatedBuildInputs = [
+      click
+      colorama
+      easy-google-auth
+      gmail-parser
+      task-tools
+      wiki-tools
+      book-notes-sync
+    ];
+    checkPkgs = [ ];
+  };
+  bisync = ''
+  SECRETS_DIR="$HOME/secrets"
+  if [[ "$1" == "refresh" ]] || [[ "$1" == "validate" ]]; then
+    if [[ ! -d "$SECRETS_DIR" ]]; then
+      ${color-prints}/bin/echo_red "Secrets directory $SECRETS_DIR not present. Exiting."
+      exit 1
+    fi
+    ${color-prints}/bin/echo_cyan "Syncing the secrets directory..."
+    if [[ ! $(rclone bisync dropbox:secrets "$SECRETS_DIR") ]]; then
+      ${color-prints}/bin/echo_yellow "Bisync failed; attempting with --resync..."
+      if [[ ! $(rclone bisync --resync dropbox:secrets "$SECRETS_DIR") ]]; then
+        ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
+        exit 1
+      fi
+    fi
+  fi
+  '';
+in (writeShellScriptBin pkgname ''
+  ${bisync}
+  ${authm}/bin/${pkgname} $@
+  ${bisync}
+'') // {
+  meta = {
+    inherit description longDescription;
+  };
 }
