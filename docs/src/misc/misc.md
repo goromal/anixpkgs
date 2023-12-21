@@ -3,6 +3,7 @@
 Packages written in assorted languages like Bash, Rust, Java, etc.
 
 - [aapis-grpcurl](./aapis-grpcurl.md)
+- [authm](./authm.md)
 - [abc](./abc.md)
 - [doku](./doku.md)
 - [epub](./epub.md)

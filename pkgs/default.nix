@@ -62,7 +62,6 @@ let
               apis-fds = aapis-fds;
               pkg-src = flakeInputs.aapis;
             });
-            authm = addDoc (pySelf.callPackage ./python-packages/authm { });
             budget_report =
               addDoc (pySelf.callPackage ./python-packages/budget-report { });
             easy-google-auth = addDoc
@@ -223,10 +222,11 @@ in rec {
   wiki-tools = final.python310.pkgs.wiki-tools;
   book-notes-sync = final.python310.pkgs.book-notes-sync;
   gmail-parser = final.python310.pkgs.gmail-parser;
-  authm = final.python310.pkgs.authm;
   goromail = final.python310.pkgs.goromail;
   orchestrator = final.python39.pkgs.orchestrator;
 
+  authm =
+    addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python310;
   });
