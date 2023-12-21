@@ -35,15 +35,16 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1700276740,
-        "narHash": "sha256-ueNF/AkrE+TcYJb+kZ6SiRjJS8sjzyTJUGeJN3zgds4=",
+        "lastModified": 1703137312,
+        "narHash": "sha256-jFqXw8afix0nzKhnF84UudwtfdkF6pEcxsYLzj/emv0=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "0918805684dbafa1621ea81743ae1e5e7171f34e",
+        "rev": "44d9fdda2cbbf6eea167f6d0e032c8edd550c1f6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/headless",
         "repo": "book-notes-sync",
         "type": "github"
       }

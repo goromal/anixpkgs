@@ -55,7 +55,7 @@
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;
 
-    book-notes-sync.url = "github:goromal/book-notes-sync";
+    book-notes-sync.url = "github:goromal/book-notes-sync?ref=dev/headless";
     book-notes-sync.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth?ref=dev/headless";
