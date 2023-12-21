@@ -202,12 +202,17 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
     try:
-        gbot = GBotCorpus(
+        gbotCorpus = GBotCorpus(
             "goromal.bot@gmail.com",
             gmail_secrets_json=ctx.obj["gmail_secrets_json"],
             gbot_refresh_file=ctx.obj["gbot_refresh_file"],
             enable_logging=ctx.obj["enable_logging"]
-        ).Inbox(ctx.obj["num_messages"])
+        )
+    except Exception as e:
+        print(f"Program error: {e}")
+        exit(1)
+    try:
+        gbot = gbotCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
         return
@@ -216,11 +221,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
         enable_logging=ctx.obj["enable_logging"]
     )
-    task = TaskManager(
-        task_secrets_file=ctx.obj["task_secrets_file"],
-        task_refresh_token=ctx.obj["task_refresh_token"],
-        enable_logging=ctx.obj["enable_logging"]
-    )
+    try:
+        task = TaskManager(
+            task_secrets_file=ctx.obj["task_secrets_file"],
+            task_refresh_token=ctx.obj["task_refresh_token"],
+            enable_logging=ctx.obj["enable_logging"]
+        )
+    except Exception as e:
+        print(f"Program error: {e}")
+        exit(1)
     print(Fore.YELLOW + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
     msgs = gbot.fromSenders(['6612105214@vzwpix.com']).getMessages()
     for msg in reversed(msgs):
@@ -268,12 +277,17 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
     try:
-        journal = JournalCorpus(
+        journalCorpus = JournalCorpus(
             "goromal.journal@gmail.com",
             gmail_secrets_json=ctx.obj["gmail_secrets_json"],
             journal_refresh_file=ctx.obj["journal_refresh_file"],
             enable_logging=ctx.obj["enable_logging"]
-        ).Inbox(ctx.obj["num_messages"])
+        )
+    except Exception as e:
+        print(f"Program error: {e}")
+        exit(1)
+    try:
+        journal = journalCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
         return
