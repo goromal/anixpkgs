@@ -6,6 +6,10 @@
                 "ci": true
             },
             {
+                "attr": "authm",
+                "ci": true
+            },
+            {
                 "attr": "abc",
                 "ci": true
             },
@@ -363,10 +367,6 @@
             },
             {
                 "attr": "python310.pkgs.book-notes-sync",
-                "ci": true
-            },
-            {
-                "attr": "python310.pkgs.authm",
                 "ci": true
             },
             {

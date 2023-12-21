@@ -1,6 +1,4 @@
-{ writeShellScriptBin, color-prints, callPackage, pytestCheckHook
-, buildPythonPackage, click, colorama, easy-google-auth, gmail-parser
-, task-tools, wiki-tools, book-notes-sync }:
+{ writeShellScriptBin, color-prints, callPackage, python }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
@@ -21,7 +19,7 @@ let
     before and after the selected command.
     ```
   '';
-  authm = callPackage ../pythonPkgFromScript.nix {
+  authm = with python.pkgs; (callPackage ../../python-packages/pythonPkgFromScript.nix {
     pname = pkgname;
     version = "1.0.0";
     inherit description longDescription;
@@ -37,7 +35,7 @@ let
       book-notes-sync
     ];
     checkPkgs = [ ];
-  };
+  });
   bisync = ''
     SECRETS_DIR="$HOME/secrets"
     if [[ "$1" == "refresh" ]] || [[ "$1" == "validate" ]]; then
