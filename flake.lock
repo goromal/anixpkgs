@@ -182,11 +182,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1703221671,
-        "narHash": "sha256-dS8RG3PwvpPNU7pD7n8LnTySBMFywzhOE/oU/CEye1s=",
+        "lastModified": 1703225778,
+        "narHash": "sha256-l5gy4mlK9tTuMwybAcQul/3+yf7MxPP+KeasTRDXkbQ=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "baea51a35f5c001a702cf517b6b2b76fd465e23b",
+        "rev": "b39e5ae536a64f36ed02a4dac37c7175f1db756e",
         "type": "github"
       },
       "original": {
