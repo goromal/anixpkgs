@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1703222208,
+        "lastModified": 1703227836,
         "narHash": "sha256-i4WuAS69M/8HFdVY5aVwe3CYbCj5rdS1gHa9MMdfJN4=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "d95094b4693618f989ef4b2334b241bcc251f01a",
+        "rev": "23ab83cfa44ada14427fe5860339e1af9e263c82",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/bash-job",
         "repo": "aapis",
         "type": "github"
       }
@@ -182,16 +181,15 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1703225778,
+        "lastModified": 1703227883,
         "narHash": "sha256-l5gy4mlK9tTuMwybAcQul/3+yf7MxPP+KeasTRDXkbQ=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "b39e5ae536a64f36ed02a4dac37c7175f1db756e",
+        "rev": "a8e7caeac0e96440119d81ad91149a0d532385b0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/msg_send",
         "repo": "gmail_parser",
         "type": "github"
       }
@@ -327,16 +325,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1703225204,
+        "lastModified": 1703227932,
         "narHash": "sha256-J3NFOivMkFBIuz+dzrp0/NTDhrMKV3fDE6Hs+G7Hmdg=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "39b60a164d05b1829310d1d5708af0b6051e9e84",
+        "rev": "c0ef720e0ff11be4d2dbe9999fbf4e73e667a50b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/bash_cmd",
         "repo": "orchestrator",
         "type": "github"
       }

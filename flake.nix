@@ -13,7 +13,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis?ref=dev/bash-job";
+    aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
@@ -68,7 +68,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser?ref=dev/msg_send";
+    gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
     makepyshell.url =
@@ -81,7 +81,7 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator?ref=dev/bash_cmd";
+    orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
     pyceres.url =
