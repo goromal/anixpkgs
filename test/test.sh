@@ -85,6 +85,9 @@ rmjob=$(orchestrator remove $lsjob -b $mp4job)
 unijob=$(orchestrator mp4-unite $mp4job $orchoutpath/unified_vid.mp4)
 rmjob=$(orchestrator remove $mp4job -b $unijob)
 
+echo "touch $orchoutpath/new.txt" > "$tmpdir/touchfile.sh"
+bjob=$(orchestrator bash "bash $tmpdir/touchfile.sh")
+
 num_pending=1
 timeout_secs=60
 num_tries=0
@@ -113,13 +116,19 @@ fi
 echo "All jobs complete at $num_tries seconds"
 
 if [ ! -f "$orchoutpath/unified_vid.mp4" ]; then
-    echo_red "ERROR: expected workflow output not present"
+    echo_red "ERROR: expected workflow output video not present"
+    kill $serverPID
+    exit 1
+fi
+
+if [ ! -f "$orchoutpath/new.txt" ]; then
+    echo_red "ERROR: expected workflow output file not present"
     kill $serverPID
     exit 1
 fi
 
 num_outputs=$(ls -1 "$orchoutpath" | wc -l)
-if [ $num_outputs -ne 1 ]; then
+if [ $num_outputs -ne 2 ]; then
     echo_red "ERROR: extra outputs present"
     kill $serverPID
     exit 1
