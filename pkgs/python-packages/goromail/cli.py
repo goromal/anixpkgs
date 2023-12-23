@@ -1,6 +1,7 @@
 import click
 import re
 import os
+import sys
 from colorama import Fore, Style
 from datetime import datetime
 from gmail_parser.corpus import GBotCorpus, JournalCorpus
@@ -209,7 +210,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             enable_logging=ctx.obj["enable_logging"]
         )
     except Exception as e:
-        print(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
         exit(1)
     try:
         gbot = gbotCorpus.Inbox(ctx.obj["num_messages"])
@@ -228,7 +229,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             enable_logging=ctx.obj["enable_logging"]
         )
     except Exception as e:
-        print(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
         exit(1)
     print(Fore.YELLOW + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
     msgs = gbot.fromSenders(['6612105214@vzwpix.com']).getMessages()
@@ -284,7 +285,7 @@ def journal(ctx: click.Context, dry_run):
             enable_logging=ctx.obj["enable_logging"]
         )
     except Exception as e:
-        print(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
         exit(1)
     try:
         journal = journalCorpus.Inbox(ctx.obj["num_messages"])

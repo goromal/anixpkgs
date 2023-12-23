@@ -340,7 +340,7 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ]
+      imports = [ ./components/base-nixos-pkgs.nix ./components/ats-pkgs.nix ] # ^^^^ TODO REMOVE
         ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else

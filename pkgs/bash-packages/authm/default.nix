@@ -39,9 +39,9 @@ let
     });
   bisync = ''
     SECRETS_DIR="$HOME/secrets"
-    if [[ "$1" == "refresh" ]] || [[ "$1" == "validate" ]]; then
+    if [[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]; then
       if [[ ! -d "$SECRETS_DIR" ]]; then
-        ${color-prints}/bin/echo_red "Secrets directory $SECRETS_DIR not present. Exiting."
+        >&2 ${color-prints}/bin/echo_red "Secrets directory $SECRETS_DIR not present. Exiting."
         exit 1
       fi
       ${color-prints}/bin/echo_cyan "Syncing the secrets directory..."
@@ -52,7 +52,7 @@ let
         _success=1
         rclone bisync --resync dropbox:secrets "$SECRETS_DIR" || { _success=0; }
         if [[ "$_success" == "0" ]]; then
-          ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
+          >&2 ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
           exit 1
         fi
       fi
