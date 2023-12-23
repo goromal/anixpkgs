@@ -10,6 +10,10 @@ in {
       description = "Root directory for data and configuration";
       default = "/data/andrew/orchestratord";
     };
+    orchestratorPkg = mkOption {
+      type = types.package;
+      description = "The orchestrator package to use";
+    };
     threads = mkOption {
       type = types.int;
       description = "Number of concurrent threads to orchestrate";
@@ -26,7 +30,7 @@ in {
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.orchestrator}/bin/orchestratord -n ${
+        ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
             builtins.toString cfg.threads
           }";
         ReadWritePaths = [ "/" ];

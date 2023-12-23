@@ -10,6 +10,10 @@ greetingScript = writeShellScript "ats-greeting" ''
 in {
   options.services.ats-greeting = with types; {
     enable = mkEnableOption "enable ATS greeting script";
+    orchestratorPkg = mkOption {
+      type = types.package;
+      description = "The orchestrator package to use";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -19,7 +23,7 @@ in {
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.orchestrator}/bin/orchestrator bash 'bash ${greetingScript}'";
+        ExecStart = "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
         Restart = "always";
         RestartSec = 5;
         User = "andrew";
