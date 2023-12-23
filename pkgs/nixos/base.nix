@@ -27,7 +27,7 @@ in {
     };
   };
 
-  imports = [ (import "${home-manager}/nixos") ] ++ (if cfg.isServer then [ ./components/ats-nixos-pkgs.nix ] else []);
+  imports = ([ (import "${home-manager}/nixos") ] ++ (if cfg.isServer then [ ./components/ats-nixos-pkgs.nix ] else []));
 
   config = {
     system.stateVersion = nixos-state;
