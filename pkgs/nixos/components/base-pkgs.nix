@@ -3,6 +3,12 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     rclone
+    anixpkgs.authm
+    anixpkgs.goromail
+    anixpkgs.manage-gmail
+    anixpkgs.gmail-parser
+    anixpkgs.wiki-tools
+    anixpkgs.book-notes-sync
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
@@ -16,6 +22,23 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
+      anixpkgs.gantter
+      anixpkgs.md2pdf
+      anixpkgs.notabilify
+      anixpkgs.code2pdf
+      anixpkgs.abc
+      anixpkgs.doku
+      anixpkgs.epub
+      anixpkgs.gif
+      anixpkgs.md
+      anixpkgs.mp3
+      anixpkgs.mp4
+      anixpkgs.mp4unite
+      anixpkgs.pdf
+      anixpkgs.png
+      anixpkgs.svg
+      anixpkgs.zipper
+      anixpkgs.scrape
   ];
 
   programs.vim = {
@@ -44,10 +67,12 @@ with import ../dependencies.nix { inherit config; }; {
       vim-airline
       The_NERD_tree
       fugitive
-      # vim-gitgutter
-      YouCompleteMe
       vim-abolish
       command-t
     ];
+  };
+
+  home.file = with anixpkgs.pkgData; {
+"records/${records.crypt.name}".source = records.crypt.data;
   };
 }

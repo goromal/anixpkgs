@@ -10,6 +10,7 @@ in {
     machineType = "pi4";
     graphical = false;
     recreational = false;
+    isServer = false;
   };
 
   services.rankserver = {

@@ -21,9 +21,13 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes recreational packages.";
     };
+    isServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure is for a personal server instance.";
+    };
   };
 
-  imports = [ (import "${home-manager}/nixos") ];
+  imports = [ (import "${home-manager}/nixos") ] ++ (if cfg.isServer then [ ./components/ats-nixos-pkgs.nix ] else []);
 
   config = {
     system.stateVersion = nixos-state;
@@ -340,7 +344,7 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ./components/ats-pkgs.nix ] # ^^^^ TODO REMOVE
+      imports = [ ./components/base-nixos-pkgs.nix ]
         ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else

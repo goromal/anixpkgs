@@ -15,6 +15,11 @@ with import ../dependencies.nix { inherit config; }; {
     inherit anixpkgs;
   };
 
+  programs.vim.plugins = with vimPlugins; [
+    vim-gitgutter
+    YouCompleteMe
+  ];
+
   home.file = {
     ".anix-version".text =
       if local-build then "Local Build" else "v${anix-version}";

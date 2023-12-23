@@ -30,30 +30,7 @@ in {
 
     home.packages = [
       terminator
-      anixpkgs.authm
-      anixpkgs.goromail
-      anixpkgs.manage-gmail
-      anixpkgs.gmail-parser
-      anixpkgs.wiki-tools
-      anixpkgs.book-notes-sync
       anixpkgs.budget_report
-      anixpkgs.gantter
-      anixpkgs.md2pdf
-      anixpkgs.notabilify
-      anixpkgs.code2pdf
-      anixpkgs.abc
-      anixpkgs.doku
-      anixpkgs.epub
-      anixpkgs.gif
-      anixpkgs.md
-      anixpkgs.mp3
-      anixpkgs.mp4
-      anixpkgs.mp4unite
-      anixpkgs.pdf
-      anixpkgs.png
-      anixpkgs.svg
-      anixpkgs.zipper
-      anixpkgs.scrape
     ];
 
     home.file = with anixpkgs.pkgData; {
@@ -62,7 +39,6 @@ in {
       "TK_LIB_VARS.sh".text = ''
         export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
       '';
-      "records/${records.crypt.name}".source = records.crypt.data;
       ".config/terminator/config".source =
         ../res/terminator-config; # https://rigel.netlify.app/#terminal
       ".local/share/nautilus/scripts/terminal".source =
