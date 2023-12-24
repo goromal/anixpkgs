@@ -11,6 +11,7 @@ from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.manage import TaskManager
 from task_tools.defaults import TaskToolsDefaults as TTD
 
+
 def append_text_to_wiki_page(wiki, id, msg, text):
     doku = None
     doku = wiki.getPage(id=id)
@@ -24,10 +25,11 @@ def append_text_to_wiki_page(wiki, id, msg, text):
     if doku is not None:
         msg.moveToTrash()
 
-def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run):
+
+def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile):
     n = len(keyword)
-    if text[:(n+1)].lower() == f"{keyword}:":
-        matter = text[(n+1):].strip()
+    if text[: (n + 1)].lower() == f"{keyword}:":
+        matter = text[(n + 1) :].strip()
         print(f"  {keyword} offload item: {matter}")
         if matter[:3].lower() == "p0:":
             item = f"[::::{datestr}::::] {matter[3:].strip()}"
@@ -35,11 +37,12 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run):
             item = f"[:::{datestr}:::] {matter[3:].strip()}"
         else:
             item = f"[**{datestr}**] {matter.strip()}"
+        logfile.write(f"Wiki:{keyword} entry\n")
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
-    elif text[:(n+6)].lower() == f"sort {keyword}.":
-        matter = text[(n+6):].strip()
+    elif text[: (n + 6)].lower() == f"sort {keyword}.":
+        matter = text[(n + 6) :].strip()
         print(f"  {keyword} offload item: {matter}")
         if matter[:3].lower() == "p0:":
             item = f"[::::{datestr}::::] {matter[3:].strip()}"
@@ -47,10 +50,12 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run):
             item = f"[:::{datestr}:::] {matter[3:].strip()}"
         else:
             item = f"[**{datestr}**] {matter.strip()}"
+        logfile.write(f"Wiki:{keyword} entry\n")
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, item)
-        return True 
+        return True
     return False
+
 
 def add_journal_entry_to_wiki(wiki, msg, date, text):
     new_entry = (date, date.strftime("%B %d"), "FIXME\n\n" + text + "\n\n")
@@ -61,8 +66,13 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
         doku = f"""====== {date.year} ======
 
 """
-    entries = re.findall(r"===== (\w+\s\w+) =====\n\n([^=====]*)", doku, re.MULTILINE | re.DOTALL)
-    annotated_entries = [[datetime.strptime(f"{entry[0]} {date.year}", "%B %d %Y"), entry[0], entry[1]] for entry in entries]
+    entries = re.findall(
+        r"===== (\w+\s\w+) =====\n\n([^=====]*)", doku, re.MULTILINE | re.DOTALL
+    )
+    annotated_entries = [
+        [datetime.strptime(f"{entry[0]} {date.year}", "%B %d %Y"), entry[0], entry[1]]
+        for entry in entries
+    ]
     final_entries = []
     inserted_new = False
     for entry in annotated_entries:
@@ -73,7 +83,9 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
                 final_entries.append(new_entry)
                 inserted_new = True
             elif new_entry[0].date() == entry[0].date():
-                entry[2] += f"""
+                entry[
+                    2
+                ] += f"""
 
 {new_entry[2]}
 
@@ -85,7 +97,9 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
         final_entries.append(new_entry)
         inserted_new = True
 
-    string_entries = [f"===== {entry[1]} =====\n\n{entry[2]}" for entry in final_entries]
+    string_entries = [
+        f"===== {entry[1]} =====\n\n{entry[2]}" for entry in final_entries
+    ]
 
     new_doku = f"""====== {date.year} ======
 
@@ -95,6 +109,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     wiki.putPage(id=f"journals:{date.year}", content=new_doku)
     if doku is not None:
         msg.moveToTrash()
+
 
 @click.group()
 @click.pass_context
@@ -170,7 +185,36 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     show_default=True,
     help="Whether to enable logging.",
 )
-def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refresh_file, num_messages, wiki_url, wiki_secrets_file, task_secrets_file, task_refresh_token, enable_logging):
+@click.option(
+    "--headless",
+    "headless",
+    type=bool,
+    default=False,
+    show_default=True,
+    help="Whether to run in headless (i.e., server) mode.",
+)
+@click.option(
+    "--headless-logdir",
+    "headless_logdir",
+    type=click.Path(),
+    default=os.path.expanduser("~/goromail"),
+    show_default=True,
+    help="Directory in which to store log files for headless mode.",
+)
+def cli(
+    ctx: click.Context,
+    gmail_secrets_json,
+    gbot_refresh_file,
+    journal_refresh_file,
+    num_messages,
+    wiki_url,
+    wiki_secrets_file,
+    task_secrets_file,
+    task_refresh_token,
+    enable_logging,
+    headless,
+    headless_logdir,
+):
     """Manage the mail for GBot and Journal."""
     ctx.obj = {
         "enable_logging": enable_logging,
@@ -181,8 +225,11 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
         "wiki_url": wiki_url,
         "wiki_secrets_file": wiki_secrets_file,
         "task_secrets_file": task_secrets_file,
-        "task_refresh_token": task_refresh_token
+        "task_refresh_token": task_refresh_token,
+        "headless": headless,
+        "headless_logdir": headless_logdir,
     }
+
 
 @cli.command()
 @click.pass_context
@@ -202,37 +249,46 @@ def cli(ctx: click.Context, gmail_secrets_json, gbot_refresh_file, journal_refre
 )
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
+    if ctx["headless"]:
+        logfile = open(os.path.join(ctx["headless_logdir"], "bot.log"), "w")
     try:
         gbotCorpus = GBotCorpus(
             "goromal.bot@gmail.com",
             gmail_secrets_json=ctx.obj["gmail_secrets_json"],
             gbot_refresh_file=ctx.obj["gbot_refresh_file"],
-            enable_logging=ctx.obj["enable_logging"]
+            enable_logging=ctx.obj["enable_logging"],
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        logfile.close()
         exit(1)
     try:
         gbot = gbotCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        logfile.close()
         return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
-        enable_logging=ctx.obj["enable_logging"]
+        enable_logging=ctx.obj["enable_logging"],
     )
     try:
         task = TaskManager(
             task_secrets_file=ctx.obj["task_secrets_file"],
             task_refresh_token=ctx.obj["task_refresh_token"],
-            enable_logging=ctx.obj["enable_logging"]
+            enable_logging=ctx.obj["enable_logging"],
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        logfile.close()
         exit(1)
-    print(Fore.YELLOW + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
-    msgs = gbot.fromSenders(['6612105214@vzwpix.com']).getMessages()
+    print(
+        Fore.YELLOW
+        + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..."
+        + Style.RESET_ALL
+    )
+    msgs = gbot.fromSenders(["6612105214@vzwpix.com"]).getMessages()
     for msg in reversed(msgs):
         text = msg.getText().strip()
         date = msg.getDate()
@@ -241,31 +297,54 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             with open(categories_csv, "r") as categories:
                 for line in categories:
                     keyword, page_id = line.split(",")[0], line.split(",")[1]
-                    matched = process_keyword(text, date.strftime('%m/%d/%Y'), keyword, page_id, wiki, msg, dry_run)
+                    matched = process_keyword(
+                        text,
+                        date.strftime("%m/%d/%Y"),
+                        keyword,
+                        page_id,
+                        wiki,
+                        msg,
+                        dry_run,
+                        logfile,
+                    )
                     if matched:
                         break
         if matched:
             continue
         if text.isnumeric():
             print(f"  Calorie intake on {date}: {text}")
+            logfile.write("Calories entry\n")
             if not dry_run:
                 caljo_doku = None
                 caljo_doku = wiki.getPage(id="calorie-journal")
                 new_caljo_doku = f"""{caljo_doku}
-  * ({date}) {text}"""
+    * ({date}) {text}"""
                 wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                 if caljo_doku is not None:
                     msg.moveToTrash()
-        elif text[:3].lower() == "p0:" or text[:3].lower() == "p1:" or text[:3].lower() == "p2:" or text[:3].lower() == "p3:":
+        elif (
+            text[:3].lower() == "p0:"
+            or text[:3].lower() == "p1:"
+            or text[:3].lower() == "p2:"
+            or text[:3].lower() == "p3:"
+        ):
             print(f"  {text[:2]} task for {date}: {text[3:]}")
+            logfile.write("Task entry\n")
             if not dry_run:
-                task.putTask(text, f"Generated: {datetime.now().strftime('%m/%d/%Y')}", datetime.today())
+                task.putTask(
+                    text,
+                    f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
+                    datetime.today(),
+                )
                 msg.moveToTrash()
         else:
             print(f"  ITNS from {date}: {text}")
+            logfile.write("Wiki:ITNS entry\n")
             if not dry_run:
                 append_text_to_wiki_page(wiki, "itns", msg, text)
+    logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
+
 
 @cli.command()
 @click.pass_context
@@ -277,44 +356,58 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 )
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
+    if ctx["headless"]:
+        logfile = open(os.path.join(ctx["headless_logdir"], "journal.log"), "w")
     try:
         journalCorpus = JournalCorpus(
             "goromal.journal@gmail.com",
             gmail_secrets_json=ctx.obj["gmail_secrets_json"],
             journal_refresh_file=ctx.obj["journal_refresh_file"],
-            enable_logging=ctx.obj["enable_logging"]
+            enable_logging=ctx.obj["enable_logging"],
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        logfile.close()
         exit(1)
     try:
         journal = journalCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        logfile.close()
         return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
-        enable_logging=ctx.obj["enable_logging"]
+        enable_logging=ctx.obj["enable_logging"],
     )
-    print(Fore.YELLOW + f"Processing pending journal entries{' (DRY RUN)' if dry_run else ''}..." + Style.RESET_ALL)
-    msgs = journal.fromSenders(['6612105214@vzwpix.com']).getMessages()
+    print(
+        Fore.YELLOW
+        + f"Processing pending journal entries{' (DRY RUN)' if dry_run else ''}..."
+        + Style.RESET_ALL
+    )
+    msgs = journal.fromSenders(["6612105214@vzwpix.com"]).getMessages()
     for msg in reversed(msgs):
         text = msg.getText()
         date = msg.getDate()
         predate = re.match(r"\d\d?/\d\d?/\d\d\d\d:", text)
         if predate:
-            date = datetime.strptime(re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y")
+            date = datetime.strptime(
+                re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
+            )
             text = text.split(":")[1].strip()
         print(f"  Journal entry for {date}")
+        logfile.write(f"{date}\n")
         if dry_run:
             print(text)
         if not dry_run:
             add_journal_entry_to_wiki(wiki, msg, date, text)
+    logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
+
 
 def main():
     cli()
+
 
 if __name__ == "__main__":
     main()
