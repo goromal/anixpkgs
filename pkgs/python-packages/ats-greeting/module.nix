@@ -24,8 +24,7 @@ in {
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
-        Restart = "always";
-        RestartSec = 5;
+        Restart = "no";
         User = "andrew";
         Group = "dev";
       };
