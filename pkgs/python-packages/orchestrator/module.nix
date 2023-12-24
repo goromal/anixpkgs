@@ -19,6 +19,11 @@ in {
       description = "Number of concurrent threads to orchestrate";
       default = 2;
     };
+    pathPkgs = mkOption {
+      type = types.listOf types.package;
+      description = "Packages to expose to orchestratord's PATH";
+      default = [];
+    };
   };
 
   config = mkIf cfg.enable {
@@ -41,6 +46,7 @@ in {
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];
+      path = cfg.pathPkgs;
     };
   };
 }

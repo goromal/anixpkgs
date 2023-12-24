@@ -201,6 +201,10 @@ in {
     services.orchestratord = {
       enable = cfg.isServer;
       orchestratorPkg = anixpkgs.orchestrator;
+      pathPkgs = [
+        pkgs.coreutils
+        anixpkgs.mp4
+      ];
     };
 
     services.ats-greeting = {
