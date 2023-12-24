@@ -204,6 +204,7 @@ in {
       pathPkgs = [
         pkgs.bash
         pkgs.coreutils
+        pkgs.rclone
         anixpkgs.mp4
         anixpkgs.mp4unite
         anixpkgs.gmail-parser
