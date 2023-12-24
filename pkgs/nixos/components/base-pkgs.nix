@@ -22,23 +22,23 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
-      anixpkgs.gantter
-      anixpkgs.md2pdf
-      anixpkgs.notabilify
-      anixpkgs.code2pdf
-      anixpkgs.abc
-      anixpkgs.doku
-      anixpkgs.epub
-      anixpkgs.gif
-      anixpkgs.md
-      anixpkgs.mp3
-      anixpkgs.mp4
-      anixpkgs.mp4unite
-      anixpkgs.pdf
-      anixpkgs.png
-      anixpkgs.svg
-      anixpkgs.zipper
-      anixpkgs.scrape
+    anixpkgs.gantter
+    anixpkgs.md2pdf
+    anixpkgs.notabilify
+    anixpkgs.code2pdf
+    anixpkgs.abc
+    anixpkgs.doku
+    anixpkgs.epub
+    anixpkgs.gif
+    anixpkgs.md
+    anixpkgs.mp3
+    anixpkgs.mp4
+    anixpkgs.mp4unite
+    anixpkgs.pdf
+    anixpkgs.png
+    anixpkgs.svg
+    anixpkgs.zipper
+    anixpkgs.scrape
   ];
 
   programs.vim = {
@@ -73,6 +73,6 @@ with import ../dependencies.nix { inherit config; }; {
   };
 
   home.file = with anixpkgs.pkgData; {
-"records/${records.crypt.name}".source = records.crypt.data;
+    "records/${records.crypt.name}".source = records.crypt.data;
   };
 }

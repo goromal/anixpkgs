@@ -14,10 +14,7 @@ with import ../dependencies.nix { inherit config; }; {
     inherit anixpkgs;
   };
 
-  programs.vim.plugins = with vimPlugins; [
-    vim-gitgutter
-    YouCompleteMe
-  ];
+  programs.vim.plugins = with vimPlugins; [ vim-gitgutter YouCompleteMe ];
 
   home.file = {
     ".anix-version".text =

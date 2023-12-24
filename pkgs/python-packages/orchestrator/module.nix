@@ -22,7 +22,7 @@ in {
     pathPkgs = mkOption {
       type = types.listOf types.package;
       description = "Packages to expose to orchestratord's PATH";
-      default = [];
+      default = [ ];
     };
   };
 
