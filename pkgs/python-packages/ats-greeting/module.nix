@@ -4,6 +4,7 @@ with lib;
 let cfg = config.services.ats-greeting;
 greetingScript = writeShellScript "ats-greeting" ''
   authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
+  sleep 5
   gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
     "🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
 '';
@@ -29,7 +30,7 @@ in {
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];
-      requires = [ "orchestratord.service" ];
+      after = [ "orchestratord.service" ];
     };
   };
 }
