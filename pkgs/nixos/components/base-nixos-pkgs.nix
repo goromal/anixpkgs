@@ -5,7 +5,6 @@ with import ../dependencies.nix { inherit config; }; {
     ./base-pkgs.nix
     ./base-dev-pkgs.nix
     ../../bash-packages/nix-tools/module.nix
-    ../../python-packages/orchestrator/module.nix
   ];
 
   home.packages = [ docker tmux ];

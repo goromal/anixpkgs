@@ -27,7 +27,11 @@ in {
     };
   };
 
-  imports = ([ (import "${home-manager}/nixos") ] ++ (if cfg.isServer then [ ./components/ats-nixos-pkgs.nix ] else []));
+  imports = [
+    (import "${home-manager}/nixos")
+    ../../python-packages/orchestrator/module.nix
+    ../../python-packages/ats-greeting/module.nix
+  ];
 
   config = {
     system.stateVersion = nixos-state;
@@ -193,6 +197,18 @@ in {
       rateLimitInterval = "0s";
     };
 
+    # Server processes
+    services.orchestratord = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+    };
+
+    services.ats-greeting = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+    };
+
+    # Global packages
     environment.systemPackages = [
       ack
       procs
