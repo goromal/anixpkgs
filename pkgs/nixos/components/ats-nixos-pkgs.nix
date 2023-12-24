@@ -1,8 +1,9 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with import ../dependencies.nix { inherit config; };
-let orchestratorPkg = anixpkgs.orchestrator;
-in {
+# let orchestratorPkg = anixpkgs.orchestrator;
+# in {
+{
   # imports = [
   #   ../../python-packages/orchestrator/module.nix
   #   ../../python-packages/ats-greeting/module.nix
