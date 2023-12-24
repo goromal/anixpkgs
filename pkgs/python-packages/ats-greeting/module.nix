@@ -8,7 +8,7 @@ let
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
     sleep 5
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
-      "🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+      "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
 in {
   options.services.ats-greeting = with types; {
