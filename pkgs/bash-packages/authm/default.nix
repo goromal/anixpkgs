@@ -1,4 +1,4 @@
-{ writeShellScriptBin, color-prints, callPackage, python }:
+{ writeShellScriptBin, color-prints, redirects, callPackage, python }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
@@ -46,11 +46,11 @@ let
       fi
       ${color-prints}/bin/echo_cyan "Syncing the secrets directory..."
       _success=1
-      rclone bisync dropbox:secrets "$SECRETS_DIR" || { _success=0; }
+      rclone bisync dropbox:secrets "$SECRETS_DIR" ${redirects.suppress_all} || { _success=0; }
       if [[ "$_success" == "0" ]]; then
         ${color-prints}/bin/echo_yellow "Bisync failed; attempting with --resync..."
         _success=1
-        rclone bisync --resync dropbox:secrets "$SECRETS_DIR" || { _success=0; }
+        rclone bisync --resync dropbox:secrets "$SECRETS_DIR" ${redirects.suppress_all} || { _success=0; }
         if [[ "$_success" == "0" ]]; then
           >&2 ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
           exit 1
