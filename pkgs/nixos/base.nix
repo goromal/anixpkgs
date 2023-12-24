@@ -29,8 +29,8 @@ in {
 
   imports = [
     (import "${home-manager}/nixos")
-    ../../python-packages/orchestrator/module.nix
-    ../../python-packages/ats-greeting/module.nix
+    ../python-packages/orchestrator/module.nix
+    ../python-packages/ats-greeting/module.nix
   ];
 
   config = {
