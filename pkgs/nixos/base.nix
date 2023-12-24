@@ -202,8 +202,13 @@ in {
       enable = cfg.isServer;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = [
+        pkgs.bash
         pkgs.coreutils
         anixpkgs.mp4
+        anixpkgs.mp4unite
+        anixpkgs.gmail-parser
+        anixpkgs.scrape
+        anixpkgs.authm
       ];
     };
 
