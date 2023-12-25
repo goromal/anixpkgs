@@ -208,6 +208,7 @@ in {
         pkgs.rclone
         anixpkgs.mp4
         anixpkgs.mp4unite
+        anixpkgs.goromail
         anixpkgs.gmail-parser
         anixpkgs.scrape
         anixpkgs.authm
