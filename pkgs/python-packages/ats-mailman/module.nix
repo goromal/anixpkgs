@@ -11,20 +11,21 @@ let
     goromail --headless 1 journal ${cfg.redirectsPkg.suppress_all}
     if [[ ! -z "$(cat ${cfg.rootDir}/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
-      # authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
-      # gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-      #  "[$(date)] Processed mail:"
       authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
+      echo "[$(date)] Bot mail received:" \
+        | cat - ${cfg.rootDir}/bot.log > ${cfg.rootDir}/temp \
+        && mv ${cfg.rootDir}/temp ${cfg.rootDir}/bot.log
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Bot mail received:\n$(cat ${cfg.rootDir}/bot.log)"
+        "$(cat ${cfg.rootDir}/bot.log)"
     fi 
     if [[ ! -z "$(cat ${cfg.rootDir}/journal.log)" ]]; then
       echo "Notifying about processed journal mail..."
-      # gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-      #   "[$(date)] Processed journal:"
       authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
+      echo "[$(date)] Journal mail received:" \
+        | cat - ${cfg.rootDir}/journal.log > ${cfg.rootDir}/temp \
+        && mv ${cfg.rootDir}/temp ${cfg.rootDir}/journal.log
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Journal mail received:\n$(cat ${cfg.rootDir}/journal.log)"
+        "$(cat ${cfg.rootDir}/journal.log)"
     fi
   '';
 in {
