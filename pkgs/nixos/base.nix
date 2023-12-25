@@ -218,6 +218,11 @@ in {
       orchestratorPkg = anixpkgs.orchestrator;
     };
 
+    services.ats-mailman = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+    };
+
     # Global packages
     environment.systemPackages = [
       ack

@@ -10,12 +10,18 @@ let
     goromail bot --headless
     goromail journal --headless
     if [[ ! -z "$(cat ${cfg.rootDir}/bot.log)" ]]; then
+      echo "Notifying about processed bot mail..."
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Processed mail:\n$(cat ${cfg.rootDir}/bot.log)"
+        "[$(date)] Processed mail:"
+      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+        "$(cat ${cfg.rootDir}/bot.log)"
     fi 
     if [[ ! -z "$(cat ${cfg.rootDir}/journal.log)" ]]; then
+      echo "Notifying about processed journal mail..."
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Processed journal:\n$(cat ${cfg.rootDir}/journal.log)"
+        "[$(date)] Processed journal:"
+      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+        "$(cat ${cfg.rootDir}/journal.log)"
     fi
   '';
 in {
