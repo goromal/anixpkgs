@@ -249,8 +249,8 @@ def cli(
 )
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
-    if ctx["headless"]:
-        logfile = open(os.path.join(ctx["headless_logdir"], "bot.log"), "w")
+    if ctx.obj["headless"]:
+        logfile = open(os.path.join(ctx.obj["headless_logdir"], "bot.log"), "w")
     try:
         gbotCorpus = GBotCorpus(
             "goromal.bot@gmail.com",
@@ -356,8 +356,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 )
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
-    if ctx["headless"]:
-        logfile = open(os.path.join(ctx["headless_logdir"], "journal.log"), "w")
+    if ctx.obj["headless"]:
+        logfile = open(os.path.join(ctx.obj["headless_logdir"], "journal.log"), "w")
     try:
         journalCorpus = JournalCorpus(
             "goromal.journal@gmail.com",
