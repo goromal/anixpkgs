@@ -2,17 +2,11 @@
 with pkgs;
 with lib;
 let
-  cfg = config.services.ats-mailman;
+  cfg = config.services.ats-greeting;
   greetingScript = writeShellScript "ats-greeting" ''
-    set -e
+    sleep 5
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
-    # TODO warn about expiration
-    goromail bot --headless
-    goromail journal --headless
-    # TODO! read logs and notify
-    
-    
-    
+    sleep 5
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
