@@ -8,7 +8,7 @@ let
     Manage cloud directories with rclone.
 
     CLOUD_DIR options:
-    
+
       configs       dropbox:configs  <->  ~/configs
       secrets       dropbox:secrets  <->  ~/secrets
       games         dropbox:Games    <->  ~/games
@@ -16,8 +16,7 @@ let
       documents     drive:Documents  <->  ~/Documents
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      ${longDescription}'';
+    usage_str = "${longDescription}";
     optsWithVarsAndDefaults = [ ];
   };
   printErr = ">&2 ${color-prints}/bin/echo_red";
