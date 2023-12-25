@@ -7,8 +7,8 @@ let
     set -e
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
     # TODO warn about expiration
-    goromail bot --headless
-    goromail journal --headless
+    goromail --headless bot
+    goromail --headless journal
     if [[ ! -z "$(cat ${cfg.rootDir}/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
@@ -51,7 +51,7 @@ in {
           "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
         Restart = "always";
         RestartSec = 300;
-        ReadWritePaths = [ "${cfg.rootDir}" ];
+        ReadWritePaths = [ "/data/andrew" ];
         WorkingDirectory = cfg.rootDir;
         User = "andrew";
         Group = "dev";

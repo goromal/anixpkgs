@@ -59,9 +59,23 @@ let
     fi
   '';
 in (writeShellScriptBin pkgname ''
+  lockfile=$HOME/.authm-lock
+  timeout_secs=30
+  wait_secs=0
+  while [[ -f "$lockfile" ]] && (( wait_secs < timeout_secs )); do
+    echo "Waiting for lockfile to clear..."
+    wait_secs=$(( wait_secs+1 ))
+    sleep 1
+  done
+  if [[ -f "$lockfile" ]]; then
+    >&2 ${color-prints}/bin/echo_red "Timed out waiting for lockfile to clear. Exiting."
+    exit 1
+  fi
+  touch "$lockfile"
   ${bisync}
   ${authm}/bin/${pkgname} $@
   ${bisync}
+  rm "$lockfile"
 '') // {
   meta = { inherit description longDescription; };
 }

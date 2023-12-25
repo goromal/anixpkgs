@@ -29,6 +29,7 @@ in {
         ExecStart =
           "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
         Restart = "no";
+        ReadWritePaths = [ "/data/andrew" ];
         User = "andrew";
         Group = "dev";
       };
