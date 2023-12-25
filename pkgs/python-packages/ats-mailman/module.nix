@@ -7,8 +7,8 @@ let
     set -e
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
     # TODO warn about expiration
-    goromail --headless bot
-    goromail --headless journal
+    goromail --headless 1 bot
+    goromail --headless 1 journal
     if [[ ! -z "$(cat ${cfg.rootDir}/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
