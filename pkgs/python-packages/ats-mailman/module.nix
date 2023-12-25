@@ -7,21 +7,24 @@ let
     set -e
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
     # TODO warn about expiration
-    goromail --headless 1 bot
-    goromail --headless 1 journal
+    goromail --headless 1 bot ${cfg.redirectsPkg.suppress_all}
+    goromail --headless 1 journal ${cfg.redirectsPkg.suppress_all}
     if [[ ! -z "$(cat ${cfg.rootDir}/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
+      # authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
+      # gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+      #  "[$(date)] Processed mail:"
+      authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Processed mail:"
-      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "$(cat ${cfg.rootDir}/bot.log)"
+        "[$(date)] Bot mail received:\n$(cat ${cfg.rootDir}/bot.log)"
     fi 
     if [[ ! -z "$(cat ${cfg.rootDir}/journal.log)" ]]; then
       echo "Notifying about processed journal mail..."
+      # gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+      #   "[$(date)] Processed journal:"
+      authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Processed journal:"
-      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "$(cat ${cfg.rootDir}/journal.log)"
+        "[$(date)] Journal mail received:\n$(cat ${cfg.rootDir}/journal.log)"
     fi
   '';
 in {
@@ -35,6 +38,10 @@ in {
     orchestratorPkg = mkOption {
       type = types.package;
       description = "The orchestrator package to use";
+    };
+    redirectsPkg = mkOption {
+      type = types.package;
+      description = "The redirects package to use";
     };
   };
 
