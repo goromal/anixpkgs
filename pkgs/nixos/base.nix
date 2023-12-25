@@ -223,6 +223,7 @@ in {
     services.ats-mailman = {
       enable = cfg.isServer;
       orchestratorPkg = anixpkgs.orchestrator;
+      redirectsPkg = anixpkgs.redirects;
     };
 
     # Global packages
