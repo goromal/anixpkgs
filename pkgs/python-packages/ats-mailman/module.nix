@@ -15,7 +15,7 @@ let
     fi 
     if [[ ! -z "$(cat ${cfg.rootDir}/journal.log)" ]]; then
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-        "[$(date)] Processed mail:\n$(cat ${cfg.rootDir}/journal.log)"
+        "[$(date)] Processed journal:\n$(cat ${cfg.rootDir}/journal.log)"
     fi
   '';
 in {
@@ -51,7 +51,7 @@ in {
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];
-      after = [ "orchestratord.service" ];
+      after = [ "ats-greeting.service" ];
     };
   };
 }
