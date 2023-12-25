@@ -31,6 +31,7 @@ in {
     (import "${home-manager}/nixos")
     ../python-packages/orchestrator/module.nix
     ../python-packages/ats-greeting/module.nix
+    ../python-packages/ats-mailman/module.nix
   ];
 
   config = {
