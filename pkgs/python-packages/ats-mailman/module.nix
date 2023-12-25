@@ -40,7 +40,7 @@ in {
       description = "The orchestrator package to use";
     };
     redirectsPkg = mkOption {
-      type = types.package;
+      type = types.attrs;
       description = "The redirects package to use";
     };
   };
