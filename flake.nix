@@ -81,7 +81,7 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator?ref=dev/exec-errors";
+    orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
     pyceres.url =

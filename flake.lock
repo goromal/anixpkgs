@@ -325,16 +325,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1703391016,
+        "lastModified": 1703565014,
         "narHash": "sha256-84piWwQgaSKDbUbSAs43FlaraZimoxrRuYXXL8dJiw8=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "df9b56d95b852fa219735945e09cd8a41ba41a67",
+        "rev": "ce80790c4b7a031280b2f2b0cde234b1656ac8c0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/exec-errors",
         "repo": "orchestrator",
         "type": "github"
       }
