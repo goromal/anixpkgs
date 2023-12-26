@@ -6,6 +6,7 @@ let
   greetingScript = writeShellScript "ats-mailman" ''
     set -e
     authm refresh  || { >&2 echo "authm refresh error!"; exit 1; }
+    rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
     # TODO warn about expiration
     goromail --headless 1 bot ${cfg.redirectsPkg.suppress_all}
     goromail --headless 1 journal ${cfg.redirectsPkg.suppress_all}
@@ -58,7 +59,7 @@ in {
         ExecStart =
           "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
         Restart = "always";
-        RestartSec = 300;
+        RestartSec = 1800; # every half hour
         ReadWritePaths = [ "/data/andrew" ];
         WorkingDirectory = cfg.rootDir;
         User = "andrew";
