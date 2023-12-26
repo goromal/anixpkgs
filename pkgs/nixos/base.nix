@@ -206,6 +206,7 @@ in {
         pkgs.bash
         pkgs.coreutils
         pkgs.rclone
+        anixpkgs.rcrsync
         anixpkgs.mp4
         anixpkgs.mp4unite
         anixpkgs.goromail
