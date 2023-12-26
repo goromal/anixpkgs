@@ -21,6 +21,10 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes recreational packages.";
     };
+    developer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure includes developer packages.";
+    };
     isServer = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
@@ -378,7 +382,7 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ]
+      imports = [ ./components/base-nixos-pkgs.nix ] ++ (if cfg.developer then [ ./components/base-dev-nixos-pkgs.nix] else [])
         ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else
@@ -388,7 +392,7 @@ in {
             else
               [ ]) ++ (if cfg.graphical then
                 ([ ./components/x86-graphical-nixos-pkgs.nix ]
-                  ++ (if cfg.recreational then
+                  ++ (if cfg.developer then [ ./components/x86-graphical-dev-nixos-pkgs.nix] else []) ++ (if cfg.recreational then
                     [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
                   else
                     [ ]))

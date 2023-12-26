@@ -3,7 +3,6 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   imports = [
     ./base-pkgs.nix
-    ./base-dev-pkgs.nix
     ../../bash-packages/nix-tools/module.nix
   ];
 
@@ -13,8 +12,6 @@ with import ../dependencies.nix { inherit config; }; {
     enable = true;
     inherit anixpkgs;
   };
-
-  programs.vim.plugins = with vimPlugins; [ vim-gitgutter YouCompleteMe ];
 
   home.file = {
     ".anix-version".text =

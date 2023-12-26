@@ -8,7 +8,6 @@ let
 in {
   imports = [
     ./x86-graphical-pkgs.nix
-    ./x86-graphical-dev-pkgs.nix
     ../../bash-packages/nix-tools/module.nix
   ];
 
@@ -68,7 +67,6 @@ in {
         "org.gnome.Nautilus.desktop"
         "google-chrome.desktop"
         "terminator.desktop"
-        "codium.desktop"
         "pinta.desktop"
         "gimp.desktop"
         "org.inkscape.Inkscape.desktop"

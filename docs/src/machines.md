@@ -24,22 +24,36 @@ nixpkgs https://nixos.org/channels/nixos-23.05
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
-Example home import (if necessary):
+Example `home.nix` file for personal use:
 
 ```nix
-# home.nix
-{ config, pkgs, ... }:
-let
-   anixsrc = ...; 
-   unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
-in {
-    imports = [
-        "${anixsrc}/pkgs/nixos/homes/personal.nix"
-    ];
+{ config, pkgs, lib, ... }:
+with import ../dependencies.nix { inherit config; }; {
+  home.username = "andrew";
+  home.homeDirectory = "/home/andrew";
+  home.stateVersion = nixos-version;
+  programs.home-manager.enable = true;
 
-    mods.x86-graphical.vscodium-package = unstable.vscodium;
+  # $ nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl && nix-channel --update
+  # $ nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
+
+  imports = [
+    [ANIX_SRC]/pkgs/nixos/components/base-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/base-dev-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-rec-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-dev-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-rec-pkgs.nix
+  ];
+
+  mods.x86-graphical.standalone = true;
+  mods.x86-graphical.homeDir = "/home/andrew";
+  mods.x86-graphical-rec.standalone = true;
 }
+
 ```
+
+`*-rec-*` packages can be removed for non-recreational use.
 
 Symlink to `~/.config/home-manager/home.nix`.
 
