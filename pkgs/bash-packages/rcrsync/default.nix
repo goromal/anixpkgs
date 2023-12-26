@@ -71,7 +71,7 @@ in (writeShellScriptBin pkgname ''
       ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
       exit 1
     fi
-    ${printCyn} "Syncing the $CLOUD_DIR and $LOCAL_DIR..."
+    ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
     _success=1
     ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
     if [[ "$_success" == "0" ]]; then
