@@ -382,8 +382,10 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ] ++ (if cfg.developer then [ ./components/base-dev-nixos-pkgs.nix] else [])
-        ++ (if cfg.machineType == "pi4" then
+      imports = [ ./components/base-nixos-pkgs.nix ] ++ (if cfg.developer then
+        [ ./components/base-dev-nixos-pkgs.nix ]
+      else
+        [ ]) ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else
           [ ]) ++ (if cfg.machineType == "x86_linux" then
@@ -392,10 +394,13 @@ in {
             else
               [ ]) ++ (if cfg.graphical then
                 ([ ./components/x86-graphical-nixos-pkgs.nix ]
-                  ++ (if cfg.developer then [ ./components/x86-graphical-dev-nixos-pkgs.nix] else []) ++ (if cfg.recreational then
-                    [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                  ++ (if cfg.developer then
+                    [ ./components/x86-graphical-dev-nixos-pkgs.nix ]
                   else
-                    [ ]))
+                    [ ]) ++ (if cfg.recreational then
+                      [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                    else
+                      [ ]))
               else
                 [ ]))
           else
