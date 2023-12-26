@@ -1,4 +1,4 @@
-{ writeShellScriptBin, color-prints, redirects, callPackage, python }:
+{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
@@ -38,27 +38,12 @@ let
       checkPkgs = [ ];
     });
   bisync = ''
-    SECRETS_DIR="$HOME/secrets"
     if [[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]; then
-      if [[ ! -d "$SECRETS_DIR" ]]; then
-        >&2 ${color-prints}/bin/echo_red "Secrets directory $SECRETS_DIR not present. Exiting."
-        exit 1
-      fi
-      ${color-prints}/bin/echo_cyan "Syncing the secrets directory..."
-      _success=1
-      rclone bisync dropbox:secrets "$SECRETS_DIR" ${redirects.suppress_all} || { _success=0; }
-      if [[ "$_success" == "0" ]]; then
-        ${color-prints}/bin/echo_yellow "Bisync failed; attempting with --resync..."
-        _success=1
-        rclone bisync --resync dropbox:secrets "$SECRETS_DIR" ${redirects.suppress_all} || { _success=0; }
-        if [[ "$_success" == "0" ]]; then
-          >&2 ${color-prints}/bin/echo_red "Bisync retry failed. Exiting."
-          exit 1
-        fi
-      fi
+      ${rcrsync}/bin/rcrsync sync secrets
     fi
   '';
 in (writeShellScriptBin pkgname ''
+  set -e
   lockfile=$HOME/.authm-lock
   timeout_secs=30
   wait_secs=0

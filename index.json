@@ -178,6 +178,10 @@
                 "ci": true
             },
             {
+                "attr": "rcrsync",
+                "ci": true
+            },
+            {
                 "attr": "manif-geom-rs",
                 "ci": true
             },

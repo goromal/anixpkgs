@@ -303,7 +303,6 @@ in {
       glances
       gping
       dog
-      rclone
     ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
     # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;

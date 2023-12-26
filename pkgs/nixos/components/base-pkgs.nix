@@ -4,6 +4,7 @@ with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     rclone
     anixpkgs.authm
+    anixpkgs.rcrsync
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
