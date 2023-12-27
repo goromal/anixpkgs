@@ -405,12 +405,6 @@ in {
                 [ ]))
           else
             [ ]);
-
-      mods.x86-graphical =
-        lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-          vscodium-package = unstable.vscodium;
-        };
-
     };
   };
 }
