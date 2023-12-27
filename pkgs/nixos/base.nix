@@ -6,7 +6,6 @@ let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
-  lookup = attrs: key: default: if attrs ? key then attrs."${key}" else default;
 in {
   options.machines.base = {
     machineType = lib.mkOption {
@@ -43,7 +42,9 @@ in {
 
     boot = {
       kernelPackages = (if cfg.machineType == "pi4" then
-        pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest);
+        pkgs.linuxPackages_rpi4
+      else
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -57,8 +58,8 @@ in {
       loader = {
         # Use the systemd-boot EFI boot loader.
         # Grub is used on Raspberry Pi
-        systemd-boot.enable = lib.mkForce (
-          if cfg.machineType == "x86_linux" then true else false);
+        systemd-boot.enable =
+          (if cfg.machineType == "x86_linux" then true else false);
         efi = {
           canTouchEfiVariables = true;
           efiSysMountPoint =
