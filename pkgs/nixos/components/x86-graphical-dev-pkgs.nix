@@ -7,7 +7,7 @@ in {
     vscodium-package = lib.mkOption {
       type = lib.types.package;
       description = "VSCode flavor to use (default: pkgs.vscodium)";
-      default = vscodium;
+      default = unstable.vscodium;
     };
   };
 
