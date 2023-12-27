@@ -81,6 +81,9 @@ in (writeShellScriptBin pkgname ''
       exit 1
     fi
     ln -s "$source" anixpkgs
+    if [[ "$localVar" == "true" ]]; then
+      sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/nixos/dependencies.nix
+    fi
   else
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
