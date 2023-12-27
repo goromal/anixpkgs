@@ -46,5 +46,6 @@ Packages written in assorted languages like Bash, Rust, Java, etc.
 - [nix-diffs](./nix-diffs.md)
 - [anix-version](./anix-version.md)
 - [anix-upgrade](./anix-upgrade.md)
+- [rcrsync](./rcrsync.md)
 - [manif-geom-rs](./manif-geom-rs.md)
 - [xv-lidar-rs](./xv-lidar-rs.md)
