@@ -65,6 +65,10 @@ in (writeShellScriptBin pkgname ''
   else
     localVar=false
   fi
+  if [[ -d anixpkgs ]]; then
+    ${printYellow} "Removing existing symlink."
+    rm anixpkgs
+  fi
   if [[ ! -z "$version" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
   elif [[ ! -z "$commit" ]]; then
@@ -75,9 +79,6 @@ in (writeShellScriptBin pkgname ''
     if [[ "$source" != /* ]]; then
       ${printError} "Please provide an absolute path to the source tree."
       exit 1
-    fi
-    if [[ -d anixpkgs ]]; then
-      rm anixpkgs
     fi
     ln -s "$source" anixpkgs
   else
