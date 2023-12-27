@@ -54,3 +54,13 @@ nix-shell --run "bash test.sh"
 ```
 
 *Automatically run as part of CI pipeline.*
+
+## Closure Verifications
+
+To check the validity of all NixOS closures (without actually building them), run
+
+```bash
+bash scripts/check_machines.sh
+```
+
+*Automatically run as part of CI pipeline.*
