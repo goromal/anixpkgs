@@ -42,10 +42,8 @@ in {
     system.stateVersion = nixos-state;
 
     boot = {
-      kernelPackages = (lookup {
-        x86_linux = pkgs.linuxPackages_latest;
-        pi4 = pkgs.linuxPackages_rpi4;
-      } cfg.machineType pkgs.linuxPackages_latest);
+      kernelPackages = (if cfg.machineType == "pi4" then
+        pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -59,10 +57,8 @@ in {
       loader = {
         # Use the systemd-boot EFI boot loader.
         # Grub is used on Raspberry Pi
-        systemd-boot.enable = lib.mkForce (lookup {
-          x86_linux = true;
-          pi4 = false;
-        } cfg.machineType true);
+        systemd-boot.enable = lib.mkForce (
+          if cfg.machineType == "x86_linux" then true else false);
         efi = {
           canTouchEfiVariables = true;
           efiSysMountPoint =
