@@ -21,9 +21,22 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes recreational packages.";
     };
+    developer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure includes developer packages.";
+    };
+    isServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure is for a personal server instance.";
+    };
   };
 
-  imports = [ (import "${home-manager}/nixos") ];
+  imports = [
+    (import "${home-manager}/nixos")
+    ../python-packages/orchestrator/module.nix
+    ../python-packages/ats-greeting/module.nix
+    ../python-packages/ats-mailman/module.nix
+  ];
 
   config = {
     system.stateVersion = nixos-state;
@@ -189,6 +202,36 @@ in {
       rateLimitInterval = "0s";
     };
 
+    # Server processes
+    services.orchestratord = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+      pathPkgs = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.rclone
+        anixpkgs.rcrsync
+        anixpkgs.mp4
+        anixpkgs.mp4unite
+        anixpkgs.goromail
+        anixpkgs.gmail-parser
+        anixpkgs.scrape
+        anixpkgs.authm
+      ];
+    };
+
+    services.ats-greeting = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+    };
+
+    services.ats-mailman = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+      redirectsPkg = anixpkgs.redirects;
+    };
+
+    # Global packages
     environment.systemPackages = [
       ack
       procs
@@ -265,7 +308,6 @@ in {
       glances
       gping
       dog
-      rclone
     ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
     # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
@@ -340,8 +382,10 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ]
-        ++ (if cfg.machineType == "pi4" then
+      imports = [ ./components/base-nixos-pkgs.nix ] ++ (if cfg.developer then
+        [ ./components/base-dev-nixos-pkgs.nix ]
+      else
+        [ ]) ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else
           [ ]) ++ (if cfg.machineType == "x86_linux" then
@@ -350,10 +394,13 @@ in {
             else
               [ ]) ++ (if cfg.graphical then
                 ([ ./components/x86-graphical-nixos-pkgs.nix ]
-                  ++ (if cfg.recreational then
-                    [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                  ++ (if cfg.developer then
+                    [ ./components/x86-graphical-dev-nixos-pkgs.nix ]
                   else
-                    [ ]))
+                    [ ]) ++ (if cfg.recreational then
+                      [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                    else
+                      [ ]))
               else
                 [ ]))
           else

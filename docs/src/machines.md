@@ -4,28 +4,67 @@
 
 ## Home-Manager Example
 
-```nix
-# home.nix
-{ config, pkgs, ... }:
-let
-   anixsrc = ...; 
-   unstable = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
-in {
-    imports = [
-        "${anixsrc}/pkgs/nixos/homes/personal.nix"
-    ];
-
-    mods.x86-graphical.vscodium-package = unstable.vscodium;
-}
+1. Install Nix standalone:
+```bash
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
+3. Set proper Nix settings in `/etc/nix/nix.conf`:
+```
+substituters = https://cache.nixos.org/ https://github-public.cachix.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+narinfo-cache-positive-ttl = 0
+narinfo-cache-negative-ttl = 0
+experimental-features = nix-command flakes auto-allocate-uids
+```
+4. Add these Nix channels via `nix-channel --add URL NAME`:
+```bash
+$ nix-channel --list
+home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-23.05
+```
+5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
+
+Example `home.nix` file for personal use:
+
+```nix
+{ config, pkgs, lib, ... }:
+with import ../dependencies.nix { inherit config; }; {
+  home.username = "andrew";
+  home.homeDirectory = "/home/andrew";
+  home.stateVersion = nixos-version;
+  programs.home-manager.enable = true;
+
+  # $ nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl && nix-channel --update
+  # $ nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
+
+  imports = [
+    [ANIX_SRC]/pkgs/nixos/components/base-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/base-dev-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-rec-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-dev-pkgs.nix
+    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-rec-pkgs.nix
+  ];
+
+  mods.x86-graphical.standalone = true;
+  mods.x86-graphical.homeDir = "/home/andrew";
+  mods.x86-graphical-rec.standalone = true;
+}
+
+```
+
+`*-rec-*` packages can be removed for non-recreational use.
+
+Symlink to `~/.config/home-manager/home.nix`.
 
 Corresponding `~/.bashrc`:
 
 ```bash
+export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 export NIXPKGS_ALLOW_UNFREE=1
-alias code='codium'
-eval "$(direnv hook bash)"
+# alias code='codium'
+# eval "$(direnv hook bash)"
 ```
 
 ## Build a Raspberry Pi NixOS SD Installer Image

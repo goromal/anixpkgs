@@ -3,20 +3,17 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     rclone
-    direnv
+    anixpkgs.authm
+    anixpkgs.rcrsync
+    anixpkgs.goromail
+    anixpkgs.manage-gmail
+    anixpkgs.gmail-parser
+    anixpkgs.wiki-tools
+    anixpkgs.book-notes-sync
     anixpkgs.color-prints
-    anixpkgs.git-cc
-    anixpkgs.gitcop
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
-    anixpkgs.setupws
-    anixpkgs.listsources
-    anixpkgs.pkgshell
-    anixpkgs.devshell
-    anixpkgs.cpp-helper
-    anixpkgs.py-helper
-    anixpkgs.makepyshell
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
@@ -26,26 +23,24 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
+    anixpkgs.gantter
+    anixpkgs.md2pdf
+    anixpkgs.notabilify
+    anixpkgs.code2pdf
+    anixpkgs.abc
+    anixpkgs.doku
+    anixpkgs.epub
+    anixpkgs.gif
+    anixpkgs.md
+    anixpkgs.mp3
+    anixpkgs.mp4
+    anixpkgs.mp4unite
+    anixpkgs.pdf
+    anixpkgs.png
+    anixpkgs.svg
+    anixpkgs.zipper
+    anixpkgs.scrape
   ];
-
-  programs.git = {
-    package = gitAndTools.gitFull;
-    enable = true;
-    userName = "Andrew Torgesen";
-    userEmail = "andrew.torgesen@gmail.com";
-    aliases = {
-      aa = "add -A";
-      cm = "commit -m";
-      co = "checkout";
-      s = "status";
-      d = "diff";
-    };
-    extraConfig = {
-      init = { defaultBranch = "master"; };
-      push = { default = "current"; };
-      pull = { default = "current"; };
-    };
-  };
 
   programs.vim = {
     enable = true;
@@ -73,12 +68,12 @@ with import ../dependencies.nix { inherit config; }; {
       vim-airline
       The_NERD_tree
       fugitive
-      vim-gitgutter
-      YouCompleteMe
       vim-abolish
       command-t
     ];
   };
 
-  services.lorri.enable = true;
+  home.file = with anixpkgs.pkgData; {
+    "records/${records.crypt.name}".source = records.crypt.data;
+  };
 }

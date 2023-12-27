@@ -16,8 +16,8 @@ callPackage ../pythonPkgFromScript.nix {
     - Calorie counts via a solo number (e.g., `100`)
     - Tasks via the keywords `P[0-3]:`
       - `P0` = "Must do today"
-      - `P1` = "Must do in e.g., next few days"
-      - `P2` = "Must do in e.g., next 1-2 weeks"
+      - `P1` = "Must do within a week"
+      - `P2` = "Must do within a month"
       - `P3` = "Should do eventually"
     - Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the `bot` command:
       - `KEYWORD: [P0-1:] ...`

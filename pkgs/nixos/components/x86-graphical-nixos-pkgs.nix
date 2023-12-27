@@ -65,7 +65,6 @@ in {
         "org.gnome.Nautilus.desktop"
         "google-chrome.desktop"
         "terminator.desktop"
-        "codium.desktop"
         "pinta.desktop"
         "gimp.desktop"
         "org.inkscape.Inkscape.desktop"

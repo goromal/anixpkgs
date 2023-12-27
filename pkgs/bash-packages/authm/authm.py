@@ -1,4 +1,5 @@
 import click
+import sys
 from colorama import Fore, Style
 from easy_google_auth.auth    import getGoogleService
 from gmail_parser.defaults    import GmailParserDefaults   as GPD
@@ -11,48 +12,71 @@ def cli():
     """Manage secrets."""
 
 @cli.command()
-def refresh():
+@click.option(
+    "--headless",
+    "headless",
+    type=bool,
+    default=False,
+    show_default=True,
+    help="Whether to run in headless mode.",
+)
+def refresh(headless):
     """Refresh all auth tokens one-by-one."""
     print(Fore.YELLOW + "Refreshing GMail token (personal)..." + Style.RESET_ALL)
-    _ = getGoogleService(
+    if getGoogleService(
         "gmail",
         "v1",
         GPD.getKwargsOrDefault("gmail_secrets_json"),
         GPD.getKwargsOrDefault("gmail_refresh_file"),
-        GPD.getKwargsOrDefault("gmail_corpus_scope")
-    )
+        GPD.getKwargsOrDefault("gmail_corpus_scope"),
+        headless=headless
+    ) is None:
+        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed.")
+        exit(1)
     print(Fore.YELLOW + "Refreshing GMail token (gbot)..." + Style.RESET_ALL)
-    _ = getGoogleService(
+    if getGoogleService(
         "gmail",
         "v1",
         GPD.getKwargsOrDefault("gmail_secrets_json"),
         GPD.getKwargsOrDefault("gbot_refresh_file"),
-        GPD.getKwargsOrDefault("gmail_corpus_scope")
-    )
+        GPD.getKwargsOrDefault("gmail_corpus_scope"),
+        headless=headless
+    ) is None:
+        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed.")
+        exit(1)
     print(Fore.YELLOW + "Refreshing GMail token (journal)..." + Style.RESET_ALL)
-    _ = getGoogleService(
+    if getGoogleService(
         "gmail",
         "v1",
         GPD.getKwargsOrDefault("gmail_secrets_json"),
         GPD.getKwargsOrDefault("journal_refresh_file"),
-        GPD.getKwargsOrDefault("gmail_corpus_scope")
-    )
+        GPD.getKwargsOrDefault("gmail_corpus_scope"),
+        headless=headless
+    ) is None:
+        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed.")
+        exit(1)
     print(Fore.YELLOW + "Refreshing Docs token..." + Style.RESET_ALL)
-    _ = getGoogleService(
+    if getGoogleService(
         "docs",
         "v1",
         BNSD.getKwargsOrDefault("docs_secrets_file"),
         BNSD.getKwargsOrDefault("docs_refresh_token"),
-        BNSD.getKwargsOrDefault("docs_scope")
-    )
+        BNSD.getKwargsOrDefault("docs_scope"),
+        headless=headless
+    ) is None:
+        sys.stderr.write(f"Refresh of {BNSD.getKwargsOrDefault('docs_refresh_token')} needed.")
+        exit(1)
     print(Fore.YELLOW + "Refreshing Tasks token..." + Style.RESET_ALL)
-    _ = getGoogleService(
+    if getGoogleService(
         "tasks",
         "v1",
         TTD.getKwargsOrDefault("task_secrets_file"),
         TTD.getKwargsOrDefault("task_refresh_token"),
-        TTD.getKwargsOrDefault("task_scope")
-    )
+        TTD.getKwargsOrDefault("task_scope"),
+        headless=headless
+    ) is None:
+        sys.stderr.write(f"Refresh of {TTD.getKwargsOrDefault('task_refresh_token')} needed.")
+        exit(1)
     print(Fore.GREEN + "DONE" + Style.RESET_ALL)
 
 @cli.command()

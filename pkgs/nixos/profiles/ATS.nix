@@ -3,9 +3,9 @@
 
   machines.base = {
     machineType = "x86_linux";
-    graphical = true;
-    recreational = true;
-    developer = true;
-    isServer = false;
+    graphical = false;
+    recreational = false;
+    developer = false;
+    isServer = true;
   };
 }

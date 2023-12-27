@@ -5,5 +5,7 @@
     machineType = "x86_linux";
     graphical = true;
     recreational = false;
+    developer = true;
+    isServer = false;
   };
 }
