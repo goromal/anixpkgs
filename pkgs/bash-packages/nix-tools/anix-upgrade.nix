@@ -52,6 +52,7 @@ let
     ];
   };
   printYellow = "${color-prints}/bin/echo_yellow";
+  printError = "${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
   ${argparse}
   cd ~/sources
@@ -71,6 +72,10 @@ in (writeShellScriptBin pkgname ''
   elif [[ ! -z "$branch" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
   elif [[ ! -z "$source" ]]; then
+    if [[ "$source" != /* ]]; then
+      ${printError} "Please provide an absolute path to the source tree."
+      exit 1
+    fi
     if [[ -d anixpkgs ]]; then
       rm anixpkgs
     fi
