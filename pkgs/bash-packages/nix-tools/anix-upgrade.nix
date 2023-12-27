@@ -5,7 +5,7 @@ let
       if browser-aliases == null then "." else " and view the delta."
     }";
   long-description = ''
-    usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH] [--local] [--boot]
+    usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH;-s|--source SOURCETREE] [--local] [--boot]
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
@@ -32,6 +32,12 @@ let
         flags = "-b|--branch";
       }
       {
+        var = "source";
+        isBool = false;
+        default = "";
+        flags = "-s|--source";
+      }
+      {
         var = "local";
         isBool = true;
         default = "0";
@@ -46,6 +52,7 @@ let
     ];
   };
   printYellow = "${color-prints}/bin/echo_yellow";
+  printError = "${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
   ${argparse}
   cd ~/sources
@@ -58,12 +65,25 @@ in (writeShellScriptBin pkgname ''
   else
     localVar=false
   fi
+  if [[ -d anixpkgs ]]; then
+    ${printYellow} "Removing existing symlink."
+    rm anixpkgs
+  fi
   if [[ ! -z "$version" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
   elif [[ ! -z "$commit" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "'"$commit"'"; }' -o anixpkgs
   elif [[ ! -z "$branch" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
+  elif [[ ! -z "$source" ]]; then
+    if [[ "$source" != /* ]]; then
+      ${printError} "Please provide an absolute path to the source tree."
+      exit 1
+    fi
+    ln -s "$source" anixpkgs
+    if [[ "$localVar" == "true" ]]; then
+      sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/pkgs/nixos/dependencies.nix
+    fi
   else
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
