@@ -11,6 +11,7 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 export NIXPKGS_ALLOW_UNFREE=1
+export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 configurations=(personal-inspiron rankserver-pi)
 for configuration in ${configurations[@]}; do
