@@ -6,7 +6,7 @@ with import ../dependencies.nix { inherit config; }; {
   dconf.settings = {
     "org/gnome/shell" = {
       "favorite-apps" = [
-        "codium.desktop" # ^^^^ TODO works?
+        "codium.desktop"
       ];
     };
   };
