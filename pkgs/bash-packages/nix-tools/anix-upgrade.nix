@@ -5,7 +5,7 @@ let
       if browser-aliases == null then "." else " and view the delta."
     }";
   long-description = ''
-    usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH] [--local] [--boot]
+    usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH;-s|--source SOURCETREE] [--local] [--boot]
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
@@ -30,6 +30,12 @@ let
         isBool = false;
         default = "";
         flags = "-b|--branch";
+      }
+      {
+        var = "source";
+        isBool = false;
+        default = "";
+        flags = "-s|--source";
       }
       {
         var = "local";
@@ -64,6 +70,11 @@ in (writeShellScriptBin pkgname ''
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; rev = "'"$commit"'"; }' -o anixpkgs
   elif [[ ! -z "$branch" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
+  elif [[ ! -z "$source" ]]; then
+    if [[ -d anixpkgs ]]; then
+      rm anixpkgs
+    fi
+    ln -s "$source" anixpkgs
   else
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
   fi
