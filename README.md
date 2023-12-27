@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v5.6.0](https://github.com/goromal/anixpkgs/tree/v5.6.0)**
+**LATEST RELEASE: [v5.6.1](https://github.com/goromal/anixpkgs/tree/v5.6.1)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
@@ -51,6 +51,16 @@ To run regression tests, run
 ```bash
 cd test
 nix-shell --run "bash test.sh"
+```
+
+*Automatically run as part of CI pipeline.*
+
+## Closure Verifications
+
+To check the validity of all NixOS closures (without actually building them), run
+
+```bash
+bash scripts/check_machines.sh
 ```
 
 *Automatically run as part of CI pipeline.*
