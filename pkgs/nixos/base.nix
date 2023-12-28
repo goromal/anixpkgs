@@ -33,8 +33,9 @@ in {
   imports = [
     (import "${home-manager}/nixos")
     ../python-packages/orchestrator/module.nix
-    ../python-packages/ats-greeting/module.nix
-    ../python-packages/ats-mailman/module.nix
+    ../standalone-modules/ats-greeting/module.nix
+    ../standalone-modules/ats-mailman/module.nix
+    ../standalone-modules/ats-ccounterd/module.nix
   ];
 
   config = {
@@ -207,6 +208,7 @@ in {
         pkgs.bash
         pkgs.coreutils
         pkgs.rclone
+        anixpkgs.wiki-tools
         anixpkgs.rcrsync
         anixpkgs.mp4
         anixpkgs.mp4unite
@@ -226,6 +228,11 @@ in {
       enable = cfg.isServer;
       orchestratorPkg = anixpkgs.orchestrator;
       redirectsPkg = anixpkgs.redirects;
+    };
+
+    services.ats-ccounterd = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
     };
 
     # Global packages
