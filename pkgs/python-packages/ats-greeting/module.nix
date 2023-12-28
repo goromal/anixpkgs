@@ -29,7 +29,7 @@ in {
       serviceConfig = {
         Type = "simple";
         ExecStart =
-          "sleep 30 && ${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
+          "${pkgs.coreutils}/bin/sleep 30 && ${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
         Restart = "no";
         ReadWritePaths = [ "/data/andrew" ];
         User = "andrew";
