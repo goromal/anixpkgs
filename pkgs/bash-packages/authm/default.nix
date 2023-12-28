@@ -42,8 +42,8 @@ let
       ${rcrsync}/bin/rcrsync sync secrets
     fi
   '';
+  printErr = ">&2 ${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
-  set -e
   lockfile=$HOME/.authm-lock
   timeout_secs=30
   wait_secs=0
@@ -53,12 +53,12 @@ in (writeShellScriptBin pkgname ''
     sleep 1
   done
   if [[ -f "$lockfile" ]]; then
-    >&2 ${color-prints}/bin/echo_red "Timed out waiting for lockfile to clear. Exiting."
+    ${printErr} "Timed out waiting for lockfile to clear. Exiting."
     exit 1
   fi
   touch "$lockfile"
   ${bisync}
-  ${authm}/bin/${pkgname} $@
+  ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; rm "$lockfile"; exit 1; }
   ${bisync}
   rm "$lockfile"
 '') // {
