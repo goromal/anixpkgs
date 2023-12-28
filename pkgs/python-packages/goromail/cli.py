@@ -29,7 +29,7 @@ def append_text_to_wiki_page(wiki, id, msg, text):
         msg.moveToTrash()
 
 
-def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile):
+def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile=None):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
         matter = text[(n + 1) :].strip()
@@ -40,7 +40,8 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
             item = f"[:::{datestr}:::] {matter[3:].strip()}"
         else:
             item = f"[**{datestr}**] {matter.strip()}"
-        logfile.write(f"Wiki:{keyword} entry\n")
+        if logfile is not None:
+            logfile.write(f"Wiki:{keyword} entry\n")
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
@@ -53,7 +54,8 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
             item = f"[:::{datestr}:::] {matter[3:].strip()}"
         else:
             item = f"[**{datestr}**] {matter.strip()}"
-        logfile.write(f"Wiki:{keyword} entry\n")
+        if logfile is not None:
+            logfile.write(f"Wiki:{keyword} entry\n")
         if not dry_run:
             append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
@@ -254,6 +256,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
     if ctx.obj["headless"]:
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "bot.log"), "w")
+    else:
+        logfile = None
     try:
         gbotCorpus = GBotCorpus(
             "goromal.bot@gmail.com",
@@ -263,13 +267,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        logfile.close()
+        if logfile is not None:
+            logfile.close()
         exit(1)
     try:
         gbot = gbotCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
-        logfile.close()
+        if logfile is not None:
+            logfile.close()
         return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
@@ -284,7 +290,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        logfile.close()
+        if logfile is not None:
+            logfile.close()
         exit(1)
     print(
         Fore.YELLOW
@@ -316,7 +323,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             continue
         if text.isnumeric():
             print(f"  Calorie intake on {date}: {text}")
-            logfile.write("Calories entry\n")
+            if logfile is not None:
+                logfile.write("Calories entry\n")
             if not dry_run:
                 caljo_doku = None
                 caljo_doku = wiki.getPage(id="calorie-journal")
@@ -332,7 +340,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             or text[:3].lower() == "p3:"
         ):
             print(f"  {text[:2]} task for {date}: {text[3:]}")
-            logfile.write("Task entry\n")
+            if logfile is not None:
+                logfile.write("Task entry\n")
             if not dry_run:
                 task.putTask(
                     text,
@@ -342,10 +351,12 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                 msg.moveToTrash()
         else:
             print(f"  ITNS from {date}: {text}")
-            logfile.write("Wiki:ITNS entry\n")
+            if logfile is not None:
+                logfile.write("Wiki:ITNS entry\n")
             if not dry_run:
                 append_text_to_wiki_page(wiki, "itns", msg, text)
-    logfile.close()
+    if logfile is not None:
+        logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
 
 
@@ -361,6 +372,8 @@ def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
     if ctx.obj["headless"]:
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "journal.log"), "w")
+    else:
+        logfile = None
     try:
         journalCorpus = JournalCorpus(
             "goromal.journal@gmail.com",
@@ -370,13 +383,15 @@ def journal(ctx: click.Context, dry_run):
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        logfile.close()
+        if logfile is not None:
+            logfile.close()
         exit(1)
     try:
         journal = journalCorpus.Inbox(ctx.obj["num_messages"])
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
-        logfile.close()
+        if logfile is not None:
+            logfile.close()
         return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
@@ -399,12 +414,14 @@ def journal(ctx: click.Context, dry_run):
             )
             text = text.split(":")[1].strip()
         print(f"  Journal entry for {date}")
-        logfile.write(f"{date}\n")
+        if logfile is not None:
+            logfile.write(f"{date}\n")
         if dry_run:
             print(text)
         if not dry_run:
             add_journal_entry_to_wiki(wiki, msg, date, text)
-    logfile.close()
+    if logfile is not None:
+        logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
 
 
