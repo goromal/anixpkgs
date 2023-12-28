@@ -45,7 +45,7 @@ in (writeShellScriptBin pkgname ''
   elif [[ "$2" == "data" ]]; then
     CLOUD_DIR="box:data"
     LOCAL_DIR="$HOME/data"
-  elif [[ "$2" == "douments" ]]; then
+  elif [[ "$2" == "documents" ]]; then
     CLOUD_DIR="drive:Documents"
     LOCAL_DIR="$HOME/Documents"
   else
