@@ -329,7 +329,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                 caljo_doku = None
                 caljo_doku = wiki.getPage(id="calorie-journal")
                 new_caljo_doku = f"""{caljo_doku}
-    * ({date}) {text}"""
+  * ({date}) {text}"""
                 wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                 if caljo_doku is not None:
                     msg.moveToTrash()
