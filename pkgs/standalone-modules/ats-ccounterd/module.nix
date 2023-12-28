@@ -38,22 +38,25 @@ in {
   };
 
   config = mkIf cfg.enable {
+    systemd.timers.ats-ccounterd = {
+      wantedBy = [ "timers.target" ];
+      after = [ "ats-greeting.service" ];
+      timerConfig = {
+        OnCalendar = [ "*-*-* 10:00:00" "*-*-* 14:00:00" "*-*-* 20:00:00" ];
+        Unit = "ats-ccounterd.service";
+      };
+    };
     systemd.services.ats-ccounterd = {
       enable = true;
       description = "ATS ccounterd script";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      script =
+        "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${counterScript}'";
       serviceConfig = {
-        Type = "simple";
-        ExecStart =
-          "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${counterScript}'";
-        Restart = "always";
-        RestartSec = 60; # every hour
+        Type = "oneshot";
         ReadWritePaths = [ "/data/andrew" ];
         User = "andrew";
         Group = "dev";
       };
-      wantedBy = [ "multi-user.target" ];
-      after = [ "ats-greeting.service" ];
     };
   };
 }
