@@ -18,6 +18,8 @@ let
         && mv ${cfg.rootDir}/temp ${cfg.rootDir}/bot.log
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
         "$(cat ${cfg.rootDir}/bot.log)"
+      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
+        "$(cat ${cfg.rootDir}/bot.log)"
     fi 
     if [[ ! -z "$(cat ${cfg.rootDir}/journal.log)" ]]; then
       echo "Notifying about processed journal mail..."
@@ -26,6 +28,8 @@ let
         | cat - ${cfg.rootDir}/journal.log > ${cfg.rootDir}/temp \
         && mv ${cfg.rootDir}/temp ${cfg.rootDir}/journal.log
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+        "$(cat ${cfg.rootDir}/journal.log)"
+      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
         "$(cat ${cfg.rootDir}/journal.log)"
     fi
   '';
