@@ -9,6 +9,8 @@ let
     sleep 5
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
+      "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
 in {
   options.services.ats-greeting = with types; {
