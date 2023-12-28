@@ -11,6 +11,9 @@ from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.manage import TaskManager
 from task_tools.defaults import TaskToolsDefaults as TTD
 
+MAIL_EMAIL = "andrew.torgesen@gmail.com"
+TEXT_EMAIL = "6612105214@vzwpix.com"
+
 
 def append_text_to_wiki_page(wiki, id, msg, text):
     doku = None
@@ -288,7 +291,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..."
         + Style.RESET_ALL
     )
-    msgs = gbot.fromSenders(["6612105214@vzwpix.com"]).getMessages()
+    msgs = gbot.fromSenders([TEXT_EMAIL, MAIL_EMAIL]).getMessages()
     for msg in reversed(msgs):
         text = msg.getText().strip()
         date = msg.getDate()
@@ -385,7 +388,7 @@ def journal(ctx: click.Context, dry_run):
         + f"Processing pending journal entries{' (DRY RUN)' if dry_run else ''}..."
         + Style.RESET_ALL
     )
-    msgs = journal.fromSenders(["6612105214@vzwpix.com"]).getMessages()
+    msgs = journal.fromSenders([TEXT_EMAIL, MAIL_EMAIL]).getMessages()
     for msg in reversed(msgs):
         text = msg.getText()
         date = msg.getDate()
