@@ -43,6 +43,8 @@ in {
       after = [ "ats-greeting.service" ];
       timerConfig = {
         OnCalendar = [ "*-*-* 10:00:00" "*-*-* 14:00:00" "*-*-* 20:00:00" ];
+        Persistent =
+          true; # triggers the service immediately if it missed the last start time
         Unit = "ats-ccounterd.service";
       };
     };
