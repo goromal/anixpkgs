@@ -18,14 +18,14 @@ let
     echo $ctotal
     if (( ctotal <= clim )); then
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-        "Calorie counter: $ctotal / $clim ✅"
+        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
       gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-        "Calorie counter: $ctotal / $clim ✅"
+        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
     else
       gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-        "Calorie counter: $ctotal / $clim 🚨"
+        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
       gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-        "Calorie counter: $ctotal / $clim 🚨"
+        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
     fi
   '';
 in {
@@ -43,8 +43,8 @@ in {
       after = [ "ats-greeting.service" ];
       timerConfig = {
         OnCalendar = [ "*-*-* 10:00:00" "*-*-* 14:00:00" "*-*-* 20:00:00" ];
-        Persistent =
-          true; # triggers the service immediately if it missed the last start time
+        # triggers the service immediately if it missed the last start time
+        Persistent = true;
         Unit = "ats-ccounterd.service";
       };
     };

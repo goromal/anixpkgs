@@ -83,16 +83,15 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1703813192,
+        "lastModified": 1703814036,
         "narHash": "sha256-VlNioSSVR1WZNjHpwp+CYfGY37Zc6maLYngbffVbrrE=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "2c2ad8bd85c7ed26e81d2ffd9cb097336f8a5383",
+        "rev": "1234e0fc45242e8192761925cdaaba3454c4282c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/headless-fix",
         "repo": "easy-google-auth",
         "type": "github"
       }
