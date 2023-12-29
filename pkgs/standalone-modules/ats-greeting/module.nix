@@ -22,21 +22,27 @@ in {
   };
 
   config = mkIf cfg.enable {
+    systemd.timers.ats-greeting = {
+      wantedBy = [ "timers.target" ];
+      after = [ "orchestratord.service" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        Unit = "ats-greeting.service";
+      };
+    };
     systemd.services.ats-greeting = {
       enable = true;
       description = "ATS greeting script";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      script =
+        "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
       serviceConfig = {
-        Type = "simple";
-        ExecStart =
-          "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
+        Type = "oneshot";
         Restart = "on-failure";
         ReadWritePaths = [ "/data/andrew" ];
         User = "andrew";
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];
-      after = [ "orchestratord.service" ];
     };
   };
 }

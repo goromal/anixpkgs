@@ -53,23 +53,27 @@ in {
   config = mkIf cfg.enable {
     systemd.tmpfiles.rules =
       [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
+    systemd.timers.ats-mailman = {
+      wantedBy = [ "timers.target" ];
+      after = [ "ats-greeting.service" ];
+      timerConfig = {
+        OnBootSec = "5m";
+        OnUnitActiveSec = "30m";
+        Unit = "ats-mailman.service";
+      };
+    };
     systemd.services.ats-mailman = {
       enable = true;
       description = "ATS mailman script";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      script =
+        "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
       serviceConfig = {
-        Type = "simple";
-        ExecStart =
-          "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
-        Restart = "always";
-        RestartSec = 1800; # every half hour
+        Type = "oneshot";
         ReadWritePaths = [ "/data/andrew" ];
         WorkingDirectory = cfg.rootDir;
         User = "andrew";
         Group = "dev";
       };
-      wantedBy = [ "multi-user.target" ];
-      after = [ "ats-greeting.service" ];
     };
   };
 }
