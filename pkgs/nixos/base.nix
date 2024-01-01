@@ -174,10 +174,10 @@ in {
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
-    networking.useDHCP = false;
-    networking.networkmanager.enable = true;
+    # networking.useDHCP = false; # ^^^^ TODO
+    networking.networkmanager.enable = false; # ^^^^ TODO true
 
-    networking.firewall.allowedTCPPorts = [ 4444 ];
+    # networking.firewall.allowedTCPPorts = [ 4444 ]; # ^^^^ TODO
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -242,7 +242,6 @@ in {
       tldr
       fzf
       fdupes
-      exa # TODO ls (or l) alias?
       zoxide # z, ...
       duf
       gcc

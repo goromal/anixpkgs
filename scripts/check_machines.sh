@@ -20,3 +20,5 @@ for configuration in ${configurations[@]}; do
     echo "Checks out!"
     echo ""
 done
+
+# ^^^^ TODO nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/configurations/ats-installer.nix --dry-run
