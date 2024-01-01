@@ -6,4 +6,5 @@
     <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
     ../profiles/ats.nix
   ];
+  machines.base.isInstaller = pkgs.lib.mkForce true;
 }
