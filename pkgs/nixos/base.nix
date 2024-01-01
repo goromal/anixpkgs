@@ -28,6 +28,10 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    isInstaller = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure is for an ISO install image.";
+    };
   };
 
   imports = [
@@ -45,7 +49,10 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        pkgs.linuxPackages_6_1); # TODO _latest
+        (if cfg.isInstaller then
+          pkgs.linuxPackages_6_1
+        else
+          pkgs.linuxPackages_latest));
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -174,10 +181,10 @@ in {
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
-    # networking.useDHCP = false; # ^^^^ TODO
-    networking.networkmanager.enable = false; # ^^^^ TODO true
+    networking.useDHCP = false;
+    networking.networkmanager.enable = !cfg.isInstaller;
 
-    # networking.firewall.allowedTCPPorts = [ 4444 ]; # ^^^^ TODO
+    networking.firewall.allowedTCPPorts = [ 4444 ];
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";

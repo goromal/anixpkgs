@@ -7,5 +7,6 @@
     recreational = false;
     developer = true;
     isServer = false;
+    isInstaller = false;
   };
 }

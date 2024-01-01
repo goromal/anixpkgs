@@ -12,6 +12,7 @@ in {
     recreational = false;
     developer = false;
     isServer = false;
+    isInstaller = false;
   };
 
   services.rankserver = {
