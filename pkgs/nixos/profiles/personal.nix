@@ -6,7 +6,7 @@
     graphical = true;
     recreational = true;
     developer = true;
-    isServer = false;
+    isServer = true; # TODO temporary
     isInstaller = false;
   };
 }
