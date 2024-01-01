@@ -45,7 +45,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        pkgs.linuxPackages_latest);
+        pkgs.linuxPackages_6_1); # TODO _latest
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
