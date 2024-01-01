@@ -28,6 +28,10 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    isInstaller = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure is for an ISO install image.";
+    };
   };
 
   imports = [
@@ -45,7 +49,10 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        pkgs.linuxPackages_latest);
+        (if cfg.isInstaller then
+          pkgs.linuxPackages_6_1
+        else
+          pkgs.linuxPackages_latest));
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -175,7 +182,7 @@ in {
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = true;
+    networking.networkmanager.enable = !cfg.isInstaller;
 
     networking.firewall.allowedTCPPorts = [ 4444 ];
 
@@ -242,7 +249,6 @@ in {
       tldr
       fzf
       fdupes
-      exa # TODO ls (or l) alias?
       zoxide # z, ...
       duf
       gcc
