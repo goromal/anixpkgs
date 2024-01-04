@@ -3,7 +3,8 @@ with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     (writeShellScriptBin "launch-services" ''
-    
+    cd $HOME
+    nix run 'github:numtide/system-manager' -- switch --flake '.'
     '')
   ];
 
