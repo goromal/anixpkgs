@@ -6,7 +6,7 @@ let flakeFile = writeTextFile {
   text = ''
   {
       inputs = {
-        nixpkgs.url = "github:goromal/anixpkgs?ref=v${anix-version}";
+        nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/${nixos-version}";
 
         system-manager = {
           url = "github:numtide/system-manager?rev=70490c9d59327ffbc58a40fd226ff48b73b697ee";
