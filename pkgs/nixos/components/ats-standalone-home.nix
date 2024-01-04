@@ -1,17 +1,10 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
-  home.packages = [
-    (writeShellScriptBin "launch-services" ''
-    cd $HOME
-    nix run 'github:numtide/system-manager' -- switch --flake '.'
-    '')
-  ];
-
-  home.file = {
-    "ats-modules/default.nix".source = ./ats-standalone-modules.nix;
-    "flake.nix".text = ''
-    {
+with import ../dependencies.nix { inherit config; };
+let flakeFile = writeTextFile {
+  name = "flake.nix";
+  text = ''
+  {
       inputs = {
         nixpkgs.url = "github:goromal/anixpkgs?ref=v${anix-version}";
 
@@ -29,6 +22,24 @@ with import ../dependencies.nix { inherit config; }; {
         };
       };
     }
-    '';
-  };
+  '';
+};
+in {
+  home.packages = [
+    (writeShellScriptBin "launch-services" ''
+    cd $HOME
+    echo "Setting up"
+    if [[ -f flake.nix ]]; then
+      rm flake.nix
+    fi
+    if [[ -d ats-modules ]]; then
+      rm -r ats-modules
+    fi
+    cp ${flakeFile} flake.nix
+    mkdir ats-modules
+    cp ${./ats-standalone-modules.nix} ats-modules.default.nix
+    echo "Running system-manager"
+    nix run 'github:numtide/system-manager' -- switch --flake '.'
+    '')
+  ];
 }
