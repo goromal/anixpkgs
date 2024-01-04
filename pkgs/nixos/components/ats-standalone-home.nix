@@ -37,7 +37,7 @@ in {
     fi
     cp ${flakeFile} flake.nix
     mkdir ats-modules
-    cp ${./ats-standalone-modules.nix} ats-modules.default.nix
+    cp ${./ats-standalone-modules.nix} ats-modules/default.nix
     echo "Running system-manager"
     nix run 'github:numtide/system-manager' -- switch --flake '.'
     '')
