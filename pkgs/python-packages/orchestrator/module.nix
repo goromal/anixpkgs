@@ -24,6 +24,11 @@ in {
       description = "Packages to expose to orchestratord's PATH";
       default = [ ];
     };
+    isNixOS = mkOption {
+      type = types.bool;
+      description = "Whether this service is running on NixOS";
+      default = true;
+    };
   };
 
   config = mkIf cfg.enable {
@@ -38,14 +43,14 @@ in {
         ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
             builtins.toString cfg.threads
           }";
-        ReadWritePaths = [ "/" ];
+        ReadWritePaths = mkIf cfg.isNixOS [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
-        User = "andrew";
-        Group = "dev";
+        User = mkIf cfg.isNixOS "andrew";
+        Group = mkIf cfg.isNixOS "dev";
       };
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = if cfg.isNixOS then [ "multi-user.target" ] else [ "system-manager.target" ];
       path = cfg.pathPkgs;
     };
   };
