@@ -8,9 +8,12 @@ in rec {
   nixos-state = nixos-version;
   homem-state = nixos-version;
   inherit anix-version;
-  anixsrc = if local-build then ../../default.nix else (builtins.fetchTarball
-      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz");
-  anixpkgs = import anixsrc { };
+  anixpkgs = import (if local-build then
+    ../../default.nix
+  else
+    (builtins.fetchTarball
+      "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anix-version}.tar.gz"))
+    { };
   unstable = import (builtins.fetchTarball
     "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
 }

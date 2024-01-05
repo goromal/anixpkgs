@@ -7,7 +7,17 @@ with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
 let
-  oPathPkgs = lib.makeBinPath [ rclone wiki-tools rcrsync mp4 mp4unite goromail gmail-parser scrape authm ];
+  oPathPkgs = lib.makeBinPath [
+    rclone
+    wiki-tools
+    rcrsync
+    mp4
+    mp4unite
+    goromail
+    gmail-parser
+    scrape
+    authm
+  ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs}
     ${anixpkgs.orchestrator}/bin/orchestratord -n 2
@@ -80,10 +90,7 @@ in {
   home.homeDirectory = "/home/andrew";
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
-  imports = [
-    ./base-pkgs.nix
-    ./x86-graphical-pkgs.nix
-  ];
+  imports = [ ./base-pkgs.nix ./x86-graphical-pkgs.nix ];
   mods.x86-graphical.standalone = true;
   mods.x86-graphical.homeDir = "/home/andrew";
   home.packages = [
@@ -100,9 +107,7 @@ in {
     '')
   ];
   systemd.user.services.orchestratord = {
-    Unit = {
-      Description = "Orchestrator daemon";
-    };
+    Unit = { Description = "Orchestrator daemon"; };
     Service = {
       Type = "simple";
       ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";
@@ -111,9 +116,7 @@ in {
     Install.WantedBy = [ "default.target" ];
   };
   systemd.user.timers.ats-greeting = {
-    Unit = {
-      Description = "ATS greeting timer";
-    };
+    Unit = { Description = "ATS greeting timer"; };
     Timer = {
       OnBootSec = "1m";
       Persistent = true;
@@ -122,12 +125,11 @@ in {
     Install.WantedBy = [ "timers.target" ];
   };
   systemd.user.services.ats-greeting = {
-    Unit = {
-      Description = "ATS greeting script";
-    };
+    Unit = { Description = "ATS greeting script"; };
     Service = {
       Type = "oneshot";
-      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${greetingScript}'";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${greetingScript}'";
       Restart = "on-failure";
       ReadWritePaths = [ "/home/andrew" ];
     };
@@ -147,7 +149,8 @@ in {
     Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
-      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${mailmanScript}'";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${mailmanScript}'";
       ReadWritePaths = [ "/home/andrew" ];
     };
   };
@@ -165,7 +168,8 @@ in {
     Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
-      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${counterScript}'";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${counterScript}'";
       ReadWritePaths = [ "/home/andrew" ];
     };
   };
