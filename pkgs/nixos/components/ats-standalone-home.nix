@@ -89,7 +89,14 @@ in {
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
-      # TODO https://askubuntu.com/questions/1083537/how-do-i-properly-install-a-systemd-timer-and-service
+      systemctl --user daemon-reload
+      systemctl --user restart orchestratord.service
+      systemctl --user enable ats-greeting.timer
+      systemctl --user start ats-greeting.timer
+      systemctl --user enable ats-mailman.timer
+      systemctl --user start ats-mailman.timer
+      systemctl --user enable ats-ccounterd.timer
+      systemctl --user start ats-ccounterd.timer
     '')
   ];
   systemd.user.services.orchestratord = {
