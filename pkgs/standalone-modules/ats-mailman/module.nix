@@ -3,7 +3,7 @@ with pkgs;
 with lib;
 let
   cfg = config.services.ats-mailman;
-  greetingScript = writeShellScript "ats-mailman" ''
+  mailmanScript = writeShellScript "ats-mailman" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
     # TODO warn about expiration
@@ -66,7 +66,7 @@ in {
       enable = true;
       description = "ATS mailman script";
       script =
-        "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${greetingScript}'";
+        "${cfg.orchestratorPkg}/bin/orchestrator bash 'bash ${mailmanScript}'";
       serviceConfig = {
         Type = "oneshot";
         ReadWritePaths = [ "/data/andrew" ];

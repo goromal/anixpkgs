@@ -21,6 +21,35 @@ let
     gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
+  mailmanScript = writeShellScript "ats-mailman" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
+    # TODO warn about expiration
+    goromail --headless 1 bot ${anixpkgs.redirects.suppress_all}
+    goromail --headless 1 journal ${anixpkgs.redirects.suppress_all}
+    if [[ ! -z "$(cat /home/andrew/goromail/bot.log)" ]]; then
+      echo "Notifying about processed bot mail..."
+      authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+      echo "[$(date)] 📬 Bot mail received:" \
+        | cat - /home/andrew/goromail/bot.log > /home/andrew/goromail/temp \
+        && mv /home/andrew/goromail/temp /home/andrew/goromail/bot.log
+      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+        "$(cat /home/andrew/goromail/bot.log)"
+      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
+        "$(cat /home/andrew/goromail/bot.log)"
+    fi 
+    if [[ ! -z "$(cat /home/andrew/goromail/journal.log)" ]]; then
+      echo "Notifying about processed journal mail..."
+      authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+      echo "[$(date)] 📖 Journal mail received:" \
+        | cat - /home/andrew/goromail/journal.log > /home/andrew/goromail/temp \
+        && mv /home/andrew/goromail/temp /home/andrew/goromail/journal.log
+      gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
+        "$(cat /home/andrew/goromail/journal.log)"
+      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
+        "$(cat /home/andrew/goromail/journal.log)"
+    fi
+  '';
   counterScript = writeShellScript "ats-ccounterd" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     lines="$(wiki-tools get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
@@ -57,6 +86,12 @@ in {
   ];
   mods.x86-graphical.standalone = true;
   mods.x86-graphical.homeDir = "/home/andrew";
+  home.packages = [
+    (writeShellScriptBin "ats-load-services" ''
+      mkdir -p /home/andrew/goromail
+      # TODO https://askubuntu.com/questions/1083537/how-do-i-properly-install-a-systemd-timer-and-service
+    '')
+  ];
   systemd.user.services.orchestratord = {
     Unit = {
       Description = "Orchestrator daemon";
@@ -91,18 +126,32 @@ in {
     };
     Install.WantedBy = [ "default.target" ];
   };
-  # TODO ats-mailman
-  systemd.user.timers.ats-ccounterd = {
-    Unit = {
-      Description = "ATS ccounterd timer";
+  systemd.user.timers.ats-mailman = {
+    Unit.Description = "ATS mailman timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "30m";
+      Unit = "ats-mailman.service";
     };
+  };
+  systemd.user.services.ats-mailman = {
+    Unit.Description = "ATS mailman script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${mailmanScript}'";
+      ReadWritePaths = [ "/home/andrew" ];
+    };
+  };
+  systemd.user.timers.ats-ccounterd = {
+    Unit.Description = "ATS ccounterd timer";
+    Install.WantedBy = [ "timers.target" ];
     Timer = {
       OnCalendar = [ "*-*-* 10:00:00" "*-*-* 14:00:00" "*-*-* 20:00:00" ];
-      # triggers the service immediately if it missed the last start time
       Persistent = true;
       Unit = "ats-ccounterd.service";
     };
-    Install.WantedBy = [ "timers.target" ];
   };
   systemd.user.services.ats-ccounterd = {
     Unit.Description = "ATS ccounterd script";
