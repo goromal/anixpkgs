@@ -1,7 +1,27 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with lib;
-let cfg = config.services.orchestratord;
+let
+  cfg = config.services.orchestratord;
+  serviceDef = {
+    enable = true;
+      description = "Orchestrator daemon";
+      unitConfig = { StartLimitIntervalSec = 0; };
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
+            builtins.toString cfg.threads
+          }";
+        ReadWritePaths = mkIf cfg.isNixOS [ "/" ];
+        WorkingDirectory = cfg.rootDir;
+        Restart = "always";
+        RestartSec = 5;
+        User = mkIf cfg.isNixOS "andrew";
+        Group = mkIf cfg.isNixOS "dev";
+      };
+      wantedBy = if cfg.isNixOS then [ "multi-user.target" ] else [ "system-manager.target" ];
+      path = cfg.pathPkgs;
+  };
 in {
   options.services.orchestratord = with types; {
     enable = mkEnableOption "enable orchestrator daemon";
@@ -34,24 +54,7 @@ in {
   config = mkIf cfg.enable {
     systemd.tmpfiles.rules =
       [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
-    systemd.services.orchestratord = {
-      enable = true;
-      description = "Orchestrator daemon";
-      unitConfig = { StartLimitIntervalSec = 0; };
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
-            builtins.toString cfg.threads
-          }";
-        ReadWritePaths = mkIf cfg.isNixOS [ "/" ];
-        WorkingDirectory = cfg.rootDir;
-        Restart = "always";
-        RestartSec = 5;
-        User = mkIf cfg.isNixOS "andrew";
-        Group = mkIf cfg.isNixOS "dev";
-      };
-      wantedBy = if cfg.isNixOS then [ "multi-user.target" ] else [ "system-manager.target" ];
-      path = cfg.pathPkgs;
-    };
+    systemd.services.orchestratord = cfg.mkIf cfg.isNixOS serviceDef;
+    systemd.user.services.orchestratord = cfg.mkIf cfg.isNixOS serviceDef;
   };
 }
