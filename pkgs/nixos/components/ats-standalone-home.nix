@@ -21,7 +21,7 @@ in {
     };
     Service = {
       Type = "simple";
-      ExecStart = "PATH=$PATH:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2";;
+      ExecStart = "PATH=$PATH:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2";
       Restart = "always";
     };
     Install.WantedBy = [ "default.target" ];
