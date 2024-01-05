@@ -45,7 +45,7 @@ with import ../dependencies.nix { inherit config; };
         Restart = "always";
         RestartSec = 5;
       };
-      wantedBy = [ "multi-user.target" ];
+      # wantedBy = [ "multi-user.target" ];
       # path = cfg.pathPkgs;
   };
   # home.packages = [
