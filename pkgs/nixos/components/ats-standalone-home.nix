@@ -43,7 +43,7 @@ with import ../dependencies.nix { inherit config; };
       ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
       Restart = "always";
     };
-    Install.WantedBy = [ "default.target" ];
+    # Install.WantedBy = [ "default.target" ];
     # enable = true;
       # # description = "Orchestrator daemon";
       # unitConfig = { StartLimitIntervalSec = 0; };
