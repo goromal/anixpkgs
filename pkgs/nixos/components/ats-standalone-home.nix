@@ -1,77 +1,54 @@
 { pkgs, config, lib, ... }:
+# TODO this is a very bespoke script--adapt or use sparingly
 with pkgs;
 with import ../dependencies.nix { inherit config; };
-# let flakeFile = writeTextFile {
-#   name = "flake.nix";
-#   text = ''
-#   {
-#       inputs = {
-#         nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/${nixos-version}";
-
-#         system-manager = {
-#           url = "github:numtide/system-manager?rev=70490c9d59327ffbc58a40fd226ff48b73b697ee";
-#           inputs.nixpkgs.follows = "nixpkgs";
-#         };
-#       };
-
-#       outputs = { self, flake-utils, nixpkgs, system-manager }: {
-#         systemConfigs.default = system-manager.lib.makeSystemConfig {
-#           modules = [
-#             ./ats-modules
-#           ];
-#         };
-#       };
-#     }
-#   '';
-# };
-# in {
-{
-  # imports = [
-  #   ../../python-packages/orchestrator/module.nix
-  # ];
-  # services.orchestratord = {
-  #   enable = true;
-  #   orchestratorPkg = anixpkgs.orchestrator;
-  #   isNixOS = false;
-  # };
+with anixpkgs;
+let
+  orchestratorScriptText = ''
+    PATH=$PATH:${lib.makeBinPath [ bash coreutils rclone wiki-tools rcrsync mp4 mp4unite goromail gmail-parser scrape authm ]}
+    ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+  '';
+  greetingScript = writeShellScript "ats-greeting" ''
+    sleep 5
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    sleep 5
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
+      "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
+      "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+  '';
+in {
   systemd.user.services.orchestratord = {
     Unit = {
       Description = "Orchestrator daemon";
     };
     Service = {
       Type = "simple";
-      ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+      ExecStart = orchestratorScriptText;
       Restart = "always";
     };
-    # Install.WantedBy = [ "default.target" ];
-    # enable = true;
-      # # description = "Orchestrator daemon";
-      # unitConfig = { StartLimitIntervalSec = 0; };
-      # serviceConfig = {
-      #   Type = "simple";
-      #   ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
-      #   # WorkingDirectory = cfg.rootDir;
-      #   Restart = "always";
-      #   RestartSec = 5;
-      # };
-      # wantedBy = [ "multi-user.target" ];
-      # path = cfg.pathPkgs;
+    Install.WantedBy = [ "default.target" ];
   };
-  # home.packages = [
-  #   (writeShellScriptBin "launch-services" ''
-  #   cd $HOME
-  #   echo "Setting up"
-  #   if [[ -f flake.nix ]]; then
-  #     rm flake.nix
-  #   fi
-  #   if [[ -d ats-modules ]]; then
-  #     rm -r ats-modules
-  #   fi
-  #   cp ${flakeFile} flake.nix
-  #   mkdir ats-modules
-  #   cp ${./ats-standalone-modules.nix} ats-modules/default.nix
-  #   echo "Running system-manager"
-  #   nix run 'github:numtide/system-manager' -- switch --flake '.'
-  #   '')
-  # ];
+  systemd.user.timers.ats-greeting = {
+    Unit = {
+      Description = "ATS greeting timer";
+    };
+    Timer = {
+      OnBootSec = "1m";
+      Unit = "ats-greeting.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
+  systemd.user.services.ats-greeting = {
+    Unit = {
+      Description = "ATS greeting script";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${greetingScript}'";
+      Restart = "on-failure";
+      ReadWritePaths = [ "/home/andrew" ];
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 }
