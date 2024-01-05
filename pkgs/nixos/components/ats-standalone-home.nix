@@ -109,6 +109,7 @@ in {
     Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
+      ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${counterScript}'";
       ReadWritePaths = [ "/home/andrew" ];
     };
   };
