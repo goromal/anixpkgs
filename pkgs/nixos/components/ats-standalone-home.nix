@@ -5,6 +5,10 @@ with import ../dependencies.nix { inherit config; };
 with anixpkgs;
 let
   oPathPkgs = lib.makeBinPath [ rclone wiki-tools rcrsync mp4 mp4unite goromail gmail-parser scrape authm ];
+  launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
+    PATH=$PATH:/usr/bin:${oPathPkgs}
+    ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+  '';
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
@@ -15,13 +19,23 @@ let
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
 in {
+  home.username = "andrew";
+  home.homeDirectory = "/home/andrew";
+  home.stateVersion = "23.05";
+  programs.home-manager.enable = true;
+  imports = [
+    ./base-pkgs.nix
+    ./x86-graphical-pkgs.nix
+  ];
+  mods.x86-graphical.standalone = true;
+  mods.x86-graphical.homeDir = "/home/andrew";
   systemd.user.services.orchestratord = {
     Unit = {
       Description = "Orchestrator daemon";
     };
     Service = {
       Type = "simple";
-      ExecStart = "PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+      ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";
       Restart = "always";
     };
     Install.WantedBy = [ "default.target" ];
