@@ -54,7 +54,7 @@ in {
   config = mkIf cfg.enable {
     systemd.tmpfiles.rules =
       [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
-    systemd.services.orchestratord = cfg.mkIf cfg.isNixOS serviceDef;
-    systemd.user.services.orchestratord = cfg.mkIf cfg.isNixOS serviceDef;
+    systemd.services.orchestratord = mkIf cfg.isNixOS serviceDef;
+    systemd.user.services.orchestratord = mkIf cfg.isNixOS serviceDef;
   };
 }
