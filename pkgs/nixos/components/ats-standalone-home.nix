@@ -4,7 +4,7 @@ with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
 let
-  oPathPkgs = lib.makeBinPath [ bash coreutils rclone wiki-tools rcrsync mp4 mp4unite goromail gmail-parser scrape authm ];
+  oPathPkgs = lib.makeBinPath [ rclone wiki-tools rcrsync mp4 mp4unite goromail gmail-parser scrape authm ];
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
@@ -21,7 +21,7 @@ in {
     };
     Service = {
       Type = "simple";
-      ExecStart = "PATH=$PATH:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+      ExecStart = "PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2";
       Restart = "always";
     };
     Install.WantedBy = [ "default.target" ];
