@@ -51,10 +51,11 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (if cfg.isNixOS then {
     systemd.tmpfiles.rules =
       [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
-    systemd.services.orchestratord = mkIf cfg.isNixOS serviceDef;
-    systemd.user.services.orchestratord = mkIf cfg.isNixOS serviceDef;
-  };
+    systemd.services.orchestratord = serviceDef;
+  } else {
+    systemd.user.services.orchestratord = serviceDef;
+  });
 }

@@ -29,9 +29,11 @@ with import ../dependencies.nix { inherit config; };
   imports = [
     ../../python-packages/orchestrator/module.nix
   ];
-  services.orchestratord.enable = true;
-  services.orchestratord.orchestratorPkg = anixpkgs.orchestrator;
-  services.orchestratord.isNixOS = false;
+  services.orchestratord = {
+    enable = true;
+    orchestratorPkg = anixpkgs.orchestrator;
+    isNixOS = false;
+  };
   # home.packages = [
   #   (writeShellScriptBin "launch-services" ''
   #   cd $HOME
