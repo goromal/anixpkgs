@@ -35,16 +35,24 @@ with import ../dependencies.nix { inherit config; };
   #   isNixOS = false;
   # };
   systemd.user.services.orchestratord = {
+    Unit = {
+      Description = "Orchestrator daemon";
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+      Restart = "always";
+    };
     # enable = true;
-      # description = "Orchestrator daemon";
-      unitConfig = { StartLimitIntervalSec = 0; };
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
-        # WorkingDirectory = cfg.rootDir;
-        Restart = "always";
-        RestartSec = 5;
-      };
+      # # description = "Orchestrator daemon";
+      # unitConfig = { StartLimitIntervalSec = 0; };
+      # serviceConfig = {
+      #   Type = "simple";
+      #   ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+      #   # WorkingDirectory = cfg.rootDir;
+      #   Restart = "always";
+      #   RestartSec = 5;
+      # };
       # wantedBy = [ "multi-user.target" ];
       # path = cfg.pathPkgs;
   };
