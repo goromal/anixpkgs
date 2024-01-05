@@ -36,7 +36,7 @@ with import ../dependencies.nix { inherit config; };
   # };
   systemd.user.services.orchestratord = {
     enable = true;
-      description = "Orchestrator daemon";
+      # description = "Orchestrator daemon";
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
