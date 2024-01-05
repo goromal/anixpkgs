@@ -26,13 +26,27 @@ with import ../dependencies.nix { inherit config; };
 # };
 # in {
 {
-  imports = [
-    ../../python-packages/orchestrator/module.nix
-  ];
-  services.orchestratord = {
+  # imports = [
+  #   ../../python-packages/orchestrator/module.nix
+  # ];
+  # services.orchestratord = {
+  #   enable = true;
+  #   orchestratorPkg = anixpkgs.orchestrator;
+  #   isNixOS = false;
+  # };
+  systemd.user.services.orchestratord = {
     enable = true;
-    orchestratorPkg = anixpkgs.orchestrator;
-    isNixOS = false;
+      description = "Orchestrator daemon";
+      unitConfig = { StartLimitIntervalSec = 0; };
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${anixpkgs.orchestrator}/bin/orchestratord -n 2";
+        # WorkingDirectory = cfg.rootDir;
+        Restart = "always";
+        RestartSec = 5;
+      };
+      wantedBy = [ "multi-user.target" ];
+      # path = cfg.pathPkgs;
   };
   # home.packages = [
   #   (writeShellScriptBin "launch-services" ''
