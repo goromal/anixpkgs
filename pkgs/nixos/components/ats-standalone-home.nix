@@ -35,7 +35,7 @@ with import ../dependencies.nix { inherit config; };
   #   isNixOS = false;
   # };
   systemd.user.services.orchestratord = {
-    enable = true;
+    # enable = true;
       # description = "Orchestrator daemon";
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
