@@ -321,7 +321,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                         break
         if matched:
             continue
-        if text.isnumeric():
+        if text.lstrip('-+').isdigit():
             print(f"  Calorie intake on {date}: {text}")
             if logfile is not None:
                 logfile.write("Calories entry\n")
