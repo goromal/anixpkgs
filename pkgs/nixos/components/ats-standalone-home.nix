@@ -111,6 +111,8 @@ in {
       systemctl --user start ats-mailman.timer
       systemctl --user enable ats-ccounterd.timer
       systemctl --user start ats-ccounterd.timer
+      systemctl --user enable ats-ptaskerd.timer
+      systemctl --user start ats-ptaskerd.timer
     '')
   ];
   systemd.user.services.orchestratord = {
