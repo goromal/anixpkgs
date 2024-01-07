@@ -91,6 +91,8 @@ let
     providence-tasker 7 ${anixpkgs.redirects.suppress_all}
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
       "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
+      "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
   '';
 in {
   home.username = "andrew";
