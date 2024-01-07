@@ -22,7 +22,7 @@ in (writeShellScriptBin pkgname ''
   for i in $(seq 1 $num_days); do
       duedate=$(date --date="$i days" +"%Y-%m-%d")
       echo "Creating task for $duedate..."
-      taskname="$(${prexe} passage)"
+      taskname="P0: [T] $(${prexe} passage)"
       tasknotes="$(${prexe} patriarchal)"
       ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
   done
