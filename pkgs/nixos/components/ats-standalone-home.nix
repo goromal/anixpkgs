@@ -17,6 +17,7 @@ let
     gmail-parser
     scrape
     authm
+    providence-tasker
   ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs}
@@ -85,12 +86,20 @@ let
         "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
     fi
   '';
+  provTaskerScript = writeShellScript "ats-ptaskerd" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    providence-tasker 7 ${anixpkgs.redirects.suppress_all}
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
+      "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
+      "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
+  '';
 in {
   home.username = "andrew";
   home.homeDirectory = "/home/andrew";
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
-  imports = [ ./base-pkgs.nix ./x86-graphical-pkgs.nix ];
+  imports = [ ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
   mods.x86-graphical.standalone = true;
   mods.x86-graphical.homeDir = "/home/andrew";
   home.packages = [
@@ -104,6 +113,8 @@ in {
       systemctl --user start ats-mailman.timer
       systemctl --user enable ats-ccounterd.timer
       systemctl --user start ats-ccounterd.timer
+      systemctl --user enable ats-ptaskerd.timer
+      systemctl --user start ats-ptaskerd.timer
     '')
   ];
   systemd.user.services.orchestratord = {
@@ -170,6 +181,25 @@ in {
       Type = "oneshot";
       ExecStart =
         "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${counterScript}'";
+      ReadWritePaths = [ "/home/andrew" ];
+    };
+  };
+  systemd.user.timers.ats-ptaskerd = {
+    Unit.Description = "ATS ptaskerd timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "Sun *-*-* 08:00:00" ];
+      Persistent = true;
+      Unit = "ats-ptaskerd.service";
+    };
+  };
+  systemd.user.services.ats-ptaskerd = {
+    Unit.Description = "ATS ptaskerd script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${provTaskerScript}'";
       ReadWritePaths = [ "/home/andrew" ];
     };
   };
