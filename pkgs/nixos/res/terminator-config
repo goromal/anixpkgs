@@ -3,6 +3,8 @@
     borderless = False
     handle_size = 4
 [keybindings]
+    broadcast_all = Alt+A
+    broadcast_off = Alt+O
 [profiles]
 [[default]]
     font = Mono 10
