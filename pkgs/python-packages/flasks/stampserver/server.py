@@ -56,7 +56,8 @@ def index():
     global args
     global stampserver
     if flask.request.method == "POST":
-        stampserver.stamp(flask.request.form["text"])
+        if flask.request.form["text"] != "":
+            stampserver.stamp(flask.request.form["text"])
     res, msg = stampserver.load()
     if not res:
         return flask.render_template("index.html", err=True, msg=msg, file="", ftype="")
