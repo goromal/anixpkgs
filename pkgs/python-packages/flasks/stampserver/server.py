@@ -16,8 +16,7 @@ else:
 app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
 
 class StampServer:
-    STAMP = 0
-    RESTAMP = 1
+    STAMP = "asdfkl;ajsd;lkfj;ljkasdf"
     
     def __init__(self):
         self.reset()
@@ -48,9 +47,9 @@ class StampServer:
     def load_stamped(self, stamp):
         if not os.path.isdir(RES_DIR):
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
-        if self.task_type != StampServer.RESTAMP:
+        if self.task_type != stamp:
             self.reset()
-            self.task_type = StampServer.RESTAMP
+            self.task_type = stamp
         if len(self.filelist) == 0:
             for file in os.listdir(RES_DIR):
                 if file.startswith(f"stamped.{stamp}"):
