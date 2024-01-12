@@ -2,7 +2,7 @@
 with pkgs;
 with import ../dependencies.nix { inherit config; }; {
   # TODO temporary fix for bad URL dependency in home-manager
-  home.manual.{html,manpages,json}.enable = false;
+  home.manual.manpages.enable = false;
 
   home.packages = [
     rclone
