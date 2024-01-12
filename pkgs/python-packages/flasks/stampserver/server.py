@@ -26,7 +26,7 @@ class StampServer:
     def reset(self):
         self.filelist = {}
         self.filedeck = ""
-    
+
     def load(self):
         if not os.path.isdir(RES_DIR):
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
@@ -99,22 +99,25 @@ def index():
             stampserver.stamp(flask.request.form["text"])
     res, msg = stampserver.load()
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="")
+        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root="")
     file, ftype = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype)
+    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root="")
 
 @app.route("/restamp/<stamp>", methods=["GET","POST"])
 def stamped(stamp):
     global args
     global stampserver
     if flask.request.method == "POST":
-        if flask.request.form["text"] != "":
-            stampserver.replace_stamp(stamp, flask.request.form["text"])
+        if flask.request.form["text"] == "":
+            new_stamp = stamp
+        else:
+            new_stamp = flask.request.form["text"]
+        stampserver.replace_stamp(stamp, new_stamp)
     res, msg = stampserver.load_stamped(stamp)
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="")
+        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}")
     file, ftype = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype)
+    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}")
 
 def run():
     global args
