@@ -126,7 +126,7 @@ in {
     Unit = { Description = "ATS greeting timer"; };
     Timer = {
       OnBootSec = "1m";
-      Persistent = true;
+      Persistent = false;
       Unit = "ats-greeting.service";
     };
     Install.WantedBy = [ "timers.target" ];
@@ -166,7 +166,7 @@ in {
     Install.WantedBy = [ "timers.target" ];
     Timer = {
       OnCalendar = [ "Sun *-*-* 08:00:00" ];
-      Persistent = true;
+      Persistent = false;
       Unit = "ats-ptaskerd.service";
     };
   };
