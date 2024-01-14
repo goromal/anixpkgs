@@ -1,6 +1,9 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with import ../dependencies.nix { inherit config; }; {
+  # TODO temporary fix for bad URL dependency in home-manager
+  manual.manpages.enable = false;
+
   home.packages = [
     rclone
     anixpkgs.authm
