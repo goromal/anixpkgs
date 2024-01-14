@@ -40,7 +40,6 @@ let
     goromail --headless 1 journal ${anixpkgs.redirects.suppress_all}
     if [[ ! -z "$(cat /home/andrew/goromail/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
-      authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
       echo "[$(date)] 📬 Bot mail received:" \
         | cat - /home/andrew/goromail/bot.log > /home/andrew/goromail/temp \
         && mv /home/andrew/goromail/temp /home/andrew/goromail/bot.log
@@ -48,10 +47,34 @@ let
         "$(cat /home/andrew/goromail/bot.log)"
       gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
         "$(cat /home/andrew/goromail/bot.log)"
+      if [[ ! -z "$(grep 'Calories entry' /home/andrew/goromail/bot.log)" ]]; then
+        echo "Notifying of calorie total..."
+        lines="$(wiki-tools get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
+        if [[ -z $lines ]]; then
+          exit
+        fi
+        ctotal=0
+        clim=1950
+        while IFS= read -r line; do
+          c=`echo ''${line##* }`
+          ctotal=$(( ctotal + c ))
+        done <<< "$lines"
+        echo $ctotal
+        if (( ctotal <= clim )); then
+          gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
+            "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
+          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
+            "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
+        else
+          gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
+            "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
+          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
+            "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
+        fi
+      fi
     fi 
     if [[ ! -z "$(cat /home/andrew/goromail/journal.log)" ]]; then
       echo "Notifying about processed journal mail..."
-      authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
       echo "[$(date)] 📖 Journal mail received:" \
         | cat - /home/andrew/goromail/journal.log > /home/andrew/goromail/temp \
         && mv /home/andrew/goromail/temp /home/andrew/goromail/journal.log
@@ -59,31 +82,6 @@ let
         "$(cat /home/andrew/goromail/journal.log)"
       gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
         "$(cat /home/andrew/goromail/journal.log)"
-    fi
-  '';
-  counterScript = writeShellScript "ats-ccounterd" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
-    lines="$(wiki-tools get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
-    if [[ -z $lines ]]; then
-      exit
-    fi
-    ctotal=0
-    clim=1950
-    while IFS= read -r line; do
-      c=`echo ''${line##* }`
-      ctotal=$(( ctotal + c ))
-    done <<< "$lines"
-    echo $ctotal
-    if (( ctotal <= clim )); then
-      gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
-      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
-    else
-      gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
-      gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-        "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
     fi
   '';
   provTaskerScript = writeShellScript "ats-ptaskerd" ''
@@ -111,8 +109,6 @@ in {
       systemctl --user start ats-greeting.timer
       systemctl --user enable ats-mailman.timer
       systemctl --user start ats-mailman.timer
-      systemctl --user enable ats-ccounterd.timer
-      systemctl --user start ats-ccounterd.timer
       systemctl --user enable ats-ptaskerd.timer
       systemctl --user start ats-ptaskerd.timer
     '')
@@ -162,25 +158,6 @@ in {
       Type = "oneshot";
       ExecStart =
         "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${mailmanScript}'";
-      ReadWritePaths = [ "/home/andrew" ];
-    };
-  };
-  systemd.user.timers.ats-ccounterd = {
-    Unit.Description = "ATS ccounterd timer";
-    Install.WantedBy = [ "timers.target" ];
-    Timer = {
-      OnCalendar = [ "*-*-* 10:00:00" "*-*-* 14:00:00" "*-*-* 20:00:00" ];
-      Persistent = true;
-      Unit = "ats-ccounterd.service";
-    };
-  };
-  systemd.user.services.ats-ccounterd = {
-    Unit.Description = "ATS ccounterd script";
-    Install.WantedBy = [ "default.target" ];
-    Service = {
-      Type = "oneshot";
-      ExecStart =
-        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${counterScript}'";
       ReadWritePaths = [ "/home/andrew" ];
     };
   };
