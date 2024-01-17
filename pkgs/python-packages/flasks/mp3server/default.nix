@@ -81,6 +81,6 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     --port PORT  Port to run the server on
     ```
 
-    The server page takes an input audio file and converts it to an MP3 using the [mp3](../misc/mp3.md) tool. One can also specify a frequency transpose in terms of positive or negative half-steps.
+    The server page takes an input audio file and converts it to an MP3 using the [mp3](../bash/mp3.md) tool. One can also specify a frequency transpose in terms of positive or negative half-steps.
   '';
 }
