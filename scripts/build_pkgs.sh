@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+pkgstype=$1
+
 nb() {
 nix-build . -A $1
 }
@@ -15,8 +17,8 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd "$DIR/.."
 
-echo "Building Python packages..."
+echo "Building $pkgstype packages..."
 
-for pkg in $(python3 scripts/filter_pkg_list.py python); do
+for pkg in $(python3 scripts/filter_pkg_list.py $pkgstype); do
     nb $pkg
 done

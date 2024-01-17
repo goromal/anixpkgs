@@ -10,7 +10,7 @@
 
 This repository of personally maintained Nix derivations, overlays, and machine closures is essentially the centralized mechanism by which I maintain all of the software I write and use for both personal projects and recreation. In other words, I employ [Nix](https://nixos.org) as both a package manager for my software as well as an operating system for all of my computers, Raspberry Pi’s, etc.
 
-These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the [C++](./cpp/cpp.md), [Python](./python/python.md), and [miscellaneous](./misc/misc.md) software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
+These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
 
 ## Why Nix?
 

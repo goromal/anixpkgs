@@ -201,13 +201,22 @@ in rec {
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
+  aapis-py = final.python39.pkgs.aapis-py;
   budget_report = final.python39.pkgs.budget_report;
   makepyshell = final.python39.pkgs.makepyshell;
   mavlog-utils = final.python39.pkgs.mavlog-utils;
   sunnyside = final.python39.pkgs.sunnyside;
   fqt = final.python39.pkgs.fqt;
+  ichabod = final.python39.pkgs.ichabod;
+  norbert = final.python39.pkgs.norbert;
+  geometry = final.python39.pkgs.geometry;
+  pyceres = final.python39.pkgs.pyceres;
+  pyceres_factors = final.python39.pkgs.pyceres_factors;
+  pysorting = final.python39.pkgs.pysorting;
+  pysignals = final.python39.pkgs.pysignals;
+  mesh-plotter = final.python39.pkgs.mesh-plotter;
   scrape = final.python39.pkgs.scrape;
-  spleeter = final.python39.pkgs.spleeter;
+  spleeter = final.python38.pkgs.spleeter;
   find_rotational_conventions = final.python39.pkgs.find_rotational_conventions;
   trafficsim = final.python39.pkgs.trafficsim;
   flask-hello-world = final.python39.pkgs.flask-hello-world;
@@ -216,9 +225,13 @@ in rec {
   flask-mp3server = final.python39.pkgs.flask-mp3server;
   flask-smfserver = final.python39.pkgs.flask-smfserver;
   flask-oatbox = final.python39.pkgs.flask-oatbox;
+  imutils-cv4 = final.python39.pkgs.imutils-cv4;
+  vidstab-cv4 = final.python39.pkgs.vidstab-cb4;
   rankserver = final.python39.pkgs.rankserver;
   stampserver = final.python39.pkgs.stampserver;
+  easy-google-auth = final.python310.pkgs.easy-google-auth;
   task-tools = final.python310.pkgs.task-tools;
+  python-dokuwiki = final.python310.pkgs.python-dokuwiki;
   wiki-tools = final.python310.pkgs.wiki-tools;
   book-notes-sync = final.python310.pkgs.book-notes-sync;
   gmail-parser = final.python310.pkgs.gmail-parser;

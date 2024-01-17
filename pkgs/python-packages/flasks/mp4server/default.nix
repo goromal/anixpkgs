@@ -61,6 +61,6 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     --port PORT  Port to run the server on
     ```
 
-    The server page takes an input video file and converts it to an MP4 using the [mp4](../misc/mp4.md) tool.
+    The server page takes an input video file and converts it to an MP4 using the [mp4](../bash/mp4.md) tool.
   '';
 }
