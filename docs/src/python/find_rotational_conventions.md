@@ -1,4 +1,4 @@
-# python39.pkgs.find_rotational_conventions
+# find_rotational_conventions
 
 Find rotational conventions of a Python transform library.
 

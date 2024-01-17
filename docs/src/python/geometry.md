@@ -1,4 +1,4 @@
-# python39.pkgs.geometry
+# geometry
 
 Implementations for SO(3) and SE(3).
 

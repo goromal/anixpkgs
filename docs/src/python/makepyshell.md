@@ -1,4 +1,4 @@
-# python39.pkgs.makepyshell
+# makepyshell
 
 Generate a nix-shell file for Python development.
 

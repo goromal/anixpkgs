@@ -1,4 +1,4 @@
-# python39.pkgs.imutils-cv4
+# imutils-cv4
 
 A series of convenience functions to make basic image processing functions
 

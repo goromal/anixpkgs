@@ -1,4 +1,4 @@
-# python39.pkgs.sunnyside
+# sunnyside
 
 Make scrambled eggs.
 

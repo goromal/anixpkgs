@@ -1,4 +1,4 @@
-# python39.pkgs.norbert
+# norbert
 
 Painless Wiener filters for audio separation.
 

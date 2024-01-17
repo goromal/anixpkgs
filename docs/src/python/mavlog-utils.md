@@ -1,4 +1,4 @@
-# python39.pkgs.mavlog-utils
+# mavlog-utils
 
 Assorted tools for processing mavlink .bin logs.
 

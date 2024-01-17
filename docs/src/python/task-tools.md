@@ -1,4 +1,4 @@
-# python310.pkgs.task-tools
+# task-tools
 
 CLI tools for managing Google Tasks.
 

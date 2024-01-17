@@ -1,4 +1,4 @@
-# python39.pkgs.flask-hello-world
+# flask-hello-world
 
 Spawn a trivial website, powered by Python's flask library.
 

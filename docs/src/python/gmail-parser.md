@@ -1,4 +1,4 @@
-# python310.pkgs.gmail-parser
+# gmail-parser
 
 Assorted Python tools for semi-automated processing of GMail messages.
 

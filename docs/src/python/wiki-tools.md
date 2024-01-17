@@ -1,4 +1,4 @@
-# python310.pkgs.wiki-tools
+# wiki-tools
 
 CLI tools for managing my wiki notes site.
 

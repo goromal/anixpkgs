@@ -1,4 +1,4 @@
-# python39.pkgs.ichabod
+# ichabod
 
 Friend of the headless horseman.
 

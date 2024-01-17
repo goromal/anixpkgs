@@ -1,4 +1,4 @@
-# python39.pkgs.flask-oatbox
+# flask-oatbox
 
 "One at a time" (O.A.T.) Box. Store one file at a time, powered by Python's flask library.
 
