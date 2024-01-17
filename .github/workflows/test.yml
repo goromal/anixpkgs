@@ -145,7 +145,6 @@ jobs:
   regression:
     name: Regression Tests
     needs:
-    - tests
     - cpp
     - rust
     - python
@@ -166,7 +165,6 @@ jobs:
   machines:
     name: Machine Checks
     needs:
-    - tests
     - cpp
     - rust
     - python
