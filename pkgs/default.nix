@@ -226,7 +226,7 @@ in rec {
   flask-smfserver = final.python39.pkgs.flask-smfserver;
   flask-oatbox = final.python39.pkgs.flask-oatbox;
   imutils-cv4 = final.python39.pkgs.imutils-cv4;
-  vidstab-cv4 = final.python39.pkgs.vidstab-cb4;
+  vidstab-cv4 = final.python39.pkgs.vidstab-cv4;
   rankserver = final.python39.pkgs.rankserver;
   stampserver = final.python39.pkgs.stampserver;
   easy-google-auth = final.python310.pkgs.easy-google-auth;
