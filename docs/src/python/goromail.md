@@ -1,4 +1,4 @@
-# python310.pkgs.goromail
+# goromail
 
 Manage mail for GBot and Journal.
 

@@ -1,4 +1,4 @@
-# python39.pkgs.stampserver
+# stampserver
 
 Provides an interface for stamping metadata on PNGs and MP4s.
 

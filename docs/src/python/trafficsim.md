@@ -1,4 +1,4 @@
-# python39.pkgs.trafficsim
+# trafficsim
 
 Simulate traffic.
 

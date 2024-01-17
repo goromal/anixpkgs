@@ -1,4 +1,4 @@
-# python310.pkgs.python-dokuwiki
+# python-dokuwiki
 
 Manage Dokuwiki via XMLRPC.
 

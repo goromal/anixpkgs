@@ -1,4 +1,4 @@
-# python39.pkgs.flask-mp4server
+# flask-mp4server
 
 Spawn an MP4 conversion server, powered by Python's flask library.
 

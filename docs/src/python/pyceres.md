@@ -1,4 +1,4 @@
-# python39.pkgs.pyceres
+# pyceres
 
 Python bindings for the Ceres Solver.
 

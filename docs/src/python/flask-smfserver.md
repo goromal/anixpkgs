@@ -1,4 +1,4 @@
-# python39.pkgs.flask-smfserver
+# flask-smfserver
 
 Spawn an SMF "simple music file" conversion server, powered by Python's flask library.
 

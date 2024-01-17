@@ -1,4 +1,4 @@
-# python39.pkgs.flask-mp3server
+# flask-mp3server
 
 Spawn an MP3 conversion server, powered by Python's flask library.
 

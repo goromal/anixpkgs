@@ -1,4 +1,4 @@
-# python39.pkgs.flask-url2mp4
+# flask-url2mp4
 
 Convert URL's pointing to videos to MP4's, powered by Python's flask library.
 

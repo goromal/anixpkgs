@@ -1,4 +1,4 @@
-# python39.pkgs.pysignals
+# pysignals
 
 Python bindings of signals-cpp.
 
