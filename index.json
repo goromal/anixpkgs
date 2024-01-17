@@ -236,6 +236,7 @@
                 "ci": true
             }
         ],
+        "rust": [],
         "python": [
             {
                 "attr": "python39.pkgs.aapis-py",
@@ -377,7 +378,9 @@
                 "attr": "python310.pkgs.goromail",
                 "ci": true
             }
-        ]
+        ],
+        "bash": [],
+        "java": []
     },
     "rfcs": [
         {
