@@ -229,11 +229,11 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1705700672,
-        "narHash": "sha256-/x7r5n0vu1AR8JhskB78C1Z0aKmNK/MD0oyY2NONCEE=",
+        "lastModified": 1705773958,
+        "narHash": "sha256-wKSGYuMPpDTn21M2unjlhPbJq69Tlg5++zjBxHz2Siw=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "b48363403d199ca406ff6df20399a42ef383a76c",
+        "rev": "5030af3428b4cc0c0250c16886b3dee837da7e13",
         "type": "github"
       },
       "original": {
