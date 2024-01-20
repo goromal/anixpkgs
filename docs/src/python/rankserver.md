@@ -1,4 +1,4 @@
-# python39.pkgs.rankserver
+# rankserver
 
 A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.
 

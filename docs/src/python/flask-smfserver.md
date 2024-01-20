@@ -1,4 +1,4 @@
-# python39.pkgs.flask-smfserver
+# flask-smfserver
 
 Spawn an SMF "simple music file" conversion server, powered by Python's flask library.
 
@@ -26,5 +26,5 @@ The server page presents a text input area where you can type a song as specifie
 - Multiple letters in a group form a chord.
 - Begin a line with a number and colon (e.g., 1:) to specify a unique voice.
 
-Under the hood, conversions to MP3 are done using the [abc](../misc/abc.md) and [mp3](../misc/mp3.md) tools.
+Under the hood, conversions to MP3 are done using the [abc](../bash/abc.md) and [mp3](../bash/mp3.md) tools.
 

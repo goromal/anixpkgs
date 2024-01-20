@@ -1,4 +1,4 @@
-# python39.pkgs.pyceres_factors
+# pyceres_factors
 
 Python bindings of ceres-factors.
 

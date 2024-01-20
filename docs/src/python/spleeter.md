@@ -1,4 +1,4 @@
-# python38.pkgs.spleeter
+# spleeter
 
 Deezer source separation library including pretrained models.
 

@@ -20,3 +20,11 @@ for configuration in ${configurations[@]}; do
     echo "Checks out!"
     echo ""
 done
+
+installers=(ats)
+for installer in ${installers[@]}; do
+    echo "Checking derivation for installer: $installer..."
+    nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=${DIR}/../pkgs/nixos/installers/${installer}.nix --no-out-link --dry-run
+    echo "Checks out!"
+    echo ""
+done

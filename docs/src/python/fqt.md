@@ -1,4 +1,4 @@
-# python39.pkgs.fqt
+# fqt
 
 Four-quadrant tasking.
 

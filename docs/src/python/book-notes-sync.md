@@ -1,4 +1,4 @@
-# python310.pkgs.book-notes-sync
+# book-notes-sync
 
 Utility for syncing Google Play Books notes with my personal wiki.
 

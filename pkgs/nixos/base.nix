@@ -28,13 +28,18 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    isInstaller = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the closure is for an ISO install image.";
+    };
   };
 
   imports = [
     (import "${home-manager}/nixos")
     ../python-packages/orchestrator/module.nix
-    ../python-packages/ats-greeting/module.nix
-    ../python-packages/ats-mailman/module.nix
+    ../standalone-modules/ats-greeting/module.nix
+    ../standalone-modules/ats-mailman/module.nix
+    ../standalone-modules/ats-ccounterd/module.nix
   ];
 
   config = {
@@ -44,7 +49,10 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        pkgs.linuxPackages_latest);
+        (if cfg.isInstaller then
+          pkgs.linuxPackages_6_1
+        else
+          pkgs.linuxPackages_latest));
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -174,7 +182,7 @@ in {
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = true;
+    networking.networkmanager.enable = !cfg.isInstaller;
 
     networking.firewall.allowedTCPPorts = [ 4444 ];
 
@@ -207,6 +215,7 @@ in {
         pkgs.bash
         pkgs.coreutils
         pkgs.rclone
+        anixpkgs.wiki-tools
         anixpkgs.rcrsync
         anixpkgs.mp4
         anixpkgs.mp4unite
@@ -228,6 +237,11 @@ in {
       redirectsPkg = anixpkgs.redirects;
     };
 
+    services.ats-ccounterd = {
+      enable = cfg.isServer;
+      orchestratorPkg = anixpkgs.orchestrator;
+    };
+
     # Global packages
     environment.systemPackages = [
       ack
@@ -235,7 +249,6 @@ in {
       tldr
       fzf
       fdupes
-      exa # TODO ls (or l) alias?
       zoxide # z, ...
       duf
       gcc

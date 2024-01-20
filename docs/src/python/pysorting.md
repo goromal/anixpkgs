@@ -1,4 +1,4 @@
-# python39.pkgs.pysorting
+# pysorting
 
 RESTful incremental sorting with client-side comparators.
 

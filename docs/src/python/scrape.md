@@ -1,4 +1,4 @@
-# python39.pkgs.scrape
+# scrape
 
 Scrape content off the internet, quickly.
 
