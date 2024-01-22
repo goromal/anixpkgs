@@ -89,7 +89,9 @@ let
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    task-tools grader --start-date 2024-01-01 > $tmpdir/out.txt
+    echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools grader --start-date 2024-01-01 >> $tmpdir/out.txt
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
         "$(cat $tmpdir/out.txt)"
     gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
@@ -101,7 +103,8 @@ let
   taskP0Script = writeShellScript "ats-p0-tasks" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    echo "Pending P0 Tasks for the Day:\n" > $tmpdir/out.txt
+    echo "❗0️⃣❗Pending P0 Tasks for the Day:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
     task-tools list p0 --no-ids >> $tmpdir/out.txt
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
         "$(cat $tmpdir/out.txt)"
@@ -112,7 +115,8 @@ let
   taskP1Script = writeShellScript "ats-p1-tasks" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    echo "Pending P1 Tasks for the Week:\n" > $tmpdir/out.txt
+    echo "💡1️⃣💡 Pending P1 Tasks for the Week:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
     task-tools list p1 --no-ids >> $tmpdir/out.txt
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
         "$(cat $tmpdir/out.txt)"
@@ -123,7 +127,8 @@ let
   taskP2Script = writeShellScript "ats-p2-tasks" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    echo "Pending P2 Tasks for the Month:\n" > $tmpdir/out.txt
+    echo "🗓️2️⃣🗓️ Pending P2 Tasks for the Month:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
     task-tools list p2 --no-ids >> $tmpdir/out.txt
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
         "$(cat $tmpdir/out.txt)"
@@ -134,7 +139,8 @@ let
   taskLateScript = writeShellScript "ats-late-tasks" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    echo "LATE Tasks:\n" > $tmpdir/out.txt
+    echo "🚨*️⃣🚨 LATE Tasks:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
     task-tools list late --no-ids >> $tmpdir/out.txt
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
         "$(cat $tmpdir/out.txt)"
@@ -309,7 +315,7 @@ in {
     Unit.Description = "ATS taskLate timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
-      OnCalendar = [ "*-*-* 07:01:00" "*-*-* 20:01:00" ];
+      OnCalendar = [ "*-*-* 07:03:00" "*-*-* 20:03:00" ];
       Persistent = false;
       Unit = "ats-taskLate.service";
     };
