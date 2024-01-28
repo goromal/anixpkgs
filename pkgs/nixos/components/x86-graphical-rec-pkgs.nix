@@ -43,7 +43,7 @@ in {
         cp "$MEMRY_CRD" "$MMCRD_DSK" || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Copy failed!"; }
         ${anixpkgs.color-prints}/bin/echo_cyan "Launching the emulator..."
         ${if cfg.standalone then
-          "nixGL ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"
+          "nix run --override-input nixpkgs nixpkgs/nixos-${nixos-version} --impure github:guibou/nixGL -- ${pkgs.dolphinEmu}/bin/dolphin-emu -e $ZELDA_ROM"
         else
           "${pkgs.dolphinEmu}/bin/dolphin-emu -a LLE -e $ZELDA_ROM"}
         ${anixpkgs.color-prints}/bin/echo_cyan "Copying memory card from disk to cloud..."
