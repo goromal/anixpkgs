@@ -90,5 +90,9 @@ in {
       themes.nordic-gtk4.css-dark.data;
     ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
       themes.nordic-gtk4.thumbnail.data;
+    ".config/gtk-4.0/bookmarks".text = ''
+      file:///data/andrew/dev Development
+      file:///data/andrew/data Data
+    '';
   };
 }
