@@ -13,6 +13,8 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 export NIXPKGS_ALLOW_UNFREE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
+sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
+
 configurations=(personal-inspiron rankserver-pi)
 for configuration in ${configurations[@]}; do
     echo "Checking derivation for configuration: $configuration..."
@@ -28,3 +30,5 @@ for installer in ${installers[@]}; do
     echo "Checks out!"
     echo ""
 done
+
+sed -i 's|local-build = true;|local-build = false;|g' ${DIR}/../pkgs/nixos/dependencies.nix
