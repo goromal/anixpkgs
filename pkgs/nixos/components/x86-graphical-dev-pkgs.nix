@@ -6,7 +6,7 @@ in {
   options.mods.x86-graphical = {
     vscodium-package = lib.mkOption {
       type = lib.types.package;
-      description = "VSCode flavor to use (default: pkgs.vscodium)";
+      description = "VSCode flavor to use (default: unstable.vscodium)";
       default = unstable.vscodium;
     };
   };
