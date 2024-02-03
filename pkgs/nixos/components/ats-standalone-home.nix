@@ -10,6 +10,7 @@ let
   oPathPkgs = lib.makeBinPath [
     rclone
     wiki-tools
+    task-tools
     rcrsync
     mp4
     mp4unite
@@ -84,6 +85,69 @@ let
         "$(cat /home/andrew/goromail/journal.log)"
     fi
   '';
+  graderScript = writeShellScript "ats-grader" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools grader --start-date 2024-01-01 >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+    rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
+
+  '';
+  taskP0Script = writeShellScript "ats-p0-tasks" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "❗0️⃣❗Pending P0 Tasks for the Day:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools list p0 --no-ids >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
+  taskP1Script = writeShellScript "ats-p1-tasks" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "💡1️⃣💡 Pending P1 Tasks for the Week:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools list p1 --no-ids >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
+  taskP2Script = writeShellScript "ats-p2-tasks" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "🗓️2️⃣🗓️ Pending P2 Tasks for the Month:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools list p2 --no-ids >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
+  taskLateScript = writeShellScript "ats-late-tasks" ''
+    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "🚨*️⃣🚨 LATE Tasks:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools list late --no-ids >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
   provTaskerScript = writeShellScript "ats-ptaskerd" ''
     authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
     providence-tasker 7 ${anixpkgs.redirects.suppress_all}
@@ -111,6 +175,16 @@ in {
       systemctl --user start ats-mailman.timer
       systemctl --user enable ats-ptaskerd.timer
       systemctl --user start ats-ptaskerd.timer
+      systemctl --user enable ats-grader.timer
+      systemctl --user start ats-grader.timer
+      systemctl --user enable ats-taskP0.timer
+      systemctl --user start ats-taskP0.timer
+      systemctl --user enable ats-taskP1.timer
+      systemctl --user start ats-taskP1.timer
+      systemctl --user enable ats-taskP2.timer
+      systemctl --user start ats-taskP2.timer
+      systemctl --user enable ats-taskLate.timer
+      systemctl --user start ats-taskLate.timer
     '')
   ];
   systemd.user.services.orchestratord = {
@@ -159,6 +233,101 @@ in {
       ExecStart =
         "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${mailmanScript}'";
       ReadWritePaths = [ "/home/andrew" ];
+    };
+  };
+  systemd.user.timers.ats-grader = {
+    Unit.Description = "ATS grader timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "Sat *-*-* 22:00:00" ];
+      Persistent = false;
+      Unit = "ats-grader.service";
+    };
+  };
+  systemd.user.services.ats-grader = {
+    Unit.Description = "ATS grader script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${graderScript}'";
+      ReadWritePaths = [ "/" ];
+    };
+  };
+  systemd.user.timers.ats-taskP0 = {
+    Unit.Description = "ATS taskP0 timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "*-*-* 07:00:00" "*-*-* 12:00:00" "*-*-* 20:00:00" ];
+      Persistent = false;
+      Unit = "ats-taskP0.service";
+    };
+  };
+  systemd.user.services.ats-taskP0 = {
+    Unit.Description = "ATS taskP0 script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP0Script}'";
+      ReadWritePaths = [ "/" ];
+    };
+  };
+  systemd.user.timers.ats-taskP1 = {
+    Unit.Description = "ATS taskP1 timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "*-*-* 07:01:00" "*-*-* 20:01:00" ];
+      Persistent = false;
+      Unit = "ats-taskP1.service";
+    };
+  };
+  systemd.user.services.ats-taskP1 = {
+    Unit.Description = "ATS taskP1 script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP1Script}'";
+      ReadWritePaths = [ "/" ];
+    };
+  };
+  systemd.user.timers.ats-taskP2 = {
+    Unit.Description = "ATS taskP2 timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "*-*-* 07:02:00" "*-*-* 20:02:00" ];
+      Persistent = false;
+      Unit = "ats-taskP2.service";
+    };
+  };
+  systemd.user.services.ats-taskP2 = {
+    Unit.Description = "ATS taskP2 script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP2Script}'";
+      ReadWritePaths = [ "/" ];
+    };
+  };
+  systemd.user.timers.ats-taskLate = {
+    Unit.Description = "ATS taskLate timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "*-*-* 07:03:00" "*-*-* 20:03:00" ];
+      Persistent = false;
+      Unit = "ats-taskLate.service";
+    };
+  };
+  systemd.user.services.ats-taskLate = {
+    Unit.Description = "ATS taskLate script";
+    Install.WantedBy = [ "default.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskLateScript}'";
+      ReadWritePaths = [ "/" ];
     };
   };
   systemd.user.timers.ats-ptaskerd = {

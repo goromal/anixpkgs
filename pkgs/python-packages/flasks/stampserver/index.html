@@ -6,6 +6,11 @@
 </head>
 
 <body>
+    <nav>
+        <ul>
+            <li><a href="/logout">Logout</a></li>
+        </ul>
+    </nav>
     <h1>Stamp Server</h1>
     {% if err %}
     <p>{{ msg }}</p>
@@ -13,8 +18,12 @@
     {% if ftype == "PNG" %}
     <img src="/{{ file }}" alt="" />
     {% elif ftype == "MP4" %}
-    <video controls width="250">
+    <video controls loop width="250">
         <source src="/{{ file }}" type="video/mp4" />
+    </video>
+    {% elif ftype == "WEBM_EXT" %}
+    <video controls loop width="250">
+        <source src="{{ file }}" type="video/webm" />
     </video>
     {% endif %}
     <form action="/{{ root }}" method="POST">
