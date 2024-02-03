@@ -1,11 +1,28 @@
 import os
 import argparse
 import flask
+import flask_login
+import flask_wtf
+from wtforms import StringField, PasswordField, SubmitField
+from werkzeug.security import generate_password_hash, check_password_hash
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
 parser.add_argument("--data-dir", action="store", type=str, default="", help="Directory containing the stampable elements")
 args = parser.parse_args()
+
+class LoginForm(flask_wtf.FlaskForm):
+    username = StringField("Username")
+    password = PasswordField("Password")
+    submit = SubmitField("Submit")
+
+class User(flask_login.UserMixin):
+    def check_password(self, password):
+        return check_password_hash("pbkdf2:sha256:260000$lZSRuIMsXegmiXNl$8a1fde09226a09391218ec3b1f07f6d8373a055f0469b69d0855f9cc29a53e31", password)
+    def get_id(self):
+        return "anonymous"
+
+user = User()
 
 PWD = os.getcwd()
 if args.data_dir[0] == '/':
@@ -14,6 +31,8 @@ else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 
 app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
+app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+login_manager = flask_login.LoginManager()
 
 class StampServer:
     STAMP = "asdfkl;ajsd;lkfj;ljkasdf"
@@ -89,7 +108,38 @@ class StampServer:
 
 stampserver = StampServer()
 
+@login_manager.user_loader
+def load_user(user_id):
+    global user
+    if user_id == "anonymous":
+        return user
+    else:
+        return None
+      
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    global user
+    if flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.username.data != user.get_id() or not user.check_password(form.password.data):
+            return flask.redirect(flask.url_for("login"))
+        flask_login.login_user(user, remember=True)
+        next = flask.request.args.get('next')
+        # if not url_has_allowed_host_and_scheme(next, flask.request.host):
+        #     return flask.abort(400)
+        return flask.redirect(next or flask.url_for('index'))
+    return flask.render_template("login.html", title="Sign In", form=form)
+      
+@app.route("/logout")
+@flask_login.login_required
+def logout():
+    flask_login.logout_user()
+    return flask.redirect(flask.url_for("login"))
+
 @app.route("/", methods=["GET","POST"])
+@flask_login.login_required
 def index():
     global args
     global stampserver
@@ -103,6 +153,7 @@ def index():
     return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root="")
 
 @app.route("/restamp/<stamp>", methods=["GET","POST"])
+@flask_login.login_required
 def stamped(stamp):
     global args
     global stampserver
@@ -118,8 +169,22 @@ def stamped(stamp):
     file, ftype = stampserver.getfile()
     return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}")
 
+@app.route("/zzz", methods=["GET","POST"])
+@flask_login.login_required
+def zzz():
+    return flask.render_template(
+        "index.html",
+        err=False,
+        msg="",
+        file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_1280x720.webm",
+        ftype="WEBM_EXT",
+        root="zzz"
+    )
+
 def run():
     global args
+    login_manager.init_app(app)
+    login_manager.login_view = "login"
     app.run(host="0.0.0.0", port=args.port)
 
 if __name__ == "__main__":
