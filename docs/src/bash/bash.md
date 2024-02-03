@@ -31,7 +31,7 @@ Packages written (or glued together) in Bash.
 - [py-helper](./py-helper.md)
 - [mp4unite](./mp4unite.md)
 - [git-cc](./git-cc.md)
-- [gitcop](./gitcop.md)
+- [git-shortcuts](./git-shortcuts.md)
 - [setupws](./setupws.md)
 - [listsources](./listsources.md)
 - [pkgshell](./pkgshell.md)

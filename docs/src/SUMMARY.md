@@ -86,7 +86,7 @@
   - [py-helper](./bash/py-helper.md)
   - [mp4unite](./bash/mp4unite.md)
   - [git-cc](./bash/git-cc.md)
-  - [gitcop](./bash/gitcop.md)
+  - [git-shortcuts](./bash/git-shortcuts.md)
   - [setupws](./bash/setupws.md)
   - [listsources](./bash/listsources.md)
   - [pkgshell](./bash/pkgshell.md)
