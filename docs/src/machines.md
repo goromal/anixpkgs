@@ -34,9 +34,6 @@ with import ../dependencies.nix { inherit config; }; {
   home.stateVersion = nixos-version;
   programs.home-manager.enable = true;
 
-  # $ nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl && nix-channel --update
-  # $ nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
-
   imports = [
     [ANIX_SRC]/pkgs/nixos/components/base-pkgs.nix
     [ANIX_SRC]/pkgs/nixos/components/base-dev-pkgs.nix
