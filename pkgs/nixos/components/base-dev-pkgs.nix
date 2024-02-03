@@ -4,7 +4,7 @@ with import ../dependencies.nix { inherit config; }; {
   home.packages = [
     direnv
     anixpkgs.git-cc
-    anixpkgs.gitcop
+    anixpkgs.git-shortcuts
     anixpkgs.setupws
     anixpkgs.listsources
     anixpkgs.pkgshell

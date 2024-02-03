@@ -316,7 +316,7 @@
                 "ci": true
             },
             {
-                "attr": "gitcop",
+                "attr": "git-shortcuts",
                 "ci": true
             },
             {
