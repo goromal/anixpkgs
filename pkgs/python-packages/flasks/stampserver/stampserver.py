@@ -176,8 +176,8 @@ def zzz():
         "index.html",
         err=False,
         msg="",
-        file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_1280x720.webm",
-        ftype="WEBM_EXT",
+        file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4",
+        ftype="MP4_EXT",
         root="zzz"
     )
 
