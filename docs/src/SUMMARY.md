@@ -84,6 +84,7 @@
   - [code2pdf](./bash/code2pdf.md)
   - [cpp-helper](./bash/cpp-helper.md)
   - [py-helper](./bash/py-helper.md)
+  - [rust-helper](./bash/rust-helper.md)
   - [mp4unite](./bash/mp4unite.md)
   - [git-cc](./bash/git-cc.md)
   - [git-shortcuts](./bash/git-shortcuts.md)

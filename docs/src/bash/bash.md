@@ -29,6 +29,7 @@ Packages written (or glued together) in Bash.
 - [code2pdf](./code2pdf.md)
 - [cpp-helper](./cpp-helper.md)
 - [py-helper](./py-helper.md)
+- [rust-helper](./rust-helper.md)
 - [mp4unite](./mp4unite.md)
 - [git-cc](./git-cc.md)
 - [git-shortcuts](./git-shortcuts.md)
