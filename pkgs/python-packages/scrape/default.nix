@@ -46,6 +46,8 @@ buildPythonPackage rec {
       [sample_960x400_ocean_with_audio](https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_960x400_ocean_with_audio.webm)
 
       [sample_960x540](https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_960x540.webm)
+
+      [sample_640x360 (mp4)](https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4)
     '';
   };
 }
