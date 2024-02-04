@@ -1,6 +1,7 @@
 { writeShellScriptBin, callPackage, color-prints, redirects, git-cc }:
 let
   pkgname = "cpp-helper";
+  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
       usage: ${pkgname} [options]
@@ -53,7 +54,9 @@ let
     if [[ "$makenix" == "1" ]]; then
         ${printGrn} "Generating template default.nix and shell.nix files..."
         cat ${defaultFile} > default.nix
+        sed -i 's|REPLACEME|${anix-version}|g' default.nix
         cat ${shellFile} > shell.nix
+        sed -i 's|REPLACEME|${anix-version}|g' shell.nix
     fi
   '';
   makehotRule = ''

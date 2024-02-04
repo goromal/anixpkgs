@@ -1,6 +1,7 @@
 { writeShellScriptBin, callPackage, color-prints, redirects, strings, git-cc }:
 let
   pkgname = "py-helper";
+  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
       usage: ${pkgname} [options]
@@ -40,6 +41,7 @@ let
         ${printGrn} "Generating template default.nix and shell.nix files..."
         cat ${defaultFile} > default.nix
         cat ${shellFile} > shell.nix
+        sed -i 's|REPLACEME|${anix-version}|g' shell.nix
     fi
   '';
   makepkgRule = ''
