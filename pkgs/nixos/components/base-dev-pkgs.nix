@@ -11,6 +11,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.devshell
     anixpkgs.cpp-helper
     anixpkgs.py-helper
+    anixpkgs.rust-helper
     anixpkgs.makepyshell
   ];
 
