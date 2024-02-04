@@ -162,8 +162,8 @@ in {
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
   imports = [ ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
-  mods.x86-graphical.standalone = true;
-  mods.x86-graphical.homeDir = "/home/andrew";
+  mods.base.standalone = true;
+  mods.base.homeDir = "/home/andrew";
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
