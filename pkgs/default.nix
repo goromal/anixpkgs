@@ -259,6 +259,7 @@ in rec {
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
   cpp-helper = addDoc (prev.callPackage ./bash-packages/cpp-helper { });
   py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
+  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper { });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });

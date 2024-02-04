@@ -308,6 +308,10 @@
                 "ci": true
             },
             {
+                "attr": "rust-helper",
+                "ci": true
+            },
+            {
                 "attr": "mp4unite",
                 "ci": true
             },
