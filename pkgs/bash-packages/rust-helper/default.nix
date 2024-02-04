@@ -1,6 +1,7 @@
 { writeShellScriptBin, callPackage, color-prints, redirects, git-cc }:
 let
   pkgname = "rust-helper";
+  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   usage_str = ''
     usage: ${pkgname} [options]
 
@@ -9,14 +10,12 @@ let
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
     inherit usage_str;
-    optsWithVarsAndDefaults = [
-      {
-        var = "makenix";
-        isBool = true;
-        default = "0";
-        flags = "--make-nix";
-      }
-    ];
+    optsWithVarsAndDefaults = [{
+      var = "makenix";
+      isBool = true;
+      default = "0";
+      flags = "--make-nix";
+    }];
   };
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
@@ -25,6 +24,7 @@ let
     if [[ "$makenix" == "1" ]]; then
         ${printGrn} "Generating template shell.nix file..."
         cat ${shellFile} > shell.nix
+        sed -i 's|REPLACEME|${anix-version}|g' shell.nix
     fi
   '';
 in (writeShellScriptBin pkgname ''
