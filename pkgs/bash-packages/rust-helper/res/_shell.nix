@@ -2,10 +2,4 @@ let
   pkgs = import (fetchTarball
     ("https://github.com/goromal/anixpkgs/archive/refs/tags/vREPLACEME.tar.gz"))
     { };
-in with pkgs;
-mkShell {
-  nativeBuildInputs = [ cmake ];
-  buildInputs = [
-    # ADD deps
-  ];
-}
+in pkgs.mkShell { buildInputs = [ pkgs.cargo pkgs.rustc ]; }
