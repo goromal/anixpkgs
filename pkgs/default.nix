@@ -314,6 +314,9 @@ in rec {
   });
   mscpp = addDoc
     (prev.callPackage ./cxx-packages/mscpp { pkg-src = flakeInputs.mscpp; });
+  orchestrator-cpp = addDoc (prev.callPackage ./cxx-packages/orchestrator-cpp {
+    pkg-src = flakeInputs.orchestrator-cpp;
+  });
   ceres-factors = addDoc (prev.callPackage ./cxx-packages/ceres-factors {
     pkg-src = flakeInputs.ceres-factors;
   });
