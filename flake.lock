@@ -338,6 +338,22 @@
         "type": "github"
       }
     },
+    "orchestrator-cpp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1707604031,
+        "narHash": "sha256-K2a3yNvKAd+u9Gzgf1bes7Bcy5J3300REUjeU0oy/BQ=",
+        "owner": "goromal",
+        "repo": "orchestrator-cpp",
+        "rev": "3316ac16c6cddfbfd71a33cd73c01edca0679bab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "orchestrator-cpp",
+        "type": "github"
+      }
+    },
     "pyceres": {
       "flake": false,
       "locked": {
@@ -475,6 +491,7 @@
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
+        "orchestrator-cpp": "orchestrator-cpp",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
         "pysignals": "pysignals",

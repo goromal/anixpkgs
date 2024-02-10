@@ -31,6 +31,9 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
+    orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
+    orchestrator-cpp.flake = false;
+
     quad-sim-cpp.url = "github:goromal/quad-sim-cpp";
     quad-sim-cpp.flake = false;
 

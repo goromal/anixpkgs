@@ -44,6 +44,10 @@
             {
                 "attr": "mfn",
                 "ci": true
+            },
+            {
+                "attr": "orchestrator-cpp",
+                "ci": true
             }
         ],
         "rust": [
