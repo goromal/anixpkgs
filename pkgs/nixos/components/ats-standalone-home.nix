@@ -26,7 +26,7 @@ let
   '';
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     sleep 5
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
@@ -34,11 +34,11 @@ let
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
   '';
   mailmanScript = writeShellScript "ats-mailman" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
     # TODO warn about expiration
-    goromail --headless 1 bot ${anixpkgs.redirects.suppress_all}
-    goromail --headless 1 journal ${anixpkgs.redirects.suppress_all}
+    goromail --headless bot ${anixpkgs.redirects.suppress_all}
+    goromail --headless journal ${anixpkgs.redirects.suppress_all}
     if [[ ! -z "$(cat /home/andrew/goromail/bot.log)" ]]; then
       echo "Notifying about processed bot mail..."
       echo "[$(date)] 📬 Bot mail received:" \
@@ -86,7 +86,7 @@ let
     fi
   '';
   graderScript = writeShellScript "ats-grader" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
     tmpdir=$(mktemp -d)
     echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
@@ -101,7 +101,7 @@ let
 
   '';
   taskP0Script = writeShellScript "ats-p0-tasks" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
     echo "❗0️⃣❗Pending P0 Tasks for the Day:" > $tmpdir/out.txt
     echo "" >> $tmpdir/out.txt
@@ -113,7 +113,7 @@ let
     rm -r $tmpdir
   '';
   taskP1Script = writeShellScript "ats-p1-tasks" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
     echo "💡1️⃣💡 Pending P1 Tasks for the Week:" > $tmpdir/out.txt
     echo "" >> $tmpdir/out.txt
@@ -125,7 +125,7 @@ let
     rm -r $tmpdir
   '';
   taskP2Script = writeShellScript "ats-p2-tasks" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
     echo "🗓️2️⃣🗓️ Pending P2 Tasks for the Month:" > $tmpdir/out.txt
     echo "" >> $tmpdir/out.txt
@@ -137,7 +137,7 @@ let
     rm -r $tmpdir
   '';
   taskLateScript = writeShellScript "ats-late-tasks" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     tmpdir=$(mktemp -d)
     echo "🚨*️⃣🚨 LATE Tasks:" > $tmpdir/out.txt
     echo "" >> $tmpdir/out.txt
@@ -149,7 +149,7 @@ let
     rm -r $tmpdir
   '';
   provTaskerScript = writeShellScript "ats-ptaskerd" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     providence-tasker 7 ${anixpkgs.redirects.suppress_all}
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
       "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
