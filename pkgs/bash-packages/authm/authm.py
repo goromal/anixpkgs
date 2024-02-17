@@ -15,9 +15,7 @@ def cli():
 @click.option(
     "--headless",
     "headless",
-    type=bool,
-    default=False,
-    show_default=True,
+    is_flag=True,
     help="Whether to run in headless mode.",
 )
 def refresh(headless):

@@ -5,7 +5,7 @@ let
   cfg = config.services.ats-greeting;
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     sleep 5
     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"

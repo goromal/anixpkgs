@@ -4,7 +4,7 @@ with lib;
 let
   cfg = config.services.ats-ccounterd;
   counterScript = writeShellScript "ats-ccounterd" ''
-    authm refresh --headless 1  || { >&2 echo "authm refresh error!"; exit 1; }
+    authm refresh --headless  || { >&2 echo "authm refresh error!"; exit 1; }
     lines="$(wiki-tools get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
     if [[ -z $lines ]]; then
       exit
