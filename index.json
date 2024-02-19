@@ -264,6 +264,10 @@
                 "ci": true
             },
             {
+                "attr": "dirgather",
+                "ci": true
+            },
+            {
                 "attr": "manage-gmail",
                 "ci": true
             },

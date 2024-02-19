@@ -261,6 +261,7 @@ in rec {
   py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
   rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper { });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
+  dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
