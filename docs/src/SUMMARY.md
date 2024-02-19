@@ -73,6 +73,7 @@
   - [zipper](./bash/zipper.md)
   - [color-prints](./bash/color-prints.md)
   - [dirgroups](./bash/dirgroups.md)
+  - [dirgather](./bash/dirgather.md)
   - [manage-gmail](./bash/manage-gmail.md)
   - [gantter](./bash/gantter.md)
   - [la-quiz](./bash/la-quiz.md)

@@ -17,6 +17,7 @@ Packages written (or glued together) in Bash.
 - [zipper](./zipper.md)
 - [color-prints](./color-prints.md)
 - [dirgroups](./dirgroups.md)
+- [dirgather](./dirgather.md)
 - [manage-gmail](./manage-gmail.md)
 - [gantter](./gantter.md)
 - [la-quiz](./la-quiz.md)
