@@ -12,6 +12,8 @@ mkShell {
     scrape
     orchestrator
     fix-perms
+    dirgather
+    dirgroups
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."
