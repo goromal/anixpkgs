@@ -3,6 +3,10 @@
     filename=$(basename -- "$1")
     echo "$filename"
   '';
+  getBaseDir = writeShellScript "getBaseDir" ''
+    dname=$(basename -- $(dirname -- $(realpath "$1")))
+    echo "$dname"
+  '';
   getExtension = writeShellScript "getExtension" ''
     filename=`${getBasename} "$1"`
     echo "''${filename##*.}"
