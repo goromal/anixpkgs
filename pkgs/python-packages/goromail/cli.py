@@ -193,9 +193,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
 @click.option(
     "--headless",
     "headless",
-    type=bool,
-    default=False,
-    show_default=True,
+    is_flag=True,
     help="Whether to run in headless (i.e., server) mode.",
 )
 @click.option(

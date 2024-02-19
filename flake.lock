@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1702534595,
-        "narHash": "sha256-a+7M/hMxVIrNqBP943hEbaGC5VG0Dggr1OWJ8q/urJ8=",
+        "lastModified": 1707018004,
+        "narHash": "sha256-YOA4MvKJqJEJ6g5JzuHwW47zJNNXQWSUtrVcdFp7L4U=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "b2bfeee5c1e41af4cc4012bb2345fe076e8723e4",
+        "rev": "77211cd6ab4ee5a9879aef94403c81daf2a11d58",
         "type": "github"
       },
       "original": {
@@ -35,11 +35,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1703143407,
-        "narHash": "sha256-fpsBIbv/uivkhfSoftPX+AZDZC7UCLHjEToyqPqKEZE=",
+        "lastModified": 1708324156,
+        "narHash": "sha256-CEDIfPCDzBlG+aIZ1HSA686KeJ/d7+aPMPCeq2MY/pI=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "a53363ed084136c0c6bca548699185966fac5ad7",
+        "rev": "bfbc4b1671f1b990ded9f6ec2b25d56dce95a437",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1703814036,
-        "narHash": "sha256-VlNioSSVR1WZNjHpwp+CYfGY37Zc6maLYngbffVbrrE=",
+        "lastModified": 1708324128,
+        "narHash": "sha256-kLzTR30umTmnx1nxVGtP8Mxa+PXtSXTtueqnCc8R2mA=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "1234e0fc45242e8192761925cdaaba3454c4282c",
+        "rev": "f6e303ec4f2c9601071b0859c72a0f45496a55f3",
         "type": "github"
       },
       "original": {
@@ -181,11 +181,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1703227883,
-        "narHash": "sha256-l5gy4mlK9tTuMwybAcQul/3+yf7MxPP+KeasTRDXkbQ=",
+        "lastModified": 1708324181,
+        "narHash": "sha256-/gz4Mnm/oqgga53YuRmcNVlrEByZcGtUq+ECMZMsKVY=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "a8e7caeac0e96440119d81ad91149a0d532385b0",
+        "rev": "26f389f9efed9ac0d798be5b18d075d746f72bf2",
         "type": "github"
       },
       "original": {
@@ -341,11 +341,11 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1707604031,
-        "narHash": "sha256-K2a3yNvKAd+u9Gzgf1bes7Bcy5J3300REUjeU0oy/BQ=",
+        "lastModified": 1707606598,
+        "narHash": "sha256-ch21eRka7G/PEt/Ku8UplSYobjtw8zM8o2LgWXaAO00=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "3316ac16c6cddfbfd71a33cd73c01edca0679bab",
+        "rev": "73f7ec5912cf9e26dff994251ab109d557a3a36a",
         "type": "github"
       },
       "original": {
@@ -625,11 +625,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1705865825,
-        "narHash": "sha256-uvc5eNleXUEbZdCyNYkfxsYigjWacIYvb9DSAnVQkUc=",
+        "lastModified": 1708324212,
+        "narHash": "sha256-nZjl6yelA83ekfQEs81A5jnQg5cRLyAtghG0JU8M+Yc=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "3f90c965ee7012768ee785426657b6fedb32ed9f",
+        "rev": "2d12faa3c696b4c20b53da75357942c1e2c45e7c",
         "type": "github"
       },
       "original": {

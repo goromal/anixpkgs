@@ -36,6 +36,7 @@ with import ../dependencies.nix { inherit config; }; {
       anixpkgs.make-title
       anixpkgs.pb
       anixpkgs.dirgroups
+      anixpkgs.dirgather
       anixpkgs.fixfname
       anixpkgs.nix-deps
       anixpkgs.nix-diffs
