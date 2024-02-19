@@ -52,7 +52,8 @@ in (writeShellScriptBin pkgname ''
   find "$rootdir" -type d -empty -delete
 '') // {
   meta = {
-    description = "Gather all files in a directory tree into a single directory.";
+    description =
+      "Gather all files in a directory tree into a single directory.";
     longDescription = ''
       ```
       usage: dirgather [options] rootdir gatherdir
