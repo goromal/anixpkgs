@@ -21,8 +21,7 @@ let
     providence-tasker
   ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
-    PATH=$PATH:/usr/bin:${oPathPkgs}
-    ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
