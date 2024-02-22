@@ -1,8 +1,11 @@
 { pkgs, config, lib, ... }:
-# TODO this is a very bespoke script--adapt or use sparingly
+# TODO This is a very bespoke config--adapt or use sparingly
 # probably replace the standalone-modules/ and orchestrator/ modules with these home-manager versions
 # in a components/ats.nix file (i.e., this file with added configurability, removal of home-manager configs,
 # and accommodation of NixOS paths for e.g., coreutils)
+# NOTE: When running these units as user processes on a headless server, you'll want to edit
+#       /etc/systemd/logind.conf to have the entry KillUserProcesses=no (and restart systemd-logind)
+#       in order to avoid having systemd kill the processes when you're logged out.
 with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
@@ -21,8 +24,7 @@ let
     providence-tasker
   ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
-    PATH=$PATH:/usr/bin:${oPathPkgs}
-    ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
   greetingScript = writeShellScript "ats-greeting" ''
     sleep 5
@@ -185,6 +187,13 @@ in {
       systemctl --user start ats-taskP2.timer
       systemctl --user enable ats-taskLate.timer
       systemctl --user start ats-taskLate.timer
+      loginctl enable-linger andrew
+    '')
+    (writeShellScriptBin "jfu" ''
+      journalctl --user -fu $@
+    '')
+    (writeShellScriptBin "sctl" ''
+      systemctl --user $@
     '')
   ];
   systemd.user.services.orchestratord = {
@@ -214,20 +223,18 @@ in {
       Restart = "on-failure";
       ReadWritePaths = [ "/home/andrew" ];
     };
-    Install.WantedBy = [ "default.target" ];
   };
   systemd.user.timers.ats-mailman = {
     Unit.Description = "ATS mailman timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
       OnBootSec = "5m";
-      OnUnitActiveSec = "30m";
+      OnUnitActiveSec = "10m";
       Unit = "ats-mailman.service";
     };
   };
   systemd.user.services.ats-mailman = {
     Unit.Description = "ATS mailman script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -246,7 +253,6 @@ in {
   };
   systemd.user.services.ats-grader = {
     Unit.Description = "ATS grader script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -265,7 +271,6 @@ in {
   };
   systemd.user.services.ats-taskP0 = {
     Unit.Description = "ATS taskP0 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -284,7 +289,6 @@ in {
   };
   systemd.user.services.ats-taskP1 = {
     Unit.Description = "ATS taskP1 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -303,7 +307,6 @@ in {
   };
   systemd.user.services.ats-taskP2 = {
     Unit.Description = "ATS taskP2 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -322,7 +325,6 @@ in {
   };
   systemd.user.services.ats-taskLate = {
     Unit.Description = "ATS taskLate script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -341,7 +343,6 @@ in {
   };
   systemd.user.services.ats-ptaskerd = {
     Unit.Description = "ATS ptaskerd script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
