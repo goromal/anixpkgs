@@ -187,6 +187,7 @@ in {
       systemctl --user start ats-taskP2.timer
       systemctl --user enable ats-taskLate.timer
       systemctl --user start ats-taskLate.timer
+      loginctl enable-linger andrew
     '')
     (writeShellScriptBin "jfu" ''
       journalctl --user -fu $@
