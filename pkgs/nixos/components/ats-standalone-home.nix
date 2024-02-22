@@ -223,7 +223,6 @@ in {
       Restart = "on-failure";
       ReadWritePaths = [ "/home/andrew" ];
     };
-    Install.WantedBy = [ "default.target" ];
   };
   systemd.user.timers.ats-mailman = {
     Unit.Description = "ATS mailman timer";
@@ -236,7 +235,6 @@ in {
   };
   systemd.user.services.ats-mailman = {
     Unit.Description = "ATS mailman script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -255,7 +253,6 @@ in {
   };
   systemd.user.services.ats-grader = {
     Unit.Description = "ATS grader script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -274,7 +271,6 @@ in {
   };
   systemd.user.services.ats-taskP0 = {
     Unit.Description = "ATS taskP0 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -293,7 +289,6 @@ in {
   };
   systemd.user.services.ats-taskP1 = {
     Unit.Description = "ATS taskP1 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -312,7 +307,6 @@ in {
   };
   systemd.user.services.ats-taskP2 = {
     Unit.Description = "ATS taskP2 script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -331,7 +325,6 @@ in {
   };
   systemd.user.services.ats-taskLate = {
     Unit.Description = "ATS taskLate script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
@@ -350,7 +343,6 @@ in {
   };
   systemd.user.services.ats-ptaskerd = {
     Unit.Description = "ATS ptaskerd script";
-    Install.WantedBy = [ "default.target" ];
     Service = {
       Type = "oneshot";
       ExecStart =
