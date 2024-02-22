@@ -1,8 +1,11 @@
 { pkgs, config, lib, ... }:
-# TODO this is a very bespoke script--adapt or use sparingly
+# TODO This is a very bespoke config--adapt or use sparingly
 # probably replace the standalone-modules/ and orchestrator/ modules with these home-manager versions
 # in a components/ats.nix file (i.e., this file with added configurability, removal of home-manager configs,
 # and accommodation of NixOS paths for e.g., coreutils)
+# NOTE: When running these units as user processes on a headless server, you'll want to edit
+#       /etc/systemd/logind.conf to have the entry KillUserProcesses=no (and restart systemd-logind)
+#       in order to avoid having systemd kill the processes when you're logged out.
 with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
@@ -185,6 +188,12 @@ in {
       systemctl --user enable ats-taskLate.timer
       systemctl --user start ats-taskLate.timer
     '')
+    (writeShellScriptBin "jfu" ''
+      journalctl --user -fu $@
+    '')
+    (writeShellScriptBin "sctl" ''
+      systemctl --user $@
+    '')
   ];
   systemd.user.services.orchestratord = {
     Unit = { Description = "Orchestrator daemon"; };
@@ -220,7 +229,7 @@ in {
     Install.WantedBy = [ "timers.target" ];
     Timer = {
       OnBootSec = "5m";
-      OnUnitActiveSec = "30m";
+      OnUnitActiveSec = "10m";
       Unit = "ats-mailman.service";
     };
   };
