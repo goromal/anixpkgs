@@ -246,7 +246,7 @@ in {
     Unit.Description = "ATS grader timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
-      OnCalendar = [ "Sat *-*-* 22:00:00" ];
+      OnCalendar = [ "*-*-* 22:00:00" ];
       Persistent = false;
       Unit = "ats-grader.service";
     };
@@ -264,7 +264,7 @@ in {
     Unit.Description = "ATS taskP0 timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
-      OnCalendar = [ "*-*-* 07:00:00" "*-*-* 12:00:00" "*-*-* 20:00:00" ];
+      OnCalendar = [ "*-*-* 07:00:00" ];
       Persistent = false;
       Unit = "ats-taskP0.service";
     };
@@ -282,7 +282,7 @@ in {
     Unit.Description = "ATS taskP1 timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
-      OnCalendar = [ "*-*-* 07:01:00" "*-*-* 20:01:00" ];
+      OnCalendar = [ "*-*-* 07:01:00" ];
       Persistent = false;
       Unit = "ats-taskP1.service";
     };
@@ -300,7 +300,7 @@ in {
     Unit.Description = "ATS taskP2 timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
-      OnCalendar = [ "*-*-* 07:02:00" "*-*-* 20:02:00" ];
+      OnCalendar = [ "*-*-* 07:02:00" ];
       Persistent = false;
       Unit = "ats-taskP2.service";
     };
