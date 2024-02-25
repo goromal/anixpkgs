@@ -4,7 +4,7 @@ buildPythonPackage rec {
   version = "0.0.0";
   src = pkg-src;
   propagatedBuildInputs = [ click easy-google-auth ];
-  doCheck = false;
+  doCheck = true;
   meta = {
     description = "CLI tools for managing Google Tasks.";
     longDescription = ''
