@@ -112,7 +112,7 @@ jobs:
     - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh python
   bash:
     name: Bash Packages
-    needs: envs
+    needs: python
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
