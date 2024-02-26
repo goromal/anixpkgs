@@ -28,9 +28,12 @@ Example `home.nix` file for personal use:
 
 ```nix
 { config, pkgs, lib, ... }:
-with import ../dependencies.nix { inherit config; }; {
-  home.username = "andrew";
-  home.homeDirectory = "/home/andrew";
+let
+  user = "andrew";
+  homedir = "/home/${user}";
+in with import ../dependencies.nix { inherit config; }; {
+  home.username = user;
+  home.homeDirectory = homedir;
   home.stateVersion = nixos-version;
   programs.home-manager.enable = true;
 
@@ -43,9 +46,8 @@ with import ../dependencies.nix { inherit config; }; {
     [ANIX_SRC]/pkgs/nixos/components/x86-graphical-rec-pkgs.nix
   ];
 
-  mods.x86-graphical.standalone = true;
-  mods.x86-graphical.homeDir = "/home/andrew";
-  mods.x86-graphical-rec.standalone = true;
+  mods.base.standalone = true;
+  mods.base.homeDir = homedir;
 }
 
 ```
