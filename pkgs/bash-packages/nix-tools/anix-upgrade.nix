@@ -92,9 +92,17 @@ in (writeShellScriptBin pkgname ''
   vdest=$(cat anixpkgs/ANIX_VERSION)
   ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $(cat anixpkgs/NIXOS_VERSION))..."
   if [[ "$boot" == "1" ]]; then
+    ${if standalone == false then ''
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
+    '' else ''
+    ${printYellow} "Ignoring boot flag for home switch" && home-manager switch && ${printYellow} "Done."
+    ''}
   else
+    ${if standalone == false then ''
     sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
+    '' else ''
+    home-manager switch && ${printYellow} "Done."
+    ''}
   fi
   if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then
     ${
