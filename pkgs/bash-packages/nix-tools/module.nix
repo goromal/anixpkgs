@@ -16,7 +16,7 @@ in {
     };
     browser-aliases = lib.mkOption {
       type = lib.types.nullOr lib.types.package;
-      description = "Browser package to use for graphical distros";
+      description = "Browser aliases package to use for graphical distros";
       default = null;
     };
   };
