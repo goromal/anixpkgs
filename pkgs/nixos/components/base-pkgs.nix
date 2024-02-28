@@ -1,6 +1,8 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix { inherit config; };
+let cfg = config.mods.base;
+in {
   options.mods.base = {
     standalone = lib.mkOption {
       type = lib.types.bool;
@@ -14,16 +16,51 @@ with import ../dependencies.nix { inherit config; }; {
         "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
+    cloudDirs = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      description =
+        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      default = [
+        {
+          name = "configs";
+          cloudname = "dropbox:configs";
+          dirname = "$HOME/configs";
+        }
+        {
+          name = "secrets";
+          cloudname = "dropbox:secrets";
+          dirname = "$HOME/secrets";
+        }
+        {
+          name = "games";
+          cloudname = "dropbox:games";
+          dirname = "$HOME/games";
+        }
+        {
+          name = "data";
+          cloudname = "box:data";
+          dirname = "$HOME/data";
+        }
+        {
+          name = "documents";
+          cloudname = "drive:Documents";
+          dirname = "$HOME/Documents";
+        }
+      ];
+    };
   };
 
   config = {
     # TODO temporary fix for bad URL dependency in home-manager (23.05)
     manual.manpages.enable = false;
 
-    home.packages = [
+    home.packages = let
+      rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+      authm = anixpkgs.authm.override { inherit rcrsync; };
+    in [
       rclone
-      anixpkgs.authm
-      anixpkgs.rcrsync
+      authm
+      rcrsync
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser

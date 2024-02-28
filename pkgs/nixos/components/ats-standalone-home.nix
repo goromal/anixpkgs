@@ -10,17 +10,21 @@ with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
 let
-  oPathPkgs = lib.makeBinPath [
+  cfg = config.mods.base;
+  oPathPkgs = let
+    ats-rcrsync = rcrsync.override { cloudDirs = cfg.cloudDirs; };
+    ats-authm = authm.override { rcrsync = ats-rcrsync; };
+  in lib.makeBinPath [
     rclone
     wiki-tools
     task-tools
-    rcrsync
+    ats-rcrsync
     mp4
     mp4unite
     goromail
     gmail-parser
     scrape
-    authm
+    ats-authm
     providence-tasker
   ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''

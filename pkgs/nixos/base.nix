@@ -216,12 +216,13 @@ in {
         pkgs.coreutils
         pkgs.rclone
         anixpkgs.wiki-tools
-        anixpkgs.rcrsync
         anixpkgs.mp4
         anixpkgs.mp4unite
         anixpkgs.goromail
         anixpkgs.gmail-parser
         anixpkgs.scrape
+        # TODO if we move to NixOS ATS, then these must be fixed to have the correct cloudDir arg
+        anixpkgs.rcrsync
         anixpkgs.authm
       ];
     };
