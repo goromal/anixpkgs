@@ -3,7 +3,7 @@
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
-  cliCloudList = builtins.concatStringsSep "\n  "
+  cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
     usage: ${pkgname} [init|sync] CLOUD_DIR
@@ -12,7 +12,7 @@ let
 
     CLOUD_DIR options:
 
-      ${cliCloudList}
+          ${cliCloudList}
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = "${longDescription}";
