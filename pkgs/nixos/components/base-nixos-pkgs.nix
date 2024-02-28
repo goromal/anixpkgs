@@ -5,7 +5,7 @@ with import ../dependencies.nix { inherit config; }; {
 
   home.packages = [ docker tmux ];
 
-  programs.anix-tools = {
+  programs.anix-tools = { # TODO move this to base-pkgs.nix and expose the new option
     enable = true;
     inherit anixpkgs;
   };
