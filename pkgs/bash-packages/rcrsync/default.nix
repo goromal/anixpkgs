@@ -3,7 +3,7 @@
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
-  cliCloudList = builtins.concatStringsSep "\n      "
+  cliCloudList = builtins.concatStringsSep "\n  "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
     usage: ${pkgname} [init|sync] CLOUD_DIR
