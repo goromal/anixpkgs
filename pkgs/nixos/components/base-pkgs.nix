@@ -17,7 +17,7 @@ in {
       default = "/data/andrew";
     };
     cloudDirs = lib.mkOption {
-      type = lib.types.list;
+      type = lib.types.listOf lib.types.attrs;
       description = "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
       default = [
           { name = "configs"; cloudname = "dropbox:configs"; dirname = "$HOME/configs"; }
