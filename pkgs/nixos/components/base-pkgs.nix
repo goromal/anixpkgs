@@ -54,10 +54,13 @@ in {
     # TODO temporary fix for bad URL dependency in home-manager (23.05)
     manual.manpages.enable = false;
 
-    home.packages = [
+    home.packages = let
+      rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+      authm = anixpkgs.authm.override { inherit rcrsync; };
+    in [
       rclone
-      anixpkgs.authm
-      (anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; })
+      authm
+      rcrsync
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser
