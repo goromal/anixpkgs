@@ -1,8 +1,10 @@
-{ cloudDirs ? [], writeShellScriptBin, callPackage, rclone, color-prints, redirects }:
+{ cloudDirs ? [ ], writeShellScriptBin, callPackage, rclone, color-prints
+, redirects }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
-  cliCloudList = builtins.concatStringsSep "\n      " (map (x: "${x.name}\t${x.cloudname}\t<->  ${x.dirname}") cloudDirs);
+  cliCloudList = builtins.concatStringsSep "\n      "
+    (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
     usage: ${pkgname} [init|sync] CLOUD_DIR
 
@@ -20,9 +22,9 @@ let
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
   cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
-  elif [[ "$2" == "${x.name}" ]]; then
-    CLOUD_DIR="${x.cloudname}"
-    LOCAL_DIR="${x.dirname}"
+    elif [[ "$2" == "${x.name}" ]]; then
+      CLOUD_DIR="${x.cloudname}"
+      LOCAL_DIR="${x.dirname}"
   '') cloudDirs);
 in (writeShellScriptBin pkgname ''
   ${argparse}

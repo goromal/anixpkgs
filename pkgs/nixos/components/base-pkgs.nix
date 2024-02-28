@@ -18,14 +18,35 @@ in {
     };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
-      description = "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      description =
+        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
       default = [
-          { name = "configs"; cloudname = "dropbox:configs"; dirname = "$HOME/configs"; }
-          { name = "secrets"; cloudname = "dropbox:secrets"; dirname = "$HOME/secrets"; }
-          { name = "games"; cloudname = "dropbox:games"; dirname = "$HOME/games"; }
-          { name = "data"; cloudname = "box:data"; dirname = "$HOME/data"; }
-          { name = "documents"; cloudname = "drive:Documents"; dirname = "$HOME/Documents"; }
-        ];
+        {
+          name = "configs";
+          cloudname = "dropbox:configs";
+          dirname = "$HOME/configs";
+        }
+        {
+          name = "secrets";
+          cloudname = "dropbox:secrets";
+          dirname = "$HOME/secrets";
+        }
+        {
+          name = "games";
+          cloudname = "dropbox:games";
+          dirname = "$HOME/games";
+        }
+        {
+          name = "data";
+          cloudname = "box:data";
+          dirname = "$HOME/data";
+        }
+        {
+          name = "documents";
+          cloudname = "drive:Documents";
+          dirname = "$HOME/Documents";
+        }
+      ];
     };
   };
 
@@ -36,9 +57,7 @@ in {
     home.packages = [
       rclone
       anixpkgs.authm
-      (anixpkgs.rcrsync.override {
-        cloudDirs = cfg.cloudDirs;
-      })
+      (anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; })
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser
