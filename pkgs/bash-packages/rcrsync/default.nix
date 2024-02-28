@@ -1,7 +1,8 @@
-{ writeShellScriptBin, callPackage, rclone, color-prints, redirects }:
+{ cloudDirs ? [], writeShellScriptBin, callPackage, rclone, color-prints, redirects }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
+  cliCloudList = builtins.concatStringsSep "\n      " (map (x: "${x.name}\t${x.cloudname}\t<->  ${x.dirname}") cloudDirs);
   longDescription = ''
     usage: ${pkgname} [init|sync] CLOUD_DIR
 
@@ -9,11 +10,7 @@ let
 
     CLOUD_DIR options:
 
-      configs       dropbox:configs  <->  ~/configs
-      secrets       dropbox:secrets  <->  ~/secrets
-      games         dropbox:Games    <->  ~/games
-      data          box:data         <->  ~/data
-      documents     drive:Documents  <->  ~/Documents
+      ${cliCloudList}
   '';
   argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = "${longDescription}";
@@ -22,6 +19,11 @@ let
   printErr = ">&2 ${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
+  cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
+  elif [[ "$2" == "${x.name}" ]]; then
+    CLOUD_DIR="${x.cloudname}"
+    LOCAL_DIR="${x.dirname}"
+  '') cloudDirs);
 in (writeShellScriptBin pkgname ''
   ${argparse}
   if [[ -z "$1" ]]; then
@@ -31,23 +33,7 @@ in (writeShellScriptBin pkgname ''
   if [[ -z "$2" ]]; then
     ${printErr} "No CLOUD_DIR provided."
     exit 1
-  fi
-
-  if [[ "$2" == "configs" ]]; then
-    CLOUD_DIR="dropbox:configs"
-    LOCAL_DIR="$HOME/configs"
-  elif [[ "$2" == "secrets" ]]; then
-    CLOUD_DIR="dropbox:secrets"
-    LOCAL_DIR="$HOME/secrets"
-  elif [[ "$2" == "games" ]]; then
-    CLOUD_DIR="dropbox:Games"
-    LOCAL_DIR="$HOME/games"
-  elif [[ "$2" == "data" ]]; then
-    CLOUD_DIR="box:data"
-    LOCAL_DIR="$HOME/data"
-  elif [[ "$2" == "documents" ]]; then
-    CLOUD_DIR="drive:Documents"
-    LOCAL_DIR="$HOME/Documents"
+  ${cloudChecks}
   else
     ${printErr} "Unrecognized CLOUD_DIR: $2"
     exit 1

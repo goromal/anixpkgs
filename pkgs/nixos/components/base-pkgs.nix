@@ -1,6 +1,8 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix { inherit config; };
+let cfg = config.mods.base;
+in {
   options.mods.base = {
     standalone = lib.mkOption {
       type = lib.types.bool;
@@ -14,6 +16,17 @@ with import ../dependencies.nix { inherit config; }; {
         "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
+    cloudDirs = lib.mkOption {
+      type = lib.types.list;
+      description = "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      default = [
+          { name = "configs"; cloudname = "dropbox:configs"; dirname = "$HOME/configs"; }
+          { name = "secrets"; cloudname = "dropbox:secrets"; dirname = "$HOME/secrets"; }
+          { name = "games"; cloudname = "dropbox:games"; dirname = "$HOME/games"; }
+          { name = "data"; cloudname = "box:data"; dirname = "$HOME/data"; }
+          { name = "documents"; cloudname = "drive:Documents"; dirname = "$HOME/Documents"; }
+        ];
+    };
   };
 
   config = {
@@ -23,7 +36,9 @@ with import ../dependencies.nix { inherit config; }; {
     home.packages = [
       rclone
       anixpkgs.authm
-      anixpkgs.rcrsync
+      (anixpkgs.rcrsync.override {
+        cloudDirs = cfg.cloudDirs;
+      })
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser
