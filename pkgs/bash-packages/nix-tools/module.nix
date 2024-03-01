@@ -19,12 +19,17 @@ in {
       description = "Browser aliases package to use for graphical distros";
       default = null;
     };
+    standalone = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether the containing closure is a standalone Nix install";
+      default = false;
+    };
   };
 
   config = lib.mkIf cfg.enable {
     home.packages = with cfg; [
       anixpkgs.anix-version
-      (anixpkgs.anix-upgrade.override { inherit browser-aliases; })
+      (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; inherit browser-aliases; })
     ];
   };
 }
