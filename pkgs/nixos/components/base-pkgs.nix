@@ -99,6 +99,12 @@ in {
       anixpkgs.scrape
     ];
 
+    programs.anix-tools = {
+      enable = true;
+      standalone = cfg.standalone;
+      inherit anixpkgs;
+    };
+
     programs.vim = {
       enable = true;
       extraConfig = ''
