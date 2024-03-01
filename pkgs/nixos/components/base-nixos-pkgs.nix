@@ -5,11 +5,6 @@ with import ../dependencies.nix { inherit config; }; {
 
   home.packages = [ docker tmux ];
 
-  programs.anix-tools = { # TODO move this to base-pkgs.nix and expose the new option
-    enable = true;
-    inherit anixpkgs;
-  };
-
   home.file = {
     ".anix-version".text =
       if local-build then "Local Build" else "v${anix-version}";
