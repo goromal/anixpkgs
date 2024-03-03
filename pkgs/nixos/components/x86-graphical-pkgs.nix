@@ -18,7 +18,7 @@ in {
 
   home.packages = [ terminator anixpkgs.budget_report ]
     ++ (if !cfg.standalone then [
-      lib.mkForce
+      # lib.mkForce
       (anixpkgs.anix-upgrade.override {
         standalone = cfg.standalone;
         inherit browser-aliases;
