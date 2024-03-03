@@ -7,15 +7,6 @@ let
     browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
   });
 in {
-  imports = [ ../../bash-packages/nix-tools/module.nix ];
-
-  programs.anix-tools = {
-    enable = true;
-    standalone = cfg.standalone;
-    inherit anixpkgs;
-    inherit browser-aliases;
-  };
-
   dconf.settings = {
     "org/gnome/desktop/background" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
@@ -25,7 +16,11 @@ in {
     };
   };
 
-  home.packages = [ terminator anixpkgs.budget_report ];
+  home.packages = [ terminator anixpkgs.budget_report
+   ] ++ (if !cfg.standalone then [lib.mkForce (anixpkgs.anix-upgrade.override {
+    standalone = cfg.standalone;
+    inherit browser-aliases;
+   })] else []);
 
   home.file = with anixpkgs.pkgData; {
     # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;

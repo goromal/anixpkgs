@@ -51,8 +51,6 @@ in {
   };
 
   config = {
-    imports = [ ../../bash-packages/nix-tools/module.nix ];
-
     # TODO temporary fix for bad URL dependency in home-manager (23.05)
     manual.manpages.enable = false;
 
@@ -63,6 +61,10 @@ in {
       rclone
       authm
       rcrsync
+      anixpkgs.anix-version
+      (anixpkgs.anix-upgrade.override {
+        standalone = cfg.standalone;
+      })
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser
