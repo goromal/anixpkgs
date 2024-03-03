@@ -1,6 +1,11 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix { inherit config; };
+let
+  browser-aliases = (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+    browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
+  });
+in {
   imports = [ ./x86-graphical-pkgs.nix ];
 
   home.packages = [

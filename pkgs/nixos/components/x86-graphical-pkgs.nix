@@ -16,11 +16,15 @@ in {
     };
   };
 
-  home.packages = [ terminator anixpkgs.budget_report
-   ] ++ (if !cfg.standalone then [lib.mkForce (anixpkgs.anix-upgrade.override {
-    standalone = cfg.standalone;
-    inherit browser-aliases;
-   })] else []);
+  home.packages = [ terminator anixpkgs.budget_report ]
+    ++ (if !cfg.standalone then [
+      lib.mkForce
+      (anixpkgs.anix-upgrade.override {
+        standalone = cfg.standalone;
+        inherit browser-aliases;
+      })
+    ] else
+      [ ]);
 
   home.file = with anixpkgs.pkgData; {
     # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;

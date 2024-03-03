@@ -61,12 +61,8 @@ in {
       rclone
       authm
       rcrsync
-      (anixpkgs.anix-version.override {
-        standalone = cfg.standalone;
-      })
-      (anixpkgs.anix-upgrade.override {
-        standalone = cfg.standalone;
-      })
+      (anixpkgs.anix-version.override { standalone = cfg.standalone; })
+      (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
       anixpkgs.goromail
       anixpkgs.manage-gmail
       anixpkgs.gmail-parser

@@ -15,7 +15,10 @@ let
   printYellow = "${color-prints}/bin/echo_yellow";
 in (writeShellScriptBin pkgname ''
   ${argparse}
-  ${if !standalone then "echo -n $(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) (" else ""}
+  ${if !standalone then
+    "echo -n $(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) ("
+  else
+    ""}
   ${printYellow} ${if !standalone then "-n" else ""} "$(cat ~/.anix-version)"
   ${if !standalone then "echo )" else ""}
 '') // {
