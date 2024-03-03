@@ -1,8 +1,21 @@
 { pkgs, config, lib, ... }:
 with pkgs;
 with import ../dependencies.nix { inherit config; };
-let cfg = config.mods.base;
+let
+  cfg = config.mods.base;
+  browser-aliases = (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+    browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
+  });
 in {
+  imports = [ ../../bash-packages/nix-tools/module.nix ];
+
+  programs.anix-tools = {
+    enable = true;
+    standalone = cfg.standalone;
+    inherit anixpkgs;
+    inherit browser-aliases;
+  };
+
   dconf.settings = {
     "org/gnome/desktop/background" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";

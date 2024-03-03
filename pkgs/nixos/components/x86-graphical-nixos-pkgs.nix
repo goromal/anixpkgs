@@ -1,13 +1,7 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; };
-let
-  browser-aliases = (anixpkgs.callPackage ../../bash-packages/browser-aliases {
-    browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
-  });
-in {
-  imports =
-    [ ./x86-graphical-pkgs.nix ../../bash-packages/nix-tools/module.nix ];
+with import ../dependencies.nix { inherit config; }; {
+  imports = [ ./x86-graphical-pkgs.nix ];
 
   home.packages = [
     kooha # wayland-compatible screen recorder
@@ -32,12 +26,6 @@ in {
     blender
     browser-aliases
   ];
-
-  programs.anix-tools = {
-    enable = true;
-    inherit anixpkgs;
-    inherit browser-aliases;
-  };
 
   gtk = {
     enable = true;

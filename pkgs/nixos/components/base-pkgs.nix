@@ -51,6 +51,8 @@ in {
   };
 
   config = {
+    imports = [ ../../bash-packages/nix-tools/module.nix ];
+
     # TODO temporary fix for bad URL dependency in home-manager (23.05)
     manual.manpages.enable = false;
 
@@ -137,6 +139,8 @@ in {
     };
 
     home.file = with anixpkgs.pkgData; {
+      ".anix-version".text =
+        if local-build then "Local Build" else "v${anix-version}";
       "records/${records.crypt.name}".source = records.crypt.data;
     };
   };

@@ -21,7 +21,8 @@ in {
     };
     standalone = lib.mkOption {
       type = lib.types.bool;
-      description = "Whether the containing closure is a standalone Nix install";
+      description =
+        "Whether the containing closure is a standalone Nix install";
       default = false;
     };
   };
@@ -29,7 +30,11 @@ in {
   config = lib.mkIf cfg.enable {
     home.packages = with cfg; [
       anixpkgs.anix-version
-      (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; inherit browser-aliases; })
+      # Only commandeer the browser if we're on NixOS
+      (anixpkgs.anix-upgrade.override {
+        standalone = cfg.standalone;
+        browser-aliases = if cfg.standalone then null else cfg.browser-aliases;
+      })
     ];
   };
 }
