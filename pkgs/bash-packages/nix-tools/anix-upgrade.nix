@@ -4,7 +4,7 @@ let
   pkgname = "anix-upgrade";
   description = "Upgrade the operating system${
       if browser-aliases == null then "." else " and view the delta."
-    }";
+    }${if standalone then " [HOME-MANAGER VERSION]" else " [NIXOS VERSION]"}";
   long-description = ''
     usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH;-s|--source SOURCETREE] [--local] [--boot]
   '';
