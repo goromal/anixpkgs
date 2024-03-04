@@ -49,7 +49,7 @@ in {
   });
 
   home.packages = [ terminator anixpkgs.budget_report ]
-    ++ lib.mkIf (cfg.standalone == false) [
+    ++ (if cfg.standalone == false then ([
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
       gnomeExtensions.vitals
@@ -70,7 +70,7 @@ in {
       unstable.inkscape
       unstable.audacity
       blender
-    ] ++ lib.mkIf browser-aliases != null [ browser-aliases ];
+    ] ++ (if browser-aliases != null then [ browser-aliases ] else [])) else []);
 
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;

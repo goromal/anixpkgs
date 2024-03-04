@@ -16,7 +16,7 @@ in {
   home.packages = let
     rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
     authm = anixpkgs.authm.override { inherit rcrsync; };
-  in [
+  in ([
     rclone
     authm
     rcrsync
@@ -61,7 +61,7 @@ in {
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ] ++ lib.mkIf (cfg.standalone == false) [ docker tmux ];
+  ] ++ (if cfg.standalone == false then [ docker tmux ] else []));
 
   programs.vim = {
     enable = true;
