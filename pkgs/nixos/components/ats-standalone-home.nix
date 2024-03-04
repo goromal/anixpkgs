@@ -10,7 +10,7 @@ with pkgs;
 with import ../dependencies.nix { inherit config; };
 with anixpkgs;
 let
-  cfg = config.mods.base;
+  cfg = config.mods.opts;
   oPathPkgs = let
     ats-rcrsync = rcrsync.override { cloudDirs = cfg.cloudDirs; };
     ats-authm = authm.override { rcrsync = ats-rcrsync; };
@@ -167,9 +167,9 @@ in {
   home.homeDirectory = "/home/andrew";
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
-  imports = [ ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
-  mods.base.standalone = true;
-  mods.base.homeDir = "/home/andrew";
+  imports = [ ./opts.nix ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
+  mods.opts.standalone = true;
+  mods.opts.homeDir = "/home/andrew";
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
