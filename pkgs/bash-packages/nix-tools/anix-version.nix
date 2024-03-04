@@ -20,7 +20,7 @@ in (writeShellScriptBin pkgname ''
   else
     ""}
   ${printYellow} ${if !standalone then "-n" else ""} "$(cat ~/.anix-version)"
-  ${if !standalone then "echo )" else ""}
+  ${if !standalone then ''echo ")"'' else ""}
 '') // {
   meta = {
     inherit description;
