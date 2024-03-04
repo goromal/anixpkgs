@@ -5,7 +5,7 @@ let cfg = config.mods.opts;
 in {
   home.packages = [ black clang-tools ];
 
-  deconf.settings = lib.mkIf (cfg.standalone == false) {
+  dconf.settings = lib.mkIf (cfg.standalone == false) {
     "org/gnome/shell" = { "favorite-apps" = [ "codium.desktop" ]; };
   };
 
