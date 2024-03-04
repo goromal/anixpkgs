@@ -167,7 +167,8 @@ in {
   home.homeDirectory = "/home/andrew";
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
-  imports = [ ./opts.nix ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
+  imports =
+    [ ./opts.nix ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
   mods.opts.standalone = true;
   mods.opts.homeDir = "/home/andrew";
   home.packages = [
