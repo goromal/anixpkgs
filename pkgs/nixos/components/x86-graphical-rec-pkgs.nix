@@ -1,10 +1,9 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with lib;
 with import ../dependencies.nix { inherit config; };
-let cfg = config.mods.base;
+let cfg = config.mods.opts;
 in {
-  home.packages = [
+  home.packages = ([
     anixpkgs.trafficsim
     anixpkgs.la-quiz
     (writeShellScriptBin "playzelda" ''
@@ -41,5 +40,9 @@ in {
       ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
       rclone bisync dropbox:Games ~/games || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Sync failed!"; }
     '')
-  ];
+  ] ++ (if cfg.standalone == false then [
+    sage
+    pavucontrol # compatible with pipewire-pulse
+  ] else
+    [ ]));
 }

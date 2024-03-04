@@ -393,29 +393,64 @@ in {
       home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
-      imports = [ ./components/base-nixos-pkgs.nix ] ++ (if cfg.developer then
-        [ ./components/base-dev-nixos-pkgs.nix ]
-      else
-        [ ]) ++ (if cfg.machineType == "pi4" then
+      imports = [ ./components/opts.nix ./components/base-pkgs.nix ]
+        ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
+        ++ (if cfg.machineType == "pi4" then
           [ ./components/pi-pkgs.nix ]
         else
           [ ]) ++ (if cfg.machineType == "x86_linux" then
-            ([ ./components/x86-nixos-pkgs.nix ] ++ (if cfg.recreational then
-              [ ./components/x86-rec-nixos-pkgs.nix ]
+            ([ ./components/x86-pkgs.nix ] ++ (if cfg.recreational then
+              [ ./components/x86-rec-pkgs.nix ]
             else
               [ ]) ++ (if cfg.graphical then
-                ([ ./components/x86-graphical-nixos-pkgs.nix ]
+                ([ ./components/x86-graphical-pkgs.nix ]
                   ++ (if cfg.developer then
-                    [ ./components/x86-graphical-dev-nixos-pkgs.nix ]
+                    [ ./components/x86-graphical-dev-pkgs.nix ]
                   else
                     [ ]) ++ (if cfg.recreational then
-                      [ ./components/x86-graphical-rec-nixos-pkgs.nix ]
+                      [ ./components/x86-graphical-rec-pkgs.nix ]
                     else
                       [ ]))
               else
                 [ ]))
           else
             [ ]);
+
+      mods.opts = {
+        standalone = false;
+        homeDir = "/data/andrew";
+        browserExec = if cfg.graphical && cfg.machineType == "x86_linux" then
+          "${unstable.google-chrome}/bin/google-chrome-stable"
+        else
+          null;
+        cloudDirs = [
+          {
+            name = "configs";
+            cloudname = "dropbox:configs";
+            dirname = "$HOME/configs";
+          }
+          {
+            name = "secrets";
+            cloudname = "dropbox:secrets";
+            dirname = "$HOME/secrets";
+          }
+          {
+            name = "games";
+            cloudname = "dropbox:games";
+            dirname = "$HOME/games";
+          }
+          {
+            name = "data";
+            cloudname = "box:data";
+            dirname = "$HOME/data";
+          }
+          {
+            name = "documents";
+            cloudname = "drive:Documents";
+            dirname = "$HOME/Documents";
+          }
+        ];
+      };
     };
   };
 }

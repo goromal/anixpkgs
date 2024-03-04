@@ -1,6 +1,8 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix { inherit config; };
+let cfg = config.mods.opts;
+in {
   home.packages = [
     direnv
     anixpkgs.git-cc
@@ -35,4 +37,7 @@ with import ../dependencies.nix { inherit config; }; {
   };
 
   services.lorri.enable = true;
+
+  programs.vim.plugins = lib.mkIf (cfg.standalone == false)
+    (with vimPlugins; [ vim-gitgutter YouCompleteMe ]);
 }
