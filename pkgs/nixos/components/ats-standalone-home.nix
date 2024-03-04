@@ -170,7 +170,7 @@ in {
   imports =
     [ ./opts.nix ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
   mods.opts.standalone = lib.mkForce true;
-  mods.opts.homeDir = "/home/andrew";
+  mods.opts.homeDir = lib.mkForce "/home/andrew";
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
