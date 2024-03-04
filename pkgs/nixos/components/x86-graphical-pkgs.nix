@@ -2,53 +2,124 @@
 with pkgs;
 with import ../dependencies.nix { inherit config; };
 let
-  cfg = config.mods.base;
-  browser-aliases = (anixpkgs.callPackage ../../bash-packages/browser-aliases {
-    browserExec = "${unstable.google-chrome}/bin/google-chrome-stable";
-  });
+  cfg = config.mods.opts;
+  browser-aliases = if cfg.browserExec == null then
+    null
+  else
+    (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+      browserExec = cfg.browserExec;
+    });
 in {
-  dconf.settings = {
+  dconf.settings = ({
     "org/gnome/desktop/background" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
     };
     "org/gnome/desktop/screensaver" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
     };
-  };
+  } // lib.mkIf (cfg.standalone == false) {
+    "org/gnome/desktop/wm/preferences" = {
+      "button-layout" = ":minimize,maximize,close";
+    };
+    "org/gnome/desktop/interface" = {
+      "clock-format" = "12h";
+      "clock-show-weekday" = true;
+    };
+    "org/gnome/desktop/privacy" = { "remember-recent-files" = false; };
+    "org/gnome/shell" = {
+      "favorite-apps" = [
+        "org.gnome.Nautilus.desktop"
+        "google-chrome.desktop"
+        "terminator.desktop"
+        "pinta.desktop"
+        "gimp.desktop"
+        "org.inkscape.Inkscape.desktop"
+        "audacity.desktop"
+        "blender.desktop"
+      ];
+      "enabled-extensions" = [ "Vitals@CoreCoding.com" ];
+    };
+    "org/gnome/shell/extensions/dash-to-dock" = {
+      "dash-max-icon-size" = "16";
+    };
+    "org/gnome/desktop/peripherals/touchpad" = {
+      "tap-to-click" = true;
+      "two-finger-scrolling-enabled" = true;
+    };
+  });
 
   home.packages = [ terminator anixpkgs.budget_report ]
-    ++ (if !cfg.standalone then [
-      # lib.mkForce
-      (anixpkgs.anix-upgrade.override {
-        standalone = cfg.standalone;
-        inherit browser-aliases;
-      })
-    ] else
-      [ ]);
+    ++ lib.mkIf (cfg.standalone == false) [
+      kooha # wayland-compatible screen recorder
+      gnome3.gnome-tweaks
+      gnomeExtensions.vitals
+      vlc
+      evince
+      calibre
+      xclip
+      graphviz
+      gimp
+      simplescreenrecorder
+      pinta
+      pandoc
+      texlive.combined.scheme-full
+      poppler_utils
+      meld
+      libreoffice-qt
+      unstable.google-chrome
+      unstable.inkscape
+      unstable.audacity
+      blender
+    ] ++ lib.mkIf browser-aliases != null [ browser-aliases ];
 
-  home.file = with anixpkgs.pkgData; {
-    # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
-    # see https://github.com/NixOS/nixpkgs/issues/234962
-    "TK_LIB_VARS.sh".text = ''
-      export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
-    '';
-    ".config/terminator/config".source =
-      ../res/terminator-config; # https://rigel.netlify.app/#terminal
-    ".local/share/nautilus/scripts/terminal".source =
-      (writeShellScript "terminal" "terminator");
-    ".config/nautilus/scripts-accels".text = "F4 terminal";
-    "Templates/EmptyDocument".text = "";
-    ".background-image".source = ((runCommand "make-wallpaper" { } ''
-      mkdir $out
-      ${imagemagick}/bin/convert -font ${fonts.nexa.data} \
-         -pointsize 30 \
-         -fill black \
-         -draw 'text 320,1343 "${
-           if local-build then "Local Build" else "v${anix-version}"
-         } - ${
-           if cfg.standalone then "Home-Manager" else "NixOS"
-         } ${nixos-version}"' \
-         ${img.wallpaper.data} $out/wallpaper.png
-    '') + "/wallpaper.png");
+  gtk = lib.mkIf (cfg.standalone == false) {
+    enable = true;
+    iconTheme = {
+      name = "Nordzy";
+      package = nordzy-icon-theme;
+    };
+    theme = {
+      name = "Nordic";
+      package = nordic;
+    };
   };
+
+  home.file = with anixpkgs.pkgData;
+    ({
+      # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
+      # see https://github.com/NixOS/nixpkgs/issues/234962
+      "TK_LIB_VARS.sh".text = ''
+        export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
+      '';
+      ".config/terminator/config".source =
+        ../res/terminator-config; # https://rigel.netlify.app/#terminal
+      ".local/share/nautilus/scripts/terminal".source =
+        (writeShellScript "terminal" "terminator");
+      ".config/nautilus/scripts-accels".text = "F4 terminal";
+      "Templates/EmptyDocument".text = "";
+      ".background-image".source = ((runCommand "make-wallpaper" { } ''
+        mkdir $out
+        ${imagemagick}/bin/convert -font ${fonts.nexa.data} \
+           -pointsize 30 \
+           -fill black \
+           -draw 'text 320,1343 "${
+             if local-build then "Local Build" else "v${anix-version}"
+           } - ${
+             if cfg.standalone then "Home-Manager" else "NixOS"
+           } ${nixos-version}"' \
+           ${img.wallpaper.data} $out/wallpaper.png
+      '') + "/wallpaper.png");
+    } // lib.mkIf (cfg.standalone == false) {
+      ".face".source = img.ajt-logo-white.data;
+      ".config/gtk-4.0/${themes.nordic-gtk4.css.name}".source =
+        themes.nordic-gtk4.css.data;
+      ".config/gtk-4.0/${themes.nordic-gtk4.css-dark.name}".source =
+        themes.nordic-gtk4.css-dark.data;
+      ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
+        themes.nordic-gtk4.thumbnail.data;
+      ".config/gtk-3.0/bookmarks".text = ''
+        file:///data/andrew/dev Development
+        file:///data/andrew/data Data
+      '';
+    });
 }
