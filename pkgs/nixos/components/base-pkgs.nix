@@ -61,7 +61,7 @@ in {
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ] ++ (if cfg.standalone == false then [ docker tmux ] else []));
+  ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
 
   programs.vim = {
     enable = true;

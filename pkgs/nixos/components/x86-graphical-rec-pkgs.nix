@@ -43,5 +43,6 @@ in {
   ] ++ (if cfg.standalone == false then [
     sage
     pavucontrol # compatible with pipewire-pulse
-  ] else []));
+  ] else
+    [ ]));
 }

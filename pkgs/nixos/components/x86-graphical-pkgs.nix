@@ -17,7 +17,7 @@ in {
     "org/gnome/desktop/screensaver" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
     };
-  } // lib.mkIf (cfg.standalone == false) {
+  } // (if (cfg.standalone == false) then {
     "org/gnome/desktop/wm/preferences" = {
       "button-layout" = ":minimize,maximize,close";
     };
@@ -46,31 +46,35 @@ in {
       "tap-to-click" = true;
       "two-finger-scrolling-enabled" = true;
     };
-  });
+  } else
+    { }));
 
   home.packages = [ terminator anixpkgs.budget_report ]
-    ++ (if cfg.standalone == false then ([
-      kooha # wayland-compatible screen recorder
-      gnome3.gnome-tweaks
-      gnomeExtensions.vitals
-      vlc
-      evince
-      calibre
-      xclip
-      graphviz
-      gimp
-      simplescreenrecorder
-      pinta
-      pandoc
-      texlive.combined.scheme-full
-      poppler_utils
-      meld
-      libreoffice-qt
-      unstable.google-chrome
-      unstable.inkscape
-      unstable.audacity
-      blender
-    ] ++ (if browser-aliases != null then [ browser-aliases ] else [])) else []);
+    ++ (if cfg.standalone == false then
+      ([
+        kooha # wayland-compatible screen recorder
+        gnome3.gnome-tweaks
+        gnomeExtensions.vitals
+        vlc
+        evince
+        calibre
+        xclip
+        graphviz
+        gimp
+        simplescreenrecorder
+        pinta
+        pandoc
+        texlive.combined.scheme-full
+        poppler_utils
+        meld
+        libreoffice-qt
+        unstable.google-chrome
+        unstable.inkscape
+        unstable.audacity
+        blender
+      ] ++ (if browser-aliases != null then [ browser-aliases ] else [ ]))
+    else
+      [ ]);
 
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;
@@ -109,7 +113,7 @@ in {
            } ${nixos-version}"' \
            ${img.wallpaper.data} $out/wallpaper.png
       '') + "/wallpaper.png");
-    } // lib.mkIf (cfg.standalone == false) {
+    } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
       ".config/gtk-4.0/${themes.nordic-gtk4.css.name}".source =
         themes.nordic-gtk4.css.data;
@@ -121,5 +125,6 @@ in {
         file:///data/andrew/dev Development
         file:///data/andrew/data Data
       '';
-    });
+    } else
+      { }));
 }
