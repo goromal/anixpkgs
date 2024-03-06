@@ -23,7 +23,6 @@ in {
         xaver.clang-format
         ms-python.python
         valentjn.vscode-ltex
-        llvm-vs-code-extensions.vscode-clangd
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
         ms-vscode.cpptools
