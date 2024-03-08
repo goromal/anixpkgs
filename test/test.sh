@@ -70,8 +70,17 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python39.withPackages
     echo_red "setupcurrentws overrode an edited shell file"
     exit 1
 fi
+cd $tmpdir/dev/test_env/sources/ceres-factors
+cpp-helper --make-nix
+sed -i 's|# ADD deps|eigen ceres-solver manif-geom-cpp boost|g' shell.nix
+nix-shell --run "echo 'Checking generated VSCode config'"
+if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
+    echo_red "VSCode C++ config improperly generated"
+    exit 1
+fi
 
 make-title -c yellow "Testing orchestrator"
+cd $tmpdir
 mkdir orch_data
 orchoutpath="$tmpdir/orch_data"
 oinf1="$orchoutpath/sample_960x400_ocean_with_audio.webm"
