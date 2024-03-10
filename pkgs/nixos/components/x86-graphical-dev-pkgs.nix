@@ -10,7 +10,7 @@ in {
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
-  programs.vscode = {
+  programs.vscode = lib.mkIf (cfg.standalone == false) {
     enable = true;
     package = unstable.vscodium;
     extensions = with vscode-extensions;
@@ -23,9 +23,9 @@ in {
         xaver.clang-format
         ms-python.python
         valentjn.vscode-ltex
-        llvm-vs-code-extensions.vscode-clangd
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
+        ms-vscode.cpptools
       ] ++ vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";

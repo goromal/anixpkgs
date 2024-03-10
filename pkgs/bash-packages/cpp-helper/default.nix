@@ -11,6 +11,7 @@ let
       --make-nix                     Dump template default.nix and shell.nix files
       --make-exec-lib   CPPNAME      Generate a lib+exec package template
       --make-header-lib CPPNAME      Generate a header-only library template
+      --make-vscode                  Generate VSCode C++ header detection settings file
     '';
     optsWithVarsAndDefaults = [
       {
@@ -37,6 +38,12 @@ let
         default = "0";
         flags = "--make-nix";
       }
+      {
+        var = "makevscode";
+        isBool = true;
+        default = "0";
+        flags = "--make-vscode";
+      }
     ];
   };
   printErr = "${color-prints}/bin/echo_red";
@@ -57,6 +64,18 @@ let
         sed -i 's|REPLACEME|${anix-version}|g' default.nix
         cat ${shellFile} > shell.nix
         sed -i 's|REPLACEME|${anix-version}|g' shell.nix
+    fi
+  '';
+  makevscodeRule = ''
+    if [[ "$makevscode" == "1" ]]; then
+        export CPP_CFG_JSON=.vscode/c_cpp_properties.json
+        ${printGrn} "Generating IntelliSense-compatible config for code completion in VSCode ($CPP_CFG_JSON)..."
+        mkdir -p .vscode
+        echo "{ \"configurations\": [{\"name\":\"NixOS\",\"intelliSenseMode\":\"linux-gcc-x64\"," > $CPP_CFG_JSON
+        echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
+        echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
+        echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
+        echo "]}],\"version\":4}" >> $CPP_CFG_JSON
     fi
   '';
   makehotRule = ''
@@ -109,6 +128,7 @@ in (writeShellScriptBin pkgname ''
   ${makehotRule}
   ${makeexlRule}
   ${makenixRule}
+  ${makevscodeRule}
   rm -rf "$tmpdir"
 '') // {
   meta = {
@@ -122,6 +142,7 @@ in (writeShellScriptBin pkgname ''
       --make-nix                     Dump template default.nix and shell.nix files
       --make-exec-lib   CPPNAME      Generate a lib+exec package template
       --make-header-lib CPPNAME      Generate a header-only library template
+      --make-vscode                  Generate VSCode C++ header detection settings file
       ```
     '';
   };
