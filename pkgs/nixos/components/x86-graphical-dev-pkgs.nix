@@ -13,7 +13,7 @@ in {
   programs.vscode = {
     enable = true;
     package = unstable.vscodium;
-    extensions = with vscode-extensions;
+    extensions = lib.mkIf cfg.standalone == false (with vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
@@ -39,7 +39,7 @@ in {
           version = "0.1.2";
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
-      ];
+      ]);
   };
 
   home.file = with anixpkgs.pkgData; {
