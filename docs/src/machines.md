@@ -31,6 +31,7 @@ Example `home.nix` file for personal use:
 let
   user = "andrew";
   homedir = "/home/${user}";
+  anixsrc = ./path/to/sources/anixpkgs/.;
 in with import ../dependencies.nix { inherit config; }; {
   home.username = user;
   home.homeDirectory = homedir;
@@ -38,16 +39,17 @@ in with import ../dependencies.nix { inherit config; }; {
   programs.home-manager.enable = true;
 
   imports = [
-    [ANIX_SRC]/pkgs/nixos/components/base-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/base-dev-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-rec-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-dev-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-rec-pkgs.nix
+    "${anixsrc}/pkgs/nixos/components/opts.nix"
+    "${anixsrc}/pkgs/nixos/components/base-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/base-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-rec-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-rec-pkgs.nix"
   ];
 
-  mods.base.standalone = true;
-  mods.base.homeDir = homedir;
+  mods.opts.standalone = true;
+  mods.opts.homeDir = homedir;
 }
 
 ```
