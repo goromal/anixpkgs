@@ -10,10 +10,10 @@ in {
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
-  programs.vscode = {
+  programs.vscode = lib.mkIf (cfg.standalone == false) {
     enable = true;
     package = unstable.vscodium;
-    extensions = lib.mkIf cfg.standalone == false (with vscode-extensions;
+    extensions = with vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
@@ -39,7 +39,7 @@ in {
           version = "0.1.2";
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
-      ]);
+      ];
   };
 
   home.file = with anixpkgs.pkgData; {
