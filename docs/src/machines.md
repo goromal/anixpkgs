@@ -50,6 +50,7 @@ in with import ../dependencies.nix { inherit config; }; {
 
   mods.opts.standalone = true;
   mods.opts.homeDir = homedir;
+  mods.opts.browserExec = "google-chrome-stable";
 }
 
 ```
