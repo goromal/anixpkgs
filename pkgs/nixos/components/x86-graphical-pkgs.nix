@@ -50,31 +50,29 @@ in {
     { }));
 
   home.packages = [ terminator anixpkgs.budget_report ]
-    ++ (if cfg.standalone == false then
-      ([
-        kooha # wayland-compatible screen recorder
-        gnome3.gnome-tweaks
-        gnomeExtensions.vitals
-        vlc
-        evince
-        calibre
-        xclip
-        graphviz
-        gimp
-        simplescreenrecorder
-        pinta
-        pandoc
-        texlive.combined.scheme-full
-        poppler_utils
-        meld
-        libreoffice-qt
-        unstable.google-chrome
-        unstable.inkscape
-        unstable.audacity
-        blender
-      ] ++ (if browser-aliases != null then [ browser-aliases ] else [ ]))
-    else
-      [ ]);
+    ++ (if cfg.standalone == false then [
+      kooha # wayland-compatible screen recorder
+      gnome3.gnome-tweaks
+      gnomeExtensions.vitals
+      vlc
+      evince
+      calibre
+      xclip
+      graphviz
+      gimp
+      simplescreenrecorder
+      pinta
+      pandoc
+      texlive.combined.scheme-full
+      poppler_utils
+      meld
+      libreoffice-qt
+      unstable.google-chrome
+      unstable.inkscape
+      unstable.audacity
+      blender
+    ] else
+      [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
 
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;
