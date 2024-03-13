@@ -2,6 +2,11 @@
 , browserExec }:
 let
   printErr = "${color-prints}/bin/echo_red";
+  doBrowserExec = exec: url: if exec == null then ''
+    echo "URL ${url}"
+  '' else ''
+    ${exec} ${url} ${redirects.suppress_all}
+  '';
   anix-argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
       usage: anix-compare TAG1 TAG2
@@ -20,7 +25,7 @@ let
         ${printErr} "TAG2 not specified."
         exit 1
     fi
-    ${browserExec} "https://github.com/goromal/anixpkgs/compare/v$1...v$2" ${redirects.suppress_all}
+    ${doBrowserExec browserExec "https://github.com/goromal/anixpkgs/compare/v$1...v$2"}
   '';
   open-notes-argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
@@ -37,7 +42,7 @@ let
         exit 1
     fi
     urls=$(for i in $@; do echo "https://notes.andrewtorgesen.com/doku.php?id=$i"; done)
-    ${browserExec} $urls ${redirects.suppress_all}
+    ${doBrowserExec browserExec "$urls"}
   '';
   a4s-argparse = callPackage ../bash-utils/argparse.nix {
     usage_str = ''
@@ -67,7 +72,7 @@ let
     ${wiki-tools}/bin/wiki-tools put --page-id a4s:backlog:a4s''${idx} --file $tmpdir/ticket.txt
     ${wiki-tools}/bin/wiki-tools put --page-id a4s:internal:idx --content "$idx"
     rm -rf $tmpdir
-    ${browserExec} "https://notes.andrewtorgesen.com/doku.php?id=a4s:backlog:a4s''${idx}" ${redirects.suppress_all}
+    ${doBrowserExec browserExec "https://notes.andrewtorgesen.com/doku.php?id=a4s:backlog:a4s''${idx}"}
   '';
 in stdenv.mkDerivation {
   name = "browser-aliases";
