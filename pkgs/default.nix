@@ -150,7 +150,7 @@ let
               addDoc (pySelf.callPackage ./python-packages/vidstab-cv4 { });
             rich = addDoc (pySelf.callPackage ./python-packages/rich { });
             syrupy = addDoc (pySelf.callPackage ./python-packages/syrupy { });
-            # textual = addDoc (pySelf.callPackage ./python-packages/textual { });
+            textual = addDoc (pySelf.callPackage ./python-packages/textual { });
             pytermgui =
               addDoc (pySelf.callPackage ./python-packages/pytermgui { });
             flask-hello-world = addDoc
@@ -239,6 +239,7 @@ in rec {
   gmail-parser = final.python310.pkgs.gmail-parser;
   goromail = final.python310.pkgs.goromail;
   orchestrator = final.python39.pkgs.orchestrator;
+  textual = final.python310.pkgs.textual;
   pytermgui = final.python310.pkgs.pytermgui;
 
   authm =

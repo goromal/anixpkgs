@@ -150,6 +150,10 @@
                 "ci": true
             },
             {
+                "attr": "textual",
+                "ci": true
+            },
+            {
                 "attr": "flask-hello-world",
                 "ci": true
             },
