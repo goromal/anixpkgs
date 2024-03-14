@@ -151,6 +151,8 @@ let
             rich = addDoc (pySelf.callPackage ./python-packages/rich { });
             syrupy = addDoc (pySelf.callPackage ./python-packages/syrupy { });
             # textual = addDoc (pySelf.callPackage ./python-packages/textual { });
+            pytermgui =
+              addDoc (pySelf.callPackage ./python-packages/pytermgui { });
             flask-hello-world = addDoc
               (pySelf.callPackage ./python-packages/flasks/hello-world { });
             flask-url2mp4 = addDoc
@@ -237,6 +239,7 @@ in rec {
   gmail-parser = final.python310.pkgs.gmail-parser;
   goromail = final.python310.pkgs.goromail;
   orchestrator = final.python39.pkgs.orchestrator;
+  pytermgui = final.python310.pkgs.pytermgui;
 
   authm =
     addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
