@@ -1,6 +1,6 @@
-from dataclasses import dataclass
 import sys
 import os
+import re
 import subprocess
 import curses
 
@@ -45,7 +45,11 @@ class Context:
                         .decode()
                         .strip()
                     )
-                    self.repos.append((reponame, branch, clean, hash))
+                    unpushed_output = subprocess.check_output(
+                        ["git", "-C", "status"]
+                    ).decode()
+                    local = re.search(r"Your branch is ahead of", unpushed_output)
+                    self.repos.append((reponame, branch, clean, hash, local))
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
         self.end_row = min(2 + len(self.repos), curses.LINES - 1)
@@ -67,17 +71,28 @@ def display_output(stdscr):
             stdscr.addstr(
                 i,
                 ctx.max_reponame_len + 1,
-                f"({'CLEAN' if ctx.repos[i-ctx.start_row][2] else 'DIRTY'})",
+                f"({'CLN' if ctx.repos[i-ctx.start_row][2] else 'DTY'})",
                 curses.color_pair(1)
                 if ctx.repos[i - ctx.start_row][2]
                 else curses.color_pair(2),
             )
             stdscr.addstr(
-                i, ctx.max_reponame_len + 10, ctx.repos[i - ctx.start_row][1], curses.A_BOLD
+                i,
+                ctx.max_reponame_len + 8,
+                f"({'LCL' if ctx.repos[i-ctx.start_row][4] else 'RMT'})",
+                curses.color_pair(2)
+                if ctx.repos[i - ctx.start_row][4]
+                else curses.color_pair(1),
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + ctx.max_branch_len + 11,
+                ctx.max_reponame_len + 16,
+                ctx.repos[i - ctx.start_row][1],
+                curses.A_BOLD,
+            )
+            stdscr.addstr(
+                i,
+                ctx.max_reponame_len + ctx.max_branch_len + 17,
                 ctx.repos[i - ctx.start_row][3][:7],
             )
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
