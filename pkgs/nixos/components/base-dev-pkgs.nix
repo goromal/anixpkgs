@@ -10,7 +10,7 @@ in {
     anixpkgs.setupws
     anixpkgs.listsources
     anixpkgs.pkgshell
-    anixpkgs.devshell
+    (anixpkgs.devshell.override { editorName = cfg.editor; })
     anixpkgs.cpp-helper
     anixpkgs.py-helper
     anixpkgs.rust-helper

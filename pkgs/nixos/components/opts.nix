@@ -46,6 +46,11 @@ with import ../dependencies.nix { inherit config; }; {
         }
       ];
     };
+    editor = lib.mkOption {
+      type = lib.types.str;
+      description = "Code editor (executable) of choice";
+      default = "codium";
+    };
     browserExec = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       description = "Executable name to open your browser of choice";
