@@ -12,7 +12,7 @@ let
     ${setupws}/bin/setupws --dev_dir ${devDir} --data_dir ${dataDir} ${wsname} ${reposWithUrls}
   '';
   interact = pkgs.writeShellScriptBin "interact" ''
-    ${pkgs.python3}/bin/python ${interactScript} ${wsname} ${devDir} ${editorName}
+    ${pkgs.python3}/bin/python ${interactScript} ${wsname} ${devDir}/${wsname} ${editorName}
   '';
 in pkgs.mkShell {
   nativeBuildInputs = [ setupcurrentws interact ];
