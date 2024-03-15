@@ -88,9 +88,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg interactScript ${interactScript} \
-            --arg editorName ${editorName} \
             --arg repoSpecList "$sources_list"
       else
           nix-shell ${shellFile} \
@@ -99,9 +99,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg interactScript ${interactScript} \
-            --arg editorName ${editorName} \
             --arg repoSpecList "$sources_list" \
             --command "$runcmd"
       fi 
