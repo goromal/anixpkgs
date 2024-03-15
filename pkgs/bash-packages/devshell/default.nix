@@ -1,31 +1,33 @@
-{ writeShellScriptBin, python3, callPackage, color-prints, setupws }:
+{ writeShellScriptBin, python3, callPackage, color-prints, setupws
+, editorName ? "codium" }:
 let
   pkgname = "devshell";
+  usage_str = ''
+    usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
+
+    Enter [workspace_name]'s development shell as defined in ~/.devrc
+    (can specify an alternate path with -d DEVRC).
+    Optionally run a one-off command with --run CMD (e.g., --run interact).
+
+    Example ~/.devrc:
+    =================================================================
+    dev_dir = ~/dev
+    data_dir = ~/data
+    pkgs_dir = ~/sources/anixpkgs
+    pkgs_var = <anixpkgs>
+
+    # repositories
+    [manif-geom-cpp] = pkgs manif-geom-cpp
+    [geometry] = pkgs python3.pkgs.geometry
+    [pyvitools] = git@github.com:goromal/pyvitools.git
+    [scrape] = git@github.com:goromal/scrape.git
+
+    # workspaces
+    signals = manif-geom-cpp geometry pyvitools
+    =================================================================
+  '';
   argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
-
-      Enter [workspace_name]'s development shell as defined in ~/.devrc
-      (can specify an alternate path with -d DEVRC).
-      Optionally run a one-off command with --run CMD.
-
-      Example ~/.devrc:
-      =================================================================
-      dev_dir = ~/dev
-      data_dir = ~/data
-      pkgs_dir = ~/sources/anixpkgs
-      pkgs_var = <anixpkgs>
-
-      # repositories
-      [manif-geom-cpp] = pkgs manif-geom-cpp
-      [geometry] = pkgs python3.pkgs.geometry
-      [pyvitools] = git@github.com:goromal/pyvitools.git
-      [scrape] = git@github.com:goromal/scrape.git
-
-      # workspaces
-      signals = manif-geom-cpp geometry pyvitools
-      =================================================================
-    '';
+    inherit usage_str;
     optsWithVarsAndDefaults = [
       {
         var = "devrc";
@@ -45,6 +47,7 @@ let
   parseScript = ./parseWorkspace.py;
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
+  interactScript = ./interact.py;
 in (writeShellScriptBin pkgname ''
   ${argparse}
 
@@ -85,7 +88,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
+            --arg interactScript ${interactScript} \
             --arg repoSpecList "$sources_list"
       else
           nix-shell ${shellFile} \
@@ -94,7 +99,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
+            --arg interactScript ${interactScript} \
             --arg repoSpecList "$sources_list" \
             --command "$runcmd"
       fi 
@@ -104,26 +111,7 @@ in (writeShellScriptBin pkgname ''
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''
       ```
-      usage: devshell workspace_name
-
-      Enter [workspace_name]'s development shell as defined in ~/.devrc
-
-      Example ~/.devrc:
-      =================================================================
-      dev_dir = ~/dev
-      data_dir = ~/data
-      pkgs_dir = ~/sources/anixpkgs
-      pkgs_var = <anixpkgs>
-
-      # repositories
-      [manif-geom-cpp] = pkgs manif-geom-cpp
-      [geometry] = pkgs python3.pkgs.geometry
-      [pyvitools] = git@github.com:goromal/pyvitools.git
-      [scrape] = git@github.com:goromal/scrape.git
-
-      # workspaces
-      signals = manif-geom-cpp geometry pyvitools
-      =================================================================
+      ${usage_str}
       ```
 
       A workspace has the directory tree structure:
@@ -141,6 +129,7 @@ in (writeShellScriptBin pkgname ''
       - `setupcurrentws`: A wrapped version of [setupws](./setupws.md) that will build your development workspace as specified in `~/.devrc`.
       - `godev`: An alias that will take you to the root of your development workspace.
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
+      - `interact`: Enter an interactive menu for workspace source manipulation.
     '';
   };
 }
