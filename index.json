@@ -146,14 +146,6 @@
                 "ci": true
             },
             {
-                "attr": "pytermgui",
-                "ci": true
-            },
-            {
-                "attr": "textual",
-                "ci": true
-            },
-            {
                 "attr": "flask-hello-world",
                 "ci": true
             },
