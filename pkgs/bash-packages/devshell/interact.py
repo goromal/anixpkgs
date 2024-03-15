@@ -45,10 +45,13 @@ class Context:
                         .decode()
                         .strip()
                     )
-                    unpushed_output = subprocess.check_output(
-                        ["git", "-C", root, "status"]
-                    ).decode()
-                    local = re.search(r"Your branch is ahead of", unpushed_output)
+                    local = bool(
+                        subprocess.check_output(
+                            ["git", "-C", root, "log", f"origin/{branch}..HEAD"]
+                        )
+                        .decode()
+                        .strip()
+                    )
                     self.repos.append((reponame, branch, clean, hash, local))
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
