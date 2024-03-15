@@ -46,7 +46,7 @@ class Context:
                         .strip()
                     )
                     unpushed_output = subprocess.check_output(
-                        ["git", "-C", "status"]
+                        ["git", "-C", root, "status"]
                     ).decode()
                     local = re.search(r"Your branch is ahead of", unpushed_output)
                     self.repos.append((reponame, branch, clean, hash, local))
