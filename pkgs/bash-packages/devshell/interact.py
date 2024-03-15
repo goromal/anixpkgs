@@ -78,7 +78,7 @@ def display_output(stdscr):
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + 8,
+                ctx.max_reponame_len + 7,
                 f"({'LCL' if ctx.repos[i-ctx.start_row][4] else 'RMT'})",
                 curses.color_pair(2)
                 if ctx.repos[i - ctx.start_row][4]
@@ -86,13 +86,13 @@ def display_output(stdscr):
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + 16,
+                ctx.max_reponame_len + 14,
                 ctx.repos[i - ctx.start_row][1],
                 curses.A_BOLD,
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + ctx.max_branch_len + 17,
+                ctx.max_reponame_len + ctx.max_branch_len + 15,
                 ctx.repos[i - ctx.start_row][3][:7],
             )
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
