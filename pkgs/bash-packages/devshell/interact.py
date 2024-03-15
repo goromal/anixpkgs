@@ -57,38 +57,41 @@ ctx = Context()
 def display_output(stdscr):
     global ctx
     stdscr.clear()
-    stdscr.addstr(0, 0, f'Workspace "{ctx.wsname}"', curses.A_BOLD)
-    for i in range(ctx.start_row, ctx.end_row):
-        if i == ctx.current_row:
-            stdscr.addstr(i, 0, ctx.repos[i - ctx.start_row][0], curses.A_REVERSE)
-        else:
-            stdscr.addstr(i, 0, ctx.repos[i - ctx.start_row][0])
-        stdscr.addstr(
-            i,
-            ctx.max_reponame_len + 1,
-            f"({'CLEAN' if ctx.repos[i-ctx.start_row][2] else 'DIRTY'})",
-            curses.color_pair(1)
-            if ctx.repos[i - ctx.start_row][2]
-            else curses.color_pair(2),
-        )
-        stdscr.addstr(
-            i, ctx.max_reponame_len + 10, ctx.repos[i - ctx.start_row][1], curses.A_BOLD
-        )
-        stdscr.addstr(
-            i,
-            ctx.max_reponame_len + ctx.max_branch_len + 11,
-            ctx.repos[i - ctx.start_row][3][:7],
-        )
-    stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
-    stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
-    stdscr.addstr(ctx.end_row + 4, 0, "[s]  Stash changes")
-    stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
-    stdscr.addstr(ctx.end_row + 6, 0, "[b]  Create new branch")
-    stdscr.addstr(ctx.end_row + 7, 0, "[c]  (Stash and) CheckOut and Pull")
-    stdscr.addstr(ctx.end_row + 8, 0, "[h]  Display the full HEAD hash")
-    stdscr.addstr(ctx.end_row + 9, 0, "[r]  Refresh")
-    stdscr.addstr(ctx.end_row + 10, 0, "[q]  Quit")
-    stdscr.refresh()
+    try:
+        stdscr.addstr(0, 0, f'Workspace "{ctx.wsname}"', curses.A_BOLD)
+        for i in range(ctx.start_row, ctx.end_row):
+            if i == ctx.current_row:
+                stdscr.addstr(i, 0, ctx.repos[i - ctx.start_row][0], curses.A_REVERSE)
+            else:
+                stdscr.addstr(i, 0, ctx.repos[i - ctx.start_row][0])
+            stdscr.addstr(
+                i,
+                ctx.max_reponame_len + 1,
+                f"({'CLEAN' if ctx.repos[i-ctx.start_row][2] else 'DIRTY'})",
+                curses.color_pair(1)
+                if ctx.repos[i - ctx.start_row][2]
+                else curses.color_pair(2),
+            )
+            stdscr.addstr(
+                i, ctx.max_reponame_len + 10, ctx.repos[i - ctx.start_row][1], curses.A_BOLD
+            )
+            stdscr.addstr(
+                i,
+                ctx.max_reponame_len + ctx.max_branch_len + 11,
+                ctx.repos[i - ctx.start_row][3][:7],
+            )
+        stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
+        stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
+        stdscr.addstr(ctx.end_row + 4, 0, "[s]  Stash changes")
+        stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
+        stdscr.addstr(ctx.end_row + 6, 0, "[b]  Create new branch")
+        stdscr.addstr(ctx.end_row + 7, 0, "[c]  (Stash and) CheckOut and Pull")
+        stdscr.addstr(ctx.end_row + 8, 0, "[h]  Display the full HEAD hash")
+        stdscr.addstr(ctx.end_row + 9, 0, "[r]  Refresh")
+        stdscr.addstr(ctx.end_row + 10, 0, "[q]  Quit")
+        stdscr.refresh()
+    except:
+        pass
 
 
 def main(stdscr):
