@@ -89,13 +89,13 @@ def display_output(stdscr):
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + 14,
+                ctx.max_reponame_len + 13,
                 ctx.repos[i - ctx.start_row][1],
                 curses.A_BOLD,
             )
             stdscr.addstr(
                 i,
-                ctx.max_reponame_len + ctx.max_branch_len + 15,
+                ctx.max_reponame_len + ctx.max_branch_len + 14,
                 ctx.repos[i - ctx.start_row][3][:7],
             )
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
