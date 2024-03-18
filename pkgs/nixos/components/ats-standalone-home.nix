@@ -26,6 +26,7 @@ let
     scrape
     ats-authm
     providence-tasker
+    book-notes-sync
   ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
@@ -161,6 +162,17 @@ let
       "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
     gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
       "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
+  '';
+  bookSyncScript = writeShellScript "ats-book-notes-syncd" ''
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+    rcrsync sync config || { >&2 echo "config sync error!"; exit 1; }
+    while IFS=, read -r docs_id wiki_page; do
+      echo "!JOB book_notes_sync $docs_id $wiki_page"
+    done < /home/andrew/configs/book-notes.csv
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-book-notes-syncd" \
+      "[$(date)] Book notes sync initiated."
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-book-notes-syncd" \
+      "[$(date)] Book notes sync initiated."
   '';
 in {
   home.username = "andrew";
