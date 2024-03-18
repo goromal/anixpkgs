@@ -13,7 +13,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/book_notes_sync";
     aapis.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
@@ -84,7 +84,7 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator";
+    orchestrator.url = "github:goromal/orchestrator?ref=dev/notes_sync";
     orchestrator.flake = false;
 
     pyceres.url =
