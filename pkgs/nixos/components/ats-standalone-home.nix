@@ -95,13 +95,14 @@ let
     authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
     tmpdir=$(mktemp -d)
-    echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
-    echo "" >> $tmpdir/out.txt
+    # echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
+    # echo "" >> $tmpdir/out.txt
+    # TODO intelligently choose the year...
     task-tools grader --start-date 2024-01-01 >> $tmpdir/out.txt
-    gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
-        "$(cat $tmpdir/out.txt)"
-    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
-        "$(cat $tmpdir/out.txt)"
+    # gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
+    #     "$(cat $tmpdir/out.txt)"
+    # gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
+    #     "$(cat $tmpdir/out.txt)"
     rm -r $tmpdir
     rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
 
@@ -154,6 +155,18 @@ let
         "$(cat $tmpdir/out.txt)"
     rm -r $tmpdir
   '';
+  taskRankedScript = writeShellScript "ats-ranked-tasks" ''
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "🗓️ Pending Tasks:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    task-tools list ranked --no-ids >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
   provTaskerScript = writeShellScript "ats-ptaskerd" ''
     authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
     providence-tasker 7 ${anixpkgs.redirects.suppress_all}
@@ -184,14 +197,16 @@ in {
       systemctl --user start ats-ptaskerd.timer
       systemctl --user enable ats-grader.timer
       systemctl --user start ats-grader.timer
-      systemctl --user enable ats-taskP0.timer
-      systemctl --user start ats-taskP0.timer
-      systemctl --user enable ats-taskP1.timer
-      systemctl --user start ats-taskP1.timer
-      systemctl --user enable ats-taskP2.timer
-      systemctl --user start ats-taskP2.timer
-      systemctl --user enable ats-taskLate.timer
-      systemctl --user start ats-taskLate.timer
+      # systemctl --user enable ats-taskP0.timer
+      # systemctl --user start ats-taskP0.timer
+      # systemctl --user enable ats-taskP1.timer
+      # systemctl --user start ats-taskP1.timer
+      # systemctl --user enable ats-taskP2.timer
+      # systemctl --user start ats-taskP2.timer
+      # systemctl --user enable ats-taskLate.timer
+      # systemctl --user start ats-taskLate.timer
+      systemctl --user enable ats-tasksRanked.timer
+      systemctl --user start ats-tasksRanked.timer
       loginctl enable-linger andrew
     '')
     (writeShellScriptBin "jfu" ''
@@ -265,75 +280,93 @@ in {
       ReadWritePaths = [ "/" ];
     };
   };
-  systemd.user.timers.ats-taskP0 = {
-    Unit.Description = "ATS taskP0 timer";
+  # systemd.user.timers.ats-taskP0 = {
+  #   Unit.Description = "ATS taskP0 timer";
+  #   Install.WantedBy = [ "timers.target" ];
+  #   Timer = {
+  #     OnCalendar = [ "*-*-* 07:00:00" ];
+  #     Persistent = false;
+  #     Unit = "ats-taskP0.service";
+  #   };
+  # };
+  # systemd.user.services.ats-taskP0 = {
+  #   Unit.Description = "ATS taskP0 script";
+  #   Service = {
+  #     Type = "oneshot";
+  #     ExecStart =
+  #       "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP0Script}'";
+  #     ReadWritePaths = [ "/" ];
+  #   };
+  # };
+  # systemd.user.timers.ats-taskP1 = {
+  #   Unit.Description = "ATS taskP1 timer";
+  #   Install.WantedBy = [ "timers.target" ];
+  #   Timer = {
+  #     OnCalendar = [ "*-*-* 07:01:00" ];
+  #     Persistent = false;
+  #     Unit = "ats-taskP1.service";
+  #   };
+  # };
+  # systemd.user.services.ats-taskP1 = {
+  #   Unit.Description = "ATS taskP1 script";
+  #   Service = {
+  #     Type = "oneshot";
+  #     ExecStart =
+  #       "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP1Script}'";
+  #     ReadWritePaths = [ "/" ];
+  #   };
+  # };
+  # systemd.user.timers.ats-taskP2 = {
+  #   Unit.Description = "ATS taskP2 timer";
+  #   Install.WantedBy = [ "timers.target" ];
+  #   Timer = {
+  #     OnCalendar = [ "*-*-* 07:02:00" ];
+  #     Persistent = false;
+  #     Unit = "ats-taskP2.service";
+  #   };
+  # };
+  # systemd.user.services.ats-taskP2 = {
+  #   Unit.Description = "ATS taskP2 script";
+  #   Service = {
+  #     Type = "oneshot";
+  #     ExecStart =
+  #       "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP2Script}'";
+  #     ReadWritePaths = [ "/" ];
+  #   };
+  # };
+  # systemd.user.timers.ats-taskLate = {
+  #   Unit.Description = "ATS taskLate timer";
+  #   Install.WantedBy = [ "timers.target" ];
+  #   Timer = {
+  #     OnCalendar = [ "*-*-* 07:03:00" "*-*-* 20:03:00" ];
+  #     Persistent = false;
+  #     Unit = "ats-taskLate.service";
+  #   };
+  # };
+  # systemd.user.services.ats-taskLate = {
+  #   Unit.Description = "ATS taskLate script";
+  #   Service = {
+  #     Type = "oneshot";
+  #     ExecStart =
+  #       "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskLateScript}'";
+  #     ReadWritePaths = [ "/" ];
+  #   };
+  # };
+  systemd.user.timers.ats-tasksRanked = {
+    Unit.Description = "ATS tasksRanked timer";
     Install.WantedBy = [ "timers.target" ];
     Timer = {
       OnCalendar = [ "*-*-* 07:00:00" ];
-      Persistent = false;
-      Unit = "ats-taskP0.service";
+      Persistent = true;
+      Unit = "ats-tasksRanked.service";
     };
   };
-  systemd.user.services.ats-taskP0 = {
-    Unit.Description = "ATS taskP0 script";
+  systemd.user.services.ats-tasksRanked = {
+    Unit.Description = "ATS tasksRanked script";
     Service = {
       Type = "oneshot";
       ExecStart =
-        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP0Script}'";
-      ReadWritePaths = [ "/" ];
-    };
-  };
-  systemd.user.timers.ats-taskP1 = {
-    Unit.Description = "ATS taskP1 timer";
-    Install.WantedBy = [ "timers.target" ];
-    Timer = {
-      OnCalendar = [ "*-*-* 07:01:00" ];
-      Persistent = false;
-      Unit = "ats-taskP1.service";
-    };
-  };
-  systemd.user.services.ats-taskP1 = {
-    Unit.Description = "ATS taskP1 script";
-    Service = {
-      Type = "oneshot";
-      ExecStart =
-        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP1Script}'";
-      ReadWritePaths = [ "/" ];
-    };
-  };
-  systemd.user.timers.ats-taskP2 = {
-    Unit.Description = "ATS taskP2 timer";
-    Install.WantedBy = [ "timers.target" ];
-    Timer = {
-      OnCalendar = [ "*-*-* 07:02:00" ];
-      Persistent = false;
-      Unit = "ats-taskP2.service";
-    };
-  };
-  systemd.user.services.ats-taskP2 = {
-    Unit.Description = "ATS taskP2 script";
-    Service = {
-      Type = "oneshot";
-      ExecStart =
-        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskP2Script}'";
-      ReadWritePaths = [ "/" ];
-    };
-  };
-  systemd.user.timers.ats-taskLate = {
-    Unit.Description = "ATS taskLate timer";
-    Install.WantedBy = [ "timers.target" ];
-    Timer = {
-      OnCalendar = [ "*-*-* 07:03:00" "*-*-* 20:03:00" ];
-      Persistent = false;
-      Unit = "ats-taskLate.service";
-    };
-  };
-  systemd.user.services.ats-taskLate = {
-    Unit.Description = "ATS taskLate script";
-    Service = {
-      Type = "oneshot";
-      ExecStart =
-        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskLateScript}'";
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskRankedScript}'";
       ReadWritePaths = [ "/" ];
     };
   };
