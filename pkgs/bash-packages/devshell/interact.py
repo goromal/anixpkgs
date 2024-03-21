@@ -45,13 +45,16 @@ class Context:
                         .decode()
                         .strip()
                     )
-                    local = bool(
-                        subprocess.check_output(
-                            ["git", "-C", root, "log", f"origin/{branch}..HEAD"]
+                    try:
+                        local = bool(
+                            subprocess.check_output(
+                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"]
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        local = True # a locally checked out branch will fail the above query
                     self.repos.append((reponame, branch, clean, hash, local))
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
