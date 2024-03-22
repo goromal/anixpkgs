@@ -67,7 +67,7 @@ in (writeShellScriptBin pkgname ''
       _success=1
       ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
       if [[ "$_success" == "0" ]]; then
-        ${printErr} "Bisync retry failed. Exiting."
+        ${printErr} "Bisync retry failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
         exit 1
       fi
     fi
