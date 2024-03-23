@@ -1,6 +1,6 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, name, extension
-, usage_str, optsWithVarsAndDefaults, convOptCmds, description ? ""
-, longDescription ? null }:
+{ writeArgparseScriptBin, color-prints, strings, name, extension, usage_str
+, optsWithVarsAndDefaults, convOptCmds, description ? "", longDescription ? null
+}:
 let
   conv_opt_list = map (x: ''
     ${x.extension})

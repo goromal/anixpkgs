@@ -194,17 +194,16 @@ in rec {
     };
   pkgData = prev.callPackage flakeInputs.anixdata { };
 
-  writeArgparseScriptBin = pkgname: usagestr: opts: script: (
-    let
+  writeArgparseScriptBin = pkgname: usagestr: opts: script:
+    (let
       argparse = prev.callPackage ./bash-packages/bash-utils/argparse.nix {
         usage_str = usagestr;
         optsWithVarsAndDefaults = opts;
       };
     in prev.writeShellScriptBin pkgname ''
-    ${argparse}
-    ${script}
-    ''
-  );
+      ${argparse}
+      ${script}
+    '');
 
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
