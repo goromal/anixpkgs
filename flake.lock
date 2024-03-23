@@ -229,11 +229,11 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1683782659,
-        "narHash": "sha256-oJUwIwbyEaYMdUy8Yz3UH/zuiD6PEvXE7eHzlEsnGSw=",
+        "lastModified": 1710476829,
+        "narHash": "sha256-m5XNqp5aypoJlpQ/baxb0EQiTJ9ItI1CzBhE1KC76qQ=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "641b52026a8594611324ce9134aad506f10965e8",
+        "rev": "c1fcc55181ae78752b8ac487645f0a3c78548679",
         "type": "github"
       },
       "original": {
@@ -625,11 +625,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1710827975,
-        "narHash": "sha256-oTZyF6/YWqT+miBPh+p4cxC2n9kiy/IPVXkMh8OQJKY=",
+        "lastModified": 1711233541,
+        "narHash": "sha256-BSkEsbLbpneywD37zS0I3MpeyiPpcrQD/+W0iUkK67M=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "4b063a93c48f34aad284af5627943913bae8a6b5",
+        "rev": "4ee1e32ecb7a22800733baa9775163319dbb4665",
         "type": "github"
       },
       "original": {
