@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, inkscape
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, inkscape
 }:
 let
   name = "pdf";
@@ -28,7 +28,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description =
     "Create and edit PDF files from similar formats (*under construction*).";

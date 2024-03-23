@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, pandoc }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, pandoc }:
 let
   template_file = ./res/tex_templates/template.tex;
   name = "md2pdf";
@@ -23,7 +23,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description =
     "Convert Markdown files into formatted PDF files, powered by LaTeX.";
