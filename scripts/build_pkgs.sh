@@ -17,6 +17,8 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 cd "$DIR/.."
 
+export NIXPKGS_ALLOW_UNFREE=1
+
 echo "Building $pkgstype packages..."
 
 for pkg in $(python3 scripts/filter_pkg_list.py $pkgstype); do
