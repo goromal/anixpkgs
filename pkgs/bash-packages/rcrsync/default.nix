@@ -1,5 +1,4 @@
-{ cloudDirs ? [ ], writeShellScriptBin, callPackage, rclone, color-prints
-, redirects }:
+{ cloudDirs ? [ ], writeArgparseScriptBin, rclone, color-prints, redirects }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
@@ -14,10 +13,6 @@ let
 
           ${cliCloudList}
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = "${longDescription}";
-    optsWithVarsAndDefaults = [ ];
-  };
   printErr = ">&2 ${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
@@ -26,8 +21,7 @@ let
       CLOUD_DIR="${x.cloudname}"
       LOCAL_DIR="${x.dirname}"
   '') cloudDirs);
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname longDescription [ ] ''
   if [[ -z "$1" ]]; then
     ${printErr} "No command provided."
     exit 1

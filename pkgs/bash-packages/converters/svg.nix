@@ -1,5 +1,5 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, inkscape
-, abcm2ps, scour }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
+, inkscape, abcm2ps, scour }:
 let
   name = "svg";
   extension = "svg";

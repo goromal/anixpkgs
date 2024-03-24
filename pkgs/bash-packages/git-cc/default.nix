@@ -1,19 +1,14 @@
-{ writeShellScriptBin, callPackage, color-prints, redirects }:
+{ writeArgparseScriptBin, color-prints, redirects }:
 let
   pkgname = "git-cc";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} repo_dir des_dir
-
-      Recursively backup a git repository (and its submodules) to a new, git-less source tree.
-      Effectively wraps up an arbitrarily complex git repo into a flat-packaged mass of code.
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} repo_dir des_dir
+
+  Recursively backup a git repository (and its submodules) to a new, git-less source tree.
+  Effectively wraps up an arbitrarily complex git repo into a flat-packaged mass of code.
+'' [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "No repo_dir provided."
       exit 1

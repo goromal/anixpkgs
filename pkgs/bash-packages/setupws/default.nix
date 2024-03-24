@@ -1,43 +1,36 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, color-prints }:
 let
   default-dev-dir = "~/dev";
   default-data-dir = "~/data";
+  usage_str = ''
+    usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...]
 
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...]
+    Create a development workspace with specified git sources.
 
-      Create a development workspace with specified git sources.
+    Options:
+        --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
+                                   directory will be created (default: ${default-dev-dir})
 
-      Options:
-          --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
-                                     directory will be created (default: ${default-dev-dir})
-
-          --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
-                                     data will be stored (default: ${default-data-dir})
-    '';
-    optsWithVarsAndDefaults = [
-      {
-        var = "dev_dir";
-        isBool = false;
-        default = default-dev-dir;
-        flags = "--dev_dir";
-      }
-      {
-        var = "data_dir";
-        isBool = false;
-        default = default-data-dir;
-        flags = "--data_dir";
-      }
-    ];
-  };
-
+        --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
+                                   data will be stored (default: ${default-data-dir})
+  '';
   printErr = "${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeShellScriptBin "setupws" ''
-  ${argparse}
-
+in (writeArgparseScriptBin "setupws" usage_str [
+  {
+    var = "dev_dir";
+    isBool = false;
+    default = default-dev-dir;
+    flags = "--dev_dir";
+  }
+  {
+    var = "data_dir";
+    isBool = false;
+    default = default-data-dir;
+    flags = "--data_dir";
+  }
+] ''
   set -euo pipefail
 
   wsname=$1
@@ -89,16 +82,7 @@ in (writeShellScriptBin "setupws" ''
       Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI:
 
       ```
-      usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...]
-
-      Create a development workspace with specified git sources.
-
-      Options:
-          --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
-                                     directory will be created (default: ${default-dev-dir})
-
-          --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
-                                     data will be stored (default: ${default-data-dir})
+      ${usage_str}
       ```
     '';
   };

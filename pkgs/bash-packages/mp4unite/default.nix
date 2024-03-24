@@ -1,26 +1,21 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, ffmpeg }:
+{ writeArgparseScriptBin, color-prints, strings, redirects, ffmpeg }:
 let
   pkgname = "mp4unite";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options] <MP4-sourcefile-1>..<MP4-sourcefile-n> <MP4-destfile>
-
-      Combine MP4 source files into a single destination MP4 file.
-
-      Options:
-      -h | --help     Print out the help documentation.
-      -v | --verbose  Print verbose output from ffmpeg
-    '';
-    optsWithVarsAndDefaults = [{
-      var = "verbose";
-      isBool = true;
-      default = "0";
-      flags = "-v|--verbose";
-    }];
-  };
   printErr = "${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
-  ${argparse}
+  usage: ${pkgname} [options] <MP4-sourcefile-1>..<MP4-sourcefile-n> <MP4-destfile>
+
+  Combine MP4 source files into a single destination MP4 file.
+
+  Options:
+  -h | --help     Print out the help documentation.
+  -v | --verbose  Print verbose output from ffmpeg
+'' [{
+  var = "verbose";
+  isBool = true;
+  default = "0";
+  flags = "-v|--verbose";
+}] ''
   if [ "$#" -lt "3" ]; then
       ${printErr} "Insufficient arguments provided"
       exit 1

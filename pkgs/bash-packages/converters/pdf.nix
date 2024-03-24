@@ -1,5 +1,5 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, inkscape
-}:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
+, inkscape }:
 let
   name = "pdf";
   extension = "pdf";

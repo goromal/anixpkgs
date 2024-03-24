@@ -1,4 +1,5 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
+}:
 let
   name = "mp4";
   extension = "mp4";

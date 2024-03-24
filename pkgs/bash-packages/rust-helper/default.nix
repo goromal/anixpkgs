@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, redirects, git-cc }:
+{ writeArgparseScriptBin, color-prints, redirects, git-cc }:
 let
   pkgname = "rust-helper";
   anix-version = (builtins.readFile ../../../ANIX_VERSION);
@@ -8,15 +8,6 @@ let
     Options:
     --make-nix    Dump template shell.nix file
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    inherit usage_str;
-    optsWithVarsAndDefaults = [{
-      var = "makenix";
-      isBool = true;
-      default = "0";
-      flags = "--make-nix";
-    }];
-  };
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   shellFile = ./res/_shell.nix;
@@ -27,9 +18,13 @@ let
         sed -i 's|REPLACEME|${anix-version}|g' shell.nix
     fi
   '';
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname usage_str [{
+  var = "makenix";
+  isBool = true;
+  default = "0";
+  flags = "--make-nix";
+}] ''
   set -e
-  ${argparse}
   tmpdir=$(mktemp -d)
   ${makenixRule}
   rm -rf "$tmpdir"
