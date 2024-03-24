@@ -41,6 +41,7 @@ in {
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
+    anixpkgs.task-tools
     anixpkgs.book-notes-sync
     anixpkgs.color-prints
     anixpkgs.fix-perms
