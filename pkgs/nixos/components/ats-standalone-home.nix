@@ -189,6 +189,7 @@ in {
   ];
   mods.opts.standalone = lib.mkForce true;
   mods.opts.homeDir = lib.mkForce "/home/andrew";
+  mods.opts.cloudAutoSync = false;
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
@@ -221,7 +222,7 @@ in {
       systemctl --user $@
     '')
   ];
-  systemd.user.services.orchestratord = {
+  systemd.user.services.orchestratord = lib.mkForce {
     Unit = { Description = "Orchestrator daemon"; };
     Service = {
       Type = "simple";
