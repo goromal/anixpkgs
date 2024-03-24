@@ -99,6 +99,7 @@ in {
   systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
     Unit = { Description = "cloud dirs sync timer"; };
     Timer = {
+      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
       OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
       Unit = "cloud-dirs-sync.service";
     };
