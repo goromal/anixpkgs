@@ -17,7 +17,7 @@ let
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  cloud_dir_list = builtins.concatStringSep " " (map (x: "${x.name}") cfg.cloudDirs);
+  cloud_dir_list = builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
   launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
