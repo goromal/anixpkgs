@@ -1,19 +1,15 @@
-{ writeShellScriptBin, callPackage, color-prints, task-tools, providence }:
+{ writeArgparseScriptBin, color-prints, task-tools, providence }:
 let
   pkgname = "providence-tasker";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} num_days
+  usage_str = ''
+    usage: ${pkgname} num_days
 
-      Generate [num_days] tasks derived from providence output.
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
+    Generate [num_days] tasks derived from providence output.
+  '';
   printErr = "${color-prints}/bin/echo_red";
   prexe = "${providence}/bin/providence";
   ttexe = "${task-tools}/bin/task-tools";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "num_days not specified."
       exit 1
@@ -33,9 +29,7 @@ in (writeShellScriptBin pkgname ''
       Takes output from `providence` and places it into `[num_days]` consecutive days of Google Tasks.
 
       ```
-      usage: providence-tasker num_days
-
-      Generate [num_days] tasks derived from providence output.
+      ${usage_str}
       ```
 
       Requires a wiki secrets file at `~/secrets/wiki/secrets.json` and a Google Tasks secrets file
