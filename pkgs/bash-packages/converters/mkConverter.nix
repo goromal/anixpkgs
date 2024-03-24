@@ -1,10 +1,7 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, name, extension
-, usage_str, optsWithVarsAndDefaults, convOptCmds, description ? ""
-, longDescription ? null }:
+{ writeArgparseScriptBin, color-prints, strings, name, extension, usage_str
+, optsWithVarsAndDefaults, convOptCmds, description ? "", longDescription ? null
+}:
 let
-  argparse = callPackage ../bash-utils/argparse.nix {
-    inherit usage_str optsWithVarsAndDefaults;
-  };
   conv_opt_list = map (x: ''
     ${x.extension})
     echo "$infile -> $outfile ..."
@@ -17,9 +14,8 @@ let
         cat << EOF
     ${usage_str}
     EOF
-  ''; # ${argparse}
-in (writeShellScriptBin name ''
-  ${argparse}
+  '';
+in (writeArgparseScriptBin name usage_str optsWithVarsAndDefaults ''
   infile="$1"
   if [[ -z "$infile" ]]; then
       ${printerr} "ERROR: no input file specified."

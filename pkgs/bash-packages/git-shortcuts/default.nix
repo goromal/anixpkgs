@@ -1,24 +1,18 @@
-{ stdenv, writeShellScriptBin, callPackage, color-prints }:
+{ stdenv, writeArgparseScriptBin, color-prints }:
 let
   printError = "${color-prints}/bin/echo_red";
   printYellow = "${color-prints}/bin/echo_yellow";
-  gitcop = let
-    pkgname = "gitcop";
-    argparse = callPackage ../bash-utils/argparse.nix {
-      usage_str = ''
-        usage: ${pkgname} [-f] branch_name
+  gitcop = let pkgname = "gitcop";
+  in writeArgparseScriptBin pkgname ''
+    usage: ${pkgname} [-f] branch_name
 
-        "Git CheckOut and Pull." Assumes remote is named origin. Optional -f flag fetches first.
-      '';
-      optsWithVarsAndDefaults = [{
-        var = "fetch";
-        isBool = true;
-        default = "0";
-        flags = "-f";
-      }];
-    };
-  in writeShellScriptBin pkgname ''
-    ${argparse}
+    "Git CheckOut and Pull." Assumes remote is named origin. Optional -f flag fetches first.
+  '' [{
+    var = "fetch";
+    isBool = true;
+    default = "0";
+    flags = "-f";
+  }] ''
     if [[ -z "$1" ]]; then
         ${printError} "No branch name provided."
         exit 1
@@ -32,18 +26,12 @@ let
         git checkout "$1" && sleep $pause_secs && git pull origin "$1"
     fi
   '';
-  githead = let
-    pkgname = "githead";
-    argparse = callPackage ../bash-utils/argparse.nix {
-      usage_str = ''
-        usage: ${pkgname} [repo_path]
+  githead = let pkgname = "githead";
+  in writeArgparseScriptBin pkgname ''
+    usage: ${pkgname} [repo_path]
 
-        Gets the commit hash of the HEAD of the current (or specified) repo path.
-      '';
-      optsWithVarsAndDefaults = [ ];
-    };
-  in writeShellScriptBin pkgname ''
-    ${argparse}
+    Gets the commit hash of the HEAD of the current (or specified) repo path.
+  '' [ ] ''
     if [[ ! -z "$1" ]]; then
       cd "$1"
     fi

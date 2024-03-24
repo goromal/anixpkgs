@@ -1,19 +1,14 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, color-prints }:
 let
   pkgname = "fix-perms";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} dir
-
-      Recursively claim ownership of all files and folders in dir. Attempts to deduce special cases such as ~/.ssh/*.
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
   printErr = "${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} dir
+
+  Recursively claim ownership of all files and folders in dir. Attempts to deduce special cases such as ~/.ssh/*.
+'' [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "No dir provided."
       exit 1

@@ -61,7 +61,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_envs.sh
+    - run: ./scripts/build_envs.sh
   cpp:
     name: C++ Packages
     needs: envs
@@ -77,7 +77,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh cpp
+    - run: ./scripts/build_pkgs.sh cpp
   rust:
     name: Rust Packages
     needs: envs
@@ -93,7 +93,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh rust
+    - run: ./scripts/build_pkgs.sh rust
   python:
     name: Python Packages
     needs: cpp
@@ -109,7 +109,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh python
+    - run: ./scripts/build_pkgs.sh python
   bash:
     name: Bash Packages
     needs: python
@@ -125,7 +125,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh bash
+    - run: ./scripts/build_pkgs.sh bash
   java:
     name: Java Packages
     needs: envs
@@ -141,7 +141,7 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - run: export NIXPKGS_ALLOW_UNFREE=1 && ./scripts/build_pkgs.sh java
+    - run: ./scripts/build_pkgs.sh java
   regression:
     name: Regression Tests
     needs:

@@ -1,27 +1,22 @@
-{ writeShellScriptBin, callPackage, color-prints, strings }:
+{ writeArgparseScriptBin, color-prints, strings }:
 let
   pkgname = "dirgather";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options] rootdir gatherdir
-
-      Recursively take all files in rootdir's tree and gather them in a new gatherdir. Subsequently, clean up all empty directories in rootdir.
-
-      Options:
-        --dry-run      Perform a dry run
-    '';
-    optsWithVarsAndDefaults = [{
-      var = "dry_run";
-      isBool = true;
-      default = "0";
-      flags = "--dry-run";
-    }];
-  };
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} [options] rootdir gatherdir
+
+  Recursively take all files in rootdir's tree and gather them in a new gatherdir. Subsequently, clean up all empty directories in rootdir.
+
+  Options:
+    --dry-run      Perform a dry run
+'' [{
+  var = "dry_run";
+  isBool = true;
+  default = "0";
+  flags = "--dry-run";
+}] ''
   set -e
-  ${argparse}
   if [[ -z "$1" ]]; then
     ${printErr} "rootdir not provided."
     exit 1

@@ -1,4 +1,4 @@
-{ callPackage, writeShellScriptBin, python, color-prints, pkgData }:
+{ callPackage, writeArgparseScriptBin, python, color-prints, pkgData }:
 let
   pkgname = "la-quiz";
   quiz = with python.pkgs;
@@ -11,38 +11,33 @@ let
       propagatedBuildInputs = [ tkinter pillow ];
       checkPkgs = [ ];
     });
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options] [N|C|E|S]
-
-      Spawn a LA geography quiz! Will pull up the general region you specify:
-
-          N = North
-          C = Central
-          E = East
-          S = South
-
-      Options:
-
-      --debug|-d    Open in debug mode (will print click positions to the screen).
-
-      NOTE: This program assumes that you have the place location JSON files stored in
-
-        ~/games/la-quiz/GLAA-C.json
-                        GLAA-E.json
-                        GLAA-N.json
-                        GLAA-S.json
-    '';
-    optsWithVarsAndDefaults = [{
-      var = "isdebug";
-      isBool = true;
-      default = "0";
-      flags = "--debug|-d";
-    }];
-  };
   printErr = "${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} [options] [N|C|E|S]
+
+  Spawn a LA geography quiz! Will pull up the general region you specify:
+
+      N = North
+      C = Central
+      E = East
+      S = South
+
+  Options:
+
+  --debug|-d    Open in debug mode (will print click positions to the screen).
+
+  NOTE: This program assumes that you have the place location JSON files stored in
+
+    ~/games/la-quiz/GLAA-C.json
+                    GLAA-E.json
+                    GLAA-N.json
+                    GLAA-S.json
+'' [{
+  var = "isdebug";
+  isBool = true;
+  default = "0";
+  flags = "--debug|-d";
+}] ''
   if [[ -z "$1" ]]; then
     ${printErr} "No LA region specified."
     exit 1

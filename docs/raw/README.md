@@ -41,9 +41,11 @@ python scripts/generate_docs.py
 To build all packages and run their respective unit tests, run
 
 ```bash
-bash scripts/build_misc.sh
-bash scripts/build_cpp.sh
-bash scripts/build_python.sh
+bash scripts/build_pkgs.sh cpp
+bash scripts/build_pkgs.sh rust
+bash scripts/build_pkgs.sh python
+bash scripts/build_pkgs.sh bash
+bash scripts/build_pkgs.sh java
 ```
 
 To run regression tests, run

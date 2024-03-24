@@ -1,5 +1,5 @@
-{ writeShellScriptBin, python3, callPackage, color-prints, setupws
-, editorName ? "codium" }:
+{ writeArgparseScriptBin, python3, color-prints, setupws, editorName ? "codium"
+}:
 let
   pkgname = "devshell";
   usage_str = ''
@@ -26,31 +26,25 @@ let
     signals = manif-geom-cpp geometry pyvitools
     =================================================================
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    inherit usage_str;
-    optsWithVarsAndDefaults = [
-      {
-        var = "devrc";
-        isBool = false;
-        default = "~/.devrc";
-        flags = "-d";
-      }
-      {
-        var = "runcmd";
-        isBool = false;
-        default = "";
-        flags = "--run";
-      }
-    ];
-  };
   printErr = "${color-prints}/bin/echo_red";
   parseScript = ./parseWorkspace.py;
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
   interactScript = ./interact.py;
-in (writeShellScriptBin pkgname ''
-  ${argparse}
-
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "devrc";
+    isBool = false;
+    default = "~/.devrc";
+    flags = "-d";
+  }
+  {
+    var = "runcmd";
+    isBool = false;
+    default = "";
+    flags = "--run";
+  }
+] ''
   wsname=$1
   if [[ -z "$wsname" ]]; then
       ${printErr} "ERROR: no workspace name provided."
