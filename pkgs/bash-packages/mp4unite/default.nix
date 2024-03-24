@@ -2,7 +2,7 @@
 let
   pkgname = "mp4unite";
   printErr = "${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname ''
   usage: ${pkgname} [options] <MP4-sourcefile-1>..<MP4-sourcefile-n> <MP4-destfile>
 
   Combine MP4 source files into a single destination MP4 file.
