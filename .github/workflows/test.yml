@@ -57,7 +57,7 @@ jobs:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: |
         num_side_branches=$(python scripts/check_deps.py | wc -l)
-        if [[ $num_side_branches -ge 0 ]]; then
+        if [[ $num_side_branches -ge 1 ]]; then
           echo "ERROR: Detected $num_side_branches dependencies on a side branch"
           exit 1
         else
