@@ -47,6 +47,16 @@ jobs:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: >
         nix flake lock --no-update-lock-file
+  check-deps:
+    name: Check Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: cachix/install-nix-action@v20
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: >
+        [[ -z $(python scripts/check_deps.py) ]]
   envs:
     name: Build Environments
     runs-on: ubuntu-latest
