@@ -45,4 +45,5 @@ Packages written (or glued together) in Bash.
 - [nix-diffs](./nix-diffs.md)
 - [anix-version](./anix-version.md)
 - [anix-upgrade](./anix-upgrade.md)
+- [flake-update](./flake-update.md)
 - [rcrsync](./rcrsync.md)
