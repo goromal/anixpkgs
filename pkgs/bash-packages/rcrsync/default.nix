@@ -51,7 +51,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" || { _success=0; }
+      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
     else
       ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
     fi
@@ -68,7 +68,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" || { _success=0; }
+      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
     else
       ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
     fi
@@ -76,7 +76,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
       ${printYlw} "Bisync failed; attempting with --resync..."
       _success=1
       if [[ "$verbose" == "1" ]]; then
-        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" || { _success=0; }
+        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
       else
         ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
       fi
