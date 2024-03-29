@@ -5,6 +5,7 @@ let cfg = config.mods.opts;
 in {
   home.packages = [
     direnv
+    anixpkgs.flake-update
     anixpkgs.git-cc
     anixpkgs.git-shortcuts
     anixpkgs.setupws
