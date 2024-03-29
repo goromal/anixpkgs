@@ -311,6 +311,8 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  flake-update =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
