@@ -3,7 +3,7 @@ let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anix-version = (builtins.readFile ../../ANIX_VERSION);
 in rec {
-  local-build = false;
+  local-build = true;
   inherit nixos-version; # Should match the channel in <nixpkgs>
   nixos-state = nixos-version;
   homem-state = nixos-version;

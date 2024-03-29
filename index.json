@@ -376,6 +376,10 @@
                 "ci": true
             },
             {
+                "attr": "flake-update",
+                "ci": true
+            },
+            {
                 "attr": "rcrsync",
                 "ci": true
             }
