@@ -1,53 +1,50 @@
-{ writeShellScriptBin, python3, callPackage, color-prints, setupws }:
+{ writeArgparseScriptBin, python3, color-prints, setupws, editorName ? "codium"
+}:
 let
   pkgname = "devshell";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
+  usage_str = ''
+    usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
 
-      Enter [workspace_name]'s development shell as defined in ~/.devrc
-      (can specify an alternate path with -d DEVRC).
-      Optionally run a one-off command with --run CMD.
+    Enter [workspace_name]'s development shell as defined in ~/.devrc
+    (can specify an alternate path with -d DEVRC).
+    Optionally run a one-off command with --run CMD (e.g., --run interact).
 
-      Example ~/.devrc:
-      =================================================================
-      dev_dir = ~/dev
-      data_dir = ~/data
-      pkgs_dir = ~/sources/anixpkgs
-      pkgs_var = <anixpkgs>
+    Example ~/.devrc:
+    =================================================================
+    dev_dir = ~/dev
+    data_dir = ~/data
+    pkgs_dir = ~/sources/anixpkgs
+    pkgs_var = <anixpkgs>
 
-      # repositories
-      [manif-geom-cpp] = pkgs manif-geom-cpp
-      [geometry] = pkgs python3.pkgs.geometry
-      [pyvitools] = git@github.com:goromal/pyvitools.git
-      [scrape] = git@github.com:goromal/scrape.git
+    # repositories
+    [manif-geom-cpp] = pkgs manif-geom-cpp
+    [geometry] = pkgs python3.pkgs.geometry
+    [pyvitools] = git@github.com:goromal/pyvitools.git
+    [scrape] = git@github.com:goromal/scrape.git
 
-      # workspaces
-      signals = manif-geom-cpp geometry pyvitools
-      =================================================================
-    '';
-    optsWithVarsAndDefaults = [
-      {
-        var = "devrc";
-        isBool = false;
-        default = "~/.devrc";
-        flags = "-d";
-      }
-      {
-        var = "runcmd";
-        isBool = false;
-        default = "";
-        flags = "--run";
-      }
-    ];
-  };
+    # workspaces
+    signals = manif-geom-cpp geometry pyvitools
+    =================================================================
+  '';
   printErr = "${color-prints}/bin/echo_red";
   parseScript = ./parseWorkspace.py;
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
-in (writeShellScriptBin pkgname ''
-  ${argparse}
-
+  interactScript = ./interact.py;
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "devrc";
+    isBool = false;
+    default = "~/.devrc";
+    flags = "-d";
+  }
+  {
+    var = "runcmd";
+    isBool = false;
+    default = "";
+    flags = "--run";
+  }
+] ''
   wsname=$1
   if [[ -z "$wsname" ]]; then
       ${printErr} "ERROR: no workspace name provided."
@@ -85,7 +82,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
+            --arg interactScript ${interactScript} \
             --arg repoSpecList "$sources_list"
       else
           nix-shell ${shellFile} \
@@ -94,7 +93,9 @@ in (writeShellScriptBin pkgname ''
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
+            --arg interactScript ${interactScript} \
             --arg repoSpecList "$sources_list" \
             --command "$runcmd"
       fi 
@@ -104,26 +105,7 @@ in (writeShellScriptBin pkgname ''
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''
       ```
-      usage: devshell workspace_name
-
-      Enter [workspace_name]'s development shell as defined in ~/.devrc
-
-      Example ~/.devrc:
-      =================================================================
-      dev_dir = ~/dev
-      data_dir = ~/data
-      pkgs_dir = ~/sources/anixpkgs
-      pkgs_var = <anixpkgs>
-
-      # repositories
-      [manif-geom-cpp] = pkgs manif-geom-cpp
-      [geometry] = pkgs python3.pkgs.geometry
-      [pyvitools] = git@github.com:goromal/pyvitools.git
-      [scrape] = git@github.com:goromal/scrape.git
-
-      # workspaces
-      signals = manif-geom-cpp geometry pyvitools
-      =================================================================
+      ${usage_str}
       ```
 
       A workspace has the directory tree structure:
@@ -141,6 +123,7 @@ in (writeShellScriptBin pkgname ''
       - `setupcurrentws`: A wrapped version of [setupws](./setupws.md) that will build your development workspace as specified in `~/.devrc`.
       - `godev`: An alias that will take you to the root of your development workspace.
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
+      - `interact`: Enter an interactive menu for workspace source manipulation.
     '';
   };
 }

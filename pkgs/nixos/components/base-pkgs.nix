@@ -9,12 +9,24 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
+  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
+  launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+  '';
+  cloud_dir_list =
+    builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
+  launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
+    for cloud_dir in ${cloud_dir_list}; do
+      ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
+    done
+  '';
 in {
   # TODO temporary fix for bad URL dependency in home-manager (23.05)
   manual.manpages.enable = false;
 
   home.packages = let
-    rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+    rcrsync = rcrsyncConfigured;
     authm = anixpkgs.authm.override { inherit rcrsync; };
   in ([
     rclone
@@ -29,6 +41,7 @@ in {
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
+    anixpkgs.task-tools
     anixpkgs.book-notes-sync
     anixpkgs.color-prints
     anixpkgs.fix-perms
@@ -62,6 +75,35 @@ in {
     anixpkgs.zipper
     anixpkgs.scrape
   ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
+
+  systemd.user.services.orchestratord = {
+    Unit = { Description = "Orchestrator daemon"; };
+    Service = {
+      Type = "simple";
+      ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";
+      Restart = "always";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync script"; };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
+      Restart = "on-failure";
+      ReadWritePaths = [ cfg.homeDir ];
+    };
+  };
+  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync timer"; };
+    Timer = {
+      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      Unit = "cloud-dirs-sync.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
 
   programs.vim = {
     enable = true;

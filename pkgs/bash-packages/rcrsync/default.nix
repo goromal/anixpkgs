@@ -1,23 +1,21 @@
-{ cloudDirs ? [ ], writeShellScriptBin, callPackage, rclone, color-prints
-, redirects }:
+{ cloudDirs ? [ ], writeArgparseScriptBin, rclone, color-prints, redirects }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
   cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
-    usage: ${pkgname} [init|sync] CLOUD_DIR
+    usage: ${pkgname} [OPTS] [init|sync] CLOUD_DIR
 
     Manage cloud directories with rclone.
+
+    Options:
+          -v|--verbose     Print verbose output
 
     CLOUD_DIR options:
 
           ${cliCloudList}
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = "${longDescription}";
-    optsWithVarsAndDefaults = [ ];
-  };
   printErr = ">&2 ${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
@@ -26,8 +24,12 @@ let
       CLOUD_DIR="${x.cloudname}"
       LOCAL_DIR="${x.dirname}"
   '') cloudDirs);
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname longDescription [{
+  var = "verbose";
+  isBool = true;
+  default = "0";
+  flags = "-v|--verbose";
+}] ''
   if [[ -z "$1" ]]; then
     ${printErr} "No command provided."
     exit 1
@@ -48,7 +50,11 @@ in (writeShellScriptBin pkgname ''
     fi
     ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
     _success=1
-    ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+    if [[ "$verbose" == "1" ]]; then
+      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+    else
+      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+    fi
     if [[ "$_success" == "0" ]]; then
       ${printErr} "rclone copy failed. Check rclone!"
       exit 1
@@ -61,13 +67,21 @@ in (writeShellScriptBin pkgname ''
     fi
     ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
     _success=1
-    ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+    if [[ "$verbose" == "1" ]]; then
+      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+    else
+      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+    fi
     if [[ "$_success" == "0" ]]; then
       ${printYlw} "Bisync failed; attempting with --resync..."
       _success=1
-      ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+      if [[ "$verbose" == "1" ]]; then
+        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+      else
+        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+      fi
       if [[ "$_success" == "0" ]]; then
-        ${printErr} "Bisync retry failed. Exiting."
+        ${printErr} "Bisync retry failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
         exit 1
       fi
     fi

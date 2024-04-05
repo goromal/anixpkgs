@@ -15,5 +15,6 @@ Options:
 
     --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
                                data will be stored (default: ~/data)
+
 ```
 

@@ -14,6 +14,16 @@ with import ../dependencies.nix { inherit config; }; {
         "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
+    cloudAutoSync = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to automatically sync cloud dirs (default: true)";
+      default = true;
+    };
+    cloudAutoSyncInterval = lib.mkOption {
+      type = lib.types.int;
+      description = "Interval (in minutes) of cloud dirs sync (default: 10)";
+      default = 10;
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
@@ -45,6 +55,11 @@ with import ../dependencies.nix { inherit config; }; {
           dirname = "$HOME/Documents";
         }
       ];
+    };
+    editor = lib.mkOption {
+      type = lib.types.str;
+      description = "Code editor (executable) of choice";
+      default = "codium";
     };
     browserExec = lib.mkOption {
       type = lib.types.nullOr lib.types.str;

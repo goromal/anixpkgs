@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects }:
 let
   name = "zipper";
   extension = "zip";
@@ -23,7 +23,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description = "Dead-simple compression utility (*not finished*).";
 }

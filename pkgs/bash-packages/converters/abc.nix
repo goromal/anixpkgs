@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, python3
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, python3
 , abcmidi }:
 let
   name = "abc";
@@ -30,7 +30,7 @@ let
     }
   ];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description =
     "Generate [abc music files](https://abcnotation.com/) from similar formats.";

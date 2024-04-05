@@ -148,9 +148,7 @@ let
               addDoc (pySelf.callPackage ./python-packages/imutils-cv4 { });
             vidstab-cv4 =
               addDoc (pySelf.callPackage ./python-packages/vidstab-cv4 { });
-            rich = addDoc (pySelf.callPackage ./python-packages/rich { });
             syrupy = addDoc (pySelf.callPackage ./python-packages/syrupy { });
-            # textual = addDoc (pySelf.callPackage ./python-packages/textual { });
             flask-hello-world = addDoc
               (pySelf.callPackage ./python-packages/flasks/hello-world { });
             flask-url2mp4 = addDoc
@@ -195,6 +193,17 @@ in rec {
       '';
     };
   pkgData = prev.callPackage flakeInputs.anixdata { };
+
+  writeArgparseScriptBin = pkgname: usagestr: opts: script:
+    (let
+      argparse = prev.callPackage ./bash-packages/bash-utils/argparse.nix {
+        usage_str = usagestr;
+        optsWithVarsAndDefaults = opts;
+      };
+    in prev.writeShellScriptBin pkgname ''
+      ${argparse}
+      ${script}
+    '');
 
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
@@ -302,6 +311,8 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  flake-update =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {

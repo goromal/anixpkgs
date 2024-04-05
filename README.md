@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v5.15.0](https://github.com/goromal/anixpkgs/tree/v5.15.0)**
+**LATEST RELEASE: [v5.17.0](https://github.com/goromal/anixpkgs/tree/v5.17.0)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
@@ -41,9 +41,11 @@ python scripts/generate_docs.py
 To build all packages and run their respective unit tests, run
 
 ```bash
-bash scripts/build_misc.sh
-bash scripts/build_cpp.sh
-bash scripts/build_python.sh
+bash scripts/build_pkgs.sh cpp
+bash scripts/build_pkgs.sh rust
+bash scripts/build_pkgs.sh python
+bash scripts/build_pkgs.sh bash
+bash scripts/build_pkgs.sh java
 ```
 
 To run regression tests, run

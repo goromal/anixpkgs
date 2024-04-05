@@ -101,6 +101,7 @@
   - [nix-diffs](./bash/nix-diffs.md)
   - [anix-version](./bash/anix-version.md)
   - [anix-upgrade](./bash/anix-upgrade.md)
+  - [flake-update](./bash/flake-update.md)
   - [rcrsync](./bash/rcrsync.md)
 - [Java Packages](./java/java.md)
   - [evil-hangman](./java/evil-hangman.md)

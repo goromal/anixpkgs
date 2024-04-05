@@ -1,26 +1,21 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, color-prints }:
 let
   pkgname = "dirgroups";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} num_groups dir
-                      OR
-             ${pkgname} --of group_size dir
-
-      Split a large directory of files into smaller directories with evenly distributed files (not counting remainders). 
-    '';
-    optsWithVarsAndDefaults = [{
-      var = "group_size";
-      isBool = false;
-      default = "";
-      flags = "--of";
-    }];
-  };
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} num_groups dir
+                  OR
+         ${pkgname} --of group_size dir
+
+  Split a large directory of files into smaller directories with evenly distributed files (not counting remainders). 
+'' [{
+  var = "group_size";
+  isBool = false;
+  default = "";
+  flags = "--of";
+}] ''
   set -e
-  ${argparse}
   if [[ -z "$group_size" ]]; then
       if [[ -z "$2" ]]; then
           ${printErr} "No dir specified."

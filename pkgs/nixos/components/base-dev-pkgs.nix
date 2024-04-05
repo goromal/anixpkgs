@@ -5,12 +5,13 @@ let cfg = config.mods.opts;
 in {
   home.packages = [
     direnv
+    anixpkgs.flake-update
     anixpkgs.git-cc
     anixpkgs.git-shortcuts
     anixpkgs.setupws
     anixpkgs.listsources
     anixpkgs.pkgshell
-    anixpkgs.devshell
+    (anixpkgs.devshell.override { editorName = cfg.editor; })
     anixpkgs.cpp-helper
     anixpkgs.py-helper
     anixpkgs.rust-helper

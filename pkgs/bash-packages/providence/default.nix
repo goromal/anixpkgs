@@ -1,20 +1,16 @@
-{ writeShellScriptBin, callPackage, color-prints, wiki-tools }:
+{ writeArgparseScriptBin, color-prints, wiki-tools }:
 let
   pkgname = "providence";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} domain
+  usage_str = ''
+    usage: ${pkgname} domain
 
-      Pick randomly from a specified domain:
-      - patriarchal
-      - passage
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
+    Pick randomly from a specified domain:
+    - patriarchal
+    - passage
+  '';
   printErr = "${color-prints}/bin/echo_red";
   wikitools = "${wiki-tools}/bin/wiki-tools";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "No domain chosen."
       exit 1
@@ -45,11 +41,7 @@ in (writeShellScriptBin pkgname ''
     description = "Be randomly dictated to from passages of importance.";
     longDescription = ''
       ```
-      usage: providence domain
-
-      Pick randomly from a specified domain:
-      - patriarchal
-      - passage
+      ${usage_str}
       ```
 
       Requires a wiki secrets file at `~/secrets/wiki/secrets.json`.
