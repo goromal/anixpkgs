@@ -40,6 +40,7 @@ in {
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
       ];
+    mutableExtensionsDir = false;
   };
 
   home.file = with anixpkgs.pkgData; {
