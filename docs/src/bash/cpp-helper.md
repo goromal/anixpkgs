@@ -10,6 +10,7 @@ Options:
 --make-nix                     Dump template default.nix and shell.nix files
 --make-exec-lib   CPPNAME      Generate a lib+exec package template
 --make-header-lib CPPNAME      Generate a header-only library template
+--make-vscode                  Generate VSCode C++ header detection settings file
 
 ```
 
