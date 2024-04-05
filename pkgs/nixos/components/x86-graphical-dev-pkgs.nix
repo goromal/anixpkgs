@@ -10,7 +10,7 @@ in {
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
-  programs.vscode = lib.mkIf (cfg.standalone == false) {
+  programs.vscode = {
     enable = true;
     package = unstable.vscodium;
     extensions = with vscode-extensions;
