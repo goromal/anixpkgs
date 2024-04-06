@@ -25,21 +25,24 @@ class Context:
                     reponame = os.path.basename(root)
                     branch = (
                         subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"]
+                            ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
+                            stderr=subprocess.PIPE
                         )
                         .decode()
                         .strip()
                     )
                     clean = not bool(
                         subprocess.check_output(
-                            ["git", "-C", root, "status", "--porcelain"]
+                            ["git", "-C", root, "status", "--porcelain"],
+                            stderr=subprocess.PIPE
                         )
                         .decode()
                         .strip()
                     )
                     hash = (
                         subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "HEAD"]
+                            ["git", "-C", root, "rev-parse", "HEAD"],
+                            stderr=subprocess.PIPE
                         )
                         .decode()
                         .strip()
@@ -47,7 +50,8 @@ class Context:
                     try:
                         local = bool(
                             subprocess.check_output(
-                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"]
+                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"],
+                                stderr=subprocess.PIPE
                             )
                             .decode()
                             .strip()
