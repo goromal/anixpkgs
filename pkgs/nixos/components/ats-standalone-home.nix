@@ -181,7 +181,7 @@ in {
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
   imports =
-    [ ./opts.nix ./base-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
+    [ ./opts.nix ./base-pkgs.nix ./base-dev-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
   mods.opts.standalone = lib.mkForce true;
   mods.opts.homeDir = lib.mkForce "/home/andrew";
   home.packages = [
