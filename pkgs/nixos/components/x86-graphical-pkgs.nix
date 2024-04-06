@@ -109,6 +109,7 @@ in {
            } - ${
              if cfg.standalone then "Home-Manager" else "NixOS"
            } ${nixos-version}"' \
+           -resize $(${anixpkgs.getres}/bin/getres --no-fail) \
            ${img.wallpaper.data} $out/wallpaper.png
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
