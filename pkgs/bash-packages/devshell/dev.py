@@ -26,7 +26,8 @@ class Context:
                     branch = (
                         subprocess.check_output(
                             ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
-                            stderr=subprocess.PIPE
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE
                         )
                         .decode()
                         .strip()
@@ -34,7 +35,8 @@ class Context:
                     clean = not bool(
                         subprocess.check_output(
                             ["git", "-C", root, "status", "--porcelain"],
-                            stderr=subprocess.PIPE
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE
                         )
                         .decode()
                         .strip()
@@ -42,7 +44,8 @@ class Context:
                     hash = (
                         subprocess.check_output(
                             ["git", "-C", root, "rev-parse", "HEAD"],
-                            stderr=subprocess.PIPE
+                            stderr=subprocess.PIPE,
+                            stdout=subprocess.PIPE
                         )
                         .decode()
                         .strip()
@@ -51,7 +54,8 @@ class Context:
                         local = bool(
                             subprocess.check_output(
                                 ["git", "-C", root, "log", f"origin/{branch}..HEAD"],
-                                stderr=subprocess.PIPE
+                                stderr=subprocess.PIPE,
+                                stdout=subprocess.PIPE
                             )
                             .decode()
                             .strip()
