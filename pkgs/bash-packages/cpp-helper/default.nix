@@ -1,44 +1,17 @@
-{ writeShellScriptBin, callPackage, color-prints, redirects, git-cc }:
+{ writeArgparseScriptBin, color-prints, redirects, git-cc }:
 let
   pkgname = "cpp-helper";
-  anix-version = (builtins.readFile ../../../ANIX_VERSION);
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options]
+  usage_str = ''
+    usage: ${pkgname} [options]
 
-      Options:
-      --make-format-file             Dumps a format rules file into .clang-format
-      --make-nix                     Dump template default.nix and shell.nix files
-      --make-exec-lib   CPPNAME      Generate a lib+exec package template
-      --make-header-lib CPPNAME      Generate a header-only library template
-    '';
-    optsWithVarsAndDefaults = [
-      {
-        var = "makeff";
-        isBool = true;
-        default = "0";
-        flags = "--make-format-file";
-      }
-      {
-        var = "makehot";
-        isBool = false;
-        default = "";
-        flags = "--make-header-lib";
-      }
-      {
-        var = "makeexl";
-        isBool = false;
-        default = "";
-        flags = "--make-exec-lib";
-      }
-      {
-        var = "makenix";
-        isBool = true;
-        default = "0";
-        flags = "--make-nix";
-      }
-    ];
-  };
+    Options:
+    --make-format-file             Dumps a format rules file into .clang-format
+    --make-nix                     Dump template default.nix and shell.nix files
+    --make-exec-lib   CPPNAME      Generate a lib+exec package template
+    --make-header-lib CPPNAME      Generate a header-only library template
+    --make-vscode                  Generate VSCode C++ header detection settings file
+  '';
+  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   formatFile = ./res/clang-format;
@@ -57,6 +30,18 @@ let
         sed -i 's|REPLACEME|${anix-version}|g' default.nix
         cat ${shellFile} > shell.nix
         sed -i 's|REPLACEME|${anix-version}|g' shell.nix
+    fi
+  '';
+  makevscodeRule = ''
+    if [[ "$makevscode" == "1" ]]; then
+        export CPP_CFG_JSON=.vscode/c_cpp_properties.json
+        ${printGrn} "Generating IntelliSense-compatible config for code completion in VSCode ($CPP_CFG_JSON)..."
+        mkdir -p .vscode
+        echo "{ \"configurations\": [{\"name\":\"NixOS\",\"intelliSenseMode\":\"linux-gcc-x64\"," > $CPP_CFG_JSON
+        echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
+        echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
+        echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
+        echo "]}],\"version\":4}" >> $CPP_CFG_JSON
     fi
   '';
   makehotRule = ''
@@ -101,27 +86,52 @@ let
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
   '';
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "makeff";
+    isBool = true;
+    default = "0";
+    flags = "--make-format-file";
+  }
+  {
+    var = "makehot";
+    isBool = false;
+    default = "";
+    flags = "--make-header-lib";
+  }
+  {
+    var = "makeexl";
+    isBool = false;
+    default = "";
+    flags = "--make-exec-lib";
+  }
+  {
+    var = "makenix";
+    isBool = true;
+    default = "0";
+    flags = "--make-nix";
+  }
+  {
+    var = "makevscode";
+    isBool = true;
+    default = "0";
+    flags = "--make-vscode";
+  }
+] ''
   set -e
-  ${argparse}
   tmpdir=$(mktemp -d)
   ${makeffRule}
   ${makehotRule}
   ${makeexlRule}
   ${makenixRule}
+  ${makevscodeRule}
   rm -rf "$tmpdir"
 '') // {
   meta = {
     description = "Convenience tools for setting up C++ projects.";
     longDescription = ''
       ```
-      usage: cpp-helper [options]
-
-      Options:
-      --make-format-file             Dumps a format rules file into .clang-format
-      --make-nix                     Dump template default.nix and shell.nix files
-      --make-exec-lib   CPPNAME      Generate a lib+exec package template
-      --make-header-lib CPPNAME      Generate a header-only library template
+      ${usage_str}
       ```
     '';
   };

@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
 , rubberband, abcmidi, timidity }:
 let
   name = "mp3";
@@ -91,7 +91,7 @@ let
     }
   ];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description = "Generate (or modify) an MP3 file from similar formats.";
 }

@@ -180,10 +180,16 @@ in {
   home.homeDirectory = "/home/andrew";
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
-  imports =
-    [ ./opts.nix ./base-pkgs.nix ./base-dev-pkgs.nix ./x86-graphical-pkgs.nix ./x86-rec-pkgs.nix ];
+  imports = [
+    ./opts.nix
+    ./base-pkgs.nix
+    ./base-dev-pkgs.nix
+    ./x86-graphical-pkgs.nix
+    ./x86-rec-pkgs.nix
+  ];
   mods.opts.standalone = lib.mkForce true;
   mods.opts.homeDir = lib.mkForce "/home/andrew";
+  mods.opts.cloudAutoSync = false;
   home.packages = [
     (writeShellScriptBin "ats-load-services" ''
       mkdir -p /home/andrew/goromail
@@ -216,7 +222,7 @@ in {
       systemctl --user $@
     '')
   ];
-  systemd.user.services.orchestratord = {
+  systemd.user.services.orchestratord = lib.mkForce {
     Unit = { Description = "Orchestrator daemon"; };
     Service = {
       Type = "simple";

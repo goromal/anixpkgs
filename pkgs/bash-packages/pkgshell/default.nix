@@ -1,26 +1,22 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, color-prints }:
 let
   pkgname = "pkgshell";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options] pkgs attr
+  usage_str = ''
+    usage: ${pkgname} [options] pkgs attr
 
-      Make a nix shell with package [attr] from [pkgs] (e.g., '<nixpkgs>').
+    Make a nix shell with package [attr] from [pkgs] (e.g., '<nixpkgs>').
 
-      Options:
-      -v|--verbose    Print verbose output.
-    '';
-    optsWithVarsAndDefaults = [{
-      var = "verbose";
-      isBool = true;
-      default = "0";
-      flags = "-v|--verbose";
-    }];
-  };
+    Options:
+    -v|--verbose    Print verbose output.
+  '';
   printErr = "${color-prints}/bin/echo_red";
   shellFile = ../bash-utils/customShell.nix;
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [{
+  var = "verbose";
+  isBool = true;
+  default = "0";
+  flags = "-v|--verbose";
+}] ''
   pkgs="$1"
   attr="$2"
   if [[ -z "$pkgs" ]]; then
@@ -45,12 +41,7 @@ in (writeShellScriptBin pkgname ''
     description = "Flexible Nix shell.";
     longDescription = ''
       ```
-      usage: pkgshell [options] pkgs attr
-
-      Make a nix shell with package [attr] from [pkgs] (e.g., '<nixpkgs>').
-
-      Options:
-      -v|--verbose    Print verbose output.
+      ${usage_str}
       ```
     '';
   };

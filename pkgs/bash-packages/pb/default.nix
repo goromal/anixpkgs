@@ -1,49 +1,52 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, color-prints }:
 let
   pkgname = "pb";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options] iternum itertot
+  usage = ''
+    usage: ${pkgname} [options] iternum itertot
 
-      Prints a progress bar.
+    Prints a progress bar.
 
-      Options:
-      -h | --help     Print out the help documentation.
-      -b | --barsize  Dictate the total progress bar length in chars (Default: 20).
-      -c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
+    Options:
+    -h | --help     Print out the help documentation.
+    -b | --barsize  Dictate the total progress bar length in chars (Default: 20).
+    -c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
 
-      Arguments:
-      iternum: current iteration number
-      itertot: number of total iterations
+    Arguments:
+    iternum: current iteration number
+    itertot: number of total iterations
+  '';
+  example = ''
+    N=0
+    T=20
+    while [ \$N -le \$T ]; do
+        pb \$N \$T
+        N=\$[\$N+1]
+        sleep 1
+    done
+    echo
+  '';
+  usage_str = ''
+    ${usage}
 
-      Example Usage:
-      N=0
-      T=20
-      while [ \$N -le \$T ]; do
-          pb \$N \$T
-          N=\$[\$N+1]
-          sleep 1
-      done
-      echo
-    '';
-    optsWithVarsAndDefaults = [
-      {
-        var = "barsize";
-        isBool = false;
-        default = "20";
-        flags = "-b|--barsize";
-      }
-      {
-        var = "color";
-        isBool = false;
-        default = "";
-        flags = "-c|--color";
-      }
-    ];
-  };
+    Example Usage:
+
+    ${example}
+  '';
   printErr = "${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "barsize";
+    isBool = false;
+    default = "20";
+    flags = "-b|--barsize";
+  }
+  {
+    var = "color";
+    isBool = false;
+    default = "";
+    flags = "-c|--color";
+  }
+] ''
   if [[ -z "$1" ]]; then
       ${printErr} "No iternum provided."
       exit 1
@@ -94,32 +97,13 @@ in (writeShellScriptBin pkgname ''
     description = "Print out a progress bar.";
     longDescription = ''
       ```
-      usage: pb [options] iternum itertot
-
-      Prints a progress bar.
-
-      Options:
-      -h | --help     Print out the help documentation.
-      -b | --barsize  Dictate the total progress bar length in chars (Default: 20).
-      -c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
-
-      Arguments:
-      iternum: current iteration number
-      itertot: number of total iterations
+      ${usage}
       ```
 
       Example usage:
 
       ```
-      Example Usage:
-      N=0
-      T=20
-      while [ $N -le $T ]; do
-          pb $N $T
-          N=$[$N+1]
-          sleep 1
-      done
-      echo
+      ${example}
       ```
     '';
   };
