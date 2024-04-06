@@ -1,5 +1,5 @@
 { writeArgparseScriptBin, color-prints, browser-aliases ? null
-, standalone ? false }:
+, standalone ? false, git-cc }:
 let
   pkgname = "anix-upgrade";
   description = "Upgrade the operating system${
@@ -79,7 +79,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       ${printError} "Please provide an absolute path to the source tree."
       exit 1
     fi
-    ln -s "$source" anixpkgs
+    ${git-cc}/bin/git-cc "$source" anixpkgs
     if [[ "$localVar" == "true" ]]; then
       sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/pkgs/nixos/dependencies.nix
     fi
