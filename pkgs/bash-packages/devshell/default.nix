@@ -129,7 +129,7 @@ in (writeShellScriptBin pkgname ''
       - `setupcurrentws`: A wrapped version of [setupws](./setupws.md) that will build your development workspace as specified in `~/.devrc`.
       - `godev`: An alias that will take you to the root of your development workspace.
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
-      - `dev`: Enter an devive menu for workspace source manipulation.
+      - `dev`: Enter an interactive menu for workspace source manipulation.
     '';
   };
 }
