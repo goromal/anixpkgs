@@ -71,6 +71,7 @@ in {
       unstable.inkscape
       unstable.audacity
       blender
+      anixpkgs.getres
     ] else
       [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
 
@@ -109,7 +110,7 @@ in {
            } - ${
              if cfg.standalone then "Home-Manager" else "NixOS"
            } ${nixos-version}"' \
-           -resize $(${anixpkgs.getres}/bin/getres --no-fail) \
+           -resize ${cfg.screenResolution} \
            ${img.wallpaper.data} $out/wallpaper.png
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
