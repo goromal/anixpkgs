@@ -49,7 +49,7 @@ in {
   } else
     { }));
 
-  home.packages = [ terminator anixpkgs.budget_report ]
+  home.packages = [ terminator anixpkgs.budget_report anixpkgs.getres ]
     ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
@@ -71,7 +71,6 @@ in {
       unstable.inkscape
       unstable.audacity
       blender
-      anixpkgs.getres
     ] else
       [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
 
