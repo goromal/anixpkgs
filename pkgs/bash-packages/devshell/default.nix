@@ -7,7 +7,7 @@ let
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
     (can specify an alternate path with -d DEVRC).
-    Optionally run a one-off command with --run CMD (e.g., --run interact).
+    Optionally run a one-off command with --run CMD (e.g., --run dev).
 
     Example ~/.devrc:
     =================================================================
@@ -30,7 +30,7 @@ let
   parseScript = ./parseWorkspace.py;
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
-  interactScript = ./interact.py;
+  devScript = ./dev.py;
 in (writeArgparseScriptBin pkgname usage_str [
   {
     var = "devrc";
@@ -84,7 +84,7 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr pkgsVar "$pkgs_var" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
-            --arg interactScript ${interactScript} \
+            --arg devScript ${devScript} \
             --arg repoSpecList "$sources_list"
       else
           nix-shell ${shellFile} \
@@ -95,7 +95,7 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr pkgsVar "$pkgs_var" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
-            --arg interactScript ${interactScript} \
+            --arg devScript ${devScript} \
             --arg repoSpecList "$sources_list" \
             --command "$runcmd"
       fi 
@@ -123,7 +123,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       - `setupcurrentws`: A wrapped version of [setupws](./setupws.md) that will build your development workspace as specified in `~/.devrc`.
       - `godev`: An alias that will take you to the root of your development workspace.
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
-      - `interact`: Enter an interactive menu for workspace source manipulation.
+      - `dev`: Enter an interactive menu for workspace source manipulation.
     '';
   };
 }

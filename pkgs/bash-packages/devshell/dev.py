@@ -1,6 +1,5 @@
 import sys
 import os
-import re
 import subprocess
 import curses
 
@@ -26,21 +25,24 @@ class Context:
                     reponame = os.path.basename(root)
                     branch = (
                         subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"]
+                            ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
+                            stderr=subprocess.PIPE,
                         )
                         .decode()
                         .strip()
                     )
                     clean = not bool(
                         subprocess.check_output(
-                            ["git", "-C", root, "status", "--porcelain"]
+                            ["git", "-C", root, "status", "--porcelain"],
+                            stderr=subprocess.PIPE,
                         )
                         .decode()
                         .strip()
                     )
                     hash = (
                         subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "HEAD"]
+                            ["git", "-C", root, "rev-parse", "HEAD"],
+                            stderr=subprocess.PIPE,
                         )
                         .decode()
                         .strip()
@@ -48,13 +50,14 @@ class Context:
                     try:
                         local = bool(
                             subprocess.check_output(
-                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"]
+                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"],
+                                stderr=subprocess.PIPE,
                             )
                             .decode()
                             .strip()
                         )
                     except:
-                        local = True # a locally checked out branch will fail the above query
+                        local = True  # a locally checked out branch will fail the above query
                     self.repos.append((reponame, branch, clean, hash, local))
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
@@ -151,7 +154,8 @@ def main(stdscr):
             display_output(stdscr)
             try:
                 subprocess.check_output(
-                    [editor, os.path.join(ctx.dev_dir, "sources", reponame)]
+                    [editor, os.path.join(ctx.dev_dir, "sources", reponame)],
+                    stderr=subprocess.PIPE,
                 )
             except:
                 ctx.status_msg = f"Opening {reponame} in editor... UNSUCCESSFUL."
@@ -164,7 +168,9 @@ def main(stdscr):
             ctx.status_msg = f"Stashing {reponame}..."
             display_output(stdscr)
             try:
-                subprocess.check_output(["git", "-C", repopath, "stash"])
+                subprocess.check_output(
+                    ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
+                )
             except:
                 ctx.load_sources()
                 ctx.status_msg = f"Stashing {reponame}... UNSUCCESSFUL."
@@ -180,7 +186,8 @@ def main(stdscr):
             display_output(stdscr)
             try:
                 subprocess.check_output(
-                    ["git", "-C", repopath, "push", "origin", branch]
+                    ["git", "-C", repopath, "push", "origin", branch],
+                    stderr=subprocess.PIPE,
                 )
             except:
                 ctx.load_sources()
@@ -199,7 +206,8 @@ def main(stdscr):
             display_output(stdscr)
             try:
                 subprocess.check_output(
-                    ["git", "-C", repopath, "checkout", "-b", new_branch]
+                    ["git", "-C", repopath, "checkout", "-b", new_branch],
+                    stderr=subprocess.PIPE,
                 )
             except:
                 ctx.load_sources()
@@ -215,13 +223,19 @@ def main(stdscr):
             ctx.status_msg = f"Checking out {reponame}:{branch}..."
             display_output(stdscr)
             try:
-                subprocess.check_output(["git", "-C", repopath, "stash"])
                 subprocess.check_output(
-                    ["git", "-C", repopath, "fetch", "origin", branch]
+                    ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
                 )
-                subprocess.check_output(["git", "-C", repopath, "checkout", branch])
                 subprocess.check_output(
-                    ["git", "-C", repopath, "pull", "origin", branch]
+                    ["git", "-C", repopath, "fetch", "origin", branch],
+                    stderr=subprocess.PIPE,
+                )
+                subprocess.check_output(
+                    ["git", "-C", repopath, "checkout", branch], stderr=subprocess.PIPE
+                )
+                subprocess.check_output(
+                    ["git", "-C", repopath, "pull", "origin", branch],
+                    stderr=subprocess.PIPE,
                 )
             except:
                 ctx.load_sources()
