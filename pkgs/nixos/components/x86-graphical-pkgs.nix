@@ -109,7 +109,7 @@ in {
            } - ${
              if cfg.standalone then "Home-Manager" else "NixOS"
            } ${nixos-version}"' \
-           -resize ${cfg.screenResolution} \
+           -resize ${cfg.screenResolution}^ \
            ${img.wallpaper.data} $out/wallpaper.png
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
