@@ -65,8 +65,13 @@ in (writeArgparseScriptBin pkgname usage_str [
     localVar=false
   fi
   if [[ -d anixpkgs ]]; then
-    ${printYellow} "Removing existing symlink."
-    rm anixpkgs
+    if [[ -L anixpkgs ]]; then
+      ${printYellow} "Removing existing symlink."
+      rm anixpkgs
+    else
+      ${printYellow} "Removing existing directory."
+      rm -rf anixpkgs
+    fi
   fi
   if [[ ! -z "$version" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
