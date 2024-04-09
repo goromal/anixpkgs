@@ -49,7 +49,7 @@ in {
   } else
     { }));
 
-  home.packages = [ terminator anixpkgs.budget_report ]
+  home.packages = [ terminator anixpkgs.budget_report anixpkgs.getres ]
     ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
@@ -109,6 +109,7 @@ in {
            } - ${
              if cfg.standalone then "Home-Manager" else "NixOS"
            } ${nixos-version}"' \
+           -resize ${cfg.screenResolution}! \
            ${img.wallpaper.data} $out/wallpaper.png
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {

@@ -17,6 +17,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
   default = "0";
   flags = "-v|--verbose";
 }] ''
+  set -e
   pkgs="$1"
   attr="$2"
   if [[ -z "$pkgs" ]]; then

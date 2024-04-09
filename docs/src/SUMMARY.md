@@ -64,6 +64,7 @@
   - [doku](./bash/doku.md)
   - [epub](./bash/epub.md)
   - [gif](./bash/gif.md)
+  - [getres](./bash/getres.md)
   - [md](./bash/md.md)
   - [mp3](./bash/mp3.md)
   - [mp4](./bash/mp4.md)

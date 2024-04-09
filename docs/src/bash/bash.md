@@ -8,6 +8,7 @@ Packages written (or glued together) in Bash.
 - [doku](./doku.md)
 - [epub](./epub.md)
 - [gif](./gif.md)
+- [getres](./getres.md)
 - [md](./md.md)
 - [mp3](./mp3.md)
 - [mp4](./mp4.md)
