@@ -1,4 +1,5 @@
 import os
+import re
 import argparse
 import flask
 import flask_login
@@ -29,6 +30,7 @@ if args.data_dir[0] == '/':
     RES_DIR = args.data_dir
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
+SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
 
 app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
 app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
@@ -83,7 +85,18 @@ class StampServer:
     def getfile(self):
         for file, ftype in self.filelist.items():
             self.filedeck = file
-            return file, ftype
+            return file, ftype, len(self.filelist.keys())
+    
+    def getstamps(self):
+        stamps = {}
+        for file in os.listdir(RES_DIR):
+            stampmatch = re.search(r"stamped\.(.*?)\.", file)
+            if stampmatch:
+                if stampmatch.group(1) in stamps:
+                    stamps[stampmatch.group(1)] += 1
+                else:
+                    stamps[stampmatch.group(1)] = 1
+        return stamps
 
     def stamp(self, stamp):
         try:
@@ -147,10 +160,11 @@ def index():
         if flask.request.form["text"] != "":
             stampserver.stamp(flask.request.form["text"])
     res, msg = stampserver.load()
+    stamps = stampserver.getstamps()
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root="")
-    file, ftype = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root="")
+        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root="", nleft="?", datadir=SHORT_RESDIR, stamps=stamps)
+    file, ftype, numleft = stampserver.getfile()
+    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root="", nleft=str(numleft), datadir=SHORT_RESDIR, stamps=stamps)
 
 @app.route("/restamp/<stamp>", methods=["GET","POST"])
 @flask_login.login_required
@@ -165,9 +179,9 @@ def stamped(stamp):
         stampserver.replace_stamp(stamp, new_stamp)
     res, msg = stampserver.load_stamped(stamp)
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}")
-    file, ftype = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}")
+        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR)
+    file, ftype, numleft = stampserver.getfile()
+    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}", nleft=str(numleft), datadir=SHORT_RESDIR)
 
 @app.route("/zzz", methods=["GET","POST"])
 @flask_login.login_required
