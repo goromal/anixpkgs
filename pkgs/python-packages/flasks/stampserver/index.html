@@ -45,7 +45,8 @@
     <br><br>
     <br><br>
     {% for stamp, nstamps in stamps.items() %}
-
+    <a href="/restamp/{{ stamp }}">{{ stamp }} ({{ nstamps }})</a>
+    <br><br>
     {% endfor %}
 </body>
 
