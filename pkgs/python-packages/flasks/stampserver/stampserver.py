@@ -179,9 +179,9 @@ def stamped(stamp):
         stampserver.replace_stamp(stamp, new_stamp)
     res, msg = stampserver.load_stamped(stamp)
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR)
+        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR, stamps={})
     file, ftype, numleft = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}", nleft=str(numleft), datadir=SHORT_RESDIR)
+    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}", nleft=str(numleft), datadir=SHORT_RESDIR, stamps={})
 
 @app.route("/zzz", methods=["GET","POST"])
 @flask_login.login_required
