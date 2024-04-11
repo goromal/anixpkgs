@@ -147,7 +147,7 @@ def display_output(stdscr):
             )
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
-        stdscr.addstr(ctx.end_row + 4, 0, "[s]  Stash changes")
+        stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
         stdscr.addstr(ctx.end_row + 6, 0, "[b]  Create new branch")
         stdscr.addstr(ctx.end_row + 7, 0, "[c]  (Stash and) CheckOut and Pull")
@@ -209,18 +209,42 @@ def main(stdscr):
         elif key == ord("s"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
             repopath = os.path.join(ctx.dev_dir, "sources", reponame)
-            ctx.status_msg = f"Stashing {reponame}..."
-            display_output(stdscr)
-            try:
-                subprocess.check_output(
-                    ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
-                )
-            except:
+            branch = ctx.repos[ctx.current_row - ctx.start_row][5]
+            if branch is not None:
+                ctx.status_msg = f"Synchonizing {reponame}:{branch}..."
+                display_output(stdscr)
+                try:
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "fetch", "origin", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "checkout", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "pull", "origin", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    ctx.save_ws_repo_branch(reponame, branch)
+                except:
+                    ctx.load_sources()
+                    ctx.status_msg = (
+                        f"Synchonizing {reponame}:{branch}... UNSUCCESSFUL."
+                    )
+                    continue
                 ctx.load_sources()
-                ctx.status_msg = f"Stashing {reponame}... UNSUCCESSFUL."
-                continue
-            ctx.load_sources()
-            ctx.status_msg = f"Stashing {reponame}... Done."
+                ctx.status_msg = f"Synchonizing {reponame}:{branch}... Done."
+            else:
+                branch = ctx.repos[ctx.current_row - ctx.start_row][1]
+                ctx.status_msg = f"Saving {reponame}:{branch}..."
+                display_output(stdscr)
+                ctx.save_ws_repo_branch(reponame, branch)
+                ctx.load_sources()
+                ctx.status_msg = f"Saving {reponame}:{branch}... Done."
 
         elif key == ord("p"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
