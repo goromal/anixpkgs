@@ -3,10 +3,11 @@
 Developer tool for creating siloed dev environments.
 
 ```
-usage: devshell [-d DEVRC] [--run CMD] workspace_name
+usage: devshell [-d DEVRC] [-s DEVHIST] [--run CMD] workspace_name
 
 Enter [workspace_name]'s development shell as defined in ~/.devrc
-(can specify an alternate path with -d DEVRC).
+(can specify an alternate path with -d DEVRC or history file with
+-s DEVHIST).
 Optionally run a one-off command with --run CMD (e.g., --run dev).
 
 Example ~/.devrc:
