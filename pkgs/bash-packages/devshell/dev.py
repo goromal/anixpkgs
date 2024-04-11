@@ -2,11 +2,13 @@ import sys
 import os
 import subprocess
 import curses
+import json
 
 
 class Context:
     def __init__(self):
         self.dev_dir = ""
+        self.hist_file = ""
         self.wsname = ""
         self.repos = []
         self.max_reponame_len = 0
@@ -18,6 +20,12 @@ class Context:
 
     def load_sources(self):
         self.repos = []
+        hist_data = {}
+        try:
+            with open(self.hist_file, "r") as hf:
+                hist_data = json.loads(hf.read())
+        except:
+            hist_data = {}
         for root, dirs, _ in os.walk(os.path.join(self.dev_dir, "sources")):
             if ".git" in dirs:
                 git_dir = os.path.join(root, ".git")
@@ -58,10 +66,32 @@ class Context:
                         )
                     except:
                         local = True  # a locally checked out branch will fail the above query
-                    self.repos.append((reponame, branch, clean, hash, local))
+                    try:
+                        sync_branch = hist_data[self.wsname][reponame]["branch"]
+                    except:
+                        sync_branch = None
+                    self.repos.append(
+                        (reponame, branch, clean, hash, local, sync_branch)
+                    )
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
         self.end_row = min(2 + len(self.repos), curses.LINES - 1)
+
+    def save_ws_repo_branch(self, reponame, branch):
+        hist_data = {}
+        try:
+            with open(self.hist_file, "r") as hf:
+                hist_data = json.loads(hf.read())
+        except:
+            hist_data = {}
+        if self.wsname not in hist_data:
+            hist_data[self.wsname] = {reponame: {"branch": branch}}
+        elif reponame not in hist_data[self.wsname]:
+            hist_data[self.wsname][reponame] = {"branch": branch}
+        else:
+            hist_data[self.wsname][reponame]["branch"] = branch
+        with open(self.hist_file, "w") as hf:
+            hf.write(json.dumps(hist_data))
 
 
 ctx = Context()
@@ -104,9 +134,20 @@ def display_output(stdscr):
                 ctx.max_reponame_len + ctx.max_branch_len + 14,
                 ctx.repos[i - ctx.start_row][3][:7],
             )
+            stdscr.addstr(
+                i,
+                ctx.max_reponame_len + ctx.max_branch_len + 22,
+                ctx.repos[i - ctx.start_row][5]
+                if ctx.repos[i - ctx.start_row][5] is not None
+                else "...",
+                curses.color_pair(3)
+                if ctx.repos[i - ctx.start_row][5] is not None
+                and ctx.repos[i - ctx.start_row][5] == ctx.repos[i - ctx.start_row][1]
+                else curses.color_pair(4),
+            )
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
-        stdscr.addstr(ctx.end_row + 4, 0, "[s]  Stash changes")
+        stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
         stdscr.addstr(ctx.end_row + 6, 0, "[b]  Create new branch")
         stdscr.addstr(ctx.end_row + 7, 0, "[c]  (Stash and) CheckOut and Pull")
@@ -124,12 +165,15 @@ def main(stdscr):
     ctx.wsname = sys.argv[1]
     ctx.dev_dir = sys.argv[2]
     editor = sys.argv[3]
+    ctx.hist_file = sys.argv[4]
     ctx.load_sources()
 
     curses.curs_set(0)
     curses.start_color()
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
     stdscr.clear()
 
@@ -165,18 +209,42 @@ def main(stdscr):
         elif key == ord("s"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
             repopath = os.path.join(ctx.dev_dir, "sources", reponame)
-            ctx.status_msg = f"Stashing {reponame}..."
-            display_output(stdscr)
-            try:
-                subprocess.check_output(
-                    ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
-                )
-            except:
+            branch = ctx.repos[ctx.current_row - ctx.start_row][5]
+            if branch is not None:
+                ctx.status_msg = f"Synchonizing {reponame}:{branch}..."
+                display_output(stdscr)
+                try:
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "fetch", "origin", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "checkout", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    subprocess.check_output(
+                        ["git", "-C", repopath, "pull", "origin", branch],
+                        stderr=subprocess.PIPE,
+                    )
+                    ctx.save_ws_repo_branch(reponame, branch)
+                except:
+                    ctx.load_sources()
+                    ctx.status_msg = (
+                        f"Synchonizing {reponame}:{branch}... UNSUCCESSFUL."
+                    )
+                    continue
                 ctx.load_sources()
-                ctx.status_msg = f"Stashing {reponame}... UNSUCCESSFUL."
-                continue
-            ctx.load_sources()
-            ctx.status_msg = f"Stashing {reponame}... Done."
+                ctx.status_msg = f"Synchonizing {reponame}:{branch}... Done."
+            else:
+                branch = ctx.repos[ctx.current_row - ctx.start_row][1]
+                ctx.status_msg = f"Saving {reponame}:{branch}..."
+                display_output(stdscr)
+                ctx.save_ws_repo_branch(reponame, branch)
+                ctx.load_sources()
+                ctx.status_msg = f"Saving {reponame}:{branch}... Done."
 
         elif key == ord("p"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
@@ -189,6 +257,7 @@ def main(stdscr):
                     ["git", "-C", repopath, "push", "origin", branch],
                     stderr=subprocess.PIPE,
                 )
+                ctx.save_ws_repo_branch(reponame, branch)
             except:
                 ctx.load_sources()
                 ctx.status_msg = (
@@ -237,6 +306,7 @@ def main(stdscr):
                     ["git", "-C", repopath, "pull", "origin", branch],
                     stderr=subprocess.PIPE,
                 )
+                ctx.save_ws_repo_branch(reponame, branch)
             except:
                 ctx.load_sources()
                 ctx.status_msg = f"Checking out {reponame}:{branch}... UNSUCCESSFUL."
