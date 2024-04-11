@@ -1,5 +1,5 @@
 { pkgs ? import <nixpkgs> { }, setupws, wsname, devDir, dataDir, pkgsVar
-, devScript, editorName, repoSpecList, shellSetupScript }:
+, devScript, editorName, repoSpecList, shellSetupScript, devHistFile }:
 let
   shellSetupArgs = builtins.concatStringsSep " "
     (map (x: "${x.name}:${x.attr}:${builtins.concatStringsSep ":" x.deps}")
@@ -12,7 +12,7 @@ let
     ${setupws}/bin/setupws --dev_dir ${devDir} --data_dir ${dataDir} ${wsname} ${reposWithUrls}
   '';
   dev = pkgs.writeShellScriptBin "dev" ''
-    ${pkgs.python3}/bin/python ${devScript} ${wsname} ${devDir}/${wsname} ${editorName}
+    ${pkgs.python3}/bin/python ${devScript} ${wsname} ${devDir}/${wsname} ${editorName} ${devHistFile}
   '';
 in pkgs.mkShell {
   nativeBuildInputs = [ setupcurrentws dev ];

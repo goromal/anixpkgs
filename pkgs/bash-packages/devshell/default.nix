@@ -3,10 +3,11 @@
 let
   pkgname = "devshell";
   usage_str = ''
-    usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
+    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--run CMD] workspace_name
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
-    (can specify an alternate path with -d DEVRC).
+    (can specify an alternate path with -d DEVRC or history file with
+    -s DEVHIST).
     Optionally run a one-off command with --run CMD (e.g., --run dev).
 
     Example ~/.devrc:
@@ -37,6 +38,12 @@ in (writeArgparseScriptBin pkgname usage_str [
     isBool = false;
     default = "~/.devrc";
     flags = "-d";
+  }
+  {
+    var = "devhist";
+    isBool = false;
+    default = "~/.devhist";
+    flags = "-s";
   }
   {
     var = "runcmd";
@@ -85,6 +92,7 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
+            --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list"
       else
           nix-shell ${shellFile} \
@@ -96,6 +104,7 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
+            --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list" \
             --command "$runcmd"
       fi 
