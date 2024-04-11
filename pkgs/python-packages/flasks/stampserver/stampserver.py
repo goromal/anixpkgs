@@ -192,7 +192,10 @@ def zzz():
         msg="",
         file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4",
         ftype="MP4_EXT",
-        root="zzz"
+        root="zzz"b,
+        nleft="?",
+        datadir=SHORT_RESDIR,
+        stamps={}
     )
 
 def run():
