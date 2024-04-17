@@ -58,11 +58,6 @@ in (writeArgparseScriptBin pkgname usage_str [
       exit 1
   fi
 
-  runargstr=""
-  if [[ ! -z "$runcmd" ]]; then
-      runargstr="--run \"''${runcmd}\""
-  fi
-
   rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
   if [[ "$rcinfo" == "_NODEVRC_" ]]; then
       ${printErr} "ERROR: no $devrc file found"
@@ -82,7 +77,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       data_dir="''${rcinfoarray[1]}"
       pkgs_var="''${rcinfoarray[2]}"
       sources_list="''${rcinfoarray[3]}"
-      if [[ -z "$runcmd"  ]]; then
+      if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \

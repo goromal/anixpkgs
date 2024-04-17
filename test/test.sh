@@ -78,6 +78,10 @@ if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
     echo_red "VSCode C++ config improperly generated"
     exit 1
 fi
+cd ../../..
+touch test.py
+pkgshell anixpkgs sunnyside --run "sunnyside test.py 4 u"
+[[ -f xiwx3tC.tyz ]] || { echo_red "pkgshell:sunnyside command failed"; exit 1; }
 
 make-title -c yellow "Testing orchestrator"
 cd $tmpdir
