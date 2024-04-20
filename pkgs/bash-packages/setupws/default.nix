@@ -3,9 +3,9 @@ let
   default-dev-dir = "~/dev";
   default-data-dir = "~/data";
   usage_str = ''
-    usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...]
+    usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...] [?scriptpath ...]
 
-    Create a development workspace with specified git sources.
+    Create a development workspace with specified git sources and scripts.
 
     Options:
         --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
@@ -14,6 +14,7 @@ let
         --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
                                    data will be stored (default: ${default-data-dir})
   '';
+  printCyn = "${color-prints}/bin/echo_cyan";
   printErr = "${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
@@ -39,7 +40,7 @@ in (writeArgparseScriptBin "setupws" usage_str [
       exit 1
   fi
 
-  ${printYlw} "Setting up workspace $wsname..."
+  ${printCyn} "Setting up workspace $wsname..."
   dev_ws_dir=$dev_dir/$wsname
   data_ws_dir=$data_dir/$wsname
 
@@ -54,23 +55,43 @@ in (writeArgparseScriptBin "setupws" usage_str [
   if [[ ! -d sources ]]; then
       mkdir sources
   fi
+  if [[ -d .bin ]]; then
+      rm -rf .bin
+  fi
+  mkdir .bin
 
   if [[ ! -f .envrc ]]; then
       echo "export WSROOT=$dev_ws_dir" > .envrc
       lorri init
       echo 'eval "$(lorri direnv)"' >> .envrc
+      echo 'PATH_add .bin' >> .envrc
       direnv allow
   fi
 
   cd sources
 
   for i in ''${@:2}; do
-      reponame="''${i%%:*}"
-      repourl="''${i#*:}"
-
-      if [[ ! -d $reponame ]]; then
-          ${printYlw} "Cloning and setting up $reponame..."
-          git clone --recurse-submodules "$repourl" "$reponame"
+      if [[ "$i" == "?"* ]]; then
+          scriptpath="''${i:1}"
+          if [[ ! -f "$scriptpath" ]]; then
+              ${printYlw} "Script $scriptpath not found; skipping."
+              continue
+          fi
+          if [[ ! -x "$scriptpath" ]]; then
+              ${printYlw} "Script $scriptpath not executable; skipping."
+              continue
+          fi
+          ${printGrn} "Adding script $scriptpath..."
+          cp "$scriptpath" ../.bin
+      else
+          reponame="''${i%%:*}"
+          repourl="''${i#*:}"
+          if [[ ! -d $reponame ]]; then
+              ${printGrn} "Cloning and setting up $reponame..."
+              git clone --recurse-submodules "$repourl" "$reponame"
+          else
+              ${printGrn} "Repo $reponame present."
+          fi
       fi
   done
 
