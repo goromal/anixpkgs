@@ -325,11 +325,11 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1713590101,
-        "narHash": "sha256-lqh4GpUeAcsr08ZTwu3ml7bXRz3RhHs7qJUoJX5xn3o=",
+        "lastModified": 1713593282,
+        "narHash": "sha256-fafkePMfUUA8Q3NfsgimorRZpYL8o+ocCDwstuJ5cT8=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "92ae50737484f81c883362c644dfac75e16be8f4",
+        "rev": "17394ef8d6a5eedc577016d9525a7548734e41fd",
         "type": "github"
       },
       "original": {
