@@ -86,7 +86,7 @@ let
     }
   ];
 
-  printErr = "${color-prints}/bin/echo_red";
+  printErr = ">&2 ${color-prints}/bin/echo_red";
 
   qualityRule = ''
     if [[ ! -z "$quality" ]]; then
