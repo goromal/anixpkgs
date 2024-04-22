@@ -163,6 +163,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/smfserver { });
             flask-oatbox =
               addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
+            flask-atrs =
+              addDoc (pySelf.callPackage ./python-packages/flasks/atrs { });
             rankserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
             stampserver = addDoc
@@ -234,6 +236,7 @@ in rec {
   flask-mp3server = final.python39.pkgs.flask-mp3server;
   flask-smfserver = final.python39.pkgs.flask-smfserver;
   flask-oatbox = final.python39.pkgs.flask-oatbox;
+  atrs = final.python39.pkgs.flask-atrs;
   imutils-cv4 = final.python39.pkgs.imutils-cv4;
   vidstab-cv4 = final.python39.pkgs.vidstab-cv4;
   rankserver = final.python39.pkgs.rankserver;
