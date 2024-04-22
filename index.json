@@ -66,6 +66,10 @@
                 "ci": true
             },
             {
+                "attr": "atrs",
+                "ci": true
+            },
+            {
                 "attr": "sunnyside",
                 "ci": true
             },
