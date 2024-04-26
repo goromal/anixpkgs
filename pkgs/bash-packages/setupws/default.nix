@@ -3,7 +3,7 @@ let
   default-dev-dir = "~/dev";
   default-data-dir = "~/data";
   usage_str = ''
-    usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...] [?scriptpath ...]
+    usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...] [scriptname=scriptpath ...]
 
     Create a development workspace with specified git sources and scripts.
 
@@ -60,19 +60,24 @@ in (writeArgparseScriptBin "setupws" usage_str [
   fi
   mkdir .bin
 
-  if [[ ! -f .envrc ]]; then
-      echo "export WSROOT=$dev_ws_dir" > .envrc
-      lorri init
-      echo 'eval "$(lorri direnv)"' >> .envrc
-      echo 'PATH_add .bin' >> .envrc
-      direnv allow
-  fi
+  echo "export WSROOT=$dev_ws_dir" > .envrc
+  lorri init
+  echo 'eval "$(lorri direnv)"' >> .envrc
+  echo 'PATH_add $WSROOT/.bin' >> .envrc
+  direnv allow
+  
+  pushd data
+  echo "export WSROOT=$dev_ws_dir" > .envrc
+  echo 'PATH_add $WSROOT/.bin' >> .envrc
+  direnv allow
+  popd
 
   cd sources
 
   for i in ''${@:2}; do
-      if [[ "$i" == "?"* ]]; then
-          scriptpath="''${i:1}"
+      if [[ "$i" == *"="* ]]; then
+          scriptalias="''${i%%=*}"
+          scriptpath="''${i#*=}"
           if [[ ! -f "$scriptpath" ]]; then
               ${printYlw} "Script $scriptpath not found; skipping."
               continue
@@ -82,7 +87,7 @@ in (writeArgparseScriptBin "setupws" usage_str [
               continue
           fi
           ${printGrn} "Adding script $scriptpath..."
-          cp "$scriptpath" ../.bin
+          cp "$scriptpath" ../.bin/$scriptalias
       else
           reponame="''${i%%:*}"
           repourl="''${i#*:}"

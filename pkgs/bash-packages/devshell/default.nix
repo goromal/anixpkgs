@@ -23,8 +23,11 @@ let
     [pyvitools] = git@github.com:goromal/pyvitools.git
     [scrape] = git@github.com:goromal/scrape.git
 
+    # scripts
+    <script_ref> = data_dir_relative_path/script
+
     # workspaces
-    signals = manif-geom-cpp geometry pyvitools
+    signals = manif-geom-cpp geometry pyvitools script_ref
     =================================================================
   '';
   printErr = "${color-prints}/bin/echo_red";
@@ -77,6 +80,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       data_dir="''${rcinfoarray[1]}"
       pkgs_var="''${rcinfoarray[2]}"
       sources_list="''${rcinfoarray[3]}"
+      scripts_list="''${rcinfoarray[4]}"
       if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \
             --arg setupws ${setupws} \
@@ -88,7 +92,8 @@ in (writeArgparseScriptBin pkgname usage_str [
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
             --argstr devHistFile "$devhist" \
-            --arg repoSpecList "$sources_list"
+            --arg repoSpecList "$sources_list" \
+            --arg scriptsList "$scripts_list"
       else
           nix-shell ${shellFile} \
             --arg setupws ${setupws} \
@@ -101,6 +106,7 @@ in (writeArgparseScriptBin pkgname usage_str [
             --arg devScript ${devScript} \
             --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list" \
+            --arg scriptsList "$scripts_list" \
             --command "$runcmd"
       fi 
   fi
