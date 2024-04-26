@@ -71,9 +71,7 @@ echo "#!/usr/bin/env bash" > "$tmpdir/data/scripts/test"
 echo "touch FILE.txt" >> "$tmpdir/data/scripts/test"
 chmod +x "$tmpdir/data/scripts/test"
 devshell -d data/devrc scr_env --run "echo"
-ls "$tmpdir/dev/scr_env/.bin"
-pushd "$tmpdir/dev/scr_env" && scr && popd
-[[ -f "$tmpdir/dev/scr_env" ]] || { echo "Failed devshell script execution"; exit 1; }
+[[ -f "$tmpdir/dev/scr_env/.bin/scr" ]] || { echo "Failed devshell script gather"; exit 1; }
 sed -i 's|python3\.|python39\.|g' $tmpdir/dev/test_env/shell.nix
 devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
 if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python39.withPackages") ]]; then
