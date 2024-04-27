@@ -3,7 +3,7 @@
 Developer tool for creating siloed dev environments.
 
 ```
-usage: devshell [-d DEVRC] [-s DEVHIST] [--run CMD] workspace_name
+usage: devshell [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
 
 Enter [workspace_name]'s development shell as defined in ~/.devrc
 (can specify an alternate path with -d DEVRC or history file with
