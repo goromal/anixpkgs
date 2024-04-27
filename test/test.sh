@@ -64,6 +64,14 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "inherit ceres-factors;") ]
     echo_red "setupcurrentws missed shell pkg intra-workspace dependency"
     exit 1
 fi
+echo "<scr> = scripts/test" >> data/devrc
+echo "scr_env = geometry scr" >> data/devrc
+mkdir -p "$tmpdir/data/scripts"
+echo "#!/usr/bin/env bash" > "$tmpdir/data/scripts/test"
+echo "touch FILE.txt" >> "$tmpdir/data/scripts/test"
+chmod +x "$tmpdir/data/scripts/test"
+devshell -d data/devrc scr_env --run "echo"
+[[ -f "$tmpdir/dev/scr_env/.bin/scr" ]] || { echo "Failed devshell script gather"; exit 1; }
 sed -i 's|python3\.|python39\.|g' $tmpdir/dev/test_env/shell.nix
 devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
 if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python39.withPackages") ]]; then
@@ -78,7 +86,10 @@ if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
     echo_red "VSCode C++ config improperly generated"
     exit 1
 fi
-cd ../../..
+cd $tmpdir/dev
+setupws --dev_dir $tmpdir/dev --data_dir $tmpdir/data tws2 lint.sh=$anixdir/scripts/lint.sh mscpf:https://github.com/goromal/mscpp
+[[ -d "$tmpdir/dev/tws2/sources/mscpf/.git" ]] || { echo "setupws repo clone failed"; exit 1; }
+[[ -f "$tmpdir/dev/tws2/.bin/lint.sh" ]] || { echo "setupws script copy failed"; exit 1; }
 touch test.py
 pkgshell anixpkgs sunnyside --run "sunnyside test.py 4 u"
 [[ -f xiwx3tC.tyz ]] || { echo_red "pkgshell:sunnyside command failed"; exit 1; }
