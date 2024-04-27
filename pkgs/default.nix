@@ -167,7 +167,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
             stampserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
-            fastcore = addDoc (pySelf.callPackage ./python-packages/fastcore { });
+            fastcore =
+              addDoc (pySelf.callPackage ./python-packages/fastcore { });
             ghapi = addDoc (pySelf.callPackage ./python-packages/ghapi { });
           });
       }));

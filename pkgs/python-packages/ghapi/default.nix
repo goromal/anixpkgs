@@ -1,11 +1,5 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, pytestCheckHook
-, fastcore
-, packaging
-, pythonOlder
-}:
+{ lib, buildPythonPackage, fetchFromGitHub, pytestCheckHook, fastcore, packaging
+, pythonOlder }:
 
 buildPythonPackage rec {
   pname = "ghapi";
@@ -21,16 +15,11 @@ buildPythonPackage rec {
     sha256 = "sha256-Pry+qCHCt+c+uwkLaoTVUY1KblESj6kcNtMfGwK1rfk=";
   };
 
-  propagatedBuildInputs = [
-    fastcore
-    packaging
-  ];
+  propagatedBuildInputs = [ fastcore packaging ];
 
   doCheck = false;
 
-  pythonImportsCheck = [
-    "ghapi"
-  ];
+  pythonImportsCheck = [ "ghapi" ];
 
   meta = {
     description = "Python interface to GitHub's API";

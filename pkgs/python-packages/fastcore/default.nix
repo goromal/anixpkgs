@@ -1,10 +1,5 @@
-{ lib
-, buildPythonPackage
-, fetchFromGitHub
-, packaging
-, pytestCheckHook
-, pythonOlder
-}:
+{ lib, buildPythonPackage, fetchFromGitHub, packaging, pytestCheckHook
+, pythonOlder }:
 
 buildPythonPackage rec {
   pname = "fastcore";
@@ -20,15 +15,11 @@ buildPythonPackage rec {
     sha256 = "sha256-3l5bELb5f/cvh4gF2kJZEX6kAK9achTerIIplMuesTk=";
   };
 
-  propagatedBuildInputs = [
-    packaging
-  ];
+  propagatedBuildInputs = [ packaging ];
 
   doCheck = false;
 
-  pythonImportsCheck = [
-    "fastcore"
-  ];
+  pythonImportsCheck = [ "fastcore" ];
 
   meta = {
     description = "Python module for Fast AI";
