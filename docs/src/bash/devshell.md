@@ -23,8 +23,11 @@ pkgs_var = <anixpkgs>
 [pyvitools] = git@github.com:goromal/pyvitools.git
 [scrape] = git@github.com:goromal/scrape.git
 
+# scripts
+<script_ref> = data_dir_relative_path/script
+
 # workspaces
-signals = manif-geom-cpp geometry pyvitools
+signals = manif-geom-cpp geometry pyvitools script_ref
 =================================================================
 
 ```
