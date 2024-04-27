@@ -167,6 +167,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
             stampserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
+            fastcore = addDoc (pySelf.callPackage ./python-packages/fastcore { });
+            ghapi = addDoc (pySelf.callPackage ./python-packages/ghapi { });
           });
       }));
 in rec {
@@ -246,6 +248,8 @@ in rec {
   gmail-parser = final.python310.pkgs.gmail-parser;
   goromail = final.python310.pkgs.goromail;
   orchestrator = final.python39.pkgs.orchestrator;
+  fastcore = final.python39.pkgs.fastcore;
+  ghapi = final.python39.pkgs.ghapi;
 
   authm =
     addDoc (prev.callPackage ./bash-packages/authm { python = python310; });

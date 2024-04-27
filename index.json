@@ -200,6 +200,14 @@
             {
                 "attr": "goromail",
                 "ci": true
+            },
+            {
+                "attr": "fastcore",
+                "ci": true
+            },
+            {
+                "attr": "ghapi",
+                "ci": true
             }
         ],
         "bash": [
