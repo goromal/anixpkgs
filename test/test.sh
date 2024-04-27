@@ -59,11 +59,12 @@ echo "[geometry] = pkgs python39.pkgs.geometry" >> data/devrc
 echo "[pyceres_factors] = pkgs python39.pkgs.pyceres_factors" >> data/devrc
 echo "[ceres-factors] = pkgs ceres-factors" >> data/devrc
 echo "test_env = geometry manif-geom-cpp ceres-factors pyceres_factors" >> data/devrc
-devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
+devshell --override-data-dir "$tmpdir/data2" -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
 if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "inherit ceres-factors;") ]]; then
     echo_red "setupcurrentws missed shell pkg intra-workspace dependency"
     exit 1
 fi
+[[ -d "$tmpdir/data2" ]] || { echo "Failed data dir override"; exit 1; }
 echo "<scr> = scripts/test" >> data/devrc
 echo "scr_env = geometry scr" >> data/devrc
 mkdir -p "$tmpdir/data/scripts"
