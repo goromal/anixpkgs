@@ -117,7 +117,7 @@ done
 
 echo "Spawning server with $num_server_threads threads"
 
-nohup orchestratord -n $num_server_threads -p 5555 > /dev/null 2>&1 &
+nohup orchestratord -p 5555 -n $num_server_threads > /dev/null 2>&1 &
 serverPID=$!
 
 sleep 4
@@ -155,15 +155,27 @@ done
 
 if [ $num_pending -ne 0 ]; then
     echo_red "ERROR: orchestrator timed out at $timeout_secs seconds with $num_pending unfinished jobs:"
-    orchestrator -p 5555 status all
-    echo "----"
-    ls $orchoutpath
-    echo "----"
+    for jid in $(orchestrator -p 5555 status get-pending); do
+        orchestrator -p 5555 status $jid
+    done
     kill $serverPID
     exit 1
 fi
 
 echo "All jobs complete at $num_tries seconds"
+for jid in $(orchestrator -p 5555 status get-complete); do
+    orchestrator -p 5555 status $jid
+done
+
+num_discarded=$(orchestrator -p 5555 status count-discarded)
+if [ $num_discarded -ne 0 ]; then
+    echo_red "ERROR: orchestrator finished with $num_discarded discarded jobs:"
+    for jid in $(orchestrator -p 5555 status get-discarded); do
+        orchestrator -p 5555 status $jid
+    done
+    kill $serverPID
+    exit 1
+fi
 
 if [ ! -f "$orchoutpath/unified_vid.mp4" ]; then
     echo_red "ERROR: expected workflow output video not present"
