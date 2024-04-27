@@ -1,5 +1,6 @@
 { pkgs ? import <nixpkgs> { }, setupws, wsname, devDir, dataDir, pkgsVar
-, devScript, editorName, repoSpecList, scriptsList, shellSetupScript, devHistFile }:
+, devScript, editorName, repoSpecList, scriptsList, shellSetupScript
+, devHistFile }:
 let
   shellSetupArgs = builtins.concatStringsSep " "
     (map (x: "${x.name}:${x.attr}:${builtins.concatStringsSep ":" x.deps}")

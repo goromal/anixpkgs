@@ -65,7 +65,7 @@ in (writeArgparseScriptBin "setupws" usage_str [
   echo 'eval "$(lorri direnv)"' >> .envrc
   echo 'PATH_add $WSROOT/.bin' >> .envrc
   direnv allow
-  
+
   pushd data
   echo "export WSROOT=$dev_ws_dir" > .envrc
   echo 'PATH_add $WSROOT/.bin' >> .envrc
