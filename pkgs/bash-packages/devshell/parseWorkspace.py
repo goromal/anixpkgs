@@ -96,7 +96,10 @@ def main():
             if not foundws:
                 print("_NOWSFOUND_")
                 exit()
-            
+
+        if len(sys.argv) > 3:
+            DATADIR = os.path.expanduser(sys.argv[3])
+
         for repo, spec in repos.items():
             specsplit = spec.split()
             if len(specsplit) > 1:

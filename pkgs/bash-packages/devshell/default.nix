@@ -3,7 +3,7 @@
 let
   pkgname = "devshell";
   usage_str = ''
-    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--run CMD] workspace_name
+    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
     (can specify an alternate path with -d DEVRC or history file with
@@ -49,6 +49,12 @@ in (writeArgparseScriptBin pkgname usage_str [
     flags = "-s";
   }
   {
+    var = "overridedatadir";
+    isBool = false;
+    default = "";
+    flags = "--override-data-dir";
+  }
+  {
     var = "runcmd";
     isBool = false;
     default = "";
@@ -61,7 +67,11 @@ in (writeArgparseScriptBin pkgname usage_str [
       exit 1
   fi
 
-  rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
+  if [[ -z "$overridedatadir" ]]; then
+    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
+  else
+    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname "$overridedatadir")
+  fi
   if [[ "$rcinfo" == "_NODEVRC_" ]]; then
       ${printErr} "ERROR: no $devrc file found"
       exit 1
