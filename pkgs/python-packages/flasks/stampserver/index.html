@@ -11,7 +11,7 @@
             <li><a href="/logout">Logout</a></li>
         </ul>
     </nav>
-    <h1>Stamp Server</h1>
+    <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
     {% if err %}
     <p>{{ msg }}</p>
     {% else %}
@@ -41,6 +41,15 @@
         <input type="submit" value="Submit!">
     </form>
     {% endif %}
+    <br><br>
+    <br><br>
+    <br><br>
+    <ul>
+        {% for stamp, nstamps in stamps.items() %}
+        <li><a href="/restamp/{{ stamp }}">{{ stamp }}</a> ({{ nstamps }})</li>
+        {% endfor %}
+        <li><a href="/">ROOT</a></li>
+    </ul>
 </body>
 
 </html>

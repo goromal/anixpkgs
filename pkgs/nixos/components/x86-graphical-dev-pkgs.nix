@@ -23,9 +23,9 @@ in {
         xaver.clang-format
         ms-python.python
         valentjn.vscode-ltex
-        llvm-vs-code-extensions.vscode-clangd
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
+        ms-vscode.cpptools
       ] ++ vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";
@@ -40,6 +40,7 @@ in {
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
       ];
+    mutableExtensionsDir = false;
   };
 
   home.file = with anixpkgs.pkgData; {

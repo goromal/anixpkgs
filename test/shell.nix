@@ -14,6 +14,8 @@ mkShell {
     fix-perms
     dirgather
     dirgroups
+    cpp-helper
+    pkgshell
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."

@@ -3,11 +3,12 @@
 let
   pkgname = "devshell";
   usage_str = ''
-    usage: ${pkgname} [-d DEVRC] [--run CMD] workspace_name
+    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
-    (can specify an alternate path with -d DEVRC).
-    Optionally run a one-off command with --run CMD (e.g., --run interact).
+    (can specify an alternate path with -d DEVRC or history file with
+    -s DEVHIST).
+    Optionally run a one-off command with --run CMD (e.g., --run dev).
 
     Example ~/.devrc:
     =================================================================
@@ -22,21 +23,36 @@ let
     [pyvitools] = git@github.com:goromal/pyvitools.git
     [scrape] = git@github.com:goromal/scrape.git
 
+    # scripts
+    <script_ref> = data_dir_relative_path/script
+
     # workspaces
-    signals = manif-geom-cpp geometry pyvitools
+    signals = manif-geom-cpp geometry pyvitools script_ref
     =================================================================
   '';
   printErr = "${color-prints}/bin/echo_red";
   parseScript = ./parseWorkspace.py;
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
-  interactScript = ./interact.py;
+  devScript = ./dev.py;
 in (writeArgparseScriptBin pkgname usage_str [
   {
     var = "devrc";
     isBool = false;
     default = "~/.devrc";
     flags = "-d";
+  }
+  {
+    var = "devhist";
+    isBool = false;
+    default = "~/.devhist";
+    flags = "-s";
+  }
+  {
+    var = "overridedatadir";
+    isBool = false;
+    default = "";
+    flags = "--override-data-dir";
   }
   {
     var = "runcmd";
@@ -51,12 +67,11 @@ in (writeArgparseScriptBin pkgname usage_str [
       exit 1
   fi
 
-  runargstr=""
-  if [[ ! -z "$runcmd" ]]; then
-      runargstr="--run \"''${runcmd}\""
+  if [[ -z "$overridedatadir" ]]; then
+    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
+  else
+    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname "$overridedatadir")
   fi
-
-  rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
   if [[ "$rcinfo" == "_NODEVRC_" ]]; then
       ${printErr} "ERROR: no $devrc file found"
       exit 1
@@ -75,7 +90,8 @@ in (writeArgparseScriptBin pkgname usage_str [
       data_dir="''${rcinfoarray[1]}"
       pkgs_var="''${rcinfoarray[2]}"
       sources_list="''${rcinfoarray[3]}"
-      if [[ -z "$runcmd"  ]]; then
+      scripts_list="''${rcinfoarray[4]}"
+      if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \
@@ -84,8 +100,10 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr pkgsVar "$pkgs_var" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
-            --arg interactScript ${interactScript} \
-            --arg repoSpecList "$sources_list"
+            --arg devScript ${devScript} \
+            --argstr devHistFile "$devhist" \
+            --arg repoSpecList "$sources_list" \
+            --arg scriptsList "$scripts_list"
       else
           nix-shell ${shellFile} \
             --arg setupws ${setupws} \
@@ -95,8 +113,10 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr pkgsVar "$pkgs_var" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
-            --arg interactScript ${interactScript} \
+            --arg devScript ${devScript} \
+            --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list" \
+            --arg scriptsList "$scripts_list" \
             --command "$runcmd"
       fi 
   fi
@@ -123,7 +143,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       - `setupcurrentws`: A wrapped version of [setupws](./setupws.md) that will build your development workspace as specified in `~/.devrc`.
       - `godev`: An alias that will take you to the root of your development workspace.
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
-      - `interact`: Enter an interactive menu for workspace source manipulation.
+      - `dev`: Enter an interactive menu for workspace source manipulation.
     '';
   };
 }

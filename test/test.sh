@@ -59,19 +59,44 @@ echo "[geometry] = pkgs python39.pkgs.geometry" >> data/devrc
 echo "[pyceres_factors] = pkgs python39.pkgs.pyceres_factors" >> data/devrc
 echo "[ceres-factors] = pkgs ceres-factors" >> data/devrc
 echo "test_env = geometry manif-geom-cpp ceres-factors pyceres_factors" >> data/devrc
-devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
+devshell --override-data-dir "$tmpdir/data2" -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
 if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "inherit ceres-factors;") ]]; then
     echo_red "setupcurrentws missed shell pkg intra-workspace dependency"
     exit 1
 fi
+[[ -d "$tmpdir/data2" ]] || { echo "Failed data dir override"; exit 1; }
+echo "<scr> = scripts/test" >> data/devrc
+echo "scr_env = geometry scr" >> data/devrc
+mkdir -p "$tmpdir/data/scripts"
+echo "#!/usr/bin/env bash" > "$tmpdir/data/scripts/test"
+echo "touch FILE.txt" >> "$tmpdir/data/scripts/test"
+chmod +x "$tmpdir/data/scripts/test"
+devshell -d data/devrc scr_env --run "echo"
+[[ -f "$tmpdir/dev/scr_env/.bin/scr" ]] || { echo "Failed devshell script gather"; exit 1; }
 sed -i 's|python3\.|python39\.|g' $tmpdir/dev/test_env/shell.nix
 devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
 if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python39.withPackages") ]]; then
     echo_red "setupcurrentws overrode an edited shell file"
     exit 1
 fi
+cd $tmpdir/dev/test_env/sources/ceres-factors
+cpp-helper --make-nix
+sed -i 's|# ADD deps|eigen ceres-solver manif-geom-cpp boost|g' shell.nix
+nix-shell --run "echo 'Checking generated VSCode config'"
+if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
+    echo_red "VSCode C++ config improperly generated"
+    exit 1
+fi
+cd $tmpdir/dev
+setupws --dev_dir $tmpdir/dev --data_dir $tmpdir/data tws2 lint.sh=$anixdir/scripts/lint.sh mscpf:https://github.com/goromal/mscpp
+[[ -d "$tmpdir/dev/tws2/sources/mscpf/.git" ]] || { echo "setupws repo clone failed"; exit 1; }
+[[ -f "$tmpdir/dev/tws2/.bin/lint.sh" ]] || { echo "setupws script copy failed"; exit 1; }
+touch test.py
+pkgshell anixpkgs sunnyside --run "sunnyside test.py 4 u"
+[[ -f xiwx3tC.tyz ]] || { echo_red "pkgshell:sunnyside command failed"; exit 1; }
 
 make-title -c yellow "Testing orchestrator"
+cd $tmpdir
 mkdir orch_data
 orchoutpath="$tmpdir/orch_data"
 oinf1="$orchoutpath/sample_960x400_ocean_with_audio.webm"
@@ -93,26 +118,26 @@ done
 
 echo "Spawning server with $num_server_threads threads"
 
-nohup orchestratord -n $num_server_threads > /dev/null 2>&1 &
+nohup orchestratord -p 5555 -n $num_server_threads > /dev/null 2>&1 &
 serverPID=$!
 
 sleep 4
 
 echo "Spawning jobs"
 
-rmjob=$(orchestrator remove $orchoutpath/sample_960x400_ocean_with_audio.webm)
-rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1280x720.webm)
-rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_1920x1080.webm)
-rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_2560x1440.webm)
-rmjob=$(orchestrator remove -b $rmjob $orchoutpath/sample_3840x2160.webm)
-lsjob=$(orchestrator listing -b $rmjob --ext webm $orchoutpath)
-mp4job=$(orchestrator mp4 $lsjob $orchoutpath/vid.mp4)
-rmjob=$(orchestrator remove $lsjob -b $mp4job)
-unijob=$(orchestrator mp4-unite $mp4job $orchoutpath/unified_vid.mp4)
-rmjob=$(orchestrator remove $mp4job -b $unijob)
+rmjob=$(orchestrator -p 5555 remove $orchoutpath/sample_960x400_ocean_with_audio.webm)
+rmjob=$(orchestrator -p 5555 remove -b $rmjob $orchoutpath/sample_1280x720.webm)
+rmjob=$(orchestrator -p 5555 remove -b $rmjob $orchoutpath/sample_1920x1080.webm)
+rmjob=$(orchestrator -p 5555 remove -b $rmjob $orchoutpath/sample_2560x1440.webm)
+rmjob=$(orchestrator -p 5555 remove -b $rmjob $orchoutpath/sample_3840x2160.webm)
+lsjob=$(orchestrator -p 5555 listing -b $rmjob --ext webm $orchoutpath)
+mp4job=$(orchestrator -p 5555 mp4 $lsjob $orchoutpath/vid.mp4)
+rmjob=$(orchestrator -p 5555 remove $lsjob -b $mp4job)
+unijob=$(orchestrator -p 5555 mp4-unite $mp4job $orchoutpath/unified_vid.mp4)
+rmjob=$(orchestrator -p 5555 remove $mp4job -b $unijob)
 
 echo "touch $orchoutpath/new.txt" > "$tmpdir/touchfile.sh"
-bjob=$(orchestrator bash "bash $tmpdir/touchfile.sh")
+bjob=$(orchestrator -p 5555 bash "bash $tmpdir/touchfile.sh")
 
 num_pending=1
 timeout_secs=60
@@ -121,7 +146,7 @@ num_tries=0
 echo "Waiting for pending jobs..."
 
 while (( num_pending > 0 )) && (( num_tries < timeout_secs )); do
-    num_pending=$(orchestrator status count-pending)
+    num_pending=$(orchestrator -p 5555 status count-pending)
     echo "Filesystem: ($num_pending)"
     ls $orchoutpath
     echo "----------------"
@@ -131,15 +156,27 @@ done
 
 if [ $num_pending -ne 0 ]; then
     echo_red "ERROR: orchestrator timed out at $timeout_secs seconds with $num_pending unfinished jobs:"
-    orchestrator status all
-    echo "----"
-    ls $orchoutpath
-    echo "----"
+    for jid in $(orchestrator -p 5555 status get-pending); do
+        orchestrator -p 5555 status $jid
+    done
     kill $serverPID
     exit 1
 fi
 
 echo "All jobs complete at $num_tries seconds"
+for jid in $(orchestrator -p 5555 status get-complete); do
+    orchestrator -p 5555 status $jid
+done
+
+num_discarded=$(orchestrator -p 5555 status count-discarded)
+if [ $num_discarded -ne 0 ]; then
+    echo_red "ERROR: orchestrator finished with $num_discarded discarded jobs:"
+    for jid in $(orchestrator -p 5555 status get-discarded); do
+        orchestrator -p 5555 status $jid
+    done
+    kill $serverPID
+    exit 1
+fi
 
 if [ ! -f "$orchoutpath/unified_vid.mp4" ]; then
     echo_red "ERROR: expected workflow output video not present"

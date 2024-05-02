@@ -66,5 +66,10 @@ with import ../dependencies.nix { inherit config; }; {
       description = "Executable name to open your browser of choice";
       default = null;
     };
+    screenResolution = lib.mkOption {
+      type = lib.types.str;
+      description = "Screen resolution in [width]x[height] format";
+      default = "1920x1080";
+    };
   };
 }

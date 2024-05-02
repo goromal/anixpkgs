@@ -228,6 +228,10 @@
                 "ci": true
             },
             {
+                "attr": "getres",
+                "ci": true
+            },
+            {
                 "attr": "md",
                 "ci": true
             },

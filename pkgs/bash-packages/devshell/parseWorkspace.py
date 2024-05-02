@@ -63,10 +63,13 @@ def main():
     repos = {}
     attrs = {}
     urls = {}
+    wsscripts = {}
     dependencies = {}
     wssources = []
     source_sets = []
+    script_sets = []
     sources = "[]" # "[{name=...;url=...;attr=...;deps=[...];}]"
+    scripts = "[]"
     foundws = False
 
     try:
@@ -85,13 +88,18 @@ def main():
                         PKGSVAR = right
                     elif "[" in left:
                         repos[left.replace("[","").replace("]","")] = right
+                    elif "<" in left:
+                        wsscripts[left.replace("<","").replace(">","")] = right
                     elif left == wsname:
                         wssources = right.split()
                         foundws = True
             if not foundws:
                 print("_NOWSFOUND_")
                 exit()
-            
+
+        if len(sys.argv) > 3:
+            DATADIR = os.path.expanduser(sys.argv[3])
+
         for repo, spec in repos.items():
             specsplit = spec.split()
             if len(specsplit) > 1:
@@ -106,16 +114,20 @@ def main():
                 dependencies[repo] = []
         
         for wssource in wssources:
-            deps_str = "[{}]".format(" ".join(dependencies[wssource]))
-            source_sets.append(f"{{name=\"{wssource}\";url=\"{urls[wssource]}\";attr=\"{attrs[wssource]}\";deps={deps_str};}}")
+            if wssource in dependencies:
+                deps_str = "[{}]".format(" ".join(dependencies[wssource]))
+                source_sets.append(f"{{name=\"{wssource}\";url=\"{urls[wssource]}\";attr=\"{attrs[wssource]}\";deps={deps_str};}}")
+            elif wssource in wsscripts:
+                script_sets.append(f"\"{wssource}={os.path.join(DATADIR, wsscripts[wssource])}\"")
         
         sources = "[{}]".format("".join(source_sets))
+        scripts = "[{}]".format(" ".join(script_sets))
 
     except Exception as e:
         print("ERROR:", e)
         exit()
 
-    print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{sources}")
+    print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{sources}|{scripts}")
 
 if __name__ == "__main__":
     main()

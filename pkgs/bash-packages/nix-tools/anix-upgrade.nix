@@ -1,5 +1,5 @@
 { writeArgparseScriptBin, color-prints, browser-aliases ? null
-, standalone ? false }:
+, standalone ? false, git-cc }:
 let
   pkgname = "anix-upgrade";
   description = "Upgrade the operating system${
@@ -65,8 +65,13 @@ in (writeArgparseScriptBin pkgname usage_str [
     localVar=false
   fi
   if [[ -d anixpkgs ]]; then
-    ${printYellow} "Removing existing symlink."
-    rm anixpkgs
+    if [[ -L anixpkgs ]]; then
+      ${printYellow} "Removing existing symlink."
+      rm anixpkgs
+    else
+      ${printYellow} "Removing existing directory."
+      rm -rf anixpkgs
+    fi
   fi
   if [[ ! -z "$version" ]]; then
     nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
@@ -79,7 +84,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       ${printError} "Please provide an absolute path to the source tree."
       exit 1
     fi
-    ln -s "$source" anixpkgs
+    ${git-cc}/bin/git-cc "$source" anixpkgs
     if [[ "$localVar" == "true" ]]; then
       sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/pkgs/nixos/dependencies.nix
     fi
