@@ -46,8 +46,8 @@ in {
   home.file = with anixpkgs.pkgData; {
     ".config/VSCodium/User/settings.json".source = ../res/vscode-settings.json;
     ".config/gtk-3.0/bookmarks".text = ''
-        file://${cfg.homeDir}/dev Development
-        file://${cfg.homeDir}/data Data
-      '';
+      file://${cfg.homeDir}/dev Development
+      file://${cfg.homeDir}/data Data
+    '';
   };
 }
