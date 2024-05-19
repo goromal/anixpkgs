@@ -16,7 +16,7 @@ in {
           exit 1
       fi
       ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
-      rclone bisync dropbox:Games ~/games || { ${anixpkgs.color-prints}/bin/echo_red "Sync failed. Exiting."; exit 1; }
+      rcrsync sync games || { ${anixpkgs.color-prints}/bin/echo_red "Sync failed. Exiting."; exit 1; }
       if [[ ! -f "$ZELDA_ROM" ]]; then
           ${anixpkgs.color-prints}/bin/echo_red "Zelda ROM $ZELDA_ROM not present after syncing. Exiting."
           exit 1
@@ -38,7 +38,7 @@ in {
       ${anixpkgs.color-prints}/bin/echo_cyan "Copying memory card from disk to cloud..."
       cp "$MMCRD_DSK" "$MEMRY_CRD" || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Copy failed!"; }
       ${anixpkgs.color-prints}/bin/echo_cyan "Syncing the Games directory..."
-      rclone bisync dropbox:Games ~/games || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Sync failed!"; }
+      rcrsync sync games || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Sync failed!"; }
     '')
   ] ++ (if cfg.standalone == false then [
     sage
