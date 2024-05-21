@@ -6,6 +6,7 @@ import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
 from werkzeug.security import generate_password_hash, check_password_hash
+from random import shuffle
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
@@ -44,7 +45,7 @@ class StampServer:
         self.task_type = StampServer.STAMP
 
     def reset(self):
-        self.filelist = {}
+        self.filelist = []
         self.filedeck = ""
 
     def load(self):
@@ -58,9 +59,10 @@ class StampServer:
                 if file.startswith("stamped."):
                     continue
                 if file.lower().endswith(".png"):
-                    self.filelist[file.strip()] = "PNG"
+                    self.filelist.append((file.strip(), "PNG"))
                 elif file.lower().endswith(".mp4"):
-                    self.filelist[file.strip()] = "MP4"
+                    self.filelist.append((file.strip(), "MP4"))
+            shuffle(self.filelist)
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of stampable files!")
         return (True, "")
@@ -75,17 +77,18 @@ class StampServer:
             for file in os.listdir(RES_DIR):
                 if file.startswith(f"stamped.{stamp}"):
                     if file.lower().endswith(".png"):
-                        self.filelist[file.strip()] = "PNG"
+                        self.filelist.append((file.strip(), "PNG"))
                     elif file.lower().endswith(".mp4"):
-                        self.filelist[file.strip()] = "MP4"
+                        self.filelist.append((file.strip(), "MP4"))
+            shuffle(self.filelist)
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of files stamped with {stamp}!")
         return (True, "")
     
     def getfile(self):
-        for file, ftype in self.filelist.items():
+        for file, ftype in self.filelist:
             self.filedeck = file
-            return file, ftype, len(self.filelist.keys())
+            return file, ftype, len(self.filelist)
     
     def getstamps(self):
         stamps = {}
@@ -103,7 +106,7 @@ class StampServer:
             dirname = os.path.dirname(self.filedeck)
             basename = os.path.basename(self.filedeck)
             os.rename(self.filedeck, os.path.join(dirname, f"stamped.{stamp}." + basename))
-            self.filelist.pop(self.filedeck, None)
+            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
         except:
             pass
 
@@ -115,7 +118,7 @@ class StampServer:
             split_basename[1] = new_stamp
             new_basename = ".".join(split_basename)
             os.rename(self.filedeck, os.path.join(dirname, new_basename))
-            self.filelist.pop(self.filedeck, None)
+            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
         except:
             pass
 
