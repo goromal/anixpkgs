@@ -6,6 +6,7 @@ import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
 from werkzeug.security import generate_password_hash, check_password_hash
+from random import shuffle
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
@@ -61,6 +62,7 @@ class StampServer:
                     self.filelist.append((file.strip(), "PNG"))
                 elif file.lower().endswith(".mp4"):
                     self.filelist.append((file.strip(), "MP4"))
+            shuffle(self.filelist)
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of stampable files!")
         return (True, "")
@@ -78,6 +80,7 @@ class StampServer:
                         self.filelist.append((file.strip(), "PNG"))
                     elif file.lower().endswith(".mp4"):
                         self.filelist.append((file.strip(), "MP4"))
+            shuffle(self.filelist)
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of files stamped with {stamp}!")
         return (True, "")
