@@ -58,9 +58,9 @@ class StampServer:
                 if file.startswith("stamped."):
                     continue
                 if file.lower().endswith(".png"):
-                    self.filelist.append((file.strip(), "PNG")
+                    self.filelist.append((file.strip(), "PNG"))
                 elif file.lower().endswith(".mp4"):
-                    self.filelist[file.strip()] = "MP4"
+                    self.filelist.append((file.strip(), "MP4"))
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of stampable files!")
         return (True, "")
@@ -75,17 +75,17 @@ class StampServer:
             for file in os.listdir(RES_DIR):
                 if file.startswith(f"stamped.{stamp}"):
                     if file.lower().endswith(".png"):
-                        self.filelist[file.strip()] = "PNG"
+                        self.filelist.append((file.strip(), "PNG"))
                     elif file.lower().endswith(".mp4"):
-                        self.filelist[file.strip()] = "MP4"
+                        self.filelist.append((file.strip(), "MP4"))
         if len(self.filelist) == 0:
             return (False, f"Data directory devoid of files stamped with {stamp}!")
         return (True, "")
     
     def getfile(self):
-        for file, ftype in self.filelist.items():
+        for file, ftype in self.filelist:
             self.filedeck = file
-            return file, ftype, len(self.filelist.keys())
+            return file, ftype, len(self.filelist)
     
     def getstamps(self):
         stamps = {}
@@ -103,7 +103,7 @@ class StampServer:
             dirname = os.path.dirname(self.filedeck)
             basename = os.path.basename(self.filedeck)
             os.rename(self.filedeck, os.path.join(dirname, f"stamped.{stamp}." + basename))
-            self.filelist.pop(self.filedeck, None)
+            self.filelist.pop(self.filedeck, None) # TODO ^^^^
         except:
             pass
 
@@ -115,7 +115,7 @@ class StampServer:
             split_basename[1] = new_stamp
             new_basename = ".".join(split_basename)
             os.rename(self.filedeck, os.path.join(dirname, new_basename))
-            self.filelist.pop(self.filedeck, None)
+            self.filelist.pop(self.filedeck, None) # TODO ^^^^
         except:
             pass
 
