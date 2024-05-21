@@ -103,7 +103,7 @@ class StampServer:
             dirname = os.path.dirname(self.filedeck)
             basename = os.path.basename(self.filedeck)
             os.rename(self.filedeck, os.path.join(dirname, f"stamped.{stamp}." + basename))
-            self.filelist.pop(self.filedeck, None) # TODO ^^^^
+            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
         except:
             pass
 
@@ -115,7 +115,7 @@ class StampServer:
             split_basename[1] = new_stamp
             new_basename = ".".join(split_basename)
             os.rename(self.filedeck, os.path.join(dirname, new_basename))
-            self.filelist.pop(self.filedeck, None) # TODO ^^^^
+            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
         except:
             pass
 
