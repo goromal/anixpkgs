@@ -44,7 +44,7 @@ class StampServer:
         self.task_type = StampServer.STAMP
 
     def reset(self):
-        self.filelist = {}
+        self.filelist = []
         self.filedeck = ""
 
     def load(self):
@@ -58,7 +58,7 @@ class StampServer:
                 if file.startswith("stamped."):
                     continue
                 if file.lower().endswith(".png"):
-                    self.filelist[file.strip()] = "PNG"
+                    self.filelist.append((file.strip(), "PNG")
                 elif file.lower().endswith(".mp4"):
                     self.filelist[file.strip()] = "MP4"
         if len(self.filelist) == 0:
