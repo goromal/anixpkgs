@@ -41,7 +41,7 @@ buildPythonPackage rec {
       ```bash
       Usage: task-tools list [OPTIONS] FILTER
 
-        List pending tasks according to a filter ∈ [all, p0, p1, p2, late, ranked].
+        List pending tasks according to a filter ∈ [all, p0, p1, p2, p3, late, ranked].
 
       Options:
         --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
@@ -91,9 +91,11 @@ buildPythonPackage rec {
 
         - P2: ... tasks must be completed within a month.
 
+        - P3: ... tasks must be completed within 90 days.
+
         Deletion / failure criteria:
 
-        - P[0-2]: [T] ... tasks that have not be completed within the appropriate
+        - P[0-3]: [T] ... tasks that have not be completed within the appropriate
         window.
 
       Options:

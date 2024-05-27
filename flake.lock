@@ -625,11 +625,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1711233541,
-        "narHash": "sha256-BSkEsbLbpneywD37zS0I3MpeyiPpcrQD/+W0iUkK67M=",
+        "lastModified": 1716787933,
+        "narHash": "sha256-ZCNcdYAgHj6YPx++1GrJYxL2C12FTwgNoa4QUpMLuho=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "4ee1e32ecb7a22800733baa9775163319dbb4665",
+        "rev": "7d6535e2e2a956cbe90c7656d7d2b68b9104d060",
         "type": "github"
       },
       "original": {
@@ -657,11 +657,11 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694858,
-        "narHash": "sha256-oJBcpzBOp620HXGhk+0Y1gj3HrpNz0ocCB1EiaEMIOs=",
+        "lastModified": 1716785277,
+        "narHash": "sha256-uYHZThiPnGWYBgwNY9zjIHWQefVHD36qiccmwxKfctI=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "56cceeadda9f21ba4a551359be384594d9f64bbe",
+        "rev": "277abfba2263b31ae70e7767cea93688266d4836",
         "type": "github"
       },
       "original": {
