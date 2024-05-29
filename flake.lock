@@ -35,16 +35,15 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1717002712,
+        "lastModified": 1717024799,
         "narHash": "sha256-1NxKGoKdp5Mrfx+G97gsDBEOO1gRmnvRJKAcBVEas3k=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "5dd60f3c370ca1ee8d32567805a8c79cad14d3f8",
+        "rev": "52afb6ca32c0652d9b0875d30d8c1d597897dc22",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/secrets_consolidation",
         "repo": "book-notes-sync",
         "type": "github"
       }
@@ -84,16 +83,15 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1717002303,
+        "lastModified": 1717024728,
         "narHash": "sha256-v/kaUNvGHlr1F1mxY3YHzi0gu7uUWIvCVWzKUX5bahE=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "9c2195a712cd4ddf909c61324c9e707bf852313c",
+        "rev": "f9529cb85fc8cbacb03cff669a788387534d1ca2",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/secrets_consolidation",
         "repo": "easy-google-auth",
         "type": "github"
       }
@@ -183,16 +181,15 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1717002516,
+        "lastModified": 1717024764,
         "narHash": "sha256-NluhEH1Di8iMqzi6WaP5UXkvILkmGbvI0wIk113nMC0=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "a45fd7a91f87e2758759fc22d6a6a4a75b90a613",
+        "rev": "82e213c9a3e21a268c018703a31e8aca448251d6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/secrets_consolidation",
         "repo": "gmail_parser",
         "type": "github"
       }
@@ -628,16 +625,15 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717002892,
+        "lastModified": 1717024843,
         "narHash": "sha256-zeqc6ZVoI+KSCyE3xzMEaLqbbWKsJSPxleZbdD+OtyE=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "a2d203b3d1e5d412be5cce16bbdf993feb5a9381",
+        "rev": "564399274b936c0cb12a116685137b318a9b6420",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/secrets_consolidation",
         "repo": "task-tools",
         "type": "github"
       }
