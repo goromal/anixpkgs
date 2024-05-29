@@ -33,7 +33,6 @@ def refresh(headless, force):
             "v1",
             GPD.getKwargsOrDefault("gmail_secrets_json"),
             GPD.getKwargsOrDefault("gmail_refresh_file"),
-            GPD.getKwargsOrDefault("gmail_corpus_scope"),
             headless=headless,
             force=force,
         )
@@ -47,7 +46,6 @@ def refresh(headless, force):
             "v1",
             GPD.getKwargsOrDefault("gmail_secrets_json"),
             GPD.getKwargsOrDefault("gbot_refresh_file"),
-            GPD.getKwargsOrDefault("gmail_corpus_scope"),
             headless=headless,
             force=force,
         )
@@ -61,7 +59,6 @@ def refresh(headless, force):
             "v1",
             GPD.getKwargsOrDefault("gmail_secrets_json"),
             GPD.getKwargsOrDefault("journal_refresh_file"),
-            GPD.getKwargsOrDefault("gmail_corpus_scope"),
             headless=headless,
             force=force,
         )
@@ -75,7 +72,6 @@ def refresh(headless, force):
             "v1",
             BNSD.getKwargsOrDefault("docs_secrets_file"),
             BNSD.getKwargsOrDefault("docs_refresh_token"),
-            BNSD.getKwargsOrDefault("docs_scope"),
             headless=headless,
             force=force,
         )
@@ -89,7 +85,6 @@ def refresh(headless, force):
             "v1",
             TTD.getKwargsOrDefault("task_secrets_file"),
             TTD.getKwargsOrDefault("task_refresh_token"),
-            TTD.getKwargsOrDefault("task_scope"),
             headless=headless,
             force=force,
         )
