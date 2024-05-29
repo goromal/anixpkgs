@@ -58,10 +58,12 @@
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;
 
-    book-notes-sync.url = "github:goromal/book-notes-sync?ref=dev/secrets_consolidation";
+    book-notes-sync.url =
+      "github:goromal/book-notes-sync?ref=dev/secrets_consolidation";
     book-notes-sync.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth?ref=dev/secrets_consolidation";
+    easy-google-auth.url =
+      "github:goromal/easy-google-auth?ref=dev/secrets_consolidation";
     easy-google-auth.flake = false;
 
     find_rotational_conventions.url =
@@ -71,7 +73,8 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser?ref=dev/secrets_consolidation";
+    gmail-parser.url =
+      "github:goromal/gmail_parser?ref=dev/secrets_consolidation";
     gmail-parser.flake = false;
 
     makepyshell.url =

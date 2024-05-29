@@ -26,7 +26,7 @@ def cli():
 )
 def refresh(headless, force):
     """Refresh all auth tokens one-by-one."""
-    print(Fore.YELLOW + "Refreshing GMail token (personal)..." + Style.RESET_ALL)
+    print(Fore.YELLOW + "Refreshing Personal Tokens..." + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
@@ -39,7 +39,7 @@ def refresh(headless, force):
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed.")
         exit(1)
-    print(Fore.YELLOW + "Refreshing GMail token (gbot)..." + Style.RESET_ALL)
+    print(Fore.YELLOW + "Refreshing Bot Tokens..." + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
@@ -52,7 +52,7 @@ def refresh(headless, force):
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed.")
         exit(1)
-    print(Fore.YELLOW + "Refreshing GMail token (journal)..." + Style.RESET_ALL)
+    print(Fore.YELLOW + "Refreshing Journal Tokens..." + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
@@ -64,32 +64,6 @@ def refresh(headless, force):
         )
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed.")
-        exit(1)
-    print(Fore.YELLOW + "Refreshing Docs token..." + Style.RESET_ALL)
-    try:
-        getGoogleService(
-            "docs",
-            "v1",
-            BNSD.getKwargsOrDefault("docs_secrets_file"),
-            BNSD.getKwargsOrDefault("docs_refresh_token"),
-            headless=headless,
-            force=force,
-        )
-    except CredentialsRefreshException:
-        sys.stderr.write(f"Refresh of {BNSD.getKwargsOrDefault('docs_refresh_token')} needed.")
-        exit(1)
-    print(Fore.YELLOW + "Refreshing Tasks token..." + Style.RESET_ALL)
-    try:
-        getGoogleService(
-            "tasks",
-            "v1",
-            TTD.getKwargsOrDefault("task_secrets_file"),
-            TTD.getKwargsOrDefault("task_refresh_token"),
-            headless=headless,
-            force=force,
-        )
-    except CredentialsRefreshException:
-        sys.stderr.write(f"Refresh of {TTD.getKwargsOrDefault('task_refresh_token')} needed.")
         exit(1)
     print(Fore.GREEN + "DONE" + Style.RESET_ALL)
 
