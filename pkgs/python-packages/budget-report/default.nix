@@ -1,11 +1,16 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, pandas, scipy, matplotlib }:
+{ callPackage, pytestCheckHook, buildPythonPackage, gspread,
+# fuzzywuzzy,
+easy-google-auth, gmail-parser }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "budget_report";
   version = "1.0.0";
   description = "Generate a budget report.";
-  script-file = ./report.py;
+  # script-file = ./report.py;
+  script-file = ./new.report.py;
   inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs = [ pandas scipy matplotlib ];
+  propagatedBuildInputs = [ gspread 
+    # fuzzywuzzy 
+    easy-google-auth gmail-parser ];
   checkPkgs = [ ];
   longDescription = ''
     ```
