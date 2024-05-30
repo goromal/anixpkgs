@@ -15,15 +15,17 @@ Options:
   --url TEXT                URL of the DokuWiki instance (https).  [default:
                             https://notes.andrewtorgesen.com]
   --secrets-file PATH       Path to the DokuWiki login secrets JSON file.
-                            [default: /data/andrew/secrets/wiki/secrets.json]
   --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
   --help                    Show this message and exit.
 
 Commands:
-  get     Read the content of a DokuWiki page.
-  get-md  Read the content of a DokuWiki page in Markdown format.
-  put     Put content onto a DokuWiki page.
-  put-md  Put Markdown content onto a DokuWiki page.
+  get               Read the content of a DokuWiki page.
+  get-md            Read the content of a DokuWiki page in Markdown format.
+  get-rand-journal  Get a random journal entry between 2013 and now.
+  put               Put content onto a DokuWiki page.
+  put-dir           Put a directory of pages into a DokuWiki namespace.
+  put-md            Put Markdown content onto a DokuWiki page.
+  put-md-dir        Put a directory of Markdown pages into a DokuWiki...
 ```
 
 ### Get
@@ -54,6 +56,20 @@ Options:
   --help          Show this message and exit.
 ```
 
+### Get Random Journal
+
+```bash
+Usage: wiki-tools get-rand-journal [OPTIONS]
+
+  Get a random journal entry between 2013 and now.
+
+Options:
+  --namespace TEXT  Journal pages namespace.  [default: journals]
+  --output TEXT     Output text file name. Will print to terminal if not
+                    specified.
+  --help            Show this message and exit.
+```
+
 ### Put
 
 ```bash
@@ -67,6 +83,19 @@ Options:
   --content TEXT  Content to put on the page if file is not specified. NOTE:
                   This argument is mutually exclusive with content_file
   --help          Show this message and exit.
+```
+
+### Put Directory
+
+```bash
+Usage: wiki-tools put-dir [OPTIONS]
+
+  Put a directory of pages into a DokuWiki namespace.
+
+Options:
+  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
+  --namespace TEXT       Namespace to upload the pages to.  [required]
+  --help                 Show this message and exit.
 ```
 
 ### Put Markdown
@@ -83,5 +112,18 @@ Options:
                   specified. NOTE: This argument is mutually exclusive with
                   content_file
   --help          Show this message and exit.
+```
+
+### Put Markdown Directory
+
+```bash
+Usage: wiki-tools put-md-dir [OPTIONS]
+
+  Put a directory of Markdown pages into a DokuWiki namespace.
+
+Options:
+  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
+  --namespace TEXT       Namespace to upload the pages to.  [required]
+  --help                 Show this message and exit.
 ```
 

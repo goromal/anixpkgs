@@ -175,6 +175,18 @@ let
     gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
       "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
   '';
+  randJournalScript = writeShellScript "ats-rand-journal" ''
+    authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+    tmpdir=$(mktemp -d)
+    echo "🖊️ Random Journal Entry of the Day:" > $tmpdir/out.txt
+    echo "" >> $tmpdir/out.txt
+    wiki-tools get-rand-journal >> $tmpdir/out.txt
+    gmail-manager gbot-send 6612105214@vzwpix.com "ats-rand-journal" \
+        "$(cat $tmpdir/out.txt)"
+    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-rand-journal" \
+        "$(cat $tmpdir/out.txt)"
+    rm -r $tmpdir
+  '';
 in {
   home.username = "andrew";
   home.homeDirectory = "/home/andrew";
@@ -213,6 +225,8 @@ in {
       # systemctl --user start ats-taskLate.timer
       systemctl --user enable ats-tasksRanked.timer
       systemctl --user start ats-tasksRanked.timer
+      systemctl --user enable ats-randJournal.timer
+      systemctl --user start ats-randJournal.timer
       loginctl enable-linger andrew
     '')
     (writeShellScriptBin "jfu" ''
@@ -373,6 +387,24 @@ in {
       Type = "oneshot";
       ExecStart =
         "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${taskRankedScript}'";
+      ReadWritePaths = [ "/" ];
+    };
+  };
+  systemd.user.timers.ats-randJournal = {
+    Unit.Description = "ATS randJournal timer";
+    Install.WantedBy = [ "timers.target" ];
+    Timer = {
+      OnCalendar = [ "*-*-* 06:30:00" ];
+      Persistent = true;
+      Unit = "ats-randJournal.service";
+    };
+  };
+  systemd.user.services.ats-randJournal = {
+    Unit.Description = "ATS randJournal script";
+    Service = {
+      Type = "oneshot";
+      ExecStart =
+        "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${randJournalScript}'";
       ReadWritePaths = [ "/" ];
     };
   };
