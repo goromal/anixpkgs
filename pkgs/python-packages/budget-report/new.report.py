@@ -2,13 +2,23 @@ import logging
 import click
 import sys
 import os
+import csv
 import json
-# import pandas as pd
+import re
 import gspread
+# import pandas as pd
 # from fuzzywuzzy import fuzz
 
 from easy_google_auth.auth import getGoogleCreds
 from gmail_parser.defaults import GmailParserDefaults as GPD
+
+def column_index_to_letter(column_index):
+    """Convert a column index (integer) to a letter index (string) used in Google Sheets."""
+    result = ''
+    while column_index > 0:
+        column_index, remainder = divmod(column_index - 1, 26)
+        result = chr(65 + remainder) + result
+    return result
 
 @click.group()
 @click.pass_context
@@ -85,6 +95,62 @@ def transactions_status(ctx: click.Context):
 @cli.command()
 @click.pass_context
 @click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Activate dry run mode.",
+)
+def transactions_process(ctx: click.Context, dry_run):
+    """Process raw transactions."""
+    transactions_sheet = None
+    for config_datum in ctx.obj["config_data"]:
+        if config_datum["Category"] == "_TRANSACTIONS_":
+            transactions_sheet = config_datum["Sheet"]
+            break
+    if transactions_sheet is None:
+        raise Exception("Unable to find sheet metadata for transactions")
+    category_sheets = {}
+    for entry in ctx.obj["config_data"]:
+        category_sheets[entry["Category"]] = (entry["Sheet"], entry["LeftColumn"])
+    raw_transactions_sheet = ctx.obj["sheet"].worksheet(transactions_sheet)
+    transactions_data = raw_transactions_sheet.get_all_records()
+    unprocessed_transactions = [(
+        i + 2,
+        tdata["Account"],
+        tdata["Date"],
+        tdata["Description"].replace("\"",""),
+        float(tdata["Amount"]),
+        tdata["Categorization"],
+    ) for i, tdata in enumerate(transactions_data) if tdata["Processed?"] == ""]
+    if len(unprocessed_transactions) > 0:
+        print("Processing the following raw transactions:")
+        for t in unprocessed_transactions:
+            print(t[1], t[2], t[3], t[4])
+            if not dry_run:
+                if t[5] == "NONE":
+                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                elif t[5] in category_sheets:
+                    dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
+                    dest_lfcol = category_sheets[t[5]][1] + 1
+                    col_vals = dest_sheet.col_values(dest_lfcol)
+                    empty_row_index = len(col_vals) + 1
+                    first_col_letter = column_index_to_letter(dest_lfcol)
+                    last_col_letter = column_index_to_letter(dest_lfcol + 4)
+                    dest_sheet.update(f"{first_col_letter}{empty_row_index}:{last_col_letter}{empty_row_index}", [[
+                        t[1],
+                        t[2],
+                        t[3],
+                        t[4],
+                    ]])
+                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                else:
+                    print(f"  Not processed; unknown category: {t[5]}")
+    else:
+        print("No unprocessed transactions!")
+
+@cli.command()
+@click.pass_context
+@click.option(
     "--raw-csv",
     "raw_csv",
     type=click.Path(exists=True),
@@ -98,8 +164,69 @@ def transactions_status(ctx: click.Context):
     required=True,
     help="Account type from the config file.",
 )
-def transactions_status(ctx: click.Context, raw_csv, account):
-    """Upload missing raw transactions to the budget sheet"""
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Activate dry run mode.",
+)
+def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
+    """Upload missing raw transactions to the budget sheet."""
+    transactions_sheet = None
+    for config_datum in ctx.obj["config_data"]:
+        if config_datum["Category"] == "_TRANSACTIONS_":
+            transactions_sheet = config_datum["Sheet"]
+            break
+    if transactions_sheet is None:
+        raise Exception("Unable to find sheet metadata for transactions")
+    raw_transactions_sheet = ctx.obj["sheet"].worksheet(transactions_sheet)
+    transactions_data = raw_transactions_sheet.get_all_records()
+    raw_transactions = [(
+        tdata["Account"],
+        tdata["Date"],
+        tdata["Description"].replace("\"",""),
+        float(tdata["Amount"]),
+    ) for tdata in transactions_data if tdata["Amount"] != ""]
+    sources = ctx.obj["config"]["sources"]
+    acct_cfg = None
+    for source in sources:
+        if source["Account"] == account:
+            acct_cfg = source
+            break
+    if acct_cfg is None:
+        raise Exception(f"Could not find config for account {account}")
+    transactions = []
+    with open(raw_csv, "r", newline="") as csvfile:
+        reader = csv.reader(csvfile)
+        for i, row in enumerate(reader):
+            if i >= acct_cfg["StartRow"]:
+                transactions.append((
+                    account.replace("_", " "),
+                    row[acct_cfg["Date"]],
+                    re.sub(r'\s+', ' ', row[acct_cfg["Description"]]).strip(),
+                    float(row[acct_cfg["Amount"]]) * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                ))
+    new_transactions = [transaction for transaction in transactions if transaction not in raw_transactions]
+    print("Uploading the following transactions:")
+    for transaction in new_transactions:
+        print(transaction)
+        if not dry_run:
+            raw_transactions_sheet.append_row([
+                "",
+                *transaction
+            ])
+
+@cli.command()
+@click.pass_context
+@click.option(
+    "--category",
+    "category",
+    type=str,
+    required=True,
+    help="Category from the Config sheet.",
+)
+def transactions_bin(ctx: click.Context, category):
+    """Bin all transactions from a category sheet."""
     pass # TODO
 
 # Assuming you have already set up the Google Sheets API object named 'service'
