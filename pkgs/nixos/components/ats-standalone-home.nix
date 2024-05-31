@@ -181,9 +181,9 @@ let
     echo "🖊️ Random Journal Entry of the Day:" > $tmpdir/out.txt
     echo "" >> $tmpdir/out.txt
     wiki-tools get-rand-journal >> $tmpdir/out.txt
-    gmail-manager gbot-send 6612105214@vzwpix.com "ats-rand-journal" \
+    gmail-manager journal-send 6612105214@vzwpix.com "ats-rand-journal" \
         "$(cat $tmpdir/out.txt)"
-    gmail-manager gbot-send andrew.torgesen@gmail.com "ats-rand-journal" \
+    gmail-manager journal-send andrew.torgesen@gmail.com "ats-rand-journal" \
         "$(cat $tmpdir/out.txt)"
     rm -r $tmpdir
   '';
