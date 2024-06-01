@@ -11,13 +11,15 @@ from fuzzywuzzy import fuzz
 from easy_google_auth.auth import getGoogleCreds
 from gmail_parser.defaults import GmailParserDefaults as GPD
 
+
 def column_index_to_letter(column_index):
     """Convert a column index (integer) to a letter index (string) used in Google Sheets."""
-    result = ''
+    result = ""
     while column_index > 0:
         column_index, remainder = divmod(column_index - 1, 26)
         result = chr(65 + remainder) + result
     return result
+
 
 @click.group()
 @click.pass_context
@@ -60,11 +62,13 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
     try:
         with open(config_json, "r") as configfile:
             config = json.load(configfile)
-        sheet = gspread.authorize(getGoogleCreds(
+        sheet = gspread.authorize(
+            getGoogleCreds(
                 secrets_json,
                 refresh_file,
                 headless=True,
-            )).open_by_key(config["spreadsheetId"])
+            )
+        ).open_by_key(config["spreadsheetId"])
         config_data = sheet.worksheet(config["configSheetName"]).get_all_records()
         ctx.obj = {
             "config": config,
@@ -75,6 +79,7 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
         logging.error(f"Program error: {e}")
         sys.stderr.write(f"Program error: {e}")
         exit(1)
+
 
 @cli.command()
 @click.pass_context
@@ -90,6 +95,7 @@ def transactions_status(ctx: click.Context):
     transactions_data = ctx.obj["sheet"].worksheet(transactions_sheet).get_all_records()
     num_processed = sum([1 for t in transactions_data if t["Processed?"] == "X"])
     print(f"{num_processed} / {len(transactions_data)} transactions processed.")
+
 
 @cli.command()
 @click.pass_context
@@ -113,14 +119,18 @@ def transactions_process(ctx: click.Context, dry_run):
         category_sheets[entry["Category"]] = (entry["Sheet"], entry["LeftColumn"])
     raw_transactions_sheet = ctx.obj["sheet"].worksheet(transactions_sheet)
     transactions_data = raw_transactions_sheet.get_all_records()
-    unprocessed_transactions = [(
-        i + 2,
-        tdata["Account"],
-        tdata["Date"],
-        tdata["Description"].replace("\"",""),
-        float(tdata["Amount"]),
-        tdata["Categorization"],
-    ) for i, tdata in enumerate(transactions_data) if tdata["Processed?"] == ""]
+    unprocessed_transactions = [
+        (
+            i + 2,
+            tdata["Account"],
+            tdata["Date"],
+            tdata["Description"].replace('"', ""),
+            float(tdata["Amount"]),
+            tdata["Categorization"],
+        )
+        for i, tdata in enumerate(transactions_data)
+        if tdata["Processed?"] == ""
+    ]
     if len(unprocessed_transactions) > 0:
         print("Processing the following raw transactions:")
         for t in unprocessed_transactions:
@@ -135,17 +145,23 @@ def transactions_process(ctx: click.Context, dry_run):
                     empty_row_index = len(col_vals) + 1
                     first_col_letter = column_index_to_letter(dest_lfcol)
                     last_col_letter = column_index_to_letter(dest_lfcol + 4)
-                    dest_sheet.update(f"{first_col_letter}{empty_row_index}:{last_col_letter}{empty_row_index}", [[
-                        t[1],
-                        t[2],
-                        t[3],
-                        t[4],
-                    ]])
+                    dest_sheet.update(
+                        f"{first_col_letter}{empty_row_index}:{last_col_letter}{empty_row_index}",
+                        [
+                            [
+                                t[1],
+                                t[2],
+                                t[3],
+                                t[4],
+                            ]
+                        ],
+                    )
                     raw_transactions_sheet.update(f"A{t[0]}", "X")
                 else:
                     print(f"  Not processed; unknown category: {t[5]}")
     else:
         print("No unprocessed transactions!")
+
 
 @cli.command()
 @click.pass_context
@@ -180,12 +196,16 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
         raise Exception("Unable to find sheet metadata for transactions")
     raw_transactions_sheet = ctx.obj["sheet"].worksheet(transactions_sheet)
     transactions_data = raw_transactions_sheet.get_all_records()
-    raw_transactions = [(
-        tdata["Account"],
-        tdata["Date"],
-        tdata["Description"].replace("\"",""),
-        float(tdata["Amount"]),
-    ) for tdata in transactions_data if tdata["Amount"] != ""]
+    raw_transactions = [
+        (
+            tdata["Account"],
+            tdata["Date"],
+            tdata["Description"].replace('"', ""),
+            float(tdata["Amount"]),
+        )
+        for tdata in transactions_data
+        if tdata["Amount"] != ""
+    ]
     sources = ctx.obj["config"]["sources"]
     acct_cfg = None
     for source in sources:
@@ -199,21 +219,26 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
         reader = csv.reader(csvfile)
         for i, row in enumerate(reader):
             if i >= acct_cfg["StartRow"]:
-                transactions.append((
-                    account.replace("_", " "),
-                    row[acct_cfg["Date"]],
-                    re.sub(r'\s+', ' ', row[acct_cfg["Description"]]).strip(),
-                    float(row[acct_cfg["Amount"]]) * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
-                ))
-    new_transactions = [transaction for transaction in transactions if transaction not in raw_transactions]
+                transactions.append(
+                    (
+                        account.replace("_", " "),
+                        row[acct_cfg["Date"]],
+                        re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip(),
+                        float(row[acct_cfg["Amount"]])
+                        * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                    )
+                )
+    new_transactions = [
+        transaction
+        for transaction in transactions
+        if transaction not in raw_transactions
+    ]
     print("Uploading the following transactions:")
     for transaction in new_transactions:
         print(transaction)
         if not dry_run:
-            raw_transactions_sheet.append_row([
-                "",
-                *transaction
-            ])
+            raw_transactions_sheet.append_row(["", *transaction])
+
 
 @cli.command()
 @click.pass_context
@@ -228,7 +253,11 @@ def transactions_bin(ctx: click.Context, category):
     """Bin all transactions from a category sheet."""
     category_sheets = {}
     for entry in ctx.obj["config_data"]:
-        category_sheets[entry["Category"]] = (entry["Sheet"], entry["LeftColumn"], entry["FirstRow"])
+        category_sheets[entry["Category"]] = (
+            entry["Sheet"],
+            entry["LeftColumn"],
+            entry["FirstRow"],
+        )
     if category in category_sheets:
         src_sheet = ctx.obj["sheet"].worksheet(category_sheets[category][0])
         src_lfcol = category_sheets[category][1] + 1
@@ -239,69 +268,35 @@ def transactions_bin(ctx: click.Context, category):
         last_row = len(col_vals)
         cell_range = f"{first_col}{first_row}:{last_col}{last_row}"
         cell_values = src_sheet.get(cell_range)
-        # print(cell_values)
         groups = {}
         for transaction in cell_values:
-            transaction[0] = re.sub(r'[^a-zA-Z]', '', transaction[0]).lower()
+            transaction[0] = re.sub(r"[^a-zA-Z\s]", "", transaction[0]).lower()
             matched = False
             for group_name, group_data in groups.items():
                 for grouped_transaction in group_data:
                     if fuzz.partial_ratio(transaction[0], grouped_transaction[0]) > 80:
                         groups[group_name].append(transaction)
                         matched = True
+                        break
                 if matched:
                     break
             if not matched:
                 groups[transaction[0]] = [transaction]
-        print(groups)
+        grouped_info = []
+        for group_name, group_data in groups.items():
+            num_transactions = len(group_data)
+            total_amount = sum(float(gd[1]) for gd in group_data)
+            grouped_info.append((group_name, total_amount, num_transactions))
+        sorted_group_info = sorted(grouped_info, key=lambda g: -g[1])
+        for ginfo in sorted_group_info:
+            print(f"{ginfo[0][:15]:<15}    ${ginfo[1]:.2f}\t({ginfo[2]} transactions)")
     else:
         print(f"Not processed; unknown category: {category}")
 
-# Assuming you have already set up the Google Sheets API object named 'service'
-
-# Function to fetch data from Google Sheets
-# def fetch_google_sheets_data(service, spreadsheet_id, range_name):
-#     result = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
-#     values = result.get('values', [])
-
-#     if not values:
-#         print('No data found.')
-#         return None
-#     else:
-#         df = pd.DataFrame(values[1:], columns=values[0])
-#         return df
-
-# # Define a function to perform fuzzy string matching and group transactions
-# def group_transactions(df):
-#     groups = {}
-#     for index, row in df.iterrows():
-#         matched = False
-#         for group_name, group_data in groups.items():
-#             for transaction in group_data:
-#                 if fuzz.partial_ratio(row['transaction'], transaction) > 80:  # Adjust threshold as needed
-#                     groups[group_name].append(row['transaction'])
-#                     matched = True
-#                     break
-#             if matched:
-#                 break
-#         if not matched:
-#             groups[row['transaction']] = [row['transaction']]
-#     return groups
-
-# # Group transactions
-# transaction_groups = group_transactions(df)
-
-# # Calculate total amount for each group
-# group_totals = {}
-# for group_name, transactions in transaction_groups.items():
-#     group_totals[group_name] = df[df['transaction'].isin(transactions)]['amount'].astype(float).sum()
-
-# # Print the results
-# for group_name, total_amount in group_totals.items():
-#     print(f"Group: {group_name}, Total Amount: {total_amount}")
 
 def main():
     cli()
+
 
 if __name__ == "__main__":
     main()
