@@ -83,16 +83,15 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1717043854,
+        "lastModified": 1717220994,
         "narHash": "sha256-XV7pcgpA+knCFoDDjwGSt4DsG/qxGo3B2+VN2RhK8+4=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "44b3fab2afe7c2e394dab0ee2b063893877a4479",
+        "rev": "a818346992bf868fdbd52a118e9f4999339275f7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/creds",
         "repo": "easy-google-auth",
         "type": "github"
       }
