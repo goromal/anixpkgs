@@ -261,11 +261,11 @@
     "mesh-plotter": {
       "flake": false,
       "locked": {
-        "lastModified": 1691897730,
-        "narHash": "sha256-oH/8xL43F6Z7nLKD4rsZZZa9WT4tnrpuvD0fX52XylA=",
+        "lastModified": 1717387621,
+        "narHash": "sha256-iPhcnHIGjhYDQiPQSWVSDTPntFe3hTJIKxb7JtbuKF8=",
         "owner": "goromal",
         "repo": "mesh-plotter",
-        "rev": "866a767e5b815d9735b5bdf0f17f154f5bbbf2c4",
+        "rev": "a67401095de7acf8dd3a95a844f14e9c580fcbbc",
         "type": "github"
       },
       "original": {
