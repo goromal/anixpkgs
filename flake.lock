@@ -261,16 +261,15 @@
     "mesh-plotter": {
       "flake": false,
       "locked": {
-        "lastModified": 1717386744,
+        "lastModified": 1717387621,
         "narHash": "sha256-iPhcnHIGjhYDQiPQSWVSDTPntFe3hTJIKxb7JtbuKF8=",
         "owner": "goromal",
         "repo": "mesh-plotter",
-        "rev": "c3898613ff37f51391adcb7436bcc1b97b27f6e6",
+        "rev": "a67401095de7acf8dd3a95a844f14e9c580fcbbc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/notebook3d",
         "repo": "mesh-plotter",
         "type": "github"
       }

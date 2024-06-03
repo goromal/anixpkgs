@@ -81,7 +81,7 @@
     mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
 
-    mesh-plotter.url = "github:goromal/mesh-plotter?ref=dev/notebook3d";
+    mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
     orchestrator.url = "github:goromal/orchestrator";
