@@ -3,17 +3,24 @@
 Generate a budget report.
 
 ```
-usage: budget_report [-h] [-c CONFIG] transactions
+Usage: budget_report [OPTIONS] COMMAND [ARGS]...
 
-Budget report generator
+  Tools for Budget Management.
 
-positional arguments:
-transactions          CSV file of transactions (exported from Mint)
+Options:
+  --secrets-json PATH       Client secrets file.  [default: /home/atorgesen/se
+                            crets/google/client_secrets.json]
+  --refresh-file PATH       Refresh file (if it exists).  [default:
+                            /home/atorgesen/secrets/google/refresh.json]
+  --config-json PATH        Budget tool config file.  [default:
+                            /home/atorgesen/configs/budget-tool.json]
+  --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
+  --help                    Show this message and exit.
 
-optional arguments:
--h, --help            show this help message and exit
--c CONFIG, --config CONFIG
-                        JSON config file with budget names and limits (default:
-                        /data/andrew/configs/budgets.json)
+Commands:
+  transactions-bin      Bin all transactions from a category sheet.
+  transactions-process  Process raw transactions.
+  transactions-status   Get the status of raw transactions.
+  transactions-upload   Upload missing raw transactions to the budget sheet.
 ```
 
