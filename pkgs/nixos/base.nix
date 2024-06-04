@@ -321,10 +321,7 @@ in {
       dog
     ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
-    # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
-    # see https://github.com/NixOS/nixpkgs/issues/234962
     programs.bash.interactiveShellInit = ''
-      export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
       eval "$(direnv hook bash)"
     '';
 

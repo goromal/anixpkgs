@@ -8,7 +8,7 @@ on:
       - master
 
 env:
-  NIXOS_VERSION: 23.05
+  NIXOS_VERSION: 24.05
 
 jobs:
   generate-docs-dry:
