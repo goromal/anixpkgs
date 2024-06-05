@@ -21,3 +21,4 @@ Currently the program will simply continuously print out 2D point cloud data to 
 I plan to instead have it stream gRPC 2D point cloud messages (defined in [aapis](https://github.com/goromal/aapis))
 to a [mscpp](../cpp/mscpp.md)-based daemon for real-time pose estimation over [SE(2)](../cpp/manif-geom-cpp.md).
 
+

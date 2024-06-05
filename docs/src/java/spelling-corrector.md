@@ -10,3 +10,4 @@ The repository contains the text-file dictionary from which all word suggestions
 usage: spelling-corrector <word>
 ```
 
+

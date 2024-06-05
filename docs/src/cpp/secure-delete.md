@@ -41,3 +41,4 @@ In 1 second you can approximately overwrite 1 to 2 MB of data (on a hard disk).
 
 In "totally insecure" mode, in 15 seconds you can approximately overwrite 100 MB of data. The same deletion takes about 60 minutes in totally secure mode.
 
+

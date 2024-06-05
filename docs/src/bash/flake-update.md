@@ -7,3 +7,4 @@ usage: flake-update [path/to/flake.nix]
 
 ```
 
+

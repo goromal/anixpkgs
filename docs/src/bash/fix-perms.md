@@ -8,3 +8,4 @@ usage: fix-perms dir
 
 Attempts to deduce special cases such as `~/.ssh/*`.
 
+

@@ -10,3 +10,4 @@ Input and output images must be in the [PPM](https://netpbm.sourceforge.net/doc/
 usage: simple-image-editor <input.ppm> <output.ppm> [grayscale|invert|emboss|motionblur motion-blur-length]
 ```
 
+

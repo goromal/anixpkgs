@@ -10,3 +10,4 @@ usage: dirgroups num_groups dir
 Split a large directory of files into smaller directories with evenly distributed files (not counting remainders). 
 ```
 
+

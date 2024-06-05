@@ -19,14 +19,30 @@ let
   };
 
   addDoc = pkg-attr:
-    pkg-attr // rec {
+    let
+      # TODO: maybe remove the (Auto-Generated) qualifier when the functionality has proven out
+      auto-usage-doc =
+        (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
+
+          ## Usage (Auto-Generated)
+
+          ```bash
+          ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
+            packageAttr = pkg-attr;
+            helpCmd = pkg-attr.meta.autoGenUsageCmd;
+          }}
+          ```
+        '' else
+          "");
+    in pkg-attr // rec {
       doc = prev.writeTextFile {
         name = "doc.txt";
-        text = (if builtins.hasAttr "description" pkg-attr.meta then ''
+        text = (if builtins.hasAttr "description" pkg-attr.meta then (''
           ${pkg-attr.meta.description}
 
           ${pkg-attr.meta.longDescription}
-        '' else ''
+          ${auto-usage-doc}
+        '') else ''
           No package documentation currently provided.
         '');
       };

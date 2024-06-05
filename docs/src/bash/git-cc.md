@@ -9,3 +9,4 @@ Recursively backup a git repository (and its submodules) to a new, git-less sour
 Effectively wraps up an arbitrarily complex git repo into a flat-packaged mass of code.
 ```
 
+

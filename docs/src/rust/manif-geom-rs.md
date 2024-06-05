@@ -6,3 +6,4 @@ Rust implementation of [manif-geom-cpp](https://github.com/goromal/manif-geom-cp
 
 ***TODO*** Once finished, these docs will contrast the API with `manif-geom-cpp`.
 
+
