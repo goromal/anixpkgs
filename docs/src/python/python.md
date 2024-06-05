@@ -3,7 +3,6 @@
 Packages written (or bound) in Python.
 
 - [aapis-py](./aapis-py.md)
-- [sunnyside](./sunnyside.md)
 - [fqt](./fqt.md)
 - [find_rotational_conventions](./find_rotational_conventions.md)
 - [geometry](./geometry.md)

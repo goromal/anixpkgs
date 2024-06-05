@@ -135,7 +135,7 @@ in {
 
   home.file = with anixpkgs.pkgData; {
     ".anix-version".text =
-      if local-build then "Local Build" else "v${anix-version}";
+      if local-build then "Local Build" else "v${anixpkgs-version}";
     "records/${records.crypt.name}".source = records.crypt.data;
     ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
       text = ''

@@ -505,6 +505,7 @@
         "simple-image-editor": "simple-image-editor",
         "sorting": "sorting",
         "spelling-corrector": "spelling-corrector",
+        "sunnyside": "sunnyside",
         "task-tools": "task-tools",
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
@@ -604,6 +605,22 @@
       "original": {
         "owner": "goromal",
         "repo": "spelling-corrector",
+        "type": "github"
+      }
+    },
+    "sunnyside": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717568445,
+        "narHash": "sha256-U2wiyKsJ6ACiajkfULpkdCUJ2/xZKQqNgzIHQL9utIE=",
+        "owner": "goromal",
+        "repo": "sunnyside",
+        "rev": "d6605667490ce008321b32dea5732d7962609bf7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "sunnyside",
         "type": "github"
       }
     },

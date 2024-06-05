@@ -100,7 +100,7 @@ in {
            -pointsize 30 \
            -fill black \
            -draw 'text 320,1343 "${
-             if local-build then "Local Build" else "v${anix-version}"
+             if local-build then "Local Build" else "v${anixpkgs-version}"
            } - ${
              if cfg.standalone then "Home-Manager" else "NixOS"
            } ${nixos-version}"' \

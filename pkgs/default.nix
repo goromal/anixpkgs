@@ -2,6 +2,7 @@ final: prev:
 with prev.lib;
 let
   flakeInputs = final.flakeInputs;
+  anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -74,8 +75,6 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
-            sunnyside =
-              addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -214,7 +213,6 @@ in rec {
   budget_report = final.python39.pkgs.budget_report;
   makepyshell = final.python39.pkgs.makepyshell;
   mavlog-utils = final.python39.pkgs.mavlog-utils;
-  sunnyside = final.python39.pkgs.sunnyside;
   fqt = final.python39.pkgs.fqt;
   ichabod = final.python39.pkgs.ichabod;
   norbert = final.python39.pkgs.norbert;
@@ -266,9 +264,13 @@ in rec {
   redirects =
     addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
-  cpp-helper = addDoc (prev.callPackage ./bash-packages/cpp-helper { });
-  py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
-  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper { });
+  cpp-helper = addDoc
+    (prev.callPackage ./bash-packages/cpp-helper { inherit anixpkgs-version; });
+  py-helper = addDoc
+    (prev.callPackage ./bash-packages/py-helper { inherit anixpkgs-version; });
+  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper {
+    inherit anixpkgs-version;
+  });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
@@ -368,6 +370,9 @@ in rec {
   });
   xv-lidar-rs = addDoc (prev.callPackage ./rust-packages/xv-lidar-rs {
     pkg-src = flakeInputs.xv-lidar-rs;
+  });
+  sunnyside = addDoc (prev.callPackage ./rust-packages/sunnyside {
+    pkg-src = flakeInputs.sunnyside;
   });
 
   nixos-machines = rec { personal = makeMachines "personal"; };

@@ -121,6 +121,9 @@
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
     xv-lidar-rs.flake = false;
+
+    sunnyside.url = "github:goromal/sunnyside";
+    sunnyside.flake = false;
   };
 
   outputs = { self, nixpkgs, flake-utils, ... }@inputs:
