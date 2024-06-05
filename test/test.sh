@@ -92,7 +92,7 @@ setupws --dev_dir $tmpdir/dev --data_dir $tmpdir/data tws2 lint.sh=$anixdir/scri
 [[ -d "$tmpdir/dev/tws2/sources/mscpf/.git" ]] || { echo "setupws repo clone failed"; exit 1; }
 [[ -f "$tmpdir/dev/tws2/.bin/lint.sh" ]] || { echo "setupws script copy failed"; exit 1; }
 touch test.py
-pkgshell anixpkgs sunnyside --run "sunnyside test.py 4 u"
+pkgshell anixpkgs sunnyside --run "sunnyside -t test.py -s 4 -k u"
 [[ -f xiwx3tC.tyz ]] || { echo_red "pkgshell:sunnyside command failed"; exit 1; }
 
 make-title -c yellow "Testing orchestrator"

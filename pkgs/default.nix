@@ -74,8 +74,6 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
-            sunnyside =
-              addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -214,7 +212,6 @@ in rec {
   budget_report = final.python39.pkgs.budget_report;
   makepyshell = final.python39.pkgs.makepyshell;
   mavlog-utils = final.python39.pkgs.mavlog-utils;
-  sunnyside = final.python39.pkgs.sunnyside;
   fqt = final.python39.pkgs.fqt;
   ichabod = final.python39.pkgs.ichabod;
   norbert = final.python39.pkgs.norbert;
@@ -368,6 +365,9 @@ in rec {
   });
   xv-lidar-rs = addDoc (prev.callPackage ./rust-packages/xv-lidar-rs {
     pkg-src = flakeInputs.xv-lidar-rs;
+  });
+  sunnyside = addDoc (prev.callPackage ./rust-packages/sunnyside {
+    pkg-src = flakeInputs.sunnyside;
   });
 
   nixos-machines = rec { personal = makeMachines "personal"; };
