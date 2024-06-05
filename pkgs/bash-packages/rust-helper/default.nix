@@ -1,5 +1,5 @@
 { writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version
-, cargo, rustc }:
+, cargo, rustc, rustfmt }:
 let
   pkgname = "rust-helper";
   usage_str = ''
@@ -19,7 +19,7 @@ let
         ${printGrn} "Entering a Rust development shell from anixpkgs v${anixpkgs-version}..."
         nix-shell ${directShellFile} \
           --argstr shellName "Rust" \
-          --arg pkgList "[ ${cargo} ${rustc} ]" \
+          --arg pkgList "[ ${cargo} ${rustc} ${rustfmt} ]" \
           --arg colorCode 31
     fi
   '';
