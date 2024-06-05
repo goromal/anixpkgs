@@ -7,4 +7,3 @@ usage: nix-diffs derivation1 derivation2 out_dir
 
 ```
 
-

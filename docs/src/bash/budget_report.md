@@ -24,4 +24,3 @@ Commands:
   transactions-upload   Upload missing raw transactions to the budget sheet.
 ```
 
-

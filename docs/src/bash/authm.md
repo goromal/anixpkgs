@@ -18,4 +18,3 @@ NOTE: This program will perform a bi-directional sync of the ~/secrets directory
 before and after the selected command.
 ```
 
-

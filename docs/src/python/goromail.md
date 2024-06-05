@@ -44,4 +44,3 @@ Commands:
   journal  Process all pending journal entries.
 ```
 
-

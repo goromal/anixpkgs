@@ -62,4 +62,3 @@ Quaternion Conventions for manif-geom-cpp/geometry:
     Quaternion Directionality: Body-to-World
 ```
 
-

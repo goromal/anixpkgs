@@ -12,4 +12,3 @@ optional arguments:
 
 The server page takes an input video file and converts it to an MP4 using the [mp4](../bash/mp4.md) tool.
 
-

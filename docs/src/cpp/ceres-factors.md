@@ -11,4 +11,3 @@ Articles/tutorials showcasing some of the custom cost functions and parameteriza
 - [Ceres Solver Python Tutorial (Linux)](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres)
 - [2D Range-Bearing Landmark Resolution with Ceres](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres-rangebearing)
 
-

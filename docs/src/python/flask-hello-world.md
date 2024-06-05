@@ -10,4 +10,3 @@ optional arguments:
 --port PORT  Port to run the server on
 ```
 
-

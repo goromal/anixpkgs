@@ -11,4 +11,3 @@ List git information for all sources in a workspace. Must be run
 within in a workspace created by setupws.
 ```
 
-

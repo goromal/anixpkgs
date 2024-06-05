@@ -44,4 +44,3 @@ while not (state.top == UINT32_MAX and state.c != 0) and iter < maxIters:
 # state.arr == [2, 3, 0, 4, 1]
 ```
 
-

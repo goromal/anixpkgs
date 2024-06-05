@@ -15,4 +15,3 @@ optional arguments:
 
 The server page takes a URL string and either uses `wget` or `youtube-dl` to download the video and convert it to MP4 using the [mp4](../bash/mp4.md) tool.
 
-

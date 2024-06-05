@@ -17,4 +17,3 @@ final ordering of the elements from the sorting algorithm, this design provides 
 arbitrary sets of objects through the cognitively manageable task of successive binary choices of preference. The [rankserver](./rankserver-cpp.md)
 experiment is powered by this library.
 
-

@@ -62,4 +62,3 @@ Mark an entire sub-inbox as read:
 subInbox.markAllAsRead()
 ```
 
-

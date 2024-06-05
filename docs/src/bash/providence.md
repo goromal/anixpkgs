@@ -13,4 +13,3 @@ Pick randomly from a specified domain:
 
 Requires a wiki secrets file at `~/secrets/wiki/secrets.json`.
 
-

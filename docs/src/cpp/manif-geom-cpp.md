@@ -145,4 +145,3 @@ Body-to-world with local perturbations:
 
 $$\mathbf{R}_B^W \oplus \tilde{\theta} \triangleq \mathbf{R}_B^W \text{Exp}\left(\tilde{\theta}\right).$$
 
-

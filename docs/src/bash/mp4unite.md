@@ -12,4 +12,3 @@ Options:
 -v | --verbose  Print verbose output from ffmpeg
 ```
 
-

@@ -10,4 +10,3 @@ Used as the authorization source for:
 - [task-tools](./task-tools.md)
 - [book-notes-sync](./book-notes-sync.md)
 
-

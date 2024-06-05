@@ -4,7 +4,6 @@ File scrambler.
 
 Written in Rust. [Repository](https://github.com/goromal/sunnyside)
 
-
 ## Usage (Auto-Generated)
 
 ```bash

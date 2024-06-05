@@ -60,4 +60,3 @@ qr3 = qr2 / 0.2
 assert np.allclose(qr.array(), qr3.array())
 ```
 
-

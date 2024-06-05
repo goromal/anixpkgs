@@ -40,8 +40,7 @@ let
         text = (if builtins.hasAttr "description" pkg-attr.meta then (''
           ${pkg-attr.meta.description}
 
-          ${pkg-attr.meta.longDescription}
-          ${auto-usage-doc}
+          ${pkg-attr.meta.longDescription}${auto-usage-doc}
         '') else ''
           No package documentation currently provided.
         '');

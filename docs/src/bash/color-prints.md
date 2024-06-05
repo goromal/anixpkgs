@@ -13,4 +13,3 @@ ANSI color codes referenced from [Wikipedia](https://en.wikipedia.org/wiki/ANSI_
 - `echo_cyan`
 - `echo_white`
 
-

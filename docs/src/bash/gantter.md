@@ -26,4 +26,3 @@ REQUIRES pdflatex to be in your system path (not interested in shipping
 texlive-full in its entirety with this little tool).
 ```
 
-

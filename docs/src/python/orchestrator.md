@@ -6,4 +6,3 @@ Daemon + CLI for managing select background tasks on my computer.
 
 ***Work in progress. Detailed description to come.***
 
-

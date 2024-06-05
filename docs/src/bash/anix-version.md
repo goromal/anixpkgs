@@ -7,4 +7,3 @@ usage: anix-version
 
 ```  
 
-

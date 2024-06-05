@@ -14,4 +14,3 @@ Generate [num_days] tasks derived from providence output.
 Requires a wiki secrets file at `~/secrets/wiki/secrets.json` and a Google Tasks secrets file
 at `~/secrets/task/secrets.json`.
 
-
