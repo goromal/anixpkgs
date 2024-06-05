@@ -224,7 +224,8 @@ in rec {
   mesh-plotter = final.python310.pkgs.mesh-plotter;
   scrape = final.python310.pkgs.scrape;
   spleeter = final.python38.pkgs.spleeter;
-  find_rotational_conventions = final.python310.pkgs.find_rotational_conventions;
+  find_rotational_conventions =
+    final.python310.pkgs.find_rotational_conventions;
   trafficsim = final.python310.pkgs.trafficsim;
   flask-hello-world = final.python310.pkgs.flask-hello-world;
   flask-url2mp4 = final.python310.pkgs.flask-url2mp4;
