@@ -1,4 +1,5 @@
-{ writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version }:
+{ writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version
+, cargo, rustc }:
 let
   pkgname = "rust-helper";
   usage_str = ''
@@ -17,9 +18,8 @@ let
     if [[ "$dev" == "1" ]]; then
         ${printGrn} "Entering a Rust development shell from anixpkgs v${anixpkgs-version}..."
         nix-shell ${directShellFile} \
-          --arg pkgs "(import (fetchTarball 'https://github.com/goromal/anixpkgs/archive/refs/tags/v${anixpkgs-version}.tar.gz') {})" \
           --argstr shellName "Rust" \
-          --arg pkgList "[ pkgs.cargo pkgs.rustc ]" \
+          --arg pkgList "[ ${cargo} ${rustc} ]" \
           --arg colorCode 31
     fi
   '';
@@ -30,17 +30,20 @@ let
         sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
-in (writeArgparseScriptBin pkgname usage_str [{
-  var = "makenix";
-  isBool = true;
-  default = "0";
-  flags = "--make-nix";
-} {
-  var = "dev";
-  isBool = true;
-  default = "0";
-  flags = "--dev";
-}] ''
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "makenix";
+    isBool = true;
+    default = "0";
+    flags = "--make-nix";
+  }
+  {
+    var = "dev";
+    isBool = true;
+    default = "0";
+    flags = "--dev";
+  }
+] ''
   set -e
   tmpdir=$(mktemp -d)
   ${makenixRule}

@@ -1,4 +1,5 @@
-{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc, anixpkgs-version }:
+{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc
+, anixpkgs-version }:
 let
   pkgname = "py-helper";
   usage_str = ''
