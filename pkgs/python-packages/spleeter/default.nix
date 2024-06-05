@@ -14,6 +14,7 @@ in buildPythonPackage rec {
   version = "2.3.0";
   nativeBuildInputs = [ ffmpeg libsndfile ];
   disabled = pythonOlder "3.8" || pythonAtLeast "3.9";
+  broken = true;
   propagatedBuildInputs = [
     numpy
     pandas
