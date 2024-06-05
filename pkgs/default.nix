@@ -2,6 +2,7 @@ final: prev:
 with prev.lib;
 let
   flakeInputs = final.flakeInputs;
+  anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -263,9 +264,13 @@ in rec {
   redirects =
     addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
-  cpp-helper = addDoc (prev.callPackage ./bash-packages/cpp-helper { });
-  py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
-  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper { });
+  cpp-helper = addDoc
+    (prev.callPackage ./bash-packages/cpp-helper { inherit anixpkgs-version; });
+  py-helper = addDoc
+    (prev.callPackage ./bash-packages/py-helper { inherit anixpkgs-version; });
+  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper {
+    inherit anixpkgs-version;
+  });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
