@@ -83,7 +83,7 @@ Here are some `shell.nix` files to access Python packages (using version `v5.21.
 let
   pkgs = import (builtins.fetchTarball
     "https://github.com/goromal/anixpkgs/archive/refs/tags/v5.21.0.tar.gz") {};
-  python-with-my-packages = pkgs.python39.withPackages (p: with p; [
+  python-with-my-packages = pkgs.python310.withPackages (p: with p; [
     numpy
     matplotlib
     geometry
@@ -101,16 +101,16 @@ let
     "https://github.com/goromal/anixpkgs/archive/refs/tags/v5.21.0.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
-    pkgs.python39
-    pkgs.python39.pkgs.numpy
-    pkgs.python39.pkgs.geometry
-    pkgs.python39.pkgs.find_rotational_conventions
+    pkgs.python310
+    pkgs.python310.pkgs.numpy
+    pkgs.python310.pkgs.geometry
+    pkgs.python310.pkgs.find_rotational_conventions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
     # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
     export PIP_PREFIX=$(pwd)/_build/pip_packages
-    export PYTHONPATH="$PIP_PREFIX/${pkgs.python39.sitePackages}:$PYTHONPATH"
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python310.sitePackages}:$PYTHONPATH"
     export PATH="$PIP_PREFIX/bin:$PATH"
     unset SOURCE_DATE_EPOCH
   '';
