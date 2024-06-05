@@ -58,15 +58,15 @@
             {
                 "attr": "xv-lidar-rs",
                 "ci": true
+            },
+            {
+                "attr": "sunnyside",
+                "ci": true
             }
         ],
         "python": [
             {
                 "attr": "aapis-py",
-                "ci": true
-            },
-            {
-                "attr": "sunnyside",
                 "ci": true
             },
             {

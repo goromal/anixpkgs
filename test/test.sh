@@ -91,9 +91,19 @@ cd $tmpdir/dev
 setupws --dev_dir $tmpdir/dev --data_dir $tmpdir/data tws2 lint.sh=$anixdir/scripts/lint.sh mscpf:https://github.com/goromal/mscpp
 [[ -d "$tmpdir/dev/tws2/sources/mscpf/.git" ]] || { echo "setupws repo clone failed"; exit 1; }
 [[ -f "$tmpdir/dev/tws2/.bin/lint.sh" ]] || { echo "setupws script copy failed"; exit 1; }
-touch test.py
-pkgshell anixpkgs sunnyside --run "sunnyside test.py 4 u"
-[[ -f xiwx3tC.tyz ]] || { echo_red "pkgshell:sunnyside command failed"; exit 1; }
+pkgshell anixpkgs sunnyside --run "sunnyside --help"
+
+make-title -c yellow "Testing sunnyside"
+echo "SUCCESS" > test.py
+sunnyside -t test.py -s 4 -k u
+rm test.py
+[[ -f xiwx3tC.tyz ]] || { echo_red "sunnyside rename failed"; exit 1; }
+sunnyside -t xiwx3tC.tyz -s 4 -k u
+[[ -f test.py ]] || { echo_red "sunnyside re-rename failed"; exit 1; }
+if [[ -z $(cat test.py | grep SUCCESS) ]]; then
+    echo_red "sunnyside reconstruction failed"
+    exit 1
+fi
 
 make-title -c yellow "Testing orchestrator"
 cd $tmpdir
