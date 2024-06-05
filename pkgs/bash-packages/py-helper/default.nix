@@ -1,4 +1,4 @@
-{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc }:
+{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc, anixpkgs-version }:
 let
   pkgname = "py-helper";
   usage_str = ''
@@ -9,7 +9,6 @@ let
     --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
     --make-nix                     Dump template default.nix and shell.nix files
   '';
-  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   shellFile = ./res/_shell.nix;
@@ -19,7 +18,7 @@ let
         ${printGrn} "Generating template default.nix and shell.nix files..."
         cat ${defaultFile} > default.nix
         cat ${shellFile} > shell.nix
-        sed -i 's|REPLACEME|${anix-version}|g' shell.nix
+        sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
   makepkgRule = ''

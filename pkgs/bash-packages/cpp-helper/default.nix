@@ -1,4 +1,4 @@
-{ writeArgparseScriptBin, color-prints, redirects, git-cc }:
+{ writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version }:
 let
   pkgname = "cpp-helper";
   usage_str = ''
@@ -11,7 +11,6 @@ let
     --make-header-lib CPPNAME      Generate a header-only library template
     --make-vscode                  Generate VSCode C++ header detection settings file
   '';
-  anix-version = (builtins.readFile ../../../ANIX_VERSION);
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   formatFile = ./res/clang-format;
@@ -27,9 +26,9 @@ let
     if [[ "$makenix" == "1" ]]; then
         ${printGrn} "Generating template default.nix and shell.nix files..."
         cat ${defaultFile} > default.nix
-        sed -i 's|REPLACEME|${anix-version}|g' default.nix
+        sed -i 's|REPLACEME|${anixpkgs-version}|g' default.nix
         cat ${shellFile} > shell.nix
-        sed -i 's|REPLACEME|${anix-version}|g' shell.nix
+        sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
   makevscodeRule = ''
