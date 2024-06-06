@@ -31,7 +31,7 @@ nix-shell -p nixfmt --run "bash scripts/lint.sh"
 Comprehensive documentation for individual packages and common NixOS use cases is served in site form [here](https://goromal.github.io/anixpkgs/) using `mdbook` on the `docs/` directory. To generate new docs, run
 
 ```bash
-python scripts/generate_docs.py
+NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
 ```
 
 *Auto-generated as part of CD pipeline.*

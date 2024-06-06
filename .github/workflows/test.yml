@@ -157,7 +157,7 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: |
-        python scripts/generate_docs.py
+        NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
           echo "Found changes to $num_changes docs"

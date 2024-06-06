@@ -21,6 +21,7 @@ let
   addDoc = pkg-attr:
     let
       # TODO: maybe remove the (Auto-Generated) qualifier when the functionality has proven out
+      sub-cmds = if builtins.hasAttr "subCmds" pkg-attr.meta then pkg-attr.meta.subCmds else []; 
       auto-usage-doc =
         (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
 
@@ -30,6 +31,7 @@ let
           ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
             packageAttr = pkg-attr;
             helpCmd = pkg-attr.meta.autoGenUsageCmd;
+            subCmds = sub-cmds;
           }}
           ```
         '' else

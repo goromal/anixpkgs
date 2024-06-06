@@ -11,5 +11,14 @@ buildPythonPackage rec {
       [Repository](https://github.com/goromal/wiki-tools)
     '';
     autoGenUsageCmd = "--help";
+    subCmds = [
+      "get"
+      "get-md"
+      "get-rand-journal"
+      "put"
+      "put-dir"
+      "put-md"
+      "put-md-dir"
+    ];
   };
 }
