@@ -6,26 +6,7 @@ Assorted Python tools for semi-automated processing of GMail messages.
 
 This package may be used either in CLI form or via an interactive Python shell.
 
-## Usage Examples (CLI)
-
-```bash
-Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
-
-  Manage GMail.
-
-Options:
-  --gmail-secrets-json PATH  GMail client secrets file.  [default:
-                            /data/andrew/secrets/gmail/secrets.json]
-  --gmail-refresh-file PATH  GMail refresh file (if it exists).  [default:
-                            /data/andrew/secrets/gmail/refresh.json]
-  --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
-  --help                     Show this message and exit.
-
-Commands:
-  clean  Clean out promotions and social emails.
-```
-
-## Usage Examples (Interactive Shell)
+## Interactive Shell
 
 Import with
 
@@ -60,5 +41,35 @@ Mark an entire sub-inbox as read:
 
 ```python
 subInbox.markAllAsRead()
+```
+
+## Usage (Auto-Generated)
+
+```bash
+Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
+
+  Manage GMail.
+
+Options:
+  --gmail-secrets-json PATH    GMail client secrets file.  [default:
+                               /homeless-
+                               shelter/secrets/google/client_secrets.json]
+  --gmail-refresh-file PATH    GMail refresh file (if it exists).  [default:
+                               /homeless-shelter/secrets/google/refresh.json]
+  --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
+                               /homeless-
+                               shelter/secrets/google/bot_refresh.json]
+  --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
+                               /homeless-
+                               shelter/secrets/google/journal_refresh.json]
+  --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
+  --help                       Show this message and exit.
+
+Commands:
+  clean         Clean out promotions and social emails.
+  gbot-send     Send an email from GBot.
+  journal-send  Send an email from Journal.
+  send          Send an email.
+
 ```
 

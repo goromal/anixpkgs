@@ -1,4 +1,4 @@
-{ pname, version, description, longDescription ? "", script-file, is-exec ? true
+{ pname, version, description, longDescription ? "", autoGenUsageCmd ? "--help", script-file, is-exec ? true
 , test-dir ? null, pytestCheckHook, buildPythonPackage, nativeBuildInputs ? [ ]
 , propagatedBuildInputs ? [ ], checkPkgs ? [ ] }:
 let
@@ -33,5 +33,5 @@ in buildPythonPackage rec {
     sed -i 's|_tmpversion|${version}|g' __version__.py
     ${testsCpyCmd}
   '';
-  meta = { inherit description longDescription; };
+  meta = { inherit description longDescription autoGenUsageCmd; };
 }

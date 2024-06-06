@@ -47,8 +47,13 @@ for rfc in pkgs["rfcs"]:
 
 for lang, title, desc in langs:
     lang_pkgs =  [{"name": pkg["attr"].split(
-        ".")[-1], "attr": pkg["attr"]} for pkg in pkgs["pkgs"][lang]]
-    with open(os.path.join(ANIXDIR, "docs", "src", lang, f"{lang}.md"), "w") as langfile:
+        ".")[-1], "attr": pkg["attr"]} for pkg in pkgs["pkgs"][lang] if pkg["docs"]]
+    lang_dir = os.path.join(ANIXDIR, "docs", "src", lang)
+    for filename in os.listdir(lang_dir):
+        file_path = os.path.join(lang_dir, filename)
+        if os.path.isfile(file_path) or os.path.islink(file_path):
+            os.unlink(file_path)
+    with open(os.path.join(lang_dir, f"{lang}.md"), "w") as langfile:
         summaryfile.write(f"- [{title}](./{lang}/{lang}.md)\n")
         langfile.write(f"# {title}\n\n")
         langfile.write(f"{desc}\n\n")

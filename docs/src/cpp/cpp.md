@@ -9,3 +9,8 @@ Packages written in C++.
 - [ceres-factors](./ceres-factors.md)
 - [signals-cpp](./signals-cpp.md)
 - [secure-delete](./secure-delete.md)
+- [sorting](./sorting.md)
+- [crowcpp](./crowcpp.md)
+- [rankserver-cpp](./rankserver-cpp.md)
+- [mfn](./mfn.md)
+- [orchestrator-cpp](./orchestrator-cpp.md)

@@ -4,7 +4,7 @@ CLI tools for managing my wiki notes site.
 
 [Repository](https://github.com/goromal/wiki-tools)
 
-## Usage
+## Usage (Auto-Generated)
 
 ```bash
 Usage: wiki-tools [OPTIONS] COMMAND [ARGS]...
@@ -15,6 +15,8 @@ Options:
   --url TEXT                URL of the DokuWiki instance (https).  [default:
                             https://notes.andrewtorgesen.com]
   --secrets-file PATH       Path to the DokuWiki login secrets JSON file.
+                            [default: /homeless-
+                            shelter/secrets/wiki/secrets.json]
   --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
   --help                    Show this message and exit.
 
@@ -26,104 +28,6 @@ Commands:
   put-dir           Put a directory of pages into a DokuWiki namespace.
   put-md            Put Markdown content onto a DokuWiki page.
   put-md-dir        Put a directory of Markdown pages into a DokuWiki...
-```
 
-### Get
-
-```bash
-Usage: wiki-tools get [OPTIONS]
-
-  Read the content of a DokuWiki page.
-
-Options:
-  --page-id TEXT  ID of the DokuWiki page.  [required]
-  --output TEXT   Output text file name. Will print to terminal if not
-                  specified.
-  --help          Show this message and exit.
-```
-
-### Get Markdown
-
-```bash
-Usage: wiki-tools get-md [OPTIONS]
-
-  Read the content of a DokuWiki page in Markdown format.
-
-Options:
-  --page-id TEXT  ID of the DokuWiki page.  [required]
-  --output TEXT   Output Markdown file name. Will print to terminal if not
-                  specified.
-  --help          Show this message and exit.
-```
-
-### Get Random Journal
-
-```bash
-Usage: wiki-tools get-rand-journal [OPTIONS]
-
-  Get a random journal entry between 2013 and now.
-
-Options:
-  --namespace TEXT  Journal pages namespace.  [default: journals]
-  --output TEXT     Output text file name. Will print to terminal if not
-                    specified.
-  --help            Show this message and exit.
-```
-
-### Put
-
-```bash
-Usage: wiki-tools put [OPTIONS]
-
-  Put content onto a DokuWiki page.
-
-Options:
-  --page-id TEXT  ID of the DokuWiki page.  [required]
-  --file PATH     File containing the target content.
-  --content TEXT  Content to put on the page if file is not specified. NOTE:
-                  This argument is mutually exclusive with content_file
-  --help          Show this message and exit.
-```
-
-### Put Directory
-
-```bash
-Usage: wiki-tools put-dir [OPTIONS]
-
-  Put a directory of pages into a DokuWiki namespace.
-
-Options:
-  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
-  --namespace TEXT       Namespace to upload the pages to.  [required]
-  --help                 Show this message and exit.
-```
-
-### Put Markdown
-
-```bash
-Usage: wiki-tools put-md [OPTIONS]
-
-  Put Markdown content onto a DokuWiki page.
-
-Options:
-  --page-id TEXT  ID of the DokuWiki page.  [required]
-  --file PATH     Markdown file containing the target content.
-  --content TEXT  Markdown content to put on the page if file is not
-                  specified. NOTE: This argument is mutually exclusive with
-                  content_file
-  --help          Show this message and exit.
-```
-
-### Put Markdown Directory
-
-```bash
-Usage: wiki-tools put-md-dir [OPTIONS]
-
-  Put a directory of Markdown pages into a DokuWiki namespace.
-
-Options:
-  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
-  --namespace TEXT       Namespace to upload the pages to.  [required]
-  --help                 Show this message and exit.
 ```
 
