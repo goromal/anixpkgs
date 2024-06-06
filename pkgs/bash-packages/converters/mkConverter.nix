@@ -1,5 +1,5 @@
 { writeArgparseScriptBin, color-prints, strings, name, extension, usage_str
-, optsWithVarsAndDefaults, convOptCmds, description ? "", longDescription ? null
+, optsWithVarsAndDefaults, convOptCmds, description ? "", longDescription ? "", autoGenUsageCmd ? "--help"
 }:
 let
   conv_opt_list = map (x: ''
@@ -39,13 +39,6 @@ in (writeArgparseScriptBin name usage_str optsWithVarsAndDefaults ''
   esac
 '') // {
   meta = {
-    inherit description;
-    longDescription = (if longDescription != null then
-      longDescription
-    else ''
-      ```
-      ${usage_str}
-      ```
-    '');
+    inherit description longDescription autoGenUsageCmd;
   };
 }

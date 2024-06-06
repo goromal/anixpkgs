@@ -23,10 +23,7 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
 '') // {
   meta = {
     inherit description;
-    longDescription = ''
-      ```bash
-      ${long-description}
-      ```  
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }
