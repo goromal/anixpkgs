@@ -67,9 +67,9 @@ for lang, title, desc in langs:
                 try:
                     docf = check_output(
                         ["nix-build", ".", "-A", f"{lang_pkg['attr']}.doc", "--no-out-link"], stderr=DEVNULL)
-                except CalledProcessError:
+                except CalledProcessError as e:
                     print(
-                        f"ERROR: {lang_pkg['attr']} does not appear to have a doc attribute defined.")
+                        f"ERROR: {lang_pkg['attr']} does not appear to have a doc attribute defined: {e}\n\n{docf}")
                     exit(1)
                 with open(docf.decode().strip(), "r") as docfile:
                     docstr = docfile.read()
