@@ -75,6 +75,7 @@ for lang, title, desc in langs:
                 pkgfile.write(f"# {lang_pkg['attr']}\n\n")
                 process = Popen(
                     [
+                        "NIXPKGS_ALLOW_UNFREE=1",
                         "nix-build",
                         ".",
                         "-A",
