@@ -1,6 +1,7 @@
-{ pname, version, description, longDescription ? "", autoGenUsageCmd ? "--help", script-file, is-exec ? true
-, test-dir ? null, pytestCheckHook, buildPythonPackage, nativeBuildInputs ? [ ]
-, propagatedBuildInputs ? [ ], checkPkgs ? [ ] }:
+{ pname, version, description, longDescription ? "", autoGenUsageCmd ? "--help"
+, script-file, is-exec ? true, test-dir ? null, pytestCheckHook
+, buildPythonPackage, nativeBuildInputs ? [ ], propagatedBuildInputs ? [ ]
+, checkPkgs ? [ ] }:
 let
   testsCpyCmd = if test-dir != null then ''
     cp ${test-dir}/* tests/
