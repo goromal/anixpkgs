@@ -299,7 +299,7 @@ in {
       exiftool
       dhcpcd
       dnsutils
-      v4l_utils
+      v4l-utils
       usbutils
       ffmpeg
       chrony
