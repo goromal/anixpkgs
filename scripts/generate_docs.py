@@ -85,7 +85,8 @@ for lang, title, desc in langs:
                     stderr=PIPE,
                 )
                 docf, stderr = process.communicate()
-                if stderr:
+                exit_code = process.returncode
+                if exit_code != 0:
                     print(
                         f"ERROR: doc attribute generation for package {lang_pkg['attr']} failed: {docf.decode()}\n\n{stderr.decode()}"
                     )
