@@ -113,7 +113,7 @@
       "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
     trafficsim.flake = false;
 
-    wiki-tools.url = "github:goromal/wiki-tools?rev=d2381166fcaac4d389a34265ab199def9a9abbb7";
+    wiki-tools.url = "github:goromal/wiki-tools?rev=8db9b8285e752a931ff9f04483d5f215c729a194";
     wiki-tools.flake = false;
 
     manif-geom-rs.url = "github:goromal/manif-geom-rs";

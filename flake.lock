@@ -674,17 +674,17 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717697305,
-        "narHash": "sha256-Twjy3K6HQdfzYVmzCNeB/qHv27F2le4528yfNBT9yhQ=",
+        "lastModified": 1717733911,
+        "narHash": "sha256-Nq7LJl8EuDIZSqvZ9ZPJnG0QF7vxkN10AFnbPO7NM5E=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "d2381166fcaac4d389a34265ab199def9a9abbb7",
+        "rev": "8db9b8285e752a931ff9f04483d5f215c729a194",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "d2381166fcaac4d389a34265ab199def9a9abbb7",
+        "rev": "8db9b8285e752a931ff9f04483d5f215c729a194",
         "type": "github"
       }
     },

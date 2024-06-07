@@ -15,8 +15,7 @@ Options:
   --url TEXT                URL of the DokuWiki instance (https).  [default:
                             https://notes.andrewtorgesen.com]
   --secrets-file PATH       Path to the DokuWiki login secrets JSON file.
-                            [default: /homeless-
-                            shelter/secrets/wiki/secrets.json]
+                            [default: ~/secrets/wiki/secrets.json]
   --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
   --help                    Show this message and exit.
 

@@ -43,8 +43,7 @@ Options:
   --wiki-url TEXT              URL of the DokuWiki instance (https).
                                [default: https://notes.andrewtorgesen.com]
   --wiki-secrets-file PATH     Path to the DokuWiki login secrets JSON file.
-                               [default: /homeless-
-                               shelter/secrets/wiki/secrets.json]
+                               [default: ~/secrets/wiki/secrets.json]
   --task-secrets-file PATH     Google Tasks client secrets file.  [default:
                                /homeless-
                                shelter/secrets/google/client_secrets.json]
