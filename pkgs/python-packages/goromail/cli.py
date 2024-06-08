@@ -121,7 +121,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
 @click.option(
     "--gmail-secrets-json",
     "gmail_secrets_json",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default=GPD.GMAIL_SECRETS_JSON,
     show_default=True,
     help="GMail client secrets file.",
@@ -161,7 +161,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
 @click.option(
     "--wiki-secrets-file",
     "wiki_secrets_file",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default=WTD.WIKI_SECRETS_FILE,
     show_default=True,
     help="Path to the DokuWiki login secrets JSON file.",
@@ -169,7 +169,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
 @click.option(
     "--task-secrets-file",
     "task_secrets_file",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default=TTD.TASK_SECRETS_FILE,
     show_default=True,
     help="Google Tasks client secrets file.",
@@ -200,7 +200,7 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     "--headless-logdir",
     "headless_logdir",
     type=click.Path(),
-    default=os.path.expanduser("~/goromail"),
+    default="~/goromail",
     show_default=True,
     help="Directory in which to store log files for headless mode.",
 )
@@ -230,7 +230,7 @@ def cli(
         "task_secrets_file": task_secrets_file,
         "task_refresh_token": task_refresh_token,
         "headless": headless,
-        "headless_logdir": headless_logdir,
+        "headless_logdir": os.path.expanduser(headless_logdir),
     }
 
 
@@ -239,8 +239,8 @@ def cli(
 @click.option(
     "--categories-csv",
     "categories_csv",
-    type=click.Path(exists=True),
-    default=os.path.expanduser("~/configs/goromail-categories.csv"),
+    type=click.Path(),
+    default="~/configs/goromail-categories.csv",
     show_default=True,
     help="CSV that maps keywords to wiki pages.",
 )
@@ -302,7 +302,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         date = msg.getDate()
         matched = False
         if categories_csv is not None:
-            with open(categories_csv, "r") as categories:
+            with open(os.path.expanduser(categories_csv), "r") as categories:
                 for line in categories:
                     keyword, page_id = line.split(",")[0], line.split(",")[1]
                     matched = process_keyword(

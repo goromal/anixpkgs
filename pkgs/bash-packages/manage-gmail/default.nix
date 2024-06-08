@@ -46,10 +46,7 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
       "Interactively manage your GMail inbox from the command line.";
     longDescription = ''
       Powered by [gmail-parser](../python/gmail-parser.md).
-
-      ```bash
-      ${usage_str}
-      ```
     '';
+    autoGenUsageCmd = "--help";
   };
 }

@@ -54,10 +54,7 @@ in (writeArgparseScriptBin pkgname usage_str [
     description = "Convenience tools for setting up Rust projects.";
     longDescription = ''
       ***Under construction.***
-
-      ```bash
-      ${usage_str}
-      ```
     '';
+    autoGenUsageCmd = "--help";
   };
 }

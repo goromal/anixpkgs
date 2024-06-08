@@ -35,11 +35,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1717024799,
-        "narHash": "sha256-1NxKGoKdp5Mrfx+G97gsDBEOO1gRmnvRJKAcBVEas3k=",
+        "lastModified": 1717871019,
+        "narHash": "sha256-0ic7jZirFebHbYtQDoFcdJmuVKAkwiKVq8lmE0byy9I=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "52afb6ca32c0652d9b0875d30d8c1d597897dc22",
+        "rev": "3f96818f223520e45dea7a98f7b3287ab23b5a5a",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1717220994,
-        "narHash": "sha256-XV7pcgpA+knCFoDDjwGSt4DsG/qxGo3B2+VN2RhK8+4=",
+        "lastModified": 1717871040,
+        "narHash": "sha256-MGVU1SSsC7P218a9jBYw1w54dIiMQSKeO68XuJ9HpqA=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "a818346992bf868fdbd52a118e9f4999339275f7",
+        "rev": "1d1b4d627729260bd783b1fd7590861579ac0127",
         "type": "github"
       },
       "original": {
@@ -181,11 +181,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1717040684,
-        "narHash": "sha256-2GgdPvDBicDga4U5hK2Gz9ru9Zs3trZ/XDE8QWFB68Q=",
+        "lastModified": 1717870983,
+        "narHash": "sha256-VdJC/Z4xI5GHONMlA07Mui0gihbwOqjehurWUfWvxGc=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "d48de4bbc0ee9239565e34aec4067c73e299814e",
+        "rev": "81c4c2f30cc02cacae0c4d19c8bf42e64fb5d248",
         "type": "github"
       },
       "original": {
@@ -642,11 +642,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717024843,
-        "narHash": "sha256-zeqc6ZVoI+KSCyE3xzMEaLqbbWKsJSPxleZbdD+OtyE=",
+        "lastModified": 1717870999,
+        "narHash": "sha256-ZCpgZCkc66zY0JPrFAtHhWXSePDFAgoqKUyyOP3ftZM=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "564399274b936c0cb12a116685137b318a9b6420",
+        "rev": "901ad78fae2bebf1bdae4c27522d1e216b1809ee",
         "type": "github"
       },
       "original": {
@@ -674,11 +674,11 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1716785277,
-        "narHash": "sha256-uYHZThiPnGWYBgwNY9zjIHWQefVHD36qiccmwxKfctI=",
+        "lastModified": 1717870970,
+        "narHash": "sha256-mMB/Vj6jA7nJqsJPPX8FX1EwaJDJuxP/gzXT3cyOZkg=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "277abfba2263b31ae70e7767cea93688266d4836",
+        "rev": "60619a5e7f0c0005903153074c6963782984b479",
         "type": "github"
       },
       "original": {
