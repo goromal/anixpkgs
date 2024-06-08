@@ -32,10 +32,10 @@ Usage: budget_report [OPTIONS] COMMAND [ARGS]...
   Tools for Budget Management.
 
 Options:
-  --secrets-json PATH       Client secrets file.  [default: /homeless-
-                            shelter/secrets/google/client_secrets.json]
-  --refresh-file PATH       Refresh file (if it exists).  [default: /homeless-
-                            shelter/secrets/google/refresh.json]
+  --secrets-json PATH       Client secrets file.  [default:
+                            ~/secrets/google/client_secrets.json]
+  --refresh-file PATH       Refresh file (if it exists).  [default:
+                            ~/secrets/google/refresh.json]
   --config-json PATH        Budget tool config file.  [default: /homeless-
                             shelter/configs/budget-tool.json]
   --enable-logging BOOLEAN  Whether to enable logging.  [default: False]

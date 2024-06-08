@@ -52,16 +52,13 @@ Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --gmail-secrets-json PATH    GMail client secrets file.  [default:
-                               /homeless-
-                               shelter/secrets/google/client_secrets.json]
+                               ~/secrets/google/client_secrets.json]
   --gmail-refresh-file PATH    GMail refresh file (if it exists).  [default:
-                               /homeless-shelter/secrets/google/refresh.json]
+                               ~/secrets/google/refresh.json]
   --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
-                               /homeless-
-                               shelter/secrets/google/bot_refresh.json]
+                               ~/secrets/google/bot_refresh.json]
   --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
-                               /homeless-
-                               shelter/secrets/google/journal_refresh.json]
+                               ~/secrets/google/journal_refresh.json]
   --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
   --help                       Show this message and exit.
 
@@ -70,6 +67,44 @@ Commands:
   gbot-send     Send an email from GBot.
   journal-send  Send an email from Journal.
   send          Send an email.
+
+
+
+Usage: gmail-manager clean [OPTIONS]
+
+  Clean out promotions and social emails.
+
+Options:
+  --num-messages INTEGER  Number of messages to poll before cleaning.
+                          [default: 1000]
+  --help                  Show this message and exit.
+
+
+
+Usage: gmail-manager send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email.
+
+Options:
+  --help  Show this message and exit.
+
+
+
+Usage: gmail-manager gbot-send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email from GBot.
+
+Options:
+  --help  Show this message and exit.
+
+
+
+Usage: gmail-manager journal-send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email from Journal.
+
+Options:
+  --help  Show this message and exit.
 
 ```
 

@@ -58,10 +58,10 @@
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;
 
-    book-notes-sync.url = "github:goromal/book-notes-sync";
+    book-notes-sync.url = "github:goromal/book-notes-sync?ref=dev/no-rqd";
     book-notes-sync.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth";
+    easy-google-auth.url = "github:goromal/easy-google-auth?ref=dev/no-rqd";
     easy-google-auth.flake = false;
 
     find_rotational_conventions.url =

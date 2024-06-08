@@ -12,5 +12,6 @@ buildPythonPackage rec {
       [Repository](https://github.com/goromal/book-notes-sync)
     '';
     autoGenUsageCmd = "--help";
+    subCmds = [ "sync" "sync-from-csv" ];
   };
 }

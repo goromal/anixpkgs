@@ -12,11 +12,6 @@ buildPythonPackage rec {
       [Repository](https://github.com/goromal/task-tools)
     '';
     autoGenUsageCmd = "--help";
-    subCmds = [
-      "list"
-      "delete"
-      "put"
-      "grader"
-    ];
+    subCmds = [ "list" "delete" "put" "grader" ];
   };
 }

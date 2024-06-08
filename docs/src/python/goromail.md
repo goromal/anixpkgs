@@ -30,14 +30,11 @@ Usage: goromail [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --gmail-secrets-json PATH    GMail client secrets file.  [default:
-                               /homeless-
-                               shelter/secrets/google/client_secrets.json]
+                               ~/secrets/google/client_secrets.json]
   --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
-                               /homeless-
-                               shelter/secrets/google/bot_refresh.json]
+                               ~/secrets/google/bot_refresh.json]
   --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
-                               /homeless-
-                               shelter/secrets/google/journal_refresh.json]
+                               ~/secrets/google/journal_refresh.json]
   --num-messages INTEGER       Number of messages to poll for GBot and Journal
                                (each).  [default: 1000]
   --wiki-url TEXT              URL of the DokuWiki instance (https).
@@ -45,21 +42,40 @@ Options:
   --wiki-secrets-file PATH     Path to the DokuWiki login secrets JSON file.
                                [default: ~/secrets/wiki/secrets.json]
   --task-secrets-file PATH     Google Tasks client secrets file.  [default:
-                               /homeless-
-                               shelter/secrets/google/client_secrets.json]
+                               ~/secrets/google/client_secrets.json]
   --task-refresh-token PATH    Google Tasks refresh file (if it exists).
-                               [default: /homeless-
-                               shelter/secrets/google/refresh.json]
+                               [default: ~/secrets/google/refresh.json]
   --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
   --headless                   Whether to run in headless (i.e., server) mode.
   --headless-logdir PATH       Directory in which to store log files for
-                               headless mode.  [default: /homeless-
-                               shelter/goromail]
+                               headless mode.  [default: ~/goromail]
   --help                       Show this message and exit.
 
 Commands:
   bot      Process all pending bot commands.
   journal  Process all pending journal entries.
+
+
+
+Usage: goromail bot [OPTIONS]
+
+  Process all pending bot commands.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to wiki pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; no message deletions.
+  --help                 Show this message and exit.
+
+
+
+Usage: goromail journal [OPTIONS]
+
+  Process all pending journal entries.
+
+Options:
+  --dry-run  Do a dry run; no message deletions.
+  --help     Show this message and exit.
 
 ```
 
