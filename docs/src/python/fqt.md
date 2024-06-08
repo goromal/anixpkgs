@@ -22,10 +22,8 @@ Usage: fqt [OPTIONS] COMMAND [ARGS]...
   Four-quadrants tasking tools.
 
 Options:
-  --config-file PATH  Path to the config file.  [default: /homeless-
-                      shelter/fqt/config]
-  --log-file PATH     Path to the log file.  [default: /homeless-
-                      shelter/fqt/log]
+  --config-file PATH  Path to the config file.  [default: ~/fqt/config]
+  --log-file PATH     Path to the log file.  [default: ~/fqt/log]
   --help              Show this message and exit.
 
 Commands:

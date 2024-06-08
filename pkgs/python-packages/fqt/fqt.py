@@ -4,7 +4,7 @@ def getClasses(cfgfile):
     class_names = []
     class_weights = []
     total_weight = 0.0
-    with open(cfgfile, "r") as cfg:
+    with open(os.path.expanduser(cfgfile), "r") as cfg:
         for line in cfg:
             class_name = line.split(":")[0]
             class_names.append(class_name)
@@ -24,8 +24,8 @@ def getClasses(cfgfile):
 @click.option(
     "--config-file",
     "config_file",
-    type=click.Path(exists=True),
-    default=os.path.expanduser("~/fqt/config"),
+    type=click.Path(),
+    default="~/fqt/config",
     show_default=True,
     help="Path to the config file.",
 )
@@ -33,7 +33,7 @@ def getClasses(cfgfile):
     "--log-file",
     "log_file",
     type=click.Path(),
-    default=os.path.expanduser("~/fqt/log"),
+    default="~/fqt/log",
     show_default=True,
     help="Path to the log file.",
 )
@@ -75,7 +75,7 @@ def task(ctx: click.Context):
         else:
             print("Response not understood.")
             response = None
-    with open(ctx.obj["log"], "a") as log:
+    with open(os.path.expanduser(ctx.obj["log"]), "a") as log:
         log.write(f"{datetime.datetime.now()}|{chosen_class}|{response}\n")
 
 @cli.command()

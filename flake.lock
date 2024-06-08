@@ -683,8 +683,8 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/no-rqd",
         "repo": "wiki-tools",
-        "rev": "8db9b8285e752a931ff9f04483d5f215c729a194",
         "type": "github"
       }
     },
