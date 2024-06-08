@@ -52,5 +52,6 @@ buildPythonPackage rec {
       ```
     '';
     autoGenUsageCmd = "--help";
+    subCmds = [ "clean" "send" "gbot-send" "journal-send" ];
   };
 }

@@ -1,7 +1,7 @@
 { pname, version, description, longDescription ? "", autoGenUsageCmd ? "--help"
 , script-file, is-exec ? true, test-dir ? null, pytestCheckHook
 , buildPythonPackage, nativeBuildInputs ? [ ], propagatedBuildInputs ? [ ]
-, checkPkgs ? [ ] }:
+, checkPkgs ? [ ], subCmds ? [ ] }:
 let
   testsCpyCmd = if test-dir != null then ''
     cp ${test-dir}/* tests/
@@ -34,5 +34,5 @@ in buildPythonPackage rec {
     sed -i 's|_tmpversion|${version}|g' __version__.py
     ${testsCpyCmd}
   '';
-  meta = { inherit description longDescription autoGenUsageCmd; };
+  meta = { inherit description longDescription autoGenUsageCmd subCmds; };
 }

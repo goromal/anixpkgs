@@ -71,7 +71,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser";
+    gmail-parser.url = "github:goromal/gmail_parser?ref=dev/no-rqd";
     gmail-parser.flake = false;
 
     makepyshell.url =
@@ -106,7 +106,7 @@
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
-    task-tools.url = "github:goromal/task-tools";
+    task-tools.url = "github:goromal/task-tools?ref=dev/no-rqd";
     task-tools.flake = false;
 
     trafficsim.url =
