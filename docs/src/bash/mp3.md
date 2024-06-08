@@ -2,10 +2,7 @@
 
 Generate (or modify) an MP3 file from similar formats.
 
-
-## Usage (Auto-Generated)
-
-```bash
+```
 usage: mp3 inputfile outputfile
 
 Create a mp3 file.
@@ -20,7 +17,6 @@ Options:
     --transpose [+- # HALF STEPS]
         Powered by https://github.com/breakfastquay/rubberband.
     --TODO
-
 
 ```
 

@@ -6,7 +6,26 @@ Assorted Python tools for semi-automated processing of GMail messages.
 
 This package may be used either in CLI form or via an interactive Python shell.
 
-## Interactive Shell
+## Usage Examples (CLI)
+
+```bash
+Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
+
+  Manage GMail.
+
+Options:
+  --gmail-secrets-json PATH  GMail client secrets file.  [default:
+                            /data/andrew/secrets/gmail/secrets.json]
+  --gmail-refresh-file PATH  GMail refresh file (if it exists).  [default:
+                            /data/andrew/secrets/gmail/refresh.json]
+  --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
+  --help                     Show this message and exit.
+
+Commands:
+  clean  Clean out promotions and social emails.
+```
+
+## Usage Examples (Interactive Shell)
 
 Import with
 
@@ -41,70 +60,5 @@ Mark an entire sub-inbox as read:
 
 ```python
 subInbox.markAllAsRead()
-```
-
-## Usage (Auto-Generated)
-
-```bash
-Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
-
-  Manage GMail.
-
-Options:
-  --gmail-secrets-json PATH    GMail client secrets file.  [default:
-                               ~/secrets/google/client_secrets.json]
-  --gmail-refresh-file PATH    GMail refresh file (if it exists).  [default:
-                               ~/secrets/google/refresh.json]
-  --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
-                               ~/secrets/google/bot_refresh.json]
-  --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
-                               ~/secrets/google/journal_refresh.json]
-  --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
-  --help                       Show this message and exit.
-
-Commands:
-  clean         Clean out promotions and social emails.
-  gbot-send     Send an email from GBot.
-  journal-send  Send an email from Journal.
-  send          Send an email.
-
-
-
-Usage: gmail-manager clean [OPTIONS]
-
-  Clean out promotions and social emails.
-
-Options:
-  --num-messages INTEGER  Number of messages to poll before cleaning.
-                          [default: 1000]
-  --help                  Show this message and exit.
-
-
-
-Usage: gmail-manager send [OPTIONS] RECIPIENT SUBJECT BODY
-
-  Send an email.
-
-Options:
-  --help  Show this message and exit.
-
-
-
-Usage: gmail-manager gbot-send [OPTIONS] RECIPIENT SUBJECT BODY
-
-  Send an email from GBot.
-
-Options:
-  --help  Show this message and exit.
-
-
-
-Usage: gmail-manager journal-send [OPTIONS] RECIPIENT SUBJECT BODY
-
-  Send an email from Journal.
-
-Options:
-  --help  Show this message and exit.
-
 ```
 

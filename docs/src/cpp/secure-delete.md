@@ -4,6 +4,21 @@ Secure file deletion utility, written in C.
 
 [Repository](https://github.com/goromal/secure-delete)
 
+```bash
+secure-delete [-dflrvz] file1 file2 etc.
+
+Options:
+        -d  ignore the two dot special files "." and "..".
+        -f  fast (and insecure mode): no /dev/urandom, no synchronize mode.
+        -l  lessens the security (use twice for "totally insecure" mode).
+        -r  recursive mode, deletes all subdirectories.
+        -v  is verbose mode.
+        -z  last wipe writes zeros instead of random data.
+
+Does a secure overwrite/rename/delete of the target file(s).
+Default is secure mode (38 writes).
+```
+
 The deletion process is as follows:
 
 1. Overwrite the file with multiple passes. After each pass, the disk cache is flushed. The number of passes depends on the commanded mode:
@@ -25,21 +40,4 @@ The deletion process is as follows:
 In 1 second you can approximately overwrite 1 to 2 MB of data (on a hard disk).
 
 In "totally insecure" mode, in 15 seconds you can approximately overwrite 100 MB of data. The same deletion takes about 60 minutes in totally secure mode.
-
-## Usage
-
-```bash
-secure-delete [-dflrvz] file1 file2 etc.
-
-Options:
-        -d  ignore the two dot special files "." and "..".
-        -f  fast (and insecure mode): no /dev/urandom, no synchronize mode.
-        -l  lessens the security (use twice for total insecure mode).
-        -r  recursive mode, deletes all subdirectories.
-        -v  is verbose mode.
-        -z  last wipe writes zeros instead of random data.
-
-Does a secure overwrite/rename/delete of the target file(s).
-Default is secure mode (38 writes).
-```
 

@@ -2,6 +2,14 @@
 
 Spawn an SMF "simple music file" conversion server, powered by Python's flask library.
 
+```bash
+usage: flask_smfserver [-h] [--port PORT]
+
+optional arguments:
+-h, --help   show this help message and exit
+--port PORT  Port to run the server on
+```
+
 The server page presents a text input area where you can type a song as specified by the simplified SMF music specification language:
 
 - Notes are typed as letters with spaces between them.
@@ -19,15 +27,4 @@ The server page presents a text input area where you can type a song as specifie
 - Begin a line with a number and colon (e.g., 1:) to specify a unique voice.
 
 Under the hood, conversions to MP3 are done using the [abc](../bash/abc.md) and [mp3](../bash/mp3.md) tools.
-
-## Usage (Auto-Generated)
-
-```bash
-usage: flask_smfserver [-h] [--port PORT]
-
-optional arguments:
-  -h, --help   show this help message and exit
-  --port PORT  Port to run the server on
-
-```
 

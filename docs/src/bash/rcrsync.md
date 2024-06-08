@@ -2,9 +2,6 @@
 
 Cloud directory management tool.
 
-
-## Usage (Auto-Generated)
-
 ```bash
 usage: rcrsync [OPTS] [init|sync] CLOUD_DIR
 
@@ -16,7 +13,6 @@ Options:
 CLOUD_DIR options:
 
       
-
 
 ```
 

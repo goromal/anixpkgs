@@ -4,8 +4,6 @@ Interactively manage your GMail inbox from the command line.
 
 Powered by [gmail-parser](../python/gmail-parser.md).
 
-## Usage (Auto-Generated)
-
 ```bash
 usage: manage-gmail
 
@@ -33,7 +31,6 @@ Examples:
     [Mark an entire sub-inbox as read]
 
     >> subInbox.markAllAsRead()
-
 
 ```
 
