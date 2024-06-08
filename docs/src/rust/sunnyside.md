@@ -4,7 +4,7 @@ File scrambler.
 
 Written in Rust. [Repository](https://github.com/goromal/sunnyside)
 
-## Usage
+## Usage (Auto-Generated)
 
 ```bash
 Make some scrambled eggs
@@ -17,5 +17,6 @@ Options:
   -k, --key <KEY>        Scramble key
   -h, --help             Print help
   -V, --version          Print version
+
 ```
 
