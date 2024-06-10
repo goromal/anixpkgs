@@ -11,13 +11,6 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
         return 'Hello, World! Oh, the places we will go!'
   '';
   description = "Spawn a trivial website, powered by Python's flask library.";
-  longDescription = ''
-    ```bash
-    usage: flask_hello_world [-h] [--port PORT]
-
-    optional arguments:
-    -h, --help   show this help message and exit
-    --port PORT  Port to run the server on
-    ```
-  '';
+  longDescription = "";
+  autoGenUsageCmd = "--help";
 }

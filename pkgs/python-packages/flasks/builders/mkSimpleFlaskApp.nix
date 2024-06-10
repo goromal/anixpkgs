@@ -1,7 +1,7 @@
 { pname, version, buildPythonPackage, flask, writeTextFile, flaskScript
 , overrideFullFlaskScript ? false, helperScript ? null, templateText ? null
 , writeShellScript, scriptPropagatedBuildInputs, python, description
-, longDescription ? "" }:
+, longDescription ? "", autoGenUsageCmd ? "--help" }:
 let
   use_template = templateText != null;
   use_helper = helperScript != null;
@@ -83,5 +83,5 @@ in buildPythonPackage rec {
     cp ${script_file} ${pname}.py
   '';
   propagatedBuildInputs = [ flask ] ++ scriptPropagatedBuildInputs;
-  meta = { inherit description longDescription; };
+  meta = { inherit description longDescription autoGenUsageCmd; };
 }

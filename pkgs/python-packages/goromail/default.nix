@@ -27,28 +27,7 @@ callPackage ../pythonPkgFromScript.nix {
     **Journal (*goromal.journal@gmail.com*):**
 
     - Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
-
-    ```bash
-    Usage: goromail [OPTIONS] COMMAND [ARGS]...
-
-      Manage the mail for GBot and Journal.
-
-    Options:
-      --gmail-secrets-json PATH    GMail client secrets file.
-      --gbot-refresh-file PATH     GBot refresh file (if it exists).
-      --journal-refresh-file PATH  Journal refresh file (if it exists).
-      --num-messages INTEGER       Number of messages to poll for GBot and Journal
-                                  (each).  [default: 1000]
-      --wiki-url TEXT              URL of the DokuWiki instance (https).
-      --wiki-secrets-file PATH     Path to the DokuWiki login secrets JSON file.
-      --task-secrets-file PATH     Google Tasks client secrets file.
-      --task-refresh-token PATH    Google Tasks refresh file (if it exists).
-      --enable-logging BOOLEAN     Whether to enable logging.  [default: True]
-      --help                       Show this message and exit.
-
-    Commands:
-      bot      Process all pending bot commands.
-      journal  Process all pending journal entries.
-    ```
   '';
+  autoGenUsageCmd = "--help";
+  subCmds = [ "bot" "journal" ];
 }
