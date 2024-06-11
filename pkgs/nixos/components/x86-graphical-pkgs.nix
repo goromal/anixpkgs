@@ -109,11 +109,6 @@ in {
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
-      # ^^^^ TODO FIXME
-      # ".config/gtk-4.0/${themes.nordic-gtk4.css.name}".source =
-      #   themes.nordic-gtk4.css.data;
-      ".config/gtk-4.0/${themes.nordic-gtk4.css-dark.name}".source =
-        themes.nordic-gtk4.css-dark.data;
       ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
         themes.nordic-gtk4.thumbnail.data;
     } else
