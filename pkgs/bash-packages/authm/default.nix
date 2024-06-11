@@ -2,23 +2,7 @@
 let
   pkgname = "authm";
   description = "Manage secrets.";
-  longDescription = ''
-    ```
-    Usage: ${pkgname} [OPTIONS] COMMAND [ARGS]...
-
-      Manage secrets.
-
-    Options:
-      --help  Show this message and exit.
-
-    Commands:
-      refresh   Refresh all auth tokens one-by-one.
-      validate  Validate the secrets files present on the filesystem.
-
-    NOTE: This program will perform a bi-directional sync of the ~/secrets directory
-    before and after the selected command.
-    ```
-  '';
+  longDescription = "";
   authm = with python.pkgs;
     (callPackage ../../python-packages/pythonPkgFromScript.nix {
       pname = pkgname;
@@ -62,5 +46,9 @@ in (writeShellScriptBin pkgname ''
   ${bisync}
   rm "$lockfile"
 '') // {
-  meta = { inherit description longDescription; };
+  meta = {
+    inherit description longDescription;
+    autoGenUsageCmd = "--help";
+    subCmds = [ "refresh" "validate" ];
+  };
 }
