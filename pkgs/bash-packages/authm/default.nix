@@ -1,4 +1,5 @@
-{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python, flock }:
+{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python
+, flock }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
