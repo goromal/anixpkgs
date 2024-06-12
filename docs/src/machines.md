@@ -174,6 +174,23 @@ sudo nixos-rebuild boot
 sudo reboot
 ```
 
+## Upgrading NixOS versions with `anixpkgs`
+
+Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
+
+```bash
+# e.g., upgrading to 24.05:
+home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
+nixos https://nixos.org/channels/nixos-24.05
+nixpkgs https://nixos.org/channels/nixos-24.05
+```
+
+`sudo nix-channel --update`. Then upgrade with
+
+```bash
+anix-upgrade [source specification] --local --boot
+```
+
 ### Cloud Syncing
 
 The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
