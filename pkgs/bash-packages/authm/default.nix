@@ -23,7 +23,7 @@ let
       checkPkgs = [ ];
     });
   bisync = ''
-    if [[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]; then
+    if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help" ]]; then
       ${flock}/bin/flock /tmp -c "${rcrsync}/bin/rcrsync sync secrets"
     fi
   '';
