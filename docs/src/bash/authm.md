@@ -2,7 +2,10 @@
 
 Manage secrets.
 
-```
+
+## Usage (Auto-Generated)
+
+```bash
 Usage: authm [OPTIONS] COMMAND [ARGS]...
 
   Manage secrets.
@@ -14,7 +17,25 @@ Commands:
   refresh   Refresh all auth tokens one-by-one.
   validate  Validate the secrets files present on the filesystem.
 
-NOTE: This program will perform a bi-directional sync of the ~/secrets directory
-before and after the selected command.
+
+
+Usage: authm refresh [OPTIONS]
+
+  Refresh all auth tokens one-by-one.
+
+Options:
+  --headless  Run in headless mode.
+  --force     Force the auth files to be re-written.
+  --help      Show this message and exit.
+
+
+
+Usage: authm validate [OPTIONS]
+
+  Validate the secrets files present on the filesystem.
+
+Options:
+  --help  Show this message and exit.
+
 ```
 
