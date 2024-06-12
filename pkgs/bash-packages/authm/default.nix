@@ -1,4 +1,4 @@
-{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python }:
+{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python, flock }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
@@ -18,33 +18,20 @@ let
         task-tools
         wiki-tools
         book-notes-sync
+        flock
       ];
       checkPkgs = [ ];
     });
   bisync = ''
     if [[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]; then
-      ${rcrsync}/bin/rcrsync sync secrets
+      ${flock}/bin/flock /tmp -c "${rcrsync}/bin/rcrsync sync secrets"
     fi
   '';
   printErr = ">&2 ${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
-  lockfile=$HOME/.authm-lock
-  timeout_secs=30
-  wait_secs=0
-  while [[ -f "$lockfile" ]] && (( wait_secs < timeout_secs )); do
-    echo "Waiting for lockfile to clear..."
-    wait_secs=$(( wait_secs+1 ))
-    sleep 1
-  done
-  if [[ -f "$lockfile" ]]; then
-    ${printErr} "Timed out waiting for lockfile to clear. Exiting."
-    exit 1
-  fi
-  touch "$lockfile"
   ${bisync}
-  ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; rm "$lockfile"; exit 1; }
+  ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; exit 1; }
   ${bisync}
-  rm "$lockfile"
 '') // {
   meta = {
     inherit description longDescription;
