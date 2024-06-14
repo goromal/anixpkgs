@@ -12,7 +12,7 @@ usage: makepyshell [-h] [--nix-path NIX_PATH]
 
 Generate a nix-shell file (shell.nix) for Python 3.9 development.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --nix-path NIX_PATH   Nix source path. (default: nixpkgs)
   --modules MODULES [MODULES ...]

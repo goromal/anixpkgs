@@ -9,7 +9,7 @@ This tool gives you a method to store, extract, and replace files (again, one at
 ```bash
 usage: flask_oatbox [-h] [--port PORT]
 
-optional arguments:
+options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
 

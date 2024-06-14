@@ -9,7 +9,7 @@ The server page takes an input video file and converts it to an MP4 using the [m
 ```bash
 usage: flask_mp4server [-h] [--port PORT]
 
-optional arguments:
+options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
 

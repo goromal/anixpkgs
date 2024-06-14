@@ -25,7 +25,7 @@ Under the hood, conversions to MP3 are done using the [abc](../bash/abc.md) and 
 ```bash
 usage: flask_smfserver [-h] [--port PORT]
 
-optional arguments:
+options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
 

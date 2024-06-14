@@ -9,7 +9,7 @@ The server page takes an input audio file and converts it to an MP3 using the [m
 ```bash
 usage: flask_mp3server [-h] [--port PORT]
 
-optional arguments:
+options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
 

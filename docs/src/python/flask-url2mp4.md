@@ -9,7 +9,7 @@ The server page takes a URL string and either uses `wget` or `youtube-dl` to dow
 ```bash
 usage: flask_url2mp4 [-h] [--port PORT]
 
-optional arguments:
+options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
 

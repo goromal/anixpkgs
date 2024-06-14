@@ -18,7 +18,7 @@ usage: trafficsim [-h] [--num_cars NUM_CARS] [--vel_des VEL_DES]
 
 Simple traffic simulator on a circular road.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --num_cars NUM_CARS   Number of cars to simulate. (default: 7)
   --vel_des VEL_DES     Desired car velocity. (default: 1.0)
