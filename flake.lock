@@ -83,11 +83,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1718075117,
-        "narHash": "sha256-ggQi4fR9zApC6/jKqsIayDZ5/zlKqzLRq08ZmxoZ9Fk=",
+        "lastModified": 1718250350,
+        "narHash": "sha256-a6n/tsqw6l+ACnrWY0JWsvJU6tGKvjezBr0OBGx090U=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "b7f0e24df2e6832d0ec3a1e392d789b00ba297f5",
+        "rev": "536d581e676aa43b085b89074441a3110717f935",
         "type": "github"
       },
       "original": {
@@ -308,16 +308,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1685566663,
-        "narHash": "sha256-btHN1czJ6rzteeCuE/PNrdssqYD2nIA4w48miQAFloM=",
+        "lastModified": 1717179513,
+        "narHash": "sha256-vboIEwIQojofItm2xGCdZCzW96U85l9nDW3ifMuAIdM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4ecab3273592f27479a583fb6d975d4aba3486fe",
+        "rev": "63dacb46bf939521bdc93981b4cbb7ecb58427a0",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "refs/tags/23.05",
+        "ref": "refs/tags/24.05",
         "repo": "nixpkgs",
         "type": "github"
       }

@@ -22,8 +22,7 @@ let
     done
   '';
 in {
-  # TODO temporary fix for bad URL dependency in home-manager (23.05)
-  manual.manpages.enable = false;
+  home.stateVersion = cfg.homeState;
 
   home.packages = let
     rcrsync = rcrsyncConfigured;

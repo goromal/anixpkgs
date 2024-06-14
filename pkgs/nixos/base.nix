@@ -8,6 +8,10 @@ let
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
   options.machines.base = {
+    nixosState = lib.mkOption {
+      type = lib.types.str;
+      description = "Initiating state of the NixOS install (example: '22.05')";
+    };
     machineType = lib.mkOption {
       type = lib.types.enum [ "x86_linux" "pi4" ];
       description = "Machine type that the closure is targeting.";
@@ -43,7 +47,7 @@ in {
   ];
 
   config = {
-    system.stateVersion = nixos-state;
+    system.stateVersion = cfg.nixosState;
 
     boot = {
       kernelPackages = (if cfg.machineType == "pi4" then
@@ -299,7 +303,7 @@ in {
       exiftool
       dhcpcd
       dnsutils
-      v4l_utils
+      v4l-utils
       usbutils
       ffmpeg
       chrony
@@ -321,10 +325,7 @@ in {
       dog
     ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
-    # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
-    # see https://github.com/NixOS/nixpkgs/issues/234962
     programs.bash.interactiveShellInit = ''
-      export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
       eval "$(direnv hook bash)"
     '';
 
@@ -390,7 +391,6 @@ in {
 
     home-manager.users.andrew = {
       programs.home-manager.enable = true;
-      home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
       imports = [ ./components/opts.nix ./components/base-pkgs.nix ]
@@ -417,6 +417,7 @@ in {
             [ ]);
 
       mods.opts = {
+        homeState = cfg.nixosState;
         standalone = false;
         homeDir = "/data/andrew";
         browserExec = if cfg.graphical && cfg.machineType == "x86_linux" then

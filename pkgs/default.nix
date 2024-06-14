@@ -229,33 +229,34 @@ in rec {
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
-  aapis-py = final.python39.pkgs.aapis-py;
-  budget_report = final.python39.pkgs.budget_report;
-  makepyshell = final.python39.pkgs.makepyshell;
-  mavlog-utils = final.python39.pkgs.mavlog-utils;
-  fqt = final.python39.pkgs.fqt;
-  ichabod = final.python39.pkgs.ichabod;
-  norbert = final.python39.pkgs.norbert;
-  geometry = final.python39.pkgs.geometry;
-  pyceres = final.python39.pkgs.pyceres;
-  pyceres_factors = final.python39.pkgs.pyceres_factors;
-  pysorting = final.python39.pkgs.pysorting;
-  pysignals = final.python39.pkgs.pysignals;
-  mesh-plotter = final.python39.pkgs.mesh-plotter;
-  scrape = final.python39.pkgs.scrape;
+  aapis-py = final.python310.pkgs.aapis-py;
+  budget_report = final.python310.pkgs.budget_report;
+  makepyshell = final.python310.pkgs.makepyshell;
+  mavlog-utils = final.python310.pkgs.mavlog-utils;
+  fqt = final.python310.pkgs.fqt;
+  ichabod = final.python310.pkgs.ichabod;
+  norbert = final.python310.pkgs.norbert;
+  geometry = final.python310.pkgs.geometry;
+  pyceres = final.python310.pkgs.pyceres;
+  pyceres_factors = final.python310.pkgs.pyceres_factors;
+  pysorting = final.python310.pkgs.pysorting;
+  pysignals = final.python310.pkgs.pysignals;
+  mesh-plotter = final.python310.pkgs.mesh-plotter;
+  scrape = final.python310.pkgs.scrape;
   spleeter = final.python38.pkgs.spleeter;
-  find_rotational_conventions = final.python39.pkgs.find_rotational_conventions;
-  trafficsim = final.python39.pkgs.trafficsim;
-  flask-hello-world = final.python39.pkgs.flask-hello-world;
-  flask-url2mp4 = final.python39.pkgs.flask-url2mp4;
-  flask-mp4server = final.python39.pkgs.flask-mp4server;
-  flask-mp3server = final.python39.pkgs.flask-mp3server;
-  flask-smfserver = final.python39.pkgs.flask-smfserver;
-  flask-oatbox = final.python39.pkgs.flask-oatbox;
-  imutils-cv4 = final.python39.pkgs.imutils-cv4;
-  vidstab-cv4 = final.python39.pkgs.vidstab-cv4;
-  rankserver = final.python39.pkgs.rankserver;
-  stampserver = final.python39.pkgs.stampserver;
+  find_rotational_conventions =
+    final.python310.pkgs.find_rotational_conventions;
+  trafficsim = final.python310.pkgs.trafficsim;
+  flask-hello-world = final.python310.pkgs.flask-hello-world;
+  flask-url2mp4 = final.python310.pkgs.flask-url2mp4;
+  flask-mp4server = final.python310.pkgs.flask-mp4server;
+  flask-mp3server = final.python310.pkgs.flask-mp3server;
+  flask-smfserver = final.python310.pkgs.flask-smfserver;
+  flask-oatbox = final.python310.pkgs.flask-oatbox;
+  imutils-cv4 = final.python310.pkgs.imutils-cv4;
+  vidstab-cv4 = final.python310.pkgs.vidstab-cv4;
+  rankserver = final.python310.pkgs.rankserver;
+  stampserver = final.python310.pkgs.stampserver;
   easy-google-auth = final.python310.pkgs.easy-google-auth;
   task-tools = final.python310.pkgs.task-tools;
   python-dokuwiki = final.python310.pkgs.python-dokuwiki;
@@ -263,7 +264,7 @@ in rec {
   book-notes-sync = final.python310.pkgs.book-notes-sync;
   gmail-parser = final.python310.pkgs.gmail-parser;
   goromail = final.python310.pkgs.goromail;
-  orchestrator = final.python39.pkgs.orchestrator;
+  orchestrator = final.python310.pkgs.orchestrator;
 
   authm =
     addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
@@ -271,11 +272,11 @@ in rec {
     python = final.python310;
   });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
-    python = final.python39;
+    python = final.python310;
     blank-svg = pkgData.img.blank-svg;
   });
   la-quiz = addDoc
-    (prev.callPackage ./bash-packages/la-quiz { python = final.python39; });
+    (prev.callPackage ./bash-packages/la-quiz { python = final.python310; });
 
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
@@ -313,7 +314,7 @@ in rec {
   pdf = addDoc (prev.callPackage ./bash-packages/converters/pdf.nix { });
   png = addDoc (prev.callPackage ./bash-packages/converters/png.nix { });
   svg = addDoc (prev.callPackage ./bash-packages/converters/svg.nix {
-    scour = final.python39.pkgs.scour;
+    scour = final.python310.pkgs.scour;
   });
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });

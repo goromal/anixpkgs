@@ -190,7 +190,6 @@ let
 in {
   home.username = "andrew";
   home.homeDirectory = "/home/andrew";
-  home.stateVersion = "23.05";
   programs.home-manager.enable = true;
   imports = [
     ./opts.nix
@@ -199,6 +198,7 @@ in {
     ./x86-graphical-pkgs.nix
     ./x86-rec-pkgs.nix
   ];
+  mods.opts.homeState = lib.mkForce "23.05";
   mods.opts.standalone = lib.mkForce true;
   mods.opts.homeDir = lib.mkForce "/home/andrew";
   mods.opts.cloudAutoSync = false;

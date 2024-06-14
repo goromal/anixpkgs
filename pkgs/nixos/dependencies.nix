@@ -5,8 +5,6 @@ let
 in rec {
   local-build = false;
   inherit nixos-version; # Should match the channel in <nixpkgs>
-  nixos-state = nixos-version;
-  homem-state = nixos-version;
   inherit anixpkgs-version;
   anixpkgs = import (if local-build then
     ../../default.nix

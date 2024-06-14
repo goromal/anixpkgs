@@ -19,8 +19,8 @@ experimental-features = nix-command flakes auto-allocate-uids
 4. Add these Nix channels via `nix-channel --add URL NAME`:
 ```bash
 $ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-23.05
+home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-24.05
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
@@ -35,7 +35,6 @@ let
 in with import ../dependencies.nix { inherit config; }; {
   home.username = user;
   home.homeDirectory = homedir;
-  home.stateVersion = nixos-version;
   programs.home-manager.enable = true;
 
   imports = [
@@ -50,6 +49,7 @@ in with import ../dependencies.nix { inherit config; }; {
 
   mods.opts.standalone = true;
   mods.opts.homeDir = homedir;
+  mods.opts.homeState = "23.05";
   mods.opts.browserExec = "google-chrome-stable";
 }
 

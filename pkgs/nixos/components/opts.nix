@@ -14,6 +14,10 @@ with import ../dependencies.nix { inherit config; }; {
         "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
+    homeState = lib.mkOption {
+      type = lib.types.str;
+      description = "Initiating state of home-manager (example: '22.05')";
+    };
     cloudAutoSync = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to automatically sync cloud dirs (default: true)";

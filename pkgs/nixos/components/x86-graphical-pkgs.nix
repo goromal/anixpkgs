@@ -88,11 +88,6 @@ in {
 
   home.file = with anixpkgs.pkgData;
     ({
-      # TODO the TK_LIBRARY hack should only be necessary until we move on from 23.05;
-      # see https://github.com/NixOS/nixpkgs/issues/234962
-      "TK_LIB_VARS.sh".text = ''
-        export TK_LIBRARY="${pkgs.tk}/lib/${pkgs.tk.libPrefix}"
-      '';
       ".config/terminator/config".source =
         ../res/terminator-config; # https://rigel.netlify.app/#terminal
       ".local/share/nautilus/scripts/terminal".source =
@@ -114,10 +109,6 @@ in {
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
-      ".config/gtk-4.0/${themes.nordic-gtk4.css.name}".source =
-        themes.nordic-gtk4.css.data;
-      ".config/gtk-4.0/${themes.nordic-gtk4.css-dark.name}".source =
-        themes.nordic-gtk4.css-dark.data;
       ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
         themes.nordic-gtk4.thumbnail.data;
     } else
