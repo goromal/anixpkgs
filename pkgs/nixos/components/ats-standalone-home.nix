@@ -198,7 +198,7 @@ in {
     ./x86-graphical-pkgs.nix
     ./x86-rec-pkgs.nix
   ];
-  mods.opts.homeState = "23.05";
+  mods.opts.homeState = lib.mkForce "23.05";
   mods.opts.standalone = lib.mkForce true;
   mods.opts.homeDir = lib.mkForce "/home/andrew";
   mods.opts.cloudAutoSync = false;
