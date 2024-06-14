@@ -417,6 +417,7 @@ in {
             [ ]);
 
       mods.opts = {
+        homeState = cfg.nixosState;
         standalone = false;
         homeDir = "/data/andrew";
         browserExec = if cfg.graphical && cfg.machineType == "x86_linux" then
