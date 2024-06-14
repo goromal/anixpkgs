@@ -8,6 +8,10 @@ let
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
   options.machines.base = {
+    nixosState = lib.mkOption {
+      type = lib.types.str;
+      description = "Initiating state of the NixOS install (example: '22.05')";
+    };
     machineType = lib.mkOption {
       type = lib.types.enum [ "x86_linux" "pi4" ];
       description = "Machine type that the closure is targeting.";
@@ -43,7 +47,7 @@ in {
   ];
 
   config = {
-    system.stateVersion = nixos-state;
+    system.stateVersion = cfg.nixosState;
 
     boot = {
       kernelPackages = (if cfg.machineType == "pi4" then
@@ -387,7 +391,6 @@ in {
 
     home-manager.users.andrew = {
       programs.home-manager.enable = true;
-      home.stateVersion = homem-state;
       programs.command-not-found.enable = true;
 
       imports = [ ./components/opts.nix ./components/base-pkgs.nix ]

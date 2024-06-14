@@ -22,6 +22,8 @@ let
     done
   '';
 in {
+  home.stateVersion = cfg.homeState;
+
   home.packages = let
     rcrsync = rcrsyncConfigured;
     authm = anixpkgs.authm.override { inherit rcrsync; };

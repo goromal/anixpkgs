@@ -35,7 +35,6 @@ let
 in with import ../dependencies.nix { inherit config; }; {
   home.username = user;
   home.homeDirectory = homedir;
-  home.stateVersion = nixos-version;
   programs.home-manager.enable = true;
 
   imports = [
@@ -50,6 +49,7 @@ in with import ../dependencies.nix { inherit config; }; {
 
   mods.opts.standalone = true;
   mods.opts.homeDir = homedir;
+  mods.opts.homeState = "23.05";
   mods.opts.browserExec = "google-chrome-stable";
 }
 

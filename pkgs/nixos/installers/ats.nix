@@ -6,5 +6,6 @@
     <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
     ../profiles/ats.nix
   ];
+  machines.base.nixosState = "24.05";
   machines.base.isInstaller = pkgs.lib.mkForce true;
 }
