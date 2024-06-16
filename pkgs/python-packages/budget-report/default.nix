@@ -9,5 +9,10 @@ callPackage ../pythonPkgFromScript.nix {
   propagatedBuildInputs = [ gspread fuzzywuzzy easy-google-auth gmail-parser ];
   checkPkgs = [ ];
   longDescription = "";
-  subCmds = [ "transactions-bin" "transactions-process" "transactions-status" "transactions-upload" ];
+  subCmds = [
+    "transactions-bin"
+    "transactions-process"
+    "transactions-status"
+    "transactions-upload"
+  ];
 }
