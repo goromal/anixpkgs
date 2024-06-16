@@ -26,7 +26,7 @@ def column_index_to_letter(column_index):
 @click.option(
     "--secrets-json",
     "secrets_json",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default=GPD.GMAIL_SECRETS_JSON,
     show_default=True,
     help="Client secrets file.",
@@ -42,7 +42,7 @@ def column_index_to_letter(column_index):
 @click.option(
     "--config-json",
     "config_json",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default="~/configs/budget-tool.json",
     show_default=True,
     help="Budget tool config file.",
