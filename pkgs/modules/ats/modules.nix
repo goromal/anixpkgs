@@ -21,7 +21,7 @@ let
     ats-authm
     providence-tasker
   ];
-  mkOneshotTimedService = { name, execScript, timerConfig }: {}; # ^^^^ TODO
+  mkOneshotTimedService = { name, execScript, timerConfig, readWritePaths, rootDir }: {}; # ^^^^ TODO
 in {
   options.services.ats = {
     enable = mkEnableOption "enable ATS services";
