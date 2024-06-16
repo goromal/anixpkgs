@@ -15,14 +15,14 @@ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 
-configurations=(personal-inspiron rankserver-pi)
+configurations=(personal-inspiron ats-pi rankserver-pi)
 for configuration in ${configurations[@]}; do
     echo "Checking derivation for configuration: $configuration..."
     nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run
     echo "Checks out!"
     echo ""
 done
-# ^^^^ TODO REPLACE
+
 # installers=(ats)
 # for installer in ${installers[@]}; do
 #     echo "Checking derivation for installer: $installer..."
