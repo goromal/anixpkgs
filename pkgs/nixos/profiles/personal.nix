@@ -6,7 +6,7 @@
     graphical = true;
     recreational = true;
     developer = true;
-    loadATSServices = true; # ^^^^ TODO TMP
+    loadATSServices = false;
     isInstaller = false;
   };
 }
