@@ -6,22 +6,6 @@ let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
-  oPathPkgs = with anixpkgs; let
-    ats-rcrsync = rcrsync.override { cloudDirs = cfg.cloudDirs; };
-    ats-authm = authm.override { rcrsync = ats-rcrsync; };
-  in [
-    rclone
-    wiki-tools
-    task-tools
-    ats-rcrsync
-    mp4
-    mp4unite
-    goromail
-    gmail-parser
-    scrape
-    ats-authm
-    providence-tasker
-  ];
 in {
   options.machines.base = {
     nixosState = lib.mkOption {
@@ -88,10 +72,7 @@ in {
 
   imports = [
     (import "${home-manager}/nixos")
-    ../python-packages/orchestrator/module.nix
-    ../standalone-modules/ats-greeting/module.nix
-    ../standalone-modules/ats-mailman/module.nix
-    ../standalone-modules/ats-ccounterd/module.nix
+    ../modules/ats/modules.nix
   ];
 
   config = {
@@ -260,27 +241,7 @@ in {
     };
 
     # Server processes
-    services.orchestratord = {
-      enable = cfg.loadATSServices;
-      orchestratorPkg = anixpkgs.orchestrator;
-      pathPkgs = oPathPkgs;
-    };
-
-    services.ats-greeting = { # ^^^^ TODO
-      enable = cfg.loadATSServices;
-      orchestratorPkg = anixpkgs.orchestrator;
-    };
-
-    services.ats-mailman = { # ^^^^ TODO
-      enable = cfg.loadATSServices;
-      orchestratorPkg = anixpkgs.orchestrator;
-      redirectsPkg = anixpkgs.redirects;
-    };
-
-    services.ats-ccounterd = { # ^^^^ TODO
-      enable = cfg.loadATSServices;
-      orchestratorPkg = anixpkgs.orchestrator;
-    };
+    services.ats.enable = cfg.loadATSServices;
 
     # Global packages
     environment.systemPackages = [
