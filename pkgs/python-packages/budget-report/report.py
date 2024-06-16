@@ -43,7 +43,7 @@ def column_index_to_letter(column_index):
     "--config-json",
     "config_json",
     type=click.Path(exists=True),
-    default=os.path.expanduser("~/configs/budget-tool.json"),
+    default="~/configs/budget-tool.json",
     show_default=True,
     help="Budget tool config file.",
 )
@@ -57,6 +57,9 @@ def column_index_to_letter(column_index):
 )
 def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logging):
     """Tools for Budget Management."""
+    secrets_json = os.path.expanduser(secrets_json)
+    refresh_file = os.path.expanduser(refresh_file)
+    config_json = os.path.expanduser(config_json)
     if enable_logging:
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     try:
