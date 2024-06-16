@@ -18,6 +18,11 @@ with import ../dependencies.nix { inherit config; }; {
       type = lib.types.str;
       description = "Initiating state of home-manager (example: '22.05')";
     };
+    userOrchestrator = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to run a user-domain instance of orchestratord (default: true)";
+      default = true;
+    };
     cloudAutoSync = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to automatically sync cloud dirs (default: true)";

@@ -11,7 +11,7 @@ in {
     graphical = false;
     recreational = false;
     developer = false;
-    isServer = false;
+    loadATSServices = false;
     isInstaller = false;
   };
 

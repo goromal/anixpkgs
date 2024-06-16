@@ -6,7 +6,7 @@
     graphical = true;
     recreational = true;
     developer = true;
-    isServer = false;
+    loadATSServices = false;
     isInstaller = false;
   };
 }
