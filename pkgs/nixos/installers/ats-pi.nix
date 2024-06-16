@@ -7,5 +7,7 @@
     ../profiles/ats.nix
   ];
   machines.base.nixosState = "24.05";
+  machines.base.machineType = "pi4";
   machines.base.isInstaller = pkgs.lib.mkForce true;
 }
+# NIXPKGS_ALLOW_UNFREE=1 nixos-generate -f sd-aarch64-installer --system aarch64-linux -c /data/andrew/dev/anix/sources/anixpkgs/pkgs/nixos/installers/ats-pi.nix
