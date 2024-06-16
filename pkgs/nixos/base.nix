@@ -8,6 +8,11 @@ let
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
   options.machines.base = {
+    homeDir = lib.mkOption {
+      type = lib.types.str;
+      description = "Home directory for primary user (default: /data/andrew)";
+      default = "/data/andrew";
+    };
     nixosState = lib.mkOption {
       type = lib.types.str;
       description = "Initiating state of the NixOS install (example: '22.05')";
@@ -70,10 +75,7 @@ in {
     };
   };
 
-  imports = [
-    (import "${home-manager}/nixos")
-    ../modules/ats/modules.nix
-  ];
+  imports = [ (import "${home-manager}/nixos") ../modules/ats/modules.nix ];
 
   config = {
     system.stateVersion = cfg.nixosState;
@@ -118,7 +120,7 @@ in {
             [User]
             Session=
             XSession=
-            Icon=/data/andrew/.face
+            Icon=${cfg.homeDir}/.face
             SystemAccount=false
           '';
         in ''
@@ -139,7 +141,7 @@ in {
       nixPath = [
         "nixos-config=/etc/nixos/configuration.nix"
         "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-        "anixpkgs=/data/andrew/sources/anixpkgs"
+        "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
       ];
       settings = {
         auto-optimise-store = true;
@@ -341,7 +343,7 @@ in {
     users.users.andrew = {
       isNormalUser = true;
       uid = 1000;
-      home = "/data/andrew";
+      home = cfg.homeDir;
       createHome = true;
       description = "Andrew Torgesen";
       group = "dev";
@@ -415,7 +417,7 @@ in {
       mods.opts = {
         homeState = cfg.nixosState;
         standalone = false;
-        homeDir = "/data/andrew";
+        homeDir = cfg.homeDir;
         browserExec = if cfg.graphical && cfg.machineType == "x86_linux" then
           "${unstable.google-chrome}/bin/google-chrome-stable"
         else

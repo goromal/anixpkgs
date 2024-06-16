@@ -20,7 +20,8 @@ with import ../dependencies.nix { inherit config; }; {
     };
     userOrchestrator = lib.mkOption {
       type = lib.types.bool;
-      description = "Whether to run a user-domain instance of orchestratord (default: true)";
+      description =
+        "Whether to run a user-domain instance of orchestratord (default: true)";
       default = true;
     };
     cloudAutoSync = lib.mkOption {
