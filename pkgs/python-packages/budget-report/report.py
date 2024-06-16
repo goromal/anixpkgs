@@ -141,7 +141,7 @@ def transactions_process(ctx: click.Context, dry_run):
             print(t[1], t[2], t[3], t[4])
             if not dry_run:
                 if t[5] == "NONE":
-                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                    raw_transactions_sheet.update_cell(int(t[0]), 1, "X")
                 elif t[5] in category_sheets:
                     time.sleep(1.0)
                     dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
