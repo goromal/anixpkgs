@@ -147,6 +147,7 @@ def transactions_process(ctx: click.Context, dry_run):
                     dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
                     dest_lfcol = category_sheets[t[5]][1] + 1
                     col_vals = dest_sheet.col_values(dest_lfcol)
+                    time.sleep(1.0)
                     empty_row_index = len(col_vals) + 1
                     first_col_letter = column_index_to_letter(dest_lfcol)
                     last_col_letter = column_index_to_letter(dest_lfcol + 4)
