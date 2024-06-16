@@ -6,6 +6,7 @@ import csv
 import json
 import re
 import gspread
+import time
 from fuzzywuzzy import fuzz
 
 from easy_google_auth.auth import getGoogleCreds
@@ -142,6 +143,7 @@ def transactions_process(ctx: click.Context, dry_run):
                 if t[5] == "NONE":
                     raw_transactions_sheet.update(f"A{t[0]}", "X")
                 elif t[5] in category_sheets:
+                    time.sleep(1.0)
                     dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
                     dest_lfcol = category_sheets[t[5]][1] + 1
                     col_vals = dest_sheet.col_values(dest_lfcol)
@@ -240,6 +242,7 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     for transaction in new_transactions:
         print(transaction)
         if not dry_run:
+            time.sleep(1.0)
             raw_transactions_sheet.append_row(["", *transaction])
 
 
