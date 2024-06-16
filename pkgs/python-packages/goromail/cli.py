@@ -4,6 +4,7 @@ import os
 import sys
 from colorama import Fore, Style
 from datetime import datetime
+from pathlib import Path
 from gmail_parser.corpus import GBotCorpus, JournalCorpus
 from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
@@ -253,6 +254,7 @@ def cli(
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
     if ctx.obj["headless"]:
+        Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "bot.log"), "w")
     else:
         logfile = None
@@ -369,6 +371,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
     if ctx.obj["headless"]:
+        Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "journal.log"), "w")
     else:
         logfile = None
