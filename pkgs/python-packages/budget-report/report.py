@@ -161,7 +161,7 @@ def transactions_process(ctx: click.Context, dry_run):
                             ]
                         ],
                     )
-                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                    raw_transactions_sheet.update_cell(int(t[0]), 1, "X")
                 else:
                     print(f"  Not processed; unknown category: {t[5]}")
     else:
