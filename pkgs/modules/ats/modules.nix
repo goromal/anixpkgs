@@ -28,16 +28,14 @@ in {
   };
 
   imports = [
-    ../python-packages/orchestrator/module.nix
+    ../../python-packages/orchestrator/module.nix
   ];
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable ({
     services.orchestratord = {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = oPathPkgs;
     };
-
-    # ^^^^ TODO
-  };
+  } // {}); # ^^^^ TODO
 }
