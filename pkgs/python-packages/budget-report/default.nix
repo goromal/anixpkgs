@@ -10,9 +10,9 @@ callPackage ../pythonPkgFromScript.nix {
   checkPkgs = [ ];
   longDescription = "";
   subCmds = [
-    "transactions-bin"
     "transactions-process"
     "transactions-status"
     "transactions-upload"
+    "transactions-bin"
   ];
 }
