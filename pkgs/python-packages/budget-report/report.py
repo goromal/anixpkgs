@@ -5,12 +5,23 @@ import os
 import csv
 import json
 import re
-import gspread
 import time
 from fuzzywuzzy import fuzz
 
 from easy_google_auth.auth import getGoogleCreds
 from gmail_parser.defaults import GmailParserDefaults as GPD
+
+import gspread
+
+def _check_valid_context(func):
+    def wrapper(self, ctx, *args, **kwargs):
+        if "error" in ctx.obj:
+            e = ctx.obj["error"]
+            logging.error(f"Program error: {e}")
+            sys.stderr.write(f"Program error: {e}")
+            exit(1)
+        return func(ctx, *args, **kwargs)
+    return wrapper
 
 
 def column_index_to_letter(column_index):
@@ -80,13 +91,14 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
             "config_data": config_data,
         }
     except Exception as e:
-        logging.error(f"Program error: {e}")
-        sys.stderr.write(f"Program error: {e}")
-        exit(1)
+        ctx.obj = {
+            "error": f"{e}"
+        }
 
 
 @cli.command()
 @click.pass_context
+@_check_valid_context
 def transactions_status(ctx: click.Context):
     """Get the status of raw transactions."""
     transactions_sheet = None
@@ -109,6 +121,7 @@ def transactions_status(ctx: click.Context):
     is_flag=True,
     help="Activate dry run mode.",
 )
+@_check_valid_context
 def transactions_process(ctx: click.Context, dry_run):
     """Process raw transactions."""
     transactions_sheet = None
@@ -191,6 +204,7 @@ def transactions_process(ctx: click.Context, dry_run):
     is_flag=True,
     help="Activate dry run mode.",
 )
+@_check_valid_context
 def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     """Upload missing raw transactions to the budget sheet."""
     transactions_sheet = None
@@ -256,6 +270,7 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     required=True,
     help="Category from the Config sheet.",
 )
+@_check_valid_context
 def transactions_bin(ctx: click.Context, category):
     """Bin all transactions from a category sheet."""
     category_sheets = {}
