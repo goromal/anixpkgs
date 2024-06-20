@@ -69,6 +69,35 @@ export NIXPKGS_ALLOW_UNFREE=1
 # eval "$(direnv hook bash)"
 ```
 
+## Build and Deploy a Raspberry Pi NixOS SD Configuration
+
+Since the hardware configuration for the Raspberry Pi is well understood, it makes sense to skip the installer step and deploy a fully-fledged clusure instead.
+
+```bash
+nixos-generate -f sd-aarch64 --system aarch64-linux -c /path/to/anixpkgs/pkgs/nixos/configurations/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+```
+
+```bash
+nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
+```
+
+```bash
+sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
+```
+
+On the Pi, copy over SSH keys (including to `/root/.ssh/`!) and then set up the Nix channel:
+
+```bash
+sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
+sudo nix-channel --update
+```
+
+Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` packages (that's something for me to look into) so the `anix-upgrade` setup steps are especially important:
+
+- Make a `~/sources` directory
+- Symlink the configuration file even if it doesn't exist yet
+- Run `anix-upgrade` to aarch-ify everything
+
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
