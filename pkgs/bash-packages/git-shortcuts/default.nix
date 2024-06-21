@@ -62,7 +62,7 @@ let
     ${printYellow} "git cm \"$@\" && git push && githead"
     words=""
     for word in "$@"; do
-      words+="\"$word\" "
+      words+="$word "
     done
     words=''${words% }
     git cm "$words" && git push && githead

@@ -31,8 +31,8 @@ class Context:
         self.scripts = [
             f
             for f in os.listdir(os.path.join(self.dev_dir, ".bin"))
-            if os.path.isfile(os.path.join(self.dev_dir, f))
-            and os.access(os.path.join(self.dev_dir, f), os.X_OK)
+            if os.path.isfile(os.path.join(self.dev_dir, ".bin", f))
+            and os.access(os.path.join(self.dev_dir, ".bin", f), os.X_OK)
         ]
         for root, dirs, _ in os.walk(os.path.join(self.dev_dir, "sources")):
             if ".git" in dirs:
