@@ -55,8 +55,8 @@ if [[ -z $(cat $tmpdir/dev/test/shell.nix | grep "pkg-src = pkgs.lib.cleanSource
     echo_red "devshell didn\'t make the correct source override in shell file"
     exit 1
 fi
-echo "[geometry] = pkgs python310.pkgs.geometry" >> data/devrc
-echo "[pyceres_factors] = pkgs python310.pkgs.pyceres_factors" >> data/devrc
+echo "[geometry] = pkgs python311.pkgs.geometry" >> data/devrc
+echo "[pyceres_factors] = pkgs python311.pkgs.pyceres_factors" >> data/devrc
 echo "[ceres-factors] = pkgs ceres-factors" >> data/devrc
 echo "test_env = geometry manif-geom-cpp ceres-factors pyceres_factors" >> data/devrc
 devshell --override-data-dir "$tmpdir/data2" -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
@@ -73,9 +73,9 @@ echo "touch FILE.txt" >> "$tmpdir/data/scripts/test"
 chmod +x "$tmpdir/data/scripts/test"
 devshell -d data/devrc scr_env --run "echo"
 [[ -f "$tmpdir/dev/scr_env/.bin/scr" ]] || { echo "Failed devshell script gather"; exit 1; }
-sed -i 's|python3\.|python310\.|g' $tmpdir/dev/test_env/shell.nix
+sed -i 's|python3\.|python311\.|g' $tmpdir/dev/test_env/shell.nix
 devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
-if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python310.withPackages") ]]; then
+if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python311.withPackages") ]]; then
     echo_red "setupcurrentws overrode an edited shell file"
     exit 1
 fi
