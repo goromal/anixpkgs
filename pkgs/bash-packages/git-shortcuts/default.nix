@@ -44,11 +44,11 @@ let
     fi
     git log | head -1 | sed 's/.* //'
   '';
-  gitcph = let pkgname = "gitcph";
+  gitcm = let pkgname = "gitcm";
   in writeArgparseScriptBin pkgname ''
     usage: ${pkgname} commit message ...
 
-    "Git Commit, Push, and Head." No quotes needed for commit message.
+    "Git CoMmit, push, and get head revision." No quotes needed for commit message.
   '' [ ] ''
     currentbranch="$(git rev-parse --abbrev-ref HEAD)"
     if [[ -z "$currentbranch" ]]; then
@@ -75,7 +75,7 @@ in stdenv.mkDerivation {
     mkdir -p                  $out/bin
     cp ${gitcop}/bin/gitcop   $out/bin
     cp ${githead}/bin/githead $out/bin
-    cp ${gitcph}/bin/gitcph   $out/bin
+    cp ${gitcm}/bin/gitcm     $out/bin
   '';
   meta = {
     description = "Git shortcut commands.";
