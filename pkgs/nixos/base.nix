@@ -324,7 +324,7 @@ in {
     ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
     programs.bash.interactiveShellInit = ''
-      ${if cfg.developer then ''eval "$(direnv hook bash)'' else ""}
+      ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
     '';
 
     environment.shellAliases = {

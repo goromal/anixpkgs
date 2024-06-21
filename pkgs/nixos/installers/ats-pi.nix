@@ -1,4 +1,4 @@
- # TODO BROKEN; no running DHCP service. Build sd-aarch64 instead of the installer.
+# TODO BROKEN; no running DHCP service. Build sd-aarch64 instead of the installer.
 { config, pkgs, ... }: {
   imports = [
     # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> <- Non-SD, for x86
