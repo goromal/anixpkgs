@@ -30,7 +30,7 @@ class Context:
             hist_data = {}
         self.scripts = [
             f
-            for f in os.listdir(self.dev_dir)
+            for f in os.listdir(os.path.join(self.dev_dir, ".bin"))
             if os.path.isfile(os.path.join(self.dev_dir, f))
             and os.access(os.path.join(self.dev_dir, f), os.X_OK)
         ]
