@@ -60,7 +60,7 @@ let
       exit 1
     fi
     ${printYellow} "git cm \"$@\" && git push && githead"
-    git cm "$@" && git push && githead
+    git cm \"$@\" && git push && githead
   '';
 in stdenv.mkDerivation {
   name = "git-shortcuts";

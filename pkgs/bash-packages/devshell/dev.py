@@ -11,8 +11,10 @@ class Context:
         self.hist_file = ""
         self.wsname = ""
         self.repos = []
+        self.scripts = []
         self.max_reponame_len = 0
         self.max_branch_len = 0
+        self.max_script_len = 0
         self.status_msg = "AWAITING COMMAND"
         self.start_row = 2
         self.current_row = self.start_row
@@ -26,6 +28,12 @@ class Context:
                 hist_data = json.loads(hf.read())
         except:
             hist_data = {}
+        self.scripts = [
+            f
+            for f in os.listdir(self.dev_dir)
+            if os.path.isfile(os.path.join(self.dev_dir, f))
+            and os.access(os.path.join(self.dev_dir, f), os.X_OK)
+        ]
         for root, dirs, _ in os.walk(os.path.join(self.dev_dir, "sources")):
             if ".git" in dirs:
                 git_dir = os.path.join(root, ".git")
@@ -73,6 +81,11 @@ class Context:
                     self.repos.append(
                         (reponame, branch, clean, hash, local, sync_branch)
                     )
+        self.max_script_len = (
+            max([len(script) for script in self.scripts])
+            if len(self.scripts) > 0
+            else 5
+        )
         self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
         self.max_branch_len = max([len(repo[1]) for repo in self.repos])
         self.end_row = min(2 + len(self.repos), curses.LINES - 1)
@@ -111,17 +124,21 @@ def display_output(stdscr):
                 i,
                 ctx.max_reponame_len + 1,
                 f"({'CLN' if ctx.repos[i-ctx.start_row][2] else 'DTY'})",
-                curses.color_pair(1)
-                if ctx.repos[i - ctx.start_row][2]
-                else curses.color_pair(2),
+                (
+                    curses.color_pair(1)
+                    if ctx.repos[i - ctx.start_row][2]
+                    else curses.color_pair(2)
+                ),
             )
             stdscr.addstr(
                 i,
                 ctx.max_reponame_len + 7,
                 f"({'LCL' if ctx.repos[i-ctx.start_row][4] else 'RMT'})",
-                curses.color_pair(2)
-                if ctx.repos[i - ctx.start_row][4]
-                else curses.color_pair(1),
+                (
+                    curses.color_pair(2)
+                    if ctx.repos[i - ctx.start_row][4]
+                    else curses.color_pair(1)
+                ),
             )
             stdscr.addstr(
                 i,
@@ -137,15 +154,22 @@ def display_output(stdscr):
             stdscr.addstr(
                 i,
                 ctx.max_reponame_len + ctx.max_branch_len + 22,
-                ctx.repos[i - ctx.start_row][5]
-                if ctx.repos[i - ctx.start_row][5] is not None
-                else "...",
-                curses.color_pair(3)
-                if ctx.repos[i - ctx.start_row][5] is not None
-                and ctx.repos[i - ctx.start_row][5] == ctx.repos[i - ctx.start_row][1]
-                else curses.color_pair(4),
+                (
+                    ctx.repos[i - ctx.start_row][5]
+                    if ctx.repos[i - ctx.start_row][5] is not None
+                    else "..."
+                ),
+                (
+                    curses.color_pair(3)
+                    if ctx.repos[i - ctx.start_row][5] is not None
+                    and ctx.repos[i - ctx.start_row][5]
+                    == ctx.repos[i - ctx.start_row][1]
+                    else curses.color_pair(4)
+                ),
             )
+
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
+        stdscr.addstr(ctx.end_row + 2, 36, "-" * (self.max_script_len + 2))
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
         stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
@@ -154,6 +178,9 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 8, 0, "[h]  Display the full HEAD hash")
         stdscr.addstr(ctx.end_row + 9, 0, "[r]  Refresh")
         stdscr.addstr(ctx.end_row + 10, 0, "[q]  Quit")
+        for j, script in enumerate(self.scripts):
+            stdscr.addstr(ctx.end_row + 3 + j, 36, f"| {script}")
+
         stdscr.refresh()
     except:
         pass
