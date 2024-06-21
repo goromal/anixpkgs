@@ -4,18 +4,25 @@ let
   printYellow = "${color-prints}/bin/echo_yellow";
   gitcop = let pkgname = "gitcop";
   in writeArgparseScriptBin pkgname ''
-    usage: ${pkgname} [-f] branch_name
+    usage: ${pkgname} [-f] [branch_name]
 
     "Git CheckOut and Pull." Assumes remote is named origin. Optional -f flag fetches first.
+    If no branch_name is provided, then only a pull will occur.
   '' [{
     var = "fetch";
     isBool = true;
     default = "0";
     flags = "-f";
   }] ''
-    if [[ -z "$1" ]]; then
-        ${printError} "No branch name provided."
+    currentbranch="$(git rev-parse --abbrev-ref HEAD)"
+    if [[ -z "$currentbranch" ]]; then
+        ${printError} "Must be run within a Git repository with a current branch."
         exit 1
+    fi
+    if [[ -z "$1" ]]; then
+        ${printYellow} "git pull origin $currentbranch"
+        git pull origin "$currentbranch"
+        exit
     fi
     pause_secs=1
     if [[ "$fetch" == "1" ]]; then
@@ -37,6 +44,29 @@ let
     fi
     git log | head -1 | sed 's/.* //'
   '';
+  gitcm = let pkgname = "gitcm";
+  in writeArgparseScriptBin pkgname ''
+    usage: ${pkgname} commit message ...
+
+    "Git CoMmit, push, and get head revision." No quotes needed for commit message.
+  '' [ ] ''
+    currentbranch="$(git rev-parse --abbrev-ref HEAD)"
+    if [[ -z "$currentbranch" ]]; then
+      ${printError} "Must be run within a Git repository with a current branch."
+      exit 1
+    fi
+    if [[ -z "$1" ]]; then
+      ${printError} "Must provide a commit message (no quotes needed)"
+      exit 1
+    fi
+    ${printYellow} "git cm \"$@\" && git push && githead"
+    words=""
+    for word in "$@"; do
+      words+="$word "
+    done
+    words=''${words% }
+    git cm "$words" && git push && githead
+  '';
 in stdenv.mkDerivation {
   name = "git-shortcuts";
   version = "1.0.0";
@@ -45,6 +75,7 @@ in stdenv.mkDerivation {
     mkdir -p                  $out/bin
     cp ${gitcop}/bin/gitcop   $out/bin
     cp ${githead}/bin/githead $out/bin
+    cp ${gitcm}/bin/gitcm     $out/bin
   '';
   meta = {
     description = "Git shortcut commands.";

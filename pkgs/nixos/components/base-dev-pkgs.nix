@@ -12,6 +12,9 @@ in {
     anixpkgs.listsources
     anixpkgs.pkgshell
     (anixpkgs.devshell.override { editorName = cfg.editor; })
+    (writeShellScriptBin "dsd" ''
+      devshell $1 --run dev
+    '')
     anixpkgs.cpp-helper
     anixpkgs.py-helper
     anixpkgs.rust-helper
