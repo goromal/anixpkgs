@@ -60,7 +60,12 @@ let
       exit 1
     fi
     ${printYellow} "git cm \"$@\" && git push && githead"
-    git cm \"$@\" && git push && githead
+    words=""
+    for word in "$@"; do
+      words+="\"$word\" "
+    done
+    words=''${words% }
+    git cm "$words" && git push && githead
   '';
 in stdenv.mkDerivation {
   name = "git-shortcuts";

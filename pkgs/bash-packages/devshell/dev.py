@@ -169,7 +169,7 @@ def display_output(stdscr):
             )
 
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
-        stdscr.addstr(ctx.end_row + 2, 36, "-" * (self.max_script_len + 2))
+        stdscr.addstr(ctx.end_row + 2, 36, "-" * (ctx.max_script_len + 2))
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
         stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
@@ -178,7 +178,7 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 8, 0, "[h]  Display the full HEAD hash")
         stdscr.addstr(ctx.end_row + 9, 0, "[r]  Refresh")
         stdscr.addstr(ctx.end_row + 10, 0, "[q]  Quit")
-        for j, script in enumerate(self.scripts):
+        for j, script in enumerate(ctx.scripts):
             stdscr.addstr(ctx.end_row + 3 + j, 36, f"| {script}")
 
         stdscr.refresh()
