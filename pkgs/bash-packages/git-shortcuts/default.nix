@@ -4,7 +4,6 @@ let
   printYellow = "${color-prints}/bin/echo_yellow";
   gitcop = let pkgname = "gitcop";
   in writeArgparseScriptBin pkgname ''
-
     usage: ${pkgname} [-f] [branch_name]
 
     "Git CheckOut and Pull." Assumes remote is named origin. Optional -f flag fetches first.
