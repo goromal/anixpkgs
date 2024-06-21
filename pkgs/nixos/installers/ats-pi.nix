@@ -1,6 +1,8 @@
+ # TODO BROKEN; no running DHCP service. Build sd-aarch64 instead of the installer.
 { config, pkgs, ... }: {
   imports = [
-    <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
+    # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> <- Non-SD, for x86
+    <nixpkgs/nixos/modules/installer/sd-card/sd-image-aarch64.nix>
     # Provide an initial copy of the NixOS channel so that the user
     # doesn't need to run "nix-channel --update" first.
     <nixpkgs/nixos/modules/installer/cd-dvd/channel.nix>
