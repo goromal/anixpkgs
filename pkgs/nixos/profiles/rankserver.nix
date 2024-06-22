@@ -12,6 +12,7 @@ in {
     recreational = false;
     developer = false;
     loadATSServices = false;
+    serveNotesWiki = false;
     isInstaller = false;
   };
 

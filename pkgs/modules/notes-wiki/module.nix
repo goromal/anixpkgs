@@ -4,31 +4,35 @@ with lib;
 with import ../../nixos/dependencies.nix { inherit config; };
 let
   app = "notes-wiki";
+  defaultDomain = "public_html";
   globalCfg = config.machines.base;
   cfg = config.services.${app};
 in {
   options.services.${app} = {
+    enable = mkEnableOption "enable notes wiki server";
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =
-        "Root directory for notes wiki (default: ~/data/${app}/public_html)";
-      default = "${globalCfg.homeDir}/data/${app}/public_html";
+        "Root directory for notes wiki (default: ~/data/${app}/${defaultDomain})";
+      default = "${globalCfg.homeDir}/data/${app}/${defaultDomain}";
     };
     domain = lib.mkOption {
       type = lib.types.str;
-      description = "Wiki domain (default: notes.andrewtorgesen.com)";
-      default = "notes.andrewtorgesen.com";
+      description = "Wiki domain (default: ${defaultDomain})";
+      default = defaultDomain;
     };
     php = lib.mkOption {
       type = lib.types.package;
-      description = "PHP build (default: 7.4 until DokuWiki version gets updated)";
+      description =
+        "PHP build (default: 7.4 until DokuWiki version gets updated)";
       default = anixpkgs.php74;
     };
   };
 
-  config = {
+  config = mkIf cfg.enable {
     services.phpfpm.pools.${app} = {
-      user = app;
+      user = "andrew";
+      group = "dev";
       settings = {
         "listen.owner" = config.services.nginx.user;
         "pm" = "dynamic";
@@ -43,23 +47,18 @@ in {
       };
       phpEnv."PATH" = lib.makeBinPath [ cfg.php ];
     };
-    services.nginx = {
-      enable = true;
-      virtualHosts.${cfg.domain}.locations."/" = {
-        root = cfg.wikiDir;
-        extraConfig = ''
-          fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          fastcgi_pass unix:${config.services.phpfpm.pools.${app}.socket};
-          include ${pkgs.nginx}/conf/fastcgi.conf;
-        '';
+    services.nginx =
+      { # TODO https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/web-apps/dokuwiki.nix#L418
+        enable = true;
+        virtualHosts.${cfg.domain}.locations."/" = {
+          index = "doku.php";
+          root = cfg.wikiDir;
+          extraConfig = ''
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass unix:${config.services.phpfpm.pools.${app}.socket};
+            include ${pkgs.nginx}/conf/fastcgi.conf;
+          '';
+        };
       };
-    };
-    users.users.${app} = {
-      isSystemUser = true;
-      createHome = true;
-      home = cfg.wikiDir;
-      group = app;
-    };
-    users.groups.${app} = { };
   };
 }

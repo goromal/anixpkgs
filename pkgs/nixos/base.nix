@@ -37,6 +37,10 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    serveNotesWiki = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to serve the notes wiki site.";
+    };
     isInstaller = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
@@ -75,7 +79,11 @@ in {
     };
   };
 
-  imports = [ (import "${home-manager}/nixos") ../modules/ats/modules.nix ];
+  imports = [
+    (import "${home-manager}/nixos")
+    ../modules/ats/modules.nix
+    ../modules/notes-wiki/module.nix
+  ];
 
   config = {
     system.stateVersion = cfg.nixosState;
@@ -244,6 +252,7 @@ in {
 
     # Server processes
     services.ats.enable = cfg.loadATSServices;
+    services.notes-wiki.enable = cfg.serveNotesWiki;
 
     # Global packages
     environment.systemPackages = [

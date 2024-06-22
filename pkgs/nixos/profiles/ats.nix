@@ -2,11 +2,12 @@
   imports = [ ../base.nix ];
 
   machines.base = {
-    # machineType to be filled out in the end configuration
+    machineType = "x86_linux";
     graphical = false;
     recreational = false;
     developer = false;
     loadATSServices = true;
+    serveNotesWiki = true;
     isInstaller = false;
   };
 }
