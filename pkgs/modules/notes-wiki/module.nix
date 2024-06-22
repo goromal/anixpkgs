@@ -21,9 +21,11 @@ in {
     };
     php = lib.mkOption {
       type = lib.types.package;
-      description = "PHP build";
+      description = "PHP build (default: 7.4 until DokuWiki version gets updated)";
+      default = anixpkgs.php74;
     };
   };
+
   config = {
     services.phpfpm.pools.${app} = {
       user = app;
