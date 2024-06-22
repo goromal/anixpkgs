@@ -45,20 +45,51 @@ in {
         "php_admin_flag[log_errors]" = true;
         "catch_workers_output" = true;
       };
+      phpPackage = cfg.php;
       phpEnv."PATH" = lib.makeBinPath [ cfg.php ];
     };
-    services.nginx =
-      { # TODO https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/web-apps/dokuwiki.nix#L418
-        enable = true;
-        virtualHosts.${cfg.domain}.locations."/" = {
-          index = "doku.php";
-          root = cfg.wikiDir;
-          extraConfig = ''
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
-            fastcgi_pass unix:${config.services.phpfpm.pools.${app}.socket};
-            include ${pkgs.nginx}/conf/fastcgi.conf;
-          '';
+    # Reference: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/web-apps/dokuwiki.nix#L418
+    services.nginx = {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      virtualHosts.${cfg.domain} = {
+        root = cfg.wikiDir;
+        locations = {
+          "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
+          "~ ^/data/" = {
+            root = "${cfg.wikiDir}/data";
+            extraConfig = "internal;";
+          };
+          "~ ^/lib.*.(js|css|gif|png|ico|jpg|jpeg)$" = {
+            extraConfig = "expires 365d;"; # for caching
+          };
+          "/" = {
+            priority = 1;
+            index = "doku.php";
+            extraConfig = "try_files $uri $uri/ @dokuwiki;";
+          };
+          "@dokuwiki" = {
+            extraConfig = ''
+              # rewrites "doku.php/" out of the URLs if you set the userwrite setting to .htaccess in dokuwiki config page
+              rewrite ^/_media/(.*) /lib/exe/fetch.php?media=$1 last;
+              rewrite ^/_detail/(.*) /lib/exe/detail.php?media=$1 last;
+              rewrite ^/_export/([^/]+)/(.*) /doku.php?do=export_$1&id=$2 last;
+              rewrite ^/(.*) /doku.php?id=$1&$args last;
+            '';
+          };
+          "~ \\.php$" = {
+            extraConfig = ''
+              try_files $uri $uri/ /doku.php;
+              include ${config.services.nginx.package}/conf/fastcgi_params;
+              include ${pkgs.nginx}/conf/fastcgi.conf;
+              fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+              fastcgi_param REDIRECT_STATUS 200;
+              fastcgi_pass unix:${config.services.phpfpm.pools.${app}.socket};
+            '';
+          };
         };
       };
+    };
   };
 }
