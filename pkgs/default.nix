@@ -224,6 +224,8 @@ in rec {
       ${script}
     '');
 
+  php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
+
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;

@@ -15,3 +15,4 @@ nb python311
 nb python311.pkgs.pybind11
 nb python311
 nb rustPlatform
+nb php74
