@@ -96,9 +96,9 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
         }
 
 
+@_check_valid_context
 @cli.command()
 @click.pass_context
-@_check_valid_context
 def transactions_status(ctx: click.Context):
     """Get the status of raw transactions."""
     transactions_sheet = None
@@ -113,6 +113,7 @@ def transactions_status(ctx: click.Context):
     print(f"{num_processed} / {len(transactions_data)} transactions processed.")
 
 
+@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -121,7 +122,6 @@ def transactions_status(ctx: click.Context):
     is_flag=True,
     help="Activate dry run mode.",
 )
-@_check_valid_context
 def transactions_process(ctx: click.Context, dry_run):
     """Process raw transactions."""
     transactions_sheet = None
@@ -182,6 +182,7 @@ def transactions_process(ctx: click.Context, dry_run):
         print("No unprocessed transactions!")
 
 
+@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -204,7 +205,6 @@ def transactions_process(ctx: click.Context, dry_run):
     is_flag=True,
     help="Activate dry run mode.",
 )
-@_check_valid_context
 def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     """Upload missing raw transactions to the budget sheet."""
     transactions_sheet = None
@@ -261,6 +261,7 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
             raw_transactions_sheet.append_row(["", *transaction])
 
 
+@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -270,7 +271,6 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     required=True,
     help="Category from the Config sheet.",
 )
-@_check_valid_context
 def transactions_bin(ctx: click.Context, category):
     """Bin all transactions from a category sheet."""
     category_sheets = {}
