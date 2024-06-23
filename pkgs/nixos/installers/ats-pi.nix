@@ -1,5 +1,5 @@
 # TODO BROKEN; no running DHCP service. Build sd-aarch64 instead of the installer.
-{ config, pkgs, ... }: {
+{ config, pkgs, lib, ... }: {
   imports = [
     # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> <- Non-SD, for x86
     <nixpkgs/nixos/modules/installer/sd-card/sd-image-aarch64.nix>
@@ -9,7 +9,7 @@
     ../profiles/ats.nix
   ];
   machines.base.nixosState = "24.05";
-  machines.base.machineType = pkgs.lib.mkForce "pi4";
-  machines.base.isInstaller = pkgs.lib.mkForce true;
+  machines.base.machineType = lib.mkForce "pi4";
+  machines.base.isInstaller = lib.mkForce true;
 }
 # NIXPKGS_ALLOW_UNFREE=1 nixos-generate -f sd-aarch64-installer --system aarch64-linux -c /data/andrew/dev/anix/sources/anixpkgs/pkgs/nixos/installers/ats-pi.nix
