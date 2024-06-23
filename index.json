@@ -2,12 +2,12 @@
     "pkgs": {
         "cpp": [
             {
-                "attr": "aapis-cpp",
+                "attr": "manif-geom-cpp",
                 "ci": true,
                 "docs": true
             },
             {
-                "attr": "manif-geom-cpp",
+                "attr": "aapis-cpp",
                 "ci": true,
                 "docs": true
             },
@@ -103,7 +103,7 @@
             {
                 "attr": "mavlog-utils",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "pyceres",
@@ -228,7 +228,7 @@
             {
                 "attr": "python-dokuwiki",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "task-tools",
@@ -270,17 +270,17 @@
             {
                 "attr": "doku",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "epub",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "gif",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "getres",
@@ -290,7 +290,7 @@
             {
                 "attr": "md",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "mp3",
@@ -305,7 +305,7 @@
             {
                 "attr": "pdf",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "png",
@@ -320,7 +320,7 @@
             {
                 "attr": "zipper",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "color-prints",
@@ -502,10 +502,6 @@
         ]
     },
     "rfcs": [
-        {
-            "file": "001.orchestrator",
-            "title": "Orchestrator Daemon"
-        },
         {
             "file": "002.oscd",
             "title": "Continuous OS Deployment"
