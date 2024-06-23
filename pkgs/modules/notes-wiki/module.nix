@@ -4,7 +4,7 @@ with lib;
 with import ../../nixos/dependencies.nix { inherit config; };
 let
   app = "notes-wiki";
-  defaultDomain = "public_html";
+  defaultDomain = "localhost";
   globalCfg = config.machines.base;
   cfg = config.services.${app};
 in {
@@ -13,8 +13,8 @@ in {
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =
-        "Root directory for notes wiki (default: ~/data/${app}/${defaultDomain})";
-      default = "${globalCfg.homeDir}/data/${app}/${defaultDomain}";
+        "Root directory for notes wiki (default: ~/data/${app}/public_html)";
+      default = "${globalCfg.homeDir}/data/${app}/public_html";
     };
     domain = lib.mkOption {
       type = lib.types.str;
@@ -54,6 +54,8 @@ in {
       user = "andrew";
       group = "dev";
       virtualHosts.${cfg.domain} = {
+        # addSSL = true;
+        # enableACME = true;
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
@@ -91,5 +93,9 @@ in {
         };
       };
     };
+    # security.acme = {
+    #   acceptTerms = true;
+    #   defaults.email = "andrew.torgesen@gmail.com";
+    # };
   };
 }
