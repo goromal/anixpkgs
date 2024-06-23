@@ -1,10 +1,12 @@
-# anixpkgs
+# Andrew's Software
 
 ![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml) [![pages-build-deployment](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment)
 
+My open source software is packaged and deployed from a central repository: **anixpkgs**. See the navigation menu for individual package documentation.
+
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v6.1.1](https://github.com/goromal/anixpkgs/tree/v6.1.1)**
+**LATEST RELEASE: [v6.1.2](https://github.com/goromal/anixpkgs/tree/v6.1.2)**
 
 **[Repository](https://github.com/goromal/anixpkgs)**
 
@@ -43,7 +45,7 @@ The software packaged in `anixpkgs` is buildable both through [Nix flakes](https
 
 ### Accessing the Packages Using Flakes
 
-Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v6.1.1`) while also giving you access to the public cache to avoid building from source on your machine:
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v6.1.2`) while also giving you access to the public cache to avoid building from source on your machine:
 
 ```nix
 {
@@ -57,7 +59,7 @@ Here is a `flake.nix` file that will get you a shell with select `anixpkgs` soft
     "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
   ];
   inputs = {
-    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v6.1.1";
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v6.1.2";
   };
   outputs = { self, nixpkgs }:
     let pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -77,12 +79,12 @@ Access the packages with `nix develop`.
 
 ### Accessing the Packages Using shell.nix
 
-Here are some `shell.nix` files to access Python packages (using version `v6.1.1` of the packages):
+Here are some `shell.nix` files to access Python packages (using version `v6.1.2` of the packages):
 
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.2.tar.gz") {};
   python-with-my-packages = pkgs.python310.withPackages (p: with p; [
     numpy
     matplotlib
@@ -98,7 +100,7 @@ or:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.2.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
     pkgs.python310
@@ -122,7 +124,7 @@ And for general software packages:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.1.2.tar.gz") {};
 in with pkgs; mkShell {
   buildInputs = [
     pb

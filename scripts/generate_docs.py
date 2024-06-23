@@ -34,7 +34,7 @@ summaryfile = open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w")
 rfcsfile = open(os.path.join(ANIXDIR, "docs", "src", "rfcs", "rfcs.md"), "w")
 
 summaryfile.write("# Summary\n\n")
-summaryfile.write("- [anixpkgs Overview](./intro.md)\n")
+summaryfile.write("- [Andrew's Software](./intro.md)\n")
 summaryfile.write("- [Machine Management](./machines.md)\n")
 
 summaryfile.write("- [RFCs](./rfcs/rfcs.md)\n")

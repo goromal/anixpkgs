@@ -5,11 +5,13 @@ import os
 import csv
 import json
 import re
-import gspread
+import time
 from fuzzywuzzy import fuzz
 
 from easy_google_auth.auth import getGoogleCreds
 from gmail_parser.defaults import GmailParserDefaults as GPD
+
+import gspread
 
 
 def column_index_to_letter(column_index):
@@ -26,7 +28,7 @@ def column_index_to_letter(column_index):
 @click.option(
     "--secrets-json",
     "secrets_json",
-    type=click.Path(exists=True),
+    type=click.Path(),
     default=GPD.GMAIL_SECRETS_JSON,
     show_default=True,
     help="Client secrets file.",
@@ -42,8 +44,8 @@ def column_index_to_letter(column_index):
 @click.option(
     "--config-json",
     "config_json",
-    type=click.Path(exists=True),
-    default=os.path.expanduser("~/configs/budget-tool.json"),
+    type=click.Path(),
+    default="~/configs/budget-tool.json",
     show_default=True,
     help="Budget tool config file.",
 )
@@ -57,6 +59,9 @@ def column_index_to_letter(column_index):
 )
 def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logging):
     """Tools for Budget Management."""
+    secrets_json = os.path.expanduser(secrets_json)
+    refresh_file = os.path.expanduser(refresh_file)
+    config_json = os.path.expanduser(config_json)
     if enable_logging:
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     try:
@@ -76,15 +81,20 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
             "config_data": config_data,
         }
     except Exception as e:
-        logging.error(f"Program error: {e}")
-        sys.stderr.write(f"Program error: {e}")
-        exit(1)
+        ctx.obj = {
+            "error": f"{e}"
+        }
 
 
 @cli.command()
 @click.pass_context
 def transactions_status(ctx: click.Context):
     """Get the status of raw transactions."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -107,6 +117,11 @@ def transactions_status(ctx: click.Context):
 )
 def transactions_process(ctx: click.Context, dry_run):
     """Process raw transactions."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -137,11 +152,13 @@ def transactions_process(ctx: click.Context, dry_run):
             print(t[1], t[2], t[3], t[4])
             if not dry_run:
                 if t[5] == "NONE":
-                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                    raw_transactions_sheet.update_cell(int(t[0]), 1, "X")
                 elif t[5] in category_sheets:
+                    time.sleep(1.0)
                     dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
                     dest_lfcol = category_sheets[t[5]][1] + 1
                     col_vals = dest_sheet.col_values(dest_lfcol)
+                    time.sleep(1.0)
                     empty_row_index = len(col_vals) + 1
                     first_col_letter = column_index_to_letter(dest_lfcol)
                     last_col_letter = column_index_to_letter(dest_lfcol + 4)
@@ -156,7 +173,7 @@ def transactions_process(ctx: click.Context, dry_run):
                             ]
                         ],
                     )
-                    raw_transactions_sheet.update(f"A{t[0]}", "X")
+                    raw_transactions_sheet.update_cell(int(t[0]), 1, "X")
                 else:
                     print(f"  Not processed; unknown category: {t[5]}")
     else:
@@ -187,6 +204,11 @@ def transactions_process(ctx: click.Context, dry_run):
 )
 def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     """Upload missing raw transactions to the budget sheet."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -237,6 +259,7 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     for transaction in new_transactions:
         print(transaction)
         if not dry_run:
+            time.sleep(1.0)
             raw_transactions_sheet.append_row(["", *transaction])
 
 
@@ -251,6 +274,11 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
 )
 def transactions_bin(ctx: click.Context, category):
     """Bin all transactions from a category sheet."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     category_sheets = {}
     for entry in ctx.obj["config_data"]:
         category_sheets[entry["Category"]] = (
