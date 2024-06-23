@@ -13,16 +13,6 @@ from gmail_parser.defaults import GmailParserDefaults as GPD
 
 import gspread
 
-def _check_valid_context(func):
-    def wrapper(self, ctx, *args, **kwargs):
-        if "error" in ctx.obj:
-            e = ctx.obj["error"]
-            logging.error(f"Program error: {e}")
-            sys.stderr.write(f"Program error: {e}")
-            exit(1)
-        return func(ctx, *args, **kwargs)
-    return wrapper
-
 
 def column_index_to_letter(column_index):
     """Convert a column index (integer) to a letter index (string) used in Google Sheets."""
@@ -96,11 +86,15 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
         }
 
 
-@_check_valid_context
 @cli.command()
 @click.pass_context
 def transactions_status(ctx: click.Context):
     """Get the status of raw transactions."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -113,7 +107,6 @@ def transactions_status(ctx: click.Context):
     print(f"{num_processed} / {len(transactions_data)} transactions processed.")
 
 
-@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -124,6 +117,11 @@ def transactions_status(ctx: click.Context):
 )
 def transactions_process(ctx: click.Context, dry_run):
     """Process raw transactions."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -182,7 +180,6 @@ def transactions_process(ctx: click.Context, dry_run):
         print("No unprocessed transactions!")
 
 
-@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -207,6 +204,11 @@ def transactions_process(ctx: click.Context, dry_run):
 )
 def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     """Upload missing raw transactions to the budget sheet."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     transactions_sheet = None
     for config_datum in ctx.obj["config_data"]:
         if config_datum["Category"] == "_TRANSACTIONS_":
@@ -261,7 +263,6 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
             raw_transactions_sheet.append_row(["", *transaction])
 
 
-@_check_valid_context
 @cli.command()
 @click.pass_context
 @click.option(
@@ -273,6 +274,11 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
 )
 def transactions_bin(ctx: click.Context, category):
     """Bin all transactions from a category sheet."""
+    if "error" in ctx.obj:
+        e = ctx.obj["error"]
+        logging.error(f"Program error: {e}")
+        sys.stderr.write(f"Program error: {e}")
+        exit(1)
     category_sheets = {}
     for entry in ctx.obj["config_data"]:
         category_sheets[entry["Category"]] = (
