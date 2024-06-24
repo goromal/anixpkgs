@@ -253,6 +253,7 @@ in {
     # Server processes
     services.ats.enable = cfg.loadATSServices;
     services.notes-wiki.enable = cfg.serveNotesWiki;
+    services.notes-wiki.openFirewall = true;
 
     # Global packages
     environment.systemPackages = [

@@ -5,6 +5,10 @@ with import ../../nixos/dependencies.nix { inherit config; };
 let
   globalCfg = config.machines.base;
   cfg = config.services.ats;
+  wiki-url = if globalCfg.serveNotesWiki then
+    "http://localhost:80"
+  else
+    "https://notes.andrewtorgesen.com";
   oPathPkgs = with anixpkgs;
     let
       ats-rcrsync = rcrsync.override { cloudDirs = globalCfg.cloudDirs; };
@@ -72,8 +76,8 @@ let
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
         # TODO warn about expiration
-        goromail --headless bot ${anixpkgs.redirects.suppress_all}
-        goromail --headless journal ${anixpkgs.redirects.suppress_all}
+        goromail --wiki-url ${wiki-url} --headless bot ${anixpkgs.redirects.suppress_all}
+        goromail --wiki-url ${wiki-url} --headless journal ${anixpkgs.redirects.suppress_all}
         if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
           echo "Notifying about processed bot mail..."
           echo "[$(date)] 📬 Bot mail received:" \
@@ -85,7 +89,7 @@ let
             "$(cat $HOME/goromail/bot.log)"
           if [[ ! -z "$(grep 'Calories entry' $HOME/goromail/bot.log)" ]]; then
             echo "Notifying of calorie total..."
-            lines="$(wiki-tools get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
+            lines="$(wiki-tools --url "${wiki-url}" get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
             if [[ -z $lines ]]; then
               exit
             fi
@@ -129,18 +133,16 @@ let
       name = "ats-grader";
       jobShellScript = writeShellScript "ats-grader" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
-        rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
         tmpdir=$(mktemp -d)
-        # echo "🔥 Tasking Grades for the Week 🔥" > $tmpdir/out.txt
-        # echo "" >> $tmpdir/out.txt
+        echo "🔥 Task Cleaning for the Week 🔥" > $tmpdir/out.txt
+        echo "" >> $tmpdir/out.txt
         # TODO intelligently choose the year...
-        task-tools grader --start-date 2024-01-01 >> $tmpdir/out.txt
-        # gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
-        #     "$(cat $tmpdir/out.txt)"
-        # gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
-        #     "$(cat $tmpdir/out.txt)"
+        task-tools clean --start-date 2024-01-01 >> $tmpdir/out.txt
+        gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
+            "$(cat $tmpdir/out.txt)"
+        gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
+            "$(cat $tmpdir/out.txt)"
         rm -r $tmpdir
-        rcrsync sync data || { >&2 echo "data sync error!"; exit 1; }
       '';
       timerCfg = {
         OnCalendar = [ "*-*-* 22:00:00" ];
@@ -170,7 +172,7 @@ let
       name = "ats-prov-tasker";
       jobShellScript = writeShellScript "ats-prov-tasker" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
-        providence-tasker 7 ${anixpkgs.redirects.suppress_all}
+        providence-tasker --wiki-url ${wiki-url} 7 ${anixpkgs.redirects.suppress_all}
         gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
           "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
         gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
@@ -188,7 +190,7 @@ let
         tmpdir=$(mktemp -d)
         echo "🖊️ Random Journal Entry of the Day:" > $tmpdir/out.txt
         echo "" >> $tmpdir/out.txt
-        wiki-tools get-rand-journal >> $tmpdir/out.txt
+        wiki-tools --url ${wiki-url} get-rand-journal >> $tmpdir/out.txt
         gmail-manager journal-send 6612105214@vzwpix.com "ats-rand-journal" \
           "$(cat $tmpdir/out.txt)"
         gmail-manager journal-send andrew.torgesen@gmail.com "ats-rand-journal" \

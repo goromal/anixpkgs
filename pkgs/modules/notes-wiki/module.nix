@@ -27,9 +27,17 @@ in {
         "PHP build (default: 7.4 until DokuWiki version gets updated)";
       default = anixpkgs.php74;
     };
+    openFirewall = mkOption {
+      type = types.bool;
+      description =
+        "Whether to open the specific firewall port for inter-computer usage";
+      default = false;
+    };
   };
 
   config = mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ 80 443 ];
+
     services.phpfpm.pools.${app} = {
       user = "andrew";
       group = "dev";
@@ -48,6 +56,7 @@ in {
       phpPackage = cfg.php;
       phpEnv."PATH" = lib.makeBinPath [ cfg.php ];
     };
+
     # Reference: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/web-apps/dokuwiki.nix#L418
     services.nginx = {
       enable = true;
