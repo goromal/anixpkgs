@@ -77,12 +77,17 @@ in {
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;
     iconTheme = {
-      name = "Nordzy";
-      package = nordzy-icon-theme;
+      # name = "Nordzy";
+      name = "Kanagawa";
+      # package = nordzy-icon-theme;
+      package = kanagawa-icon-theme;
     };
     theme = {
-      name = "Nordic";
-      package = nordic;
+      # name = "Nordic";
+      # package = nordic;
+      name = "Kanagawa";
+      # package = nightfox-gtk-theme;
+      package = kanagawa-gtk-theme;
     };
   };
 
@@ -109,8 +114,8 @@ in {
       '') + "/wallpaper.png");
     } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
-      ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
-        themes.nordic-gtk4.thumbnail.data;
+      # ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
+      #   themes.nordic-gtk4.thumbnail.data;
     } else
       { }));
 }

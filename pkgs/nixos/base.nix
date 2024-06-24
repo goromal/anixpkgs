@@ -389,6 +389,7 @@ in {
 
     programs.wireshark.enable = true;
 
+    home-manager.backupFileExtension = "backup";
     home-manager.users.andrew = {
       programs.home-manager.enable = true;
       programs.command-not-found.enable = true;
