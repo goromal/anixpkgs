@@ -7,19 +7,20 @@
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot.initrd.availableKernelModules =
-    [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
+    [ "xhci_pci" "ahci" "usbhid" "sd_mod" "sdhci_pci" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/e30f7381-0470-4882-b2f9-8c0d5cc4a98f";
+    device = "/dev/disk/by-uuid/0f7596f5-d29c-41da-8faa-4a6523d61528";
     fsType = "ext4";
   };
 
-  fileSystems."/boot/efi" = {
-    device = "/dev/disk/by-uuid/04B3-A3DD";
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/5375-AF34";
     fsType = "vfat";
+    options = [ "fmask=0022" "dmask=0022" ];
   };
 
   swapDevices = [ ];
@@ -29,22 +30,9 @@
   # still possible to use this option, but it's recommended to use it in conjunction
   # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
   networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlp1s0.useDHCP = lib.mkDefault true;
+  # networking.interfaces.enp1s0.useDHCP = lib.mkDefault true;
 
-  powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode =
     lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # Inspiron Touchpad
-  # boot.kernelModules = [ "psmouse" ]; redundant
-  # boot.kernelParams = [ "psmouse.synaptics_intertouch=0" ]; # https://wiki.ubuntu.com/DebuggingTouchpadDetection
-  services.libinput = {
-    enable = true;
-    touchpad.tapping = true;
-    touchpad.tappingDragLock = true;
-  };
-  services.xserver.exportConfiguration = true;
-
-  # Essential Firmware
-  hardware.enableRedistributableFirmware = lib.mkDefault true;
 }

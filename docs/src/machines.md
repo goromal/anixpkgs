@@ -69,6 +69,35 @@ export NIXPKGS_ALLOW_UNFREE=1
 # eval "$(direnv hook bash)"
 ```
 
+## Build and Deploy a Raspberry Pi NixOS SD Configuration
+
+Since the hardware configuration for the Raspberry Pi is well understood, it makes sense to skip the installer step and deploy a fully-fledged clusure instead.
+
+```bash
+nixos-generate -f sd-aarch64 --system aarch64-linux -c /path/to/anixpkgs/pkgs/nixos/configurations/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+```
+
+```bash
+nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
+```
+
+```bash
+sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
+```
+
+On the Pi, connect to the internet, copy over SSH keys (maybe no need for `/root/.ssh/`) and then set up the Nix channel(s):
+
+```bash
+sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
+sudo nix-channel --update
+```
+
+Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` packages (that's something for me to look into) so the `anix-upgrade` setup steps are especially important:
+
+- Make a `~/sources` directory
+- Symlink the configuration file even if it doesn't exist yet
+- Run `anix-upgrade` to aarch-ify everything
+
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
@@ -97,6 +126,10 @@ sudo nix-channel --update
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
+***Note***: You can replace steps 1-8 with a `kexec` kernel load and disk formatting with `disko`:
+- [kexec directions](https://github.com/nix-community/nixos-images#kexec-tarballs)
+- [disko directions](https://github.com/nix-community/disko)
+
 1. Download a [NixOS ISO](https://nixos.org/nixos/download.html) image.
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
@@ -107,7 +140,7 @@ cp nixos-xxx.iso /dev/sdX
 dd if=nixos.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
 ```
 5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Wipe the file system: 
+6. Wipe the file system:
 ```bash
 wipefs [--all -a] /dev/sda
 ```
@@ -150,16 +183,16 @@ nixos-generate-config --root /mnt/nixos
 # /etc/nixos/configuration.nix
 # /etc/nixos/hardware-configuration.nix
 ```
-10. Do the installation:
+10.  Do the installation:
 ```bash
 nixos-install --root /mnt/nixos
 ```
-11. If everything went well:
+11.  If everything went well:
 ```bash
 reboot
 ```
-12. Log into Github and generate an SSH key for authentication.
-13. Clone and link an editable version of the configuration:
+12.  Log into Github and generate an SSH key for authentication.
+13.  Clone and link an editable version of the configuration:
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
@@ -168,7 +201,7 @@ sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
 sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
 sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
 ```
-14. Make other needed updates to the configuration, then apply:
+14.  Make other needed updates to the configuration, then apply:
 ```bash
 sudo nixos-rebuild boot
 sudo reboot

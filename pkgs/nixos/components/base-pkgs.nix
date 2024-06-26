@@ -75,8 +75,8 @@ in {
     anixpkgs.scrape
   ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
 
-  systemd.user.services.orchestratord = {
-    Unit = { Description = "Orchestrator daemon"; };
+  systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
+    Unit = { Description = "User-domain Orchestrator daemon"; };
     Service = {
       Type = "simple";
       ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";

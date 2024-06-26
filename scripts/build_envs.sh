@@ -11,7 +11,8 @@ export NIXPKGS_ALLOW_UNFREE=1
 echo "Building build environments..."
 
 nb clangStdenv
-nb python310
-nb python310.pkgs.pybind11
-nb python310
+nb python311
+nb python311.pkgs.pybind11
+nb python311
 nb rustPlatform
+nb php74

@@ -144,6 +144,22 @@
         "type": "github"
       }
     },
+    "flake-compat_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1696426674,
+        "narHash": "sha256-kvjfFW7WAETZlt09AgDn1MrtKzP7t90Vf7vypd3OL1U=",
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "rev": "0f9255e01c2351cc7d116c072cb317785dd33b33",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -322,6 +338,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1718276985,
+        "narHash": "sha256-u1fA0DYQYdeG+5kDm1bOoGcHtX0rtC7qs2YA2N1X++I=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3f84a279f1a6290ce154c5531378acc827836fbb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "orchestrator": {
       "flake": false,
       "locked": {
@@ -351,6 +383,26 @@
       "original": {
         "owner": "goromal",
         "repo": "orchestrator-cpp",
+        "type": "github"
+      }
+    },
+    "phps": {
+      "inputs": {
+        "flake-compat": "flake-compat_2",
+        "nixpkgs": "nixpkgs_2",
+        "utils": "utils"
+      },
+      "locked": {
+        "lastModified": 1718658141,
+        "narHash": "sha256-Ikk7H1Lbt+u75+vcoxb0K8aX6TmWdRg3KQoIM2PlSH4=",
+        "owner": "fossar",
+        "repo": "nix-phps",
+        "rev": "0760794ce696c1c5d9d3bd3979ff4811ea6276da",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fossar",
+        "repo": "nix-phps",
         "type": "github"
       }
     },
@@ -492,6 +544,7 @@
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
+        "phps": "phps",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
         "pysignals": "pysignals",
@@ -639,14 +692,29 @@
         "type": "github"
       }
     },
+    "systems_2": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870999,
-        "narHash": "sha256-ZCpgZCkc66zY0JPrFAtHhWXSePDFAgoqKUyyOP3ftZM=",
+        "lastModified": 1719368704,
+        "narHash": "sha256-lJ0oEfPhgjNCIvK0gjSxXMYWUJQ95FooQP/vg8v/L90=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "901ad78fae2bebf1bdae4c27522d1e216b1809ee",
+        "rev": "dbeb316216d733326a7a55fd47defadbd2dd9b1d",
         "type": "github"
       },
       "original": {
@@ -669,6 +737,24 @@
       "original": {
         "type": "git",
         "url": "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96"
+      }
+    },
+    "utils": {
+      "inputs": {
+        "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1710146030,
+        "narHash": "sha256-SZ5L6eA7HJ/nmkzGG7/ISclqe6oZdOZTNoesiInkXPQ=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "b1d9ab70662946ef0850d488da1c9019f3a9752a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
       }
     },
     "wiki-tools": {

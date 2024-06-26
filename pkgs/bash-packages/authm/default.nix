@@ -1,5 +1,4 @@
-{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python
-, flock }:
+{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python }:
 let
   pkgname = "authm";
   description = "Manage secrets.";
@@ -19,13 +18,12 @@ let
         task-tools
         wiki-tools
         book-notes-sync
-        flock
       ];
       checkPkgs = [ ];
     });
   bisync = ''
     if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help" ]]; then
-      ${flock}/bin/flock /tmp -c "${rcrsync}/bin/rcrsync sync secrets"
+      ${rcrsync}/bin/rcrsync sync secrets
     fi
   '';
   printErr = ">&2 ${color-prints}/bin/echo_red";

@@ -224,59 +224,61 @@ in rec {
       ${script}
     '');
 
+  php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
+
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
-  aapis-py = final.python310.pkgs.aapis-py;
-  budget_report = final.python310.pkgs.budget_report;
-  makepyshell = final.python310.pkgs.makepyshell;
-  mavlog-utils = final.python310.pkgs.mavlog-utils;
-  fqt = final.python310.pkgs.fqt;
-  ichabod = final.python310.pkgs.ichabod;
-  norbert = final.python310.pkgs.norbert;
-  geometry = final.python310.pkgs.geometry;
-  pyceres = final.python310.pkgs.pyceres;
-  pyceres_factors = final.python310.pkgs.pyceres_factors;
-  pysorting = final.python310.pkgs.pysorting;
-  pysignals = final.python310.pkgs.pysignals;
-  mesh-plotter = final.python310.pkgs.mesh-plotter;
-  scrape = final.python310.pkgs.scrape;
+  aapis-py = final.python311.pkgs.aapis-py;
+  budget_report = final.python311.pkgs.budget_report;
+  makepyshell = final.python311.pkgs.makepyshell;
+  mavlog-utils = final.python311.pkgs.mavlog-utils;
+  fqt = final.python311.pkgs.fqt;
+  ichabod = final.python311.pkgs.ichabod;
+  norbert = final.python311.pkgs.norbert;
+  geometry = final.python311.pkgs.geometry;
+  pyceres = final.python311.pkgs.pyceres;
+  pyceres_factors = final.python311.pkgs.pyceres_factors;
+  pysorting = final.python311.pkgs.pysorting;
+  pysignals = final.python311.pkgs.pysignals;
+  mesh-plotter = final.python311.pkgs.mesh-plotter;
+  scrape = final.python311.pkgs.scrape;
   spleeter = final.python38.pkgs.spleeter;
   find_rotational_conventions =
-    final.python310.pkgs.find_rotational_conventions;
-  trafficsim = final.python310.pkgs.trafficsim;
-  flask-hello-world = final.python310.pkgs.flask-hello-world;
-  flask-url2mp4 = final.python310.pkgs.flask-url2mp4;
-  flask-mp4server = final.python310.pkgs.flask-mp4server;
-  flask-mp3server = final.python310.pkgs.flask-mp3server;
-  flask-smfserver = final.python310.pkgs.flask-smfserver;
-  flask-oatbox = final.python310.pkgs.flask-oatbox;
-  imutils-cv4 = final.python310.pkgs.imutils-cv4;
-  vidstab-cv4 = final.python310.pkgs.vidstab-cv4;
-  rankserver = final.python310.pkgs.rankserver;
-  stampserver = final.python310.pkgs.stampserver;
-  easy-google-auth = final.python310.pkgs.easy-google-auth;
-  task-tools = final.python310.pkgs.task-tools;
-  python-dokuwiki = final.python310.pkgs.python-dokuwiki;
-  wiki-tools = final.python310.pkgs.wiki-tools;
-  book-notes-sync = final.python310.pkgs.book-notes-sync;
-  gmail-parser = final.python310.pkgs.gmail-parser;
-  goromail = final.python310.pkgs.goromail;
-  orchestrator = final.python310.pkgs.orchestrator;
+    final.python311.pkgs.find_rotational_conventions;
+  trafficsim = final.python311.pkgs.trafficsim;
+  flask-hello-world = final.python311.pkgs.flask-hello-world;
+  flask-url2mp4 = final.python311.pkgs.flask-url2mp4;
+  flask-mp4server = final.python311.pkgs.flask-mp4server;
+  flask-mp3server = final.python311.pkgs.flask-mp3server;
+  flask-smfserver = final.python311.pkgs.flask-smfserver;
+  flask-oatbox = final.python311.pkgs.flask-oatbox;
+  imutils-cv4 = final.python311.pkgs.imutils-cv4;
+  vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  rankserver = final.python311.pkgs.rankserver;
+  stampserver = final.python311.pkgs.stampserver;
+  easy-google-auth = final.python311.pkgs.easy-google-auth;
+  task-tools = final.python311.pkgs.task-tools;
+  python-dokuwiki = final.python311.pkgs.python-dokuwiki;
+  wiki-tools = final.python311.pkgs.wiki-tools;
+  book-notes-sync = final.python311.pkgs.book-notes-sync;
+  gmail-parser = final.python311.pkgs.gmail-parser;
+  goromail = final.python311.pkgs.goromail;
+  orchestrator = final.python311.pkgs.orchestrator;
 
   authm =
-    addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
+    addDoc (prev.callPackage ./bash-packages/authm { python = python311; });
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
-    python = final.python310;
+    python = final.python311;
   });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
-    python = final.python310;
+    python = final.python311;
     blank-svg = pkgData.img.blank-svg;
   });
   la-quiz = addDoc
-    (prev.callPackage ./bash-packages/la-quiz { python = final.python310; });
+    (prev.callPackage ./bash-packages/la-quiz { python = final.python311; });
 
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
@@ -314,7 +316,7 @@ in rec {
   pdf = addDoc (prev.callPackage ./bash-packages/converters/pdf.nix { });
   png = addDoc (prev.callPackage ./bash-packages/converters/png.nix { });
   svg = addDoc (prev.callPackage ./bash-packages/converters/svg.nix {
-    scour = final.python310.pkgs.scour;
+    scour = final.python311.pkgs.scour;
   });
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });

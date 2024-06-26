@@ -1,4 +1,5 @@
-{ cloudDirs ? [ ], writeArgparseScriptBin, rclone, color-prints, redirects }:
+{ cloudDirs ? [ ], writeArgparseScriptBin, rclone, color-prints, redirects
+, flock }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
@@ -42,7 +43,6 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printErr} "Unrecognized CLOUD_DIR: $2"
     exit 1
   fi
-
   if [[ "$1" == "init" ]]; then
     if [[ -d "$LOCAL_DIR" ]]; then
       ${printYlw} "Local directory $LOCAL_DIR present. Delete it if you wish to start fresh."
@@ -51,9 +51,9 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+      ${rclone}/bin/rclone copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout} || { _success=0; }
     else
-      ${rclone}/bin/rclone copy "$CLOUD_DIR" "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+      ${rclone}/bin/rclone copy $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all} || { _success=0; }
     fi
     if [[ "$_success" == "0" ]]; then
       ${printErr} "rclone copy failed. Check rclone!"
@@ -68,17 +68,17 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone bisync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
     else
-      ${rclone}/bin/rclone bisync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone bisync $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
     fi
     if [[ "$_success" == "0" ]]; then
       ${printYlw} "Bisync failed; attempting with --resync..."
       _success=1
       if [[ "$verbose" == "1" ]]; then
-        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.stderr_to_stdout} || { _success=0; }
+        ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone bisync --resync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
       else
-        ${rclone}/bin/rclone bisync --resync $CLOUD_DIR "$LOCAL_DIR" ${redirects.suppress_all} || { _success=0; }
+        ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone bisync --resync $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
       fi
       if [[ "$_success" == "0" ]]; then
         ${printErr} "Bisync retry failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."

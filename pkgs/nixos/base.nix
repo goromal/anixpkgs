@@ -8,6 +8,11 @@ let
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
   options.machines.base = {
+    homeDir = lib.mkOption {
+      type = lib.types.str;
+      description = "Home directory for primary user (default: /data/andrew)";
+      default = "/data/andrew";
+    };
     nixosState = lib.mkOption {
       type = lib.types.str;
       description = "Initiating state of the NixOS install (example: '22.05')";
@@ -15,6 +20,12 @@ in {
     machineType = lib.mkOption {
       type = lib.types.enum [ "x86_linux" "pi4" ];
       description = "Machine type that the closure is targeting.";
+    };
+    bootMntPt = lib.mkOption {
+      type = lib.types.str;
+      description =
+        "(x86_linux) Boot partition mount point (default: /boot/efi)";
+      default = "/boot/efi";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;
@@ -28,22 +39,56 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes developer packages.";
     };
-    isServer = lib.mkOption {
+    loadATSServices = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
+    };
+    serveNotesWiki = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to serve the notes wiki site.";
     };
     isInstaller = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
     };
+    cloudDirs = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      description =
+        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      default = [
+        {
+          name = "configs";
+          cloudname = "dropbox:configs";
+          dirname = "$HOME/configs";
+        }
+        {
+          name = "secrets";
+          cloudname = "dropbox:secrets";
+          dirname = "$HOME/secrets";
+        }
+        {
+          name = "games";
+          cloudname = "dropbox:games";
+          dirname = "$HOME/games";
+        }
+        {
+          name = "data";
+          cloudname = "box:data";
+          dirname = "$HOME/data";
+        }
+        {
+          name = "documents";
+          cloudname = "drive:Documents";
+          dirname = "$HOME/Documents";
+        }
+      ];
+    };
   };
 
   imports = [
     (import "${home-manager}/nixos")
-    ../python-packages/orchestrator/module.nix
-    ../standalone-modules/ats-greeting/module.nix
-    ../standalone-modules/ats-mailman/module.nix
-    ../standalone-modules/ats-ccounterd/module.nix
+    ../modules/ats/modules.nix
+    ../modules/notes-wiki/module.nix
   ];
 
   config = {
@@ -75,7 +120,7 @@ in {
         efi = {
           canTouchEfiVariables = true;
           efiSysMountPoint =
-            lib.mkIf (cfg.machineType == "x86_linux") "/boot/efi";
+            lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
       };
       supportedFilesystems =
@@ -89,7 +134,7 @@ in {
             [User]
             Session=
             XSession=
-            Icon=/data/andrew/.face
+            Icon=${cfg.homeDir}/.face
             SystemAccount=false
           '';
         in ''
@@ -110,7 +155,7 @@ in {
       nixPath = [
         "nixos-config=/etc/nixos/configuration.nix"
         "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-        "anixpkgs=/data/andrew/sources/anixpkgs"
+        "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
       ];
       settings = {
         auto-optimise-store = true;
@@ -212,40 +257,9 @@ in {
     };
 
     # Server processes
-    services.orchestratord = {
-      enable = cfg.isServer;
-      orchestratorPkg = anixpkgs.orchestrator;
-      pathPkgs = [
-        pkgs.bash
-        pkgs.coreutils
-        pkgs.rclone
-        anixpkgs.wiki-tools
-        anixpkgs.mp4
-        anixpkgs.mp4unite
-        anixpkgs.goromail
-        anixpkgs.gmail-parser
-        anixpkgs.scrape
-        # TODO if we move to NixOS ATS, then these must be fixed to have the correct cloudDir arg
-        anixpkgs.rcrsync
-        anixpkgs.authm
-      ];
-    };
-
-    services.ats-greeting = {
-      enable = cfg.isServer;
-      orchestratorPkg = anixpkgs.orchestrator;
-    };
-
-    services.ats-mailman = {
-      enable = cfg.isServer;
-      orchestratorPkg = anixpkgs.orchestrator;
-      redirectsPkg = anixpkgs.redirects;
-    };
-
-    services.ats-ccounterd = {
-      enable = cfg.isServer;
-      orchestratorPkg = anixpkgs.orchestrator;
-    };
+    services.ats.enable = cfg.loadATSServices;
+    services.notes-wiki.enable = cfg.serveNotesWiki;
+    services.notes-wiki.openFirewall = true;
 
     # Global packages
     environment.systemPackages = [
@@ -345,7 +359,7 @@ in {
     users.users.andrew = {
       isNormalUser = true;
       uid = 1000;
-      home = "/data/andrew";
+      home = cfg.homeDir;
       createHome = true;
       description = "Andrew Torgesen";
       group = "dev";
@@ -419,38 +433,14 @@ in {
       mods.opts = {
         homeState = cfg.nixosState;
         standalone = false;
-        homeDir = "/data/andrew";
+        homeDir = cfg.homeDir;
         browserExec = if cfg.graphical && cfg.machineType == "x86_linux" then
           "${unstable.google-chrome}/bin/google-chrome-stable"
         else
           null;
-        cloudDirs = [
-          {
-            name = "configs";
-            cloudname = "dropbox:configs";
-            dirname = "$HOME/configs";
-          }
-          {
-            name = "secrets";
-            cloudname = "dropbox:secrets";
-            dirname = "$HOME/secrets";
-          }
-          {
-            name = "games";
-            cloudname = "dropbox:games";
-            dirname = "$HOME/games";
-          }
-          {
-            name = "data";
-            cloudname = "box:data";
-            dirname = "$HOME/data";
-          }
-          {
-            name = "documents";
-            cloudname = "drive:Documents";
-            dirname = "$HOME/Documents";
-          }
-        ];
+        cloudDirs = cfg.cloudDirs;
+        userOrchestrator = !cfg.loadATSServices;
+        cloudAutoSync = !cfg.loadATSServices;
       };
     };
   };

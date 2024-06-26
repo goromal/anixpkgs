@@ -5,6 +5,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/24.05";
 
+    phps.url = "github:fossar/nix-phps";
+
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
 

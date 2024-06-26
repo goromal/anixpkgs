@@ -11,7 +11,8 @@ in {
     graphical = false;
     recreational = false;
     developer = false;
-    isServer = false;
+    loadATSServices = false;
+    serveNotesWiki = false;
     isInstaller = false;
   };
 

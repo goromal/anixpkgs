@@ -85,7 +85,7 @@ Here are some `shell.nix` files to access Python packages (using version `vRELEA
 let
   pkgs = import (builtins.fetchTarball
     "https://github.com/goromal/anixpkgs/archive/refs/tags/vRELEASETAGREPLACE.tar.gz") {};
-  python-with-my-packages = pkgs.python310.withPackages (p: with p; [
+  python-with-my-packages = pkgs.python311.withPackages (p: with p; [
     numpy
     matplotlib
     geometry
@@ -103,16 +103,16 @@ let
     "https://github.com/goromal/anixpkgs/archive/refs/tags/vRELEASETAGREPLACE.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
-    pkgs.python310
-    pkgs.python310.pkgs.numpy
-    pkgs.python310.pkgs.geometry
-    pkgs.python310.pkgs.find_rotational_conventions
+    pkgs.python311
+    pkgs.python311.pkgs.numpy
+    pkgs.python311.pkgs.geometry
+    pkgs.python311.pkgs.find_rotational_conventions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
     # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
     export PIP_PREFIX=$(pwd)/_build/pip_packages
-    export PYTHONPATH="$PIP_PREFIX/${pkgs.python310.sitePackages}:$PYTHONPATH"
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python311.sitePackages}:$PYTHONPATH"
     export PATH="$PIP_PREFIX/bin:$PATH"
     unset SOURCE_DATE_EPOCH
   '';

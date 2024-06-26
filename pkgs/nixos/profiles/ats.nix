@@ -6,16 +6,11 @@
     graphical = false;
     recreational = false;
     developer = false;
-    isServer = true;
+    loadATSServices = true;
+    serveNotesWiki = true;
     isInstaller = false;
   };
 
-  # TODO for now ATS needs to be founded on home-manager;
-  # most of the content below is filler boilerplate for
-  # ats-standalone-home.nix (for installer testing purposes ONLY)
-
-  home-manager.users.andrew = {
-    home.homeDirectory = pkgs.lib.mkForce "/home/andrew";
-    imports = [ ../components/ats-standalone-home.nix ];
-  };
+  users.users.andrew.hashedPassword = lib.mkForce
+    "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
 }
