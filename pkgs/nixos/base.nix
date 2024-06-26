@@ -21,6 +21,12 @@ in {
       type = lib.types.enum [ "x86_linux" "pi4" ];
       description = "Machine type that the closure is targeting.";
     };
+    bootMntPt = lib.mkOption {
+      type = lib.types.str;
+      description =
+        "(x86_linux) Boot partition mount point (default: /boot/efi)";
+      default = "/boot/efi";
+    };
     graphical = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure includes a graphical interface.";
@@ -114,7 +120,7 @@ in {
         efi = {
           canTouchEfiVariables = true;
           efiSysMountPoint =
-            lib.mkIf (cfg.machineType == "x86_linux") "/boot/efi";
+            lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
       };
       supportedFilesystems =
