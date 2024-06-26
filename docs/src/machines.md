@@ -126,6 +126,10 @@ sudo nix-channel --update
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
+***Note***: You can replace steps 1-8 with a `kexec` kernel load and disk formatting with `disko`:
+- [kexec directions](https://github.com/nix-community/nixos-images#kexec-tarballs)
+- [disko directions](https://github.com/nix-community/disko)
+
 1. Download a [NixOS ISO](https://nixos.org/nixos/download.html) image.
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
@@ -135,12 +139,12 @@ cp nixos-xxx.iso /dev/sdX
 # OR
 dd if=nixos.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
 ```
-5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Wipe the file system: 
+1. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
+2. Wipe the file system: 
 ```bash
 wipefs [--all -a] /dev/sda
 ```
-7. `gparted`
+1. `gparted`
    1. Create a GUID table: *Device* > *Create Partition Table* > *GPT*
       1. Select `/dev/sda`
       2. *Entire disk*
@@ -166,29 +170,29 @@ wipefs [--all -a] /dev/sda
       7. File system: `ext4`
       8. Label: NixOS
    5. Apply modifications
-8. Mount root and boot partitions:
+2. Mount root and boot partitions:
 ```bash
 mkdir /mnt/nixos
 mount /dev/disk/by-label/NixOS /mnt/nixos
 mkdir /mnt/nixos/boot
 mount /dev/disk/by-label/EFI /mnt/nixos/boot
 ```
-9. Generate an initial configuration (you'll want it to enable WiFi connectivity and a web browser at least):
+1. Generate an initial configuration (you'll want it to enable WiFi connectivity and a web browser at least):
 ```bash
 nixos-generate-config --root /mnt/nixos
 # /etc/nixos/configuration.nix
 # /etc/nixos/hardware-configuration.nix
 ```
-10. Do the installation:
+1.  Do the installation:
 ```bash
 nixos-install --root /mnt/nixos
 ```
-11. If everything went well:
+1.  If everything went well:
 ```bash
 reboot
 ```
-12. Log into Github and generate an SSH key for authentication.
-13. Clone and link an editable version of the configuration:
+1.  Log into Github and generate an SSH key for authentication.
+2.  Clone and link an editable version of the configuration:
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
@@ -197,7 +201,7 @@ sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
 sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
 sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
 ```
-14. Make other needed updates to the configuration, then apply:
+1.  Make other needed updates to the configuration, then apply:
 ```bash
 sudo nixos-rebuild boot
 sudo reboot
