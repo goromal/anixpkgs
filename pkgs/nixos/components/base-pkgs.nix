@@ -42,6 +42,7 @@ in {
     anixpkgs.wiki-tools
     anixpkgs.task-tools
     anixpkgs.book-notes-sync
+    anixpkgs.budget_report
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
