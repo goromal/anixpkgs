@@ -4,7 +4,7 @@ with lib;
 with import ../../nixos/dependencies.nix { inherit config; };
 let
   app = "notes-wiki";
-  defaultDomain = "localhost";
+  defaultDomain = "notes.andrewtorgesen.com";
   globalCfg = config.machines.base;
   cfg = config.services.${app};
 in {
@@ -63,8 +63,8 @@ in {
       user = "andrew";
       group = "dev";
       virtualHosts.${cfg.domain} = {
-        # addSSL = true;
-        # enableACME = true;
+        addSSL = true;
+        enableACME = true;
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
@@ -102,9 +102,9 @@ in {
         };
       };
     };
-    # security.acme = {
-    #   acceptTerms = true;
-    #   defaults.email = "andrew.torgesen@gmail.com";
-    # };
+    security.acme = {
+      acceptTerms = true;
+      defaults.email = "andrew.torgesen@gmail.com";
+    };
   };
 }
