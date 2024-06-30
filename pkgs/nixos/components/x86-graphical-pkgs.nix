@@ -49,7 +49,7 @@ in {
   } else
     { }));
 
-  home.packages = [ terminator anixpkgs.budget_report anixpkgs.getres ]
+  home.packages = [ terminator anixpkgs.getres ]
     ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
