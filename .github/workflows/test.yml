@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - uses: cachix/install-nix-action@v25
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
