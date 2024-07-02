@@ -30,15 +30,18 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: |
+        branch="${GITHUB_REF#refs/heads/}"
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
+        git checkout $branch
+        git pull origin $branch
         python scripts/update_deps.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
           echo "Committing changes to flake lock"
           git add .
           git commit -m "Update flake lock"
-          git push
+          git push origin $branch
         else
           echo "No lock changes to commit"
         fi
