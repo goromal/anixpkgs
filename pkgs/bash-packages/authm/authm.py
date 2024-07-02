@@ -26,7 +26,7 @@ def cli():
 )
 def refresh(headless, force):
     """Refresh all auth tokens one-by-one."""
-    print(Fore.YELLOW + "Refreshing Personal Tokens..." + Style.RESET_ALL)
+    print(Fore.YELLOW + f"Refreshing Personal Tokens...{' (Forced)' if force else ''}" + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
@@ -35,6 +35,7 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("gmail_refresh_file"),
             headless=headless,
             force=force,
+            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed.")
@@ -48,6 +49,7 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("gbot_refresh_file"),
             headless=headless,
             force=force,
+            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed.")
@@ -61,6 +63,7 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("journal_refresh_file"),
             headless=headless,
             force=force,
+            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed.")
