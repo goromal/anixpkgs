@@ -26,7 +26,7 @@ def cli():
 )
 def refresh(headless, force):
     """Refresh all auth tokens one-by-one."""
-    print(Fore.YELLOW + "Refreshing Personal Tokens..." + Style.RESET_ALL)
+    print(Fore.YELLOW + f"Refreshing Personal Tokens...{' (Forced)' if force else ''}" + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
