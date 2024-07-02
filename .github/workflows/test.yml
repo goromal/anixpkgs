@@ -33,7 +33,7 @@ jobs:
         branch=${{ github.head_ref || github.ref_name }}
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
-        git checkout $branch
+        git checkout origin $branch
         git pull origin $branch
         python scripts/update_deps.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
