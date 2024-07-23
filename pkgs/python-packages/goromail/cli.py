@@ -9,6 +9,7 @@ from gmail_parser.corpus import GBotCorpus, JournalCorpus
 from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
 from wiki_tools.defaults import WikiToolsDefaults as WTD
+from notion_client import Client
 from task_tools.manage import TaskManager
 from task_tools.defaults import TaskToolsDefaults as TTD
 

@@ -246,6 +246,11 @@
                 "docs": true
             },
             {
+                "attr": "notion-client",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "goromail",
                 "ci": true,
                 "docs": true
