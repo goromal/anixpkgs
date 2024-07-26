@@ -63,6 +63,9 @@ def append_text_to_notion_page(token, id, msg, text):
     if response.status_code == 200:
         # TODO delete msg if successful
         pass
+    else:
+        sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
+        exit(1)
 
 
 def append_text_to_wiki_page(wiki, id, msg, text):
@@ -376,7 +379,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if categories_csv is not None:
             with open(os.path.expanduser(categories_csv), "r") as categories:
                 for line in categories:
-                    keyword, page_id, notion_page_id = line.split(",")[0], line.split(",")[1], line.split(",")[2]
+                    keyword, page_id, notion_page_id = line.split(",")[0], line.split(",")[1], line.split(",")[2].strip()
                     matched = process_keyword(
                         text,
                         date.strftime("%m/%d/%Y"),
@@ -426,7 +429,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             if logfile is not None:
                 logfile.write("Wiki:ITNS entry\n")
             if not dry_run:
-                append_text_to_notion_page(notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, item)
+                append_text_to_notion_page(notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text)
                 append_text_to_wiki_page(wiki, "itns", msg, text)
     if logfile is not None:
         logfile.close()
