@@ -76,7 +76,7 @@ let
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
         # TODO warn about expiration
-        goromail --wiki-url ${wiki-url} --headless bot ${anixpkgs.redirects.suppress_all}
+        goromail --wiki-url ${wiki-url} --headless bot --categories-csv ~/configs/new.goromail-pages.csv ${anixpkgs.redirects.suppress_all}
         goromail --wiki-url ${wiki-url} --headless journal ${anixpkgs.redirects.suppress_all}
         if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
           echo "Notifying about processed bot mail..."

@@ -93,8 +93,6 @@ let
               (pySelf.callPackage ./python-packages/gmail-parser {
                 pkg-src = flakeInputs.gmail-parser;
               });
-            notion-client =
-              addDoc (pySelf.callPackage ./python-packages/notion-client { });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });

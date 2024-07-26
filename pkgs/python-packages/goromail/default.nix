@@ -1,5 +1,5 @@
 { callPackage, pytestCheckHook, buildPythonPackage, easy-google-auth, click
-, colorama, gmail-parser, task-tools, wiki-tools, notion-client }:
+, colorama, gmail-parser, task-tools, wiki-tools }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "goromail";
   version = "1.0.0";
@@ -13,7 +13,6 @@ callPackage ../pythonPkgFromScript.nix {
     gmail-parser
     task-tools
     wiki-tools
-    notion-client
   ];
   checkPkgs = [ ];
   longDescription = ''
