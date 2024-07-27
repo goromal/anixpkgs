@@ -17,6 +17,7 @@ from task_tools.defaults import TaskToolsDefaults as TTD
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
 
+
 def create_notion_bulleted_list(data, level=0):
     if not isinstance(data, list):
         raise ValueError("Input data must be a list.")
@@ -33,25 +34,19 @@ def create_notion_bulleted_list(data, level=0):
                 "object": "block",
                 "type": "bulleted_list_item",
                 "bulleted_list_item": {
-                    "rich_text": [
-                        {
-                            "type": "text",
-                            "text": {
-                                "content": str(item)
-                            }
-                        }
-                    ]
-                }
+                    "rich_text": [{"type": "text", "text": {"content": str(item)}}]
+                },
             }
             notion_blocks.append(block)
     return notion_blocks
 
+
 def append_text_to_notion_page(token, id, msg, text):
-    ps = [p for p in text.split('\n') if p.strip()]
+    ps = [p for p in text.split("\n") if p.strip()]
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28"
+        "Notion-Version": "2022-06-28",
     }
     data = {
         "children": create_notion_bulleted_list(
@@ -67,7 +62,9 @@ def append_text_to_notion_page(token, id, msg, text):
         exit(1)
 
 
-def process_keyword(text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None):
+def process_keyword(
+    text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None
+):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
         matter = text[(n + 1) :].strip()
@@ -362,7 +359,10 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if categories_csv is not None:
             with open(os.path.expanduser(categories_csv), "r") as categories:
                 for line in categories:
-                    keyword, notion_page_id = line.split(",")[0], line.split(",")[1].strip()
+                    keyword, notion_page_id = (
+                        line.split(",")[0],
+                        line.split(",")[1].strip(),
+                    )
                     matched = process_keyword(
                         text,
                         date.strftime("%m/%d/%Y"),
@@ -377,7 +377,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                         break
         if matched:
             continue
-        if text.lstrip('-+').isdigit():
+        if text.lstrip("-+").isdigit():
             print(f"  Calorie intake on {date}: {text}")
             if logfile is not None:
                 logfile.write("Calories entry\n")
@@ -410,7 +410,9 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             if logfile is not None:
                 logfile.write("Notion:ITNS entry\n")
             if not dry_run:
-                append_text_to_notion_page(notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text)
+                append_text_to_notion_page(
+                    notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
+                )
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)

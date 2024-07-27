@@ -6,14 +6,8 @@ callPackage ../pythonPkgFromScript.nix {
   description = "Manage mail for GBot and Journal.";
   script-file = ./cli.py;
   inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs = [
-    easy-google-auth
-    click
-    colorama
-    gmail-parser
-    task-tools
-    wiki-tools
-  ];
+  propagatedBuildInputs =
+    [ easy-google-auth click colorama gmail-parser task-tools wiki-tools ];
   checkPkgs = [ ];
   longDescription = ''
     The following workflows are supported, all via text messaging:
