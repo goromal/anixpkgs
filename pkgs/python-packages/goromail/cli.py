@@ -61,28 +61,13 @@ def append_text_to_notion_page(token, id, msg, text):
     url = f"https://api.notion.com/v1/blocks/{id}/children"
     response = requests.patch(url, json=data, headers=headers)
     if response.status_code == 200:
-        # TODO delete msg if successful
-        pass
+        msg.moveToTrash()
     else:
         sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
         exit(1)
 
 
-def append_text_to_wiki_page(wiki, id, msg, text):
-    doku = None
-    doku = wiki.getPage(id=id)
-    new_doku = f"""{doku}
-
----- 
-
-{text}
-"""
-    wiki.putPage(id=id, content=new_doku)
-    if doku is not None:
-        msg.moveToTrash()
-
-
-def process_keyword(text, datestr, keyword, notion_api_token, notion_page_id, page_id, wiki, msg, dry_run, logfile=None):
+def process_keyword(text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
         matter = text[(n + 1) :].strip()
@@ -94,10 +79,9 @@ def process_keyword(text, datestr, keyword, notion_api_token, notion_page_id, pa
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
             append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
-            append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -109,10 +93,9 @@ def process_keyword(text, datestr, keyword, notion_api_token, notion_page_id, pa
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
             append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
-            append_text_to_wiki_page(wiki, page_id, msg, item)
         return True
     return False
 
@@ -379,15 +362,13 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if categories_csv is not None:
             with open(os.path.expanduser(categories_csv), "r") as categories:
                 for line in categories:
-                    keyword, page_id, notion_page_id = line.split(",")[0], line.split(",")[1], line.split(",")[2].strip()
+                    keyword, notion_page_id = line.split(",")[0], line.split(",")[1].strip()
                     matched = process_keyword(
                         text,
                         date.strftime("%m/%d/%Y"),
                         keyword,
                         notion_api_token,
                         notion_page_id,
-                        page_id,
-                        wiki,
                         msg,
                         dry_run,
                         logfile,
@@ -427,10 +408,9 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         else:
             print(f"  ITNS from {date}: {text}")
             if logfile is not None:
-                logfile.write("Wiki:ITNS entry\n")
+                logfile.write("Notion:ITNS entry\n")
             if not dry_run:
                 append_text_to_notion_page(notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text)
-                append_text_to_wiki_page(wiki, "itns", msg, text)
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
