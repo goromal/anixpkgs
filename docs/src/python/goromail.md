@@ -43,6 +43,8 @@ Options:
                                [default: ~/secrets/wiki/secrets.json]
   --task-secrets-file PATH     Google Tasks client secrets file.  [default:
                                ~/secrets/google/client_secrets.json]
+  --notion-secrets-file PATH   Notion client secrets file.  [default:
+                               ~/secrets/notion/secret.json]
   --task-refresh-token PATH    Google Tasks refresh file (if it exists).
                                [default: ~/secrets/google/refresh.json]
   --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
