@@ -2,6 +2,8 @@ import click
 import re
 import os
 import sys
+import json
+import requests
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -16,21 +18,53 @@ MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
 
 
-def append_text_to_wiki_page(wiki, id, msg, text):
-    doku = None
-    doku = wiki.getPage(id=id)
-    new_doku = f"""{doku}
+def create_notion_bulleted_list(data, level=0):
+    if not isinstance(data, list):
+        raise ValueError("Input data must be a list.")
+    notion_blocks = []
+    for item in data:
+        if isinstance(item, list):
+            nested_blocks = create_notion_bulleted_list(item, level + 1)
+            if notion_blocks:
+                notion_blocks[-1]["bulleted_list_item"]["children"] = nested_blocks
+            else:
+                raise ValueError("Nested list structure is invalid.")
+        else:
+            block = {
+                "object": "block",
+                "type": "bulleted_list_item",
+                "bulleted_list_item": {
+                    "rich_text": [{"type": "text", "text": {"content": str(item)}}]
+                },
+            }
+            notion_blocks.append(block)
+    return notion_blocks
 
----- 
 
-{text}
-"""
-    wiki.putPage(id=id, content=new_doku)
-    if doku is not None:
+def append_text_to_notion_page(token, id, msg, text):
+    ps = [p for p in text.split("\n") if p.strip()]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    data = {
+        "children": create_notion_bulleted_list(
+            [ps[0], ps[1:]] if len(ps) > 1 else [ps[0]]
+        )
+    }
+    url = f"https://api.notion.com/v1/blocks/{id}/children"
+    response = requests.patch(url, json=data, headers=headers)
+    if response.status_code == 200:
         msg.moveToTrash()
+    else:
+        sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
+        exit(1)
 
 
-def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile=None):
+def process_keyword(
+    text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None
+):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
         matter = text[(n + 1) :].strip()
@@ -42,9 +76,9 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, item)
+            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -56,9 +90,9 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, item)
+            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
         return True
     return False
 
@@ -176,6 +210,14 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     help="Google Tasks client secrets file.",
 )
 @click.option(
+    "--notion-secrets-file",
+    "notion_secrets_file",
+    type=click.Path(),
+    default="~/secrets/notion/secret.json",
+    show_default=True,
+    help="Notion client secrets file.",
+)
+@click.option(
     "--task-refresh-token",
     "task_refresh_token",
     type=click.Path(),
@@ -214,6 +256,7 @@ def cli(
     wiki_url,
     wiki_secrets_file,
     task_secrets_file,
+    notion_secrets_file,
     task_refresh_token,
     enable_logging,
     headless,
@@ -229,6 +272,7 @@ def cli(
         "wiki_url": wiki_url,
         "wiki_secrets_file": wiki_secrets_file,
         "task_secrets_file": task_secrets_file,
+        "notion_secrets_file": notion_secrets_file,
         "task_refresh_token": task_refresh_token,
         "headless": headless,
         "headless_logdir": os.path.expanduser(headless_logdir),
@@ -277,6 +321,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if logfile is not None:
             logfile.close()
         return
+    try:
+        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
+            secrets = json.load(nsf)
+        notion_api_token = secrets["auth"]
+    except:
+        sys.stderr.write(f"Failed to load Notion API key")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
@@ -306,13 +359,16 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if categories_csv is not None:
             with open(os.path.expanduser(categories_csv), "r") as categories:
                 for line in categories:
-                    keyword, page_id = line.split(",")[0], line.split(",")[1]
+                    keyword, notion_page_id = (
+                        line.split(",")[0],
+                        line.split(",")[1].strip(),
+                    )
                     matched = process_keyword(
                         text,
                         date.strftime("%m/%d/%Y"),
                         keyword,
-                        page_id,
-                        wiki,
+                        notion_api_token,
+                        notion_page_id,
                         msg,
                         dry_run,
                         logfile,
@@ -321,7 +377,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                         break
         if matched:
             continue
-        if text.lstrip('-+').isdigit():
+        if text.lstrip("-+").isdigit():
             print(f"  Calorie intake on {date}: {text}")
             if logfile is not None:
                 logfile.write("Calories entry\n")
@@ -352,9 +408,11 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         else:
             print(f"  ITNS from {date}: {text}")
             if logfile is not None:
-                logfile.write("Wiki:ITNS entry\n")
+                logfile.write("Notion:ITNS entry\n")
             if not dry_run:
-                append_text_to_wiki_page(wiki, "itns", msg, text)
+                append_text_to_notion_page(
+                    notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
+                )
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)

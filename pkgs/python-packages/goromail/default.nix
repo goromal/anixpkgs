@@ -1,12 +1,13 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, click, colorama
-, gmail-parser, task-tools, wiki-tools }:
+{ callPackage, pytestCheckHook, buildPythonPackage, easy-google-auth, click
+, colorama, gmail-parser, task-tools, wiki-tools }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "goromail";
   version = "1.0.0";
   description = "Manage mail for GBot and Journal.";
   script-file = ./cli.py;
   inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs = [ click colorama gmail-parser task-tools wiki-tools ];
+  propagatedBuildInputs =
+    [ easy-google-auth click colorama gmail-parser task-tools wiki-tools ];
   checkPkgs = [ ];
   longDescription = ''
     The following workflows are supported, all via text messaging:
