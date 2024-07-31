@@ -316,6 +316,8 @@ def main(stdscr):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
             repopath = os.path.join(ctx.dev_dir, "sources", reponame)
             branch = branch_prompt(stdscr)
+            if not branch:
+                branch = ctx.repos[ctx.current_row - ctx.start_row][1]
             ctx.status_msg = f"Checking out {reponame}:{branch}..."
             display_output(stdscr)
             try:
