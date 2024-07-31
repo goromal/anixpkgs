@@ -68,9 +68,9 @@ in (writeArgparseScriptBin pkgname usage_str [
   fi
 
   if [[ -z "$overridedatadir" ]]; then
-    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
+    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
   else
-    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname "$overridedatadir")
+    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
   fi
   if [[ "$rcinfo" == "_NODEVRC_" ]]; then
       ${printErr} "ERROR: no $devrc file found"
@@ -98,9 +98,11 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr devrcFile "$devrc" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
+            --arg parseScript ${parseScript} \
             --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list" \
             --arg scriptsList "$scripts_list"
@@ -111,9 +113,11 @@ in (writeArgparseScriptBin pkgname usage_str [
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr devrcFile "$devrc" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
+            --arg parseScript ${parseScript} \
             --argstr devHistFile "$devhist" \
             --arg repoSpecList "$sources_list" \
             --arg scriptsList "$scripts_list" \

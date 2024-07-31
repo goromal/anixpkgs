@@ -78,8 +78,24 @@ class Context:
                         sync_branch = hist_data[self.wsname][reponame]["branch"]
                     except:
                         sync_branch = None
+                    url = (
+                        subprocess.check_output(
+                            [
+                                "git",
+                                "-C",
+                                root,
+                                "remote",
+                                "get-url",
+                                "--push",
+                                "origin",
+                            ],
+                            stderr=subprocess.PIPE,
+                        )
+                        .decode()
+                        .strip()
+                    )
                     self.repos.append(
-                        (reponame, branch, clean, hash, local, sync_branch)
+                        (reponame, branch, clean, hash, local, sync_branch, url)
                     )
         self.max_script_len = (
             max([len(script) for script in self.scripts])
@@ -173,11 +189,13 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
         stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
-        stdscr.addstr(ctx.end_row + 6, 0, "[b]  Create new branch")
-        stdscr.addstr(ctx.end_row + 7, 0, "[c]  (Stash and) CheckOut and Pull")
-        stdscr.addstr(ctx.end_row + 8, 0, "[h]  Display the full HEAD hash")
-        stdscr.addstr(ctx.end_row + 9, 0, "[r]  Refresh")
-        stdscr.addstr(ctx.end_row + 10, 0, "[q]  Quit")
+        stdscr.addstr(ctx.end_row + 6, 0, "[R]  Rebase-pull then push current branch")
+        stdscr.addstr(ctx.end_row + 7, 0, "[b]  Create new branch")
+        stdscr.addstr(ctx.end_row + 8, 0, "[c]  (Stash and) CheckOut and Pull")
+        stdscr.addstr(ctx.end_row + 9, 0, "[h]  Display the full HEAD hash")
+        stdscr.addstr(ctx.end_row + 10, 0, "[r]  Refresh")
+        stdscr.addstr(ctx.end_row + 11, 0, "[n]  Nuke")
+        stdscr.addstr(ctx.end_row + 12, 0, "[q]  Quit")
         for j, script in enumerate(ctx.scripts):
             stdscr.addstr(ctx.end_row + 3 + j, 40, f"| {script}")
 
@@ -294,6 +312,31 @@ def main(stdscr):
             ctx.load_sources()
             ctx.status_msg = f"Pushing {reponame}:{branch} to origin... Done."
 
+        elif key == ord("R"):
+            reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
+            repopath = os.path.join(ctx.dev_dir, "sources", reponame)
+            branch = ctx.repos[ctx.current_row - ctx.start_row][1]
+            ctx.status_msg = f"Rebasing and pushing {reponame}:{branch} to origin..."
+            display_output(stdscr)
+            try:
+                subprocess.check_output(
+                    ["git", "-C", repopath, "pull", "--rebase", "origin", branch],
+                    stderr=subprocess.PIPE,
+                )
+                subprocess.check_output(
+                    ["git", "-C", repopath, "push", "origin", branch],
+                    stderr=subprocess.PIPE,
+                )
+                ctx.save_ws_repo_branch(reponame, branch)
+            except:
+                ctx.load_sources()
+                ctx.status_msg = f"Rebasing and pushing {reponame}:{branch} to origin... UNSUCCESSFUL."
+                continue
+            ctx.load_sources()
+            ctx.status_msg = (
+                f"Rebasing and pushing {reponame}:{branch} to origin... Done."
+            )
+
         elif key == ord("b"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
             repopath = os.path.join(ctx.dev_dir, "sources", reponame)
@@ -342,6 +385,34 @@ def main(stdscr):
                 continue
             ctx.load_sources()
             ctx.status_msg = f"Checking out {reponame}:{branch}... Done."
+
+        elif key == ord("n"):
+            reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
+            url = ctx.repos[ctx.current_row - ctx.start_row][6]
+            repopath = os.path.join(ctx.dev_dir, "sources", reponame)
+            branch = branch_prompt(stdscr)
+            if not branch:
+                branch = ctx.repos[ctx.current_row - ctx.start_row][1]
+            ctx.status_msg = f"Nuking and checking out {reponame}:{branch}..."
+            display_output(stdscr)
+            try:
+                subprocess.check_output(
+                    ["rm", "-rf", repopath],
+                    stderr=subprocess.PIPE,
+                )
+                subprocess.check_output(
+                    ["git", "clone", url, repopath, "--branch", branch],
+                    stderr=subprocess.PIPE,
+                )
+                ctx.save_ws_repo_branch(reponame, branch)
+            except:
+                ctx.load_sources()
+                ctx.status_msg = (
+                    f"Nuking and checking out {reponame}:{branch}... UNSUCCESSFUL."
+                )
+                continue
+            ctx.load_sources()
+            ctx.status_msg = f"Nuking and checking out {reponame}:{branch}... Done."
 
         elif key == ord("h"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]

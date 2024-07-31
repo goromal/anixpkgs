@@ -1,5 +1,5 @@
-{ pkgs ? import <nixpkgs> { }, setupws, wsname, devDir, dataDir, pkgsVar
-, devScript, editorName, repoSpecList, scriptsList, shellSetupScript
+{ pkgs ? import <nixpkgs> { }, setupws, wsname, devDir, dataDir, pkgsVar, devrcFile
+, devScript, parseScript, editorName, repoSpecList, scriptsList, shellSetupScript
 , devHistFile }:
 let
   shellSetupArgs = builtins.concatStringsSep " "
@@ -16,8 +16,19 @@ let
   dev = pkgs.writeShellScriptBin "dev" ''
     ${pkgs.python3}/bin/python ${devScript} ${wsname} ${devDir}/${wsname} ${editorName} ${devHistFile}
   '';
+  addsrc = pkgs.writeShellScriptBin "addsrc" ''
+    if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
+      echo "addsrc REPONAME REPOURL"
+      exit
+    fi
+    if [[ -z "$1" ]] || [[ -z "$2" ]]; then
+      echo "addsrc REPONAME REPOURL"
+      exit
+    fi
+    ${pkgs.python3}/bin/python ${parseScript} ADD ${wsname} ${devrcFile} "$1" "$2"
+  '';
 in pkgs.mkShell {
-  nativeBuildInputs = [ setupcurrentws dev ];
+  nativeBuildInputs = [ setupcurrentws dev addsrc ];
   shellHook = ''
     export PS1='\n\[\033[1;36m\][devshell=${wsname}:\w]\$\[\033[0m\] '
     alias godev='cd ${devDir}/${wsname}'

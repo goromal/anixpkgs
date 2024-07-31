@@ -40,7 +40,9 @@ in pkgs.mkShell {{
     pkgs.bashInteractive
   ];
 }}
-""".format(PKGVAR, letset, pyinputset, inputset)
+""".format(
+    PKGVAR, letset, pyinputset, inputset
+)
 
 if not os.path.exists(os.path.join(DEVDIR, "shell.nix")):
     with open(os.path.join(DEVDIR, "shell.nix"), "w") as shellfile:
