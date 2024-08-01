@@ -141,10 +141,9 @@ def parse_ws():
     else:
         DATADIR = os.path.expanduser("~/data")
 
+    rpspec_sets = []
     source_sets = []
     script_sets = []
-    sources = "[]"  # "[{name=...;url=...;attr=...;deps=[...];}]"
-    scripts = "[]"
 
     try:
         (
@@ -163,30 +162,29 @@ def parse_ws():
             exit()
         for wssource in wssources:
             if wssource in dependencies:
-                deps_str = "[{}]".format(" ".join(dependencies[wssource]))
-                source_sets.append(
-                    f'{{name="{wssource}";url="{urls[wssource]}";attr="{attrs[wssource]}";deps={deps_str};}}'
-                )
+                rpspec_sets.append(f"{wssource}:{attrs[wssource]}:{':'.join(dependencies[wssource])}")
+                source_sets.append(f"{wssource}:{urls[wssource]}")
             elif wssource in wsscripts:
                 script_sets.append(
-                    f'"{wssource}={os.path.join(DATADIR, wsscripts[wssource])}"'
+                    f'{wssource}={os.path.join(DATADIR, wsscripts[wssource])}'
                 )
-        sources = "[{}]".format("".join(source_sets))
-        scripts = "[{}]".format(" ".join(script_sets))
+        rpspecs = " ".join(rpspec_sets)
+        sources = " ".join(source_sets)
+        scripts = " ".join(script_sets)
     except Exception as e:
         print("ERROR:", e)
         exit()
 
-    print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{sources}|{scripts}")
+    print(f"{DEVDIR}|{DATADIR}|{PKGSVAR}|{rpspecs}|{sources}|{scripts}")
 
 
-def add_to_ws():
+def add_src_to_ws():
     wsname = sys.argv[2]
     devrc = os.path.expanduser(sys.argv[3])
     reponame = sys.argv[4]
     try:
         repourl = sys.argv[5]
-        hasurl = True
+        hasurl = repourl != ""
     except:
         hasurl = False
 
@@ -206,12 +204,6 @@ def add_to_ws():
         with open(devrc, "r") as devrcfile:
             devrclines = devrcfile.readlines()
 
-        # with open(devrcfile, "r") as devrc:
-        # for line in devrc:
-        #     if "#" not in line and "=" in line:
-        #         left = line.split("=")[0].strip()
-        #         right = line.split("=")[1].strip()
-
         if reponame not in repos:
             if not hasurl:
                 print(f"Cannot add {reponame} to source list without a url")
@@ -219,20 +211,94 @@ def add_to_ws():
             print(f"Adding {reponame} to source list")
             def find_last_bracket_index(lst):
                 for i in range(len(lst) - 1, -1, -1):
-                    if "=" in list[i]:
-                        left = line.split("=")[0].strip()
+                    if "#" not in lst[i] and "=" in lst[i]:
+                        left = lst[i].split("=")[0].strip()
                         if left.startswith('['):
                             return i
                 return len(lst)-1
-            last_src_idx = find_last_bracked_index(devrclines)
-            devrclines.insert(last_src_idx+1, f"[{reponame}] = {repourl}")
+            last_src_idx = find_last_bracket_index(devrclines)
+            devrclines.insert(last_src_idx+1, f"[{reponame}] = {repourl}\n")
 
-            # ^^^^ TODO
         if reponame not in wssources:
             print(f"Adding {reponame} to workspace {wsname}")
-            # ^^^^ TODO
-        
-        # ^^^^ TODO write lines
+            added_to_ws = False
+            for i, line in enumerate(devrclines):
+                if "#" not in line and "=" in line:
+                    left = line.split("=")[0].strip()
+                    if left == wsname:
+                        devrclines[i] = line[:-1] + f" {reponame}" + line[-1] if line[-1] == "\n" else line + f" {reponame}"
+                        added_to_ws = True
+                        break
+            if not added_to_ws:
+                print(f"Unable to add {reponame} to workspace {wsname}")
+                exit(1)
+
+        with open(devrc, "w") as devrcfile:
+            for line in devrclines:
+                devrcfile.write(line)
+
+    except Exception as e:
+        print("ERROR:", e)
+        exit()
+
+def add_scr_to_ws():
+    wsname = sys.argv[2]
+    devrc = os.path.expanduser(sys.argv[3])
+    scriptname = sys.argv[4]
+    try:
+        scriptpath = sys.argv[5]
+        haspath = scriptpath != ""
+    except:
+        haspath = False
+
+    try:
+        (
+            foundws,
+            DEVDIR,
+            PKGSVAR,
+            repos,
+            attrs,
+            urls,
+            wsscripts,
+            dependencies,
+            wssources,
+        ) = devrc_components_by_ws(devrc, wsname)
+
+        with open(devrc, "r") as devrcfile:
+            devrclines = devrcfile.readlines()
+
+        if scriptname not in wsscripts:
+            if not haspath:
+                print(f"Cannot add {scriptname} to script list without a path")
+                exit(1)
+            print(f"Adding {scriptname} to script list")
+            def find_last_bracket_index(lst):
+                for i in range(len(lst) - 1, -1, -1):
+                    if "#" not in lst[i] and "=" in lst[i]:
+                        left = lst[i].split("=")[0].strip()
+                        if left.startswith('<'):
+                            return i
+                return len(lst)-1
+            last_src_idx = find_last_bracket_index(devrclines)
+            devrclines.insert(last_src_idx+1, f"<{scriptname}> = {scriptpath}\n")
+
+        if scriptname not in wssources:
+            print(f"Adding {scriptname} to workspace {wsname}")
+            added_to_ws = False
+            for i, line in enumerate(devrclines):
+                if "#" not in line and "=" in line:
+                    left = line.split("=")[0].strip()
+                    if left == wsname:
+                        devrclines[i] = line[:-1] + f" {scriptname}" + line[-1] if line[-1] == "\n" else line + f" {scriptname}"
+                        added_to_ws = True
+                        break
+            if not added_to_ws:
+                print(f"Unable to add {scriptname} to workspace {wsname}")
+                exit(1)
+
+        with open(devrc, "w") as devrcfile:
+            for line in devrclines:
+                devrcfile.write(line)
 
     except Exception as e:
         print("ERROR:", e)
@@ -243,8 +309,10 @@ def main():
     cmd = sys.argv[1]
     if cmd == "PARSE":
         parse_ws()
-    elif cmd == "ADD":
-        add_to_ws()
+    elif cmd == "ADDSRC":
+        add_src_to_ws()
+    elif cmd == "ADDSCR":
+        add_scr_to_ws()
 
 
 if __name__ == "__main__":

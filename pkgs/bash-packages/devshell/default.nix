@@ -89,10 +89,9 @@ in (writeArgparseScriptBin pkgname usage_str [
       dev_dir="''${rcinfoarray[0]}"
       data_dir="''${rcinfoarray[1]}"
       pkgs_var="''${rcinfoarray[2]}"
-      sources_list="''${rcinfoarray[3]}"
-      scripts_list="''${rcinfoarray[4]}"
       if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \
+            --arg printErr ${printErr} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \
             --argstr devDir "$dev_dir" \
@@ -103,11 +102,10 @@ in (writeArgparseScriptBin pkgname usage_str [
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
             --arg parseScript ${parseScript} \
-            --argstr devHistFile "$devhist" \
-            --arg repoSpecList "$sources_list" \
-            --arg scriptsList "$scripts_list"
+            --argstr devHistFile "$devhist"
       else
           nix-shell ${shellFile} \
+            --arg printErr ${printErr} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \
             --argstr devDir "$dev_dir" \
@@ -119,8 +117,6 @@ in (writeArgparseScriptBin pkgname usage_str [
             --arg devScript ${devScript} \
             --arg parseScript ${parseScript} \
             --argstr devHistFile "$devhist" \
-            --arg repoSpecList "$sources_list" \
-            --arg scriptsList "$scripts_list" \
             --command "$runcmd"
       fi 
   fi
