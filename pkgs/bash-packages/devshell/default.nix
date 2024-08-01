@@ -3,11 +3,12 @@
 let
   pkgname = "devshell";
   usage_str = ''
-    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
+    usage: ${pkgname} [-n|--new] [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
     (can specify an alternate path with -d DEVRC or history file with
     -s DEVHIST).
+    Add a new workspace with the -n|--new flag.
     Optionally run a one-off command with --run CMD (e.g., --run dev).
 
     Example ~/.devrc:
@@ -60,11 +61,21 @@ in (writeArgparseScriptBin pkgname usage_str [
     default = "";
     flags = "--run";
   }
+  {
+    var = "newws";
+    isBool = false;
+    default = "0";
+    flags = "-n|--new";
+  }
 ] ''
   wsname=$1
   if [[ -z "$wsname" ]]; then
       ${printErr} "ERROR: no workspace name provided."
       exit 1
+  fi
+
+  if [[ "$newws" == "1" ]]; then
+      ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
   fi
 
   if [[ -z "$overridedatadir" ]]; then
@@ -124,10 +135,6 @@ in (writeArgparseScriptBin pkgname usage_str [
   meta = {
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''
-      ```
-      ${usage_str}
-      ```
-
       A workspace has the directory tree structure:
 
       - `[dev_dir]/[workspace_name]`: Workspace root.
@@ -145,5 +152,6 @@ in (writeArgparseScriptBin pkgname usage_str [
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
       - `dev`: Enter an interactive menu for workspace source manipulation.
     '';
+    autoGenUsageCmd = "--help";
   };
 }

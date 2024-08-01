@@ -195,7 +195,9 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 9, 0, "[h]  Display the full HEAD hash")
         stdscr.addstr(ctx.end_row + 10, 0, "[r]  Refresh")
         stdscr.addstr(ctx.end_row + 11, 0, "[n]  Nuke")
-        stdscr.addstr(ctx.end_row + 12, 0, "[q]  Quit")
+        stdscr.addstr(ctx.end_row + 12, 0, "[o]  Add source")
+        stdscr.addstr(ctx.end_row + 12, 0, "[i]  Add script")
+        stdscr.addstr(ctx.end_row + 13, 0, "[q]  Quit")
         for j, script in enumerate(ctx.scripts):
             stdscr.addstr(ctx.end_row + 3 + j, 40, f"| {script}")
 
@@ -385,6 +387,21 @@ def main(stdscr):
                 continue
             ctx.load_sources()
             ctx.status_msg = f"Checking out {reponame}:{branch}... Done."
+        
+        elif key == ord("o"):
+            source_spec = [p for p in source_prompt(stdscr).split(" ") if p.strip()]
+            ctx.status_msg = f"Adding source {source_spec[0]}..."
+            display_output(stdscr)
+            try:
+                if len(source_spec) > 1:
+                    pass # TODO
+                else:
+                    pass # TODO
+            except 
+            continue # ^^^^ TODO
+
+        elif key == ord("i"):
+            continue # ^^^^ TODO
 
         elif key == ord("n"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
@@ -431,15 +448,27 @@ def main(stdscr):
             break
 
 
-def branch_prompt(stdscr):
+def make_prompt(stdscr, prompt):
     stdscr.clear()
-    stdscr.addstr(0, 0, "Branch name: ", curses.A_BOLD)
+    stdscr.addstr(0, 0, prompt, curses.A_BOLD)
     stdscr.refresh()
     curses.echo()
-    stdscr.move(0, len("Branch name: "))
-    branch = stdscr.getstr(0, len("Branch name: ")).decode(encoding="utf-8")
+    stdscr.move(0, len(prompt))
+    answer = stdscr.getstr(0, len(prompt)).decode(encoding="utf-8")
     stdscr.clear()
-    return branch
+    return answer
+
+
+def branch_prompt(stdscr):
+    return make_prompt(stdscr, "Branch name: ")
+
+
+def source_prompt(stdscr):
+    return make_prompt(stdscr, "Source_name [Source_url]: ")
+
+
+def script_prompt(stdscr):
+    return make_prompt(stdscr, "Script_name [Script_path]: ")
 
 
 if __name__ == "__main__":

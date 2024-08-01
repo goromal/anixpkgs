@@ -305,6 +305,10 @@ def add_scr_to_ws():
         exit()
 
 
+def add_ws():
+    pass # ^^^^ TODO
+
+
 def main():
     cmd = sys.argv[1]
     if cmd == "PARSE":
@@ -313,6 +317,8 @@ def main():
         add_src_to_ws()
     elif cmd == "ADDSCR":
         add_scr_to_ws()
+    elif cmd == "ADDWS":
+        add_ws()
 
 
 if __name__ == "__main__":
