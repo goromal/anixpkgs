@@ -185,7 +185,7 @@ def display_output(stdscr):
             )
 
         stdscr.addstr(ctx.end_row + 1, 0, ctx.status_msg, curses.A_BOLD)
-        stdscr.addstr(ctx.end_row + 2, 40, "-" * (ctx.max_script_len + 2))
+        stdscr.addstr(ctx.end_row + 2, 42, "-" * (ctx.max_script_len + 2))
         stdscr.addstr(ctx.end_row + 3, 0, "[e]  Open in editor")
         stdscr.addstr(ctx.end_row + 4, 0, "[s]  Synchronize branch")
         stdscr.addstr(ctx.end_row + 5, 0, "[p]  Push current branch")
@@ -199,7 +199,7 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 12, 0, "[i]  Add script")
         stdscr.addstr(ctx.end_row + 13, 0, "[q]  Quit")
         for j, script in enumerate(ctx.scripts):
-            stdscr.addstr(ctx.end_row + 3 + j, 40, f"| {script}")
+            stdscr.addstr(ctx.end_row + 3 + j, 42, f"| {script}")
 
         stdscr.refresh()
     except:
@@ -393,15 +393,30 @@ def main(stdscr):
             ctx.status_msg = f"Adding source {source_spec[0]}..."
             display_output(stdscr)
             try:
-                if len(source_spec) > 1:
-                    pass # TODO
-                else:
-                    pass # TODO
-            except 
-            continue # ^^^^ TODO
+                subprocess.check_output(
+                    ["addsrc", *source_spec], stderr=subprocess.PIPE
+                )
+            except:
+                ctx.load_sources()
+                ctx.status_msg = f"Adding source {source_spec[0]}... UNSUCCESSFUL."
+                continue
+            ctx.load_sources()
+            ctx.status_msg = f"Adding source {source_spec[0]}... Done."
 
         elif key == ord("i"):
-            continue # ^^^^ TODO
+            script_spec = [p for p in script_prompt(stdscr).split(" ") if p.strip()]
+            ctx.status_msg = f"Adding script {script_spec[0]}..."
+            display_output(stdscr)
+            try:
+                subprocess.check_output(
+                    ["addscr", *script_spec], stderr=subprocess.PIPE
+                )
+            except:
+                ctx.load_sources()
+                ctx.status_msg = f"Adding script {script_spec[0]}... UNSUCCESSFUL."
+                continue
+            ctx.load_sources()
+            ctx.status_msg = f"Adding script {script_spec[0]}... Done."
 
         elif key == ord("n"):
             reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
