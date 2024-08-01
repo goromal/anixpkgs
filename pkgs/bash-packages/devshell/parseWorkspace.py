@@ -182,9 +182,13 @@ def parse_ws():
 
 def add_to_ws():
     wsname = sys.argv[2]
-    devrc = sys.argv[3]
+    devrc = os.path.expanduser(sys.argv[3])
     reponame = sys.argv[4]
-    repourl = sys.argv[5]
+    try:
+        repourl = sys.argv[5]
+        hasurl = True
+    except:
+        hasurl = False
 
     try:
         (
@@ -199,7 +203,37 @@ def add_to_ws():
             wssources,
         ) = devrc_components_by_ws(devrc, wsname)
 
-        # ^^^^ TODO
+        with open(devrc, "r") as devrcfile:
+            devrclines = devrcfile.readlines()
+
+        # with open(devrcfile, "r") as devrc:
+        # for line in devrc:
+        #     if "#" not in line and "=" in line:
+        #         left = line.split("=")[0].strip()
+        #         right = line.split("=")[1].strip()
+
+        if reponame not in repos:
+            if not hasurl:
+                print(f"Cannot add {reponame} to source list without a url")
+                exit(1)
+            print(f"Adding {reponame} to source list")
+            def find_last_bracket_index(lst):
+                for i in range(len(lst) - 1, -1, -1):
+                    if "=" in list[i]:
+                        left = line.split("=")[0].strip()
+                        if left.startswith('['):
+                            return i
+                return len(lst)-1
+            last_src_idx = find_last_bracked_index(devrclines)
+            devrclines.insert(last_src_idx+1, f"[{reponame}] = {repourl}")
+
+            # ^^^^ TODO
+        if reponame not in wssources:
+            print(f"Adding {reponame} to workspace {wsname}")
+            # ^^^^ TODO
+        
+        # ^^^^ TODO write lines
+
     except Exception as e:
         print("ERROR:", e)
         exit()
