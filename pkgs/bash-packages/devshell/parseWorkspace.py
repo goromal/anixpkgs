@@ -239,7 +239,7 @@ def add_src_to_ws():
 
     except Exception as e:
         print("ERROR:", e)
-        exit()
+        exit(1)
 
 def add_scr_to_ws():
     wsname = sys.argv[2]
@@ -302,11 +302,42 @@ def add_scr_to_ws():
 
     except Exception as e:
         print("ERROR:", e)
-        exit()
+        exit(1)
 
 
 def add_ws():
-    pass # ^^^^ TODO
+    devrc = os.path.expanduser(sys.argv[2])
+    wsname = sys.argv[3]
+
+    try:
+        (
+            foundws,
+            DEVDIR,
+            PKGSVAR,
+            repos,
+            attrs,
+            urls,
+            wsscripts,
+            dependencies,
+            wssources,
+        ) = devrc_components_by_ws(devrc, wsname)
+        
+        if not foundws:
+            print(f"Adding workspace {wsname}")
+
+            with open(devrc, "r") as devrcfile:
+                devrclines = devrcfile.readlines()
+            with open(devrc, "w") as devrcfile:
+                for i, line in enumerate(devrclines):
+                    if i != len(devrclines) - 1 or line[-1] == "\n":
+                        devrcfile.write(line)
+                    else:
+                        devrcfile.write(line + "\n")
+                devrcfile.write(f"{wsname} = \n")
+    
+    except Exception as e:
+        print("ERROR:", e)
+        exit(1)
 
 
 def main():

@@ -63,7 +63,7 @@ in (writeArgparseScriptBin pkgname usage_str [
   }
   {
     var = "newws";
-    isBool = false;
+    isBool = true;
     default = "0";
     flags = "-n|--new";
   }

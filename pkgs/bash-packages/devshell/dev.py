@@ -196,8 +196,8 @@ def display_output(stdscr):
         stdscr.addstr(ctx.end_row + 10, 0, "[r]  Refresh")
         stdscr.addstr(ctx.end_row + 11, 0, "[n]  Nuke")
         stdscr.addstr(ctx.end_row + 12, 0, "[o]  Add source")
-        stdscr.addstr(ctx.end_row + 12, 0, "[i]  Add script")
-        stdscr.addstr(ctx.end_row + 13, 0, "[q]  Quit")
+        stdscr.addstr(ctx.end_row + 13, 0, "[i]  Add script")
+        stdscr.addstr(ctx.end_row + 14, 0, "[q]  Quit")
         for j, script in enumerate(ctx.scripts):
             stdscr.addstr(ctx.end_row + 3 + j, 42, f"| {script}")
 
