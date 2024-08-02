@@ -18,7 +18,7 @@ class Context:
         self.status_msg = "AWAITING COMMAND"
         self.start_row = 2
         self.current_row = self.start_row
-        self.end_row = self.start_row + 1
+        self.end_row = self.start_row
 
     def load_sources(self):
         self.repos = []
@@ -102,9 +102,10 @@ class Context:
             if len(self.scripts) > 0
             else 5
         )
-        self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
-        self.max_branch_len = max([len(repo[1]) for repo in self.repos])
-        self.end_row = min(2 + len(self.repos), curses.LINES - 1)
+        if len(self.repos) > 0:
+            self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
+            self.max_branch_len = max([len(repo[1]) for repo in self.repos])
+            self.end_row = min(2 + len(self.repos), curses.LINES - 1)
 
     def save_ws_repo_branch(self, reponame, branch):
         hist_data = {}
