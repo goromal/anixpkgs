@@ -99,6 +99,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       IFS='|' read -ra rcinfoarray <<< "$rcinfo"
       dev_dir="''${rcinfoarray[0]}"
       data_dir="''${rcinfoarray[1]}"
+      echo "DATA DIR = $data_dir"
       pkgs_var="''${rcinfoarray[2]}"
       if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \

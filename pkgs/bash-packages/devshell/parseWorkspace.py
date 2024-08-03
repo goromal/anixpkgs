@@ -55,7 +55,7 @@ def get_deps_from_dep(dep, attr):
     return deps
 
 
-def devrc_components_by_ws(devrcfile, wsname, DATADIR=os.path.expanduser("~/data")):
+def devrc_components_by_ws(devrcfile, wsname, DATADIR=None):
     DEVDIR = os.path.expanduser("~/dev")
     PKGSDIR = os.path.expanduser("~/sources/nixpkgs")
     PKGSVAR = "<nixpkgs>"
@@ -73,7 +73,7 @@ def devrc_components_by_ws(devrcfile, wsname, DATADIR=os.path.expanduser("~/data
                 right = line.split("=")[1].strip()
                 if left == "dev_dir":
                     DEVDIR = os.path.expanduser(right)
-                elif left == "data_dir":
+                elif left == "data_dir" and DATADIR is None:
                     DATADIR = os.path.expanduser(right)
                 elif left == "pkgs_dir":
                     PKGSDIR = os.path.expanduser(right)
@@ -97,6 +97,7 @@ def devrc_components_by_ws(devrcfile, wsname, DATADIR=os.path.expanduser("~/data
             wsscripts,
             dependencies,
             wssources,
+            DATADIR,
         )
 
     for repo, spec in repos.items():
@@ -122,6 +123,7 @@ def devrc_components_by_ws(devrcfile, wsname, DATADIR=os.path.expanduser("~/data
         wsscripts,
         dependencies,
         wssources,
+        DATADIR,
     )
 
 
@@ -139,7 +141,7 @@ def parse_ws():
     if len(sys.argv) > 4:
         DATADIR = os.path.expanduser(sys.argv[4])
     else:
-        DATADIR = os.path.expanduser("~/data")
+        DATADIR = None
 
     rpspec_sets = []
     source_sets = []
@@ -156,6 +158,7 @@ def parse_ws():
             wsscripts,
             dependencies,
             wssources,
+            DATADIR,
         ) = devrc_components_by_ws(DEVRCFILE, wsname, DATADIR)
         if not foundws:
             print("_NOWSFOUND_")
@@ -199,6 +202,7 @@ def add_src_to_ws():
             wsscripts,
             dependencies,
             wssources,
+            DATADIR,
         ) = devrc_components_by_ws(devrc, wsname)
 
         with open(devrc, "r") as devrcfile:
@@ -262,6 +266,7 @@ def add_scr_to_ws():
             wsscripts,
             dependencies,
             wssources,
+            DATADIR,
         ) = devrc_components_by_ws(devrc, wsname)
 
         with open(devrc, "r") as devrcfile:
@@ -320,6 +325,7 @@ def add_ws():
             wsscripts,
             dependencies,
             wssources,
+            DATADIR,
         ) = devrc_components_by_ws(devrc, wsname)
         
         if not foundws:
