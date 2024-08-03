@@ -49,7 +49,7 @@ def get_deps_from_dep(dep, attr):
         linesplit = deps_line.split()
         if len(linesplit) > 1:
             for dep in linesplit:
-                deps.append(f'"{dep}"')
+                deps.append(f'{dep}')
         else:
             deps.append(f'"{linesplit[0]}"')
     return deps
