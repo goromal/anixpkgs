@@ -13,7 +13,7 @@ in {
     anixpkgs.pkgshell
     (anixpkgs.devshell.override { editorName = cfg.editor; })
     (writeShellScriptBin "dsd" ''
-      devshell $1 --run dev
+      devshell $@ --run dev
     '')
     anixpkgs.cpp-helper
     anixpkgs.py-helper
