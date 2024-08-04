@@ -79,7 +79,7 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python311.withPackage
     echo_red "setupcurrentws overrode an edited shell file"
     exit 1
 fi
-devshell -d $tmpdir/data/devrc test_env --run "addsrc task-tools git@github.com:goromal/task-tools.git"
+devshell -d $tmpdir/data/devrc test_env --run "addsrc task-tools https://github.com/goromal/task-tools"
 [[ -d $tmpdir/dev/test_env/sources/task-tools ]] || { echo_red "Failed to add source to workspace"; exit 1; }
 cd $tmpdir/dev/test_env/sources/ceres-factors
 cpp-helper --make-nix
