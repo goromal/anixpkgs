@@ -21,7 +21,7 @@ let
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
   cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
-    elif [[ "$2" == "${x.name}" ]]; then
+    elif [[ "$2" == "${x.name}" ]] && [[ "$1" == "${if x.daemonmode then "init" else "$1"}" ]]; then
       CLOUD_DIR="${x.cloudname}"
       LOCAL_DIR="${x.dirname}"
   '') cloudDirs);
@@ -29,7 +29,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
   var = "verbose";
   isBool = true;
   default = "0";
-  flags = "-v|--verbose";
+  flags = "-v|--verbose"; # ^^^^ TODO handle daemon inits differently
 }] ''
   if [[ -z "$1" ]]; then
     ${printErr} "No command provided."
@@ -40,7 +40,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     exit 1
   ${cloudChecks}
   else
-    ${printErr} "Unrecognized CLOUD_DIR: $2"
+    ${printErr} "Unsupported CLOUD_DIR for command $1: $2"
     exit 1
   fi
   if [[ "$1" == "init" ]]; then

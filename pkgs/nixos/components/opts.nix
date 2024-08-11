@@ -1,6 +1,9 @@
 { pkgs, config, lib, ... }:
 with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix { inherit config; };
+let
+  opts = config.mods.opts;
+in {
   options.mods.opts = {
     standalone = lib.mkOption {
       type = lib.types.bool;
@@ -34,7 +37,7 @@ with import ../dependencies.nix { inherit config; }; {
       description = "Interval (in minutes) of cloud dirs sync (default: 10)";
       default = 10;
     };
-    cloudDirs = lib.mkOption {
+    cloudDirs = lib.mkOption { # ^^^^ TODO trace all dependents
       type = lib.types.listOf lib.types.attrs;
       description =
         "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
@@ -42,27 +45,32 @@ with import ../dependencies.nix { inherit config; }; {
         {
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
+          dirname = "${opts.homeDir}/configs";
+          daemonmode = true;
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
+          dirname = "${opts.homeDir}/secrets";
+          daemonmode = true;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "$HOME/games";
+          dirname = "${opts.homeDir}/games";
+          daemonmode = true;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "$HOME/data";
+          dirname = "${opts.homeDir}/data";
+          daemonmode = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
+          dirname = "${opts.homeDir}/Documents";
+          daemonmode = true;
         }
       ];
     };

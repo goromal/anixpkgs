@@ -14,13 +14,25 @@ let
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  # cloud_dir_list =
-  #   builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
-  # launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
-  #   for cloud_dir in ${cloud_dir_list}; do
-  #     ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
-  #   done
-  # '';
+  cloud_dir_list =
+    builtins.concatStringsSep " " (map (x: "${x.name}") (lib.ifilter0 (i: v: !v.daemonmode) cfg.cloudDirs));
+  launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
+    for cloud_dir in ${cloud_dir_list}; do
+      ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
+    done
+  '';
+  # ^^^^ TODO reference ats/modules.nix
+  # ^^^^ TODO let execScript = ; in 
+  mkSyncService = { name, cloudname, dirname }: {
+    systemd.services."${name}-sync" = {
+      enable = true;
+      description = "${name} cloud sync service";
+      serviceConfig = {
+        Type = "simple";
+        # ^^^^ TODO
+      };
+    };
+  };
 in {
   home.stateVersion = cfg.homeState;
 
@@ -76,7 +88,7 @@ in {
     anixpkgs.scrape
   ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
 
-  systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator { # ^^^^ TODO still needed for non-server machines.
+  systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
     Unit = { Description = "User-domain Orchestrator daemon"; };
     Service = {
       Type = "simple";
@@ -86,24 +98,24 @@ in {
     Install.WantedBy = [ "default.target" ];
   };
 
-  # systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-  #   Unit = { Description = "cloud dirs sync script"; };
-  #   Service = {
-  #     Type = "oneshot";
-  #     ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
-  #     Restart = "on-failure";
-  #     ReadWritePaths = [ cfg.homeDir ];
-  #   };
-  # };
-  # systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-  #   Unit = { Description = "cloud dirs sync timer"; };
-  #   Timer = {
-  #     OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-  #     OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-  #     Unit = "cloud-dirs-sync.service";
-  #   };
-  #   Install.WantedBy = [ "timers.target" ];
-  # };
+  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync script"; };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
+      Restart = "on-failure";
+      ReadWritePaths = [ cfg.homeDir ];
+    };
+  };
+  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync timer"; };
+    Timer = {
+      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      Unit = "cloud-dirs-sync.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
 
   programs.vim = {
     enable = true;
