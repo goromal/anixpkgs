@@ -6,7 +6,7 @@ let
   cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
-    usage: ${pkgname} [OPTS] [init|sync] CLOUD_DIR
+    usage: ${pkgname} [OPTS] [status|init|sync] CLOUD_DIR
 
     Manage cloud directories with rclone.
 
@@ -21,11 +21,12 @@ let
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
   cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
-    elif [[ "$2" == "${x.name}" ]] && [[ "$1" == "${
-      if x.daemonmode then "init" else "$1"
-    }" ]]; then
+    elif [[ "$2" == "${x.name}" ]] && [[ "$1" == ${
+      if x.daemonmode then ''"init" || "$1" == "status"'' else "$1"
+    } ]]; then
       CLOUD_DIR="${x.cloudname}"
       LOCAL_DIR="${x.dirname}"
+      DAEMON_NAME="${if x.daemonmode then "${x.name}-sync.service" else ""}"
   '') cloudDirs);
 in (writeArgparseScriptBin pkgname longDescription [{
   var = "verbose";
@@ -88,6 +89,23 @@ in (writeArgparseScriptBin pkgname longDescription [{
       fi
     fi
     echo "Done."
+  elif [[ "$1" == "status" ]]; then
+    if [[ ! -z "$DAEMON_NAME" ]]; then
+      systemctl --user is-active --quiet "$DAEMON_NAME" && { echo -n "$DAEMON_NAME is "; echo_green "ACTIVE"; } || { echo -n "$DAEMON_NAME is "; echo_red "INACTIVE"; }
+    else
+      echo -n "$LOCAL_DIR "
+      if [ -d "$LOCAL_DIR" ]; then
+        echo_green -n "EXISTS "
+        echo -n "and "
+        if [ "$(ls -A $LOCAL_DIR 2>/dev/null)" ]; then
+          echo_green "HAS STUFF IN IT"
+        else
+          echo_red "IS EMPTY"
+        fi
+      else
+        echo_red "DOES NOT EXIST"
+      fi
+    fi
   else
     ${printErr} "Unrecognized command: $1"
     exit 1

@@ -72,7 +72,7 @@ in {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "${cfg.homeDir}/games";
-          daemonmode = true;
+          daemonmode = false;
         }
         {
           name = "data";

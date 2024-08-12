@@ -57,7 +57,7 @@ in {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "${opts.homeDir}/games";
-          daemonmode = true;
+          daemonmode = false;
         }
         {
           name = "data";

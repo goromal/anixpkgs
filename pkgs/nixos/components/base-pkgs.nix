@@ -18,24 +18,53 @@ let
   '';
   cloud_dir_list = builtins.concatStringsSep " "
     (map (x: "${x.name}") (lib.ifilter0 (i: v: !v.daemonmode) cfg.cloudDirs));
+  cloud_daemon_list = lib.ifilter0 (i: v: v.daemonmode) cfg.cloudDirs;
   launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
   '';
-  # ^^^^ TODO reference ats/modules.nix
-  # ^^^^ TODO let execScript = ; in 
-  mkSyncService = { name, cloudname, dirname }: {
-    systemd.services."${name}-sync" = {
-      enable = true;
-      description = "${name} cloud sync service";
-      serviceConfig = {
-        Type = "simple";
-        # ^^^^ TODO
+  mkSyncService = { name, cloudname, dirname }:
+    let
+      execScript = writeShellScript "execute-sync" ''
+        if [ ! -d "${dirname}" ] || [ "$(ls -A ${dirname} 2>/dev/null)" ]; then
+            if [ ! -d "${dirname}" ]; then
+                echo "Mount directory ${dirname} does not exist. Exiting."
+            else
+                echo "Mount directory ${dirname} is not empty. Exiting."
+            fi
+            exit 1
+        else
+            echo "Mount directory ${dirname} exists and is empty. Continuing..."
+        fi
+        echo "Mounting "${cloudname} -> ${dirname}..."
+        rclone mount --config=${cfg.homeDir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
+      '';
+      stopScript = "stop-sync" ''
+        fusermount -u ${dirname}
+      '';
+    in {
+      systemd.user.services."${name}-sync" = {
+        Unit.Description = "${name} cloud sync service";
+        Unit.After = [ "network-online.target" ];
+        Service = {
+          Type = "simple";
+          ExecStart = "${execScript}/bin/execute-sync";
+          ExecStop = "${stopScript}/bin/stop-sync";
+          Restart = "always";
+          RestartSec = 30;
+        };
+        Install.WantedBy = [ "default.target" ];
       };
     };
-  };
+  # cloudDaemonServices =
+  #   map (x: (mkSyncService x.name x.cloudname x.dirname)) cloud_daemon_list;
+  cloudDaemonServices = [
+    {a = "b";}
+    {c = "d";}
+  ];
 in {
+  config = (foldl' (acc: set: recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
@@ -163,4 +192,5 @@ in {
       '';
     };
   };
+}) cloudDaemonServices);
 }
