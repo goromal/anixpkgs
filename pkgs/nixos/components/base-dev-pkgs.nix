@@ -44,6 +44,6 @@ in {
 
   programs.vim.plugins = lib.mkIf (cfg.standalone == false)
     (with vimPlugins; [ vim-gitgutter YouCompleteMe ]);
-  
+
   # ^^^^ TODO data/ symlinks
 }

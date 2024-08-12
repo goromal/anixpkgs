@@ -13,9 +13,11 @@ in {
   dconf.settings = ({
     "org/gnome/desktop/background" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
+      "picture-uri-dark" = "${cfg.homeDir}/.background-image";
     };
     "org/gnome/desktop/screensaver" = {
       "picture-uri" = "${cfg.homeDir}/.background-image";
+      "picture-options" = "wallpaper";
     };
   } // (if (cfg.standalone == false) then {
     "org/gnome/desktop/wm/preferences" = {
@@ -24,6 +26,7 @@ in {
     "org/gnome/desktop/interface" = {
       "clock-format" = "12h";
       "clock-show-weekday" = true;
+      "color-scheme" = "prefer-dark";
     };
     "org/gnome/desktop/privacy" = { "remember-recent-files" = false; };
     "org/gnome/shell" = {
@@ -71,6 +74,17 @@ in {
       unstable.inkscape
       unstable.audacity
       blender
+      (writeShellScriptBin "allgsettings" ''
+        for schema in $(gsettings list-schemas | sort)
+        do
+            for key in $(gsettings list-keys $schema | sort)
+            do
+                range="$(gsettings range $schema $key | tr "\n" " ")"
+                value="$(gsettings get $schema $key | tr "\n" " ")"
+                echo "$schema :: $key :: $range -> $value"
+            done
+        done
+      '')
     ] else
       [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
 

@@ -21,7 +21,9 @@ let
   printYlw = "${color-prints}/bin/echo_yellow";
   printCyn = "${color-prints}/bin/echo_cyan";
   cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
-    elif [[ "$2" == "${x.name}" ]] && [[ "$1" == "${if x.daemonmode then "init" else "$1"}" ]]; then
+    elif [[ "$2" == "${x.name}" ]] && [[ "$1" == "${
+      if x.daemonmode then "init" else "$1"
+    }" ]]; then
       CLOUD_DIR="${x.cloudname}"
       LOCAL_DIR="${x.dirname}"
   '') cloudDirs);

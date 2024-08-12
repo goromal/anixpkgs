@@ -9,13 +9,15 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; }; # ^^^^ TODO modify and add modules elsewhere?
+  rcrsyncConfigured = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+  }; # ^^^^ TODO modify and add modules elsewhere?
   oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") (lib.ifilter0 (i: v: !v.daemonmode) cfg.cloudDirs));
+  cloud_dir_list = builtins.concatStringsSep " "
+    (map (x: "${x.name}") (lib.ifilter0 (i: v: !v.daemonmode) cfg.cloudDirs));
   launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
