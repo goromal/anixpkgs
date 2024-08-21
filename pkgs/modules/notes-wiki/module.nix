@@ -33,10 +33,15 @@ in {
         "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
+    insecurePort = mkOption {
+      type = types.int;
+      description = "Public insecure port";
+      default = 80;
+    };
   };
 
   config = mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ 80 443 ];
+    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
 
     services.phpfpm.pools.${app} = {
       user = "andrew";
@@ -65,6 +70,7 @@ in {
       virtualHosts.${cfg.domain} = {
         # addSSL = true;
         # enableACME = true;
+        listen = [ cfg.insecurePort ];
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
