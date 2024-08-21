@@ -70,7 +70,7 @@ in {
       virtualHosts.${cfg.domain} = {
         # addSSL = true;
         # enableACME = true;
-        listen = [ cfg.insecurePort ];
+        listen = [ { addr = "0.0.0.0"; port = cfg.insecurePort; } ];
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
