@@ -41,7 +41,8 @@ in {
   };
 
   config = mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
+    networking.firewall.allowedTCPPorts =
+      mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
 
     services.phpfpm.pools.${app} = {
       user = "andrew";
@@ -70,7 +71,10 @@ in {
       virtualHosts.${cfg.domain} = {
         # addSSL = true;
         # enableACME = true;
-        listen = [ { addr = "0.0.0.0"; port = cfg.insecurePort; } ];
+        listen = [{
+          addr = "0.0.0.0";
+          port = cfg.insecurePort;
+        }];
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };
