@@ -8,6 +8,7 @@
     developer = false;
     loadATSServices = true;
     serveNotesWiki = true;
+    notesWikiPort = 8080;
     isInstaller = false;
   };
 

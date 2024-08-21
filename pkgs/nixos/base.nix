@@ -47,6 +47,11 @@ in {
       type = lib.types.bool;
       description = "Whether to serve the notes wiki site.";
     };
+    notesWikiPort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public insecure port for the notes wiki site.";
+      default = 80;
+    };
     isInstaller = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
@@ -259,6 +264,7 @@ in {
     # Server processes
     services.ats.enable = cfg.loadATSServices;
     services.notes-wiki.enable = cfg.serveNotesWiki;
+    services.notes-wiki.insecurePort = cfg.notesWikiPort;
     services.notes-wiki.openFirewall = true;
 
     # Global packages
