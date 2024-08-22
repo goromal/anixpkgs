@@ -6,7 +6,7 @@ let
   globalCfg = config.machines.base;
   cfg = config.services.ats;
   wiki-url = if globalCfg.serveNotesWiki then
-    "http://localhost:${globalCfg.notesWikiPort}"
+    "http://localhost:${builtins.toString globalCfg.notesWikiPort}"
   else
     "https://notes.andrewtorgesen.com";
   oPathPkgs = with anixpkgs;
