@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/gradebook";
     aapis.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
