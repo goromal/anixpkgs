@@ -39,14 +39,17 @@ class Context:
                 git_dir = os.path.join(root, ".git")
                 if os.path.isdir(git_dir):
                     reponame = os.path.basename(root)
-                    branch = (
-                        subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
-                            stderr=subprocess.PIPE,
+                    try:
+                        branch = (
+                            subprocess.check_output(
+                                ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        continue # no branch or remote yet
                     clean = not bool(
                         subprocess.check_output(
                             ["git", "-C", root, "status", "--porcelain"],
