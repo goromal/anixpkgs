@@ -211,6 +211,22 @@
         "type": "github"
       }
     },
+    "gradebook": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724639326,
+        "narHash": "sha256-J7oaVzoV7Ok8Tl7M2n6zu3bUoHipnya/3FqMbcf078k=",
+        "owner": "goromal",
+        "repo": "gradebook",
+        "rev": "f1e667847286580e2c2b96c214cf6a35630a7ec9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "gradebook",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -535,6 +551,7 @@
         "flake-utils": "flake-utils",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
+        "gradebook": "gradebook",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
