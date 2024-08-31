@@ -145,7 +145,7 @@ let
         rm -r $tmpdir
       '';
       timerCfg = {
-        OnCalendar = [ "*-*-* 22:00:00" ];
+        OnCalendar = [ "*-*-* 06:00:00" ];
         Persistent = true;
       };
     })

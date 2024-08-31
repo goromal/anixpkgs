@@ -710,15 +710,16 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1719368704,
-        "narHash": "sha256-lJ0oEfPhgjNCIvK0gjSxXMYWUJQ95FooQP/vg8v/L90=",
+        "lastModified": 1725082101,
+        "narHash": "sha256-VCQfYtRtExhfHPLHiWUOukJ6iwv9hk8fLwENnEgRxUc=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "dbeb316216d733326a7a55fd47defadbd2dd9b1d",
+        "rev": "7dd1d231d5a8b74eeb6d47c63bf9eb92e6d8adfd",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/latemigrate",
         "repo": "task-tools",
         "type": "github"
       }
