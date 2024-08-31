@@ -710,11 +710,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1725082101,
-        "narHash": "sha256-VCQfYtRtExhfHPLHiWUOukJ6iwv9hk8fLwENnEgRxUc=",
+        "lastModified": 1725129914,
+        "narHash": "sha256-Ml8ygEk0DiRuxj6lxdG1xd4nSHaw3BZedqHWA96ClBY=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "7dd1d231d5a8b74eeb6d47c63bf9eb92e6d8adfd",
+        "rev": "f5b65e9cac499eac6b45fa4dc90a98f84fd46ad6",
         "type": "github"
       },
       "original": {

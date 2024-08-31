@@ -134,10 +134,10 @@ let
       jobShellScript = writeShellScript "ats-grader" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         tmpdir=$(mktemp -d)
-        echo "🔥 Task Cleaning for the Week 🔥" > $tmpdir/out.txt
+        echo "🧹 Daily Task Cleaning 🧹" > $tmpdir/out.txt
         echo "" >> $tmpdir/out.txt
-        # TODO intelligently choose the year...
-        task-tools clean --start-date 2024-01-01 >> $tmpdir/out.txt
+        current_year=$(date +"%Y")
+        task-tools clean --start-date "''${current_year}-01-01" >> $tmpdir/out.txt
         gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
             "$(cat $tmpdir/out.txt)"
         gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
