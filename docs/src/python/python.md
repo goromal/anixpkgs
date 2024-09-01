@@ -26,6 +26,7 @@ Packages written (or bound) in Python.
 - [stampserver](./stampserver.md)
 - [easy-google-auth](./easy-google-auth.md)
 - [task-tools](./task-tools.md)
+- [photos-tools](./photos-tools.md)
 - [wiki-tools](./wiki-tools.md)
 - [book-notes-sync](./book-notes-sync.md)
 - [goromail](./goromail.md)
