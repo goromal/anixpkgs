@@ -41,6 +41,7 @@ in {
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
     anixpkgs.task-tools
+    anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
     anixpkgs.color-prints

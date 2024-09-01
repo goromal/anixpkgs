@@ -83,11 +83,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1718250350,
-        "narHash": "sha256-a6n/tsqw6l+ACnrWY0JWsvJU6tGKvjezBr0OBGx090U=",
+        "lastModified": 1725171145,
+        "narHash": "sha256-i7seU6iynBZjmiNxZ+R2StFyCT2e0csC21IaixrD3jQ=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "536d581e676aa43b085b89074441a3110717f935",
+        "rev": "8d6c959c1fa2270e87cc5d3b07636e2a16e1259e",
         "type": "github"
       },
       "original": {
@@ -386,6 +386,22 @@
         "type": "github"
       }
     },
+    "photos-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725170663,
+        "narHash": "sha256-M2OS2Lyf2I7FuDEXH0IgSosha0uXta8kd6ipRDyTNiE=",
+        "owner": "goromal",
+        "repo": "photos-tools",
+        "rev": "de94de37da9a1cc5d258539f055361e89342789e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "photos-tools",
+        "type": "github"
+      }
+    },
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -544,6 +560,7 @@
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
+        "photos-tools": "photos-tools",
         "phps": "phps",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
