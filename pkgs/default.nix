@@ -128,6 +128,10 @@ let
               (pySelf.callPackage ./python-packages/task-tools {
                 pkg-src = flakeInputs.task-tools;
               });
+            photos-tools = addDoc
+              (pySelf.callPackage ./python-packages/photos-tools {
+                pkg-src = flakeInputs.photos-tools;
+              });
             wiki-tools = addDoc
               (pySelf.callPackage ./python-packages/wiki-tools {
                 pkg-src = flakeInputs.wiki-tools;
@@ -261,6 +265,7 @@ in rec {
   stampserver = final.python311.pkgs.stampserver;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
+  photos-tools = final.python311.pkgs.photos-tools;
   python-dokuwiki = final.python311.pkgs.python-dokuwiki;
   wiki-tools = final.python311.pkgs.wiki-tools;
   book-notes-sync = final.python311.pkgs.book-notes-sync;

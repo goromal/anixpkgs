@@ -387,6 +387,22 @@
         "type": "github"
       }
     },
+    "photos-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725170663,
+        "narHash": "sha256-M2OS2Lyf2I7FuDEXH0IgSosha0uXta8kd6ipRDyTNiE=",
+        "owner": "goromal",
+        "repo": "photos-tools",
+        "rev": "de94de37da9a1cc5d258539f055361e89342789e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "photos-tools",
+        "type": "github"
+      }
+    },
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -545,6 +561,7 @@
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
+        "photos-tools": "photos-tools",
         "phps": "phps",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",

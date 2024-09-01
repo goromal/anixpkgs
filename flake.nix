@@ -89,6 +89,9 @@
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
+    photos-tools.url = "github:goromal/photos-tools";
+    photos-tools.flake = false;
+
     pyceres.url =
       "github:Edwinem/ceres_python_bindings?rev=2106d043bce37adcfef450dd23d3005480948c37";
     pyceres.flake = false;
