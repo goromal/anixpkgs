@@ -20,7 +20,7 @@ let
       };
     };
   # cloud_daemon_list = (builtins.filter (x: x.daemonmode) cfg.cloudDirs);
-  cloud_daemon_list = (builtins.filter (x: x.daemonmode) [
+  cloud_daemon_list = (builtins.filter (x: x.daemonmode) [ # ^^^^
         {
           name = "configs";
           cloudname = "dropbox:configs";
