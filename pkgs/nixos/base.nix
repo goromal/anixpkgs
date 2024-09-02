@@ -99,6 +99,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/ats/modules.nix
     ../modules/notes-wiki/module.nix
+    # ./components/sync-pkgs.nix
   ];
 
   config = {
