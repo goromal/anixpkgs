@@ -2,9 +2,7 @@
 with pkgs;
 with lib;
 with import ../dependencies.nix { inherit config; };
-let cloud_daemon_list =
-    (builtins.filter (v: v.daemonmode) (cfg.cloudDirs));
-in let
+let
   cfg = config.mods.opts;
   browser-aliases = if cfg.browserExec == null then
     null
@@ -21,8 +19,8 @@ in let
   '';
   cloud_dir_list = builtins.concatStringsSep " "
     (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
-  # cloud_daemon_list =
-  #   (builtins.filter (v: v.daemonmode) (cfg.cloudDirs)); # ^^^^ TODO
+  cloud_daemon_list =
+    (builtins.filter (v: v.daemonmode) (cfg.cloudDirs)); # ^^^^ TODO
   # cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
   #       ({
   #         name = "configs";
