@@ -236,6 +236,11 @@
                 "docs": true
             },
             {
+                "attr": "photos-tools",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "wiki-tools",
                 "ci": true,
                 "docs": true

@@ -46,6 +46,7 @@
   - [stampserver](./python/stampserver.md)
   - [easy-google-auth](./python/easy-google-auth.md)
   - [task-tools](./python/task-tools.md)
+  - [photos-tools](./python/photos-tools.md)
   - [wiki-tools](./python/wiki-tools.md)
   - [book-notes-sync](./python/book-notes-sync.md)
   - [goromail](./python/goromail.md)
