@@ -1,8 +1,10 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, ... }:
 with pkgs;
 with lib;
 with import ../dependencies.nix { inherit config; };
-let
+let cloud_daemon_list =
+    (builtins.filter (v: v.daemonmode) (cfg.cloudDirs));
+in let
   cfg = config.mods.opts;
   browser-aliases = if cfg.browserExec == null then
     null
@@ -13,14 +15,14 @@ let
   rcrsyncConfigured = anixpkgs.rcrsync.override {
     cloudDirs = cfg.cloudDirs;
   }; # ^^^^ TODO modify and add modules elsewhere?
-  oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
+  oPathPkgs = makeBinPath [ rclone rcrsyncConfigured ];
   launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
   cloud_dir_list = builtins.concatStringsSep " "
     (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
-  cloud_daemon_list =
-    (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
+  # cloud_daemon_list =
+  #   (builtins.filter (v: v.daemonmode) (cfg.cloudDirs)); # ^^^^ TODO
   # cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
   #       ({
   #         name = "configs";
@@ -73,7 +75,7 @@ let
         fi
         echo "Mounting "${cloudname} -> ${dirname}..."
         rclone mount --config=${homedir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
-      '';
+      ''; # ^^^^ TODO assuming the location of the rclone conf file...
       stopScript = writeShellScript "stop-sync" ''
         fusermount -u ${dirname}
       '';
@@ -98,6 +100,7 @@ let
       dirname = x.dirname;
       homedir = cfg.homeDir;
     })) cloud_daemon_list);
+
 in (foldl' (acc: set: recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
@@ -153,7 +156,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
     anixpkgs.scrape
   ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
 
-  systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
+  systemd.user.services.orchestratord = mkIf cfg.userOrchestrator {
     Unit = { Description = "User-domain Orchestrator daemon"; };
     Service = {
       Type = "simple";
@@ -163,7 +166,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
     Install.WantedBy = [ "default.target" ];
   };
 
-  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+  systemd.user.services.cloud-dirs-sync = mkIf cfg.cloudAutoSync {
     Unit = { Description = "cloud dirs sync script"; };
     Service = {
       Type = "oneshot";
@@ -172,7 +175,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
       ReadWritePaths = [ cfg.homeDir ];
     };
   };
-  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+  systemd.user.timers.cloud-dirs-sync = mkIf cfg.cloudAutoSync {
     Unit = { Description = "cloud dirs sync timer"; };
     Timer = {
       OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
@@ -217,7 +220,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
     ".anix-version".text =
       if local-build then "Local Build" else "v${anixpkgs-version}";
     "records/${records.crypt.name}".source = records.crypt.data;
-    ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
+    ".tmux.conf" = mkIf (cfg.standalone == false) {
       text = ''
         set-option -g default-shell /run/current-system/sw/bin/bash
         set-window-option -g mode-keys vi
@@ -226,4 +229,5 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
       '';
     };
   };
+
 }) cloudDaemonServices)

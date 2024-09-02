@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 with pkgs;
 with lib;
 with import ./dependencies.nix { inherit config; };
@@ -8,87 +8,119 @@ let
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
 in {
   options.machines.base = {
-    homeDir = lib.mkOption {
-      type = lib.types.str;
+    homeDir = mkOption {
+      type = types.str;
       description = "Home directory for primary user (default: /data/andrew)";
       default = "/data/andrew";
     };
-    nixosState = lib.mkOption {
-      type = lib.types.str;
+    nixosState = mkOption {
+      type = types.str;
       description = "Initiating state of the NixOS install (example: '22.05')";
     };
-    machineType = lib.mkOption {
-      type = lib.types.enum [ "x86_linux" "pi4" ];
+    machineType = mkOption {
+      type = types.enum [ "x86_linux" "pi4" ];
       description = "Machine type that the closure is targeting.";
     };
-    bootMntPt = lib.mkOption {
-      type = lib.types.str;
+    bootMntPt = mkOption {
+      type = types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
       default = "/boot/efi";
     };
-    graphical = lib.mkOption {
-      type = lib.types.bool;
+    graphical = mkOption {
+      type = types.bool;
       description = "Whether the closure includes a graphical interface.";
     };
-    recreational = lib.mkOption {
-      type = lib.types.bool;
+    recreational = mkOption {
+      type = types.bool;
       description = "Whether the closure includes recreational packages.";
     };
-    developer = lib.mkOption {
-      type = lib.types.bool;
+    developer = mkOption {
+      type = types.bool;
       description = "Whether the closure includes developer packages.";
     };
-    loadATSServices = lib.mkOption {
-      type = lib.types.bool;
+    loadATSServices = mkOption {
+      type = types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
-    serveNotesWiki = lib.mkOption {
-      type = lib.types.bool;
+    serveNotesWiki = mkOption {
+      type = types.bool;
       description = "Whether to serve the notes wiki site.";
     };
-    notesWikiPort = lib.mkOption {
-      type = lib.types.int;
+    notesWikiPort = mkOption {
+      type = types.int;
       description = "Public insecure port for the notes wiki site.";
       default = 80;
     };
-    isInstaller = lib.mkOption {
-      type = lib.types.bool;
+    isInstaller = mkOption {
+      type = types.bool;
       description = "Whether the closure is for an ISO install image.";
     };
-    cloudDirs = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
+    cloudDirs = mkOption {
+      type = types.listOf types.attrs;
       description =
         "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      # default = [ # ^^^^ TODO actually make this build work...this is the one that's used
+      #   {
+      #     name = "configs";
+      #     cloudname = "dropbox:configs";
+      #     dirname = "${cfg.homeDir}/configs";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "secrets";
+      #     cloudname = "dropbox:secrets";
+      #     dirname = "${cfg.homeDir}/secrets";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "games";
+      #     cloudname = "dropbox:games";
+      #     dirname = "${cfg.homeDir}/games";
+      #     daemonmode = false;
+      #   }
+      #   {
+      #     name = "data";
+      #     cloudname = "box:data";
+      #     dirname = "${cfg.homeDir}/data";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "documents";
+      #     cloudname = "drive:Documents";
+      #     dirname = "${cfg.homeDir}/Documents";
+      #     daemonmode = true;
+      #   }
+      # ];
       default = [
-        {
+        ({
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "${cfg.homeDir}/configs";
+          dirname = "/data/andrew/configs";
           daemonmode = true;
-        }
+        })
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "${cfg.homeDir}/secrets";
+          dirname = "/data/andrew/secrets";
           daemonmode = true;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "${cfg.homeDir}/games";
+          dirname = "/data/andrew/games";
           daemonmode = false;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "${cfg.homeDir}/data";
+          dirname = "/data/andrew/data";
           daemonmode = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "${cfg.homeDir}/Documents";
+          dirname = "/data/andrew/Documents";
           daemonmode = true;
         }
       ];
@@ -130,16 +162,16 @@ in {
         efi = {
           canTouchEfiVariables = true;
           efiSysMountPoint =
-            lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
+            mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
       };
       supportedFilesystems =
-        lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
+        mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
       binfmt.emulatedSystems =
-        lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
+        mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
 
       postBootCommands =
-        lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (let
+        mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (let
           gdm_user_conf = ''
             [User]
             Session=
@@ -153,7 +185,7 @@ in {
     };
 
     # https://github.com/NixOS/nixpkgs/issues/154163
-    nixpkgs.overlays = lib.mkIf (cfg.machineType == "pi4") [
+    nixpkgs.overlays = mkIf (cfg.machineType == "pi4") [
       (final: super: {
         # modprobe: FATAL: Module sun4i-drm not found
         makeModulesClosure = x:
@@ -186,14 +218,14 @@ in {
     };
 
     services.xserver =
-      lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+      mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         enable = true;
         displayManager.gdm.enable = true;
         desktopManager.gnome.enable = true;
       };
 
     environment.gnome =
-      lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+      mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         excludePackages = [ gnome-photos gnome-tour ] ++ (with gnome; [
           cheese
           gnome-music
@@ -209,28 +241,28 @@ in {
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
-    hardware.bluetooth = lib.mkIf
+    hardware.bluetooth = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational) {
         enable = true;
         settings = { General = { ControllerMode = "bredr"; }; };
       };
-    services.blueman.enable = lib.mkIf
+    services.blueman.enable = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    hardware.pulseaudio.enable = lib.mkIf
+    hardware.pulseaudio.enable = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       false;
-    security.rtkit.enable = lib.mkIf
+    security.rtkit.enable = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    services.pipewire = lib.mkIf
+    services.pipewire = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational) {
         enable = true;
         alsa.enable = true;
         pulse.enable = true;
       };
 
-    services.udev.packages = lib.mkIf
+    services.udev.packages = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       [ pkgs.dolphinEmu ];
 

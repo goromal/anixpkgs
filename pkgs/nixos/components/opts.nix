@@ -40,35 +40,67 @@ in {
       type = lib.types.listOf lib.types.attrs;
       description =
         "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+      # default = [ # ^^^^ TODO make this build work
+      #   {
+      #     name = "configs";
+      #     cloudname = "dropbox:configs";
+      #     dirname = "${opts.homeDir}/configs";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "secrets";
+      #     cloudname = "dropbox:secrets";
+      #     dirname = "${opts.homeDir}/secrets";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "games";
+      #     cloudname = "dropbox:games";
+      #     dirname = "${opts.homeDir}/games";
+      #     daemonmode = false;
+      #   }
+      #   {
+      #     name = "data";
+      #     cloudname = "box:data";
+      #     dirname = "${opts.homeDir}/data";
+      #     daemonmode = true;
+      #   }
+      #   {
+      #     name = "documents";
+      #     cloudname = "drive:Documents";
+      #     dirname = "${opts.homeDir}/Documents";
+      #     daemonmode = true;
+      #   }
+      # ];
       default = [
         {
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "${opts.homeDir}/configs";
+          dirname = "/data/andrew/configs";
           daemonmode = true;
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "${opts.homeDir}/secrets";
+          dirname = "/data/andrew/secrets";
           daemonmode = true;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "${opts.homeDir}/games";
+          dirname = "/data/andrew/games";
           daemonmode = false;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "${opts.homeDir}/data";
+          dirname = "/data/andrew/data";
           daemonmode = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "${opts.homeDir}/Documents";
+          dirname = "/data/andrew/Documents";
           daemonmode = true;
         }
       ];
