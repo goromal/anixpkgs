@@ -3,7 +3,7 @@ let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
 in rec {
-  local-build = false;
+  local-build = true;
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
   anixpkgs = import (if local-build then

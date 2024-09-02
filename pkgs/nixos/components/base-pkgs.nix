@@ -1,5 +1,6 @@
 { pkgs, config, lib, ... }:
 with pkgs;
+with lib;
 with import ../dependencies.nix { inherit config; };
 let
   cfg = config.mods.opts;
@@ -17,8 +18,8 @@ let
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
   cloud_dir_list = builtins.concatStringsSep " "
-    (map (x: "${x.name}") (lib.ifilter0 (i: v: !v.daemonmode) cfg.cloudDirs));
-  cloud_daemon_list = lib.ifilter0 (i: v: v.daemonmode) cfg.cloudDirs;
+    (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
+  cloud_daemon_list = (builtins.filter (v: v.daemonmode) cfg.cloudDirs);
   launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
@@ -57,12 +58,8 @@ let
         Install.WantedBy = [ "default.target" ];
       };
     };
-  # cloudDaemonServices =
-  #   map (x: (mkSyncService x.name x.cloudname x.dirname)) cloud_daemon_list;
-  cloudDaemonServices = [
-    {a = "b";}
-    {c = "d";}
-  ];
+  cloudDaemonServices =
+    map (x: (mkSyncService x.name x.cloudname x.dirname)) cloud_daemon_list;
 in {
   config = (foldl' (acc: set: recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
