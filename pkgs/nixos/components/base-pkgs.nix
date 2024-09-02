@@ -19,13 +19,46 @@ let
   '';
   cloud_dir_list = builtins.concatStringsSep " "
     (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
-  cloud_daemon_list = (builtins.filter (v: v.daemonmode) cfg.cloudDirs);
+  cloud_daemon_list =
+    (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
+  # cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
+  #       ({
+  #         name = "configs";
+  #         cloudname = "dropbox:configs";
+  #         dirname = "${cfg.homeDir}/configs";
+  #         daemonmode = true;
+  #       })
+  #       {
+  #         name = "secrets";
+  #         cloudname = "dropbox:secrets";
+  #         dirname = "${cfg.homeDir}/secrets";
+  #         daemonmode = true;
+  #       }
+  #       {
+  #         name = "games";
+  #         cloudname = "dropbox:games";
+  #         dirname = "${cfg.homeDir}/games";
+  #         daemonmode = false;
+  #       }
+  #       {
+  #         name = "data";
+  #         cloudname = "box:data";
+  #         dirname = "${cfg.homeDir}/data";
+  #         daemonmode = true;
+  #       }
+  #       {
+  #         name = "documents";
+  #         cloudname = "drive:Documents";
+  #         dirname = "${cfg.homeDir}/Documents";
+  #         daemonmode = true;
+  #       }
+  #     ]));
   launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
   '';
-  mkSyncService = { name, cloudname, dirname }:
+  mkSyncService = { name, cloudname, dirname, homedir }:
     let
       execScript = writeShellScript "execute-sync" ''
         if [ ! -d "${dirname}" ] || [ "$(ls -A ${dirname} 2>/dev/null)" ]; then
@@ -39,9 +72,9 @@ let
             echo "Mount directory ${dirname} exists and is empty. Continuing..."
         fi
         echo "Mounting "${cloudname} -> ${dirname}..."
-        rclone mount --config=${cfg.homeDir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
+        rclone mount --config=${homedir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
       '';
-      stopScript = "stop-sync" ''
+      stopScript = writeShellScript "stop-sync" ''
         fusermount -u ${dirname}
       '';
     in {
@@ -58,10 +91,14 @@ let
         Install.WantedBy = [ "default.target" ];
       };
     };
-  cloudDaemonServices =
-    map (x: (mkSyncService x.name x.cloudname x.dirname)) cloud_daemon_list;
-in {
-  config = (foldl' (acc: set: recursiveUpdate acc set) ({
+  cloudDaemonServices = (map (x:
+    (mkSyncService {
+      name = x.name;
+      cloudname = x.cloudname;
+      dirname = x.dirname;
+      homedir = cfg.homeDir;
+    })) cloud_daemon_list);
+in (foldl' (acc: set: recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
@@ -189,5 +226,4 @@ in {
       '';
     };
   };
-}) cloudDaemonServices);
-}
+}) cloudDaemonServices)
