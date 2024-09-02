@@ -1,6 +1,4 @@
 { config, pkgs, lib, ... }:
-with pkgs;
-with lib;
 with import ./dependencies.nix { inherit config; };
 let
   cfg = config.machines.base;
@@ -189,7 +187,7 @@ in {
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-        excludePackages = [ gnome-photos gnome-tour ] ++ (with gnome; [
+        excludePackages = with pkgs; [ gnome-photos gnome-tour ] ++ (with gnome; [
           cheese
           gnome-music
           epiphany
@@ -268,7 +266,7 @@ in {
     services.notes-wiki.openFirewall = true;
 
     # Global packages
-    environment.systemPackages = [
+    environment.systemPackages = with pkgs; [
       ack
       procs
       tldr
