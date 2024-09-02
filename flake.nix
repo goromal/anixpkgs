@@ -111,7 +111,7 @@
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
-    task-tools.url = "github:goromal/task-tools?ref=dev/latemigrate";
+    task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
 
     trafficsim.url =
