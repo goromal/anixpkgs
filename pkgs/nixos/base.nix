@@ -138,12 +138,12 @@ in {
 
     boot = {
       kernelPackages = (if cfg.machineType == "pi4" then
-        pkgs.linuxPackages_rpi4
+        linuxPackages_rpi4
       else
         (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
+          linuxPackages_6_1
         else
-          pkgs.linuxPackages_latest));
+          linuxPackages_latest));
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -264,7 +264,7 @@ in {
 
     services.udev.packages = mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-      [ pkgs.dolphinEmu ];
+      [ dolphinEmu ];
 
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
