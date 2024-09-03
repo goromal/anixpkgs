@@ -1,5 +1,4 @@
 { pkgs, config, lib, ... }:
-with pkgs;
 with import ../dependencies.nix { inherit config; };
 let
   cfg = config.mods.opts;
@@ -49,8 +48,8 @@ in {
   } else
     { }));
 
-  home.packages = [ terminator anixpkgs.getres ]
-    ++ (if cfg.standalone == false then [
+  home.packages = with pkgs;
+    [ terminator anixpkgs.getres ] ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
       gnomeExtensions.vitals
@@ -78,11 +77,11 @@ in {
     enable = true;
     iconTheme = {
       name = "Nordzy";
-      package = nordzy-icon-theme;
+      package = pkgs.nordzy-icon-theme;
     };
     theme = {
       name = "Nordic";
-      package = nordic;
+      package = pkgs.nordic;
     };
   };
 
@@ -91,12 +90,12 @@ in {
       ".config/terminator/config".source =
         ../res/terminator-config; # https://rigel.netlify.app/#terminal
       ".local/share/nautilus/scripts/terminal".source =
-        (writeShellScript "terminal" "terminator");
+        (pkgs.writeShellScript "terminal" "terminator");
       ".config/nautilus/scripts-accels".text = "F4 terminal";
       "Templates/EmptyDocument".text = "";
-      ".background-image".source = ((runCommand "make-wallpaper" { } ''
+      ".background-image".source = ((pkgs.runCommand "make-wallpaper" { } ''
         mkdir $out
-        ${imagemagick}/bin/convert -font ${fonts.nexa.data} \
+        ${pkgs.imagemagick}/bin/convert -font ${fonts.nexa.data} \
            -pointsize 30 \
            -fill black \
            -draw 'text 320,1343 "${

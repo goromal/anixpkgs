@@ -1,6 +1,4 @@
 { config, pkgs, lib, ... }:
-with pkgs;
-with lib;
 with import ../dependencies.nix { inherit config; };
 let ports = import ../service-ports.nix;
 in {

@@ -1,6 +1,4 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with lib;
 with import ../../nixos/dependencies.nix { inherit config; };
 let
   globalCfg = config.machines.base;
@@ -13,7 +11,7 @@ let
     let
       ats-rcrsync = rcrsync.override { cloudDirs = globalCfg.cloudDirs; };
       ats-authm = authm.override { rcrsync = ats-rcrsync; };
-    in [
+    in with pkgs; [
       bash
       coreutils
       rclone
@@ -56,7 +54,7 @@ let
     }
     (mkOneshotTimedOrchService {
       name = "ats-greeting";
-      jobShellScript = writeShellScript "ats-greeting" ''
+      jobShellScript = pkgs.writeShellScript "ats-greeting" ''
           sleep 5
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         sleep 5
@@ -72,7 +70,7 @@ let
     })
     (mkOneshotTimedOrchService {
       name = "ats-mailman";
-      jobShellScript = writeShellScript "ats-mailman" ''
+      jobShellScript = pkgs.writeShellScript "ats-mailman" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
         # TODO warn about expiration
@@ -131,7 +129,7 @@ let
     })
     (mkOneshotTimedOrchService {
       name = "ats-grader";
-      jobShellScript = writeShellScript "ats-grader" ''
+      jobShellScript = pkgs.writeShellScript "ats-grader" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         tmpdir=$(mktemp -d)
         echo "🧹 Daily Task Cleaning 🧹" > $tmpdir/out.txt
@@ -151,7 +149,7 @@ let
     })
     (mkOneshotTimedOrchService {
       name = "ats-tasks-ranked";
-      jobShellScript = writeShellScript "ats-tasks-ranked" ''
+      jobShellScript = pkgs.writeShellScript "ats-tasks-ranked" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         tmpdir=$(mktemp -d)
         echo "🗓️ Pending Tasks:" > $tmpdir/out.txt
@@ -170,7 +168,7 @@ let
     })
     (mkOneshotTimedOrchService {
       name = "ats-prov-tasker";
-      jobShellScript = writeShellScript "ats-prov-tasker" ''
+      jobShellScript = pkgs.writeShellScript "ats-prov-tasker" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         providence-tasker --wiki-url ${wiki-url} 7 ${anixpkgs.redirects.suppress_all}
         gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
@@ -185,7 +183,7 @@ let
     })
     (mkOneshotTimedOrchService {
       name = "ats-rand-journal";
-      jobShellScript = writeShellScript "ats-rand-journal" ''
+      jobShellScript = pkgs.writeShellScript "ats-rand-journal" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         tmpdir=$(mktemp -d)
         echo "🖊️ Random Journal Entry of the Day:" > $tmpdir/out.txt
@@ -204,10 +202,10 @@ let
     })
   ];
 in {
-  options.services.ats = { enable = mkEnableOption "enable ATS services"; };
+  options.services.ats = { enable = lib.mkEnableOption "enable ATS services"; };
 
   imports = [ ../../python-packages/orchestrator/module.nix ];
 
-  config = mkIf cfg.enable
-    (foldl' (acc: set: recursiveUpdate acc set) { } atsServices);
+  config = lib.mkIf cfg.enable
+    (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { } atsServices);
 }
