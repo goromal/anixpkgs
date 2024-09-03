@@ -48,8 +48,8 @@ in {
   } else
     { }));
 
-  home.packages = with pkgs; [ terminator anixpkgs.getres ]
-    ++ (if cfg.standalone == false then [
+  home.packages = with pkgs;
+    [ terminator anixpkgs.getres ] ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
       gnomeExtensions.vitals
