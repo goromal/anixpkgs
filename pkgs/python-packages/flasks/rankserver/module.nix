@@ -1,41 +1,39 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with lib;
 let cfg = config.services.rankserver;
 in {
-  options.services.rankserver = with types; {
-    enable = mkEnableOption "enable rank server";
-    package = mkOption {
-      type = types.package;
+  options.services.rankserver = {
+    enable = lib.mkEnableOption "enable rank server";
+    package = lib.mkOption {
+      type = lib.types.package;
       description = "The rank server package to use";
       default = pkgs.rankserver;
     };
-    homeDir = mkOption {
-      type = types.str;
+    homeDir = lib.mkOption {
+      type = lib.types.str;
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
-    dataDir = mkOption {
-      type = types.str;
+    dataDir = lib.mkOption {
+      type = lib.types.str;
       description =
         "Data directory with rankable elements (.png|.txt). RELATIVE path from ~.";
       default = "rankables";
     };
-    port = mkOption {
-      type = types.int;
+    port = lib.mkOption {
+      type = lib.types.int;
       description = "Port for the server to use";
       default = 5000;
     };
-    openFirewall = mkOption {
-      type = types.bool;
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
       description =
         "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
   };
 
-  config = mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ cfg.port ];
+  config = lib.mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ cfg.port ];
     systemd.services.rankserver = {
       enable = true;
       description = "Rank server";

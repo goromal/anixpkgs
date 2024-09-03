@@ -1,5 +1,4 @@
 { pkgs, config, lib, ... }:
-with pkgs;
 with import ../dependencies.nix { inherit config; };
 let
   cfg = config.mods.opts;
@@ -10,13 +9,13 @@ let
       browserExec = cfg.browserExec;
     });
   rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
-  oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
-  launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
+  oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
+  launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
   cloud_dir_list =
     builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
-  launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
+  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
@@ -28,7 +27,7 @@ in {
     rcrsync = rcrsyncConfigured;
     authm = anixpkgs.authm.override { inherit rcrsync; };
   in ([
-    rclone
+    pkgs.rclone
     authm
     rcrsync
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
@@ -75,7 +74,7 @@ in {
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
+  ] ++ (if cfg.standalone == false then [ pkgs.docker pkgs.tmux ] else [ ]));
 
   systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
     Unit = { Description = "User-domain Orchestrator daemon"; };
@@ -126,7 +125,7 @@ in {
       let g:mix_format_options = '--check-equivalent'
     '';
     settings = { number = true; };
-    plugins = with vimPlugins; [
+    plugins = with pkgs.vimPlugins; [
       vim-elixir
       sensible
       vim-airline
