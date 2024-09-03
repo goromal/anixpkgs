@@ -93,7 +93,7 @@ in {
         (pkgs.writeShellScript "terminal" "terminator");
       ".config/nautilus/scripts-accels".text = "F4 terminal";
       "Templates/EmptyDocument".text = "";
-      ".background-image".source = ((runCommand "make-wallpaper" { } ''
+      ".background-image".source = ((pkgs.runCommand "make-wallpaper" { } ''
         mkdir $out
         ${pkgs.imagemagick}/bin/convert -font ${fonts.nexa.data} \
            -pointsize 30 \
