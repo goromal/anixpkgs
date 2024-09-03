@@ -7,7 +7,7 @@ let
   cfg = config.services.${app};
 in {
   options.services.${app} = {
-    enable = mkEnableOption "enable notes wiki server";
+    enable = lib.mkEnableOption "enable notes wiki server";
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =

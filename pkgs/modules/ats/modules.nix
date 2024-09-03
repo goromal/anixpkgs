@@ -207,5 +207,5 @@ in {
   imports = [ ../../python-packages/orchestrator/module.nix ];
 
   config = lib.mkIf cfg.enable
-    (builtins.foldl' (acc: set: recursiveUpdate acc set) { } atsServices);
+    (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { } atsServices);
 }
