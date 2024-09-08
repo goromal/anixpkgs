@@ -2,7 +2,8 @@
 with import ../dependencies.nix { inherit config; };
 let ports = import ../service-ports.nix;
 in {
-  imports = [ ../base.nix ../../python-packages/flasks/rankserver/module.nix ];
+  imports =
+    [ ../pc-base.nix ../../python-packages/flasks/rankserver/module.nix ];
 
   machines.base = {
     machineType = "pi4";
