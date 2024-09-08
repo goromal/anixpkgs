@@ -15,40 +15,40 @@ let
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  cloud_daemon_list =
-    (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
-  # cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
-  #       ({
-  #         name = "configs";
-  #         cloudname = "dropbox:configs";
-  #         dirname = "${cfg.homeDir}/configs";
-  #         daemonmode = true;
-  #       })
-  #       {
-  #         name = "secrets";
-  #         cloudname = "dropbox:secrets";
-  #         dirname = "${cfg.homeDir}/secrets";
-  #         daemonmode = true;
-  #       }
-  #       {
-  #         name = "games";
-  #         cloudname = "dropbox:games";
-  #         dirname = "${cfg.homeDir}/games";
-  #         daemonmode = false;
-  #       }
-  #       {
-  #         name = "data";
-  #         cloudname = "box:data";
-  #         dirname = "${cfg.homeDir}/data";
-  #         daemonmode = true;
-  #       }
-  #       {
-  #         name = "documents";
-  #         cloudname = "drive:Documents";
-  #         dirname = "${cfg.homeDir}/Documents";
-  #         daemonmode = true;
-  #       }
-  #     ]));
+  # cloud_daemon_list =
+  #   (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
+  cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
+    ({
+      name = "configs";
+      cloudname = "dropbox:configs";
+      dirname = "${cfg.homeDir}/configs";
+      daemonmode = true;
+    })
+    {
+      name = "secrets";
+      cloudname = "dropbox:secrets";
+      dirname = "${cfg.homeDir}/secrets";
+      daemonmode = true;
+    }
+    {
+      name = "games";
+      cloudname = "dropbox:games";
+      dirname = "${cfg.homeDir}/games";
+      daemonmode = false;
+    }
+    {
+      name = "data";
+      cloudname = "box:data";
+      dirname = "${cfg.homeDir}/data";
+      daemonmode = true;
+    }
+    {
+      name = "documents";
+      cloudname = "drive:Documents";
+      dirname = "${cfg.homeDir}/Documents";
+      daemonmode = true;
+    }
+  ]));
   cloud_dir_list = builtins.concatStringsSep " "
     (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
   launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
@@ -96,7 +96,7 @@ let
       dirname = x.dirname;
       homedir = cfg.homeDir;
     })) cloud_daemon_list);
-in (lib.foldl' (acc: set: recursiveUpdate acc set) ({
+in (lib.foldl' (acc: set: lib.recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
