@@ -1,6 +1,4 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with lib;
 with import ../dependencies.nix { inherit config; };
 let
   cfg = config.mods.opts;
@@ -13,12 +11,10 @@ let
   rcrsyncConfigured = anixpkgs.rcrsync.override {
     cloudDirs = cfg.cloudDirs;
   }; # ^^^^ TODO modify and add modules elsewhere?
-  oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
-  launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
+  oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
+  launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  cloud_dir_list = builtins.concatStringsSep " "
-    (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
   cloud_daemon_list =
     (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
   # cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
@@ -53,7 +49,9 @@ let
   #         daemonmode = true;
   #       }
   #     ]));
-  launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
+  cloud_dir_list = builtins.concatStringsSep " "
+    (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
+  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
@@ -98,14 +96,14 @@ let
       dirname = x.dirname;
       homedir = cfg.homeDir;
     })) cloud_daemon_list);
-in (foldl' (acc: set: recursiveUpdate acc set) ({
+in (lib.foldl' (acc: set: recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
     rcrsync = rcrsyncConfigured;
     authm = anixpkgs.authm.override { inherit rcrsync; };
   in ([
-    rclone
+    pkgs.rclone
     authm
     rcrsync
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
@@ -118,6 +116,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
     anixpkgs.task-tools
+    anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
     anixpkgs.color-prints
@@ -151,7 +150,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
+  ] ++ (if cfg.standalone == false then [ pkgs.docker pkgs.tmux ] else [ ]));
 
   systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
     Unit = { Description = "User-domain Orchestrator daemon"; };
@@ -202,7 +201,7 @@ in (foldl' (acc: set: recursiveUpdate acc set) ({
       let g:mix_format_options = '--check-equivalent'
     '';
     settings = { number = true; };
-    plugins = with vimPlugins; [
+    plugins = with pkgs.vimPlugins; [
       vim-elixir
       sensible
       vim-airline

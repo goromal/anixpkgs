@@ -1,12 +1,11 @@
 { pkgs, config, lib, ... }:
-with pkgs;
 with import ../dependencies.nix { inherit config; };
 let cfg = config.mods.opts;
 in {
   home.packages = ([
     anixpkgs.trafficsim
     anixpkgs.la-quiz
-    (writeShellScriptBin "playzelda" ''
+    (pkgs.writeShellScriptBin "playzelda" ''
       GAMES_DIR="$HOME/games"
       ZELDA_ROM="$GAMES_DIR/LegendOfZeldaCollectorsEdition.iso"
       MEMRY_CRD="$GAMES_DIR/MemoryCardA.USA.raw"
@@ -41,8 +40,8 @@ in {
       rcrsync sync games || { ${anixpkgs.color-prints}/bin/echo_yellow "WARNING: Sync failed!"; }
     '')
   ] ++ (if cfg.standalone == false then [
-    sage
-    pavucontrol # compatible with pipewire-pulse
+    pkgs.sage
+    pkgs.pavucontrol # compatible with pipewire-pulse
   ] else
     [ ]));
 }
