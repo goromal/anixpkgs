@@ -1,5 +1,5 @@
 { pkgs, config, lib, ... }:
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix; {
   options.mods.opts = {
     standalone = lib.mkOption {
       type = lib.types.bool;

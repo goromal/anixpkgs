@@ -1,12 +1,17 @@
 { config, pkgs, lib, ... }:
-with import ./dependencies.nix { inherit config; };
+with import ./dependencies.nix;
 let cfg = config.drone.base;
 in {
   options.drone.base = {
-    homeDir = lib.mkOption {
+    homeRoot = lib.mkOption {
       type = lib.types.str;
-      description = "Home directory for primary user (default: /data/andrew)";
-      default = "/data/andrew";
+      description = "Home root directory for primary user (default: /data)";
+      default = "/data";
+    };
+    homeUser = lib.mkOption {
+      type = lib.types.str;
+      description = "Primary user (default: drone)";
+      default = "drone";
     };
     nixosState = lib.mkOption {
       type = lib.types.str;
@@ -24,7 +29,7 @@ in {
     };
   };
 
-  imports = [ ../../python-packages/orchestrator/module.nix ];
+  imports = [ ../python-packages/orchestrator/module.nix ];
 
   config = {
     system.stateVersion = cfg.nixosState;
@@ -32,7 +37,7 @@ in {
     boot = {
       kernelPackages =
         let machineKernelPkgs = { sitl = pkgs.linuxPackages_latest; };
-        in kernelPackages.${cfg.machine};
+        in machineKernelPkgs.${cfg.machine};
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -60,7 +65,7 @@ in {
       nixPath = [
         "nixos-config=/etc/nixos/configuration.nix"
         "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
-        "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
+        "anixpkgs=${cfg.homeRoot}/${cfg.homeUser}/sources/anixpkgs"
       ];
       settings = {
         auto-optimise-store = true;
@@ -80,6 +85,8 @@ in {
       '';
     };
 
+    nixpkgs.overlays = lib.mkForce [];
+
     time.timeZone = "America/Los_Angeles";
 
     networking.useDHCP = false;
@@ -93,7 +100,7 @@ in {
 
     services.openssh = {
       enable = true;
-      settings = { X11Forwarding = true; };
+      settings = { X11Forwarding = false; };
     };
     programs.ssh.startAgent = true;
 
@@ -198,5 +205,68 @@ in {
       anixpkgs.nix-diffs
       anixpkgs.orchestrator
     ];
+
+    services.orchestratord = {
+      enable = true;
+      orchestratorPkg = anixpkgs.orchestrator;
+      pathPkgs = with pkgs; [ bash coreutils ];
+    };
+
+    environment.shellAliases = {
+      jfu = "journalctl -fu";
+      nohistory = "set +o history";
+    };
+    environment.noXlibs = true;
+
+    systemd.tmpfiles.rules = [ "d ${cfg.homeRoot} 0777 root root" ];
+
+    users.groups.dev = { gid = 1000; };
+
+    users.users.${cfg.homeUser} = {
+      isNormalUser = true;
+      uid = 1000;
+      home = "${cfg.homeRoot}/${cfg.homeUser}";
+      createHome = true;
+      description = "Primary User";
+      group = "dev";
+      extraGroups = [
+        "users"
+        "wheel"
+        "networkmanager"
+        "dialout"
+        "video"
+        "docker"
+        "systemd-journal"
+        "wireshark"
+      ];
+      subUidRanges = [
+        {
+          count = 1;
+          startUid = 1000;
+        }
+        {
+          count = 65536;
+          startUid = 100000;
+        }
+      ];
+      subGidRanges = [
+        {
+          count = 1;
+          startGid = 100;
+        }
+        {
+          count = 65536;
+          startGid = 100000;
+        }
+      ];
+      hashedPassword =
+        "$6$0fv.6VfJi8qfOLtZ$nJ9OeiLzDenXaogPJl1bIe6ipx4KTnsyPExB.9sZk/dEXfFv34PtRRxZf28RKwrpcg5bgmee6QiQFGQQhv4rS/";
+      openssh.authorizedKeys.keys = [
+        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDARsquoLlZN+DIsqoBh1tQ4h5E+V1UD7SpBZCpzcWMHY+N8SJ6CnYKUiQU8FSCWSOhdZ1r52za+iMl0g983S71cH70attk5KvQYHYGfqpSckwIQ326wE6e+fPQAytgqv6CS+xjNzcpRwVRzBmlB1IyqNCl79OnWsg0TXxL/GBt3UUI9p6XjAeZhxpqb2NPZYHV+TZPPvI3/1X0LadBZZWFPbtoI+XbHABtW06YUDpR+BQSpFGtq+2eIjRgoo4WEHPewV73zzLVIYZ3xaa0Whmm4qTPpNtw+U1tHZkxUAjU92Y7Mq7oehd5z6YGRQ+UxSAuSYkR7xTt63KFb/vTjJg0W0LphwPYnfzG1M+jhK/6rGAdL0AYaUiMDTwl6gSkROKAzab63wf9gbeo+6Smgv3LQYCXvAFccEKtqlt1RLP/SUdTCdjVL728c0+WohrOD3tyRR8XU94CdOyLrhRG0k4Bcb0W0GYaLxsUSkc/wSyg6An9ITldBfH0FOON2sft52M= andrew@andrew-Precision-5550"
+      ];
+    };
+    users.mutableUsers = true;
+
+    programs.wireshark.enable = true;
   };
 }
