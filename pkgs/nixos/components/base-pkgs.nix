@@ -96,7 +96,7 @@ let
       dirname = x.dirname;
       homedir = cfg.homeDir;
     })) cloud_daemon_list);
-in (lib.foldl' (acc: set: lib.recursiveUpdate acc set) ({
+in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
