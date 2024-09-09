@@ -85,7 +85,7 @@ in {
       '';
     };
 
-    nixpkgs.overlays = lib.mkForce [];
+    nixpkgs.overlays = lib.mkForce [ ];
 
     time.timeZone = "America/Los_Angeles";
 
