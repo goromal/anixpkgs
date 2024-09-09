@@ -1,5 +1,5 @@
 { pkgs, config, lib, ... }:
-with import ../../nixos/dependencies.nix { inherit config; };
+with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.ats;

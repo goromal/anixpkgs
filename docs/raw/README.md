@@ -66,3 +66,12 @@ bash scripts/check_machines.sh
 ```
 
 *Automatically run as part of CI pipeline.*
+
+## SITL
+
+Some commands to spin up SITL environments:
+
+```bash
+# Drone Sim
+bash scripts/sitl/drone-sim.sh
+```

@@ -1,5 +1,5 @@
 { pkgs, lib, config, ... }:
-with import ../../nixos/dependencies.nix { inherit config; };
+with import ../../nixos/dependencies.nix;
 let
   app = "notes-wiki";
   defaultDomain = "localhost";
