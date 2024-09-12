@@ -21,22 +21,18 @@ let
       ];
       checkPkgs = [ ];
     });
-  bisync = ''
-    if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help" ]] && [[ "$*" != *"--headless" ]]; then
-      ${rcrsync}/bin/rcrsync sync secrets
-    fi
-  '';
-  copyonly = ''
-    if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help" ]] && [[ "$*" == *"--headless" ]]; then
-       ${rcrsync}/bin/rcrsync copy secrets
-    fi
-  '';
   printErr = ">&2 ${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
-  ${bisync}
-  ${copyonly}
+  if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]] || [[ "$*" == *"copy"* ]]) && [[ "$*" != *"--help"* ]]; then
+    ${rcrsync}/bin/rcrsync copy secrets
+  fi
   ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; exit 1; }
-  ${bisync}
+  if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]] || [[ "$*" == *"copy"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
+    ${rcrsync}/bin/rcrsync sync secrets
+  fi
+  if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]] || [[ "$*" == *"copy"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" == *"--headless"* ]]; then
+    ${rcrsync}/bin/rcrsync copy secrets
+  fi
 '') // {
   meta = {
     inherit description longDescription;
