@@ -6,7 +6,7 @@ let
   cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
-    usage: ${pkgname} [OPTS] [init|sync] CLOUD_DIR
+    usage: ${pkgname} [OPTS] [init|sync|copy] CLOUD_DIR
 
     Manage cloud directories with rclone.
 
@@ -84,6 +84,23 @@ in (writeArgparseScriptBin pkgname longDescription [{
         ${printErr} "Bisync retry failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
         exit 1
       fi
+    fi
+    echo "Done."
+  elif [[ "$1" == "copy" ]]; then
+    if [[ ! -d "$LOCAL_DIR" ]]; then
+      ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
+      exit 1
+    fi
+    ${printCyn} "Copying $CLOUD_DIR to $LOCAL_DIR..."
+    _success=1
+    if [[ "$verbose" == "1" ]]; then
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+    else
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone copy $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
+    fi
+    if [[ "$_success" == "0" ]]; then
+      ${printErr} "Copy failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
+      exit 1
     fi
     echo "Done."
   else
