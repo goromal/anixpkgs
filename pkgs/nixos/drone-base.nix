@@ -187,23 +187,23 @@ in {
       gping
       dog
       tmux
-      (anixpkgs.anix-version.override { standalone = false; })
-      (anixpkgs.anix-upgrade.override {
-        standalone = false;
-        browser-aliases = null;
-      })
-      anixpkgs.color-prints
-      anixpkgs.fix-perms
-      anixpkgs.secure-delete
-      anixpkgs.sunnyside
-      anixpkgs.make-title
-      anixpkgs.pb
-      anixpkgs.dirgroups
-      anixpkgs.dirgather
-      anixpkgs.fixfname
-      anixpkgs.nix-deps
-      anixpkgs.nix-diffs
-      anixpkgs.orchestrator
+      # (anixpkgs.anix-version.override { standalone = false; })
+      # (anixpkgs.anix-upgrade.override {
+      #   standalone = false;
+      #   browser-aliases = null;
+      # })
+      # anixpkgs.color-prints
+      # anixpkgs.fix-perms
+      # anixpkgs.secure-delete
+      # anixpkgs.sunnyside
+      # anixpkgs.make-title
+      # anixpkgs.pb
+      # anixpkgs.dirgroups
+      # anixpkgs.dirgather
+      # anixpkgs.fixfname
+      # anixpkgs.nix-deps
+      # anixpkgs.nix-diffs
+      # anixpkgs.orchestrator
     ];
 
     services.orchestratord = {
