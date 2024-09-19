@@ -58,7 +58,7 @@ let
   '';
   mkSyncService = { name, cloudname, dirname, homedir }:
     let
-      execScript = writeShellScript "execute-sync" ''
+      execScript = pkgs.writeShellScript "execute-sync" ''
         if [ ! -d "${dirname}" ] || [ "$(ls -A ${dirname} 2>/dev/null)" ]; then
             if [ ! -d "${dirname}" ]; then
                 echo "Mount directory ${dirname} does not exist. Exiting."
@@ -72,7 +72,7 @@ let
         echo "Mounting "${cloudname} -> ${dirname}..."
         rclone mount --config=${homedir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
       '';
-      stopScript = writeShellScript "stop-sync" ''
+      stopScript = pkgs.writeShellScript "stop-sync" ''
         fusermount -u ${dirname}
       '';
     in {
