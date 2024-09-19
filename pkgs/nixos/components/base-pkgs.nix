@@ -8,19 +8,95 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  rcrsyncConfigured = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+  }; # ^^^^ TODO modify and add modules elsewhere?
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
-  cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
+  # cloud_daemon_list =
+  #   (builtins.filter (v: v.daemonmode) cfg.cloudDirs); # ^^^^ TODO
+  cloud_daemon_list = (builtins.filter (v: v.daemonmode) ([ # ^^^^ this works...
+    ({
+      name = "configs";
+      cloudname = "dropbox:configs";
+      dirname = "${cfg.homeDir}/configs";
+      daemonmode = true;
+    })
+    {
+      name = "secrets";
+      cloudname = "dropbox:secrets";
+      dirname = "${cfg.homeDir}/secrets";
+      daemonmode = true;
+    }
+    {
+      name = "games";
+      cloudname = "dropbox:games";
+      dirname = "${cfg.homeDir}/games";
+      daemonmode = false;
+    }
+    {
+      name = "data";
+      cloudname = "box:data";
+      dirname = "${cfg.homeDir}/data";
+      daemonmode = true;
+    }
+    {
+      name = "documents";
+      cloudname = "drive:Documents";
+      dirname = "${cfg.homeDir}/Documents";
+      daemonmode = true;
+    }
+  ]));
+  cloud_dir_list = builtins.concatStringsSep " "
+    (map (x: "${x.name}") (builtins.filter (v: !v.daemonmode) cfg.cloudDirs));
   launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
   '';
-in {
+  mkSyncService = { name, cloudname, dirname, homedir }:
+    let
+      execScript = pkgs.writeShellScript "execute-sync" ''
+        if [ ! -d "${dirname}" ] || [ "$(ls -A ${dirname} 2>/dev/null)" ]; then
+            if [ ! -d "${dirname}" ]; then
+                echo "Mount directory ${dirname} does not exist. Exiting."
+            else
+                echo "Mount directory ${dirname} is not empty. Exiting."
+            fi
+            exit 1
+        else
+            echo "Mount directory ${dirname} exists and is empty. Continuing..."
+        fi
+        echo "Mounting "${cloudname} -> ${dirname}..."
+        rclone mount --config=${homedir}/.rclone.conf --vfs-cache-mode writes ${cloudname} ${dirname}
+      '';
+      stopScript = pkgs.writeShellScript "stop-sync" ''
+        fusermount -u ${dirname}
+      '';
+    in {
+      systemd.user.services."${name}-sync" = {
+        Unit.Description = "${name} cloud sync service";
+        Unit.After = [ "network-online.target" ];
+        Service = {
+          Type = "simple";
+          ExecStart = "${execScript}/bin/execute-sync";
+          ExecStop = "${stopScript}/bin/stop-sync";
+          Restart = "always";
+          RestartSec = 30;
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+    };
+  cloudDaemonServices = (map (x:
+    (mkSyncService {
+      name = x.name;
+      cloudname = x.cloudname;
+      dirname = x.dirname;
+      homedir = cfg.homeDir;
+    })) cloud_daemon_list);
+in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) ({
   home.stateVersion = cfg.homeState;
 
   home.packages = let
@@ -149,4 +225,4 @@ in {
       '';
     };
   };
-}
+}) cloudDaemonServices)

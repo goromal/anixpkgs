@@ -62,27 +62,32 @@ in {
         {
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
+          dirname = "${cfg.homeDir}/configs";
+          daemonmode = true;
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
+          dirname = "${cfg.homeDir}/secrets";
+          daemonmode = true;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "$HOME/games";
+          dirname = "${cfg.homeDir}/games";
+          daemonmode = false;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "$HOME/data";
+          dirname = "${cfg.homeDir}/data";
+          daemonmode = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
+          dirname = "${cfg.homeDir}/Documents";
+          daemonmode = true;
         }
       ];
     };

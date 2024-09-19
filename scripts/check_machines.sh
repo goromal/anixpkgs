@@ -18,7 +18,7 @@ sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/depen
 configurations=(personal-inspiron ats-alderlake ats-pi rankserver-pi)
 for configuration in ${configurations[@]}; do
     echo "Checking derivation for configuration: $configuration..."
-    nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run
+    nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run --show-trace
     echo "Checks out!"
     echo ""
 done
