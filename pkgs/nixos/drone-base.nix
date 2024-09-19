@@ -197,7 +197,7 @@ in {
       # anixpkgs.secure-delete
       # anixpkgs.sunnyside
       # anixpkgs.make-title
-      # anixpkgs.pb
+      anixpkgs.pb.out # ^^^^ TODO accessible? access via SSH
       # anixpkgs.dirgroups
       # anixpkgs.dirgather
       # anixpkgs.fixfname
