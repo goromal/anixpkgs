@@ -108,8 +108,18 @@ in (writeArgparseScriptBin pkgname longDescription [{
       ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
       exit 1
     fi
-    ${printCyn} "Copying $LOCAL_DIR to $CLOUD_DIR..."
-    // ^^^^ TODO
+    ${printCyn} "Overriding $CLOUD_DIR with $LOCAL_DIR..."
+    _success=1
+    if [[ "$verbose" == "1" ]]; then
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone copy $LOCAL_DIR $CLOUD_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+    else
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone copy $LOCAL_DIR $CLOUD_DIR ${redirects.suppress_all}" || { _success=0; }
+    fi
+    if [[ "$_success" == "0" ]]; then
+      ${printErr} "Override failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
+      exit 1
+    fi
+    echo "Done."
   else
     ${printErr} "Unrecognized command: $1"
     exit 1
