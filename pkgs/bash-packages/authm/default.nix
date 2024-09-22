@@ -28,9 +28,9 @@ in (writeShellScriptBin pkgname ''
   fi
   ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; exit 1; }
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
-    ${rcrsync}/bin/rcrsync sync secrets
+    ${rcrsync}/bin/rcrsync override secrets
   fi
-'') // {
+'') // { # ^^^^ TODO remove all rcrsync sync references in practice on all machines
   meta = {
     inherit description longDescription;
     autoGenUsageCmd = "--help";

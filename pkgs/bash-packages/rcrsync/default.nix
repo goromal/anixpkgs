@@ -6,7 +6,7 @@ let
   cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
-    usage: ${pkgname} [OPTS] [init|sync|copy] CLOUD_DIR
+    usage: ${pkgname} [OPTS] [init|sync|copy|override] CLOUD_DIR
 
     Manage cloud directories with rclone.
 
@@ -103,6 +103,13 @@ in (writeArgparseScriptBin pkgname longDescription [{
       exit 1
     fi
     echo "Done."
+  elif [[ "$1" == "override" ]]; then
+    if [[ ! -d "$LOCAL_DIR" ]]; then
+      ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
+      exit 1
+    fi
+    ${printCyn} "Copying $LOCAL_DIR to $CLOUD_DIR..."
+    // ^^^^ TODO
   else
     ${printErr} "Unrecognized command: $1"
     exit 1
