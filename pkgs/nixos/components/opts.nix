@@ -42,26 +42,31 @@ with import ../dependencies.nix { inherit config; }; {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
+          autosync = true;
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
           dirname = "$HOME/secrets";
+          autosync = false;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "$HOME/games";
+          autosync = true;
         }
         {
           name = "data";
           cloudname = "box:data";
           dirname = "$HOME/data";
+          autosync = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
           dirname = "$HOME/Documents";
+          autosync = true;
         }
       ];
     };

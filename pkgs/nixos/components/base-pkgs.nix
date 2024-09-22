@@ -13,8 +13,11 @@ let
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
+  auto_sync_cloud_dirs =
+    builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
+    cfg.cloudDirs;
   cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
+    builtins.concatStringsSep " " (map (x: "${x.name}") auto_sync_cloud_dirs);
   launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
