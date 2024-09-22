@@ -451,7 +451,7 @@ in {
           null;
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = !cfg.loadATSServices;
-        cloudAutoSync = false; # !cfg.loadATSServices;
+        cloudAutoSync = !cfg.loadATSServices;
       };
     };
   };
