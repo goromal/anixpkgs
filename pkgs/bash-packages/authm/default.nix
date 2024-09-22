@@ -30,8 +30,7 @@ in (writeShellScriptBin pkgname ''
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
     ${rcrsync}/bin/rcrsync override secrets
   fi
-'')
-// {
+'') // {
   meta = {
     inherit description longDescription;
     autoGenUsageCmd = "--help";
