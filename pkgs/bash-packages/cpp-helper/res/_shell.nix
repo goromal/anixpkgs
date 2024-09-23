@@ -9,6 +9,6 @@ mkShell {
     # ADD deps
   ];
   shellHook = ''
-    cpp-helper --make-vscode
+    cpp-helper vscode
   '';
 }
