@@ -1,6 +1,4 @@
 { pkgs, lib, config, ... }:
-with pkgs;
-with lib;
 with import ../../nixos/dependencies.nix { inherit config; };
 let
   app = "notes-wiki";
@@ -9,7 +7,7 @@ let
   cfg = config.services.${app};
 in {
   options.services.${app} = {
-    enable = mkEnableOption "enable notes wiki server";
+    enable = lib.mkEnableOption "enable notes wiki server";
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =
@@ -27,22 +25,22 @@ in {
         "PHP build (default: 7.4 until DokuWiki version gets updated)";
       default = anixpkgs.php74;
     };
-    openFirewall = mkOption {
-      type = types.bool;
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
       description =
         "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
-    insecurePort = mkOption {
-      type = types.int;
+    insecurePort = lib.mkOption {
+      type = lib.types.int;
       description = "Public insecure port";
       default = 80;
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     networking.firewall.allowedTCPPorts =
-      mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
+      lib.mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
 
     services.phpfpm.pools.${app} = {
       user = "andrew";

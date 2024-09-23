@@ -1,6 +1,4 @@
 { config, pkgs, lib, ... }:
-with pkgs;
-with lib;
 with import ./dependencies.nix { inherit config; };
 let
   cfg = config.machines.base;
@@ -65,26 +63,31 @@ in {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
+          autosync = true;
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
           dirname = "$HOME/secrets";
+          autosync = false;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "$HOME/games";
+          autosync = true;
         }
         {
           name = "data";
           cloudname = "box:data";
           dirname = "$HOME/data";
+          autosync = true;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
           dirname = "$HOME/Documents";
+          autosync = true;
         }
       ];
     };
@@ -189,18 +192,19 @@ in {
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-        excludePackages = [ gnome-photos gnome-tour ] ++ (with gnome; [
-          cheese
-          gnome-music
-          epiphany
-          geary
-          evince
-          totem
-          tali
-          iagno
-          hitori
-          atomix
-        ]);
+        excludePackages = with pkgs;
+          [ gnome-photos gnome-tour ] ++ (with gnome; [
+            cheese
+            gnome-music
+            epiphany
+            geary
+            evince
+            totem
+            tali
+            iagno
+            hitori
+            atomix
+          ]);
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
@@ -268,82 +272,83 @@ in {
     services.notes-wiki.openFirewall = true;
 
     # Global packages
-    environment.systemPackages = [
-      ack
-      procs
-      tldr
-      fzf
-      fdupes
-      zoxide # z, ...
-      duf
-      gcc
-      gdb
-      tig
-      scc
-      most
-      gnumake
-      just
-      hyperfine
-      cmake
-      valgrind
-      iotop
-      iperf
-      iftop
-      python3
-      xsel
-      htop
-      jq
-      libpwquality
-      libinput
-      rsync
-      lsof
-      mc
-      coreutils
-      ripgrep
-      diff-so-fancy
-      entr
-      bat
-      sd
-      clang
-      clang-tools
-      neofetch
-      onefetch
-      man-pages
-      black
-      mosh
-      nethogs
-      tcpdump
-      gparted
-      logkeys
-      traceroute
-      mtr
-      fish
-      screen
-      minicom
-      exiftool
-      dhcpcd
-      dnsutils
-      v4l-utils
-      usbutils
-      ffmpeg
-      chrony
-      unzip
-      wget
-      aria2
-      httpie
-      ethtool
-      arp-scan
-      dtc
-      ncdu
-      nmap
-      navi
-      unstable.mprocs
-      bandwhich
-      btop
-      glances
-      gping
-      dog
-    ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
+    environment.systemPackages = with pkgs;
+      [
+        ack
+        procs
+        tldr
+        fzf
+        fdupes
+        zoxide # z, ...
+        duf
+        gcc
+        gdb
+        tig
+        scc
+        most
+        gnumake
+        just
+        hyperfine
+        cmake
+        valgrind
+        iotop
+        iperf
+        iftop
+        python3
+        xsel
+        htop
+        jq
+        libpwquality
+        libinput
+        rsync
+        lsof
+        mc
+        coreutils
+        ripgrep
+        diff-so-fancy
+        entr
+        bat
+        sd
+        clang
+        clang-tools
+        neofetch
+        onefetch
+        man-pages
+        black
+        mosh
+        nethogs
+        tcpdump
+        gparted
+        logkeys
+        traceroute
+        mtr
+        fish
+        screen
+        minicom
+        exiftool
+        dhcpcd
+        dnsutils
+        v4l-utils
+        usbutils
+        ffmpeg
+        chrony
+        unzip
+        wget
+        aria2
+        httpie
+        ethtool
+        arp-scan
+        dtc
+        ncdu
+        nmap
+        navi
+        unstable.mprocs
+        bandwhich
+        btop
+        glances
+        gping
+        dog
+      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
@@ -446,7 +451,7 @@ in {
           null;
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = !cfg.loadATSServices;
-        cloudAutoSync = !cfg.loadATSServices;
+        cloudAutoSync = false; # !cfg.loadATSServices;
       };
     };
   };
