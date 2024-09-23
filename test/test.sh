@@ -82,7 +82,7 @@ fi
 devshell -d $tmpdir/data/devrc test_env --run "addsrc task-tools https://github.com/goromal/task-tools"
 [[ -d $tmpdir/dev/test_env/sources/task-tools ]] || { echo_red "Failed to add source to workspace"; exit 1; }
 cd $tmpdir/dev/test_env/sources/ceres-factors
-cpp-helper --make-nix
+cpp-helper nix
 sed -i 's|# ADD deps|eigen ceres-solver manif-geom-cpp boost|g' shell.nix
 nix-shell --run "echo 'Checking generated VSCode config'"
 if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
