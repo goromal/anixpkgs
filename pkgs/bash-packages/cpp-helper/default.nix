@@ -5,12 +5,13 @@ let
     usage: ${pkgname} [options]
 
     Options:
-        make       TARGET       Full CMake build command (run from repo root)
+        make       TARGET|all   Full CMake build command (run from repo root)
         format-file             Dumps a format rules file into .clang-format
         nix                     Dump template default.nix and shell.nix files
         exec-lib   CPPNAME      Generate a lib+exec package template
         header-lib CPPNAME      Generate a header-only library template
         vscode                  Generate VSCode C++ header detection settings file
+                                (Run inside a Nix dev environment)
   '';
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
@@ -19,16 +20,22 @@ let
   defaultFile = ./res/_default.nix;
   makeRule = ''
     if [[ ! -z "$maketarget" ]]; then
+      if [[ "$maketarget" == "all" ]]; then
+        maketarget=""
+      fi
       ${printGrn} "Building your repo..."
       if [[ ! -f CMakeLists.txt ]]; then
         ${printErr} "CMakeLists.txt not found."
         exit 1
       fi
-      if [[ ! -f shell.nix ]]; then
+      if [[ -f shell.nix ]]; then
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      elif [[ -f flake.nix ]]; then
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      else
         ${printErr} "shell.nix not found."
         exit 1
       fi
-      nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
     fi
   '';
   makeffRule = ''
