@@ -5,7 +5,7 @@ let
     usage: ${pkgname} [options]
 
     Options:
-        make       TARGET       Full CMake build command (run from repo root)
+        make       TARGET|all   Full CMake build command (run from repo root)
         format-file             Dumps a format rules file into .clang-format
         nix                     Dump template default.nix and shell.nix files
         exec-lib   CPPNAME      Generate a lib+exec package template
@@ -19,6 +19,9 @@ let
   defaultFile = ./res/_default.nix;
   makeRule = ''
     if [[ ! -z "$maketarget" ]]; then
+      if [[ "$maketarget" == "all"]; then
+        maketarget=""
+      fi
       ${printGrn} "Building your repo..."
       if [[ ! -f CMakeLists.txt ]]; then
         ${printErr} "CMakeLists.txt not found."
