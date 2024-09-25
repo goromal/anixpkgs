@@ -11,6 +11,7 @@ let
         exec-lib   CPPNAME      Generate a lib+exec package template
         header-lib CPPNAME      Generate a header-only library template
         vscode                  Generate VSCode C++ header detection settings file
+                                (Run inside a Nix dev environment)
   '';
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
