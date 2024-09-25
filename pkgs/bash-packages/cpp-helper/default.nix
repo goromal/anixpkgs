@@ -19,7 +19,7 @@ let
   defaultFile = ./res/_default.nix;
   makeRule = ''
     if [[ ! -z "$maketarget" ]]; then
-      if [[ "$maketarget" == "all"]; then
+      if [[ "$maketarget" == "all" ]]; then
         maketarget=""
       fi
       ${printGrn} "Building your repo..."
