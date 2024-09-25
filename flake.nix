@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/gradebook";
     aapis.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
@@ -75,6 +75,9 @@
 
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
+
+    gradebook.url = "github:goromal/gradebook";
+    gradebook.flake = false;
 
     makepyshell.url =
       "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
