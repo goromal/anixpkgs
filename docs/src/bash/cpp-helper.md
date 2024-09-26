@@ -2,7 +2,10 @@
 
 Convenience tools for setting up C++ projects.
 
-```
+
+## Usage (Auto-Generated)
+
+```bash
 usage: cpp-helper [options]
 
 Options:
@@ -13,6 +16,7 @@ Options:
     header-lib CPPNAME      Generate a header-only library template
     vscode                  Generate VSCode C++ header detection settings file
                             (Run inside a Nix dev environment)
+
 
 ```
 
