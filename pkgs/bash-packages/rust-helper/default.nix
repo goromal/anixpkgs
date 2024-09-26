@@ -78,6 +78,7 @@ in (writeArgparseScriptBin pkgname usage_str [
 '') // {
   meta = {
     description = "Convenience tools for setting up Rust projects.";
+    longDescription = "";
     autoGenUsageCmd = "--help";
   };
 }
