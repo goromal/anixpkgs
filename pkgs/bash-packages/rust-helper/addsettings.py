@@ -24,6 +24,12 @@ if "editor.semanticTokenColorCustomizations" not in settings:
         }
     }
 
+if "[rust]" not in settings:
+    settings["[rust]"] = {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer",
+        "editor.formatOnSave": True
+    }
+
 if "rust-analyzer.server.extraEnv" not in settings:
     settings["rust-analyzer.server.extraEnv"] = {}
 

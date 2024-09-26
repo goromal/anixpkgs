@@ -43,6 +43,7 @@ let
             if [[ "$envvar" == "DEFAULT" ]]; then
                 ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTC" "$(which rustc)"
                 ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "CARGO" "$(which cargo)"
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTFMT" "$(which rustfmt)"
             else
                 ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "$envvar" "''${!envvar}"
             fi
