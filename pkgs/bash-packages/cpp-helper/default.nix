@@ -157,10 +157,7 @@ in (writeArgparseScriptBin pkgname usage_str [
 '') // {
   meta = {
     description = "Convenience tools for setting up C++ projects.";
-    longDescription = ''
-      ```
-      ${usage_str}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }
