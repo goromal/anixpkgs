@@ -41,8 +41,8 @@ let
         IFS=':' read -ra vararray <<< "$makevscode"
         for envvar in "''${vararray[@]}"; do
             if [[ "$envvar" == "DEFAULT" ]]; then
-                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTC" "$RUSTC"
-                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "CARGO" "$CARGO"
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTC" "$(which rustc)"
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "CARGO" "$(which cargo)"
             else
                 ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "$envvar" "''${!envvar}"
             fi
