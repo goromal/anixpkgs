@@ -9,7 +9,7 @@ let
         challenge  TARGET|all   Full CMake build command WITH SANITIZERS
                                 (run from repo root)
         format-file             Dumps a format rules file into .clang-format
-        nix                     Dump template default.nix and shell.nix files
+        nix                     Dump template shell.nix file
         exec-lib   CPPNAME      Generate a lib+exec package template
         header-lib CPPNAME      Generate a header-only library template
         vscode                  Generate VSCode C++ header detection settings file
@@ -19,7 +19,6 @@ let
   printGrn = "${color-prints}/bin/echo_green";
   formatFile = ./res/clang-format;
   shellFile = ./res/_shell.nix;
-  defaultFile = ./res/_default.nix;
   makeRule = ''
     if [[ ! -z "$maketarget" ]]; then
       if [[ "$maketarget" == "all" ]]; then
@@ -70,9 +69,7 @@ let
   '';
   makenixRule = ''
     if [[ "$makenix" == "1" ]]; then
-        ${printGrn} "Generating template default.nix and shell.nix files..."
-        cat ${defaultFile} > default.nix
-        sed -i 's|REPLACEME|${anixpkgs-version}|g' default.nix
+        ${printGrn} "Generating template shell.nix file..."
         cat ${shellFile} > shell.nix
         sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
