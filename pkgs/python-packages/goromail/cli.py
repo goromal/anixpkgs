@@ -352,67 +352,73 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         + Style.RESET_ALL
     )
     msgs = gbot.fromSenders([TEXT_EMAIL, MAIL_EMAIL]).getMessages()
-    for msg in reversed(msgs):
-        text = msg.getText().strip()
-        date = msg.getDate()
-        matched = False
-        if categories_csv is not None:
-            with open(os.path.expanduser(categories_csv), "r") as categories:
-                for line in categories:
-                    keyword, notion_page_id = (
-                        line.split(",")[0],
-                        line.split(",")[1].strip(),
-                    )
-                    matched = process_keyword(
+    try:
+        for msg in reversed(msgs):
+            text = msg.getText().strip()
+            date = msg.getDate()
+            matched = False
+            if categories_csv is not None:
+                with open(os.path.expanduser(categories_csv), "r") as categories:
+                    for line in categories:
+                        keyword, notion_page_id = (
+                            line.split(",")[0],
+                            line.split(",")[1].strip(),
+                        )
+                        matched = process_keyword(
+                            text,
+                            date.strftime("%m/%d/%Y"),
+                            keyword,
+                            notion_api_token,
+                            notion_page_id,
+                            msg,
+                            dry_run,
+                            logfile,
+                        )
+                        if matched:
+                            break
+            if matched:
+                continue
+            if text.lstrip("-+").isdigit():
+                print(f"  Calorie intake on {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Calories entry\n")
+                if not dry_run:
+                    caljo_doku = None
+                    caljo_doku = wiki.getPage(id="calorie-journal")
+                    new_caljo_doku = f"""{caljo_doku}
+    * ({date}) {text}"""
+                    wiki.putPage(id="calorie-journal", content=new_caljo_doku)
+                    if caljo_doku is not None:
+                        msg.moveToTrash()
+            elif (
+                text[:3].lower() == "p0:"
+                or text[:3].lower() == "p1:"
+                or text[:3].lower() == "p2:"
+                or text[:3].lower() == "p3:"
+            ):
+                print(f"  {text[:2]} task for {date}: {text[3:]}")
+                if logfile is not None:
+                    logfile.write("Task entry\n")
+                if not dry_run:
+                    task.putTask(
                         text,
-                        date.strftime("%m/%d/%Y"),
-                        keyword,
-                        notion_api_token,
-                        notion_page_id,
-                        msg,
-                        dry_run,
-                        logfile,
+                        f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
+                        datetime.today(),
                     )
-                    if matched:
-                        break
-        if matched:
-            continue
-        if text.lstrip("-+").isdigit():
-            print(f"  Calorie intake on {date}: {text}")
-            if logfile is not None:
-                logfile.write("Calories entry\n")
-            if not dry_run:
-                caljo_doku = None
-                caljo_doku = wiki.getPage(id="calorie-journal")
-                new_caljo_doku = f"""{caljo_doku}
-  * ({date}) {text}"""
-                wiki.putPage(id="calorie-journal", content=new_caljo_doku)
-                if caljo_doku is not None:
                     msg.moveToTrash()
-        elif (
-            text[:3].lower() == "p0:"
-            or text[:3].lower() == "p1:"
-            or text[:3].lower() == "p2:"
-            or text[:3].lower() == "p3:"
-        ):
-            print(f"  {text[:2]} task for {date}: {text[3:]}")
-            if logfile is not None:
-                logfile.write("Task entry\n")
-            if not dry_run:
-                task.putTask(
-                    text,
-                    f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
-                    datetime.today(),
-                )
-                msg.moveToTrash()
-        else:
-            print(f"  ITNS from {date}: {text}")
-            if logfile is not None:
-                logfile.write("Notion:ITNS entry\n")
-            if not dry_run:
-                append_text_to_notion_page(
-                    notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
-                )
+            else:
+                print(f"  ITNS from {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Notion:ITNS entry\n")
+                if not dry_run:
+                    append_text_to_notion_page(
+                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
+                    )
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
