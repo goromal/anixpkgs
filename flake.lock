@@ -309,11 +309,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1683696296,
-        "narHash": "sha256-T26p1qRETYRBB9HxyjyVeBHAF1bROw5roKDYCqgy9wI=",
+        "lastModified": 1728152243,
+        "narHash": "sha256-WsLLoTGVgxtRKpxH14Mk1F5Wi/nfR4KqMTLF3Ffr7Iw=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "747f612e32aaa6c9e31285c69830d9d224c23b4b",
+        "rev": "4d186958321d54f3b2dc36215032f1c94683347a",
         "type": "github"
       },
       "original": {
@@ -617,11 +617,11 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1672599560,
-        "narHash": "sha256-KIAvkkTJ0zhidOJljtUaEKe94wiybC0LafRItR0TBcY=",
+        "lastModified": 1718422178,
+        "narHash": "sha256-WuKOdEiYwazWayfhK9r2P6AB+ER4EKSCQ9/3JaBFjHM=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "40b1aaebb651fe1fcbe5f8fdad545567fe8971c4",
+        "rev": "42136ab2aed904db6c82eae82caedf8341676430",
         "type": "github"
       },
       "original": {
