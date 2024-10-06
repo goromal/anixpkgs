@@ -309,11 +309,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1728186371,
-        "narHash": "sha256-lHo1sDoHWeLOAKRXEZ4DOfPxuIlTXDZxgJXwpsAQ01I=",
+        "lastModified": 1728191989,
+        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "657a105a7b43cb2503f9283a0db27c852d17acff",
+        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
         "type": "github"
       },
       "original": {
@@ -373,15 +373,16 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1707606598,
-        "narHash": "sha256-ch21eRka7G/PEt/Ku8UplSYobjtw8zM8o2LgWXaAO00=",
+        "lastModified": 1728192203,
+        "narHash": "sha256-UJemzN1TF2VGbiHLuYOOZZaj8yq0Ux+1J7pQGroNGw0=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "73f7ec5912cf9e26dff994251ab109d557a3a36a",
+        "rev": "e688af42040d84bf4b23d6739cdf6914341ad143",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/job_queue_impl",
         "repo": "orchestrator-cpp",
         "type": "github"
       }
