@@ -52,6 +52,7 @@
   - [goromail](./python/goromail.md)
 - [Bash Packages](./bash/bash.md)
   - [aapis-grpcurl](./bash/aapis-grpcurl.md)
+  - [aptest](./bash/aptest.md)
   - [authm](./bash/authm.md)
   - [abc](./bash/abc.md)
   - [getres](./bash/getres.md)

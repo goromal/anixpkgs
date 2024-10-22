@@ -3,6 +3,7 @@
 Packages written (or glued together) in Bash.
 
 - [aapis-grpcurl](./aapis-grpcurl.md)
+- [aptest](./aptest.md)
 - [authm](./authm.md)
 - [abc](./abc.md)
 - [getres](./getres.md)
