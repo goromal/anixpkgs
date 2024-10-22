@@ -263,6 +263,11 @@
                 "docs": true
             },
             {
+                "attr": "aptest",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "authm",
                 "ci": true,
                 "docs": true
