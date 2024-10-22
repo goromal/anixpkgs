@@ -345,6 +345,7 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
