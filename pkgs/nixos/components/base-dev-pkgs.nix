@@ -29,6 +29,7 @@ in {
       aa = "add -A";
       cm = "commit -m";
       co = "checkout";
+      cp = "cherry-pick";
       s = "status";
       d = "diff";
     };
