@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import requests
+import time
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -59,9 +60,74 @@ def append_text_to_notion_page(token, id, msg, text):
         sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
         exit(1)
 
+def get_page_blocks(headers, page_id):
+    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+    has_more = True
+    next_cursor = None
+    all_blocks = []
+
+    while has_more:
+        params = {}
+        if next_cursor:
+            time.sleep(0.3)
+            params['start_cursor'] = next_cursor
+
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            raise Exception(f"Error fetching page content: {response.status_code}, {response.text}")
+
+        data = response.json()
+        all_blocks.append(data)
+        next_cursor = data.get('next_cursor')
+        has_more = data.get('has_more', False)
+    
+    return all_blocks
+
+def count_bullet_points_and_keywords(all_content, keywords):
+    bullet_count = 0
+    keyword_count = 0
+
+    for content in all_content:
+        for block in content['results']:
+            if block['type'] == 'bulleted_list_item':
+                bullet_count += 1
+
+        for keyword in keywords:
+            keyword_count += json.dumps(content).lower().count(keyword)
+    
+    return bullet_count, keyword_count
+
+def update_page_title(headers, page_id, new_title):
+    url = f"https://api.notion.com/v1/pages/{page_id}"
+
+    data = {
+        "properties": {
+            "title": [
+                {
+                    "text": {
+                        "content": new_title
+                    }
+                }
+            ]
+        }
+    }
+
+    response = requests.patch(url, json=data, headers=headers)
+    if response.status_code != 200:
+        raise Exception(f"Error updating page title: {response.status_code}, {response.text}")
+
 def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
-    # ^^^^ TODO
-    return True, 0, 0
+    headers = {
+        "Authorization": f"Bearer {notion_api_token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    content = get_page_blocks(headers, notion_page_id)
+    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["action:"])
+    new_title = f"{keyword} - {bullet_count} - {keyword_count}"
+    if not dry_run:
+        update_page_title(headers, notion_page_id, new_title)
+    return True, bullet_count, keyword_count
 
 def process_keyword(
     text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None
@@ -537,7 +603,7 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
                         line.split(",")[1].strip(),
                     )
                     if notion_page_id not in categories:
-                        categories[notion_page_id] = keyword
+                        categories[notion_page_id] = keyword.capitalize()
         print(
             Fore.YELLOW + f"Annotating triage pages{' (DRY RUN)' if dry_run else ''}..."
             + Style.RESET_ALL
@@ -550,7 +616,7 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
                 dry_run,
             )
             if success:
-                print(f"  {keyword}: {bullet_count} bullets and {action_count} actions")
+                print(f"  {keyword}: {bullet_count} bullets and {action_count} keywords")
                 if logfile is not None:
                     logfile.write(f"{keyword}: [{bullet_count}, {action_count}]\n")
             else:
