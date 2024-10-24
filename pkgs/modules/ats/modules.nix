@@ -55,7 +55,7 @@ let
     (mkOneshotTimedOrchService {
       name = "ats-greeting";
       jobShellScript = pkgs.writeShellScript "ats-greeting" ''
-          sleep 5
+        sleep 5
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
         sleep 5
         gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
@@ -66,6 +66,28 @@ let
       timerCfg = {
         OnBootSec = "1m";
         Persistent = false;
+      };
+    })
+    (mkOneshotTimedOrchService {
+      name = "ats-triaging";
+      jobShellScript = pkgs.writeShellScript "ats-triaging" ''
+        authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+        rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
+        goromail --wiki-url ${wiki-url} --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+        if [[ ! -z "$(cat $HOME/goromail/annotate.log)" ]]; then
+          echo "Notifying about processed triage pages..."
+          echo "[$(date)] 🧮 Triage Calculations:" \
+            | cat - $HOME/goromail/annotate.log > $HOME/goromail/temp2 \
+            && mv $HOME/goromail/temp2 $HOME/goromail/annotate.log
+          gmail-manager gbot-send 6612105214@vzwpix.com "ats-triaging" \
+            "$(cat $HOME/goromail/annotate.log)"
+          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-triaging" \
+            "$(cat $HOME/goromail/annotate.log)"
+        fi
+      '';
+      timerCfg = {
+        OnCalendar = [ "*-*-* 18:30:00" ];
+        Persistent = true;
       };
     })
     (mkOneshotTimedOrchService {
