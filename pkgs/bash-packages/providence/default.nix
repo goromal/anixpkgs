@@ -29,15 +29,15 @@ in (writeArgparseScriptBin pkgname usage_str [{
       echo ''${sentences[ $SRANDOM % ''${#sentences[@]} ]}
   elif [[ "$domain" == "passage" ]]; then
       readarray -t scriplist <<< $(${wikitools} --url $wiki_url get --page-id backend:scriptural-canon)
-      scripdesc=''${scriplist[ $RANDOM % ''${#scriplist[@]} ]}
+      scripdesc=''${scriplist[ $SRANDOM % ''${#scriplist[@]} ]}
       readarray -d '!' -t scriptdat <<< "$scripdesc"
       scripname="''${scriptdat[0]}"
       readarray -d '|' -t bookspecs <<< "''${scriptdat[1]}"
-      bookspec=''${bookspecs[ $RANDOM % ''${#bookspecs[@]} ]}
+      bookspec=''${bookspecs[ $SRANDOM % ''${#bookspecs[@]} ]}
       readarray -d ':' -t bookdat <<< "$bookspec"
       bookname="''${bookdat[0]}"
       chapsnum="''${bookdat[1]}"
-      chap=$(( ( RANDOM % $chapsnum )  + 1 ))
+      chap=$(( ( SRANDOM % $chapsnum )  + 1 ))
       echo "''${scripname} -> ''${bookname} $chap"
   else
       ${printErr} "Unrecognized domain: $domain."
