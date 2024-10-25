@@ -54,8 +54,9 @@ Options:
   --help                       Show this message and exit.
 
 Commands:
-  bot      Process all pending bot commands.
-  journal  Process all pending journal entries.
+  annotate-triage-pages  Re-title triage pages based on content.
+  bot                    Process all pending bot commands.
+  journal                Process all pending journal entries.
 
 
 
@@ -64,7 +65,7 @@ Usage: goromail bot [OPTIONS]
   Process all pending bot commands.
 
 Options:
-  --categories-csv PATH  CSV that maps keywords to wiki pages.  [default:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
                          ~/configs/goromail-categories.csv]
   --dry-run              Do a dry run; no message deletions.
   --help                 Show this message and exit.
