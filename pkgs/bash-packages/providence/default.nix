@@ -26,8 +26,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
   domain="$1"
   if [[ "$domain" == "patriarchal" ]]; then
       readarray -t sentences <<< $(${wikitools} --url $wiki_url get --page-id andrews-blessing | tr '\n' ' ' | sed -e :1 -e 's/\([.?!]\)[[:blank:]]\{1,\}\([^[:blank:]]\)/\1\n\2/;t1')
-      RANDOM=$$$(date +%s)
-      echo ''${sentences[ $RANDOM % ''${#sentences[@]} ]}
+      echo ''${sentences[ $SRANDOM % ''${#sentences[@]} ]}
   elif [[ "$domain" == "passage" ]]; then
       readarray -t scriplist <<< $(${wikitools} --url $wiki_url get --page-id backend:scriptural-canon)
       scripdesc=''${scriplist[ $RANDOM % ''${#scriplist[@]} ]}
