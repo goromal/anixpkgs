@@ -75,7 +75,17 @@ in (writeArgparseScriptBin pkgname ''
 '') // {
   meta = {
     description = "Run a SITL instance of ardupilot from source.";
-    longDescription = "";
+    longDescription = ''
+      ## Sample Commands (for heli)
+
+      - If you're running LUA scripts and have some in an `ardupilot/scripts` directory:
+        - `param set SCR_ENABLE 1`
+        - `reboot`
+      - `param set DISARM_DELAY 0`
+      - `mode guided`
+      - `arm throttle`
+      - `takeoff 25`
+    '';
     autoGenUsageCmd = "--help";
   };
 }
