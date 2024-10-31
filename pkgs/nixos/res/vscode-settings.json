@@ -1,12 +1,6 @@
 {
-    "editor.formatOnSave": true,
     "editor.minimap.enabled": false,
-    "clang-format.executable": "clang-format",
-    "[cpp]": {
-        "editor.defaultFormatter": "xaver.clang-format"
-    },
     "window.zoomLevel": -1,
     "workbench.startupEditor": "none",
-    "security.workspace.trust.untrustedFiles": "open",
-    "python.formatting.provider": "black"
+    "security.workspace.trust.untrustedFiles": "open"
 }
