@@ -86,7 +86,10 @@ let
         fi
       '';
       timerCfg = {
-        OnCalendar = [ "*-*-* 18:30:00" ];
+        OnCalendar = [
+          "*-*-* 06:30:00"
+          "*-*-* 18:30:00"
+        ];
         Persistent = true;
       };
     })
