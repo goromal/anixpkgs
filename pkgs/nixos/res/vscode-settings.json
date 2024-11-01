@@ -3,7 +3,5 @@
     "window.zoomLevel": -1,
     "workbench.startupEditor": "none",
     "security.workspace.trust.untrustedFiles": "open",
-    "[json]": {
-        "editor.formatOnSave": true
-    }
+    "editor.formatOnSave": true
 }
