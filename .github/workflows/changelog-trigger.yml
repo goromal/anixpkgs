@@ -33,6 +33,7 @@ jobs:
         run: |
           git config user.name "goromal (bot)"
           git config user.email "goromal.bot@gmail.com"
+          git fetch origin ${{ env.branch_name }}
           git checkout ${{ env.branch_name }}
           mkdir -p changes
           echo "$CHANGE_DESCRIPTION" > changes/pr-${{ github.event.issue.number }}.md
