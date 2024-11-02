@@ -16,5 +16,4 @@ if description_match and checkbox_marked:
     # Set the change description as an output for GitHub Actions
     print(f"::set-output name=CHANGE_DESCRIPTION::{change_description}")
 else:
-    print("No valid description or checkbox not marked.")
-    sys.exit(1)
+    print(f"::set-output name=CHANGE_DESCRIPTION::NONE")
