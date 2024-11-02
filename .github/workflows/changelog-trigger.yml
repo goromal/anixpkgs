@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Check if comment has checkbox
+      - name: Check if comment has a checkbox
         run: |
           echo "${{ github.event.comment.body }}"
           output=$(python3 .github/extract_description.py "${{ github.event.comment.body }}")
