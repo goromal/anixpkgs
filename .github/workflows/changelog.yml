@@ -2,7 +2,9 @@ name: Changelog Bot
 
 on:
   pull_request:
-    types: [opened]
+  push:
+    branches:
+      - master
 
 jobs:
   comment-pr:
