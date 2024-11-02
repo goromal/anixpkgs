@@ -110,7 +110,7 @@ in (writeArgparseScriptBin pkgname usage_str [
       ''
     }
   fi
-  if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then
+  if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then # ^^^^ TODO
     ${
       if browser-aliases != null then
         "${browser-aliases}/bin/anix-compare $vcurr $vdest"
