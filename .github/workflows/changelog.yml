@@ -32,4 +32,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr comment ${{ github.event.pull_request.number }} --body "## Change Description\n(Please enter the change description here)\n\n- [ ] Add to global changelog"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "body": "## Change Description\n\n(Please enter the change description here)\n\n- [ ] Add to global changelog"
+          }' \
+          "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
