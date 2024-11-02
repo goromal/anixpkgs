@@ -2,7 +2,6 @@ name: "Changelog Bot Setup"
 
 on:
   pull_request:
-  push:
     branches:
       - master
 
