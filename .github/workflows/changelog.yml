@@ -8,6 +8,8 @@ jobs:
   comment-pr:
     runs-on: ubuntu-latest
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
       - name: Check for Existing Comment
         id: check_comment
         env:
