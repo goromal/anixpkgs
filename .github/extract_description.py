@@ -14,8 +14,8 @@ if description_match and checkbox_marked:
     change_description = description_match.group(1).strip()
     
     if change_description:
-        print(f"::set-output name=CHANGE_DESCRIPTION::{change_description}")
+        print(change_description)
     else:
-        print(f"::set-output name=CHANGE_DESCRIPTION::NONE")
+        print("NONE")
 else:
-    print(f"::set-output name=CHANGE_DESCRIPTION::NONE")
+    print("NONE")

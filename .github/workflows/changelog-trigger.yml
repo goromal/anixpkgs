@@ -27,7 +27,8 @@ jobs:
           python-version: '3.x'
       - name: Check if Comment Has Checkbox
         run: |
-          python3 .github/extract_description.py "${{ github.event.comment.body }}"
+          output=$(python3 .github/extract_description.py "${{ github.event.comment.body }}")
+          echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
         if: success()
         run: |
