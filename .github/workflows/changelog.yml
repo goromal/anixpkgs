@@ -1,0 +1,31 @@
+name: Changelog Bot
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Existing Comment
+        id: check_comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if there's already a bot comment on this PR
+          EXISTING_COMMENT=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          --jq '.[] | select(.user.login=="github-actions[bot]" and .body | contains("## Change Description")) | .id')
+          
+          if [[ -z "$EXISTING_COMMENT" ]]; then
+            echo "no_comment=true" >> $GITHUB_ENV
+          else
+            echo "no_comment=false" >> $GITHUB_ENV
+          fi
+
+      - name: Post Changelog Form
+        if: env.no_comment == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "## Change Description\n(Please enter the change description here)\n\n- [ ] Add to global changelog"
