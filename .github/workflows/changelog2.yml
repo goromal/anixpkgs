@@ -6,7 +6,7 @@ on:
 
 jobs:
   process-comment:
-    if: ${{ github.event.comment.body }}
+    if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
