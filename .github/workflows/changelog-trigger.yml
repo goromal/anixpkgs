@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
+      - name: Check Out the Repository
         uses: actions/checkout@v3
       - name: Get PR Details
         env:
@@ -27,7 +27,8 @@ jobs:
           python-version: '3.x'
       - name: Check if Comment Has Checkbox
         run: |
-          python3 .github/extract_description.py "${{ github.event.comment.body }}"
+          output=$(python3 .github/extract_description.py "${{ github.event.comment.body }}")
+          echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
         if: success()
         run: |
