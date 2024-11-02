@@ -25,11 +25,12 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Check if comment has a valid changelog
+      - name: Check if comment has valid changelog
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
-          output=$(python3 .github/extract_description.py "$COMMENT_BODY")
+          echo "${{ github.event.comment.body }}" > comment_body.txt
+          output=$(python3 .github/extract_description.py comment_body.txt)
           echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
         if: success()

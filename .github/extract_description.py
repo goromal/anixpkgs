@@ -2,7 +2,10 @@ import os
 import re
 import sys
 
-comment_body = sys.argv[1]
+file_path = sys.argv[1]
+
+with open(file_path, 'r') as file:
+    comment_body = file.read()
 
 description_match = re.search(r"## Change Description\n+(.+?)\n", comment_body, re.DOTALL)
 checkbox_marked = re.search(r"- \[x\] Add to global changelog", comment_body, re.IGNORECASE)
