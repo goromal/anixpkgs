@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Check if comment has a checkbox
+      - name: Check if comment has a valid changelog
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
