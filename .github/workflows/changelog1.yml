@@ -35,6 +35,6 @@ jobs:
           curl -s -H "Authorization: token $GITHUB_TOKEN" \
           -H "Content-Type: application/json" \
           -d '{
-            "body": "## Change Description\n\n(Please enter the change description here)\n\n- [ ] Add to global changelog"
+            "body": "## Change Description\n\n(Please replace me with the change description)\n\n- [ ] Add to global changelog"
           }' \
           "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
