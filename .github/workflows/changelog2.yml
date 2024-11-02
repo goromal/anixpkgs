@@ -2,7 +2,8 @@ name: "Changelog Bot Trigger"
 
 on:
   issue_comment:
-    types: [edited]
+    types:
+      - edited
 
 jobs:
   process-changelog:
