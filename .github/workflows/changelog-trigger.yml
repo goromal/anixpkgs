@@ -29,7 +29,8 @@ jobs:
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
-          output=$(python3 .github/extract_description.py "$COMMENT_BODY")
+          echo "${{ github.event.comment.body }}" > comment_body.txt
+          output=$(python3 .github/extract_description.py comment_body.txt)
           echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
         if: success()
