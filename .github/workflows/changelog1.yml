@@ -1,4 +1,4 @@
-name: Changelog Bot
+name: "Changelog Bot Setup"
 
 on:
   pull_request:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   comment-pr:
+    name: Generate PR Comment
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -26,7 +27,6 @@ jobs:
           else
             echo "no_comment=false" >> $GITHUB_ENV
           fi
-
       - name: Post Changelog Form
         if: env.no_comment == 'true'
         env:
