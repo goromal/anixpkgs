@@ -20,7 +20,7 @@ jobs:
         run: |
           # Check if there's already a bot comment on this PR
           EXISTING_COMMENT=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
-          --jq '.[] | select(.user.login=="github-actions[bot]" and .body | contains("## Change Description")) | .id')
+          --jq '.[] | select(.user.login=="github-actions[bot]" and .body | contains("## Change Description")))
           
           if [[ -z "$EXISTING_COMMENT" ]]; then
             echo "no_comment=true" >> $GITHUB_ENV
