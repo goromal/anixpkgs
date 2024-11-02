@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
+      - name: Check Out the Repository
         uses: actions/checkout@v3
       - name: Get PR Details
         env:
