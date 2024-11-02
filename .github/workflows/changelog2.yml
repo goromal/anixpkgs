@@ -5,7 +5,8 @@ on:
     types: [edited]
 
 jobs:
-  process-comment:
+  process-changelog:
+    name: Generate Changelog Entry
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
