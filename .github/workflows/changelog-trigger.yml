@@ -11,8 +11,18 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repository
+      - name: Get PR Details
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: pr_details
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
+          echo "branch_name=$PR_BRANCH" >> $GITHUB_ENV
+      - name: Check out the PR branch
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.branch_name }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
