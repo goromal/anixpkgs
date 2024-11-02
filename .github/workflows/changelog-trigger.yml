@@ -32,6 +32,7 @@ jobs:
         if: success()
         run: |
           if [[ "$CHANGE_DESCRIPTION" != "NONE" ]]; then
+            echo "CHANGE: $CHANGE_DESCRIPTION"
             git config user.name "goromal (bot)"
             git config user.email "goromal.bot@gmail.com"
             git fetch origin ${{ env.branch_name }}
