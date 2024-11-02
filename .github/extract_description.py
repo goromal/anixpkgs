@@ -1,7 +1,8 @@
 import os
 import re
+import sys
 
-comment_body = os.getenv("COMMENT_BODY", "")
+comment_body = sys.argv[1]
 
 description_match = re.search(r"## Change Description\n+(.+?)\n", comment_body, re.DOTALL)
 checkbox_marked = re.search(r"- \[x\] Add to global changelog", comment_body, re.IGNORECASE)
