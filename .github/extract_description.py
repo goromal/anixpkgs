@@ -6,7 +6,7 @@ import sys
 comment_body = sys.argv[1]
 
 # Regex to find the change description and the checkbox
-description_match = re.search(r"## Change Description\s+(.+?)\n", comment_body, re.DOTALL)
+description_match = re.search(r"## Change Description\s+\n+(.+?)\n", comment_body, re.DOTALL)
 checkbox_marked = re.search(r"- \[x\] Add to global changelog", comment_body, re.IGNORECASE)
 
 if description_match and checkbox_marked:
@@ -16,5 +16,4 @@ if description_match and checkbox_marked:
     # Set the change description as an output for GitHub Actions
     print(f"::set-output name=CHANGE_DESCRIPTION::{change_description}")
 else:
-    print("No valid description or checkbox not marked.")
-    sys.exit(1)
+    print(f"::set-output name=CHANGE_DESCRIPTION::NONE")
