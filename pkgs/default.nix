@@ -351,9 +351,7 @@ in rec {
     pkg-src = flakeInputs.aapis;
   });
   ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
-  arducopter = (prev.callPackage ./cxx-packages/arducopter {
-
-  }).copter;
+  arducopter = (prev.callPackage ./cxx-packages/arducopter { }).copter;
   manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp {
     pkg-src = flakeInputs.manif-geom-cpp;
   });
