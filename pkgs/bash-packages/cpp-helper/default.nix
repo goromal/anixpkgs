@@ -5,17 +5,62 @@ let
     usage: ${pkgname} [options]
 
     Options:
-    --make-format-file             Dumps a format rules file into .clang-format
-    --make-nix                     Dump template default.nix and shell.nix files
-    --make-exec-lib   CPPNAME      Generate a lib+exec package template
-    --make-header-lib CPPNAME      Generate a header-only library template
-    --make-vscode                  Generate VSCode C++ header detection settings file
+        make       TARGET|all   Full CMake build command (run from repo root)
+        challenge  TARGET|all   Full CMake build command WITH SANITIZERS
+                                (run from repo root)
+        format-file             Dumps a format rules file into .clang-format
+        nix                     Dump template shell.nix file
+        exec-lib   CPPNAME      Generate a lib+exec package template
+        header-lib CPPNAME      Generate a header-only library template
+        vscode                  Generate VSCode C++ header detection settings file
+                                (Run inside a Nix dev environment)
   '';
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   formatFile = ./res/clang-format;
   shellFile = ./res/_shell.nix;
-  defaultFile = ./res/_default.nix;
+  makeRule = ''
+    if [[ ! -z "$maketarget" ]]; then
+      if [[ "$maketarget" == "all" ]]; then
+        maketarget=""
+      fi
+      ${printGrn} "Building your repo..."
+      if [[ ! -f CMakeLists.txt ]]; then
+        ${printErr} "CMakeLists.txt not found."
+        exit 1
+      fi
+      if [[ -f shell.nix ]]; then
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      elif [[ -f flake.nix ]]; then
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      else
+        ${printErr} "shell.nix not found."
+        exit 1
+      fi
+    fi
+  '';
+  challengeRule = ''
+    if [[ ! -z "$challengetarget" ]]; then
+      if [[ "$challengetarget" == "all" ]]; then
+        challengetarget=""
+      fi
+      ${printGrn} "Building (challenging) your repo..."
+      if [[ ! -f CMakeLists.txt ]]; then
+        ${printErr} "CMakeLists.txt not found."
+        exit 1
+      fi
+      if [[ -f shell.nix ]]; then
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+      elif [[ -f flake.nix ]]; then
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+      else
+        ${printErr} "shell.nix not found."
+        exit 1
+      fi
+    fi
+  '';
   makeffRule = ''
     if [[ "$makeff" == "1" ]]; then
         ${printGrn} "Generating .clang-format..."
@@ -24,9 +69,7 @@ let
   '';
   makenixRule = ''
     if [[ "$makenix" == "1" ]]; then
-        ${printGrn} "Generating template default.nix and shell.nix files..."
-        cat ${defaultFile} > default.nix
-        sed -i 's|REPLACEME|${anixpkgs-version}|g' default.nix
+        ${printGrn} "Generating template shell.nix file..."
         cat ${shellFile} > shell.nix
         sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
@@ -40,7 +83,7 @@ let
         echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
         echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
         echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
-        echo "]}],\"version\":4}" >> $CPP_CFG_JSON
+        echo "], \"compileCommands\": \"build/compile_commands.json\" }],\"version\":4}" >> $CPP_CFG_JSON
     fi
   '';
   makehotRule = ''
@@ -90,31 +133,43 @@ in (writeArgparseScriptBin pkgname usage_str [
     var = "makeff";
     isBool = true;
     default = "0";
-    flags = "--make-format-file";
+    flags = "format-file";
   }
   {
     var = "makehot";
     isBool = false;
     default = "";
-    flags = "--make-header-lib";
+    flags = "header-lib";
   }
   {
     var = "makeexl";
     isBool = false;
     default = "";
-    flags = "--make-exec-lib";
+    flags = "exec-lib";
   }
   {
     var = "makenix";
     isBool = true;
     default = "0";
-    flags = "--make-nix";
+    flags = "nix";
   }
   {
     var = "makevscode";
     isBool = true;
     default = "0";
-    flags = "--make-vscode";
+    flags = "vscode";
+  }
+  {
+    var = "maketarget";
+    isBool = false;
+    default = "";
+    flags = "make";
+  }
+  {
+    var = "challengetarget";
+    isBool = false;
+    default = "";
+    flags = "challenge";
   }
 ] ''
   set -e
@@ -124,14 +179,13 @@ in (writeArgparseScriptBin pkgname usage_str [
   ${makeexlRule}
   ${makenixRule}
   ${makevscodeRule}
+  ${makeRule}
+  ${challengeRule}
   rm -rf "$tmpdir"
 '') // {
   meta = {
     description = "Convenience tools for setting up C++ projects.";
-    longDescription = ''
-      ```
-      ${usage_str}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

@@ -4,11 +4,11 @@ let
     { };
 in with pkgs;
 mkShell {
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [ cpp-helper cmake ];
   buildInputs = [
     # ADD deps
   ];
   shellHook = ''
-    cpp-helper --make-vscode
+    cpp-helper vscode
   '';
 }

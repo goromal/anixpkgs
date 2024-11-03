@@ -2,15 +2,23 @@
 
 Convenience tools for setting up C++ projects.
 
-```
+
+## Usage (Auto-Generated)
+
+```bash
 usage: cpp-helper [options]
 
 Options:
---make-format-file             Dumps a format rules file into .clang-format
---make-nix                     Dump template default.nix and shell.nix files
---make-exec-lib   CPPNAME      Generate a lib+exec package template
---make-header-lib CPPNAME      Generate a header-only library template
---make-vscode                  Generate VSCode C++ header detection settings file
+    make       TARGET|all   Full CMake build command (run from repo root)
+    challenge  TARGET|all   Full CMake build command WITH SANITIZERS
+                            (run from repo root)
+    format-file             Dumps a format rules file into .clang-format
+    nix                     Dump template shell.nix file
+    exec-lib   CPPNAME      Generate a lib+exec package template
+    header-lib CPPNAME      Generate a header-only library template
+    vscode                  Generate VSCode C++ header detection settings file
+                            (Run inside a Nix dev environment)
+
 
 ```
 

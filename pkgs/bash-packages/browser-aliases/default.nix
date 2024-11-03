@@ -29,6 +29,17 @@ let
     urls=$(for i in $@; do echo "https://notes.andrewtorgesen.com/doku.php?id=$i"; done)
     ${browserExec} $urls ${redirects.suppress_all}
   '';
+  triage = writeArgparseScriptBin "triage-and-action" ''
+    usage: triage-and-action
+
+    Open all pages needed for the triaging and actioning processes in the browser.
+  '' [ ] ''
+    ITAR_PAGE="https://www.notion.so/P0-Andrew-s-ITAR-Productivity-Workflow-ba01b8f950e64c16aace094c1e3c07f6"
+    ITNS_PAGE="https://www.notion.so/ITNS-3ea6f1aa43564b0386bcaba6c7b79870"
+    TRELLO_PAGE="https://trello.com/w/workspace69213858"
+    TASKS_PAGE="https://calendar.google.com/calendar/u/0/r/tasks"
+    ${browserExec} $ITAR_PAGE $ITNS_PAGE $TRELLO_PAGE $TASKS_PAGE ${redirects.suppress_all}
+  '';
   a4s = writeArgparseScriptBin "a4s" ''
     usage: a4s PRIORITY DESCRIPTION
 
@@ -62,6 +73,7 @@ in stdenv.mkDerivation {
     mkdir -p                            $out/bin
     cp ${anix-compare}/bin/anix-compare $out/bin
     cp ${open-notes}/bin/open-notes     $out/bin
+    cp ${triage}/bin/triage-and-action  $out/bin
     cp ${a4s}/bin/a4s                   $out/bin
   '';
 }
