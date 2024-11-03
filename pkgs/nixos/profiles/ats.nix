@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... }: {
-  imports = [ ../base.nix ];
+  imports = [ ../pc-base.nix ];
 
   machines.base = {
     machineType = "x86_linux";

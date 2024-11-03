@@ -32,7 +32,7 @@ let
   user = "andrew";
   homedir = "/home/${user}";
   anixsrc = ./path/to/sources/anixpkgs/.;
-in with import ../dependencies.nix { inherit config; }; {
+in with import ../dependencies.nix; {
   home.username = user;
   home.homeDirectory = homedir;
   programs.home-manager.enable = true;
