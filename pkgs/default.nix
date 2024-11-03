@@ -341,6 +341,8 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  anix-changelog-compare =
+    addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
   flake-update =
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
