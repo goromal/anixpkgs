@@ -1,5 +1,5 @@
-{ writeArgparseScriptBin, color-prints, browser-aliases ? null
-, standalone ? false, git-cc }:
+{ writeArgparseScriptBin, anix-changelog-compare, color-prints
+, browser-aliases ? null, standalone ? false, git-cc }:
 let
   pkgname = "anix-upgrade";
   description = "Upgrade the operating system${
