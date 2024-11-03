@@ -32,6 +32,25 @@
         "type": "github"
       }
     },
+    "ardupilot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717112455,
+        "narHash": "sha256-4sZlPIGYr9ivk1V5CHG1wsIxzqrHFxpb2inWT5IfDT4=",
+        "ref": "Copter-4.4",
+        "rev": "865cffa5f2a850f892ab43def2d4ad21b8a9adca",
+        "revCount": 57489,
+        "submodules": true,
+        "type": "git",
+        "url": "ssh://git@github.com/goromal/ardupilot"
+      },
+      "original": {
+        "ref": "Copter-4.4",
+        "submodules": true,
+        "type": "git",
+        "url": "ssh://git@github.com/goromal/ardupilot"
+      }
+    },
     "book-notes-sync": {
       "flake": false,
       "locked": {
@@ -255,6 +274,38 @@
       "original": {
         "owner": "goromal",
         "repo": "manif-geom-rs",
+        "type": "github"
+      }
+    },
+    "mavlink": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725498612,
+        "narHash": "sha256-lLGWlDRA46c0CUfSQDqbpACswCaQ4QtDLRsuBnMzTCU=",
+        "owner": "mavlink",
+        "repo": "c_library_v2",
+        "rev": "f9cec4814082af27c2fd27259aed302f52ce9cf7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mavlink",
+        "repo": "c_library_v2",
+        "type": "github"
+      }
+    },
+    "mavlink-router": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724248737,
+        "narHash": "sha256-/RkuEb/N/jtik+H9Q+9xZ/VkDX8pGNcf/t13hTRrcfo=",
+        "owner": "mavlink-router",
+        "repo": "mavlink-router",
+        "rev": "c20337bbc61abda21463e7482172d58b654e66b6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mavlink-router",
+        "repo": "mavlink-router",
         "type": "github"
       }
     },
@@ -540,6 +591,7 @@
       "inputs": {
         "aapis": "aapis",
         "anixdata": "anixdata",
+        "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
@@ -553,6 +605,8 @@
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
+        "mavlink": "mavlink",
+        "mavlink-router": "mavlink-router",
         "mavlog-utils": "mavlog-utils",
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",

@@ -60,6 +60,16 @@
                 "attr": "orchestrator-cpp",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "ardurouter",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "arducopter.sitl",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [

@@ -23,6 +23,14 @@ for configuration in ${configurations[@]}; do
     echo ""
 done
 
+sims=(dronesim)
+for sim in ${sims[@]}; do
+    echo "Checking derivation for sim environment: $sim..."
+    nix-build -A driverInteractive ${DIR}/../pkgs/nixos/sitl-envs/${sim}.nix --no-out-link --dry-run
+    echo "Checks out!"
+    echo ""
+done
+
 # installers=(ats-pi)
 # for installer in ${installers[@]}; do
 #     echo "Checking derivation for installer: $installer..."
