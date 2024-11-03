@@ -12,13 +12,19 @@ in pkgs.testers.runNixOSTest {
   nodes = {
     drone = { config, pkgs, ... }: {
       imports = [ ../configurations/drone-sitl.nix ];
-      virtualisation.forwardPorts = [ { from = "host"; host.port = 2222; guest.port = 22; } ];
+      virtualisation.forwardPorts = [{
+        from = "host";
+        host.port = 4444;
+        guest.port = 22;
+      }];
     };
     # drone-physics = { config, pkgs, ... }: {
     #   # ...
     # };
   };
   testScript = { nodes, ... }: ''
+    print("Waiting for default target on drone...")
     machines[0].wait_for_unit("default.target")
+    print("Done.")
   '';
 }

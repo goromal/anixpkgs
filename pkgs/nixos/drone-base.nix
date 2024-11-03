@@ -111,7 +111,9 @@ in {
       rateLimitInterval = "0s";
     };
 
-    environment.systemPackages = with pkgs; [
+    environment.systemPackages = let anix = pkgname: anixpkgs.${pkgname}.out;
+    in with pkgs;
+    ([
       ack
       procs
       tldr
@@ -187,27 +189,31 @@ in {
       gping
       dog
       tmux
-      # (anixpkgs.anix-version.override { standalone = false; })
+      # TODO: anix upgrade workflows don't currently work without home-manager
+      # (anixpkgs.anix-version.override { standalone = false; }).out
       # (anixpkgs.anix-upgrade.override {
       #   standalone = false;
       #   browser-aliases = null;
-      # })
-      # anixpkgs.color-prints
-      # anixpkgs.fix-perms
-      # anixpkgs.secure-delete
-      # anixpkgs.sunnyside
-      # anixpkgs.make-title
-      anixpkgs.pb.out # ^^^^ TODO accessible? access via SSH
-      # anixpkgs.dirgroups
-      # anixpkgs.dirgather
-      # anixpkgs.fixfname
-      # anixpkgs.nix-deps
-      # anixpkgs.nix-diffs
-      # anixpkgs.orchestrator
-    ];
+      # }).out
+    ] ++ (map (x: anix x) [
+      "color-prints"
+      "fix-perms"
+      "secure-delete"
+      "sunnyside"
+      "make-title"
+      "pb"
+      "dirgroups"
+      "dirgather"
+      "fixfname"
+      "nix-deps"
+      "nix-diffs"
+      # TODO: docs interfere
+      # "orchestrator"
+    ]));
 
     services.orchestratord = {
-      enable = true;
+      enable = false; # TODO needed?
+      user = cfg.homeUser;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = with pkgs; [ bash coreutils ];
     };
