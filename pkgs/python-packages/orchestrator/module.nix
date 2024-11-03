@@ -3,6 +3,11 @@ let cfg = config.services.orchestratord;
 in {
   options.services.orchestratord = {
     enable = lib.mkEnableOption "enable orchestrator daemon";
+    user = lib.mkOption {
+      type = lib.types.str;
+      description = "Daemon-controlling user";
+      default = "andrew";
+    };
     rootDir = lib.mkOption {
       type = lib.types.str;
       description = "Root directory for data and configuration";
@@ -25,8 +30,10 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules =
-      [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
+    systemd.tmpfiles.rules = [
+      "d  ${cfg.rootDir} - ${cfg.user} dev"
+      "Z  ${cfg.rootDir} - ${cfg.user} dev"
+    ];
     systemd.services.orchestratord = {
       enable = true;
       description = "Orchestrator daemon";
@@ -40,7 +47,7 @@ in {
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
-        User = "andrew";
+        User = cfg.user;
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];

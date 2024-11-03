@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... }:
-with import ./dependencies.nix { inherit config; };
+with import ./dependencies.nix;
 let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
@@ -356,10 +356,7 @@ in {
 
     environment.shellAliases = {
       jfu = "journalctl -fu";
-      nrs = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch";
-      nrb = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot";
       code = "codium";
-      cap = "codium ~/dev/anixpkgs";
       nohistory = "set +o history";
     };
     environment.noXlibs = false;
