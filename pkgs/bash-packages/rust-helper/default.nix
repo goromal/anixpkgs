@@ -1,18 +1,21 @@
 { writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version
-, cargo, rustc, rustfmt }:
+, cargo, rustc, rustfmt, python3 }:
 let
   pkgname = "rust-helper";
   usage_str = ''
     usage: ${pkgname} [options]
 
     Options:
-    --dev         Drop directly into a Rust development shell
-    --make-nix    Dump template shell.nix file
+        dev                         Drop directly into a Rust development shell
+        nix                         Dump template shell.nix file
+        vscode DEFAULT[:OTHER:ENV]  Generate VSCode settings file for rust-analyzer
+                                    (Run inside a Nix dev environment)
   '';
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   directShellFile = ../bash-utils/customShell.nix;
   shellFile = ./res/_shell.nix;
+  settingsAddScript = ./addsettings.py;
   # last possible rule executed; can't make use of tmpdir
   makedevRule = ''
     if [[ "$dev" == "1" ]]; then
@@ -30,31 +33,53 @@ let
         sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
+  makevscodeRule = ''
+    if [[ ! -z "$makevscode" ]]; then
+        export SETTINGS_JSON="$PWD/.vscode/settings.json"
+        ${printGrn} "Generating rust-analyzer-compatible config for code completion in VSCode ($SETTINGS_JSON)..."
+        mkdir -p "$PWD/.vscode"
+        IFS=':' read -ra vararray <<< "$makevscode"
+        for envvar in "''${vararray[@]}"; do
+            if [[ "$envvar" == "DEFAULT" ]]; then
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTC" "$(which rustc)"
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "CARGO" "$(which cargo)"
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "RUSTFMT" "$(which rustfmt)"
+            else
+                ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON" "$envvar" "''${!envvar}"
+            fi
+        done
+    fi
+  '';
 in (writeArgparseScriptBin pkgname usage_str [
   {
     var = "makenix";
     isBool = true;
     default = "0";
-    flags = "--make-nix";
+    flags = "nix";
   }
   {
     var = "dev";
     isBool = true;
     default = "0";
-    flags = "--dev";
+    flags = "dev";
+  }
+  {
+    var = "makevscode";
+    isBool = false;
+    default = "";
+    flags = "vscode";
   }
 ] ''
   set -e
   tmpdir=$(mktemp -d)
   ${makenixRule}
+  ${makevscodeRule}
   rm -rf "$tmpdir"
   ${makedevRule}
 '') // {
   meta = {
     description = "Convenience tools for setting up Rust projects.";
-    longDescription = ''
-      ***Under construction.***
-    '';
+    longDescription = "";
     autoGenUsageCmd = "--help";
   };
 }

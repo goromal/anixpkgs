@@ -30,6 +30,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
       tasknotes="$(${prexe} --wiki-url $wiki_url patriarchal)"
       ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
       ${ttexe} put --name="P0: [T] TSKP + PRYR" --date="$duedate"
+      ${ttexe} put --name="P0: [T] ALL ITNS, ALL Actions, 1 Triage" --date="$duedate"
   done
 '') // {
   meta = {

@@ -1,8 +1,8 @@
 { pkgs, config, lib, ... }:
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
-  home.packages = [ pkgs.black pkgs.clang-tools ];
+  home.packages = [ pkgs.black pkgs.clang-tools anixpkgs.aptest ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
     "org/gnome/shell" = { "favorite-apps" = [ "codium.desktop" ]; };

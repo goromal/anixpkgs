@@ -345,10 +345,13 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
   });
+  ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
+  arducopter = (prev.callPackage ./cxx-packages/arducopter { }).copter;
   manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp {
     pkg-src = flakeInputs.manif-geom-cpp;
   });

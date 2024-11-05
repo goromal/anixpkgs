@@ -1,0 +1,51 @@
+name: "Changelog Bot Trigger"
+
+on:
+  issue_comment:
+    types:
+      - edited
+
+jobs:
+  process-changelog:
+    name: Generate Changelog Entry
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out the Repository
+        uses: actions/checkout@v3
+      - name: Get PR Details
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: pr_details
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
+          echo "branch_name=$PR_BRANCH" >> $GITHUB_ENV
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Check if comment has a valid changelog
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          echo "${{ github.event.comment.body }}" > comment_body.txt
+          output=$(python3 .github/extract_description.py comment_body.txt)
+          echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
+      - name: Update Changelog
+        with:
+          ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+        if: success()
+        run: |
+          if [[ "$CHANGE_DESCRIPTION" != "NONE" ]]; then
+            echo "CHANGE DESCRIPTION: $CHANGE_DESCRIPTION"
+            git config user.name "goromal (bot)"
+            git config user.email "goromal.bot@gmail.com"
+            git fetch origin ${{ env.branch_name }}
+            git checkout ${{ env.branch_name }}
+            mkdir -p changes
+            echo "$CHANGE_DESCRIPTION" > changes/pr-${{ github.event.issue.number }}.md
+            git add changes/pr-${{ github.event.issue.number }}.md
+            git commit -m "Update changelog"
+            git push
+          fi

@@ -1,5 +1,5 @@
 { pkgs, config, lib, ... }:
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
   home.packages = [
@@ -29,6 +29,7 @@ in {
       aa = "add -A";
       cm = "commit -m";
       co = "checkout";
+      cp = "cherry-pick";
       s = "status";
       d = "diff";
     };
