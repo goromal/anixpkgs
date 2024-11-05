@@ -11,6 +11,9 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
       - name: Check Out the Repository
         uses: actions/checkout@v3
       - name: Get PR Details
@@ -33,9 +36,6 @@ jobs:
           output=$(python3 .github/extract_description.py comment_body.txt)
           echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
-        uses: actions/checkout@v3
-        with:
-          ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
         if: success()
         run: |
           if [[ "$CHANGE_DESCRIPTION" != "NONE" ]]; then
