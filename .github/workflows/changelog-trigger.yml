@@ -33,6 +33,8 @@ jobs:
           output=$(python3 .github/extract_description.py comment_body.txt)
           echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
       - name: Update Changelog
+        with:
+          ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
         if: success()
         run: |
           if [[ "$CHANGE_DESCRIPTION" != "NONE" ]]; then
