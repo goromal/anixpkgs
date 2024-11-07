@@ -1,10 +1,12 @@
 let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
+  anixpkgs-meta = (builtins.readFile ../ANIX_META);
 in rec {
   local-build = false;
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
+  inherit anixpkgs-meta;
   anixpkgs-src = if local-build then
     ../../default.nix
   else

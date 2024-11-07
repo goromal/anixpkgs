@@ -3,7 +3,6 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
-  anixpkgs-meta = (builtins.readFile ../ANIX_META);
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
