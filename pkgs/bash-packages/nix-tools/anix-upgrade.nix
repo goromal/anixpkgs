@@ -1,10 +1,10 @@
-{ writeArgparseScriptBin, color-prints, browser-aliases ? null
+{ writeArgparseScriptBin, anix-changelog-compare, color-prints
 , standalone ? false, git-cc }:
 let
   pkgname = "anix-upgrade";
-  description = "Upgrade the operating system${
-      if browser-aliases == null then "." else " and view the delta."
-    }${if standalone then " [HOME-MANAGER VERSION]" else " [NIXOS VERSION]"}";
+  description = "Upgrade the operating system and view the delta. ${
+      if standalone then " [HOME-MANAGER VERSION]" else " [NIXOS VERSION]"
+    }";
   long-description = ''
     usage: ${pkgname} [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH;-s|--source SOURCETREE] [--local] [--boot]
   '';
@@ -54,6 +54,8 @@ in (writeArgparseScriptBin pkgname usage_str [
     flags = "--boot";
   }
 ] ''
+  tmpdir=$(mktemp -d)
+  fromdir="$tmpdir"
   cd ~/sources
   vcurr=$(cat ~/.anix-version)
   if [[ "$vcurr" != "Local Build" ]]; then
@@ -67,9 +69,12 @@ in (writeArgparseScriptBin pkgname usage_str [
   if [[ -d anixpkgs ]]; then
     if [[ -L anixpkgs ]]; then
       ${printYellow} "Removing existing symlink."
+      fromdir=$(readlink anixpkgs)
       rm anixpkgs
     else
       ${printYellow} "Removing existing directory."
+      cp -r anixpkgs $tmpdir
+      fromdir="$tmpdir/anixpkgs"
       rm -rf anixpkgs
     fi
   fi
@@ -110,14 +115,9 @@ in (writeArgparseScriptBin pkgname usage_str [
       ''
     }
   fi
-  if [[ "$vcurr" != "Local Build" && "$local" == "0" ]]; then
-    ${
-      if browser-aliases != null then
-        "${browser-aliases}/bin/anix-compare $vcurr $vdest"
-      else
-        "echo ''"
-    }
-  fi
+  echo ""
+  ${anix-changelog-compare}/bin/anix-changelog-compare "$fromdir" anixpkgs
+  rm -rf "$tmpdir"
 '') // {
   meta = {
     inherit description;
