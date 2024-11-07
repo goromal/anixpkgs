@@ -83,7 +83,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser?ref=dev/lint-and-fix";
+    gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
     makepyshell.url =

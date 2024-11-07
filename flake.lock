@@ -216,16 +216,15 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1730949420,
+        "lastModified": 1730958833,
         "narHash": "sha256-i/gVXHiE79Gvz+VSPiBRhD0sLigsbE0yolQdZJurrlM=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "3ab3943bdac67ce7741abbc357e58aa788461102",
+        "rev": "cbad2d3c0b4b022a50bad8e2073293aadff6f795",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/lint-and-fix",
         "repo": "gmail_parser",
         "type": "github"
       }
@@ -361,11 +360,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1683696296,
-        "narHash": "sha256-T26p1qRETYRBB9HxyjyVeBHAF1bROw5roKDYCqgy9wI=",
+        "lastModified": 1728191989,
+        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "747f612e32aaa6c9e31285c69830d9d224c23b4b",
+        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
         "type": "github"
       },
       "original": {
@@ -672,11 +671,11 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1672599560,
-        "narHash": "sha256-KIAvkkTJ0zhidOJljtUaEKe94wiybC0LafRItR0TBcY=",
+        "lastModified": 1718422178,
+        "narHash": "sha256-WuKOdEiYwazWayfhK9r2P6AB+ER4EKSCQ9/3JaBFjHM=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "40b1aaebb651fe1fcbe5f8fdad545567fe8971c4",
+        "rev": "42136ab2aed904db6c82eae82caedf8341676430",
         "type": "github"
       },
       "original": {
