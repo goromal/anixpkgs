@@ -116,6 +116,7 @@ in (writeArgparseScriptBin pkgname usage_str [
     }
   fi
   ${anix-changelog-compare}/bin/anix-changelog-compare "$fromdir" anixpkgs
+  rm -rf "$tmpdir"
 '') // {
   meta = {
     inherit description;
