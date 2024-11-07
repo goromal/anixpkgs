@@ -216,15 +216,16 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870983,
-        "narHash": "sha256-VdJC/Z4xI5GHONMlA07Mui0gihbwOqjehurWUfWvxGc=",
+        "lastModified": 1730949420,
+        "narHash": "sha256-i/gVXHiE79Gvz+VSPiBRhD0sLigsbE0yolQdZJurrlM=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "81c4c2f30cc02cacae0c4d19c8bf42e64fb5d248",
+        "rev": "3ab3943bdac67ce7741abbc357e58aa788461102",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/lint-and-fix",
         "repo": "gmail_parser",
         "type": "github"
       }
