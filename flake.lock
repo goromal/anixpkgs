@@ -360,11 +360,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1728191989,
-        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
+        "lastModified": 1683696296,
+        "narHash": "sha256-T26p1qRETYRBB9HxyjyVeBHAF1bROw5roKDYCqgy9wI=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
+        "rev": "747f612e32aaa6c9e31285c69830d9d224c23b4b",
         "type": "github"
       },
       "original": {
