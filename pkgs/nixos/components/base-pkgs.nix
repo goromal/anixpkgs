@@ -36,7 +36,6 @@ in {
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
     (anixpkgs.anix-upgrade.override {
       standalone = cfg.standalone;
-      inherit browser-aliases;
     })
     anixpkgs.goromail
     anixpkgs.manage-gmail
