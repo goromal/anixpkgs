@@ -90,6 +90,7 @@
   - [nix-diffs](./bash/nix-diffs.md)
   - [anix-version](./bash/anix-version.md)
   - [anix-upgrade](./bash/anix-upgrade.md)
+  - [anix-changelog-compare](./bash/anix-changelog-compare.md)
   - [flake-update](./bash/flake-update.md)
   - [rcrsync](./bash/rcrsync.md)
 - [Java Packages](./java/java.md)
