@@ -194,7 +194,8 @@ let
       }));
 in rec {
   pkgsSource = { local ? false, rev ? null, ref ? null }:
-    prev.stdenvNoCC.mkDerivation {
+    let meta-info = if rev == null then ref else rev;
+    in prev.stdenvNoCC.mkDerivation {
       name = "anixpkgs-src";
       src = if rev == null then
         (builtins.fetchTarball
@@ -208,6 +209,7 @@ in rec {
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
+        echo -n "${meta-info}" > ANIX_META
       '' else
         "");
       installPhase = ''
@@ -341,6 +343,8 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  anix-changelog-compare =
+    addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
   flake-update =
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });

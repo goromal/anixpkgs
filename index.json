@@ -493,6 +493,11 @@
                 "docs": true
             },
             {
+                "attr": "anix-changelog-compare",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "flake-update",
                 "ci": true,
                 "docs": true

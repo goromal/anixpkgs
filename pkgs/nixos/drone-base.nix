@@ -193,7 +193,6 @@ in {
       # (anixpkgs.anix-version.override { standalone = false; }).out
       # (anixpkgs.anix-upgrade.override {
       #   standalone = false;
-      #   browser-aliases = null;
       # }).out
     ] ++ (map (x: anix x) [
       "color-prints"

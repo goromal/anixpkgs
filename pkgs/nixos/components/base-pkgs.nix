@@ -34,10 +34,7 @@ in {
     authm
     rcrsync
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
-    (anixpkgs.anix-upgrade.override {
-      standalone = cfg.standalone;
-      inherit browser-aliases;
-    })
+    (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
@@ -142,6 +139,7 @@ in {
   home.file = with anixpkgs.pkgData; {
     ".anix-version".text =
       if local-build then "Local Build" else "v${anixpkgs-version}";
+    ".anix-meta".text = anixpkgs-meta;
     "records/${records.crypt.name}".source = records.crypt.data;
     ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
       text = ''
