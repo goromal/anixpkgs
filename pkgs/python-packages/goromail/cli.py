@@ -629,7 +629,7 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
         if logfile is not None:
-            logfile.write(f"Program error on [{keyword}]")
+            logfile.write(f"Program error on [{keyword}]\n")
             logfile.close()
         exit(1)
     if logfile is not None:
