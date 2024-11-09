@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, nix-tree }:
+{ writeArgparseScriptBin, color-prints, nix-tree }:
 let
   pkgname = "nix-deps";
   description = "Recurse the dependencies of a Nix package.";
@@ -7,16 +7,12 @@ let
        OR e.g.,
            ${pkgname} '<nixpkgs>' -A pkgname
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      ${long-description}
-      ${description}
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
+  usage_str = ''
+    ${long-description}
+    ${description}
+  '';
   printErr = "${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ $# -ge 2 ]]; then
       nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree
   elif [[ $# -eq 1 ]]; then
@@ -27,10 +23,7 @@ in (writeShellScriptBin pkgname ''
 '') // {
   meta = {
     inherit description;
-    longDescription = ''
-      ```bash
-      ${long-description}
-      ```  
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

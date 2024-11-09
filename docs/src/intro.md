@@ -1,10 +1,14 @@
-# anixpkgs
+# Andrew's Software
 
 ![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml) [![pages-build-deployment](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment)
 
+My open source software is packaged and deployed from a central repository: **anixpkgs**. See the navigation menu for individual package documentation.
+
+[Return to main site](https://andrewtorgesen.com)
+
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v5.11.2](https://github.com/goromal/anixpkgs/tree/v5.11.2)**
+**LATEST RELEASE: [v6.8.2](https://github.com/goromal/anixpkgs/tree/v6.8.2)**
 
 **[Repository](https://github.com/goromal/anixpkgs)**
 
@@ -43,7 +47,7 @@ The software packaged in `anixpkgs` is buildable both through [Nix flakes](https
 
 ### Accessing the Packages Using Flakes
 
-Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v5.11.2`) while also giving you access to the public cache to avoid building from source on your machine:
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v6.8.2`) while also giving you access to the public cache to avoid building from source on your machine:
 
 ```nix
 {
@@ -57,7 +61,7 @@ Here is a `flake.nix` file that will get you a shell with select `anixpkgs` soft
     "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
   ];
   inputs = {
-    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v5.11.2";
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v6.8.2";
   };
   outputs = { self, nixpkgs }:
     let pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -77,13 +81,13 @@ Access the packages with `nix develop`.
 
 ### Accessing the Packages Using shell.nix
 
-Here are some `shell.nix` files to access Python packages (using version `v5.11.2` of the packages):
+Here are some `shell.nix` files to access Python packages (using version `v6.8.2` of the packages):
 
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v5.11.2.tar.gz") {};
-  python-with-my-packages = pkgs.python39.withPackages (p: with p; [
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.2.tar.gz") {};
+  python-with-my-packages = pkgs.python311.withPackages (p: with p; [
     numpy
     matplotlib
     geometry
@@ -98,19 +102,19 @@ or:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v5.11.2.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.2.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
-    pkgs.python39
-    pkgs.python39.pkgs.numpy
-    pkgs.python39.pkgs.geometry
-    pkgs.python39.pkgs.find_rotational_conventions
+    pkgs.python311
+    pkgs.python311.pkgs.numpy
+    pkgs.python311.pkgs.geometry
+    pkgs.python311.pkgs.find_rotational_conventions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
     # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
     export PIP_PREFIX=$(pwd)/_build/pip_packages
-    export PYTHONPATH="$PIP_PREFIX/${pkgs.python39.sitePackages}:$PYTHONPATH"
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python311.sitePackages}:$PYTHONPATH"
     export PATH="$PIP_PREFIX/bin:$PATH"
     unset SOURCE_DATE_EPOCH
   '';
@@ -122,7 +126,7 @@ And for general software packages:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v5.11.2.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.2.tar.gz") {};
 in with pkgs; mkShell {
   buildInputs = [
     pb

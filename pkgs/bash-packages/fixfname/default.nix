@@ -1,16 +1,10 @@
-{ writeShellScriptBin, callPackage, strings }:
-let
-  pkgname = "fixfname";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} FILE
+{ writeArgparseScriptBin, strings }:
+let pkgname = "fixfname";
+in (writeArgparseScriptBin pkgname ''
+  usage: ${pkgname} FILE
 
-      Replace spaces and remove [], () characters from a filename (in place).
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+  Replace spaces and remove [], () characters from a filename (in place).
+'' [ ] ''
   fname="$1"
   pt1=$(${strings.dashSpaces} "$fname")
   pt2=$(${strings.removeListNotation} "$pt1")

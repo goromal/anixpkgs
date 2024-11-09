@@ -19,8 +19,8 @@ experimental-features = nix-command flakes auto-allocate-uids
 4. Add these Nix channels via `nix-channel --add URL NAME`:
 ```bash
 $ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-23.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-23.05
+home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-24.05
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
@@ -28,27 +28,29 @@ Example `home.nix` file for personal use:
 
 ```nix
 { config, pkgs, lib, ... }:
-with import ../dependencies.nix { inherit config; }; {
-  home.username = "andrew";
-  home.homeDirectory = "/home/andrew";
-  home.stateVersion = nixos-version;
+let
+  user = "andrew";
+  homedir = "/home/${user}";
+  anixsrc = ./path/to/sources/anixpkgs/.;
+in with import ../dependencies.nix; {
+  home.username = user;
+  home.homeDirectory = homedir;
   programs.home-manager.enable = true;
 
-  # $ nix-channel --add https://github.com/guibou/nixGL/archive/main.tar.gz nixgl && nix-channel --update
-  # $ nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
-
   imports = [
-    [ANIX_SRC]/pkgs/nixos/components/base-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/base-dev-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-rec-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-dev-pkgs.nix
-    [ANIX_SRC]/pkgs/nixos/components/x86-graphical-rec-pkgs.nix
+    "${anixsrc}/pkgs/nixos/components/opts.nix"
+    "${anixsrc}/pkgs/nixos/components/base-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/base-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-rec-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-rec-pkgs.nix"
   ];
 
-  mods.x86-graphical.standalone = true;
-  mods.x86-graphical.homeDir = "/home/andrew";
-  mods.x86-graphical-rec.standalone = true;
+  mods.opts.standalone = true;
+  mods.opts.homeDir = homedir;
+  mods.opts.homeState = "23.05";
+  mods.opts.browserExec = "google-chrome-stable";
 }
 
 ```
@@ -66,6 +68,35 @@ export NIXPKGS_ALLOW_UNFREE=1
 # alias code='codium'
 # eval "$(direnv hook bash)"
 ```
+
+## Build and Deploy a Raspberry Pi NixOS SD Configuration
+
+Since the hardware configuration for the Raspberry Pi is well understood, it makes sense to skip the installer step and deploy a fully-fledged clusure instead.
+
+```bash
+nixos-generate -f sd-aarch64 --system aarch64-linux -c /path/to/anixpkgs/pkgs/nixos/configurations/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+```
+
+```bash
+nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
+```
+
+```bash
+sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
+```
+
+On the Pi, connect to the internet, copy over SSH keys (maybe no need for `/root/.ssh/`) and then set up the Nix channel(s):
+
+```bash
+sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
+sudo nix-channel --update
+```
+
+Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` packages (that's something for me to look into) so the `anix-upgrade` setup steps are especially important:
+
+- Make a `~/sources` directory
+- Symlink the configuration file even if it doesn't exist yet
+- Run `anix-upgrade` to aarch-ify everything
 
 ## Build a Raspberry Pi NixOS SD Installer Image
 
@@ -95,6 +126,10 @@ sudo nix-channel --update
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
+***Note***: You can replace steps 1-8 with a `kexec` kernel load and disk formatting with `disko`:
+- [kexec directions](https://github.com/nix-community/nixos-images#kexec-tarballs)
+- [disko directions](https://github.com/nix-community/disko)
+
 1. Download a [NixOS ISO](https://nixos.org/nixos/download.html) image.
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
@@ -105,7 +140,7 @@ cp nixos-xxx.iso /dev/sdX
 dd if=nixos.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
 ```
 5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Wipe the file system: 
+6. Wipe the file system:
 ```bash
 wipefs [--all -a] /dev/sda
 ```
@@ -148,16 +183,16 @@ nixos-generate-config --root /mnt/nixos
 # /etc/nixos/configuration.nix
 # /etc/nixos/hardware-configuration.nix
 ```
-10. Do the installation:
+10.  Do the installation:
 ```bash
 nixos-install --root /mnt/nixos
 ```
-11. If everything went well:
+11.  If everything went well:
 ```bash
 reboot
 ```
-12. Log into Github and generate an SSH key for authentication.
-13. Clone and link an editable version of the configuration:
+12.  Log into Github and generate an SSH key for authentication.
+13.  Clone and link an editable version of the configuration:
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
@@ -166,10 +201,27 @@ sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
 sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
 sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
 ```
-14. Make other needed updates to the configuration, then apply:
+14.  Make other needed updates to the configuration, then apply:
 ```bash
 sudo nixos-rebuild boot
 sudo reboot
+```
+
+## Upgrading NixOS versions with `anixpkgs`
+
+Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
+
+```bash
+# e.g., upgrading to 24.05:
+home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
+nixos https://nixos.org/channels/nixos-24.05
+nixpkgs https://nixos.org/channels/nixos-24.05
+```
+
+`sudo nix-channel --update`. Then upgrade with
+
+```bash
+anix-upgrade [source specification] --local --boot
 ```
 
 ### Cloud Syncing

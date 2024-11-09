@@ -1,11 +1,10 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix; {
   home.packages = [
-    (writeShellScriptBin "wifi-connect" ''
+    (pkgs.writeShellScriptBin "wifi-connect" ''
       nmcli d wifi connect LANtasia password 2292238177 ifname wlp1s0u1u1
     '')
-    (writeShellScriptBin "switch-rpi4-configuration" ''
+    (pkgs.writeShellScriptBin "switch-rpi4-configuration" ''
       set -e
       configPath="$1"
       if [[ -z "$configPath" ]]; then

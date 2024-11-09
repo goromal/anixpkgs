@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, nix-diff }:
+{ writeArgparseScriptBin, color-prints, nix-diff }:
 let
   pkgname = "nix-diffs";
   description =
@@ -6,16 +6,12 @@ let
   long-description = ''
     usage: ${pkgname} derivation1 derivation2 out_dir
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      ${long-description}
-      ${description}
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
+  usage_str = ''
+    ${long-description}
+    ${description}
+  '';
   printErr = "${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
+in (writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "derivation1 not specified."
       exit 1
@@ -39,10 +35,7 @@ in (writeShellScriptBin pkgname ''
 '') // {
   meta = {
     inherit description;
-    longDescription = ''
-      ```bash
-      ${long-description}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

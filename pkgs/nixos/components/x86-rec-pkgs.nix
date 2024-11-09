@@ -1,5 +1,7 @@
 { pkgs, config, lib, ... }:
-with import ../dependencies.nix { inherit config; }; {
+with import ../dependencies.nix;
+let cfg = config.mods.opts;
+in {
   home.packages = [
     anixpkgs.fqt
     anixpkgs.mfn

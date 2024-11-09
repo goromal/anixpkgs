@@ -12,6 +12,11 @@ mkShell {
     scrape
     orchestrator
     fix-perms
+    dirgather
+    dirgroups
+    cpp-helper
+    pkgshell
+    sunnyside
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."

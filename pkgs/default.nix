@@ -2,6 +2,7 @@ final: prev:
 with prev.lib;
 let
   flakeInputs = final.flakeInputs;
+  anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -18,14 +19,34 @@ let
   };
 
   addDoc = pkg-attr:
-    pkg-attr // rec {
+    let
+      # TODO: maybe remove the (Auto-Generated) qualifier when the functionality has proven out
+      sub-cmds = if builtins.hasAttr "subCmds" pkg-attr.meta then
+        pkg-attr.meta.subCmds
+      else
+        [ ];
+      auto-usage-doc =
+        (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
+
+          ## Usage (Auto-Generated)
+
+          ```bash
+          ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
+            packageAttr = pkg-attr;
+            helpCmd = pkg-attr.meta.autoGenUsageCmd;
+            subCmds = sub-cmds;
+          }}
+          ```
+        '' else
+          "");
+    in pkg-attr // rec {
       doc = prev.writeTextFile {
         name = "doc.txt";
-        text = (if builtins.hasAttr "description" pkg-attr.meta then ''
+        text = (if builtins.hasAttr "description" pkg-attr.meta then (''
           ${pkg-attr.meta.description}
 
-          ${pkg-attr.meta.longDescription}
-        '' else ''
+          ${pkg-attr.meta.longDescription}${auto-usage-doc}
+        '') else ''
           No package documentation currently provided.
         '');
       };
@@ -74,8 +95,6 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
-            sunnyside =
-              addDoc (pySelf.callPackage ./python-packages/sunnyside { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -108,6 +127,10 @@ let
             task-tools = addDoc
               (pySelf.callPackage ./python-packages/task-tools {
                 pkg-src = flakeInputs.task-tools;
+              });
+            photos-tools = addDoc
+              (pySelf.callPackage ./python-packages/photos-tools {
+                pkg-src = flakeInputs.photos-tools;
               });
             wiki-tools = addDoc
               (pySelf.callPackage ./python-packages/wiki-tools {
@@ -148,9 +171,7 @@ let
               addDoc (pySelf.callPackage ./python-packages/imutils-cv4 { });
             vidstab-cv4 =
               addDoc (pySelf.callPackage ./python-packages/vidstab-cv4 { });
-            rich = addDoc (pySelf.callPackage ./python-packages/rich { });
             syrupy = addDoc (pySelf.callPackage ./python-packages/syrupy { });
-            # textual = addDoc (pySelf.callPackage ./python-packages/textual { });
             flask-hello-world = addDoc
               (pySelf.callPackage ./python-packages/flasks/hello-world { });
             flask-url2mp4 = addDoc
@@ -173,7 +194,8 @@ let
       }));
 in rec {
   pkgsSource = { local ? false, rev ? null, ref ? null }:
-    prev.stdenvNoCC.mkDerivation {
+    let meta-info = if rev == null then ref else rev;
+    in prev.stdenvNoCC.mkDerivation {
       name = "anixpkgs-src";
       src = if rev == null then
         (builtins.fetchTarball
@@ -187,6 +209,7 @@ in rec {
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
+        echo -n "${meta-info}" > ANIX_META
       '' else
         "");
       installPhase = ''
@@ -196,59 +219,73 @@ in rec {
     };
   pkgData = prev.callPackage flakeInputs.anixdata { };
 
+  writeArgparseScriptBin = pkgname: usagestr: opts: script:
+    (let
+      argparse = prev.callPackage ./bash-packages/bash-utils/argparse.nix {
+        usage_str = usagestr;
+        optsWithVarsAndDefaults = opts;
+      };
+    in prev.writeShellScriptBin pkgname ''
+      ${argparse}
+      ${script}
+    '');
+
+  php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
+
   python38 = pythonOverridesFor prev.python38;
   python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
-  aapis-py = final.python39.pkgs.aapis-py;
-  budget_report = final.python39.pkgs.budget_report;
-  makepyshell = final.python39.pkgs.makepyshell;
-  mavlog-utils = final.python39.pkgs.mavlog-utils;
-  sunnyside = final.python39.pkgs.sunnyside;
-  fqt = final.python39.pkgs.fqt;
-  ichabod = final.python39.pkgs.ichabod;
-  norbert = final.python39.pkgs.norbert;
-  geometry = final.python39.pkgs.geometry;
-  pyceres = final.python39.pkgs.pyceres;
-  pyceres_factors = final.python39.pkgs.pyceres_factors;
-  pysorting = final.python39.pkgs.pysorting;
-  pysignals = final.python39.pkgs.pysignals;
-  mesh-plotter = final.python39.pkgs.mesh-plotter;
-  scrape = final.python39.pkgs.scrape;
+  aapis-py = final.python311.pkgs.aapis-py;
+  budget_report = final.python311.pkgs.budget_report;
+  makepyshell = final.python311.pkgs.makepyshell;
+  mavlog-utils = final.python311.pkgs.mavlog-utils;
+  fqt = final.python311.pkgs.fqt;
+  ichabod = final.python311.pkgs.ichabod;
+  norbert = final.python311.pkgs.norbert;
+  geometry = final.python311.pkgs.geometry;
+  pyceres = final.python311.pkgs.pyceres;
+  pyceres_factors = final.python311.pkgs.pyceres_factors;
+  pysorting = final.python311.pkgs.pysorting;
+  pysignals = final.python311.pkgs.pysignals;
+  mesh-plotter = final.python311.pkgs.mesh-plotter;
+  scrape = final.python311.pkgs.scrape;
   spleeter = final.python38.pkgs.spleeter;
-  find_rotational_conventions = final.python39.pkgs.find_rotational_conventions;
-  trafficsim = final.python39.pkgs.trafficsim;
-  flask-hello-world = final.python39.pkgs.flask-hello-world;
-  flask-url2mp4 = final.python39.pkgs.flask-url2mp4;
-  flask-mp4server = final.python39.pkgs.flask-mp4server;
-  flask-mp3server = final.python39.pkgs.flask-mp3server;
-  flask-smfserver = final.python39.pkgs.flask-smfserver;
-  flask-oatbox = final.python39.pkgs.flask-oatbox;
-  imutils-cv4 = final.python39.pkgs.imutils-cv4;
-  vidstab-cv4 = final.python39.pkgs.vidstab-cv4;
-  rankserver = final.python39.pkgs.rankserver;
-  stampserver = final.python39.pkgs.stampserver;
-  easy-google-auth = final.python310.pkgs.easy-google-auth;
-  task-tools = final.python310.pkgs.task-tools;
-  python-dokuwiki = final.python310.pkgs.python-dokuwiki;
-  wiki-tools = final.python310.pkgs.wiki-tools;
-  book-notes-sync = final.python310.pkgs.book-notes-sync;
-  gmail-parser = final.python310.pkgs.gmail-parser;
-  goromail = final.python310.pkgs.goromail;
-  orchestrator = final.python39.pkgs.orchestrator;
+  find_rotational_conventions =
+    final.python311.pkgs.find_rotational_conventions;
+  trafficsim = final.python311.pkgs.trafficsim;
+  flask-hello-world = final.python311.pkgs.flask-hello-world;
+  flask-url2mp4 = final.python311.pkgs.flask-url2mp4;
+  flask-mp4server = final.python311.pkgs.flask-mp4server;
+  flask-mp3server = final.python311.pkgs.flask-mp3server;
+  flask-smfserver = final.python311.pkgs.flask-smfserver;
+  flask-oatbox = final.python311.pkgs.flask-oatbox;
+  imutils-cv4 = final.python311.pkgs.imutils-cv4;
+  vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  rankserver = final.python311.pkgs.rankserver;
+  stampserver = final.python311.pkgs.stampserver;
+  easy-google-auth = final.python311.pkgs.easy-google-auth;
+  task-tools = final.python311.pkgs.task-tools;
+  photos-tools = final.python311.pkgs.photos-tools;
+  python-dokuwiki = final.python311.pkgs.python-dokuwiki;
+  wiki-tools = final.python311.pkgs.wiki-tools;
+  book-notes-sync = final.python311.pkgs.book-notes-sync;
+  gmail-parser = final.python311.pkgs.gmail-parser;
+  goromail = final.python311.pkgs.goromail;
+  orchestrator = final.python311.pkgs.orchestrator;
 
   authm =
-    addDoc (prev.callPackage ./bash-packages/authm { python = python310; });
+    addDoc (prev.callPackage ./bash-packages/authm { python = python311; });
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
-    python = final.python310;
+    python = final.python311;
   });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
-    python = final.python39;
+    python = final.python311;
     blank-svg = pkgData.img.blank-svg;
   });
   la-quiz = addDoc
-    (prev.callPackage ./bash-packages/la-quiz { python = final.python39; });
+    (prev.callPackage ./bash-packages/la-quiz { python = final.python311; });
 
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
@@ -257,11 +294,17 @@ in rec {
   redirects =
     addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
-  cpp-helper = addDoc (prev.callPackage ./bash-packages/cpp-helper { });
-  py-helper = addDoc (prev.callPackage ./bash-packages/py-helper { });
+  cpp-helper = addDoc
+    (prev.callPackage ./bash-packages/cpp-helper { inherit anixpkgs-version; });
+  py-helper = addDoc
+    (prev.callPackage ./bash-packages/py-helper { inherit anixpkgs-version; });
+  rust-helper = addDoc (prev.callPackage ./bash-packages/rust-helper {
+    inherit anixpkgs-version;
+  });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
+  dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
-  gitcop = addDoc (prev.callPackage ./bash-packages/gitcop { });
+  git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
   notabilify =
@@ -280,7 +323,7 @@ in rec {
   pdf = addDoc (prev.callPackage ./bash-packages/converters/pdf.nix { });
   png = addDoc (prev.callPackage ./bash-packages/converters/png.nix { });
   svg = addDoc (prev.callPackage ./bash-packages/converters/svg.nix {
-    scour = final.python39.pkgs.scour;
+    scour = final.python311.pkgs.scour;
   });
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });
@@ -300,11 +343,19 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  anix-changelog-compare =
+    addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
+  flake-update =
+    addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
+  getres = addDoc (prev.callPackage ./bash-packages/getres { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
   });
+  ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
+  arducopter = (prev.callPackage ./cxx-packages/arducopter { }).copter;
   manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp {
     pkg-src = flakeInputs.manif-geom-cpp;
   });
@@ -313,6 +364,9 @@ in rec {
   });
   mscpp = addDoc
     (prev.callPackage ./cxx-packages/mscpp { pkg-src = flakeInputs.mscpp; });
+  orchestrator-cpp = addDoc (prev.callPackage ./cxx-packages/orchestrator-cpp {
+    pkg-src = flakeInputs.orchestrator-cpp;
+  });
   ceres-factors = addDoc (prev.callPackage ./cxx-packages/ceres-factors {
     pkg-src = flakeInputs.ceres-factors;
   });
@@ -351,6 +405,9 @@ in rec {
   });
   xv-lidar-rs = addDoc (prev.callPackage ./rust-packages/xv-lidar-rs {
     pkg-src = flakeInputs.xv-lidar-rs;
+  });
+  sunnyside = addDoc (prev.callPackage ./rust-packages/sunnyside {
+    pkg-src = flakeInputs.sunnyside;
   });
 
   nixos-machines = rec { personal = makeMachines "personal"; };

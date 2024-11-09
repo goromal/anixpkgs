@@ -1,34 +1,39 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with lib;
 let cfg = config.services.orchestratord;
 in {
-  options.services.orchestratord = with types; {
-    enable = mkEnableOption "enable orchestrator daemon";
-    rootDir = mkOption {
-      type = types.str;
+  options.services.orchestratord = {
+    enable = lib.mkEnableOption "enable orchestrator daemon";
+    user = lib.mkOption {
+      type = lib.types.str;
+      description = "Daemon-controlling user";
+      default = "andrew";
+    };
+    rootDir = lib.mkOption {
+      type = lib.types.str;
       description = "Root directory for data and configuration";
       default = "/data/andrew/orchestratord";
     };
-    orchestratorPkg = mkOption {
-      type = types.package;
+    orchestratorPkg = lib.mkOption {
+      type = lib.types.package;
       description = "The orchestrator package to use";
     };
-    threads = mkOption {
-      type = types.int;
+    threads = lib.mkOption {
+      type = lib.types.int;
       description = "Number of concurrent threads to orchestrate";
       default = 2;
     };
-    pathPkgs = mkOption {
-      type = types.listOf types.package;
+    pathPkgs = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
       description = "Packages to expose to orchestratord's PATH";
       default = [ ];
     };
   };
 
-  config = mkIf cfg.enable {
-    systemd.tmpfiles.rules =
-      [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
+  config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules = [
+      "d  ${cfg.rootDir} - ${cfg.user} dev"
+      "Z  ${cfg.rootDir} - ${cfg.user} dev"
+    ];
     systemd.services.orchestratord = {
       enable = true;
       description = "Orchestrator daemon";
@@ -42,7 +47,7 @@ in {
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
-        User = "andrew";
+        User = cfg.user;
         Group = "dev";
       };
       wantedBy = [ "multi-user.target" ];

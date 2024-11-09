@@ -2,392 +2,531 @@
     "pkgs": {
         "cpp": [
             {
-                "attr": "aapis-cpp",
-                "ci": true
+                "attr": "manif-geom-cpp",
+                "ci": true,
+                "docs": true
             },
             {
-                "attr": "manif-geom-cpp",
-                "ci": true
+                "attr": "aapis-cpp",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mscpp",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "quad-sim-cpp",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "ceres-factors",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "signals-cpp",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "secure-delete",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "sorting",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "crowcpp",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "rankserver-cpp",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mfn",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "orchestrator-cpp",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "ardurouter",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "arducopter.sitl",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
             {
                 "attr": "manif-geom-rs",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "xv-lidar-rs",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "sunnyside",
+                "ci": true,
+                "docs": true
             }
         ],
         "python": [
             {
                 "attr": "aapis-py",
-                "ci": true
-            },
-            {
-                "attr": "sunnyside",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "fqt",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "find_rotational_conventions",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "geometry",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mavlog-utils",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "pyceres",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "pyceres_factors",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "pysorting",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "makepyshell",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "norbert",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "scrape",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "spleeter",
-                "ci": false
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ichabod",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "pysignals",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mesh-plotter",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "orchestrator",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "gmail-parser",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "trafficsim",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "imutils-cv4",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "vidstab-cv4",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "flask-hello-world",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "flask-url2mp4",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "flask-mp4server",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "flask-mp3server",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "flask-smfserver",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "flask-oatbox",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "rankserver",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "stampserver",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "easy-google-auth",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "python-dokuwiki",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "task-tools",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "photos-tools",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "wiki-tools",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "book-notes-sync",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "goromail",
-                "ci": true
+                "ci": true,
+                "docs": true
             }
         ],
         "bash": [
             {
                 "attr": "aapis-grpcurl",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "aptest",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "authm",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "abc",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "doku",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "epub",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "gif",
-                "ci": true
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "getres",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "md",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "mp3",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mp4",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "pdf",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "png",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "svg",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "zipper",
-                "ci": true
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "color-prints",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "dirgroups",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "dirgather",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "manage-gmail",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "gantter",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "la-quiz",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "budget_report",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "md2pdf",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "notabilify",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "fix-perms",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "make-title",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "pb",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "code2pdf",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "cpp-helper",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "py-helper",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "rust-helper",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "mp4unite",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "git-cc",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
-                "attr": "gitcop",
-                "ci": true
+                "attr": "git-shortcuts",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "setupws",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "listsources",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "pkgshell",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "devshell",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "providence",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "providence-tasker",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "fixfname",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "nix-deps",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "nix-diffs",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "anix-version",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "anix-upgrade",
-                "ci": true
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "anix-changelog-compare",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "flake-update",
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "rcrsync",
-                "ci": true
+                "ci": true,
+                "docs": true
             }
         ],
         "java": [
             {
                 "attr": "evil-hangman",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "spelling-corrector",
-                "ci": true
+                "ci": true,
+                "docs": true
             },
             {
                 "attr": "simple-image-editor",
-                "ci": true
+                "ci": true,
+                "docs": true
             }
         ]
     },
     "rfcs": [
-        {
-            "file": "001.orchestrator",
-            "title": "Orchestrator Daemon"
-        },
         {
             "file": "002.oscd",
             "title": "Continuous OS Deployment"

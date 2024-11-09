@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
 , ghostscript, vim }:
 let
   name = "code2pdf";
@@ -22,7 +22,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description = "Generate pretty-printed PDF files from source code files.";
 }

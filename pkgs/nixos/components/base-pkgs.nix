@@ -1,18 +1,48 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; }; {
-  # TODO temporary fix for bad URL dependency in home-manager
-  manual.manpages.enable = false;
+with import ../dependencies.nix;
+let
+  cfg = config.mods.opts;
+  browser-aliases = if cfg.browserExec == null then
+    null
+  else
+    (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+      browserExec = cfg.browserExec;
+    });
+  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
+  launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+  '';
+  auto_sync_cloud_dirs =
+    builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
+    cfg.cloudDirs;
+  cloud_dir_list =
+    builtins.concatStringsSep " " (map (x: "${x.name}") auto_sync_cloud_dirs);
+  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
+    for cloud_dir in ${cloud_dir_list}; do
+      ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
+    done
+  '';
+in {
+  home.stateVersion = cfg.homeState;
 
-  home.packages = [
-    rclone
-    anixpkgs.authm
-    anixpkgs.rcrsync
+  home.packages = let
+    rcrsync = rcrsyncConfigured;
+    authm = anixpkgs.authm.override { inherit rcrsync; };
+  in ([
+    pkgs.rclone
+    authm
+    rcrsync
+    (anixpkgs.anix-version.override { standalone = cfg.standalone; })
+    (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
+    anixpkgs.task-tools
+    anixpkgs.photos-tools
     anixpkgs.book-notes-sync
+    anixpkgs.budget_report
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
@@ -20,6 +50,7 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
+    anixpkgs.dirgather
     anixpkgs.fixfname
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
@@ -43,7 +74,36 @@ with import ../dependencies.nix { inherit config; }; {
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ];
+  ] ++ (if cfg.standalone == false then [ pkgs.docker pkgs.tmux ] else [ ]));
+
+  systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
+    Unit = { Description = "User-domain Orchestrator daemon"; };
+    Service = {
+      Type = "simple";
+      ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";
+      Restart = "always";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
+
+  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync script"; };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
+      Restart = "on-failure";
+      ReadWritePaths = [ cfg.homeDir ];
+    };
+  };
+  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
+    Unit = { Description = "cloud dirs sync timer"; };
+    Timer = {
+      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
+      Unit = "cloud-dirs-sync.service";
+    };
+    Install.WantedBy = [ "timers.target" ];
+  };
 
   programs.vim = {
     enable = true;
@@ -65,7 +125,7 @@ with import ../dependencies.nix { inherit config; }; {
       let g:mix_format_options = '--check-equivalent'
     '';
     settings = { number = true; };
-    plugins = with vimPlugins; [
+    plugins = with pkgs.vimPlugins; [
       vim-elixir
       sensible
       vim-airline
@@ -77,6 +137,17 @@ with import ../dependencies.nix { inherit config; }; {
   };
 
   home.file = with anixpkgs.pkgData; {
+    ".anix-version".text =
+      if local-build then "Local Build" else "v${anixpkgs-version}";
+    ".anix-meta".text = anixpkgs-meta;
     "records/${records.crypt.name}".source = records.crypt.data;
+    ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
+      text = ''
+        set-option -g default-shell /run/current-system/sw/bin/bash
+        set-window-option -g mode-keys vi
+        set -g default-terminal "screen-256color"
+        set -ga terminal-overrides ',screen-256color:Tc'
+      '';
+    };
   };
 }

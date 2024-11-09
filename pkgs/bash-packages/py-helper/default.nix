@@ -1,36 +1,15 @@
-{ writeShellScriptBin, callPackage, color-prints, redirects, strings, git-cc }:
+{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc
+, anixpkgs-version }:
 let
   pkgname = "py-helper";
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      usage: ${pkgname} [options]
+  usage_str = ''
+    usage: ${pkgname} [options]
 
-      Options:
-      --make-pkg        NAME         Generate a template python package
-      --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
-      --make-nix                     Dump template default.nix and shell.nix files
-    '';
-    optsWithVarsAndDefaults = [
-      {
-        var = "makepkg";
-        isBool = false;
-        default = "";
-        flags = "--make-pkg";
-      }
-      {
-        var = "makepbl";
-        isBool = false;
-        default = "";
-        flags = "--make-pybind-lib";
-      }
-      {
-        var = "makenix";
-        isBool = true;
-        default = "0";
-        flags = "--make-nix";
-      }
-    ];
-  };
+    Options:
+    --make-pkg        NAME         Generate a template python package
+    --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
+    --make-nix                     Dump template default.nix and shell.nix files
+  '';
   printErr = "${color-prints}/bin/echo_red";
   printGrn = "${color-prints}/bin/echo_green";
   shellFile = ./res/_shell.nix;
@@ -40,6 +19,7 @@ let
         ${printGrn} "Generating template default.nix and shell.nix files..."
         cat ${defaultFile} > default.nix
         cat ${shellFile} > shell.nix
+        sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
   makepkgRule = ''
@@ -102,9 +82,27 @@ let
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/CMakeLists.txt"
     fi
   '';
-in (writeShellScriptBin pkgname ''
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "makepkg";
+    isBool = false;
+    default = "";
+    flags = "--make-pkg";
+  }
+  {
+    var = "makepbl";
+    isBool = false;
+    default = "";
+    flags = "--make-pybind-lib";
+  }
+  {
+    var = "makenix";
+    isBool = true;
+    default = "0";
+    flags = "--make-nix";
+  }
+] ''
   set -e
-  ${argparse}
   tmpdir=$(mktemp -d)
   ${makepkgRule}
   ${makepblRule}
@@ -115,12 +113,7 @@ in (writeShellScriptBin pkgname ''
     description = "Developer tools for creating Python packages.";
     longDescription = ''
       ```
-      usage: py-helper [options]
-
-      Options:
-      --make-pkg        NAME         Generate a template python package
-      --make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
-      --make-nix                     Dump template default.nix and shell.nix files
+      ${usage_str}
       ```
     '';
   };

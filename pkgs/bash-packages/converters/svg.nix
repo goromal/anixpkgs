@@ -1,5 +1,5 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, inkscape
-, abcm2ps, scour }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
+, inkscape, abcm2ps, scour }:
 let
   name = "svg";
   extension = "svg";
@@ -114,7 +114,7 @@ let
     }
   ];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description = "Generate and edit SVG files from a variety of source formats.";
 }

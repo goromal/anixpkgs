@@ -1,4 +1,4 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects }:
 let
   name = "doku";
   extension = "doku";
@@ -24,7 +24,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description =
     "Generate a DokuWiki text page from similar formats (*not finished yet!*).";

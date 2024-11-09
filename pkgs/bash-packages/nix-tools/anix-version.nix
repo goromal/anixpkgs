@@ -1,30 +1,28 @@
-{ writeShellScriptBin, callPackage, color-prints }:
+{ writeArgparseScriptBin, standalone ? false, color-prints }:
 let
   pkgname = "anix-version";
   description = "Get the current anixpkgs version of the operating system.";
   long-description = ''
     usage: ${pkgname}
   '';
-  argparse = callPackage ../bash-utils/argparse.nix {
-    usage_str = ''
-      ${long-description}
-      ${description}
-    '';
-    optsWithVarsAndDefaults = [ ];
-  };
+  usage_str = ''
+    ${long-description}
+    ${description}
+  '';
   printYellow = "${color-prints}/bin/echo_yellow";
-in (writeShellScriptBin pkgname ''
-  ${argparse}
-  echo -n "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) ("
-  ${printYellow} -n "$(cat ~/.anix-version)"
-  echo ")"
+in (writeArgparseScriptBin pkgname usage_str [ ] ''
+  ${if !standalone then
+    ''echo -n "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) ("''
+  else
+    ""}
+  ${printYellow} ${
+    if !standalone then "-n" else ""
+  } "$(cat ~/.anix-version)-$(cat ~/.anix-meta)"
+  ${if !standalone then ''echo ")"'' else ""}
 '') // {
   meta = {
     inherit description;
-    longDescription = ''
-      ```bash
-      ${long-description}
-      ```  
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

@@ -4,7 +4,7 @@ CLI tools for managing Google Tasks.
 
 [Repository](https://github.com/goromal/task-tools)
 
-## Usage
+## Usage (Auto-Generated)
 
 ```bash
 Usage: task-tools [OPTIONS] COMMAND [ARGS]...
@@ -13,39 +13,45 @@ Usage: task-tools [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --task-secrets-file PATH   Google Tasks client secrets file.  [default:
-                            /home/atorgesen/secrets/task/secrets.json]
+                             ~/secrets/google/client_secrets.json]
   --task-refresh-token PATH  Google Tasks refresh file (if it exists).
-                            [default:
-                            /home/atorgesen/secrets/task/token.json]
+                             [default: ~/secrets/google/refresh.json]
   --task-list-id TEXT        UUID of the Task List to query.  [default:
-                            MDY2MzkyMzI4NTQ1MTA0NDUwODY6MDow]
+                             MDY2MzkyMzI4NTQ1MTA0NDUwODY6MDow]
   --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
   --help                     Show this message and exit.
 
 Commands:
+  clean   Delete / clean up failed timed tasks.
   delete  Delete a particular task by UUID.
   grader  Generate a CSV report of how consistently tasks have been...
   list    List pending tasks according to a filter ∈ [all, p0, p1, p2,...
   put     Upload a task.
-```
 
-### List
 
-```bash
+
 Usage: task-tools list [OPTIONS] FILTER
 
-  List pending tasks according to a filter ∈ [all, p0, p1, p2, late].
+  List pending tasks according to a filter ∈ [all, p0, p1, p2, p3, late,
+  ranked].
 
 Options:
   --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
-                    Today]
+                     2024-09-02]
   --no-ids           Don't show the UUIDs.
   --help             Show this message and exit.
-```
 
-### Put
 
-```bash
+
+Usage: task-tools delete [OPTIONS] TASK_ID
+
+  Delete a particular task by UUID.
+
+Options:
+  --help  Show this message and exit.
+
+
+
 Usage: task-tools put [OPTIONS]
 
   Upload a task.
@@ -53,24 +59,11 @@ Usage: task-tools put [OPTIONS]
 Options:
   --name TEXT        Name of the task.  [required]
   --notes TEXT       Notes to add to the task description.
-  --date [%Y-%m-%d]  Task due date.  [default: Today]
+  --date [%Y-%m-%d]  Task due date.  [default: 2024-09-02]
   --help             Show this message and exit.
-```
 
-### Delete
 
-```bash
-Usage: task-tools delete [OPTIONS] TASK_ID
 
-  Delete a particular task by UUID.
-
-Options:
-  --help  Show this message and exit.
-```
-
-### Grader
-
-```bash
 Usage: task-tools grader [OPTIONS]
 
   Generate a CSV report of how consistently tasks have been completed within
@@ -84,19 +77,24 @@ Usage: task-tools grader [OPTIONS]
 
   - P2: ... tasks must be completed within a month.
 
+  - P3: ... tasks must be completed within 90 days.
+
   Deletion / failure criteria:
 
-  - P[0-2]: [T] ... tasks that have not be completed within the appropriate
+  - P[0-3]: [T] ... tasks that have not be completed within the appropriate
   window.
+
+  P0 manually generated tasks will be migrated to the current day.
 
 Options:
   --start-date [%Y-%m-%d]  First day of the grading window.  [default:
-                          One week ago]
+                           2024-08-26]
   --end-date [%Y-%m-%d]    Last day of the grading window.  [default:
-                          Today]
+                           2024-09-02]
   -o, --out PATH           CSV file to generate the report in.  [default:
-                          /home/atorgesen/data/task_grades/log.csv]
+                           ~/data/task_grades/log.csv]
   --dry-run                Do a dry run; no task deletions.
   --help                   Show this message and exit.
+
 ```
 

@@ -1,17 +1,17 @@
 { config, pkgs, lib, ... }:
-with pkgs;
-with lib;
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let ports = import ../service-ports.nix;
 in {
-  imports = [ ../base.nix ../../python-packages/flasks/rankserver/module.nix ];
+  imports =
+    [ ../pc-base.nix ../../python-packages/flasks/rankserver/module.nix ];
 
   machines.base = {
     machineType = "pi4";
     graphical = false;
     recreational = false;
     developer = false;
-    isServer = false;
+    loadATSServices = false;
+    serveNotesWiki = false;
     isInstaller = false;
   };
 

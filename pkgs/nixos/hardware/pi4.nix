@@ -4,7 +4,7 @@ with pkgs;
 with lib;
 let
   hwArch = fetchTarball
-    "https://github.com/NixOS/nixos-hardware/archive/c9c1a5294e4ec378882351af1a3462862c61cb96.tar.gz";
+    "https://github.com/NixOS/nixos-hardware/archive/acb4f0e9bfa8ca2d6fca5e692307b5c994e7dbda.tar.gz";
 in {
   imports = [ "${hwArch}/raspberry-pi/4" ];
 

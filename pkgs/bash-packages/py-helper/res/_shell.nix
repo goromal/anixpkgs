@@ -1,6 +1,8 @@
 let
-  pkgs = import <anixpkgs> { };
-  python = pkgs.python310;
+  pkgs = import (fetchTarball
+    ("https://github.com/goromal/anixpkgs/archive/refs/tags/vREPLACEME.tar.gz"))
+    { };
+  python = pkgs.python311;
   pythonPackages = python.pkgs;
   application = pythonPackages.callPackage ./default.nix { };
   pythonEnv = python.withPackages (ps: application.propagatedBuildInputs);

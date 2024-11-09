@@ -2,18 +2,21 @@
 
 Cloud directory management tool.
 
+
+## Usage (Auto-Generated)
+
 ```bash
-usage: rcrsync [init|sync] CLOUD_DIR
+usage: rcrsync [OPTS] [init|sync|copy|override] CLOUD_DIR
 
 Manage cloud directories with rclone.
 
+Options:
+      -v|--verbose     Print verbose output
+
 CLOUD_DIR options:
 
-  configs       dropbox:configs  <->  ~/configs
-  secrets       dropbox:secrets  <->  ~/secrets
-  games         dropbox:Games    <->  ~/games
-  data          box:data         <->  ~/data
-  documents     drive:Documents  <->  ~/Documents
+      
+
 
 ```
 

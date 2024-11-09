@@ -8,21 +8,7 @@ callPackage ../pythonPkgFromScript.nix {
   propagatedBuildInputs = [ click ];
   checkPkgs = [ ];
   longDescription = ''
-    ```bash
-    Usage: fqt [OPTIONS] COMMAND [ARGS]...
-
-    Four-quadrants tasking tools.
-
-    Options:
-    --config-file PATH  Path to the config file.  [default:
-                        /data/andrew/fqt/config]
-    --log-file PATH     Path to the log file.  [default: /data/andrew/fqt/log]
-    --help              Show this message and exit.
-
-    Commands:
-    analyze  Analyze past task performance.
-    task     Propose a task for the day.
-    ```
+    This little CLI tool will suggest classes of activities to do based on configured priorities and preferences.
 
     Example config file:
 

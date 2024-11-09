@@ -1,4 +1,5 @@
-{ writeShellScriptBin, callPackage, color-prints, strings, redirects, ffmpeg }:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
+}:
 let
   name = "mp4";
   extension = "mp4";
@@ -85,7 +86,7 @@ let
     }
   ];
 
-  printErr = "${color-prints}/bin/echo_red";
+  printErr = ">&2 ${color-prints}/bin/echo_red";
 
   qualityRule = ''
     if [[ ! -z "$quality" ]]; then
@@ -159,7 +160,7 @@ let
     '';
   }];
 in callPackage ./mkConverter.nix {
-  inherit writeShellScriptBin callPackage color-prints strings;
+  inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
   description = "Generate and edit MP4 video files using `ffmpeg`.";
 }

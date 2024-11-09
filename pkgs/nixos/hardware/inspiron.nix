@@ -38,12 +38,12 @@
   # Inspiron Touchpad
   # boot.kernelModules = [ "psmouse" ]; redundant
   # boot.kernelParams = [ "psmouse.synaptics_intertouch=0" ]; # https://wiki.ubuntu.com/DebuggingTouchpadDetection
-  services.xserver = {
-    libinput.enable = true;
-    libinput.touchpad.tapping = true;
-    libinput.touchpad.tappingDragLock = true;
-    exportConfiguration = true;
+  services.libinput = {
+    enable = true;
+    touchpad.tapping = true;
+    touchpad.tappingDragLock = true;
   };
+  services.xserver.exportConfiguration = true;
 
   # Essential Firmware
   hardware.enableRedistributableFirmware = lib.mkDefault true;
