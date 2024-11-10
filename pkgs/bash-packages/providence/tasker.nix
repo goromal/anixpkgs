@@ -31,6 +31,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
       ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
       ${ttexe} put --name="P0: [T] TSKP + PRYR" --date="$duedate"
       ${ttexe} put --name="P0: [T] ALL ITNS, ALL Actions, 1 Triage" --date="$duedate"
+      ${ttexe} put --name="P0: [T] Daily Log" --notes="https://forms.gle/LSmeTgyhfkivxTdP9" --date="$duedate"
   done
 '') // {
   meta = {
