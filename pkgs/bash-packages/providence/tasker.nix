@@ -29,9 +29,6 @@ in (writeArgparseScriptBin pkgname usage_str [{
       taskname="P0: [T] Scripture - $(${prexe} --wiki-url $wiki_url passage)"
       tasknotes="$(${prexe} --wiki-url $wiki_url patriarchal)"
       ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
-      ${ttexe} put --name="P0: [T] TSKP + PRYR" --date="$duedate"
-      ${ttexe} put --name="P0: [T] ALL ITNS, ALL Actions, 1 Triage" --date="$duedate"
-      ${ttexe} put --name="P0: [T] Daily Log" --notes="https://forms.gle/LSmeTgyhfkivxTdP9" --date="$duedate"
   done
 '') // {
   meta = {
