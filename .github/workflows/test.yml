@@ -83,6 +83,7 @@ jobs:
         fi
   envs:
     name: Build Environments
+    needs: check-flake-lock
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
