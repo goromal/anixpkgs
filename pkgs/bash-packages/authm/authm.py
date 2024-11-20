@@ -21,7 +21,7 @@ def cli():
     "--force",
     "force",
     is_flag=True,
-    help="Force the auth files to be re-written.",
+    help="Force the auth files to be re-written. If headless, run a headless refresh.",
 )
 def refresh(headless, force):
     """Refresh all auth tokens one-by-one."""
@@ -34,7 +34,6 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("gmail_refresh_file"),
             headless=headless,
             force=force,
-            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(
@@ -50,7 +49,6 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("gbot_refresh_file"),
             headless=headless,
             force=force,
-            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(
@@ -66,7 +64,6 @@ def refresh(headless, force):
             GPD.getKwargsOrDefault("journal_refresh_file"),
             headless=headless,
             force=force,
-            headless_refresh=force,
         )
     except CredentialsRefreshException:
         sys.stderr.write(
