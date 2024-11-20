@@ -44,7 +44,7 @@
     mscpp.flake = false;
 
     orchestrator-cpp.url =
-      "github:goromal/orchestrator-cpp?ref=dev/job_queue_impl";
+      "github:goromal/orchestrator-cpp";
     orchestrator-cpp.flake = false;
 
     quad-sim-cpp.url = "github:goromal/quad-sim-cpp";
