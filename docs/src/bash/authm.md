@@ -25,7 +25,8 @@ Usage: authm refresh [OPTIONS]
 
 Options:
   --headless  Run in headless mode.
-  --force     Force the auth files to be re-written.
+  --force     Force the auth files to be re-written. If headless, run a
+              headless refresh.
   --help      Show this message and exit.
 
 
