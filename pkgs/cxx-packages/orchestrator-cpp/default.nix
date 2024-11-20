@@ -1,5 +1,4 @@
-{ clangStdenv, 
-cmake, boost, mscpp, aapis-cpp, protobuf, pkg-src }:
+{ clangStdenv, cmake, boost, mscpp, aapis-cpp, protobuf, pkg-src }:
 clangStdenv.mkDerivation {
   name = "orchestrator-cpp";
   version = "0.0.0";
