@@ -21,11 +21,11 @@ def cli():
     "--force",
     "force",
     is_flag=True,
-    help="Force the auth files to be re-written.",
+    help="Force the auth files to be re-written. If headless, run a headless refresh.",
 )
 def refresh(headless, force):
     """Refresh all auth tokens one-by-one."""
-    print(Fore.YELLOW + "Refreshing Personal Tokens..." + Style.RESET_ALL)
+    print(Fore.YELLOW + f"Refreshing Personal Tokens...{' (Forced)' if force else ''}" + Style.RESET_ALL)
     try:
         getGoogleService(
             "gmail",
