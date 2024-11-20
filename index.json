@@ -60,6 +60,16 @@
                 "attr": "orchestrator-cpp",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "ardurouter",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "arducopter.sitl",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
@@ -259,6 +269,11 @@
         "bash": [
             {
                 "attr": "aapis-grpcurl",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "aptest",
                 "ci": true,
                 "docs": true
             },
@@ -474,6 +489,11 @@
             },
             {
                 "attr": "anix-upgrade",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "anix-changelog-compare",
                 "ci": true,
                 "docs": true
             },

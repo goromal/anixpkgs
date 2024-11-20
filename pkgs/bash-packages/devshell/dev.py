@@ -42,14 +42,21 @@ class Context:
                     try:
                         branch = (
                             subprocess.check_output(
-                                ["git", "-C", root, "rev-parse", "--abbrev-ref", "HEAD"],
+                                [
+                                    "git",
+                                    "-C",
+                                    root,
+                                    "rev-parse",
+                                    "--abbrev-ref",
+                                    "HEAD",
+                                ],
                                 stderr=subprocess.PIPE,
                             )
                             .decode()
                             .strip()
                         )
                     except:
-                        continue # no branch or remote yet
+                        continue  # no branch or remote yet
                     clean = not bool(
                         subprocess.check_output(
                             ["git", "-C", root, "status", "--porcelain"],
@@ -391,7 +398,7 @@ def main(stdscr):
                 continue
             ctx.load_sources()
             ctx.status_msg = f"Checking out {reponame}:{branch}... Done."
-        
+
         elif key == ord("o"):
             source_spec = [p for p in source_prompt(stdscr).split(" ") if p.strip()]
             ctx.status_msg = f"Adding source {source_spec[0]}..."
@@ -437,7 +444,15 @@ def main(stdscr):
                     stderr=subprocess.PIPE,
                 )
                 subprocess.check_output(
-                    ["git", "clone", url, repopath, "--branch", branch],
+                    [
+                        "git",
+                        "clone",
+                        "--recurse-submodules",
+                        url,
+                        repopath,
+                        "--branch",
+                        branch,
+                    ],
                     stderr=subprocess.PIPE,
                 )
                 ctx.save_ws_repo_branch(reponame, branch)

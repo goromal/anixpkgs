@@ -3,6 +3,7 @@
 Packages written (or glued together) in Bash.
 
 - [aapis-grpcurl](./aapis-grpcurl.md)
+- [aptest](./aptest.md)
 - [authm](./authm.md)
 - [abc](./abc.md)
 - [getres](./getres.md)
@@ -40,5 +41,6 @@ Packages written (or glued together) in Bash.
 - [nix-diffs](./nix-diffs.md)
 - [anix-version](./anix-version.md)
 - [anix-upgrade](./anix-upgrade.md)
+- [anix-changelog-compare](./anix-changelog-compare.md)
 - [flake-update](./flake-update.md)
 - [rcrsync](./rcrsync.md)

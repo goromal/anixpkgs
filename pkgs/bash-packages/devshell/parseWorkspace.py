@@ -49,7 +49,7 @@ def get_deps_from_dep(dep, attr):
         linesplit = deps_line.split()
         if len(linesplit) > 1:
             for dep in linesplit:
-                deps.append(f'{dep}')
+                deps.append(f"{dep}")
         else:
             deps.append(f'"{linesplit[0]}"')
     return deps
@@ -165,11 +165,13 @@ def parse_ws():
             exit()
         for wssource in wssources:
             if wssource in dependencies:
-                rpspec_sets.append(f"{wssource}:{attrs[wssource]}:{':'.join(dependencies[wssource])}")
+                rpspec_sets.append(
+                    f"{wssource}:{attrs[wssource]}:{':'.join(dependencies[wssource])}"
+                )
                 source_sets.append(f"{wssource}:{urls[wssource]}")
             elif wssource in wsscripts:
                 script_sets.append(
-                    f'{wssource}={os.path.join(DATADIR, wsscripts[wssource])}'
+                    f"{wssource}={os.path.join(DATADIR, wsscripts[wssource])}"
                 )
         rpspecs = " ".join(rpspec_sets)
         sources = " ".join(source_sets)
@@ -213,15 +215,17 @@ def add_src_to_ws():
                 print(f"Cannot add {reponame} to source list without a url")
                 exit(1)
             print(f"Adding {reponame} to source list")
+
             def find_last_bracket_index(lst):
                 for i in range(len(lst) - 1, -1, -1):
                     if "#" not in lst[i] and "=" in lst[i]:
                         left = lst[i].split("=")[0].strip()
-                        if left.startswith('['):
+                        if left.startswith("["):
                             return i
-                return len(lst)-1
+                return len(lst) - 1
+
             last_src_idx = find_last_bracket_index(devrclines)
-            devrclines.insert(last_src_idx+1, f"[{reponame}] = {repourl}\n")
+            devrclines.insert(last_src_idx + 1, f"[{reponame}] = {repourl}\n")
 
         if reponame not in wssources:
             print(f"Adding {reponame} to workspace {wsname}")
@@ -230,7 +234,11 @@ def add_src_to_ws():
                 if "#" not in line and "=" in line:
                     left = line.split("=")[0].strip()
                     if left == wsname:
-                        devrclines[i] = line[:-1] + f" {reponame}" + line[-1] if line[-1] == "\n" else line + f" {reponame}"
+                        devrclines[i] = (
+                            line[:-1] + f" {reponame}" + line[-1]
+                            if line[-1] == "\n"
+                            else line + f" {reponame}"
+                        )
                         added_to_ws = True
                         break
             if not added_to_ws:
@@ -244,6 +252,7 @@ def add_src_to_ws():
     except Exception as e:
         print("ERROR:", e)
         exit(1)
+
 
 def add_scr_to_ws():
     wsname = sys.argv[2]
@@ -277,15 +286,17 @@ def add_scr_to_ws():
                 print(f"Cannot add {scriptname} to script list without a path")
                 exit(1)
             print(f"Adding {scriptname} to script list")
+
             def find_last_bracket_index(lst):
                 for i in range(len(lst) - 1, -1, -1):
                     if "#" not in lst[i] and "=" in lst[i]:
                         left = lst[i].split("=")[0].strip()
-                        if left.startswith('<'):
+                        if left.startswith("<"):
                             return i
-                return len(lst)-1
+                return len(lst) - 1
+
             last_src_idx = find_last_bracket_index(devrclines)
-            devrclines.insert(last_src_idx+1, f"<{scriptname}> = {scriptpath}\n")
+            devrclines.insert(last_src_idx + 1, f"<{scriptname}> = {scriptpath}\n")
 
         if scriptname not in wssources:
             print(f"Adding {scriptname} to workspace {wsname}")
@@ -294,7 +305,11 @@ def add_scr_to_ws():
                 if "#" not in line and "=" in line:
                     left = line.split("=")[0].strip()
                     if left == wsname:
-                        devrclines[i] = line[:-1] + f" {scriptname}" + line[-1] if line[-1] == "\n" else line + f" {scriptname}"
+                        devrclines[i] = (
+                            line[:-1] + f" {scriptname}" + line[-1]
+                            if line[-1] == "\n"
+                            else line + f" {scriptname}"
+                        )
                         added_to_ws = True
                         break
             if not added_to_ws:
@@ -327,7 +342,7 @@ def add_ws():
             wssources,
             DATADIR,
         ) = devrc_components_by_ws(devrc, wsname)
-        
+
         if not foundws:
             print(f"Adding workspace {wsname}")
 
@@ -340,7 +355,7 @@ def add_ws():
                     else:
                         devrcfile.write(line + "\n")
                 devrcfile.write(f"{wsname} = \n")
-    
+
     except Exception as e:
         print("ERROR:", e)
         exit(1)
