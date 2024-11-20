@@ -424,16 +424,15 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1732074640,
+        "lastModified": 1732075257,
         "narHash": "sha256-CWCcHbhEbHGp03+VMEd1Qu0l3jOkB1u2MbLGAhMiDng=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "5cc6a69746045375281015c645290ff918b0f6a7",
+        "rev": "fef08eaf9379d6d6a1ebdca576c49517b72ddfd9",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/job_queue_impl",
         "repo": "orchestrator-cpp",
         "type": "github"
       }
