@@ -7,6 +7,7 @@ import json
 import re
 import time
 from fuzzywuzzy import fuzz
+from colorama import Fore, Style
 
 from easy_google_auth.auth import getGoogleCreds
 from gmail_parser.defaults import GmailParserDefaults as GPD
@@ -241,15 +242,19 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
         reader = csv.reader(csvfile)
         for i, row in enumerate(reader):
             if i >= acct_cfg["StartRow"]:
-                transactions.append(
-                    (
-                        account.replace("_", " "),
-                        row[acct_cfg["Date"]],
-                        re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip(),
-                        float(row[acct_cfg["Amount"]])
-                        * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                try:
+                    row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
+                    transactions.append(
+                        (
+                            account.replace("_", " "),
+                            row[acct_cfg["Date"]],
+                            row_desc,
+                            float(row[acct_cfg["Amount"]])
+                            * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                        )
                     )
-                )
+                except ValueError:
+                    print(f"{Fore.YELLOW} WARNING: Did not process transaction {row_desc} due to unexpected value formatting {Style.RESET_ALL}")
     new_transactions = [
         transaction
         for transaction in transactions

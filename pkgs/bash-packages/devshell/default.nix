@@ -3,11 +3,12 @@
 let
   pkgname = "devshell";
   usage_str = ''
-    usage: ${pkgname} [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
+    usage: ${pkgname} [-n|--new] [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
 
     Enter [workspace_name]'s development shell as defined in ~/.devrc
     (can specify an alternate path with -d DEVRC or history file with
     -s DEVHIST).
+    Add a new workspace with the -n|--new flag.
     Optionally run a one-off command with --run CMD (e.g., --run dev).
 
     Example ~/.devrc:
@@ -60,6 +61,12 @@ in (writeArgparseScriptBin pkgname usage_str [
     default = "";
     flags = "--run";
   }
+  {
+    var = "newws";
+    isBool = true;
+    default = "0";
+    flags = "-n|--new";
+  }
 ] ''
   wsname=$1
   if [[ -z "$wsname" ]]; then
@@ -67,10 +74,14 @@ in (writeArgparseScriptBin pkgname usage_str [
       exit 1
   fi
 
+  if [[ "$newws" == "1" ]]; then
+      ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
+  fi
+
   if [[ -z "$overridedatadir" ]]; then
-    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname)
+    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
   else
-    rcinfo=$(${python3}/bin/python ${parseScript} "$devrc" $wsname "$overridedatadir")
+    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
   fi
   if [[ "$rcinfo" == "_NODEVRC_" ]]; then
       ${printErr} "ERROR: no $devrc file found"
@@ -89,34 +100,34 @@ in (writeArgparseScriptBin pkgname usage_str [
       dev_dir="''${rcinfoarray[0]}"
       data_dir="''${rcinfoarray[1]}"
       pkgs_var="''${rcinfoarray[2]}"
-      sources_list="''${rcinfoarray[3]}"
-      scripts_list="''${rcinfoarray[4]}"
       if [[ -z "$runcmd" ]]; then
           nix-shell ${shellFile} \
+            --arg printErr ${printErr} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr devrcFile "$devrc" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
-            --argstr devHistFile "$devhist" \
-            --arg repoSpecList "$sources_list" \
-            --arg scriptsList "$scripts_list"
+            --arg parseScript ${parseScript} \
+            --argstr devHistFile "$devhist"
       else
           nix-shell ${shellFile} \
+            --arg printErr ${printErr} \
             --arg setupws ${setupws} \
             --argstr wsname "$wsname" \
             --argstr devDir "$dev_dir" \
             --argstr dataDir "$data_dir" \
             --argstr pkgsVar "$pkgs_var" \
+            --argstr devrcFile "$devrc" \
             --argstr editorName ${editorName} \
             --arg shellSetupScript ${shellSetupScript} \
             --arg devScript ${devScript} \
+            --arg parseScript ${parseScript} \
             --argstr devHistFile "$devhist" \
-            --arg repoSpecList "$sources_list" \
-            --arg scriptsList "$scripts_list" \
             --command "$runcmd"
       fi 
   fi
@@ -124,10 +135,6 @@ in (writeArgparseScriptBin pkgname usage_str [
   meta = {
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''
-      ```
-      ${usage_str}
-      ```
-
       A workspace has the directory tree structure:
 
       - `[dev_dir]/[workspace_name]`: Workspace root.
@@ -145,5 +152,6 @@ in (writeArgparseScriptBin pkgname usage_str [
       - `listsources`: See the [listsources](./listsources.md) tool documentation.
       - `dev`: Enter an interactive menu for workspace source manipulation.
     '';
+    autoGenUsageCmd = "--help";
   };
 }

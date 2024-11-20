@@ -1,13 +1,13 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
-  home.packages = if (cfg.standalone == false) then [
-    imagemagick
-    maestral
-    pciutils
-    nixos-generators
-  ] else
-    [ ];
+  home.packages = with pkgs;
+    if (cfg.standalone == false) then [
+      imagemagick
+      maestral
+      pciutils
+      nixos-generators
+    ] else
+      [ ];
 }

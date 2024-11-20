@@ -22,11 +22,12 @@ Options:
   --help                     Show this message and exit.
 
 Commands:
-  clean   Delete / clean up failed timed tasks.
-  delete  Delete a particular task by UUID.
-  grader  Generate a CSV report of how consistently tasks have been...
-  list    List pending tasks according to a filter ∈ [all, p0, p1, p2,...
-  put     Upload a task.
+  clean     Delete / clean up failed timed tasks.
+  delete    Delete a particular task by UUID.
+  grader    Generate a CSV report of how consistently tasks have been...
+  list      List pending tasks according to a filter ∈ [all, p0, p1, p2,...
+  put       Upload a task.
+  put-spec  Read a CSV of task specifications and idempotently put them...
 
 
 
@@ -37,7 +38,7 @@ Usage: task-tools list [OPTIONS] FILTER
 
 Options:
   --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
-                     2024-06-24]
+                     2024-11-11]
   --no-ids           Don't show the UUIDs.
   --help             Show this message and exit.
 
@@ -59,7 +60,7 @@ Usage: task-tools put [OPTIONS]
 Options:
   --name TEXT        Name of the task.  [required]
   --notes TEXT       Notes to add to the task description.
-  --date [%Y-%m-%d]  Task due date.  [default: 2024-06-24]
+  --date [%Y-%m-%d]  Task due date.  [default: 2024-11-11]
   --help             Show this message and exit.
 
 
@@ -84,11 +85,13 @@ Usage: task-tools grader [OPTIONS]
   - P[0-3]: [T] ... tasks that have not be completed within the appropriate
   window.
 
+  P0 manually generated tasks will be migrated to the current day.
+
 Options:
   --start-date [%Y-%m-%d]  First day of the grading window.  [default:
-                           2024-06-17]
+                           2024-11-04]
   --end-date [%Y-%m-%d]    Last day of the grading window.  [default:
-                           2024-06-24]
+                           2024-11-11]
   -o, --out PATH           CSV file to generate the report in.  [default:
                            ~/data/task_grades/log.csv]
   --dry-run                Do a dry run; no task deletions.

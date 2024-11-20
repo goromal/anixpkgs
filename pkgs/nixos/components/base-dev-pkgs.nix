@@ -1,10 +1,9 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
   home.packages = [
-    direnv
+    pkgs.direnv
     anixpkgs.flake-update
     anixpkgs.git-cc
     anixpkgs.git-shortcuts
@@ -12,8 +11,8 @@ in {
     anixpkgs.listsources
     anixpkgs.pkgshell
     (anixpkgs.devshell.override { editorName = cfg.editor; })
-    (writeShellScriptBin "dsd" ''
-      devshell $1 --run dev
+    (pkgs.writeShellScriptBin "dsd" ''
+      devshell $@ --run dev
     '')
     anixpkgs.cpp-helper
     anixpkgs.py-helper
@@ -22,7 +21,7 @@ in {
   ];
 
   programs.git = {
-    package = gitAndTools.gitFull;
+    package = pkgs.gitAndTools.gitFull;
     enable = true;
     userName = "Andrew Torgesen";
     userEmail = "andrew.torgesen@gmail.com";
@@ -30,6 +29,7 @@ in {
       aa = "add -A";
       cm = "commit -m";
       co = "checkout";
+      cp = "cherry-pick";
       s = "status";
       d = "diff";
     };
@@ -43,5 +43,5 @@ in {
   services.lorri.enable = true;
 
   programs.vim.plugins = lib.mkIf (cfg.standalone == false)
-    (with vimPlugins; [ vim-gitgutter YouCompleteMe ]);
+    (with pkgs.vimPlugins; [ vim-gitgutter YouCompleteMe ]);
 }

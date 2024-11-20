@@ -128,6 +128,10 @@ let
               (pySelf.callPackage ./python-packages/task-tools {
                 pkg-src = flakeInputs.task-tools;
               });
+            photos-tools = addDoc
+              (pySelf.callPackage ./python-packages/photos-tools {
+                pkg-src = flakeInputs.photos-tools;
+              });
             wiki-tools = addDoc
               (pySelf.callPackage ./python-packages/wiki-tools {
                 pkg-src = flakeInputs.wiki-tools;
@@ -190,7 +194,8 @@ let
       }));
 in rec {
   pkgsSource = { local ? false, rev ? null, ref ? null }:
-    prev.stdenvNoCC.mkDerivation {
+    let meta-info = if rev == null then ref else rev;
+    in prev.stdenvNoCC.mkDerivation {
       name = "anixpkgs-src";
       src = if rev == null then
         (builtins.fetchTarball
@@ -204,6 +209,7 @@ in rec {
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
+        echo -n "${meta-info}" > ANIX_META
       '' else
         "");
       installPhase = ''
@@ -261,6 +267,7 @@ in rec {
   stampserver = final.python311.pkgs.stampserver;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
+  photos-tools = final.python311.pkgs.photos-tools;
   python-dokuwiki = final.python311.pkgs.python-dokuwiki;
   wiki-tools = final.python311.pkgs.wiki-tools;
   book-notes-sync = final.python311.pkgs.book-notes-sync;
@@ -336,14 +343,19 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-version.nix { });
   anix-upgrade =
     addDoc (prev.callPackage ./bash-packages/nix-tools/anix-upgrade.nix { });
+  anix-changelog-compare =
+    addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
   flake-update =
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
   });
+  ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
+  arducopter = (prev.callPackage ./cxx-packages/arducopter { }).copter;
   manif-geom-cpp = addDoc (prev.callPackage ./cxx-packages/manif-geom-cpp {
     pkg-src = flakeInputs.manif-geom-cpp;
   });

@@ -15,7 +15,9 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
     ''echo -n "$(nix-store -q /nix/var/nix/profiles/system | cut -c 12-) ("''
   else
     ""}
-  ${printYellow} ${if !standalone then "-n" else ""} "$(cat ~/.anix-version)"
+  ${printYellow} ${
+    if !standalone then "-n" else ""
+  } "$(cat ~/.anix-version)-$(cat ~/.anix-meta)"
   ${if !standalone then ''echo ")"'' else ""}
 '') // {
   meta = {

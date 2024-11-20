@@ -2,7 +2,6 @@
 
 Convenience tools for setting up Rust projects.
 
-***Under construction.***
 
 ## Usage (Auto-Generated)
 
@@ -10,8 +9,10 @@ Convenience tools for setting up Rust projects.
 usage: rust-helper [options]
 
 Options:
---dev         Drop directly into a Rust development shell
---make-nix    Dump template shell.nix file
+    dev                         Drop directly into a Rust development shell
+    nix                         Dump template shell.nix file
+    vscode DEFAULT[:OTHER:ENV]  Generate VSCode settings file for rust-analyzer
+                                (Run inside a Nix dev environment)
 
 
 ```

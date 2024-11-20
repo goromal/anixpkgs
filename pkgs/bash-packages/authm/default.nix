@@ -21,16 +21,15 @@ let
       ];
       checkPkgs = [ ];
     });
-  bisync = ''
-    if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help" ]]; then
-      ${rcrsync}/bin/rcrsync sync secrets
-    fi
-  '';
   printErr = ">&2 ${color-prints}/bin/echo_red";
 in (writeShellScriptBin pkgname ''
-  ${bisync}
+  if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]]; then
+    ${rcrsync}/bin/rcrsync copy secrets
+  fi
   ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; exit 1; }
-  ${bisync}
+  if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
+    ${rcrsync}/bin/rcrsync override secrets
+  fi
 '') // {
   meta = {
     inherit description longDescription;

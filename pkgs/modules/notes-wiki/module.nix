@@ -1,7 +1,5 @@
 { pkgs, lib, config, ... }:
-with pkgs;
-with lib;
-with import ../../nixos/dependencies.nix { inherit config; };
+with import ../../nixos/dependencies.nix;
 let
   app = "notes-wiki";
   defaultDomain = "localhost";
@@ -9,7 +7,7 @@ let
   cfg = config.services.${app};
 in {
   options.services.${app} = {
-    enable = mkEnableOption "enable notes wiki server";
+    enable = lib.mkEnableOption "enable notes wiki server";
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =
@@ -27,16 +25,22 @@ in {
         "PHP build (default: 7.4 until DokuWiki version gets updated)";
       default = anixpkgs.php74;
     };
-    openFirewall = mkOption {
-      type = types.bool;
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
       description =
         "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
+    insecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public insecure port";
+      default = 80;
+    };
   };
 
-  config = mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = mkIf cfg.openFirewall [ 80 443 ];
+  config = lib.mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts =
+      lib.mkIf cfg.openFirewall [ cfg.insecurePort 443 ];
 
     services.phpfpm.pools.${app} = {
       user = "andrew";
@@ -65,6 +69,10 @@ in {
       virtualHosts.${cfg.domain} = {
         # addSSL = true;
         # enableACME = true;
+        listen = [{
+          addr = "0.0.0.0";
+          port = cfg.insecurePort;
+        }];
         root = cfg.wikiDir;
         locations = {
           "~ /(conf/|bin/|inc/|install.php)" = { extraConfig = "deny all;"; };

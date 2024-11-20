@@ -3,7 +3,7 @@ import os
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-branches_whitelist = ["nixpkgs-unstable"]
+branches_whitelist = ["nixpkgs-unstable", "Copter-4.4"]
 
 with open(os.path.join(ANIXDIR, "flake.lock"), "r") as lockfile:
     lock = json.loads(lockfile.read())

@@ -64,14 +64,14 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "inherit ceres-factors;") ]
     echo_red "setupcurrentws missed shell pkg intra-workspace dependency"
     exit 1
 fi
-[[ -d "$tmpdir/data2" ]] || { echo "Failed data dir override"; exit 1; }
+[[ -d "$tmpdir/data2" ]] || { echo_red "Failed data dir override"; exit 1; }
 echo "<scr> = scripts/test" >> data/devrc
-echo "scr_env = geometry scr" >> data/devrc
+echo "scr_env = geometry" >> data/devrc
 mkdir -p "$tmpdir/data/scripts"
 echo "#!/usr/bin/env bash" > "$tmpdir/data/scripts/test"
 echo "touch FILE.txt" >> "$tmpdir/data/scripts/test"
 chmod +x "$tmpdir/data/scripts/test"
-devshell -d data/devrc scr_env --run "echo"
+devshell -d $tmpdir/data/devrc scr_env --run "addscr scr"
 [[ -f "$tmpdir/dev/scr_env/.bin/scr" ]] || { echo "Failed devshell script gather"; exit 1; }
 sed -i 's|python3\.|python311\.|g' $tmpdir/dev/test_env/shell.nix
 devshell -d data/devrc test_env --run "export WSROOT="$tmpdir/dev/test_env""
@@ -79,8 +79,10 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "pkgs.python311.withPackage
     echo_red "setupcurrentws overrode an edited shell file"
     exit 1
 fi
+devshell -d $tmpdir/data/devrc test_env --run "addsrc task-tools https://github.com/goromal/task-tools"
+[[ -d $tmpdir/dev/test_env/sources/task-tools ]] || { echo_red "Failed to add source to workspace"; exit 1; }
 cd $tmpdir/dev/test_env/sources/ceres-factors
-cpp-helper --make-nix
+cpp-helper nix
 sed -i 's|# ADD deps|eigen ceres-solver manif-geom-cpp boost|g' shell.nix
 nix-shell --run "echo 'Checking generated VSCode config'"
 if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then

@@ -2,35 +2,135 @@ import click
 import re
 import os
 import sys
+import json
+import requests
+import time
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
-from gmail_parser.corpus import GBotCorpus, JournalCorpus
 from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
 from wiki_tools.defaults import WikiToolsDefaults as WTD
-from task_tools.manage import TaskManager
 from task_tools.defaults import TaskToolsDefaults as TTD
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
 
 
-def append_text_to_wiki_page(wiki, id, msg, text):
-    doku = None
-    doku = wiki.getPage(id=id)
-    new_doku = f"""{doku}
+def create_notion_bulleted_list(data, level=0):
+    if not isinstance(data, list):
+        raise ValueError("Input data must be a list.")
+    notion_blocks = []
+    for item in data:
+        if isinstance(item, list):
+            nested_blocks = create_notion_bulleted_list(item, level + 1)
+            if notion_blocks:
+                notion_blocks[-1]["bulleted_list_item"]["children"] = nested_blocks
+            else:
+                raise ValueError("Nested list structure is invalid.")
+        else:
+            block = {
+                "object": "block",
+                "type": "bulleted_list_item",
+                "bulleted_list_item": {
+                    "rich_text": [{"type": "text", "text": {"content": str(item)}}]
+                },
+            }
+            notion_blocks.append(block)
+    return notion_blocks
 
----- 
 
-{text}
-"""
-    wiki.putPage(id=id, content=new_doku)
-    if doku is not None:
+def append_text_to_notion_page(token, id, msg, text):
+    ps = [p for p in text.split("\n") if p.strip()]
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    data = {
+        "children": create_notion_bulleted_list(
+            [ps[0], ps[1:]] if len(ps) > 1 else [ps[0]]
+        )
+    }
+    url = f"https://api.notion.com/v1/blocks/{id}/children"
+    response = requests.patch(url, json=data, headers=headers)
+    if response.status_code == 200:
         msg.moveToTrash()
+    else:
+        sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
+        exit(1)
 
 
-def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile=None):
+def get_page_blocks(headers, page_id):
+    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
+    has_more = True
+    next_cursor = None
+    all_blocks = []
+
+    while has_more:
+        params = {}
+        if next_cursor:
+            time.sleep(0.3)
+            params["start_cursor"] = next_cursor
+
+        response = requests.get(url, headers=headers, params=params)
+        if response.status_code != 200:
+            raise Exception(
+                f"Error fetching page content: {response.status_code}, {response.text}"
+            )
+
+        data = response.json()
+        all_blocks.append(data)
+        next_cursor = data.get("next_cursor")
+        has_more = data.get("has_more", False)
+
+    return all_blocks
+
+
+def count_bullet_points_and_keywords(all_content, keywords):
+    bullet_count = 0
+    keyword_count = 0
+
+    for content in all_content:
+        for block in content["results"]:
+            if block["type"] == "bulleted_list_item":
+                bullet_count += 1
+
+        for keyword in keywords:
+            keyword_count += json.dumps(content).lower().count(keyword)
+
+    return bullet_count, keyword_count
+
+
+def update_page_title(headers, page_id, new_title):
+    url = f"https://api.notion.com/v1/pages/{page_id}"
+
+    data = {"properties": {"title": [{"text": {"content": new_title}}]}}
+
+    response = requests.patch(url, json=data, headers=headers)
+    if response.status_code != 200:
+        raise Exception(
+            f"Error updating page title: {response.status_code}, {response.text}"
+        )
+
+
+def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
+    headers = {
+        "Authorization": f"Bearer {notion_api_token}",
+        "Content-Type": "application/json",
+        "Notion-Version": "2022-06-28",
+    }
+    content = get_page_blocks(headers, notion_page_id)
+    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["action:"])
+    new_title = f"{keyword} - {bullet_count} - {keyword_count}"
+    if not dry_run:
+        update_page_title(headers, notion_page_id, new_title)
+    return True, bullet_count, keyword_count
+
+
+def process_keyword(
+    text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None
+):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
         matter = text[(n + 1) :].strip()
@@ -42,9 +142,9 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, item)
+            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -56,9 +156,9 @@ def process_keyword(text, datestr, keyword, page_id, wiki, msg, dry_run, logfile
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Wiki:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_wiki_page(wiki, page_id, msg, item)
+            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
         return True
     return False
 
@@ -176,6 +276,14 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     help="Google Tasks client secrets file.",
 )
 @click.option(
+    "--notion-secrets-file",
+    "notion_secrets_file",
+    type=click.Path(),
+    default="~/secrets/notion/secret.json",
+    show_default=True,
+    help="Notion client secrets file.",
+)
+@click.option(
     "--task-refresh-token",
     "task_refresh_token",
     type=click.Path(),
@@ -214,6 +322,7 @@ def cli(
     wiki_url,
     wiki_secrets_file,
     task_secrets_file,
+    notion_secrets_file,
     task_refresh_token,
     enable_logging,
     headless,
@@ -229,6 +338,7 @@ def cli(
         "wiki_url": wiki_url,
         "wiki_secrets_file": wiki_secrets_file,
         "task_secrets_file": task_secrets_file,
+        "notion_secrets_file": notion_secrets_file,
         "task_refresh_token": task_refresh_token,
         "headless": headless,
         "headless_logdir": os.path.expanduser(headless_logdir),
@@ -243,7 +353,7 @@ def cli(
     type=click.Path(),
     default="~/configs/goromail-categories.csv",
     show_default=True,
-    help="CSV that maps keywords to wiki pages.",
+    help="CSV that maps keywords to notion pages.",
 )
 @click.option(
     "--dry-run",
@@ -253,6 +363,9 @@ def cli(
 )
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
+    from gmail_parser.corpus import GBotCorpus, JournalCorpus
+    from task_tools.manage import TaskManager
+
     if ctx.obj["headless"]:
         Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "bot.log"), "w")
@@ -277,6 +390,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         if logfile is not None:
             logfile.close()
         return
+    try:
+        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
+            secrets = json.load(nsf)
+        notion_api_token = secrets["auth"]
+    except:
+        sys.stderr.write(f"Failed to load Notion API key")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_secrets_file=ctx.obj["wiki_secrets_file"],
@@ -299,62 +421,73 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         + Style.RESET_ALL
     )
     msgs = gbot.fromSenders([TEXT_EMAIL, MAIL_EMAIL]).getMessages()
-    for msg in reversed(msgs):
-        text = msg.getText().strip()
-        date = msg.getDate()
-        matched = False
-        if categories_csv is not None:
-            with open(os.path.expanduser(categories_csv), "r") as categories:
-                for line in categories:
-                    keyword, page_id = line.split(",")[0], line.split(",")[1]
-                    matched = process_keyword(
+    try:
+        for msg in reversed(msgs):
+            text = msg.getText().strip()
+            date = msg.getDate()
+            matched = False
+            if categories_csv is not None:
+                with open(os.path.expanduser(categories_csv), "r") as categories:
+                    for line in categories:
+                        keyword, notion_page_id = (
+                            line.split(",")[0],
+                            line.split(",")[1].strip(),
+                        )
+                        matched = process_keyword(
+                            text,
+                            date.strftime("%m/%d/%Y"),
+                            keyword,
+                            notion_api_token,
+                            notion_page_id,
+                            msg,
+                            dry_run,
+                            logfile,
+                        )
+                        if matched:
+                            break
+            if matched:
+                continue
+            if text.lstrip("-+").isdigit():
+                print(f"  Calorie intake on {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Calories entry\n")
+                if not dry_run:
+                    caljo_doku = None
+                    caljo_doku = wiki.getPage(id="calorie-journal")
+                    new_caljo_doku = f"""{caljo_doku}
+    * ({date}) {text}"""
+                    wiki.putPage(id="calorie-journal", content=new_caljo_doku)
+                    if caljo_doku is not None:
+                        msg.moveToTrash()
+            elif (
+                text[:3].lower() == "p0:"
+                or text[:3].lower() == "p1:"
+                or text[:3].lower() == "p2:"
+                or text[:3].lower() == "p3:"
+            ):
+                print(f"  {text[:2]} task for {date}: {text[3:]}")
+                if logfile is not None:
+                    logfile.write("Task entry\n")
+                if not dry_run:
+                    task.putTask(
                         text,
-                        date.strftime("%m/%d/%Y"),
-                        keyword,
-                        page_id,
-                        wiki,
-                        msg,
-                        dry_run,
-                        logfile,
+                        f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
+                        datetime.today(),
                     )
-                    if matched:
-                        break
-        if matched:
-            continue
-        if text.lstrip('-+').isdigit():
-            print(f"  Calorie intake on {date}: {text}")
-            if logfile is not None:
-                logfile.write("Calories entry\n")
-            if not dry_run:
-                caljo_doku = None
-                caljo_doku = wiki.getPage(id="calorie-journal")
-                new_caljo_doku = f"""{caljo_doku}
-  * ({date}) {text}"""
-                wiki.putPage(id="calorie-journal", content=new_caljo_doku)
-                if caljo_doku is not None:
                     msg.moveToTrash()
-        elif (
-            text[:3].lower() == "p0:"
-            or text[:3].lower() == "p1:"
-            or text[:3].lower() == "p2:"
-            or text[:3].lower() == "p3:"
-        ):
-            print(f"  {text[:2]} task for {date}: {text[3:]}")
-            if logfile is not None:
-                logfile.write("Task entry\n")
-            if not dry_run:
-                task.putTask(
-                    text,
-                    f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
-                    datetime.today(),
-                )
-                msg.moveToTrash()
-        else:
-            print(f"  ITNS from {date}: {text}")
-            if logfile is not None:
-                logfile.write("Wiki:ITNS entry\n")
-            if not dry_run:
-                append_text_to_wiki_page(wiki, "itns", msg, text)
+            else:
+                print(f"  ITNS from {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Notion:ITNS entry\n")
+                if not dry_run:
+                    append_text_to_notion_page(
+                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
+                    )
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
@@ -370,6 +503,9 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 )
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
+    from gmail_parser.corpus import GBotCorpus, JournalCorpus
+    from task_tools.manage import TaskManager
+
     if ctx.obj["headless"]:
         Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "journal.log"), "w")
@@ -421,6 +557,81 @@ def journal(ctx: click.Context, dry_run):
             print(text)
         if not dry_run:
             add_journal_entry_to_wiki(wiki, msg, date, text)
+    if logfile is not None:
+        logfile.close()
+    print(Fore.GREEN + f"Done." + Style.RESET_ALL)
+
+
+@cli.command()
+@click.pass_context
+@click.option(
+    "--categories-csv",
+    "categories_csv",
+    type=click.Path(),
+    default="~/configs/goromail-categories.csv",
+    show_default=True,
+    help="CSV that maps keywords to notion pages.",
+)
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Do a dry run; don't actually rename the pages.",
+)
+def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
+    """Re-title triage pages based on content."""
+    if ctx.obj["headless"]:
+        Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
+        logfile = open(os.path.join(ctx.obj["headless_logdir"], "annotate.log"), "w")
+    else:
+        logfile = None
+    try:
+        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
+            secrets = json.load(nsf)
+        notion_api_token = secrets["auth"]
+    except:
+        sys.stderr.write(f"Failed to load Notion API key")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
+    categories = {}
+    keyword = "pre-loop"
+    try:
+        if categories_csv is not None:
+            with open(os.path.expanduser(categories_csv), "r") as categories_file:
+                for line in categories_file:
+                    keyword, notion_page_id = (
+                        line.split(",")[0],
+                        line.split(",")[1].strip(),
+                    )
+                    if notion_page_id not in categories:
+                        categories[notion_page_id] = keyword.capitalize()
+        print(
+            Fore.YELLOW
+            + f"Annotating triage pages{' (DRY RUN)' if dry_run else ''}..."
+            + Style.RESET_ALL
+        )
+        for notion_page_id, keyword in categories.items():
+            success, bullet_count, action_count = do_notion_counts(
+                keyword,
+                notion_page_id,
+                notion_api_token,
+                dry_run,
+            )
+            if success:
+                print(
+                    f"  {keyword}: {bullet_count} bullets and {action_count} keywords"
+                )
+                if logfile is not None:
+                    logfile.write(f"{keyword}: [{bullet_count}, {action_count}]\n")
+            else:
+                print(f"  WARNING: Could not process {keyword}")
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.write(f"Program error on [{keyword}]\n")
+            logfile.close()
+        exit(1)
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)

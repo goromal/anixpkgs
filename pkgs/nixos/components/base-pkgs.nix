@@ -1,6 +1,5 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
   browser-aliases = if cfg.browserExec == null then
@@ -10,13 +9,16 @@ let
       browserExec = cfg.browserExec;
     });
   rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
-  oPathPkgs = lib.makeBinPath [ rclone rcrsyncConfigured ];
-  launchOrchestratorScript = writeShellScriptBin "launch-orchestrator" ''
+  oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
+  launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
   '';
+  auto_sync_cloud_dirs =
+    builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
+    cfg.cloudDirs;
   cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") cfg.cloudDirs);
-  launchSyncJobsScript = writeShellScriptBin "launch-sync-jobs" ''
+    builtins.concatStringsSep " " (map (x: "${x.name}") auto_sync_cloud_dirs);
+  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
     for cloud_dir in ${cloud_dir_list}; do
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
@@ -28,19 +30,17 @@ in {
     rcrsync = rcrsyncConfigured;
     authm = anixpkgs.authm.override { inherit rcrsync; };
   in ([
-    rclone
+    pkgs.rclone
     authm
     rcrsync
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
-    (anixpkgs.anix-upgrade.override {
-      standalone = cfg.standalone;
-      inherit browser-aliases;
-    })
+    (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
     anixpkgs.wiki-tools
     anixpkgs.task-tools
+    anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
     anixpkgs.color-prints
@@ -74,7 +74,7 @@ in {
     anixpkgs.svg
     anixpkgs.zipper
     anixpkgs.scrape
-  ] ++ (if cfg.standalone == false then [ docker tmux ] else [ ]));
+  ] ++ (if cfg.standalone == false then [ pkgs.docker pkgs.tmux ] else [ ]));
 
   systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
     Unit = { Description = "User-domain Orchestrator daemon"; };
@@ -125,7 +125,7 @@ in {
       let g:mix_format_options = '--check-equivalent'
     '';
     settings = { number = true; };
-    plugins = with vimPlugins; [
+    plugins = with pkgs.vimPlugins; [
       vim-elixir
       sensible
       vim-airline
@@ -139,6 +139,7 @@ in {
   home.file = with anixpkgs.pkgData; {
     ".anix-version".text =
       if local-build then "Local Build" else "v${anixpkgs-version}";
+    ".anix-meta".text = anixpkgs-meta;
     "records/${records.crypt.name}".source = records.crypt.data;
     ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
       text = ''

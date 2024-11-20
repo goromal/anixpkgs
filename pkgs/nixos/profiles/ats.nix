@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... }: {
-  imports = [ ../base.nix ];
+  imports = [ ../pc-base.nix ];
 
   machines.base = {
     machineType = "x86_linux";
@@ -8,6 +8,7 @@
     developer = false;
     loadATSServices = true;
     serveNotesWiki = true;
+    notesWikiPort = 8080;
     isInstaller = false;
   };
 

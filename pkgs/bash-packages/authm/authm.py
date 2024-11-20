@@ -1,15 +1,14 @@
 import click
 import sys
 from colorama import Fore, Style
-from easy_google_auth.auth    import getGoogleService, CredentialsRefreshException
-from gmail_parser.defaults    import GmailParserDefaults   as GPD
-from task_tools.defaults      import TaskToolsDefaults     as TTD
-from wiki_tools.defaults      import WikiToolsDefaults     as WTD
-from book_notes_sync.defaults import BookNotesSyncDefaults as BNSD
+from easy_google_auth.auth import getGoogleService, CredentialsRefreshException
+from gmail_parser.defaults import GmailParserDefaults as GPD
+
 
 @click.group()
 def cli():
     """Manage secrets."""
+
 
 @cli.command()
 @click.option(
@@ -38,7 +37,9 @@ def refresh(headless, force):
             headless_refresh=force,
         )
     except CredentialsRefreshException:
-        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed.")
+        sys.stderr.write(
+            f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed."
+        )
         exit(1)
     print(Fore.YELLOW + "Refreshing Bot Tokens..." + Style.RESET_ALL)
     try:
@@ -52,7 +53,9 @@ def refresh(headless, force):
             headless_refresh=force,
         )
     except CredentialsRefreshException:
-        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed.")
+        sys.stderr.write(
+            f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed."
+        )
         exit(1)
     print(Fore.YELLOW + "Refreshing Journal Tokens..." + Style.RESET_ALL)
     try:
@@ -66,17 +69,22 @@ def refresh(headless, force):
             headless_refresh=force,
         )
     except CredentialsRefreshException:
-        sys.stderr.write(f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed.")
+        sys.stderr.write(
+            f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed."
+        )
         exit(1)
     print(Fore.GREEN + "DONE" + Style.RESET_ALL)
+
 
 @cli.command()
 def validate():
     """Validate the secrets files present on the filesystem."""
     print(Fore.RED + "Not yet implemented!" + Style.RESET_ALL)
 
+
 def main():
     cli()
+
 
 if __name__ == "__main__":
     main()

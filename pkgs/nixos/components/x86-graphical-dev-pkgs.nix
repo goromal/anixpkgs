@@ -1,9 +1,8 @@
 { pkgs, config, lib, ... }:
-with pkgs;
-with import ../dependencies.nix { inherit config; };
+with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
-  home.packages = [ black clang-tools ];
+  home.packages = [ pkgs.black pkgs.clang-tools anixpkgs.aptest ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
     "org/gnome/shell" = { "favorite-apps" = [ "codium.desktop" ]; };
@@ -13,7 +12,7 @@ in {
   programs.vscode = {
     enable = true;
     package = unstable.vscodium;
-    extensions = with vscode-extensions;
+    extensions = with pkgs.vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
@@ -26,7 +25,7 @@ in {
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
         ms-vscode.cpptools
-      ] ++ vscode-utils.extensionsFromVscodeMarketplace [
+      ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";
           publisher = "twxs";

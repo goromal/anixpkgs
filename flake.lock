@@ -32,6 +32,25 @@
         "type": "github"
       }
     },
+    "ardupilot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717112455,
+        "narHash": "sha256-4sZlPIGYr9ivk1V5CHG1wsIxzqrHFxpb2inWT5IfDT4=",
+        "ref": "Copter-4.4",
+        "rev": "865cffa5f2a850f892ab43def2d4ad21b8a9adca",
+        "revCount": 57489,
+        "submodules": true,
+        "type": "git",
+        "url": "ssh://git@github.com/goromal/ardupilot"
+      },
+      "original": {
+        "ref": "Copter-4.4",
+        "submodules": true,
+        "type": "git",
+        "url": "ssh://git@github.com/goromal/ardupilot"
+      }
+    },
     "book-notes-sync": {
       "flake": false,
       "locked": {
@@ -198,11 +217,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870983,
-        "narHash": "sha256-VdJC/Z4xI5GHONMlA07Mui0gihbwOqjehurWUfWvxGc=",
+        "lastModified": 1730958833,
+        "narHash": "sha256-i/gVXHiE79Gvz+VSPiBRhD0sLigsbE0yolQdZJurrlM=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "81c4c2f30cc02cacae0c4d19c8bf42e64fb5d248",
+        "rev": "cbad2d3c0b4b022a50bad8e2073293aadff6f795",
         "type": "github"
       },
       "original": {
@@ -256,6 +275,38 @@
       "original": {
         "owner": "goromal",
         "repo": "manif-geom-rs",
+        "type": "github"
+      }
+    },
+    "mavlink": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725498612,
+        "narHash": "sha256-lLGWlDRA46c0CUfSQDqbpACswCaQ4QtDLRsuBnMzTCU=",
+        "owner": "mavlink",
+        "repo": "c_library_v2",
+        "rev": "f9cec4814082af27c2fd27259aed302f52ce9cf7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mavlink",
+        "repo": "c_library_v2",
+        "type": "github"
+      }
+    },
+    "mavlink-router": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724248737,
+        "narHash": "sha256-/RkuEb/N/jtik+H9Q+9xZ/VkDX8pGNcf/t13hTRrcfo=",
+        "owner": "mavlink-router",
+        "repo": "mavlink-router",
+        "rev": "c20337bbc61abda21463e7482172d58b654e66b6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mavlink-router",
+        "repo": "mavlink-router",
         "type": "github"
       }
     },
@@ -384,6 +435,22 @@
       "original": {
         "owner": "goromal",
         "repo": "orchestrator-cpp",
+        "type": "github"
+      }
+    },
+    "photos-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725170663,
+        "narHash": "sha256-M2OS2Lyf2I7FuDEXH0IgSosha0uXta8kd6ipRDyTNiE=",
+        "owner": "goromal",
+        "repo": "photos-tools",
+        "rev": "de94de37da9a1cc5d258539f055361e89342789e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "photos-tools",
         "type": "github"
       }
     },
@@ -525,6 +592,7 @@
       "inputs": {
         "aapis": "aapis",
         "anixdata": "anixdata",
+        "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
@@ -538,6 +606,8 @@
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
+        "mavlink": "mavlink",
+        "mavlink-router": "mavlink-router",
         "mavlog-utils": "mavlog-utils",
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
@@ -545,6 +615,7 @@
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
+        "photos-tools": "photos-tools",
         "phps": "phps",
         "pyceres": "pyceres",
         "pyceres_factors": "pyceres_factors",
@@ -711,11 +782,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1719368704,
-        "narHash": "sha256-lJ0oEfPhgjNCIvK0gjSxXMYWUJQ95FooQP/vg8v/L90=",
+        "lastModified": 1731298768,
+        "narHash": "sha256-s5OG/02L8I7dBa+SZ8txW9oe+DznOdj11lj5NzYUm7I=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "dbeb316216d733326a7a55fd47defadbd2dd9b1d",
+        "rev": "a20e54a092ee0a20e49fba87303b22aecc614f28",
         "type": "github"
       },
       "original": {

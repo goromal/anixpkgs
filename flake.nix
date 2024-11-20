@@ -18,6 +18,10 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
+    ardupilot.url =
+      "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
+    ardupilot.flake = false;
+
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
@@ -26,6 +30,12 @@
 
     manif-geom-cpp.url = "github:goromal/manif-geom-cpp";
     manif-geom-cpp.flake = false;
+
+    mavlink.url = "github:mavlink/c_library_v2";
+    mavlink.flake = false;
+
+    mavlink-router.url = "github:mavlink-router/mavlink-router";
+    mavlink-router.flake = false;
 
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
@@ -88,6 +98,9 @@
 
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
+
+    photos-tools.url = "github:goromal/photos-tools";
+    photos-tools.flake = false;
 
     pyceres.url =
       "github:Edwinem/ceres_python_bindings?rev=2106d043bce37adcfef450dd23d3005480948c37";
