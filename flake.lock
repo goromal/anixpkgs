@@ -425,11 +425,11 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1707606598,
-        "narHash": "sha256-ch21eRka7G/PEt/Ku8UplSYobjtw8zM8o2LgWXaAO00=",
+        "lastModified": 1732075257,
+        "narHash": "sha256-CWCcHbhEbHGp03+VMEd1Qu0l3jOkB1u2MbLGAhMiDng=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "73f7ec5912cf9e26dff994251ab109d557a3a36a",
+        "rev": "fef08eaf9379d6d6a1ebdca576c49517b72ddfd9",
         "type": "github"
       },
       "original": {

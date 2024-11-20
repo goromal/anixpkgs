@@ -10,17 +10,7 @@ env:
 
 jobs:
   lint:
-    name: Lint Nix Files
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: cachix/install-nix-action@v25
-      with:
-        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
-    - run: >
-        nix-shell -p nixfmt --run "bash scripts/lint.sh check"
-  check-flake-lock:
-    name: Check Flake Lock Sync
+    name: Check Lint Nix Files
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -35,8 +25,34 @@ jobs:
         branch=${{ github.head_ref || github.ref_name }}
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
-        # git checkout origin $branch
-        # git pull origin $branch
+        nix-shell -p nixfmt --run "bash scripts/lint.sh"
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          echo "Committing linting changes"
+          git add .
+          git commit -m "Lint format"
+          git push origin $branch
+        else
+          echo "No linting changes to commit"
+        fi
+        nix-shell -p nixfmt --run "bash scripts/lint.sh check"
+  check-flake-lock:
+    name: Check Flake Lock Sync
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref || github.ref_name }}
+        fetch-depth: 0
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - uses: cachix/install-nix-action@v25
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: |
+        branch=${{ github.head_ref || github.ref_name }}
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
         python scripts/update_deps.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
@@ -50,6 +66,7 @@ jobs:
         nix flake lock --no-update-lock-file
   check-deps:
     name: Check Dependencies
+    needs: check-flake-lock
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -66,6 +83,7 @@ jobs:
         fi
   envs:
     name: Build Environments
+    needs: check-flake-lock
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
