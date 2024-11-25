@@ -157,6 +157,9 @@ let
                 inherit service-ports;
                 pkg-src = flakeInputs.orchestrator;
               });
+            rcdo = addDoc (pySelf.callPackage ./python-packages/rcdo {
+              pkg-src = flakeInputs.rcdo;
+            });
             scrape = addDoc (pySelf.callPackage ./python-packages/scrape {
               pkg-src = flakeInputs.scrape;
             });
@@ -264,6 +267,7 @@ in rec {
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
   rankserver = final.python311.pkgs.rankserver;
+  rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
