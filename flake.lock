@@ -102,11 +102,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1725171145,
-        "narHash": "sha256-i7seU6iynBZjmiNxZ+R2StFyCT2e0csC21IaixrD3jQ=",
+        "lastModified": 1732082047,
+        "narHash": "sha256-k5GTWnTFXQ/tvJXV4iLgEclX6+nx3DB/XhNIwbD0Ohc=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "8d6c959c1fa2270e87cc5d3b07636e2a16e1259e",
+        "rev": "6bde06d00ef2990076c630d21454168653befb6c",
         "type": "github"
       },
       "original": {
@@ -360,11 +360,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1683696296,
-        "narHash": "sha256-T26p1qRETYRBB9HxyjyVeBHAF1bROw5roKDYCqgy9wI=",
+        "lastModified": 1728191989,
+        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "747f612e32aaa6c9e31285c69830d9d224c23b4b",
+        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
         "type": "github"
       },
       "original": {
@@ -424,11 +424,11 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1707606598,
-        "narHash": "sha256-ch21eRka7G/PEt/Ku8UplSYobjtw8zM8o2LgWXaAO00=",
+        "lastModified": 1732075257,
+        "narHash": "sha256-CWCcHbhEbHGp03+VMEd1Qu0l3jOkB1u2MbLGAhMiDng=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "73f7ec5912cf9e26dff994251ab109d557a3a36a",
+        "rev": "fef08eaf9379d6d6a1ebdca576c49517b72ddfd9",
         "type": "github"
       },
       "original": {

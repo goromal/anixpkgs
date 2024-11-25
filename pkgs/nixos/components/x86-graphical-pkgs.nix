@@ -49,7 +49,7 @@ in {
     { }));
 
   home.packages = with pkgs;
-    [ terminator anixpkgs.getres ] ++ (if cfg.standalone == false then [
+    [ typora terminator anixpkgs.getres ] ++ (if cfg.standalone == false then [
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
       gnomeExtensions.vitals
