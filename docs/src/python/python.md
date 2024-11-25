@@ -25,6 +25,7 @@ Packages written (or bound) in Python.
 - [rankserver](./rankserver.md)
 - [stampserver](./stampserver.md)
 - [easy-google-auth](./easy-google-auth.md)
+- [rcdo](./rcdo.md)
 - [task-tools](./task-tools.md)
 - [photos-tools](./photos-tools.md)
 - [wiki-tools](./wiki-tools.md)
