@@ -267,6 +267,7 @@ in rec {
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
   rankserver = final.python311.pkgs.rankserver;
+  rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;

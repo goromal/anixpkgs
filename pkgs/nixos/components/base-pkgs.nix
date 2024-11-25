@@ -57,6 +57,7 @@ in {
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
+    anixpkgs.rcdo
     anixpkgs.gantter
     anixpkgs.md2pdf
     anixpkgs.notabilify
