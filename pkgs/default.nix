@@ -157,6 +157,9 @@ let
                 inherit service-ports;
                 pkg-src = flakeInputs.orchestrator;
               });
+            rcdo = addDoc (pySelf.callPackage ./python-packages/rcdo {
+              pkg-src = flakeInputs.rcdo;
+            });
             scrape = addDoc (pySelf.callPackage ./python-packages/scrape {
               pkg-src = flakeInputs.scrape;
             });

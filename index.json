@@ -241,6 +241,11 @@
                 "docs": false
             },
             {
+                "attr": "rcdo",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "task-tools",
                 "ci": true,
                 "docs": true
@@ -369,11 +374,6 @@
             },
             {
                 "attr": "la-quiz",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rcdo",
                 "ci": true,
                 "docs": true
             },

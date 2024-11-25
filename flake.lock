@@ -587,6 +587,22 @@
         "type": "github"
       }
     },
+    "rcdo": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1732513665,
+        "narHash": "sha256-xO30OUZS5PoSky2sv61mZkqsIWtDsUWgWo80Oo2EHxo=",
+        "owner": "goromal",
+        "repo": "rcdo",
+        "rev": "c20eb4cea8c89f6a38941cd9692d3171be96f48e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "rcdo",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "aapis": "aapis",
@@ -623,6 +639,7 @@
         "python-dokuwiki": "python-dokuwiki",
         "quad-sim-cpp": "quad-sim-cpp",
         "rankserver-cpp": "rankserver-cpp",
+        "rcdo": "rcdo",
         "scrape": "scrape",
         "secure-delete": "secure-delete",
         "signals-cpp": "signals-cpp",
