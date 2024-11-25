@@ -1,12 +1,22 @@
-# anixpkgs
+# Andrew's Software
 
-![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
+![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml) [![pages-build-deployment](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment)
+
+My open source software is packaged and deployed from a central repository: **anixpkgs**. See the navigation menu for individual package documentation.
+
+[Return to main site](https://andrewtorgesen.com)
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
+
+**LATEST RELEASE: [v6.8.4](https://github.com/goromal/anixpkgs/tree/v6.8.4)**
 
 **[Repository](https://github.com/goromal/anixpkgs)**
 
 This repository of personally maintained Nix derivations, overlays, and machine closures is essentially the centralized mechanism by which I maintain all of the software I write and use for both personal projects and recreation. In other words, I employ [Nix](https://nixos.org) as both a package manager for my software as well as an operating system for all of my computers, Raspberry Pi’s, etc.
+
+These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
+
+## Why Nix?
 
 Some of the main reasons why I prefer Nix as a package manager:
 
@@ -18,7 +28,11 @@ Some of the main reasons why I prefer NixOS as an operating system for all of my
 - The same things I value in packaging software, I also value in “packaging an operating system.” NixOS allows me to have **total control** over every single package in my OS, allowing me to customize every aspect and make changes with the peace of mind that I can always roll back breaking changes.
 - There is something very satisfying and empowering to me about being able to **declaratively define the OS closures for all of my machines in just several text files.** The overlay-focused design of NixOS modules makes it so that I can design the OS’s of my machines hierarchically, defining packages that are shared between *all* of my computers as well as packages that are specific to certain computers only. Moreover, when I buy a replacement computer it takes a minimal amount of steps to turn that new computer into an *all-intents-and-purposes clone* of my old one, which is a capability I value very highly for a lot of reasons.
 
-These docs provide an overview of how I manage the OS’s of my [machines](./machines.md) as well as the [C++](./cpp/cpp.md), [Python](./python/python.md), and [miscellaneous](./misc/misc.md) software that I personally maintain, all within the [anixpkgs](https://github.com/goromal/anixpkgs) repo.
+Given the above, why do I prefer Nix over Docker?
+
+- To be clear, I do think that Nix and Docker can be used together effectively. However:
+- In general, one will require a mishmash of custom or third-party build and deployment tooling to construct and glue a bunch of Docker containers together if one is trying to architect a complete *system* using Docker (as could be the case with code running on a robot). Nix provides more of a unified framework to achieve the same benefits, and that ecosystem is much more aesthetically pleasing to me than e.g., "[YAML engineering](https://media.ccc.de/v/nixcon-2023-35290-nix-and-kubernetes-deployments-done-right#t=2)."
+- Docker containers sit atop an already existing, fully fleshed out operating system. Nix allows me to (once agin, within a unified framework) control literally everything about even the operating system in an attempt to avoid unintended side effects at all levels of integration.
 
 ## Installation and Usage Patterns
 
@@ -33,7 +47,7 @@ The software packaged in `anixpkgs` is buildable both through [Nix flakes](https
 
 ### Accessing the Packages Using Flakes
 
-Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v1.5.0`) while also giving you access to the public cache to avoid building from source on your machine:
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v6.8.4`) while also giving you access to the public cache to avoid building from source on your machine:
 
 ```nix
 {
@@ -47,7 +61,7 @@ Here is a `flake.nix` file that will get you a shell with select `anixpkgs` soft
     "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
   ];
   inputs = {
-    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v1.5.0";
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v6.8.4";
   };
   outputs = { self, nixpkgs }:
     let pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -67,13 +81,13 @@ Access the packages with `nix develop`.
 
 ### Accessing the Packages Using shell.nix
 
-Here are some `shell.nix` files to access Python packages (using version `v1.5.0` of the packages):
+Here are some `shell.nix` files to access Python packages (using version `v6.8.4` of the packages):
 
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
-  python-with-my-packages = pkgs.python39.withPackages (p: with p; [
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.4.tar.gz") {};
+  python-with-my-packages = pkgs.python311.withPackages (p: with p; [
     numpy
     matplotlib
     geometry
@@ -88,19 +102,19 @@ or:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.4.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
-    pkgs.python39
-    pkgs.python39.pkgs.numpy
-    pkgs.python39.pkgs.geometry
-    pkgs.python39.pkgs.find_rotational_conventions
+    pkgs.python311
+    pkgs.python311.pkgs.numpy
+    pkgs.python311.pkgs.geometry
+    pkgs.python311.pkgs.find_rotational_conventions
   ];
   shellHook = ''
     # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
     # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
     export PIP_PREFIX=$(pwd)/_build/pip_packages
-    export PYTHONPATH="$PIP_PREFIX/${pkgs.python39.sitePackages}:$PYTHONPATH"
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python311.sitePackages}:$PYTHONPATH"
     export PATH="$PIP_PREFIX/bin:$PATH"
     unset SOURCE_DATE_EPOCH
   '';
@@ -112,7 +126,7 @@ And for general software packages:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v1.5.0.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v6.8.4.tar.gz") {};
 in with pkgs; mkShell {
   buildInputs = [
     pb

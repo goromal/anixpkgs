@@ -1,6 +1,10 @@
 [global_config]
     suppress_multiple_term_dialog = True
+    borderless = False
+    handle_size = 4
 [keybindings]
+    broadcast_all = <Alt>a
+    broadcast_off = <Alt>o
 [profiles]
 [[default]]
     font = Mono 10

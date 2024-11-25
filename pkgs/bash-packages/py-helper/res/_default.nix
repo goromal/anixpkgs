@@ -1,5 +1,4 @@
-{ buildPythonPackage
-, lib
+{ buildPythonPackage, lib
 # ADD deps
 }:
 buildPythonPackage rec {

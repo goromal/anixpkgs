@@ -1,4 +1,4 @@
-# python39.pkgs.mesh-plotter
+# mesh-plotter
 
 Tools for plotting transforms and line meshes in Python.
 

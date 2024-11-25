@@ -1,47 +1,96 @@
-{ writeShellScriptBin
-, callPackage
-, color-prints
-, redirects
-, git-cc
-}:
+{ writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version
+, python3 }:
 let
-    pkgname = "cpp-helper";
-    argparse = callPackage ../bash-utils/argparse.nix {
-        usage_str = ''
-        usage: ${pkgname} [options]
+  pkgname = "cpp-helper";
+  usage_str = ''
+    usage: ${pkgname} [options]
 
-        Options:
-        --make-format-file             Dumps a format rules file into .clang-format
-        --make-nix                     Dump template default.nix and shell.nix files
-        --make-exec-lib   CPPNAME      Generate a lib+exec package template
-        --make-header-lib CPPNAME      Generate a header-only library template
-        '';
-        optsWithVarsAndDefaults = [
-            { var = "makeff";  isBool = true;  default = "0"; flags = "--make-format-file"; }
-            { var = "makehot"; isBool = false; default = "";  flags = "--make-header-lib"; }
-            { var = "makeexl"; isBool = false; default = "";  flags = "--make-exec-lib"; }
-            { var = "makenix"; isBool = true;  default = "0"; flags = "--make-nix"; }
-        ];
-    };
-    printErr = "${color-prints}/bin/echo_red";
-    printGrn = "${color-prints}/bin/echo_green";
-    formatFile = ./res/clang-format;
-    shellFile = ./res/_shell.nix;
-    defaultFile = ./res/_default.nix;
-    makeffRule = ''
+    Options:
+        make       TARGET|all   Full CMake build command (run from repo root)
+        challenge  TARGET|all   Full CMake build command WITH SANITIZERS
+                                (run from repo root)
+        format-file             Dumps a format rules file into .clang-format
+        nix                     Dump template shell.nix file
+        exec-lib   CPPNAME      Generate a lib+exec package template
+        header-lib CPPNAME      Generate a header-only library template
+        vscode                  Generate VSCode C++ header detection settings file
+                                (Run inside a Nix dev environment)
+  '';
+  printErr = "${color-prints}/bin/echo_red";
+  printGrn = "${color-prints}/bin/echo_green";
+  formatFile = ./res/clang-format;
+  shellFile = ./res/_shell.nix;
+  settingsAddScript = ./addsettings.py;
+  makeRule = ''
+    if [[ ! -z "$maketarget" ]]; then
+      if [[ "$maketarget" == "all" ]]; then
+        maketarget=""
+      fi
+      ${printGrn} "Building your repo..."
+      if [[ ! -f CMakeLists.txt ]]; then
+        ${printErr} "CMakeLists.txt not found."
+        exit 1
+      fi
+      if [[ -f shell.nix ]]; then
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      elif [[ -f flake.nix ]]; then
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+      else
+        ${printErr} "shell.nix not found."
+        exit 1
+      fi
+    fi
+  '';
+  challengeRule = ''
+    if [[ ! -z "$challengetarget" ]]; then
+      if [[ "$challengetarget" == "all" ]]; then
+        challengetarget=""
+      fi
+      ${printGrn} "Building (challenging) your repo..."
+      if [[ ! -f CMakeLists.txt ]]; then
+        ${printErr} "CMakeLists.txt not found."
+        exit 1
+      fi
+      if [[ -f shell.nix ]]; then
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+      elif [[ -f flake.nix ]]; then
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+      else
+        ${printErr} "shell.nix not found."
+        exit 1
+      fi
+    fi
+  '';
+  makeffRule = ''
     if [[ "$makeff" == "1" ]]; then
         ${printGrn} "Generating .clang-format..."
         cat ${formatFile} > .clang-format
     fi
-    '';
-    makenixRule = ''
+  '';
+  makenixRule = ''
     if [[ "$makenix" == "1" ]]; then
-        ${printGrn} "Generating template default.nix and shell.nix files..."
-        cat ${defaultFile} > default.nix
+        ${printGrn} "Generating template shell.nix file..."
         cat ${shellFile} > shell.nix
+        sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
-    '';
-    makehotRule = ''
+  '';
+  makevscodeRule = ''
+    if [[ "$makevscode" == "1" ]]; then
+        export SETTINGS_JSON="$PWD/.vscode/settings.json"
+        export CPP_CFG_JSON="$PWD/.vscode/c_cpp_properties.json"
+        ${printGrn} "Generating IntelliSense-compatible config for code completion in VSCode ($SETTINGS_JSON and $CPP_CFG_JSON)..."
+        mkdir -p "$PWD/.vscode"
+        ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON"
+        echo "{ \"configurations\": [{\"name\":\"NixOS\",\"intelliSenseMode\":\"linux-gcc-x64\"," > $CPP_CFG_JSON
+        echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
+        echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
+        echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
+        echo "], \"compileCommands\": \"build/compile_commands.json\" }],\"version\":4}" >> $CPP_CFG_JSON
+    fi
+  '';
+  makehotRule = ''
     if [[ ! -z "$makehot" ]]; then
         if [[ -d "$makehot" ]]; then
             while true; do
@@ -61,8 +110,8 @@ let
         sed -i 's|example-cpp|'"$makehot"'|g' "$makehot/cmake/example-cppConfig.cmake.in"
         mv "$makehot/cmake/example-cppConfig.cmake.in" "$makehot/cmake/''${makehot}Config.cmake.in"
     fi
-    '';
-    makeexlRule = ''
+  '';
+  makeexlRule = ''
     if [[ ! -z "$makeexl" ]]; then
         if [[ -d "$makeexl" ]]; then
             while true; do
@@ -82,29 +131,65 @@ let
         sed -i 's|example-cpp|'"$makeexl"'|g' "$makeexl/cmake/example-cppConfig.cmake.in"
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
-    '';
-in (writeShellScriptBin pkgname ''
-    set -e
-    ${argparse}
-    tmpdir=$(mktemp -d)
-    ${makeffRule}
-    ${makehotRule}
-    ${makeexlRule}
-    ${makenixRule}
-    rm -rf "$tmpdir"
+  '';
+in (writeArgparseScriptBin pkgname usage_str [
+  {
+    var = "makeff";
+    isBool = true;
+    default = "0";
+    flags = "format-file";
+  }
+  {
+    var = "makehot";
+    isBool = false;
+    default = "";
+    flags = "header-lib";
+  }
+  {
+    var = "makeexl";
+    isBool = false;
+    default = "";
+    flags = "exec-lib";
+  }
+  {
+    var = "makenix";
+    isBool = true;
+    default = "0";
+    flags = "nix";
+  }
+  {
+    var = "makevscode";
+    isBool = true;
+    default = "0";
+    flags = "vscode";
+  }
+  {
+    var = "maketarget";
+    isBool = false;
+    default = "";
+    flags = "make";
+  }
+  {
+    var = "challengetarget";
+    isBool = false;
+    default = "";
+    flags = "challenge";
+  }
+] ''
+  set -e
+  tmpdir=$(mktemp -d)
+  ${makeffRule}
+  ${makehotRule}
+  ${makeexlRule}
+  ${makenixRule}
+  ${makevscodeRule}
+  ${makeRule}
+  ${challengeRule}
+  rm -rf "$tmpdir"
 '') // {
-    meta = {
-        description = "Convenience tools for setting up C++ projects.";
-        longDescription = ''
-        ```
-        usage: cpp-helper [options]
-
-        Options:
-        --make-format-file             Dumps a format rules file into .clang-format
-        --make-nix                     Dump template default.nix and shell.nix files
-        --make-exec-lib   CPPNAME      Generate a lib+exec package template
-        --make-header-lib CPPNAME      Generate a header-only library template
-        ```
-        '';
-    };
+  meta = {
+    description = "Convenience tools for setting up C++ projects.";
+    longDescription = "";
+    autoGenUsageCmd = "--help";
+  };
 }

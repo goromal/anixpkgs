@@ -1,13 +1,8 @@
-{ writeShellScriptBin
-, callPackage
-, color-prints
-, strings
-, redirects
-}:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects }:
 let
-    name = "epub";
-    extension = "epub";
-    usage_str = ''
+  name = "epub";
+  extension = "epub";
+  usage_str = ''
     usage: epub inputfile outputfile
 
     Create an EPUB file.
@@ -18,17 +13,19 @@ let
 
     Options:
         --TODO
+  '';
+  optsWithVarsAndDefaults = [
+
+  ];
+  convOptCmds = [{
+    extension = "*";
+    commands = ''
+      echo_yellow "NOT IMPLEMENTED YET"
     '';
-    optsWithVarsAndDefaults = [
-        
-    ];
-    convOptCmds = [
-        { extension = "*"; commands = ''
-        echo_yellow "NOT IMPLEMENTED YET"
-        ''; }
-    ];
+  }];
 in callPackage ./mkConverter.nix {
-    inherit writeShellScriptBin callPackage color-prints strings;
-    inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
-    description = "Generate EPUB files from similar formats (*not finished yet!*).";
+  inherit writeArgparseScriptBin color-prints strings;
+  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  description =
+    "Generate EPUB files from similar formats (*not finished yet!*).";
 }

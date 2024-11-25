@@ -1,25 +1,16 @@
-{ callPackage
-, pytestCheckHook
-, buildPythonPackage
-, numpy
-, geometry
-, pkg-src
-}:
+{ callPackage, pytestCheckHook, buildPythonPackage, numpy, geometry, pkg-src }:
 callPackage ../pythonPkgFromScript.nix {
-    pname = "find_rotational_conventions";
-    version = "1.0.0";
-    description = "Find rotational conventions of a Python transform library.";
-    script-file = "${pkg-src}/find_rotational_conventions.py";
-    inherit pytestCheckHook buildPythonPackage;
-    propagatedBuildInputs = [
-        numpy
-        geometry
-    ];
-    checkPkgs = [];
-    longDescription = ''
+  pname = "find_rotational_conventions";
+  version = "1.0.0";
+  description = "Find rotational conventions of a Python transform library.";
+  script-file = "${pkg-src}/find_rotational_conventions.py";
+  inherit pytestCheckHook buildPythonPackage;
+  propagatedBuildInputs = [ numpy geometry ];
+  checkPkgs = [ ];
+  longDescription = ''
     [Gist](https://gist.github.com/goromal/fb15f44150ca4e0951acaee443f72d3e)
 
-    Conventions are defined in my [notes on rotations](https://notes.andrewtorgesen.com/doku.php?id=public:implementing-rotations). Example deduction of conventions used in the [geometry](./geometry.md) library:
+    Conventions are defined in my [notes on rotations](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:math:3d-geometry:implementing-rotations). Example deduction of conventions used in the [geometry](./geometry.md) library:
 
     ```python
     from find_rotational_conventions import (                                
@@ -76,5 +67,5 @@ callPackage ../pythonPkgFromScript.nix {
         Quaternion Function:       Passive
         Quaternion Directionality: Body-to-World
     ```
-    '';
+  '';
 }

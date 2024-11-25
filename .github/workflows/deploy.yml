@@ -1,11 +1,76 @@
 name: Deploy
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - closed
 
 jobs:
-  deploy:
+  bump-version:
+    name: Version Bump
+    if: ${{ (github.event.pull_request.merged == true) }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        git checkout master
+        if [[ "${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}" == "true" ]]; then
+            python scripts/increment_anix.py major
+            git pull origin master
+            git add .
+            git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }}" == "true" ]]; then
+            python scripts/increment_anix.py minor
+            git pull origin master
+            git add .
+            git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }}" == "true" ]]; then
+            python scripts/increment_anix.py patch
+            git pull origin master
+            git add .
+            git commit -m "Bump patch ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git push origin master
+        fi
+  generate-docs:
+    name: Generate Docs
+    if: ${{ (github.event.pull_request.merged == true) }}
+    needs: bump-version
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - uses: cachix/install-nix-action@v25
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        git checkout master
+        git pull origin master
+        NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          echo "Committing changes to $num_changes docs"
+          git add .
+          git commit -m "Generate updated docs"
+          git push origin master
+        else
+          echo "No docs changes to commit"
+        fi
+  publish-docs:
+    name: Publish Docs
+    if: ${{ (github.event.pull_request.merged == true) }}
+    needs: generate-docs
     runs-on: ubuntu-latest
     permissions:
       contents: write  # To push a branch 
@@ -23,11 +88,13 @@ jobs:
         echo `pwd`/mdbook >> $GITHUB_PATH
     - name: Deploy GitHub Pages
       run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        git checkout master
+        git pull origin master
         cd docs
         mdbook build
         git worktree add gh-pages
-        git config user.name "Deploy from CI"
-        git config user.email ""
         cd gh-pages
         # Delete the ref to avoid keeping history.
         git update-ref -d refs/heads/gh-pages
@@ -36,3 +103,19 @@ jobs:
         git add .
         git commit -m "Deploy $GITHUB_SHA to gh-pages"
         git push --force --set-upstream origin gh-pages
+  tag-release:
+    name: Tag Release
+    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MajorRelease') || contains(github.event.pull_request.labels.*.name, 'MinorRelease') || contains(github.event.pull_request.labels.*.name, 'PatchRelease')) }}
+    needs: generate-docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        git checkout master
+        git pull origin master
+        git tag v$(cat ANIX_VERSION) HEAD
+        git push --tags

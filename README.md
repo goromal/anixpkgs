@@ -1,27 +1,51 @@
 # anixpkgs
 
-![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg)
+![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml) [![pages-build-deployment](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment)
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as Nix overlays.
+**LATEST RELEASE: [v6.8.4](https://github.com/goromal/anixpkgs/tree/v6.8.4)**
+
+**[Docs Website](https://goromal.github.io/anixpkgs/)**
+
+A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as a [nixpkgs](https://github.com/NixOS/nixpkgs) overlay.
+
+## Update Dependencies
+
+To systematically update all (self-owned) dependencies, run
+
+```bash
+python scripts/update_deps.py
+```
+
+## Lint
+
+To lint all `.nix` files, run
+
+```bash
+nix-shell -p nixfmt --run "bash scripts/lint.sh"
+```
 
 ## Docs
 
-Comprehensive documentation for individual packages and common NixOS use cases is served locally [here](./docs/src/SUMMARY.md) and in site form [here](https://goromal.github.io/anixpkgs/) using `mdbook` on the `docs/` directory. To generate new docs, run
+Comprehensive documentation for individual packages and common NixOS use cases is served in site form [here](https://goromal.github.io/anixpkgs/) using `mdbook` on the `docs/` directory. To generate new docs, run
 
 ```bash
-python scripts/generate_docs.py
+NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
 ```
+
+*Auto-generated as part of CD pipeline.*
 
 ## Tests
 
-To build all packages and run their respective tests, run
+To build all packages and run their respective unit tests, run
 
 ```bash
-bash scripts/build_misc.sh
-bash scripts/build_cpp.sh
-bash scripts/build_python.sh
+bash scripts/build_pkgs.sh cpp
+bash scripts/build_pkgs.sh rust
+bash scripts/build_pkgs.sh python
+bash scripts/build_pkgs.sh bash
+bash scripts/build_pkgs.sh java
 ```
 
 To run regression tests, run
@@ -31,10 +55,23 @@ cd test
 nix-shell --run "bash test.sh"
 ```
 
-## Update Dependencies
+*Automatically run as part of CI pipeline.*
 
-To systematically update all (self-owned) dependencies, run
+## Closure Verifications
+
+To check the validity of all NixOS closures (without actually building them), run
 
 ```bash
-python scripts/update_deps.py
+bash scripts/check_machines.sh
+```
+
+*Automatically run as part of CI pipeline.*
+
+## SITL
+
+Some commands to spin up SITL environments:
+
+```bash
+# Drone Sim
+bash scripts/sitl/drone-sim.sh
 ```

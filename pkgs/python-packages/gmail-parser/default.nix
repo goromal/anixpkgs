@@ -1,73 +1,57 @@
-{ buildPythonPackage
-, pythonOlder
-, google-api-python-client
-, pydrive2
-, google-auth
-, google-auth-oauthlib
-, oauth2client
-, html2text
-, progressbar2
-, pkg-src
-}:
+{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text
+, progressbar2, pkg-src }:
 buildPythonPackage rec {
-    pname = "gmail_parser";
-    version = "0.0.0";
-    disabled = pythonOlder "3.8";
-    propagatedBuildInputs = [
-        google-api-python-client
-        pydrive2
-        google-auth
-        google-auth-oauthlib
-        oauth2client
-        html2text
-        progressbar2
-    ];
-    src = pkg-src;
-    meta = {
-        description = "Assorted Python tools for semi-automated processing of GMail messages.";
-        longDescription = ''
-        [Repository](https://github.com/goromal/gmail_parser)
+  pname = "gmail_parser";
+  version = "0.0.0";
+  disabled = pythonOlder "3.8";
+  propagatedBuildInputs = [ click easy-google-auth html2text progressbar2 ];
+  src = pkg-src;
+  meta = {
+    description =
+      "Assorted Python tools for semi-automated processing of GMail messages.";
+    longDescription = ''
+      [Repository](https://github.com/goromal/gmail_parser)
 
-        ## Setup
+      This package may be used either in CLI form or via an interactive Python shell.
 
-        You at least need a Google Drive API secrets file set up at `~/secrets/pydrive/client_secrets.json`.
+      ## Interactive Shell
 
-        ## Usage Examples
+      Import with
 
-        Import with
+      ```python
+      from gmail_parser.corpus import GMailCorpus
+      ```
 
-        ```python
-        from gmail_parser.corpus import GMailCorpus
-        ```
+      Deleting promotions and social network emails:
 
-        Deleting promotions and social network emails:
+      ```python
+      inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+      inbox.clean()
+      inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+      ```
 
-        ```python
-        inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
-        inbox.clean()
-        inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
-        ```
+      Get all senders of unread emails:
 
-        Get all senders of unread emails:
+      ```python
+      unread = inbox.fromUnread()
+      print(unread.getSenders())
+      ```
 
-        ```python
-        unread = inbox.fromUnread()
-        print(unread.getSenders())
-        ```
+      Read all unread emails from specific senders:
 
-        Read all unread emails from specific senders:
+      ```python
+      msgs = unread.fromSenders(['his@email.com', 'her@email.com']).getMessages()
+      for msg in msgs:
+          print(msg.getText())
+      ```
 
-        ```python
-        msgs = unread.fromSenders(['his@email.com', 'her@email.com']).getMessages()
-        for msg in msgs:
-            print(msg.getText())
-        ```
+      Mark an entire sub-inbox as read:
 
-        Mark an entire sub-inbox as read:
-
-        ```python
-        subInbox.markAllAsRead()
-        ```
-        '';
-    };
+      ```python
+      subInbox.markAllAsRead()
+      ```
+    '';
+    autoGenUsageCmd = "--help";
+    subCmds = [ "clean" "send" "gbot-send" "journal-send" ];
+  };
 }

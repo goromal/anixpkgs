@@ -1,13 +1,8 @@
-{ writeShellScriptBin
-, callPackage
-, color-prints
-, strings
-, redirects
-}:
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects }:
 let
-    name = "doku";
-    extension = "doku";
-    usage_str = ''
+  name = "doku";
+  extension = "doku";
+  usage_str = ''
     usage: doku inputfile outputfile
 
     Create a DokuWiki page.
@@ -18,17 +13,19 @@ let
 
     Options:
         --TODO
+  '';
+  optsWithVarsAndDefaults = [
+
+  ];
+  convOptCmds = [{
+    extension = "*";
+    commands = ''
+      echo_yellow "NOT IMPLEMENTED YET"
     '';
-    optsWithVarsAndDefaults = [
-        
-    ];
-    convOptCmds = [
-        { extension = "*"; commands = ''
-        echo_yellow "NOT IMPLEMENTED YET"
-        ''; }
-    ];
+  }];
 in callPackage ./mkConverter.nix {
-    inherit writeShellScriptBin callPackage color-prints strings;
-    inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
-    description = "Generate a DokuWiki text page from similar formats (*not finished yet!*).";
+  inherit writeArgparseScriptBin color-prints strings;
+  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  description =
+    "Generate a DokuWiki text page from similar formats (*not finished yet!*).";
 }
