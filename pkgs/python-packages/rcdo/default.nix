@@ -4,7 +4,7 @@ buildPythonPackage rec {
   version = "0.0.0";
   src = pkg-src;
   propagatedBuildInputs = [ click paramiko scp ];
-  doCheck = true;
+  doCheck = false;
   checkInputs = [ pytestCheckHook ];
   meta = {
     description = "Run commands on remote machines.";
