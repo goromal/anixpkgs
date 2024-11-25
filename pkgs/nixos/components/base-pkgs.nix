@@ -24,7 +24,12 @@ let
     done
   '';
   atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
-    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$@" remote
+    words=""
+    for word in "$@"; do
+      words+="$word "
+    done
+    words=''${words% }
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$words" remote
   '';
 in {
   home.stateVersion = cfg.homeState;
