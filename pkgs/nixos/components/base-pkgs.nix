@@ -23,6 +23,9 @@ let
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
   '';
+  atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$@" remote
+  '';
 in {
   home.stateVersion = cfg.homeState;
 
@@ -58,6 +61,7 @@ in {
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
     anixpkgs.rcdo
+    atsRunScript
     anixpkgs.gantter
     anixpkgs.md2pdf
     anixpkgs.notabilify
