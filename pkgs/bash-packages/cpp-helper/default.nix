@@ -1,5 +1,5 @@
-{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc, anixpkgs-version
-, python3 }:
+{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc
+, anixpkgs-version, python3 }:
 let
   pkgname = "cpp-helper";
   usage_str = ''
