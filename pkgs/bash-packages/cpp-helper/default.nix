@@ -1,4 +1,4 @@
-{ writeArgparseScriptBin, color-prints, redirects, git-cc, anixpkgs-version
+{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc, anixpkgs-version
 , python3 }:
 let
   pkgname = "cpp-helper";
@@ -17,6 +17,7 @@ let
                                 (Run inside a Nix dev environment)
   '';
   printErr = "${color-prints}/bin/echo_red";
+  printWrn = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
   formatFile = ./res/clang-format;
   shellFile = ./res/_shell.nix;
@@ -76,18 +77,28 @@ let
         sed -i 's|REPLACEME|${anixpkgs-version}|g' shell.nix
     fi
   '';
+  makevscodeScript = writeShellScript "makevscode" ''
+    export SETTINGS_JSON="$PWD/.vscode/settings.json"
+    export CPP_CFG_JSON="$PWD/.vscode/c_cpp_properties.json"
+    ${printGrn} "Generating IntelliSense-compatible config for code completion in VSCode ($SETTINGS_JSON and $CPP_CFG_JSON)..."
+    mkdir -p "$PWD/.vscode"
+    ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON"
+    echo "{ \"configurations\": [{\"name\":\"NixOS\",\"intelliSenseMode\":\"linux-gcc-x64\"," > $CPP_CFG_JSON
+    echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
+    echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
+    echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
+    echo "], \"compileCommands\": \"build/compile_commands.json\" }],\"version\":4}" >> $CPP_CFG_JSON
+  '';
   makevscodeRule = ''
     if [[ "$makevscode" == "1" ]]; then
-        export SETTINGS_JSON="$PWD/.vscode/settings.json"
-        export CPP_CFG_JSON="$PWD/.vscode/c_cpp_properties.json"
-        ${printGrn} "Generating IntelliSense-compatible config for code completion in VSCode ($SETTINGS_JSON and $CPP_CFG_JSON)..."
-        mkdir -p "$PWD/.vscode"
-        ${python3}/bin/python ${settingsAddScript} "$SETTINGS_JSON"
-        echo "{ \"configurations\": [{\"name\":\"NixOS\",\"intelliSenseMode\":\"linux-gcc-x64\"," > $CPP_CFG_JSON
-        echo "\"cStandard\":\"gnu17\",\"cppStandard\":\"gnu++17\",\"includePath\":[" >> $CPP_CFG_JSON
-        echo $(echo $CMAKE_INCLUDE_PATH: | sed -re 's|([^:\n]+)[:\n]|\"\1\",\n|g') >> $CPP_CFG_JSON
-        echo "\"\''${workspaceFolder}/src\"" >> $CPP_CFG_JSON
-        echo "], \"compileCommands\": \"build/compile_commands.json\" }],\"version\":4}" >> $CPP_CFG_JSON
+        if [[ -f shell.nix ]]; then
+          nix-shell --command 'bash ${makevscodeScript}'
+        elif [[ -f flake.nix ]]; then
+          nix develop --command 'bash ${makevscodeScript}'
+        else
+          ${printWrn} "WARNING: could not find a nix development environment to run."
+          bash ${makevscodeScript}
+        fi
     fi
   '';
   makehotRule = ''
