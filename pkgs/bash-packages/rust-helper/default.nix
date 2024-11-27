@@ -1,5 +1,5 @@
-{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc, anixpkgs-version
-, cargo, rustc, rustfmt, python3 }:
+{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc
+, anixpkgs-version, cargo, rustc, rustfmt, python3 }:
 let
   pkgname = "rust-helper";
   usage_str = ''
