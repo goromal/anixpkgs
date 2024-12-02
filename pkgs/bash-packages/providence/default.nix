@@ -46,7 +46,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
       readarray -d '!' -t talkdat <<< "$talkdesc"
       session="''${talkdat[0]}"
       readarray -d '|' -t talknames <<< "''${talkdat[1]}"
-      talkname=''${talknames[ $SRANDOM % ''{#talknames[@]} ]}
+      talkname=''${talknames[ $SRANDOM % ''${#talknames[@]} ]}
       echo "''${session} - ''${talkname}"
   else
       ${printErr} "Unrecognized domain: $domain."
