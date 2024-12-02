@@ -7,6 +7,7 @@ let
     Pick randomly from a specified domain:
     - patriarchal
     - passage
+    - talk
 
     Options:
     --wiki-url URL   URL of wiki to get data from (default: https://notes.andrewtorgesen.com)
@@ -39,6 +40,14 @@ in (writeArgparseScriptBin pkgname usage_str [{
       chapsnum="''${bookdat[1]}"
       chap=$(( ( SRANDOM % $chapsnum )  + 1 ))
       echo "''${scripname} -> ''${bookname} $chap"
+  elif [[ "$domain" == "talk" ]]; then
+      readarray -t talklist <<< $(${wikitools} --url $wiki_url get --page-id backend:talks)
+      talkdesc=''${talklist[ $SRANDOM % ''${#talklist[@]} ]}
+      readarray -d '!' -t talkdat <<< "$talkdesc"
+      session="''${talkdat[0]}"
+      readarray -d '|' -t talknames <<< "''${talkdat[1]}"
+      talkname=''${talknames[ $SRANDOM % ''{#talknames[@]} ]}
+      echo "''${session} - ''${talkname}"
   else
       ${printErr} "Unrecognized domain: $domain."
       exit 1
