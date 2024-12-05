@@ -237,7 +237,7 @@ let
         pathPkgs = oPathPkgs;
       };
     }
-  ] // (map (x: mkOneshotTimedOrchService x) atsServiceDefs));
+  ] ++ (map (x: (mkOneshotTimedOrchService x)) atsServiceDefs));
 in {
   options.services.ats = { enable = lib.mkEnableOption "enable ATS services"; };
 
