@@ -218,12 +218,16 @@ let
   ];
   atsServices = ([
     {
-      environment.systemPackages = with pkgs; [ # ^^^^ TODO
+      environment.systemPackages = with pkgs; [
         (writeShellScriptBin "atstrigger" ''
-          echo ${
+          serviceselection=$(${python3}/bin/python ${./atstrigger.py} ${
             builtins.concatStringsSep " "
             (map (x: "${x.name}.service") atsServiceDefs)
-          }
+          })
+          if [[ ! -z "$serviceselection" ]]; then
+            echo "sudo systemctl restart $serviceselection"
+            sudo systemctl restart $serviceselection
+          fi
         '')
         (writeShellScriptBin "atsrefresh" ''
           authm refresh --headless --force && rcrsync override secrets
