@@ -6,6 +6,7 @@ selection = ""
 
 
 def display_output(stdscr):
+    global service_list
     stdscr.clear()
     try:
         stdscr.addstr(0, 0, f"atstrigger: press <q> to quit...", curses.A_BOLD)
@@ -22,6 +23,8 @@ def main(stdscr):
     curses.curs_set(0)
     stdscr.clear()
 
+    idx_ords = [ord(str(i + 1)) for i in range(len(service_list))]
+
     while True:
         display_output(stdscr)
 
@@ -30,14 +33,16 @@ def main(stdscr):
         if key == ord("q"):
             break
 
-        elif key.isnumeric():
-            k = int(key)
-            if 1 <= k <= len(service_list):
-                selection = service_list[k - 1]
-                break
+        try:
+            k = idx_ords.index(key)
+        except ValueError:
+            k = -1
+
+        if k > -1:
+            selection = service_list[k]
+            break
 
 
 if __name__ == "__main__":
-    global selection
     curses.wrapper(main)
     print(selection)
