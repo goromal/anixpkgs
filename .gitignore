@@ -1,0 +1,5 @@
+.envrc
+result*
+build/*
+*.log
+.nixos-test-history
