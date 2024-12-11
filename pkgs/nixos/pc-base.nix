@@ -189,6 +189,13 @@ in {
         displayManager.gdm.enable = true;
         desktopManager.gnome.enable = true;
       };
+    
+    services.printing.enable = (cfg.machineType == "x86_linux" && cfg.graphical);
+    services.avahi = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
