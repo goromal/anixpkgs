@@ -224,7 +224,7 @@ let
             (map (x: "${x.name}.service") atsServiceDefs);
           triggerscript = ./atstrigger.py;
         in writeShellScriptBin "atstrigger" ''
-          servicelist="${servicelist}"
+          servicelist="${builtins.toString servicelist}"
           echo "TMP $servicelist"
           serviceselection=$(${python3}/bin/python ${triggerscript} "$servicelist")
           if [[ ! -z "$serviceselection" ]]; then
