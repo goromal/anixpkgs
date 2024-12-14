@@ -225,8 +225,10 @@ let
           triggerscript = ./atstrigger.py;
         in writeShellScriptBin "atstrigger" ''
           servicelist="${builtins.toString servicelist}"
-          echo "TMP $servicelist"
-          serviceselection="$( ${python3}/bin/python ${triggerscript} $servicelist )"
+          tmpdir=$(mktemp -d)
+          ${python3}/bin/python ${triggerscript} "$servicelist" > $tmpdir/selection
+          serviceselection=$(cat $tmpdir/selection)
+          rm -r $tmpdir
           if [[ ! -z "$serviceselection" ]]; then
             echo "sudo systemctl restart ''${serviceselection}"
             sudo systemctl restart ''${serviceselection}
