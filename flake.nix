@@ -121,6 +121,9 @@
     python-dokuwiki.url = "github:fmenabe/python-dokuwiki?ref=refs/tags/1.3.3";
     python-dokuwiki.flake = false;
 
+    rcdo.url = "github:goromal/rcdo";
+    rcdo.flake = false;
+
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 

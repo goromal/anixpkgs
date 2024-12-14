@@ -12,6 +12,7 @@ usage: providence [options] domain
 Pick randomly from a specified domain:
 - patriarchal
 - passage
+- talk
 
 Options:
 --wiki-url URL   URL of wiki to get data from (default: https://notes.andrewtorgesen.com)

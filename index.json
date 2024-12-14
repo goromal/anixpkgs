@@ -241,6 +241,11 @@
                 "docs": false
             },
             {
+                "attr": "rcdo",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "task-tools",
                 "ci": true,
                 "docs": true
@@ -489,6 +494,11 @@
             },
             {
                 "attr": "anix-upgrade",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "anix-changelog-compare",
                 "ci": true,
                 "docs": true
             },

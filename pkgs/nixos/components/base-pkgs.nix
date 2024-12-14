@@ -23,6 +23,14 @@ let
       ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
     done
   '';
+  atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
+    words=""
+    for word in "$@"; do
+      words+="$word "
+    done
+    words=''${words% }
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$words" remote
+  '';
 in {
   home.stateVersion = cfg.homeState;
 
@@ -34,10 +42,7 @@ in {
     authm
     rcrsync
     (anixpkgs.anix-version.override { standalone = cfg.standalone; })
-    (anixpkgs.anix-upgrade.override {
-      standalone = cfg.standalone;
-      inherit browser-aliases;
-    })
+    (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
@@ -60,6 +65,8 @@ in {
     anixpkgs.orchestrator
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
+    anixpkgs.rcdo
+    atsRunScript
     anixpkgs.gantter
     anixpkgs.md2pdf
     anixpkgs.notabilify
@@ -142,6 +149,7 @@ in {
   home.file = with anixpkgs.pkgData; {
     ".anix-version".text =
       if local-build then "Local Build" else "v${anixpkgs-version}";
+    ".anix-meta".text = anixpkgs-meta;
     "records/${records.crypt.name}".source = records.crypt.data;
     ".tmux.conf" = lib.mkIf (cfg.standalone == false) {
       text = ''

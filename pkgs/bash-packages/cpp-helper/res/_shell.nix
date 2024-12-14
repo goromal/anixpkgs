@@ -8,7 +8,4 @@ mkShell {
   buildInputs = [
     # ADD deps
   ];
-  shellHook = ''
-    cpp-helper vscode
-  '';
 }
