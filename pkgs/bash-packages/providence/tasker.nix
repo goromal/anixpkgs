@@ -26,7 +26,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
   for i in $(seq 1 $num_days); do
       duedate=$(date --date="$i days" +"%Y-%m-%d")
       echo "Creating task for $duedate..."
-      taskname="P0: [T] Scripture - $(${prexe} --wiki-url $wiki_url passage)"
+      taskname="P0: [T] $(${prexe} --wiki-url $wiki_url passage) - $(${prexe} --wiki-url $wiki_url talk)"
       tasknotes="$(${prexe} --wiki-url $wiki_url patriarchal)"
       ${ttexe} put --name="$taskname" --notes="$tasknotes" --date="$duedate"
   done
