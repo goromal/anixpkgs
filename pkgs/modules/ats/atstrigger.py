@@ -45,4 +45,4 @@ def main(stdscr):
 
 if __name__ == "__main__":
     curses.wrapper(main)
-    print(selection.strip(), file=sys.stdout)
+    sys.stderr.write(selection.strip())
