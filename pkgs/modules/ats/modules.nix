@@ -44,15 +44,8 @@ let
         };
       };
     };
-  atsServices = [
+  atsServiceDefs = [
     {
-      services.orchestratord = {
-        enable = true;
-        orchestratorPkg = anixpkgs.orchestrator;
-        pathPkgs = oPathPkgs;
-      };
-    }
-    (mkOneshotTimedOrchService {
       name = "ats-greeting";
       jobShellScript = pkgs.writeShellScript "ats-greeting" ''
         sleep 5
@@ -67,8 +60,8 @@ let
         OnBootSec = "1m";
         Persistent = false;
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-triaging";
       jobShellScript = pkgs.writeShellScript "ats-triaging" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -89,8 +82,8 @@ let
         OnCalendar = [ "*-*-* 06:30:00" "*-*-* 18:30:00" ];
         Persistent = true;
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-mailman";
       jobShellScript = pkgs.writeShellScript "ats-mailman" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -148,8 +141,8 @@ let
         OnBootSec = "5m";
         OnUnitActiveSec = "10m";
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-grader";
       jobShellScript = pkgs.writeShellScript "ats-grader" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -168,8 +161,8 @@ let
         OnCalendar = [ "*-*-* 06:00:00" ];
         Persistent = true;
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-tasks-ranked";
       jobShellScript = pkgs.writeShellScript "ats-tasks-ranked" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -187,8 +180,8 @@ let
         OnCalendar = [ "*-*-* 07:00:00" ];
         Persistent = true;
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-prov-tasker";
       jobShellScript = pkgs.writeShellScript "ats-prov-tasker" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -202,8 +195,8 @@ let
         OnCalendar = [ "Sun *-*-* 08:00:00" ];
         Persistent = false;
       };
-    })
-    (mkOneshotTimedOrchService {
+    }
+    {
       name = "ats-rand-journal";
       jobShellScript = pkgs.writeShellScript "ats-rand-journal" ''
         authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
@@ -221,8 +214,39 @@ let
         OnCalendar = [ "*-*-* 06:30:00" ];
         Persistent = true;
       };
-    })
+    }
   ];
+  atsServices = ([
+    {
+      environment.systemPackages = with pkgs; [
+        (let
+          servicelist = builtins.concatStringsSep "/"
+            (map (x: "${x.name}.service") atsServiceDefs);
+          triggerscript = ./atstrigger.py;
+        in writeShellScriptBin "atstrigger" ''
+          servicelist="${builtins.toString servicelist}"
+          tmpdir=$(mktemp -d)
+          ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
+          serviceselection=$(cat $tmpdir/selection)
+          rm -r $tmpdir
+          if [[ ! -z "$serviceselection" ]]; then
+            echo "sudo systemctl restart ''${serviceselection}"
+            sudo systemctl restart ''${serviceselection}
+          fi
+        '')
+        (writeShellScriptBin "atsrefresh" ''
+          authm refresh --headless --force && rcrsync override secrets
+        '')
+      ];
+    }
+    {
+      services.orchestratord = {
+        enable = true;
+        orchestratorPkg = anixpkgs.orchestrator;
+        pathPkgs = oPathPkgs;
+      };
+    }
+  ] ++ (map (x: (mkOneshotTimedOrchService x)) atsServiceDefs));
 in {
   options.services.ats = { enable = lib.mkEnableOption "enable ATS services"; };
 
