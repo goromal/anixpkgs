@@ -226,10 +226,10 @@ let
         in writeShellScriptBin "atstrigger" ''
           servicelist="${builtins.toString servicelist}"
           echo "TMP $servicelist"
-          serviceselection=$(${python3}/bin/python ${triggerscript} "$servicelist")
+          serviceselection="$( ${python3}/bin/python ${triggerscript} $servicelist )"
           if [[ ! -z "$serviceselection" ]]; then
-            echo "sudo systemctl restart $serviceselection"
-            sudo systemctl restart $serviceselection
+            echo "sudo systemctl restart ''${serviceselection}"
+            sudo systemctl restart ''${serviceselection}
           fi
         '')
         (writeShellScriptBin "atsrefresh" ''
