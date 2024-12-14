@@ -220,7 +220,7 @@ let
     {
       environment.systemPackages = with pkgs; [
         (let
-          servicelist = builtins.concatStringsSep " "
+          servicelist = builtins.concatStringsSep "/"
             (map (x: "${x.name}.service") atsServiceDefs);
           triggerscript = ./atstrigger.py;
         in writeShellScriptBin "atstrigger" ''
