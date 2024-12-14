@@ -84,7 +84,8 @@ devshell -d $tmpdir/data/devrc test_env --run "addsrc task-tools https://github.
 cd $tmpdir/dev/test_env/sources/ceres-factors
 cpp-helper nix
 sed -i 's|# ADD deps|eigen ceres-solver manif-geom-cpp boost|g' shell.nix
-nix-shell --run "echo 'Checking generated VSCode config'"
+cpp-helper vscode
+echo 'Checking generated VSCode config'
 if [[ -z $(cat .vscode/c_cpp_properties.json | grep manif-geom-cpp) ]]; then
     echo_red "VSCode C++ config improperly generated"
     exit 1
