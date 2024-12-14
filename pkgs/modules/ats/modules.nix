@@ -226,7 +226,7 @@ let
         in writeShellScriptBin "atstrigger" ''
           servicelist="${builtins.toString servicelist}"
           tmpdir=$(mktemp -d)
-          ${python3}/bin/python ${triggerscript} "$servicelist" > $tmpdir/selection
+          ${python3}/bin/python ${triggerscript} "$servicelist" # > $tmpdir/selection
           serviceselection=$(cat $tmpdir/selection)
           rm -r $tmpdir
           if [[ ! -z "$serviceselection" ]]; then
