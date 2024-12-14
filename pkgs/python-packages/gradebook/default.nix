@@ -1,11 +1,11 @@
-{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, service-ports, pkg-src }:
+{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama
+, service-ports, pkg-src }:
 buildPythonPackage rec {
   pname = "gradebook";
   version = "0.0.0";
   src = pkg-src;
   buildInputs = [ makeWrapper ];
-  propagatedBuildInputs =
-    [ click aapis-py grpcio colorama ];
+  propagatedBuildInputs = [ click aapis-py grpcio colorama ];
   postInstall = ''
     wrapProgram $out/bin/gradebookd \
       --add-flags "--port ${builtins.toString service-ports.gradebook}"
