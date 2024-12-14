@@ -1,7 +1,7 @@
 import sys
 import curses
 
-service_list = sys.argv[1:]
+service_list = sys.argv[1].split()
 selection = ""
 
 

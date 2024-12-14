@@ -224,7 +224,9 @@ let
             (map (x: "${x.name}.service") atsServiceDefs);
           triggerscript = ./atstrigger.py;
         in writeShellScriptBin "atstrigger" ''
-          serviceselection=$(${python3}/bin/python ${triggerscript} ${servicelist})
+          servicelist="${servicelist}"
+          echo "TMP $servicelist"
+          serviceselection=$(${python3}/bin/python ${triggerscript} "$servicelist")
           if [[ ! -z "$serviceselection" ]]; then
             echo "sudo systemctl restart $serviceselection"
             sudo systemctl restart $serviceselection
