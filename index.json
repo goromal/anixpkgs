@@ -269,6 +269,11 @@
                 "attr": "goromail",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "gradebook",
+                "ci": true,
+                "docs": true
             }
         ],
         "bash": [

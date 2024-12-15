@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1711514214,
-        "narHash": "sha256-P90yuQ9TGUKdWxe1Xi4tMtfCSPd7puFdVK0i7ivSjvM=",
+        "lastModified": 1734240005,
+        "narHash": "sha256-ydGzaszIULCfra4cMlSIDZCjKdn6b63C9TwgDOB25+E=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "8d7eb92606d7cb7817753203fbce7ad6cd740456",
+        "rev": "bbd81c2974dc591cd309f473cd3d32559b8c1f7e",
         "type": "github"
       },
       "original": {
@@ -226,6 +226,22 @@
       "original": {
         "owner": "goromal",
         "repo": "gmail_parser",
+        "type": "github"
+      }
+    },
+    "gradebook": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724639326,
+        "narHash": "sha256-J7oaVzoV7Ok8Tl7M2n6zu3bUoHipnya/3FqMbcf078k=",
+        "owner": "goromal",
+        "repo": "gradebook",
+        "rev": "f1e667847286580e2c2b96c214cf6a35630a7ec9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "gradebook",
         "type": "github"
       }
     },
@@ -618,6 +634,7 @@
         "flake-utils": "flake-utils",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
+        "gradebook": "gradebook",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
