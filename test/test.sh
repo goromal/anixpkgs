@@ -1,5 +1,7 @@
 set -eo pipefail
 
+# ^^^^ TODO take arg(s) that we need to report test results to the gradebook (only master merges once this is proven out)
+
 make-title -c yellow "Setting up"
 anixdir="$(dirname $PWD)"
 export NIX_PATH="anixpkgs=$anixdir:$NIX_PATH"
