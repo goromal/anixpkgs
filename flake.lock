@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1724467453,
+        "lastModified": 1734240005,
         "narHash": "sha256-ydGzaszIULCfra4cMlSIDZCjKdn6b63C9TwgDOB25+E=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "18b74891dfa4a1c28cff28eb9f49183618c5cee5",
+        "rev": "bbd81c2974dc591cd309f473cd3d32559b8c1f7e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/gradebook",
         "repo": "aapis",
         "type": "github"
       }
