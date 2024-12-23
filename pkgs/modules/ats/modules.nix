@@ -7,6 +7,9 @@ let
     "http://localhost:${builtins.toString globalCfg.notesWikiPort}"
   else
     "https://notes.andrewtorgesen.com";
+  atsudo = pkgs.writeShellScriptBin "atsudo" ''
+    su -c "$@" < $HOME/secrets/ats/p.txt
+  '';
   oPathPkgs = with anixpkgs;
     let
       ats-rcrsync = rcrsync.override { cloudDirs = globalCfg.cloudDirs; };
@@ -219,6 +222,7 @@ let
   atsServices = ([
     {
       environment.systemPackages = with pkgs; [
+        atsudo
         (let
           servicelist = builtins.concatStringsSep "/"
             (map (x: "${x.name}.service") atsServiceDefs);
@@ -231,7 +235,7 @@ let
           rm -r $tmpdir
           if [[ ! -z "$serviceselection" ]]; then
             echo "sudo systemctl restart ''${serviceselection}"
-            sudo systemctl restart ''${serviceselection}
+            ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
           fi
         '')
         (writeShellScriptBin "atsrefresh" ''
