@@ -8,7 +8,12 @@ let
   else
     "https://notes.andrewtorgesen.com";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
-    echo "$(cat $HOME/secrets/ats/p.txt)" | sudo $@
+    args=""
+    for word in "$@"; do
+      args+="$word "
+    done
+    args=''${args% }
+    echo "$(cat $HOME/secrets/ats/p.txt)" | sudo $args
   '';
   oPathPkgs = with anixpkgs;
     let
