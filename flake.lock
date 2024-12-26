@@ -509,16 +509,15 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1735181542,
+        "lastModified": 1735182553,
         "narHash": "sha256-qOV2F0Jw5KuUICKv65uMW3aRGTWqj6Eudg3NFjEb6ts=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "5b0f18cbd25d0aa57f9e00887add2b1c71062528",
+        "rev": "11d6532e27122b12238af99554535f9cfb138df6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/rename",
         "repo": "pysignals",
         "type": "github"
       }
@@ -689,16 +688,15 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1735181473,
+        "lastModified": 1735182528,
         "narHash": "sha256-Gj6E/vaW/xQC3pIYm1A+Zj5Rza7m2iuhA2faM1Fm1Tc=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "6dca390747161ffce80a9ceb0a0fc90c6f00a20d",
+        "rev": "3b1cdfe2ce66f96095b762673d7ffc2ef1f666ea",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/rename",
         "repo": "signals-cpp",
         "type": "github"
       }
@@ -816,11 +814,11 @@
     "trafficsim": {
       "flake": false,
       "locked": {
-        "lastModified": 1670693563,
-        "narHash": "sha256-Vk0ReIWjbhUTa/6AtPWhwgiyUF6fPvPEJSqiCfotncI=",
+        "lastModified": 1735182718,
+        "narHash": "sha256-y4kUTA5zSAj0TYRui7prBn9xBE9uhBEryZ+pYERVfBI=",
         "ref": "refs/heads/main",
-        "rev": "bd0d6741dbbd85d2951739c351dd501ac7e9af97",
-        "revCount": 5,
+        "rev": "973f3f1895ee846917bc1918be4bc6257e1d124d",
+        "revCount": 6,
         "type": "git",
         "url": "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96"
       },
