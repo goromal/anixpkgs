@@ -509,15 +509,16 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1683346322,
-        "narHash": "sha256-8tA0TAeEx3eYU2OWQr2gptZ1kJoXVyIhw+jV9JO6ZQ4=",
+        "lastModified": 1735181542,
+        "narHash": "sha256-qOV2F0Jw5KuUICKv65uMW3aRGTWqj6Eudg3NFjEb6ts=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "4362eed73014ad9f0bdf1b6467033cfd35cbee21",
+        "rev": "5b0f18cbd25d0aa57f9e00887add2b1c71062528",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/rename",
         "repo": "pysignals",
         "type": "github"
       }
@@ -688,15 +689,16 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1733642029,
-        "narHash": "sha256-aq/kiU5PxpGf+s79/xDtN+T5OuS1sjOYhqomHtIBst4=",
+        "lastModified": 1735181473,
+        "narHash": "sha256-Gj6E/vaW/xQC3pIYm1A+Zj5Rza7m2iuhA2faM1Fm1Tc=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "5a585cc69336bfda7045e341f6d1dd140a92c256",
+        "rev": "6dca390747161ffce80a9ceb0a0fc90c6f00a20d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/rename",
         "repo": "signals-cpp",
         "type": "github"
       }
