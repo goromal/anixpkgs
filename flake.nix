@@ -28,7 +28,7 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp";
+    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=release/1";
     manif-geom-cpp.flake = false;
 
     mavlink.url = "github:mavlink/c_library_v2";
