@@ -248,11 +248,11 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1735595290,
-        "narHash": "sha256-zVzvrbvRFrpDeeBMSagQ4oaoVmXSJOPCyoM2GwKYuWw=",
+        "lastModified": 1735598262,
+        "narHash": "sha256-etebn60eTbLk7tLT4yxXauEemqSLAkALp7VatKUDWdE=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "682b8ef87242dcce1f68749be019b403f0a6bfac",
+        "rev": "d29ad6a4b73e17d98abdd0e37e7df772ccba9d8b",
         "type": "github"
       },
       "original": {
