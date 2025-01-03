@@ -24,7 +24,5 @@ buildPythonPackage rec {
 
       [Homepage](https://pypi.org/project/scikit-sparse/#description)
     '';
-    license = licenses.mit;
-    maintainers = [ maintainers.costrouc ];
   };
 }

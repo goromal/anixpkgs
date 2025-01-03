@@ -95,6 +95,7 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
+            sym = addDoc (pySelf.callPackage ./python-packages/sym { });
             symforce =
               addDoc (pySelf.callPackage ./python-packages/symforce { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -275,6 +276,7 @@ in rec {
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
   scikit-sparse = final.python311.pkgs.scikit-sparse;
+  sym = final.python311.pkgs.sym;
   symforce = final.python311.pkgs.symforce;
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;

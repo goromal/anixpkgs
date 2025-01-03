@@ -276,6 +276,11 @@
                 "docs": false
             },
             {
+                "attr": "sym",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "symforce",
                 "ci": true,
                 "docs": false
