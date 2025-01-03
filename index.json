@@ -271,9 +271,14 @@
                 "docs": true
             },
             {
+                "attr": "scikit-sparse",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "symforce",
                 "ci": true,
-                "docs": true
+                "docs": false
             },
             {
                 "attr": "nano-pgo",

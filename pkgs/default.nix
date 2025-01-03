@@ -154,6 +154,8 @@ let
                 pkg-src = flakeInputs.makepyshell;
               });
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
+            scikit-sparse =
+              addDoc (pySelf.callPackage ./python-packages/scikit-sparse { });
             orchestrator = addDoc
               (pySelf.callPackage ./python-packages/orchestrator {
                 mp4 = final.mp4;
@@ -272,6 +274,7 @@ in rec {
   flask-oatbox = final.python311.pkgs.flask-oatbox;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  scikit-sparse = final.python311.pkgs.scikit-sparse;
   symforce = final.python311.pkgs.symforce;
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;
