@@ -248,11 +248,11 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1700917726,
-        "narHash": "sha256-p0oRBEr2WWfysk/rrJxh1B4Wjy6dkrKXhkYFW0A52Vk=",
+        "lastModified": 1735596924,
+        "narHash": "sha256-ehJqKtKYB0NCugnoArFrbRlivXDowPsAwn6mgNJcdIs=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "18b04007773561bad6f43d365134da61e17c304e",
+        "rev": "27d76ca40a0b20dabc093d5b33ecf86a37bfd7b1",
         "type": "github"
       },
       "original": {
@@ -370,6 +370,23 @@
       "original": {
         "owner": "goromal",
         "repo": "mscpp",
+        "type": "github"
+      }
+    },
+    "nano-pgo": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1730894668,
+        "narHash": "sha256-nnSNTWVMxKgZAI/hfvDFxGdUFvjBjPyuNs3mSDk0CJQ=",
+        "owner": "gisbi-kim",
+        "repo": "nano-pgo",
+        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gisbi-kim",
+        "repo": "nano-pgo",
+        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
         "type": "github"
       }
     },
@@ -627,6 +644,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
+        "nano-pgo": "nano-pgo",
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
