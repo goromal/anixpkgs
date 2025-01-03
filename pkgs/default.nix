@@ -110,6 +110,9 @@ let
               (pySelf.callPackage ./python-packages/pyceres_factors {
                 pkg-src = flakeInputs.pyceres_factors;
               });
+            nano-pgo = addDoc (pySelf.callPackage ./python-packages/nano-pgo {
+              pkg-src = flakeInputs.nano-pgo;
+            });
             pysignals = addDoc (pySelf.callPackage ./python-packages/pysignals {
               pkg-src = flakeInputs.pysignals;
             });
@@ -251,6 +254,7 @@ in rec {
   pyceres = final.python311.pkgs.pyceres;
   pyceres_factors = final.python311.pkgs.pyceres_factors;
   pysorting = final.python311.pkgs.pysorting;
+  nano-pgo = final.python311.pkgs.nano-pgo;
   pysignals = final.python311.pkgs.pysignals;
   mesh-plotter = final.python311.pkgs.mesh-plotter;
   scrape = final.python311.pkgs.scrape;

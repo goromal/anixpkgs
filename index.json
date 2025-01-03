@@ -269,6 +269,11 @@
                 "attr": "goromail",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "nano-pgo",
+                "ci": true,
+                "docs": true
             }
         ],
         "bash": [
