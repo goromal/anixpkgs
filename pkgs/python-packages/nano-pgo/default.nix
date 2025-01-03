@@ -1,5 +1,5 @@
 { callPackage, pytestCheckHook, buildPythonPackage, numpy, scipy, plotly
-, matplotlib, pkg-src }:
+, symforce, matplotlib, pkg-src }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "nano_pgo";
   version = "1.0.0";
@@ -7,7 +7,7 @@ callPackage ../pythonPkgFromScript.nix {
     "For an education purpose, from-scratch, single-file, python-only pose-graph optimization implementation";
   script-file = "${pkg-src}/nano_pgo.py";
   inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs = [ numpy scipy plotly matplotlib ];
+  propagatedBuildInputs = [ numpy scipy symforce plotly matplotlib ];
   checkPkgs = [ ];
   longDescription = ''
     [Repository](https://github.com/gisbi-kim/nano-pgo/tree/main)
@@ -17,5 +17,4 @@ callPackage ../pythonPkgFromScript.nix {
     - TODO
   ''; # ^^^^ TODO examples from scratchpad
   # ^^^^ TODO scikit-sparse?
-  # ^^^^ TODO symforce
 }

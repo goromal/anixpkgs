@@ -95,6 +95,8 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
+            symforce =
+              addDoc (pySelf.callPackage ./python-packages/symforce { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -270,6 +272,7 @@ in rec {
   flask-oatbox = final.python311.pkgs.flask-oatbox;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  symforce = final.python311.pkgs.symforce;
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
