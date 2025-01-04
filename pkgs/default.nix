@@ -25,8 +25,8 @@ let
         pkg-attr.meta.subCmds
       else
         [ ];
-      auto-usage-doc =
-        (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
+      auto-usage-doc = (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
+        (if pkg-attr.meta.autoGenUsageCmd != null then ''
 
           ## Usage (Auto-Generated)
 
@@ -38,7 +38,9 @@ let
           }}
           ```
         '' else
-          "");
+          "")
+      else
+        "");
     in pkg-attr // rec {
       doc = prev.writeTextFile {
         name = "doc.txt";
