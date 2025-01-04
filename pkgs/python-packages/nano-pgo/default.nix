@@ -1,5 +1,5 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, numpy, scipy, plotly, sym
-, sympy, symforce, scikit-sparse, matplotlib, pkg-src }:
+{ callPackage, pytestCheckHook, buildPythonPackage, numpy, scipy, plotly, sympy
+, symforce, scikit-sparse, matplotlib, pkg-src }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "nano_pgo";
   version = "1.0.0";
@@ -8,7 +8,7 @@ callPackage ../pythonPkgFromScript.nix {
   script-file = "${pkg-src}/nano_pgo.py";
   inherit pytestCheckHook buildPythonPackage;
   propagatedBuildInputs =
-    [ numpy scipy sym sympy symforce scikit-sparse plotly matplotlib ];
+    [ numpy scipy sympy symforce scikit-sparse plotly matplotlib ];
   checkPkgs = [ ];
   longDescription = ''
     [Repository](https://github.com/gisbi-kim/nano-pgo/tree/main)
