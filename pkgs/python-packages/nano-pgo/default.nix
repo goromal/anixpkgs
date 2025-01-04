@@ -9,6 +9,9 @@ callPackage ../pythonPkgFromScript.nix {
   inherit pytestCheckHook buildPythonPackage;
   propagatedBuildInputs =
     [ numpy scipy sympy symforce scikit-sparse plotly matplotlib ];
+  postConfigure = ''
+    sed -i 's|if __name__ == "__main__":|def main():|g' nano_pgo/cli.py
+  '';
   checkPkgs = [ ];
   longDescription = ''
     [Repository](https://github.com/gisbi-kim/nano-pgo/tree/main)
@@ -19,4 +22,5 @@ callPackage ../pythonPkgFromScript.nix {
 
     - TODO
   ''; # ^^^^ TODO examples from scratchpad
+  autoGenUsageCmd = null;
 }

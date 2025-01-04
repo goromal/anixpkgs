@@ -1,6 +1,22 @@
-{ lib, buildPythonPackage, fetchurl, pythonOlder }:
+{ python, lib, fetchPypi, buildPythonPackage, fetchurl, pythonOlder, black
+, jinja2 }:
+let
+  symforce-sym = buildPythonPackage rec {
+    version = "0.9.0";
+    pname = "symforce-sym";
+    disabled = pythonOlder "3.11";
 
-buildPythonPackage rec {
+    src = fetchPypi {
+      inherit pname version;
+      sha256 =
+        "2eecfa0b1d9a2544be832e9842c2b7a02859ff4259f8214a5fce7f79c2064347";
+    };
+
+    propagatedBuildInputs = [ ];
+    doCheck = false;
+    pythonImportsCheck = [ ];
+  };
+in buildPythonPackage rec {
   version = "0.9.0";
   pname = "symforce";
   format = "wheel";
@@ -14,7 +30,7 @@ buildPythonPackage rec {
     hash = "";
   };
 
-  propagatedBuildInputs = [ ];
+  propagatedBuildInputs = [ symforce-sym black jinja2 ];
 
   doCheck = false;
 
