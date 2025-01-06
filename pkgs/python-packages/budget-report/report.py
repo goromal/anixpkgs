@@ -244,9 +244,9 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
         for i, row in enumerate(reader):
             if i >= acct_cfg["StartRow"]:
                 processed_line = False
+                row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
                 for amount_col in amount_cols:
                     try:
-                        row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
                         transactions.append(
                             (
                                 account.replace("_", " "),
