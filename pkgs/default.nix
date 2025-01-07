@@ -25,8 +25,8 @@ let
         pkg-attr.meta.subCmds
       else
         [ ];
-      auto-usage-doc =
-        (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
+      auto-usage-doc = (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
+        (if pkg-attr.meta.autoGenUsageCmd != null then ''
 
           ## Usage (Auto-Generated)
 
@@ -38,7 +38,9 @@ let
           }}
           ```
         '' else
-          "");
+          "")
+      else
+        "");
     in pkg-attr // rec {
       doc = prev.writeTextFile {
         name = "doc.txt";
@@ -95,6 +97,8 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
+            symforce =
+              addDoc (pySelf.callPackage ./python-packages/symforce { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -110,6 +114,9 @@ let
               (pySelf.callPackage ./python-packages/pyceres_factors {
                 pkg-src = flakeInputs.pyceres_factors;
               });
+            nano-pgo = addDoc (pySelf.callPackage ./python-packages/nano-pgo {
+              pkg-src = flakeInputs.nano-pgo;
+            });
             pysignals = addDoc (pySelf.callPackage ./python-packages/pysignals {
               pkg-src = flakeInputs.pysignals;
             });
@@ -149,6 +156,8 @@ let
                 pkg-src = flakeInputs.makepyshell;
               });
             norbert = addDoc (pySelf.callPackage ./python-packages/norbert { });
+            scikit-sparse =
+              addDoc (pySelf.callPackage ./python-packages/scikit-sparse { });
             orchestrator = addDoc
               (pySelf.callPackage ./python-packages/orchestrator {
                 mp4 = final.mp4;
@@ -251,6 +260,7 @@ in rec {
   pyceres = final.python311.pkgs.pyceres;
   pyceres_factors = final.python311.pkgs.pyceres_factors;
   pysorting = final.python311.pkgs.pysorting;
+  nano-pgo = final.python311.pkgs.nano-pgo;
   pysignals = final.python311.pkgs.pysignals;
   mesh-plotter = final.python311.pkgs.mesh-plotter;
   scrape = final.python311.pkgs.scrape;
@@ -266,6 +276,8 @@ in rec {
   flask-oatbox = final.python311.pkgs.flask-oatbox;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  scikit-sparse = final.python311.pkgs.scikit-sparse;
+  symforce = final.python311.pkgs.symforce;
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
