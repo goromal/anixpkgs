@@ -13,6 +13,7 @@ let
       args+="$word "
     done
     args=''${args% }
+    echo "sudo $args"
     echo "$(cat $HOME/secrets/ats/p.txt)" | sudo $args
   '';
   oPathPkgs = with anixpkgs;
