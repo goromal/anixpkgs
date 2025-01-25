@@ -256,6 +256,11 @@ let
         pathPkgs = oPathPkgs;
       };
     }
+    {
+      security.sudo.extraConfig = ''
+        Defaults    timestamp_timeout=0
+      '';
+    }
   ] ++ (map (x: (mkOneshotTimedOrchService x)) atsServiceDefs));
 in {
   options.services.ats = { enable = lib.mkEnableOption "enable ATS services"; };
