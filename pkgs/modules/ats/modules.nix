@@ -244,7 +244,9 @@ let
           fi
         '')
         (writeShellScriptBin "atsrefresh" ''
+          ${atsudo}/bin/atsudo systemctl stop orchestratord
           authm refresh --headless --force && rcrsync override secrets
+          ${atsudo}/bin/atsudo systemctl start orchestratord
         '')
       ];
     }
