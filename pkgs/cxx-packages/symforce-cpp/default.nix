@@ -9,8 +9,7 @@ clangStdenv.mkDerivation {
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
-    description =
-      "C++ bindings for the symforce library.";
+    description = "C++ bindings for the symforce library.";
     longDescription = ''
       [Repository](https://github.com/symforce-org/symforce/tree/main)
     '';
