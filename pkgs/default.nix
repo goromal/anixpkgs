@@ -395,6 +395,9 @@ in rec {
   sorting = addDoc (prev.callPackage ./cxx-packages/sorting {
     pkg-src = flakeInputs.sorting;
   });
+  symforce-cpp = addDoc (prev.callPackage ./cxx-packages/symforce-cpp {
+    pkg-src = flakeInputs.symforce;
+  });
   rankserver-cpp = addDoc (prev.callPackage ./cxx-packages/rankserver-cpp {
     pkg-src = flakeInputs.rankserver-cpp;
   });

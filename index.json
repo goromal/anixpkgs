@@ -70,6 +70,11 @@
                 "attr": "arducopter.sitl",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "symforce-cpp",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
