@@ -74,7 +74,7 @@
     book-notes-sync.flake = false;
 
     easy-google-auth.url =
-      "github:goromal/easy-google-auth?ref=dev/rate-limits";
+      "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
     find_rotational_conventions.url =
@@ -125,7 +125,7 @@
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
-    task-tools.url = "github:goromal/task-tools?ref=dev/rate-limits";
+    task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
 
     trafficsim.url =
