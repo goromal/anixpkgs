@@ -397,6 +397,7 @@ in rec {
   });
   symforce-cpp = addDoc (prev.callPackage ./cxx-packages/symforce-cpp {
     pkg-src = flakeInputs.symforce;
+    defaultPython = final.python311;
   });
   rankserver-cpp = addDoc (prev.callPackage ./cxx-packages/rankserver-cpp {
     pkg-src = flakeInputs.rankserver-cpp;
