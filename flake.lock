@@ -373,6 +373,23 @@
         "type": "github"
       }
     },
+    "nano-pgo": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1730894668,
+        "narHash": "sha256-nnSNTWVMxKgZAI/hfvDFxGdUFvjBjPyuNs3mSDk0CJQ=",
+        "owner": "gisbi-kim",
+        "repo": "nano-pgo",
+        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "gisbi-kim",
+        "repo": "nano-pgo",
+        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1717179513,
@@ -627,6 +644,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
+        "nano-pgo": "nano-pgo",
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
@@ -647,6 +665,7 @@
         "sorting": "sorting",
         "spelling-corrector": "spelling-corrector",
         "sunnyside": "sunnyside",
+        "symforce": "symforce",
         "task-tools": "task-tools",
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
@@ -762,6 +781,23 @@
       "original": {
         "owner": "goromal",
         "repo": "sunnyside",
+        "type": "github"
+      }
+    },
+    "symforce": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1686169351,
+        "narHash": "sha256-cOpycn48zSdR8clJEc2Zff/D6bDY453cVE2/L9gOgtc=",
+        "owner": "symforce-org",
+        "repo": "symforce",
+        "rev": "84f76b601ea6575fb990a9c23f7b77611911eab7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "symforce-org",
+        "ref": "refs/tags/v0.9.0",
+        "repo": "symforce",
         "type": "github"
       }
     },
