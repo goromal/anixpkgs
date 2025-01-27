@@ -50,7 +50,7 @@ spdlog_v1_10 = let staticBuild = false; in clangStdenv.mkDerivation rec {
   buildInputs = [ catch2_v3 ];
   propagatedBuildInputs = [ fmt_v8 ];
   patches = [
-    ./spdlog_build2.patch
+    ./spdlog_build.patch
   ];
   cmakeFlags = [
     "-DSPDLOG_BUILD_SHARED=${if staticBuild then "OFF" else "ON"}"
