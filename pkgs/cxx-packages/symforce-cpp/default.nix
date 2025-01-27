@@ -69,7 +69,8 @@ let
     };
     nativeBuildInputs = [ cmake ];
   };
-  pythonWithPkgs = defaultPython.withPackages (p: with p; [ argh skymarshal pybind11 ]);
+  pythonWithPkgs =
+    defaultPython.withPackages (p: with p; [ argh skymarshal pybind11 ]);
 in clangStdenv.mkDerivation {
   name = "symforce-cpp";
   version = "0.9.0";
