@@ -17,6 +17,8 @@ in pkgs.testers.runNixOSTest {
         host.port = 4444;
         guest.port = 22;
       }];
+      virtualisation.cores = 4;
+      virtualisation.memorySize = 2048;
     };
     # drone-physics = { config, pkgs, ... }: {
     #   # ...
