@@ -212,11 +212,11 @@ in rec {
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
-        echo -n "${meta-info}" > ANIX_META
       '' else
         "");
       installPhase = ''
         mkdir -p $out
+        echo -n "${meta-info}" > ANIX_META
         cp -r * $out/
       '';
     };
