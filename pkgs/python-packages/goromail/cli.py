@@ -164,7 +164,7 @@ def process_keyword(
 
 
 def add_journal_entry_to_wiki(wiki, msg, date, text):
-    new_entry = (date, date.strftime("%B %d"), "FIXME\n\n" + text + "\n\n")
+    new_entry = (date, date.strftime("%B %d"), "\n\n" + text + "\n\n")
     doku = None
     doku = wiki.getPage(id=f"journals:{date.year}")
     if not doku:
