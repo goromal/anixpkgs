@@ -271,6 +271,11 @@
                 "docs": true
             },
             {
+                "attr": "gradebook",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "symforce",
                 "ci": true,
                 "docs": false
