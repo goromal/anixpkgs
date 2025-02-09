@@ -70,11 +70,6 @@
                 "attr": "arducopter.sitl",
                 "ci": true,
                 "docs": false
-            },
-            {
-                "attr": "symforce-cpp",
-                "ci": true,
-                "docs": false
             }
         ],
         "rust": [
@@ -276,19 +271,9 @@
                 "docs": true
             },
             {
-                "attr": "scikit-sparse",
-                "ci": true,
-                "docs": false
-            },
-            {
                 "attr": "symforce",
                 "ci": true,
                 "docs": false
-            },
-            {
-                "attr": "nano-pgo",
-                "ci": true,
-                "docs": true
             }
         ],
         "bash": [

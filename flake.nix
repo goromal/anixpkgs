@@ -112,10 +112,6 @@
     pyceres_factors.url = "github:goromal/pyceres_factors";
     pyceres_factors.flake = false;
 
-    nano-pgo.url =
-      "github:gisbi-kim/nano-pgo?rev=b85562f0acda4d3e556f5b2d27c14156336df75b";
-    nano-pgo.flake = false;
-
     pysignals.url = "github:goromal/pysignals";
     pysignals.flake = false;
 
