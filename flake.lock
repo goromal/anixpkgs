@@ -373,23 +373,6 @@
         "type": "github"
       }
     },
-    "nano-pgo": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1730894668,
-        "narHash": "sha256-nnSNTWVMxKgZAI/hfvDFxGdUFvjBjPyuNs3mSDk0CJQ=",
-        "owner": "gisbi-kim",
-        "repo": "nano-pgo",
-        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "gisbi-kim",
-        "repo": "nano-pgo",
-        "rev": "b85562f0acda4d3e556f5b2d27c14156336df75b",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1717179513,
@@ -644,7 +627,6 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
-        "nano-pgo": "nano-pgo",
         "nixpkgs": "nixpkgs",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
