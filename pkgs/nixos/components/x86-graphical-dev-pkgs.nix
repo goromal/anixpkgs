@@ -38,6 +38,12 @@ in {
           version = "0.1.2";
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
+        {
+          name = "claude-dev";
+          publisher = "saoudrizwan";
+          version = "3.3.1";
+          sha256 = "sha256-9TltcgehgOi3kCYwSlYg6h2lhsEj0DmhrArf/eD59YM=";
+        }
       ];
     mutableExtensionsDir = false;
   };
