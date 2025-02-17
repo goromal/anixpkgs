@@ -54,7 +54,7 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
     };
-    exportMetrics = lib.mkOption {
+    enableMetrics = lib.mkOption {
       type = lib.types.bool;
       default = false;
       description = "Whether to export OS metrics";
@@ -281,7 +281,7 @@ in {
     };
 
     # Metrics
-    services.metricsNode.enable = cfg.exportMetrics;
+    services.metricsNode.enable = cfg.enableMetrics;
 
     # Server processes
     services.ats.enable = cfg.loadATSServices;
