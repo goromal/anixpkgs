@@ -54,6 +54,11 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
     };
+    exportMetrics = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to export OS metrics";
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
@@ -97,6 +102,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/ats/modules.nix
     ../modules/notes-wiki/module.nix
+    ../modules/metricsNode/module.nix
   ];
 
   config = {
@@ -273,6 +279,9 @@ in {
       rateLimitBurst = 0;
       rateLimitInterval = "0s";
     };
+
+    # Metrics
+    services.metricsNode.enable = cfg.exportMetrics;
 
     # Server processes
     services.ats.enable = cfg.loadATSServices;

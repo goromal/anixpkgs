@@ -9,5 +9,6 @@
     loadATSServices = false;
     serveNotesWiki = false;
     isInstaller = false;
+    exportMetrics = true;
   };
 }
