@@ -4,7 +4,7 @@ Find rotational conventions of a Python transform library.
 
 [Gist](https://gist.github.com/goromal/fb15f44150ca4e0951acaee443f72d3e)
 
-Conventions are defined in my [notes on rotations](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:math:3d-geometry:implementing-rotations). Example deduction of conventions used in the [geometry](./geometry.md) library:
+Conventions are defined in my [notes on rotations](https://andrewtorgesen.com/notes/Autonomy/Math_Fundamentals/3D_Geometry/Rotations_Robotics_Field_Guide.html). Example deduction of conventions used in the [geometry](./geometry.md) library:
 
 ```python
 from find_rotational_conventions import (                                
