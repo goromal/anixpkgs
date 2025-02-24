@@ -121,7 +121,7 @@ def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
         "Notion-Version": "2022-06-28",
     }
     content = get_page_blocks(headers, notion_page_id)
-    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["⏰"])
+    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["\\u23f0"]) # ⏰
     new_title = f"{keyword_count} - {bullet_count} - {keyword}"
     if not dry_run:
         update_page_title(headers, notion_page_id, new_title)
