@@ -99,7 +99,7 @@ def count_bullet_points_and_keywords(all_content, keywords):
         for keyword in keywords:
             keyword_count += json.dumps(content).lower().count(keyword)
 
-    return int(bullet_count), int(keyword_count)
+    return int(bullet_count), int(keyword_count / 2)
 
 
 def update_page_title(headers, page_id, new_title):
