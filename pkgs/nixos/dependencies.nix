@@ -3,7 +3,7 @@ let
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
   anixpkgs-meta = (builtins.readFile ../../ANIX_META);
 in rec {
-  local-build = false;
+  local-build = true;
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
   inherit anixpkgs-meta;
@@ -15,5 +15,5 @@ in rec {
   anixpkgs = import anixpkgs-src { };
   unstable = import (builtins.fetchTarball
     "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
-  service-ports = import ./service-ports { };
+  service-ports = import ./service-ports.nix;
 }

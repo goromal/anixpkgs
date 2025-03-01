@@ -6,9 +6,18 @@ let
 in {
   options.services.metricsNode = {
     enable = lib.mkEnableOption "enable metrics node services";
+    openFirewall = lib.mkOption {
+      type = lib.types.bool;
+      description =
+        "Whether to open the specific firewall port for inter-computer usage";
+      default = false;
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    networking.firewall.allowedTCPPorts =
+      lib.mkIf cfg.openFirewall [ service-ports.grafana ];
+
     services.vector = {
       enable = true;
       journaldAccess = true;
@@ -46,6 +55,7 @@ in {
     services.prometheus = {
       enable = true;
       port = service-ports.prometheus.output;
+      retentionTime = "15d";
       scrapeConfigs = [{
         job_name = "vector";
         static_configs = [{
@@ -54,7 +64,7 @@ in {
         }];
       }];
     };
-    services.grafana = { # ^^^^ TODO declarative configs w/ good descriptions
+    services.grafana = {
       enable = true;
       domain = "grafana.ajt";
       port = service-ports.grafana;
@@ -67,6 +77,7 @@ in {
       };
     };
   };
-  # ^^^^ TODO set module options for e.g., orchestrator to emit metrics
+  
+  # Enable metrics emissions
   # ^^^^ https://statsd.readthedocs.io/en/stable/
 }

@@ -27,6 +27,11 @@ in {
       description = "Packages to expose to orchestratord's PATH";
       default = [ ];
     };
+    statsdPort = lib.mkOption {
+      type = lib.types.nullOr lib.types.port;
+      default = null;
+      description = "StatsD port to send metrics to";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -42,7 +47,7 @@ in {
         Type = "simple";
         ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
             builtins.toString cfg.threads
-          }";
+          }" + lib.optionalString (cfg.statsdPort != null) " --statsd-port ${builtins.toString cfg.statsdPort}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
