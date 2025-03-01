@@ -467,6 +467,7 @@ in {
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = !cfg.loadATSServices;
         cloudAutoSync = false; # !cfg.loadATSServices;
+        enableMetrics = cfg.enableMetrics;
       };
     };
   };

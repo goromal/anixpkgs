@@ -11,7 +11,8 @@ let
   rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
-    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2 \
+      ${if cfg.enableMetrics then "--statsd-port ${builtins.toString service-ports.statsd}" else ""}
   '';
   auto_sync_cloud_dirs =
     builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
