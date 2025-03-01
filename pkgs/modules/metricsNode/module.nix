@@ -28,7 +28,7 @@ in {
           statsd = {
             # https://vector.dev/docs/reference/configuration/sources/statsd/
             type = "statsd";
-            address = "0.0.0.0:9000";
+            address = "0.0.0.0:${builtins.toString service-ports.statsd}";
             mode = "tcp";
           };
         };
@@ -37,23 +37,23 @@ in {
             # https://vector.dev/docs/reference/configuration/sinks/prometheus_exporter/
             type = "prometheus_exporter";
             inputs = [ "vector_metrics" "os_metrics" ];
-            address = "[::]:9598";
+            address = "[::]:${builtins.toString service-ports.prometheus.input}";
           };
         };
       };
     };
     services.prometheus = {
       enable = true;
-      port = 9001;
+      port = service-ports.prometheus.output;
       scrapeConfigs = [{
         job_name = "vector";
-        static_configs = [{ targets = [ "127.0.0.1:9598" ]; }];
+        static_configs = [{ targets = [ "127.0.0.1:${builtins.toString service-ports.prometheus.input}" ]; }];
       }];
     };
     services.grafana = { # ^^^^ TODO declarative configs w/ good descriptions
       enable = true;
       domain = "grafana.ajt";
-      port = 2342;
+      port = service-ports.grafana;
       addr = "127.0.0.1";
     };
     services.nginx.virtualHosts.${config.services.grafana.domain} = {
