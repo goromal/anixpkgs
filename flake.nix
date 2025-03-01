@@ -99,7 +99,7 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator";
+    orchestrator.url = "github:goromal/orchestrator?ref=dev/metrics";
     orchestrator.flake = false;
 
     photos-tools.url = "github:goromal/photos-tools";
