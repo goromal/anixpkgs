@@ -37,7 +37,8 @@ in {
             # https://vector.dev/docs/reference/configuration/sinks/prometheus_exporter/
             type = "prometheus_exporter";
             inputs = [ "vector_metrics" "os_metrics" ];
-            address = "[::]:${builtins.toString service-ports.prometheus.input}";
+            address =
+              "[::]:${builtins.toString service-ports.prometheus.input}";
           };
         };
       };
@@ -47,7 +48,10 @@ in {
       port = service-ports.prometheus.output;
       scrapeConfigs = [{
         job_name = "vector";
-        static_configs = [{ targets = [ "127.0.0.1:${builtins.toString service-ports.prometheus.input}" ]; }];
+        static_configs = [{
+          targets =
+            [ "127.0.0.1:${builtins.toString service-ports.prometheus.input}" ];
+        }];
       }];
     };
     services.grafana = { # ^^^^ TODO declarative configs w/ good descriptions
