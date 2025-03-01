@@ -99,7 +99,7 @@ def count_bullet_points_and_keywords(all_content, keywords):
         for keyword in keywords:
             keyword_count += json.dumps(content).lower().count(keyword)
 
-    return bullet_count, keyword_count
+    return int(bullet_count), int(keyword_count / 2)
 
 
 def update_page_title(headers, page_id, new_title):
@@ -121,8 +121,8 @@ def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
         "Notion-Version": "2022-06-28",
     }
     content = get_page_blocks(headers, notion_page_id)
-    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["action:"])
-    new_title = f"{keyword} - {bullet_count} - {keyword_count}"
+    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["\\u23f0"]) # ⏰
+    new_title = f"{keyword_count} - {bullet_count} - {keyword}"
     if not dry_run:
         update_page_title(headers, notion_page_id, new_title)
     return True, bullet_count, keyword_count
@@ -141,6 +141,7 @@ def process_keyword(
             item = f"[:::{datestr}:::] {matter[3:].strip()}"
         else:
             item = f"[**{datestr}**] {matter.strip()}"
+        item = re.sub(r"action:", "⏰", item, flags=re.IGNORECASE)
         if logfile is not None:
             logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
