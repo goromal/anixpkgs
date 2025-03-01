@@ -77,7 +77,7 @@ in {
       };
     };
   };
-  
+
   # Enable metrics emissions
   # ^^^^ https://statsd.readthedocs.io/en/stable/
 }

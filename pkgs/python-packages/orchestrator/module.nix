@@ -47,7 +47,8 @@ in {
         Type = "simple";
         ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
             builtins.toString cfg.threads
-          }" + lib.optionalString (cfg.statsdPort != null) " --statsd-port ${builtins.toString cfg.statsdPort}";
+          }" + lib.optionalString (cfg.statsdPort != null)
+          " --statsd-port ${builtins.toString cfg.statsdPort}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
