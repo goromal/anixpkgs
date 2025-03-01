@@ -64,7 +64,7 @@ in {
         }];
       }];
     };
-    services.grafana = {
+    services.grafana = { # ^^^^ TODO rename options; add plots configs
       enable = true;
       domain = "grafana.ajt";
       port = service-ports.grafana;

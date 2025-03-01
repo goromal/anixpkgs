@@ -282,6 +282,7 @@ in {
 
     # Metrics
     services.metricsNode.enable = cfg.enableMetrics;
+    services.metricsNode.openFirewall = cfg.enableMetrics;
 
     # Server processes
     services.ats.enable = cfg.loadATSServices;
