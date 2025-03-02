@@ -34,7 +34,7 @@ in {
               [ "cgroups" "cpu" "disk" "filesystem" "load" "memory" "network" ];
             cgroups = { base = ""; };
           };
-          statsd = {
+          statsd_metrics = {
             # https://vector.dev/docs/reference/configuration/sources/statsd/
             type = "statsd";
             address = "0.0.0.0:${builtins.toString service-ports.statsd}";
@@ -45,7 +45,7 @@ in {
           prometheus = {
             # https://vector.dev/docs/reference/configuration/sinks/prometheus_exporter/
             type = "prometheus_exporter";
-            inputs = [ "vector_metrics" "os_metrics" ];
+            inputs = [ "vector_metrics" "os_metrics" "statsd_metrics" ];
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
           };
