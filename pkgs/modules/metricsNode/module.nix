@@ -77,16 +77,19 @@ in {
         };
       };
     };
-    services.nginx.virtualHosts.${config.services.grafana.settings.server.domain} = {
-      listen = [{
+    services.nginx.virtualHosts.${config.services.grafana.settings.server.domain} =
+      {
+        listen = [{
           addr = "0.0.0.0";
           port = config.services.grafana.settings.server.http_port;
         }];
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
-        proxyWebsockets = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${
+              toString config.services.grafana.settings.server.http_port
+            }";
+          proxyWebsockets = true;
+        };
       };
-    };
   };
 
   # Enable metrics emissions
