@@ -53,6 +53,8 @@ in {
         };
       };
     };
+    # Check health with
+    # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
     services.prometheus = {
       enable = true;
       port = service-ports.prometheus.output;
@@ -69,15 +71,19 @@ in {
       enable = true;
       settings = {
         server = {
-          domain = "grafana.ajt";
+          domain = "localhost";
           http_port = service-ports.grafana;
           http_addr = "127.0.0.1";
         };
       };
     };
-    services.nginx.virtualHosts.${config.services.grafana.domain} = {
+    services.nginx.virtualHosts.${config.services.grafana.settings.server.domain} = {
+      listen = [{
+          addr = "0.0.0.0";
+          port = config.services.grafana.settings.server.http_port;
+        }];
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString config.services.grafana.port}";
+        proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
         proxyWebsockets = true;
       };
     };
