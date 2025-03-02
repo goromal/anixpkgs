@@ -48,7 +48,7 @@ in {
             inputs = [ "vector_metrics" "os_metrics" "statsd_metrics" ];
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
-          };
+          }; # ^^^^ TODO flush_period_secs, 
         };
       };
     };
@@ -64,11 +64,15 @@ in {
         }];
       }];
     };
-    services.grafana = { # ^^^^ TODO rename options; add plots configs
+    services.grafana = { # ^^^^ TODO add plots configs
       enable = true;
-      domain = "grafana.ajt";
-      port = service-ports.grafana;
-      addr = "127.0.0.1";
+      settings = {
+        server = {
+          domain = "grafana.ajt";
+          http_port = service-ports.grafana;
+          http_addr = "127.0.0.1";
+        };
+      };
     };
     services.nginx.virtualHosts.${config.services.grafana.domain} = {
       locations."/" = {
