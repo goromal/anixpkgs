@@ -48,7 +48,7 @@ in {
             inputs = [ "vector_metrics" "os_metrics" "statsd_metrics" ];
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
-          }; # ^^^^ TODO flush_period_secs, 
+          }; # ^^^^ TODO flush_period_secs,
         };
       };
     };
