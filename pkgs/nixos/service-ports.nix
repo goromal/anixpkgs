@@ -6,5 +6,8 @@
     input = 9598;
     output = 9001;
   };
-  grafana = 2342;
+  grafana = {
+    internal = 2342;
+    public = 5555;
+  };
 }

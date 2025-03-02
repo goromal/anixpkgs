@@ -16,7 +16,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     networking.firewall.allowedTCPPorts =
-      lib.mkIf cfg.openFirewall [ service-ports.grafana ];
+      lib.mkIf cfg.openFirewall [ service-ports.grafana.public ];
 
     services.vector = {
       enable = true;
@@ -72,7 +72,7 @@ in {
       settings = {
         server = {
           domain = "localhost";
-          http_port = service-ports.grafana;
+          http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
       };
@@ -81,7 +81,7 @@ in {
       {
         listen = [{
           addr = "0.0.0.0";
-          port = config.services.grafana.settings.server.http_port;
+          port = service-ports.grafana.public;
         }];
         locations."/" = {
           proxyPass = "http://127.0.0.1:${
