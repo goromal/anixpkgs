@@ -71,7 +71,7 @@ in {
       enable = true;
       settings = {
         server = {
-          domain = "localhost";
+          domain = "grafana.metrics";
           http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
