@@ -61,7 +61,7 @@ in {
         job_name = "vector";
         static_configs = [{
           targets =
-            [ "127.0.0.1:${builtins.toString service-ports.prometheus.input}" ];
+            [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
         }];
       }];
     };
