@@ -38,7 +38,7 @@ in {
             # https://vector.dev/docs/reference/configuration/sources/statsd/
             type = "statsd";
             address = "0.0.0.0:${builtins.toString service-ports.statsd}";
-            mode = "tcp";
+            mode = "udp";
           };
         };
         sinks = {
