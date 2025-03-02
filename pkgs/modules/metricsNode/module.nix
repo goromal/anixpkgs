@@ -75,6 +75,17 @@ in {
           http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
+        security = {
+    allow_embedding = true; # Allows Grafana panels to be embedded in iframes
+    cookie_samesite = "none"; # Ensures session cookies work across different origins
+  };
+  "auth.anonymous" = {
+    enabled = true; # Enable anonymous access (optional, if required)
+  };
+  "http" = {
+    enable_cors = true;  # Enable CORS
+    cors_allow_origins = ["*"]; # Allow all origins (or specify your frontend domain)
+  };
       };
     };
     services.nginx.virtualHosts.${config.services.grafana.settings.server.domain} =
