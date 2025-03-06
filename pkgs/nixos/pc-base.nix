@@ -41,6 +41,11 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    useSmtpServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to use an SMTP server for automated email.";
+      default = false;
+    };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to serve the notes wiki site.";
