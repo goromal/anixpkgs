@@ -817,11 +817,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1737904541,
-        "narHash": "sha256-xhlu/3M4rurlTf9n4AdYjnp3hKWLGXqJyCLo0lTgJ8o=",
+        "lastModified": 1740958593,
+        "narHash": "sha256-z2S7DmCIvwHfQ7iYVUe1+Ee30yMRnhG8HXrc1r7jH9Y=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "8386a4ca53b6c2ca5a25cdb00df619e0ed3d45e6",
+        "rev": "f63509631abb6934eb98bf265127414b86a31337",
         "type": "github"
       },
       "original": {
