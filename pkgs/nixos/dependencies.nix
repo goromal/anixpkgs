@@ -15,4 +15,5 @@ in rec {
   anixpkgs = import anixpkgs-src { };
   unstable = import (builtins.fetchTarball
     "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { };
+  service-ports = import ./service-ports.nix;
 }

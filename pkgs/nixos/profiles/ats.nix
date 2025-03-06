@@ -10,6 +10,7 @@
     serveNotesWiki = true;
     notesWikiPort = 8080;
     isInstaller = false;
+    enableMetrics = true;
   };
 
   users.users.andrew.hashedPassword = lib.mkForce

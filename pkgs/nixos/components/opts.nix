@@ -85,5 +85,10 @@ with import ../dependencies.nix; {
       description = "Screen resolution in [width]x[height] format";
       default = "1920x1080";
     };
+    enableMetrics = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to export OS metrics";
+    };
   };
 }

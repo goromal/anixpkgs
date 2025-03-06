@@ -255,6 +255,7 @@ let
         enable = true;
         orchestratorPkg = anixpkgs.orchestrator;
         pathPkgs = oPathPkgs;
+        statsdPort = lib.mkIf globalCfg.enableMetrics service-ports.statsd;
       };
     }
     {
