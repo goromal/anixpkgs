@@ -23,17 +23,17 @@ in {
       journaldAccess = true;
       settings = {
         sources = {
-          vector_metrics = {
-            # https://vector.dev/docs/reference/configuration/sources/internal_metrics/
-            type = "internal_metrics";
-          };
-          os_metrics = {
-            # https://vector.dev/docs/reference/configuration/sources/host_metrics/
-            type = "host_metrics";
-            collectors =
-              [ "cgroups" "cpu" "disk" "filesystem" "load" "memory" "network" ];
-            cgroups = { base = ""; };
-          };
+          # vector_metrics = {
+          #   # https://vector.dev/docs/reference/configuration/sources/internal_metrics/
+          #   type = "internal_metrics";
+          # };
+          # os_metrics = {
+          #   # https://vector.dev/docs/reference/configuration/sources/host_metrics/
+          #   type = "host_metrics";
+          #   collectors =
+          #     [ "cgroups" "cpu" "disk" "filesystem" "load" "memory" "network" ];
+          #   cgroups = { base = ""; };
+          # };
           statsd_metrics = {
             # https://vector.dev/docs/reference/configuration/sources/statsd/
             type = "statsd";
