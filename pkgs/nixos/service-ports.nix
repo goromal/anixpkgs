@@ -7,7 +7,7 @@
     output = 9001;
   };
   grafana = {
-    internal = 2342;
-    public = 5555;
+    internal = 5555;
+    public = 5556;
   };
 }
