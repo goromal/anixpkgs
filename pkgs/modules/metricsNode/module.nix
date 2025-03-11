@@ -18,6 +18,18 @@ in {
     networking.firewall.allowedTCPPorts =
       lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
 
+    services.netdata = {
+      enable = true;
+      config = {
+        global = { "memory mode" = "ram"; };
+        plugins = { "cgroup plugin" = "yes"; };
+        statsd = {
+          enabled = "yes";
+          destination = "127.0.0.1:${builtins.toString service-ports.statsd}";
+        };
+      };
+    };
+
     services.vector = {
       enable = true;
       journaldAccess = true;
