@@ -49,7 +49,7 @@ in {
             inputs = [ "statsd_metrics" ];
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
-          }; # ^^^^ TODO flush_period_secs,
+          };
         };
       };
     };
@@ -67,7 +67,7 @@ in {
         }];
       }];
     };
-    services.grafana = { # ^^^^ TODO add plots configs
+    services.grafana = {
       enable = true;
       settings = {
         server = {
@@ -91,7 +91,4 @@ in {
         };
       };
   };
-
-  # Enable metrics emissions
-  # ^^^^ https://statsd.readthedocs.io/en/stable/
 }
