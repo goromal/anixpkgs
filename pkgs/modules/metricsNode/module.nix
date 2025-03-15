@@ -23,9 +23,8 @@ in {
       config = {
         global = { "memory mode" = "ram"; };
         plugins = { "cgroup plugin" = "yes"; };
-        statsd = {
-          enabled = "yes";
-          destination = "127.0.0.1:${builtins.toString service-ports.statsd}";
+        web = {
+          "bind to" = "tcp:0.0.0.0:${builtins.toString service-ports.netdata}";
         };
       };
     };
@@ -35,17 +34,6 @@ in {
       journaldAccess = true;
       settings = {
         sources = {
-          # vector_metrics = {
-          #   # https://vector.dev/docs/reference/configuration/sources/internal_metrics/
-          #   type = "internal_metrics";
-          # };
-          # os_metrics = {
-          #   # https://vector.dev/docs/reference/configuration/sources/host_metrics/
-          #   type = "host_metrics";
-          #   collectors =
-          #     [ "cgroups" "cpu" "disk" "filesystem" "load" "memory" "network" ];
-          #   cgroups = { base = ""; };
-          # };
           statsd_metrics = {
             # https://vector.dev/docs/reference/configuration/sources/statsd/
             type = "statsd";
@@ -57,7 +45,6 @@ in {
           prometheus = {
             # https://vector.dev/docs/reference/configuration/sinks/prometheus_exporter/
             type = "prometheus_exporter";
-            # inputs = [ "vector_metrics" "os_metrics" "statsd_metrics" ];
             inputs = [ "statsd_metrics" ];
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
