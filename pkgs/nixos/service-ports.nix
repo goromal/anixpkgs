@@ -6,6 +6,7 @@
     input = 9598;
     output = 9001;
   };
+  netdata = 5554;
   grafana = {
     internal = 5555;
     public = 5556;
