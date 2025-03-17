@@ -13,7 +13,7 @@ buildPythonPackage rec {
     longDescription = ''
       [Repository](https://github.com/goromal/easy-google-auth)
 
-      Used as the authorization source for:
+      Also includes a dynamic API call rate limiter. Used as the authorization source for:
 
       - [gmail-parser](./gmail-parser.md)
       - [task-tools](./task-tools.md)

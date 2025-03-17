@@ -7,6 +7,14 @@ let
     "http://localhost:${builtins.toString globalCfg.notesWikiPort}"
   else
     "https://notes.andrewtorgesen.com";
+  atsudo = pkgs.writeShellScriptBin "atsudo" ''
+    args=""
+    for word in "$@"; do
+      args+="$word "
+    done
+    args=''${args% }
+    sudo -S $args < $HOME/secrets/ats/p.txt 2>/dev/null
+  '';
   oPathPkgs = with anixpkgs;
     let
       ats-rcrsync = rcrsync.override { cloudDirs = globalCfg.cloudDirs; };
@@ -219,6 +227,7 @@ let
   atsServices = ([
     {
       environment.systemPackages = with pkgs; [
+        atsudo
         (let
           servicelist = builtins.concatStringsSep "/"
             (map (x: "${x.name}.service") atsServiceDefs);
@@ -231,11 +240,13 @@ let
           rm -r $tmpdir
           if [[ ! -z "$serviceselection" ]]; then
             echo "sudo systemctl restart ''${serviceselection}"
-            sudo systemctl restart ''${serviceselection}
+            ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
           fi
         '')
         (writeShellScriptBin "atsrefresh" ''
+          ${atsudo}/bin/atsudo systemctl stop orchestratord
           authm refresh --headless --force && rcrsync override secrets
+          ${atsudo}/bin/atsudo systemctl start orchestratord
         '')
       ];
     }
@@ -244,7 +255,13 @@ let
         enable = true;
         orchestratorPkg = anixpkgs.orchestrator;
         pathPkgs = oPathPkgs;
+        statsdPort = lib.mkIf globalCfg.enableMetrics service-ports.statsd;
       };
+    }
+    {
+      security.sudo.extraConfig = ''
+        Defaults    timestamp_timeout=0
+      '';
     }
   ] ++ (map (x: (mkOneshotTimedOrchService x)) atsServiceDefs));
 in {
