@@ -28,7 +28,8 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=release/1";
+    manif-geom-cpp.url =
+      "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
     manif-geom-cpp.flake = false;
 
     mavlink.url = "github:mavlink/c_library_v2";
@@ -80,7 +81,7 @@
       "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    geometry.url = "github:goromal/geometry";
+    geometry.url = "github:goromal/geometry?ref=refs/tags/release/1.0";
     geometry.flake = false;
 
     gmail-parser.url = "github:goromal/gmail_parser";

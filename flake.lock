@@ -200,15 +200,16 @@
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1683347528,
-        "narHash": "sha256-aK7DiaHqXG/RfTzACi46s3RwBuHddEyXDIJpAughfuw=",
+        "lastModified": 1742189535,
+        "narHash": "sha256-rMySYxi15Cp1Li8H38DZfHyrm0N5MAbfIDRgsCRG1iY=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "a87b47c1a479ce0cf2ebaea7202b08a62150a7cc",
+        "rev": "d67ec20d64a8e9d04798306febe49b5aafa76c0e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "geometry",
         "type": "github"
       }
@@ -248,16 +249,16 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1737612137,
+        "lastModified": 1742189520,
         "narHash": "sha256-0xF03b3GfZrJpjspc7MsJYiTl/mBrbVjVNl4c4iYrxQ=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "dba7d09d187cf8c904ba911c05c546702e6a317d",
+        "rev": "9bbb6c47c8d0b2d90a53e868cfea855354106bad",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "release/1",
+        "ref": "refs/tags/release/1.0",
         "repo": "manif-geom-cpp",
         "type": "github"
       }
