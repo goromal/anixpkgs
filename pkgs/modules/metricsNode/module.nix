@@ -16,7 +16,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     networking.firewall.allowedTCPPorts =
-      lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
+      lib.mkIf cfg.openFirewall [ service-ports.grafana.internal service-ports.netdata ];
 
     services.netdata = {
       enable = true;
