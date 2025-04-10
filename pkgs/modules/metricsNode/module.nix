@@ -82,17 +82,17 @@ in {
     };
 
     # Reverse proxy settings for LAN access
-      services.avahi = { # ^^^^ TODO move to centralized location?
+    services.avahi = { # ^^^^ TODO move to centralized location?
+      enable = true;
+      nssmdns4 = true;
+      publish = {
         enable = true;
-        nssmdns4 = true;
-        publish = {
-          enable = true;
-          addresses = true;
-          domain = true;
-          workstation = true;
-        };
+        addresses = true;
+        domain = true;
+        workstation = true;
       };
-      # ^^^^ TODO base URL always directs to an auto-generated HTML file
+    };
+    # ^^^^ TODO base URL always directs to an auto-generated HTML file
     services.nginx = {
       enable = true;
       user = "andrew";
@@ -100,10 +100,13 @@ in {
       virtualHosts."${config.networking.hostName}.local" = {
         listen = [{
           addr = "0.0.0.0";
-          port = 80; # ^^^^ TODO also move to centralized location? Make an option?
+          port =
+            80; # ^^^^ TODO also move to centralized location? Make an option?
         }];
         locations."/grafana/" = {
-          proxyPass = "http://127.0.0.1:${builtins.toString service-ports.grafana.internal}/grafana/";
+          proxyPass = "http://127.0.0.1:${
+              builtins.toString service-ports.grafana.internal
+            }/grafana/";
           proxyWebsockets = true;
           extraConfig = ''
             proxy_set_header Host $host;
@@ -114,7 +117,9 @@ in {
           '';
         };
         locations."/netdata/" = {
-          proxyPass = "http://127.0.0.1:${builtins.toString service-ports.netdata}/";  # Netdata port
+          proxyPass = "http://127.0.0.1:${
+              builtins.toString service-ports.netdata
+            }/"; # Netdata port
         };
       };
     };
