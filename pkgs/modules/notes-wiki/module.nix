@@ -62,6 +62,7 @@ in {
     };
 
     # Reference: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/web-apps/dokuwiki.nix#L418
+    # ^^^^ TODO reconcile with metricsNode/module.nix
     services.nginx = {
       enable = true;
       user = "andrew";
