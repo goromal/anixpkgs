@@ -45,12 +45,8 @@ in {
       "tap-to-click" = true;
       "two-finger-scrolling-enabled" = true;
     };
-"org/gnome/mutter" = {
-                "dynamic-workspaces" = false;
-            };
-            "org/gnome/desktop/wm/preferences" = {
-                "num-workspaces" = 1;
-            };
+    "org/gnome/mutter" = { "dynamic-workspaces" = false; };
+    "org/gnome/desktop/wm/preferences" = { "num-workspaces" = 1; };
   } else
     { }));
 
