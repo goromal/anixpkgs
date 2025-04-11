@@ -16,7 +16,6 @@ in {
 
   config = lib.mkIf cfg.enable {
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
-      80 # ^^^^
       service-ports.grafana.internal
       service-ports.netdata
     ];
@@ -81,46 +80,24 @@ in {
       };
     };
 
-    # Reverse proxy settings for LAN access
-    services.avahi = { # ^^^^ TODO move to centralized location?
-      enable = true;
-      nssmdns4 = true;
-      publish = {
-        enable = true;
-        addresses = true;
-        domain = true;
-        workstation = true;
+    machines.base.runWebServer = true;
+    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      locations."/grafana/" = {
+        proxyPass = "http://127.0.0.1:${
+            builtins.toString service-ports.grafana.internal
+          }/grafana/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host;
+        '';
       };
-    };
-    # ^^^^ TODO base URL always directs to an auto-generated HTML file
-    services.nginx = {
-      enable = true;
-      user = "andrew";
-      group = "dev";
-      virtualHosts."${config.networking.hostName}.local" = {
-        listen = [{
-          addr = "0.0.0.0";
-          port =
-            80; # ^^^^ TODO also move to centralized location? Make an option?
-        }];
-        locations."/grafana/" = {
-          proxyPass = "http://127.0.0.1:${
-              builtins.toString service-ports.grafana.internal
-            }/grafana/";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-          '';
-        };
-        locations."/netdata/" = {
-          proxyPass = "http://127.0.0.1:${
-              builtins.toString service-ports.netdata
-            }/"; # Netdata port
-        };
+      locations."/netdata/" = {
+        proxyPass =
+          "http://127.0.0.1:${builtins.toString service-ports.netdata}/";
       };
     };
   };
