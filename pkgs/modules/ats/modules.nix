@@ -4,7 +4,7 @@ let
   globalCfg = config.machines.base;
   cfg = config.services.ats;
   wiki-url = if globalCfg.serveNotesWiki then
-    "http://${config.networking.hostName}.local/wiki/"
+    "http://${config.networking.hostName}.local"
   else
     "https://notes.andrewtorgesen.com"; # ^^^^ TODO FIX
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
