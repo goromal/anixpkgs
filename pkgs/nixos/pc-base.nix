@@ -41,6 +41,16 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
+    runWebServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to spawn a reverse proxy webserver.";
+      default = false;
+    };
+    webServerInsecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public insecure port";
+      default = 80;
+    };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to serve the notes wiki site.";
@@ -198,12 +208,32 @@ in {
 
     services.printing.enable =
       (cfg.machineType == "x86_linux" && cfg.graphical);
-    services.avahi =
-      lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+
+    services.avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+      # Web server DNS
+      publish = lib.mkIf cfg.runWebServer {
         enable = true;
-        nssmdns4 = true;
-        openFirewall = true;
+        addresses = true;
+        domain = true;
+        workstation = true;
       };
+    };
+    # ^^^^ TODO base URL always directs to an auto-generated HTML file
+    # Web server reverse proxy
+    services.nginx = lib.mkIf cfg.runWebServer {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      virtualHosts."${config.networking.hostName}.local" = {
+        listen = [{
+          addr = "0.0.0.0";
+          port = cfg.webServerInsecurePort;
+        }];
+      };
+    };
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -257,7 +287,8 @@ in {
     networking.useDHCP = false;
     networking.networkmanager.enable = !cfg.isInstaller;
 
-    networking.firewall.allowedTCPPorts = [ 4444 ];
+    networking.firewall.allowedTCPPorts = [ 4444 ]
+      ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -287,8 +318,6 @@ in {
     # Server processes
     services.ats.enable = cfg.loadATSServices;
     services.notes-wiki.enable = cfg.serveNotesWiki;
-    services.notes-wiki.insecurePort = cfg.notesWikiPort;
-    services.notes-wiki.openFirewall = true;
 
     # Global packages
     environment.systemPackages = with pkgs;

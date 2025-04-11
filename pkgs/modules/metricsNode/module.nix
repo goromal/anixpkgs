@@ -72,10 +72,32 @@ in {
       enable = true;
       settings = {
         server = {
-          domain = "grafana.metrics";
+          root_url = "http://${config.networking.hostName}.local/grafana/";
+          serve_from_sub_path = true;
           http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
+      };
+    };
+
+    machines.base.runWebServer = true;
+    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      locations."/grafana/" = {
+        proxyPass = "http://127.0.0.1:${
+            builtins.toString service-ports.grafana.internal
+          }/grafana/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host;
+        '';
+      };
+      locations."/netdata/" = {
+        proxyPass =
+          "http://127.0.0.1:${builtins.toString service-ports.netdata}/";
       };
     };
   };
