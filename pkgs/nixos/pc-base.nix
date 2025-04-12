@@ -221,7 +221,7 @@ in {
         workstation = true;
       };
     };
-    # ^^^^ TODO base URL always directs to an auto-generated HTML file
+
     # Web server reverse proxy
     services.nginx = lib.mkIf cfg.runWebServer {
       enable = true;
