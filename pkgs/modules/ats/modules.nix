@@ -6,7 +6,7 @@ let
   wiki-url = if globalCfg.serveNotesWiki then
     "http://${config.networking.hostName}.local"
   else
-    "https://notes.andrewtorgesen.com"; # ^^^^ TODO FIX
+    "https://notes.andrewtorgesen.com";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
