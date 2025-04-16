@@ -6,7 +6,7 @@ let
   wiki-url = if globalCfg.serveNotesWiki then
     "http://${config.networking.hostName}.local"
   else
-    "https://notes.andrewtorgesen.com";
+    "https://notes.andrewtorgesen.com"; # ^^^^ TODO by definition, the wiki runs only on ATS
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
@@ -284,4 +284,4 @@ in {
 
   config = lib.mkIf cfg.enable
     (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { } atsServices);
-}
+} # ^^^^ TODO: shouldn't I just generalize this and pull out orchestratord and put it into pc-base.nix??? make all the rest of this stuff config options???
