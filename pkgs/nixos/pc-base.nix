@@ -78,7 +78,7 @@ in {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
-          autosync = true;
+          autosync = true; # ^^^^ TODO eliminate; replace with autoSyncSubdirs = []; and only implement in ATS for now
         }
         {
           name = "secrets";
@@ -105,6 +105,12 @@ in {
           autosync = true;
         }
       ];
+    };
+    autoBackupCloudDirs = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      description =
+        "Cloud directories to backup (via override) daily [(cloudname,subdir)]";
+      default = [ ];
     };
   };
 

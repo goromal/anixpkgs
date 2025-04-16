@@ -22,6 +22,7 @@ let
     in with pkgs; [
       bash
       coreutils
+      util-linux
       rclone
       wiki-tools
       task-tools
@@ -223,7 +224,19 @@ let
         Persistent = true;
       };
     }
-  ];
+  ] ++ (map (x: [{
+    name = "ats-${x.cloudname}-${x.subdir}-backup";
+    jobShellScript =
+      pkgs.writeShellScript "ats-${x.cloudname}-${x.subdir}-backup" ''
+        rcrsync override ${x.cloudname} ${x.subdir} || { logger -t ats-${x.cloudname}-${x.subdir}-backup "Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+        logger -t ats-${x.cloudname}-${x.subdir}-backup "Backup successful!"
+      '';
+    timerCfg = {
+      OnCalendar = [ "*-*-* 00:00:00" ];
+      Persistent = false;
+    };
+    # }]) cfg.autoBackupCloudDirs); ^^^^
+  }]) [ ]);
   atsServices = ([
     {
       environment.systemPackages = with pkgs; [
