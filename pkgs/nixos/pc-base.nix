@@ -78,7 +78,8 @@ in {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
-          autosync = true; # ^^^^ TODO eliminate; replace with autoSyncSubdirs = []; and only implement in ATS for now
+          autosync =
+            true; # ^^^^ TODO eliminate; replace with autoSyncSubdirs = []; and only implement in ATS for now
         }
         {
           name = "secrets";
