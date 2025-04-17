@@ -6,7 +6,7 @@
 
 **LATEST RELEASE: [v6.18.0](https://github.com/goromal/anixpkgs/tree/v6.18.0)**
 
-**[Docs Website](https://goromal.github.io/anixpkgs/)** 
+**[Docs Website](https://goromal.github.io/anixpkgs/)**
 
 A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as a [nixpkgs](https://github.com/NixOS/nixpkgs) overlay.
 
