@@ -4,6 +4,16 @@ let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  atsudo = pkgs.writeShellScriptBin "atsudo" ''
+    args=""
+    for word in "$@"; do
+      args+="$word "
+    done
+    args=''${args% }
+    sudo -S $args < $HOME/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+  '';
+  machine-rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
 in {
   options.machines.base = {
     homeDir = lib.mkOption {
@@ -78,8 +88,7 @@ in {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
-          autosync =
-            true; # ^^^^ TODO eliminate; replace with autoSyncSubdirs = []; and only implement in ATS for now
+          autosync = false; # TODO deprecate
         }
         {
           name = "secrets";
@@ -91,35 +100,39 @@ in {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "$HOME/games";
-          autosync = true;
+          autosync = false;
         }
         {
           name = "data";
           cloudname = "box:data";
           dirname = "$HOME/data";
-          autosync = true;
+          autosync = false;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
           dirname = "$HOME/Documents";
-          autosync = true;
+          autosync = false;
         }
       ];
     };
-    autoBackupCloudDirs = lib.mkOption {
+    orchestratorJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
-      description =
-        "Cloud directories to backup (via override) daily [(cloudname,subdir)]";
+      description = "Orchestrator job definitions";
+      default = [ ];
+    };
+    extraOrchestratorPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      description = "Packages to add to orchestrator's path";
       default = [ ];
     };
   };
 
   imports = [
     (import "${home-manager}/nixos")
-    ../modules/ats/modules.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../python-packages/orchestrator/module.nix
   ];
 
   config = {
@@ -288,6 +301,16 @@ in {
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
 
+    # Orchestrator jobs
+    services.orchestratord = lib.mkIf (cfg.orchestratorJobs != [ ]) {
+      enable = true;
+      orchestratorPkg = anixpkgs.orchestrator;
+      pathPkgs =
+        [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
+        ++ cfg.extraOrchestratorPackages;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
+
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
@@ -303,6 +326,10 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+
+    security.sudo.extraConfig = ''
+      ${if cfg.loadATSServices then "Defaults    timestamp_timeout=0" else ""}
+    '';
 
     # Enable the OpenSSH daemon.
     services.openssh = {
@@ -322,8 +349,7 @@ in {
     services.metricsNode.enable = cfg.enableMetrics;
     services.metricsNode.openFirewall = cfg.enableMetrics;
 
-    # Server processes
-    services.ats.enable = cfg.loadATSServices;
+    # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
 
     # Global packages
@@ -403,7 +429,37 @@ in {
         glances
         gping
         dog
-      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
+        atsudo
+      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
+      ++ (if cfg.orchestratorJobs != [ ] then
+        [
+          (let
+            servicelist = builtins.concatStringsSep "/"
+              (map (x: "${x.name}.service") cfg.orchestratorJobs);
+            triggerscript = ./otrigger.py;
+          in pkgs.writeShellScriptBin "otrigger" ''
+            servicelist="${builtins.toString servicelist}"
+            tmpdir=$(mktemp -d)
+            ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
+            serviceselection=$(cat $tmpdir/selection)
+            rm -r $tmpdir
+            if [[ ! -z "$serviceselection" ]]; then
+              echo "sudo systemctl restart ''${serviceselection}"
+              ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
+            fi
+          '')
+        ]
+      else
+        [ ]) ++ (if cfg.loadATSServices then
+          [
+            (pkgs.writeShellScriptBin "atsrefresh" ''
+              ${atsudo}/bin/atsudo systemctl stop orchestratord
+              authm refresh --headless --force && rcrsync override secrets
+              ${atsudo}/bin/atsudo systemctl start orchestratord
+            '')
+          ]
+        else
+          [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
@@ -502,10 +558,30 @@ in {
         else
           null;
         cloudDirs = cfg.cloudDirs;
-        userOrchestrator = !cfg.loadATSServices;
-        cloudAutoSync = false; # !cfg.loadATSServices;
+        userOrchestrator = false;
+        cloudAutoSync = false;
         enableMetrics = cfg.enableMetrics;
       };
     };
   };
-}
+} // (let
+  mkOneshotTimedOrchService =
+    { name, jobShellScript, timerCfg, readWritePaths ? [ "/" ] }: {
+      systemd.timers."${name}" = {
+        description = "${name} trigger timer";
+        wantedBy = [ "timers.target" ];
+        timerConfig = timerCfg // { Unit = "${name}.service"; };
+      };
+      systemd.services."${name}" = {
+        enable = true;
+        description = "${name} oneshot service";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart =
+            "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
+          ReadWritePaths = readWritePaths;
+        };
+      };
+    };
+in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { }
+  (map (x: (mkOneshotTimedOrchService x)) cfg.orchestratorJobs)))
