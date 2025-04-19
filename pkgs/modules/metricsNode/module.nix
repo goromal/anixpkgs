@@ -42,6 +42,16 @@ in {
             address = "0.0.0.0:${builtins.toString service-ports.statsd}";
             mode = "udp";
           };
+          service_logs = { type = "journald"; };
+        };
+        transforms = {
+          tagged_service_logs = {
+            type = "remap";
+            inputs = [ "service_logs" ];
+            source = ''
+              .tag = if exists(.SYSLOG_IDENTIFIER) { .SYSLOG_IDENTIFIER } else { "unknown" }
+            '';
+          };
         };
         sinks = {
           prometheus = {
@@ -51,9 +61,68 @@ in {
             address =
               "[::]:${builtins.toString service-ports.prometheus.input}";
           };
+          loki = {
+            type = "loki";
+            inputs = [ "tagged_service_logs" ];
+            endpoint =
+              "http://localhost:${builtins.toString service-ports.loki}";
+            encoding.codec = "json"; # Recommended for structured logs
+            labels = {
+              job = "vector";
+              host = "${config.networking.hostName}";
+              tag = "{{ tag }}"; # label for filtering
+            };
+          };
         };
       };
     };
+
+    services.loki = {
+      enable = true;
+      configuration = {
+        auth_enabled = false;
+        server = { http_listen_port = service-ports.loki; };
+        common = {
+          path_prefix =
+            "/var/lib/loki"; # Ensures compactor has a working directory
+        };
+        ingester = {
+          lifecycler = {
+            ring = {
+              kvstore = { store = "inmemory"; };
+              replication_factor = 1;
+            };
+            final_sleep = "0s";
+          };
+          wal = {
+            enabled = true;
+            dir = "/var/lib/loki/wal";
+          };
+        };
+        schema_config = {
+          configs = [{
+            from = "2020-10-24";
+            store = "boltdb-shipper";
+            object_store = "filesystem";
+            schema = "v11";
+            index = {
+              prefix = "index_";
+              period = "24h";
+            };
+          }];
+        };
+        storage_config = {
+          boltdb_shipper = {
+            active_index_directory = "/var/lib/loki/index";
+            cache_location = "/var/lib/loki/cache";
+            # shared_store = "filesystem";
+          };
+          filesystem = { directory = "/var/lib/loki/chunks"; };
+        };
+        limits_config.allow_structured_metadata = false;
+      };
+    };
+
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
     services.prometheus = {
@@ -68,6 +137,7 @@ in {
         }];
       }];
     };
+
     services.grafana = {
       enable = true;
       settings = {
@@ -77,6 +147,14 @@ in {
           http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
+      };
+      provision = {
+        datasources.settings.datasources = [{
+          name = "Loki";
+          type = "loki";
+          access = "proxy";
+          url = "http://localhost:${builtins.toString service-ports.loki}";
+        }];
       };
     };
 

@@ -1,17 +1,21 @@
 { pkgs, lib, config, ... }:
 with import ../../nixos/dependencies.nix;
 let
-  app = "notes-wiki";
   globalCfg = config.machines.base;
-  cfg = config.services.${app};
+  cfg = config.services.notes-wiki;
 in {
-  options.services.${app} = {
+  options.services.notes-wiki = {
     enable = lib.mkEnableOption "enable notes wiki server";
+    dataWikiDirname = lib.mkOption {
+      type = lib.types.str;
+      description = "Subdirectory name in the data dir where the wiki resides";
+      default = "notes-wiki";
+    };
     wikiDir = lib.mkOption {
       type = lib.types.str;
       description =
-        "Root directory for notes wiki (default: ~/data/${app}/public_html)";
-      default = "${globalCfg.homeDir}/data/${app}/public_html";
+        "Root directory for notes wiki (default: ~/data/${cfg.dataWikiDirname}/public_html)";
+      default = "${globalCfg.homeDir}/data/${cfg.dataWikiDirname}/public_html";
     };
     php = lib.mkOption {
       type = lib.types.package;
@@ -22,7 +26,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    services.phpfpm.pools.${app} = {
+    services.phpfpm.pools.notes-wiki = {
       user = "andrew";
       group = "dev";
       settings = {
@@ -77,7 +81,7 @@ in {
             include ${pkgs.nginx}/conf/fastcgi.conf;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
             fastcgi_param REDIRECT_STATUS 200;
-            fastcgi_pass unix:${config.services.phpfpm.pools.${app}.socket};
+            fastcgi_pass unix:${config.services.phpfpm.pools.notes-wiki.socket};
           '';
         };
       };
