@@ -116,7 +116,12 @@ in {
         }
       ];
     };
-    orchestratorJobs = lib.mkOption {
+    enableOrchestrator = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the orchestrator daemon";
+    };
+    timedOrchJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description = "Orchestrator job definitions";
       default = [ ];
@@ -302,7 +307,7 @@ in {
     time.timeZone = "America/Los_Angeles";
 
     # Orchestrator jobs
-    services.orchestratord = lib.mkIf (cfg.orchestratorJobs != [ ]) {
+    services.orchestratord = lib.mkIf cfg.enableOrchestrator {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = with pkgs;
@@ -431,11 +436,11 @@ in {
         dog
         atsudo
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
-      ++ (if cfg.orchestratorJobs != [ ] then
+      ++ (if cfg.enableOrchestrator then
         [
           (let
             servicelist = builtins.concatStringsSep "/"
-              (map (x: "${x.name}.service") cfg.orchestratorJobs);
+              (map (x: "${x.name}.service") cfg.timedOrchJobs);
             triggerscript = ./otrigger.py;
           in pkgs.writeShellScriptBin "otrigger" ''
             servicelist="${builtins.toString servicelist}"
@@ -564,25 +569,4 @@ in {
       };
     };
   };
-} # ^^^^ TODO make the below work
-# } // (let
-#   mkOneshotTimedOrchService =
-#     { name, jobShellScript, timerCfg, readWritePaths ? [ "/" ] }: {
-#       systemd.timers."${name}" = {
-#         description = "${name} trigger timer";
-#         wantedBy = [ "timers.target" ];
-#         timerConfig = timerCfg // { Unit = "${name}.service"; };
-#       };
-#       systemd.services."${name}" = {
-#         enable = true;
-#         description = "${name} oneshot service";
-#         serviceConfig = {
-#           Type = "oneshot";
-#           ExecStart =
-#             "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
-#           ReadWritePaths = readWritePaths;
-#         };
-#       };
-#     };
-# in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { }
-#   (map (x: (mkOneshotTimedOrchService x)) cfg.orchestratorJobs)))
+}

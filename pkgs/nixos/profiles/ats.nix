@@ -2,7 +2,7 @@
 with import ../dependencies.nix; {
   imports = [ ../pc-base.nix ];
 
-  machines.base = {
+  config = mkProfileConfig {
     machineType = "x86_linux";
     graphical = false;
     recreational = false;
@@ -12,7 +12,8 @@ with import ../dependencies.nix; {
     notesWikiPort = 8080;
     isInstaller = false;
     enableMetrics = true;
-    orchestratorJobs = [
+    enableOrchestrator = true;
+    timedOrchJobs = [
       {
         name = "ats-greeting";
         jobShellScript = pkgs.writeShellScript "ats-greeting" ''
@@ -206,7 +207,4 @@ with import ../dependencies.nix; {
       anixpkgs.providence-tasker
     ];
   };
-
-  users.users.andrew.hashedPassword = lib.mkForce
-    "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
 }
