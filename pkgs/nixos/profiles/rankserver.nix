@@ -10,7 +10,7 @@ in {
     graphical = false;
     recreational = false;
     developer = false;
-    loadATSServices = false;
+    isATS = false;
     serveNotesWiki = false;
     isInstaller = false;
   };

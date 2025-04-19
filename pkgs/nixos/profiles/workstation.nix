@@ -6,7 +6,7 @@
     graphical = true;
     recreational = false;
     developer = true;
-    loadATSServices = false;
+    isATS = false;
     serveNotesWiki = false;
     isInstaller = false;
   };

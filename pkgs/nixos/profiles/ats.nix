@@ -7,7 +7,7 @@ with import ../dependencies.nix; {
     graphical = false;
     recreational = false;
     developer = false;
-    loadATSServices = true;
+    isATS = true;
     serveNotesWiki = true;
     notesWikiPort = 8080;
     isInstaller = false;

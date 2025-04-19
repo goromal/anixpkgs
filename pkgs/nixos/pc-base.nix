@@ -47,7 +47,7 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes developer packages.";
     };
-    loadATSServices = lib.mkOption {
+    isATS = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
@@ -305,7 +305,7 @@ in {
     services.orchestratord = lib.mkIf (cfg.orchestratorJobs != [ ]) {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
-      pathPkgs =
+      pathPkgs = with pkgs;
         [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
@@ -328,7 +328,7 @@ in {
     };
 
     security.sudo.extraConfig = ''
-      ${if cfg.loadATSServices then "Defaults    timestamp_timeout=0" else ""}
+      ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
     '';
 
     # Enable the OpenSSH daemon.
@@ -450,7 +450,7 @@ in {
           '')
         ]
       else
-        [ ]) ++ (if cfg.loadATSServices then
+        [ ]) ++ (if cfg.isATS then
           [
             (pkgs.writeShellScriptBin "atsrefresh" ''
               ${atsudo}/bin/atsudo systemctl stop orchestratord
@@ -564,24 +564,25 @@ in {
       };
     };
   };
-} // (let
-  mkOneshotTimedOrchService =
-    { name, jobShellScript, timerCfg, readWritePaths ? [ "/" ] }: {
-      systemd.timers."${name}" = {
-        description = "${name} trigger timer";
-        wantedBy = [ "timers.target" ];
-        timerConfig = timerCfg // { Unit = "${name}.service"; };
-      };
-      systemd.services."${name}" = {
-        enable = true;
-        description = "${name} oneshot service";
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart =
-            "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
-          ReadWritePaths = readWritePaths;
-        };
-      };
-    };
-in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { }
-  (map (x: (mkOneshotTimedOrchService x)) cfg.orchestratorJobs)))
+} # ^^^^ TODO make the below work
+# } // (let
+#   mkOneshotTimedOrchService =
+#     { name, jobShellScript, timerCfg, readWritePaths ? [ "/" ] }: {
+#       systemd.timers."${name}" = {
+#         description = "${name} trigger timer";
+#         wantedBy = [ "timers.target" ];
+#         timerConfig = timerCfg // { Unit = "${name}.service"; };
+#       };
+#       systemd.services."${name}" = {
+#         enable = true;
+#         description = "${name} oneshot service";
+#         serviceConfig = {
+#           Type = "oneshot";
+#           ExecStart =
+#             "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
+#           ReadWritePaths = readWritePaths;
+#         };
+#       };
+#     };
+# in (builtins.foldl' (acc: set: lib.recursiveUpdate acc set) { }
+#   (map (x: (mkOneshotTimedOrchService x)) cfg.orchestratorJobs)))
