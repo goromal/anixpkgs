@@ -24,9 +24,9 @@ in (writeArgparseScriptBin pkgname ''
 
   Options:
 
-  --debug|-d    Open in debug mode (will print click positions to the screen).
+  --debug|-d    Open in debug mode (will write your clicks to the keyfile).
 
-  NOTE: This program assumes that you have the place location JSON files stored in
+  NOTE: This program assumes that you have the place location JSON keyfiles stored in
 
     ~/games/la-quiz/GLAA-C.json
                     GLAA-E.json

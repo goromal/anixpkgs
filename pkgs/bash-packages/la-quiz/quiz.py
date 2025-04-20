@@ -34,27 +34,43 @@ def main():
         AWAITING_INPUT = 0
         GRADING_INPUT = 1
         def __init__(self, answers_json, debug_mode):
-            with open(answers_json, "r") as answer_file:
+            self.keyfile = answers_json
+            with open(self.keyfile, "r") as answer_file:
                 self.cities = json.loads(answer_file.read())["cities"]
             self.city_idx = 0
             random.shuffle(self.cities)
             self.state = QuizDriver.AWAITING_INPUT
             self.debug_mode = debug_mode
         def handle_click(self, event):
-            root.title(self.cities[self.city_idx]["name"])
+            fig_title = f"{self.cities[self.city_idx]['name']}{' (HELP ME)' if self.debug_mode else ''}"
+            root.title(fig_title)
             canvas.delete("marker")
             xc, yc = event.x, event.y
             if self.state == QuizDriver.AWAITING_INPUT:
                 self.state = QuizDriver.GRADING_INPUT
             else:
-                if self.debug_mode:
-                    canvas.create_text(xc, yc, text=f"({xc}, {yc})", fill="red", tags="marker")
                 x = self.cities[self.city_idx]["x"]
                 y = self.cities[self.city_idx]["y"]
-                if math.sqrt(float((x-xc)*(x-xc)) + float((y-yc)*(y-yc))) < 20:
-                    canvas.create_oval(x-5, y-5, x+5, y+5, fill="green", tags="marker")
-                else:
-                    canvas.create_oval(x-5, y-5, x+5, y+5, fill="red", tags="marker")
+                if self.debug_mode:
+                    canvas.create_text(xc, yc, text=f"({xc}, {yc})", fill="red", tags="marker")
+                    if x == -1 or y == -1:
+                        x = xc
+                        y = yc
+                        self.cities[self.city_idx]["x"] = xc
+                        self.cities[self.city_idx]["y"] = yc
+                        with open(self.keyfile, "r") as infile:
+                            orig_json = json.loads(infile.read())
+                        # ^^^^ TODO this is out of order
+                        orig_json["cities"][self.city_idx]["x"] = xc
+                        orig_json["cities"][self.city_idx]["y"] = yc
+                        with open(self.keyfile, "w") as outfile:
+                            outfile.write(json.dumps(orig_json))
+
+                if x >= 0 and y >= 0:
+                    if math.sqrt(float((x-xc)*(x-xc)) + float((y-yc)*(y-yc))) < 20:
+                        canvas.create_oval(x-5, y-5, x+5, y+5, fill="green", tags="marker")
+                    else:
+                        canvas.create_oval(x-5, y-5, x+5, y+5, fill="red", tags="marker")
                 self.state = QuizDriver.AWAITING_INPUT
                 if self.city_idx < len(self.cities) - 1:
                     self.city_idx += 1
