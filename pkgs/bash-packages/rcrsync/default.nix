@@ -6,7 +6,7 @@ let
   cliCloudList = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
   longDescription = ''
-    usage: ${pkgname} [OPTS] [init|sync|copy|override] CLOUD_DIR
+    usage: ${pkgname} [OPTS] init|sync|copy|override CLOUD_DIR [subdir]
 
     Manage cloud directories with rclone.
 
@@ -42,6 +42,10 @@ in (writeArgparseScriptBin pkgname longDescription [{
   else
     ${printErr} "Unrecognized CLOUD_DIR: $2"
     exit 1
+  fi
+  if [[ ! -z "$3" ]]; then
+    CLOUD_DIR="$CLOUD_DIR/$3"
+    LOCAL_DIR="$LOCAL_DIR/$3"
   fi
   if [[ "$1" == "init" ]]; then
     if [[ -d "$LOCAL_DIR" ]]; then
