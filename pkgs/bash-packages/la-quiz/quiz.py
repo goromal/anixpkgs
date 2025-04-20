@@ -5,6 +5,8 @@ import sys
 from tkinter import *
 from PIL import Image, ImageTk
 
+# ^^^^ TODO -1 indicates we need to append a (HELP ME) to the title; write the click coordinates to file
+
 def main():
     root = Tk()
     root.title("LA Quiz")
