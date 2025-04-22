@@ -4,6 +4,16 @@ let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  atsudo = pkgs.writeShellScriptBin "atsudo" ''
+    args=""
+    for word in "$@"; do
+      args+="$word "
+    done
+    args=''${args% }
+    sudo -S $args < $HOME/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+  '';
+  machine-rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
 in {
   options.machines.base = {
     homeDir = lib.mkOption {
@@ -37,7 +47,7 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes developer packages.";
     };
-    loadATSServices = lib.mkOption {
+    isATS = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
     };
@@ -45,6 +55,16 @@ in {
       type = lib.types.bool;
       description = "Whether to use an SMTP server for automated email.";
       default = false;
+    };
+    runWebServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to spawn a reverse proxy webserver.";
+      default = false;
+    };
+    webServerInsecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public insecure port";
+      default = 80;
     };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
@@ -59,6 +79,11 @@ in {
       type = lib.types.bool;
       description = "Whether the closure is for an ISO install image.";
     };
+    enableMetrics = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to export OS metrics";
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
@@ -68,7 +93,7 @@ in {
           name = "configs";
           cloudname = "dropbox:configs";
           dirname = "$HOME/configs";
-          autosync = true;
+          autosync = false; # TODO deprecate
         }
         {
           name = "secrets";
@@ -80,28 +105,44 @@ in {
           name = "games";
           cloudname = "dropbox:games";
           dirname = "$HOME/games";
-          autosync = true;
+          autosync = false;
         }
         {
           name = "data";
           cloudname = "box:data";
           dirname = "$HOME/data";
-          autosync = true;
+          autosync = false;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
           dirname = "$HOME/Documents";
-          autosync = true;
+          autosync = false;
         }
       ];
+    };
+    enableOrchestrator = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the orchestrator daemon";
+    };
+    timedOrchJobs = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      description = "Orchestrator job definitions";
+      default = [ ];
+    };
+    extraOrchestratorPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      description = "Packages to add to orchestrator's path";
+      default = [ ];
     };
   };
 
   imports = [
     (import "${home-manager}/nixos")
-    ../modules/ats/modules.nix
     ../modules/notes-wiki/module.nix
+    ../modules/metricsNode/module.nix
+    ../python-packages/orchestrator/module.nix
   ];
 
   config = {
@@ -197,12 +238,32 @@ in {
 
     services.printing.enable =
       (cfg.machineType == "x86_linux" && cfg.graphical);
-    services.avahi =
-      lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+
+    services.avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+      # Web server DNS
+      publish = lib.mkIf cfg.runWebServer {
         enable = true;
-        nssmdns4 = true;
-        openFirewall = true;
+        addresses = true;
+        domain = true;
+        workstation = true;
       };
+    };
+
+    # Web server reverse proxy
+    services.nginx = lib.mkIf cfg.runWebServer {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      virtualHosts."${config.networking.hostName}.local" = {
+        listen = [{
+          addr = "0.0.0.0";
+          port = cfg.webServerInsecurePort;
+        }];
+      };
+    };
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -250,13 +311,24 @@ in {
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
 
+    # Orchestrator jobs
+    services.orchestratord = lib.mkIf cfg.enableOrchestrator {
+      enable = true;
+      orchestratorPkg = anixpkgs.orchestrator;
+      pathPkgs = with pkgs;
+        [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
+        ++ cfg.extraOrchestratorPackages;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
+
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
     networking.networkmanager.enable = !cfg.isInstaller;
 
-    networking.firewall.allowedTCPPorts = [ 4444 ];
+    networking.firewall.allowedTCPPorts = [ 4444 ]
+      ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -264,6 +336,10 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+
+    security.sudo.extraConfig = ''
+      ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
+    '';
 
     # Enable the OpenSSH daemon.
     services.openssh = {
@@ -279,11 +355,12 @@ in {
       rateLimitInterval = "0s";
     };
 
-    # Server processes
-    services.ats.enable = cfg.loadATSServices;
+    # Metrics
+    services.metricsNode.enable = cfg.enableMetrics;
+    services.metricsNode.openFirewall = cfg.enableMetrics;
+
+    # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
-    services.notes-wiki.insecurePort = cfg.notesWikiPort;
-    services.notes-wiki.openFirewall = true;
 
     # Global packages
     environment.systemPackages = with pkgs;
@@ -362,7 +439,37 @@ in {
         glances
         gping
         dog
-      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
+        atsudo
+      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
+      ++ (if cfg.enableOrchestrator then
+        [
+          (let
+            servicelist = builtins.concatStringsSep "/"
+              (map (x: "${x.name}.service") cfg.timedOrchJobs);
+            triggerscript = ./otrigger.py;
+          in pkgs.writeShellScriptBin "otrigger" ''
+            servicelist="${builtins.toString servicelist}"
+            tmpdir=$(mktemp -d)
+            ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
+            serviceselection=$(cat $tmpdir/selection)
+            rm -r $tmpdir
+            if [[ ! -z "$serviceselection" ]]; then
+              echo "sudo systemctl restart ''${serviceselection}"
+              ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
+            fi
+          '')
+        ]
+      else
+        [ ]) ++ (if cfg.isATS then
+          [
+            (pkgs.writeShellScriptBin "atsrefresh" ''
+              ${atsudo}/bin/atsudo systemctl stop orchestratord
+              authm refresh --headless --force && rcrsync override secrets
+              ${atsudo}/bin/atsudo systemctl start orchestratord
+            '')
+          ]
+        else
+          [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
@@ -461,8 +568,9 @@ in {
         else
           null;
         cloudDirs = cfg.cloudDirs;
-        userOrchestrator = !cfg.loadATSServices;
-        cloudAutoSync = false; # !cfg.loadATSServices;
+        userOrchestrator = false;
+        cloudAutoSync = false;
+        enableMetrics = cfg.enableMetrics;
       };
     };
   };
