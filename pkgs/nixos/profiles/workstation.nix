@@ -1,13 +1,18 @@
-{ config, pkgs, lib, ... }: {
+{ config, pkgs, lib, ... }:
+with import ../dependencies.nix; {
   imports = [ ../pc-base.nix ];
 
-  machines.base = {
+  config = mkProfileConfig {
     machineType = "x86_linux";
     graphical = true;
     recreational = false;
     developer = true;
-    loadATSServices = false;
+    isATS = false;
     serveNotesWiki = false;
     isInstaller = false;
+    enableMetrics = false;
+    enableOrchestrator = false;
+    timedOrchJobs = [ ];
+    extraOrchestratorPackages = [ ];
   };
 }

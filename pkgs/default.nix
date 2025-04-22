@@ -25,8 +25,8 @@ let
         pkg-attr.meta.subCmds
       else
         [ ];
-      auto-usage-doc =
-        (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then ''
+      auto-usage-doc = (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
+        (if pkg-attr.meta.autoGenUsageCmd != null then ''
 
           ## Usage (Auto-Generated)
 
@@ -38,7 +38,9 @@ let
           }}
           ```
         '' else
-          "");
+          "")
+      else
+        "");
     in pkg-attr // rec {
       doc = prev.writeTextFile {
         name = "doc.txt";
@@ -95,6 +97,8 @@ let
               });
             goromail =
               addDoc (pySelf.callPackage ./python-packages/goromail { });
+            symforce =
+              addDoc (pySelf.callPackage ./python-packages/symforce { });
             fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
             find_rotational_conventions = addDoc (pySelf.callPackage
               ./python-packages/find_rotational_conventions {
@@ -212,11 +216,11 @@ in rec {
       nativeBuildInputs = [ prev.git ];
       buildPhase = (if local then ''
         sed -i 's|local-build = false;|local-build = true;|g' "pkgs/nixos/dependencies.nix"
-        echo -n "${meta-info}" > ANIX_META
       '' else
         "");
       installPhase = ''
         mkdir -p $out
+        echo -n "${meta-info}" > ANIX_META
         cp -r * $out/
       '';
     };
@@ -266,6 +270,7 @@ in rec {
   flask-oatbox = final.python311.pkgs.flask-oatbox;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
+  symforce = final.python311.pkgs.symforce;
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
