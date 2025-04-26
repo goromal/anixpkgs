@@ -14,7 +14,7 @@ in {
     package = lib.mkOption {
       type = lib.types.package;
       description = "The authui package to use";
-      default = pkgs.authui;
+      default = anixpkgs.authui;
     };
   };
 
@@ -29,7 +29,7 @@ in {
       serviceConfig = {
         Type = "simple";
         ExecStart =
-          "${cfg.package}/bin/authui --port ${service-ports.authui} --memory-file ${cfg.rootDir}/refresh_times.json";
+          "${cfg.package}/bin/authui --port ${builtins.toString service-ports.authui} --memory-file ${cfg.rootDir}/refresh_times.json";
         ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
