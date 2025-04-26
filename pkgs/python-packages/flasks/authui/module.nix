@@ -19,27 +19,27 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules =
-      [ "d ${cfg.rootDir} - andrew dev" "Z ${cfg.rootDir} - andrew dev" ];
+    # systemd.tmpfiles.rules =
+    #   [ "d ${cfg.rootDir} - andrew dev" "Z ${cfg.rootDir} - andrew dev" ];
 
-    systemd.services.authui = {
-      enable = true;
-      description = "Remote auth UI";
-      unitConfig = { StartLimitIntervalSec = 0; };
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${cfg.package}/bin/authui --port ${
-            builtins.toString service-ports.authui
-          } --memory-file ${cfg.rootDir}/refresh_times.json";
-        ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
-        WorkingDirectory = cfg.rootDir;
-        Restart = "always";
-        RestartSec = 5;
-        User = "andrew";
-        Group = "dev";
-      };
-      wantedBy = [ "multi-user.target" ];
-    };
+    # systemd.services.authui = {
+    #   enable = true;
+    #   description = "Remote auth UI";
+    #   unitConfig = { StartLimitIntervalSec = 0; };
+    #   serviceConfig = {
+    #     Type = "simple";
+    #     ExecStart = "${cfg.package}/bin/authui --port ${
+    #         builtins.toString service-ports.authui
+    #       } --memory-file ${cfg.rootDir}/refresh_times.json";
+    #     ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
+    #     WorkingDirectory = cfg.rootDir;
+    #     Restart = "always";
+    #     RestartSec = 5;
+    #     User = "andrew";
+    #     Group = "dev";
+    #   };
+    #   wantedBy = [ "multi-user.target" ];
+    # };
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
