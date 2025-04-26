@@ -138,6 +138,7 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../python-packages/orchestrator/module.nix
+    ../python-packages/flasks/authui/module.nix
   ];
 
   config = {
@@ -259,6 +260,8 @@ in {
         }];
       };
     };
+
+    services.authui.enable = true; # ^^^^ TODO cfg.isATS
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -460,6 +463,15 @@ in {
             (pkgs.writeShellScriptBin "atsrefresh" ''
               ${atsudo}/bin/atsudo systemctl stop orchestratord
               authm refresh --headless --force && rcrsync override secrets
+              ${atsudo}/bin/atsudo systemctl start orchestratord
+            '')
+            (pkgs.writeShellScriptBin "atsauthui-start" ''
+              echo "Stopping orchestratord"
+              ${atsudo}/bin/atsudo systemctl stop orchestratord
+            '')
+            (pkgs.writeShellScriptBin "atsauthui-finish" ''
+              echo "Overriding secrets and starting orchestratord"
+              rcrsync override secrets
               ${atsudo}/bin/atsudo systemctl start orchestratord
             '')
           ]
