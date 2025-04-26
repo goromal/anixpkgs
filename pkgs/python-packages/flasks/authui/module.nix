@@ -28,8 +28,9 @@ in {
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart =
-          "${cfg.package}/bin/authui --port ${builtins.toString service-ports.authui} --memory-file ${cfg.rootDir}/refresh_times.json";
+        ExecStart = "${cfg.package}/bin/authui --port ${
+            builtins.toString service-ports.authui
+          } --memory-file ${cfg.rootDir}/refresh_times.json";
         ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
