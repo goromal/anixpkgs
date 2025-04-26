@@ -76,7 +76,8 @@
     book-notes-sync.url = "github:goromal/book-notes-sync";
     book-notes-sync.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth?ref=dev/headless-cred-gen";
+    easy-google-auth.url =
+      "github:goromal/easy-google-auth?ref=dev/headless-cred-gen";
     easy-google-auth.flake = false;
 
     find_rotational_conventions.url =

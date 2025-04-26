@@ -458,24 +458,22 @@ in {
           '')
         ]
       else
-        [ ]) ++ (if cfg.isATS then
-          [
-            (pkgs.writeShellScriptBin "atsrefresh" ''
-              ${atsudo}/bin/atsudo systemctl stop orchestratord
-              authm refresh --headless --force && rcrsync override secrets
-              ${atsudo}/bin/atsudo systemctl start orchestratord
-            '')
-            (pkgs.writeShellScriptBin "atsauthui-start" ''
-              echo "Stopping orchestratord"
-              ${atsudo}/bin/atsudo systemctl stop orchestratord
-            '')
-            (pkgs.writeShellScriptBin "atsauthui-finish" ''
-              echo "Overriding secrets and starting orchestratord"
-              rcrsync override secrets
-              ${atsudo}/bin/atsudo systemctl start orchestratord
-            '')
-          ]
-        else
+        [ ]) ++ (if cfg.isATS then [
+          (pkgs.writeShellScriptBin "atsrefresh" ''
+            ${atsudo}/bin/atsudo systemctl stop orchestratord
+            authm refresh --headless --force && rcrsync override secrets
+            ${atsudo}/bin/atsudo systemctl start orchestratord
+          '')
+          (pkgs.writeShellScriptBin "atsauthui-start" ''
+            echo "Stopping orchestratord"
+            ${atsudo}/bin/atsudo systemctl stop orchestratord
+          '')
+          (pkgs.writeShellScriptBin "atsauthui-finish" ''
+            echo "Overriding secrets and starting orchestratord"
+            rcrsync override secrets
+            ${atsudo}/bin/atsudo systemctl start orchestratord
+          '')
+        ] else
           [ ]);
 
     programs.bash.interactiveShellInit = ''

@@ -197,8 +197,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
             stampserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
-            authui = addDoc
-            (pySelf.callPackage ./python-packages/flasks/authui { });
+            authui =
+              addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
           });
       }));
 in rec {
