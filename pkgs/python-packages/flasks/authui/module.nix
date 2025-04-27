@@ -48,8 +48,8 @@ in {
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
-        User = "andrew";
-        Group = "dev";
+        User = "root";
+        Group = "root";
       };
       wantedBy = [ "multi-user.target" ];
     };

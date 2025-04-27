@@ -264,11 +264,11 @@ in {
     services.authui = {
       enable = cfg.isATS;
       initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
-        ${atsudo}/bin/atsudo ${pkgs.systemd}/bin/systemctl stop orchestratord
+        ${pkgs.systemd}/bin/systemctl stop orchestratord
       '') + "/bin/atsauthui-start";
       resetScript = (pkgs.writeShellScriptBin "atsauthui-finish" ''
         ${machine-rcrsync}/bin/rcrsync override secrets
-        ${atsudo}/bin/atsudo ${pkgs.systemd}/bin/systemctl start orchestratord
+        ${pkgs.systemd}/bin/systemctl start orchestratord
       '') + "/bin/atsauthui-finish";
     };
 
