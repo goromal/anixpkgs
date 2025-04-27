@@ -261,7 +261,17 @@ in {
       };
     };
 
-    services.authui.enable = true; # ^^^^ TODO cfg.isATS
+    services.authui = {
+      enable = cfg.isATS;
+      initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
+        ${atsudo}/bin/atsudo ${pkgs.systemd}/bin/systemctl stop orchestratord
+      '') + "/bin/atsauthui-start";
+      resetScript = (pkgs.writeShellScriptBin "atsauthui-finish" ''
+        ${machine-rcrsync}/bin/rcrsync override secrets
+        ${atsudo}/bin/atsudo ${pkgs.systemd}/bin/systemctl start orchestratord
+      '') + "/bin/atsauthui-finish";
+    };
+
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -462,15 +472,6 @@ in {
           (pkgs.writeShellScriptBin "atsrefresh" ''
             ${atsudo}/bin/atsudo systemctl stop orchestratord
             authm refresh --headless --force && rcrsync override secrets
-            ${atsudo}/bin/atsudo systemctl start orchestratord
-          '')
-          (pkgs.writeShellScriptBin "atsauthui-start" ''
-            echo "Stopping orchestratord"
-            ${atsudo}/bin/atsudo systemctl stop orchestratord
-          '')
-          (pkgs.writeShellScriptBin "atsauthui-finish" ''
-            echo "Overriding secrets and starting orchestratord"
-            rcrsync override secrets
             ${atsudo}/bin/atsudo systemctl start orchestratord
           '')
         ] else

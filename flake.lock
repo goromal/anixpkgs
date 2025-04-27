@@ -102,16 +102,15 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1745643130,
-        "narHash": "sha256-mee9VK6IWfgFSuhguNSjy3LPqLnHoyUXuQyOKuULu48=",
+        "lastModified": 1745727367,
+        "narHash": "sha256-0X7+mzzHnECbd0LE8S5e6zRr4/ptd8j7mPUy8G2D/g0=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "cd6abc184a3fc7798fbcefe0b57bc0691f81cebb",
+        "rev": "e170e5282487239cc0351977d900c10ab125f2f6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/headless-cred-gen",
         "repo": "easy-google-auth",
         "type": "github"
       }

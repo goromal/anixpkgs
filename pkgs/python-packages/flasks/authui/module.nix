@@ -3,6 +3,9 @@ with import ../../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.authui;
+  nullScript = pkgs.writeShellScriptBin "null-script" ''
+  echo ""
+  '';
 in {
   options.services.authui = {
     enable = lib.mkEnableOption "enable remote auth server";
@@ -15,6 +18,16 @@ in {
       type = lib.types.package;
       description = "The authui package to use";
       default = anixpkgs.authui;
+    };
+    initScript = lib.mkOption {
+      type = lib.types.str;
+      description = "The authui init script to use";
+      default = "${nullScript}/bin/null-script";
+    };
+    resetScript = lib.mkOption {
+      type = lib.types.str;
+      description = "The authui reset script to use";
+      default = "${nullScript}/bin/null-script";
     };
   };
 
@@ -30,7 +43,7 @@ in {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/authui --port ${
             builtins.toString service-ports.authui
-          } --memory-file ${cfg.rootDir}/refresh_times.json";
+          } --memory-file ${cfg.rootDir}/refresh_times.json --init-script ${cfg.initScript} --reset-script ${cfg.resetScript}";
         ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
@@ -45,7 +58,14 @@ in {
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/auth/" = {
         proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.authui}/";
+          "http://127.0.0.1:${builtins.toString service-ports.authui}/auth/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
       };
     };
   };

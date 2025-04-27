@@ -47,7 +47,7 @@
                         Open Auth URL
                     </a>
                 </p>
-                <form method="post" action="{{ url_for('submit', gen_key=gen_key) }}">
+                <form method="post" action="{{ url_for('auth.submit', gen_key=gen_key) }}">
                     <div class="mb-2">
                         <input type="text" name="auth_code" class="form-control" placeholder="Enter authorization code"
                             required>
@@ -59,7 +59,7 @@
         {% endfor %}
         {% endif %}
         {% if initialized %}
-        <form method="post" action="{{ url_for('reset') }}">
+        <form method="post" action="{{ url_for('auth.reset') }}">
             <button class="btn btn-danger mb-4" type="submit">Reset Setup</button>
         </form>
         {% endif %}

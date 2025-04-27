@@ -1,20 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, Blueprint, render_template, request, redirect, url_for, flash
 from easy_google_auth.auth import HeadlessCredentialsGenerator
 from gmail_parser.defaults import GmailParserDefaults as GPD
 import os
 import json
 import argparse
 from datetime import datetime
+import subprocess
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
+parser.add_argument("--subdomain", action="store", type=str, default="/auth", help="Subdomain for a reverse proxy")
 parser.add_argument("--memory-file", action="store", type=str, default="refresh_times.json", help="Path to persistent memory file")
+parser.add_argument("--init-script", action="store", type=str, default=None, help="Script to run at initialization")
+parser.add_argument("--reset-script", action="store", type=str, default=None, help="Script to run on reset")
 args = parser.parse_args()
 
-refresh_times = {}
+bp = Blueprint("auth", __name__, url_prefix=args.subdomain)
 
-app = Flask(__name__)
-app.secret_key = os.urandom(24)
+refresh_times = {}
 
 GENERATOR_CONFIGS = {
     "user": {
@@ -49,7 +52,7 @@ def save_refresh_times():
 
 refresh_times = load_refresh_times()
 
-@app.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET", "POST"])
 def index():
     global generators_initialized
 
@@ -60,7 +63,14 @@ def index():
                 refresh_token=cfg["refresh_token"]
             )
         generators_initialized = True
-        flash("Generators initialized!")
+        if args.init_script is not None:
+            try:
+                subprocess.run([args.init_script], check=True)
+                flash("Full system init complete.")
+            except subprocess.CalledProcessError as e:
+                flash(f"Full system init failed: {e}")
+        else:
+            flash("Frontend init complete.")
 
     return render_template("index.html",
                        generators=generators,
@@ -69,7 +79,7 @@ def index():
                        refresh_times=refresh_times)
 
 
-@app.route("/submit/<gen_key>", methods=["POST"])
+@bp.route("/submit/<gen_key>", methods=["POST"])
 def submit(gen_key):
     auth_code = request.form.get("auth_code")
     if gen_key in generators and auth_code:
@@ -80,21 +90,30 @@ def submit(gen_key):
             flash(f"{GENERATOR_CONFIGS[gen_key]['name']} credentials saved.")
         except Exception as e:
             flash(f"Error authorizing {GENERATOR_CONFIGS[gen_key]['name']}: {e}")
-    return redirect(url_for("index"))
+    return redirect(url_for("auth.index"))
 
 
-@app.route("/reset", methods=["POST"])
+@bp.route("/reset", methods=["POST"])
 def reset():
     global generators_initialized
     generators.clear()
     generators_initialized = False
-    refresh_times.clear()
     save_refresh_times()
-    flash("Setup reset.")
-    return redirect(url_for("index"))
+    if args.reset_script is not None:
+        try:
+            subprocess.run([args.reset_script], check=True)
+            flash("Full system reset complete.")
+        except subprocess.CalledProcessError as e:
+            flash(f"Full system reset failed: {e}")
+    else:
+        flash("Frontend reset complete.")
+    return redirect(url_for("auth.index"))
 
 def run():
     global args
+    app = Flask(__name__)
+    app.secret_key = os.urandom(24)
+    app.register_blueprint(bp)
     app.run(host="0.0.0.0", port=args.port)
 
 if __name__ == "__main__":

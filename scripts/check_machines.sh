@@ -45,6 +45,3 @@ done
 #     echo "Checks out!"
 #     echo ""
 # done
-
-# ^^^^ TODO can I remove?
-# sed -i 's|local-build = true;|local-build = false;|g' ${DIR}/../pkgs/nixos/dependencies.nix
