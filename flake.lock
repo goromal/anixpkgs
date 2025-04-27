@@ -102,11 +102,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1737904364,
-        "narHash": "sha256-bANDO6BanzwA7iHq6E+oD1V+m2bSSrBiSq9I/HFPW0g=",
+        "lastModified": 1745727367,
+        "narHash": "sha256-0X7+mzzHnECbd0LE8S5e6zRr4/ptd8j7mPUy8G2D/g0=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "2c432b8abe2a25d3a3eb9d51b77c13d10a144479",
+        "rev": "e170e5282487239cc0351977d900c10ab125f2f6",
         "type": "github"
       },
       "original": {

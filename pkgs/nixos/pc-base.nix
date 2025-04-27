@@ -10,9 +10,12 @@ let
       args+="$word "
     done
     args=''${args% }
-    sudo -S $args < $HOME/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+    sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
   '';
-  machine-rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  machine-rcrsync = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
   machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
 in {
   options.machines.base = {
@@ -87,31 +90,31 @@ in {
         {
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
+          dirname = "${cfg.homeDir}/configs";
           autosync = false; # TODO deprecate
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
+          dirname = "${cfg.homeDir}/secrets";
           autosync = false;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "$HOME/games";
+          dirname = "${cfg.homeDir}/games";
           autosync = false;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "$HOME/data";
+          dirname = "${cfg.homeDir}/data";
           autosync = false;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
+          dirname = "${cfg.homeDir}/Documents";
           autosync = false;
         }
       ];
@@ -138,6 +141,7 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../python-packages/orchestrator/module.nix
+    ../python-packages/flasks/authui/module.nix
   ];
 
   config = {
@@ -258,6 +262,17 @@ in {
           port = cfg.webServerInsecurePort;
         }];
       };
+    };
+
+    services.authui = {
+      enable = cfg.isATS;
+      initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
+        ${pkgs.systemd}/bin/systemctl stop orchestratord
+      '') + "/bin/atsauthui-start";
+      resetScript = (pkgs.writeShellScriptBin "atsauthui-finish" ''
+        ${machine-rcrsync}/bin/rcrsync override secrets
+        ${pkgs.systemd}/bin/systemctl start orchestratord
+      '') + "/bin/atsauthui-finish";
     };
 
     environment.gnome =
