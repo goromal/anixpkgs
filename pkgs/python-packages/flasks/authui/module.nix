@@ -4,7 +4,7 @@ let
   globalCfg = config.machines.base;
   cfg = config.services.authui;
   nullScript = pkgs.writeShellScriptBin "null-script" ''
-  echo ""
+    echo ""
   '';
 in {
   options.services.authui = {

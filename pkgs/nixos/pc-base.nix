@@ -272,7 +272,6 @@ in {
       '') + "/bin/atsauthui-finish";
     };
 
-
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         excludePackages = with pkgs;
@@ -468,13 +467,15 @@ in {
           '')
         ]
       else
-        [ ]) ++ (if cfg.isATS then [
-          (pkgs.writeShellScriptBin "atsrefresh" ''
-            ${atsudo}/bin/atsudo systemctl stop orchestratord
-            authm refresh --headless --force && rcrsync override secrets
-            ${atsudo}/bin/atsudo systemctl start orchestratord
-          '')
-        ] else
+        [ ]) ++ (if cfg.isATS then
+          [
+            (pkgs.writeShellScriptBin "atsrefresh" ''
+              ${atsudo}/bin/atsudo systemctl stop orchestratord
+              authm refresh --headless --force && rcrsync override secrets
+              ${atsudo}/bin/atsudo systemctl start orchestratord
+            '')
+          ]
+        else
           [ ]);
 
     programs.bash.interactiveShellInit = ''
