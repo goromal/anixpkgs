@@ -10,7 +10,7 @@ let
       args+="$word "
     done
     args=''${args% }
-    sudo -S $args < $HOME/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+    sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
   '';
   machine-rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
   machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
@@ -87,31 +87,31 @@ in {
         {
           name = "configs";
           cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
+          dirname = "${cfg.homeDir}/configs";
           autosync = false; # TODO deprecate
         }
         {
           name = "secrets";
           cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
+          dirname = "${cfg.homeDir}/secrets";
           autosync = false;
         }
         {
           name = "games";
           cloudname = "dropbox:games";
-          dirname = "$HOME/games";
+          dirname = "${cfg.homeDir}/games";
           autosync = false;
         }
         {
           name = "data";
           cloudname = "box:data";
-          dirname = "$HOME/data";
+          dirname = "${cfg.homeDir}/data";
           autosync = false;
         }
         {
           name = "documents";
           cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
+          dirname = "${cfg.homeDir}/Documents";
           autosync = false;
         }
       ];
