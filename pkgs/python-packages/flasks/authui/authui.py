@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, render_template, request, redirect, url_for,
 from easy_google_auth.auth import HeadlessCredentialsGenerator
 from gmail_parser.defaults import GmailParserDefaults as GPD
 import os
+import pwd
 import json
 import argparse
 from datetime import datetime
@@ -17,23 +18,35 @@ args = parser.parse_args()
 
 bp = Blueprint("auth", __name__, url_prefix=args.subdomain)
 
+def expanduser_for(user, path):
+    if not path.startswith('~'):
+        return path
+    if path == '~':
+        homedir = pwd.getpwnam(user).pw_dir
+        return homedir
+    elif path.startswith('~/'):
+        homedir = pwd.getpwnam(user).pw_dir
+        return os.path.join(homedir, path[2:])
+    else:
+        raise ValueError(f"Unsupported path format: {path}")
+
 refresh_times = {}
 
 GENERATOR_CONFIGS = {
     "user": {
         "name": "User",
-        "secrets_file": GPD.getKwargsOrDefault("gmail_secrets_json"),
-        "refresh_token": GPD.getKwargsOrDefault("gmail_refresh_file"),
+        "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
+        "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_refresh_file")),
     },
     "bot": {
         "name": "Bot",
-        "secrets_file": GPD.getKwargsOrDefault("gmail_secrets_json"),
-        "refresh_token": GPD.getKwargsOrDefault("gbot_refresh_file"),
+        "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
+        "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("gbot_refresh_file")),
     },
     "journal": {
         "name": "Journal",
-        "secrets_file": GPD.getKwargsOrDefault("gmail_secrets_json"),
-        "refresh_token": GPD.getKwargsOrDefault("journal_refresh_file"),
+        "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
+        "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("journal_refresh_file")),
     },
 }
 
