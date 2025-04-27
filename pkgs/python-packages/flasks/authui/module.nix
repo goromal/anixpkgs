@@ -44,7 +44,7 @@ in {
         ExecStart = "${cfg.package}/bin/authui --port ${
             builtins.toString service-ports.authui
           } --memory-file ${cfg.rootDir}/refresh_times.json --init-script ${cfg.initScript} --reset-script ${cfg.resetScript}";
-        ReadWritePaths = [ "${cfg.rootDir}" "${globalCfg.homeDir}" ];
+        ReadWritePaths = [ "/" "${cfg.rootDir}" "${globalCfg.homeDir}" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
