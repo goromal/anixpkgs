@@ -197,6 +197,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/rankserver { });
             stampserver = addDoc
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
+            authui =
+              addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
           });
       }));
 in rec {
@@ -274,6 +276,7 @@ in rec {
   rankserver = final.python311.pkgs.rankserver;
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
+  authui = final.python311.pkgs.authui;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
   photos-tools = final.python311.pkgs.photos-tools;
