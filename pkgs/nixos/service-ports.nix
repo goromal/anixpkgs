@@ -12,4 +12,5 @@
     internal = 5555;
     public = 5556;
   };
+  authui = 4242;
 }

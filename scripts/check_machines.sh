@@ -10,6 +10,13 @@ while [ -h "$SOURCE" ]; do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+on_exit() {
+    echo "Cleaning up..."
+    sed -i 's|local-build = true;|local-build = false;|g' ${DIR}/../pkgs/nixos/dependencies.nix
+}
+
+trap on_exit ERR SIGINT EXIT
+
 export NIXPKGS_ALLOW_UNFREE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
@@ -38,5 +45,3 @@ done
 #     echo "Checks out!"
 #     echo ""
 # done
-
-sed -i 's|local-build = true;|local-build = false;|g' ${DIR}/../pkgs/nixos/dependencies.nix
