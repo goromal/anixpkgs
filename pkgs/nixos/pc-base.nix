@@ -12,7 +12,10 @@ let
     args=''${args% }
     sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
   '';
-  machine-rcrsync = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  machine-rcrsync = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
   machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
 in {
   options.machines.base = {
