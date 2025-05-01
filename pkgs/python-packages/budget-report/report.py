@@ -246,6 +246,8 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
                 processed_line = False
                 row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
                 for amount_col in amount_cols:
+                    if "ORIG CO NAME" in row_desc:
+                        continue
                     try:
                         transactions.append(
                             (
