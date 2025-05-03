@@ -1,10 +1,10 @@
-{ cloudDirs ? [ ], writeArgparseScriptBin, rclone, color-prints, redirects
-, flock, rcloneCfg ? "~/.config/rclone/rclone.conf" }:
+{ cloudDirs ? [ ], homeDir ? "/data/andrew", writeArgparseScriptBin, rclone
+, color-prints, redirects, flock, rcloneCfg ? "~/.config/rclone/rclone.conf" }:
 let
   pkgname = "rcrsync";
   description = "Cloud directory management tool.";
   cliCloudList = builtins.concatStringsSep "\n      "
-    (map (x: "${x.name}	${x.cloudname}	<->  ${x.dirname}") cloudDirs);
+    (map (x: "${x.name}	${x.cloudname}	<->  ~/${x.dirname}") cloudDirs);
   longDescription = ''
     usage: ${pkgname} [OPTS] init|sync|copy|override CLOUD_DIR [subdir]
 
@@ -23,7 +23,7 @@ let
   cloudChecks = builtins.concatStringsSep "\n" (map (x: ''
     elif [[ "$2" == "${x.name}" ]]; then
       CLOUD_DIR="${x.cloudname}"
-      LOCAL_DIR="${x.dirname}"
+      LOCAL_DIR="${homeDir}/${x.dirname}"
   '') cloudDirs);
 in (writeArgparseScriptBin pkgname longDescription [{
   var = "verbose";
