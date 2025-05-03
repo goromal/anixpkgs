@@ -13,6 +13,18 @@ in {
     isATS = false;
     serveNotesWiki = false;
     isInstaller = false;
+    cloudDirs = [
+      {
+        name = "configs";
+        cloudname = "dropbox:configs";
+        dirname = "configs";
+      }
+      {
+        name = "secrets";
+        cloudname = "dropbox:secrets";
+        dirname = "secrets";
+      }
+    ];
   };
 
   services.rankserver =

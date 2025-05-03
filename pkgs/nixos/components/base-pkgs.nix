@@ -19,16 +19,6 @@ let
           ""
       }
   '';
-  auto_sync_cloud_dirs =
-    builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
-    cfg.cloudDirs;
-  cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") auto_sync_cloud_dirs);
-  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
-    for cloud_dir in ${cloud_dir_list}; do
-      ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
-    done
-  '';
   atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
     words=""
     for word in "$@"; do
@@ -100,25 +90,6 @@ in {
       Restart = "always";
     };
     Install.WantedBy = [ "default.target" ];
-  };
-
-  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-    Unit = { Description = "cloud dirs sync script"; };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
-      Restart = "on-failure";
-      ReadWritePaths = [ cfg.homeDir ];
-    };
-  };
-  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-    Unit = { Description = "cloud dirs sync timer"; };
-    Timer = {
-      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-      OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-      Unit = "cloud-dirs-sync.service";
-    };
-    Install.WantedBy = [ "timers.target" ];
   };
 
   programs.vim = {

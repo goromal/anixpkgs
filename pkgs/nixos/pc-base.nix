@@ -13,6 +13,7 @@ let
     sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
   '';
   machine-rcrsync = anixpkgs.rcrsync.override {
+    homeDir = cfg.homeDir;
     cloudDirs = cfg.cloudDirs;
     rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
   };
@@ -85,39 +86,7 @@ in {
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
-        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
-      default = [
-        {
-          name = "configs";
-          cloudname = "dropbox:configs";
-          dirname = "${cfg.homeDir}/configs";
-          autosync = false; # TODO deprecate
-        }
-        {
-          name = "secrets";
-          cloudname = "dropbox:secrets";
-          dirname = "${cfg.homeDir}/secrets";
-          autosync = false;
-        }
-        {
-          name = "games";
-          cloudname = "dropbox:games";
-          dirname = "${cfg.homeDir}/games";
-          autosync = false;
-        }
-        {
-          name = "data";
-          cloudname = "box:data";
-          dirname = "${cfg.homeDir}/data";
-          autosync = false;
-        }
-        {
-          name = "documents";
-          cloudname = "drive:Documents";
-          dirname = "${cfg.homeDir}/Documents";
-          autosync = false;
-        }
-      ];
+        "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
     };
     enableOrchestrator = lib.mkOption {
       type = lib.types.bool;
@@ -579,7 +548,6 @@ in {
           null;
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = false;
-        cloudAutoSync = false;
         enableMetrics = cfg.enableMetrics;
       };
     };
