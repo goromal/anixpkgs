@@ -17,7 +17,7 @@ let
     {
       name = "windwaker";
       description = "The Wind Waker.";
-      location = "$HOME/more-games/TODO.iso";
+      location = "$HOME/more-games/WindWaker.iso";
       cloudDir = "more-games";
     }
     # ^^^^ TODO
