@@ -12,6 +12,7 @@ let
       checkPkgs = [ ];
     });
   printErr = "${color-prints}/bin/echo_red";
+  printYlw = "${color-prints}/bin/echo_yellow";
 in (writeArgparseScriptBin pkgname ''
   usage: ${pkgname} [options] [N|C|E|S]
 
@@ -58,36 +59,17 @@ in (writeArgparseScriptBin pkgname ''
     ${printErr} "Unrecognized region option: $1"
     exit 1
   fi
+  rcrsync copy games la-quiz || { ${printErr} "Sync failed. Exiting."; exit 1; }
   if [[ "$isdebug" == "1" ]]; then
     ${quiz}/bin/quiz "$imgfile" "$jsonfile" d
   else
     ${quiz}/bin/quiz "$imgfile" "$jsonfile"
   fi
+  rcrsync override games la-quiz || { ${printYlw} "Sync failed!"; }
 '') // {
   meta = {
     description = "Spawn a LA geography quiz.";
-    longDescription = ''
-      ```
-      usage: ${pkgname} [options] [N|C|E|S]
-
-      Spawn a LA geography quiz! Will pull up the general region you specify:
-
-          N = North
-          C = Central
-          E = East
-          S = South
-
-      Options:
-
-      --debug|-d    Open in debug mode (will print click positions to the screen).
-
-      NOTE: This program assumes that you have the place location JSON files stored in
-
-        ~/games/la-quiz/GLAA-C.json
-                        GLAA-E.json
-                        GLAA-N.json
-                        GLAA-S.json
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

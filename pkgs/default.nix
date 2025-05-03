@@ -298,7 +298,7 @@ in rec {
   });
   la-quiz = addDoc
     (prev.callPackage ./bash-packages/la-quiz { python = final.python311; });
-
+  play = addDoc (prev.callPackage ./bash-packages/play { });
   aapis-grpcurl = addDoc
     (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
   strings =
