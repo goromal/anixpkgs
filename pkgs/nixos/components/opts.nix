@@ -23,52 +23,10 @@ with import ../dependencies.nix; {
         "Whether to run a user-domain instance of orchestratord (default: true)";
       default = true;
     };
-    cloudAutoSync = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether to automatically sync cloud dirs (default: true)";
-      default = true;
-    };
-    cloudAutoSyncInterval = lib.mkOption {
-      type = lib.types.int;
-      description = "Interval (in minutes) of cloud dirs sync (default: 10)";
-      default = 10;
-    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
-        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
-      default = [
-        {
-          name = "configs";
-          cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
-          autosync = true;
-        }
-        {
-          name = "secrets";
-          cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
-          autosync = false;
-        }
-        {
-          name = "games";
-          cloudname = "dropbox:games";
-          dirname = "$HOME/games";
-          autosync = true;
-        }
-        {
-          name = "data";
-          cloudname = "box:data";
-          dirname = "$HOME/data";
-          autosync = true;
-        }
-        {
-          name = "documents";
-          cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
-          autosync = true;
-        }
-      ];
+        "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
     };
     editor = lib.mkOption {
       type = lib.types.str;

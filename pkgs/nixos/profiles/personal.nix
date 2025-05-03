@@ -11,6 +11,33 @@ with import ../dependencies.nix; {
     serveNotesWiki = false;
     isInstaller = false;
     enableMetrics = true;
+    cloudDirs = [
+      {
+        name = "configs";
+        cloudname = "dropbox:configs";
+        dirname = "configs";
+      }
+      {
+        name = "secrets";
+        cloudname = "dropbox:secrets";
+        dirname = "secrets";
+      }
+      {
+        name = "games";
+        cloudname = "dropbox:games";
+        dirname = "games";
+      }
+      {
+        name = "data";
+        cloudname = "box:data";
+        dirname = "data";
+      }
+      {
+        name = "documents";
+        cloudname = "drive:Documents";
+        dirname = "Documents";
+      }
+    ];
     enableOrchestrator = true;
     timedOrchJobs = [{
       name = "budgets-backup";
