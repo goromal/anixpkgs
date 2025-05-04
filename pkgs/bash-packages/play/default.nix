@@ -13,21 +13,30 @@ let
       location = "$HOME/games/LegendOfZeldaCollectorsEdition.iso";
       cloudDir = "games";
     }
-    # ^^^^ TODO
     {
       name = "windwaker";
       description = "The Wind Waker.";
       location = "$HOME/more-games/WindWaker.iso";
-      cloudDir = "more-games";
+      cloudDir = "games2";
     }
-    # ^^^^ TODO
     {
       name = "twilight";
       description = "Twilight Princess.";
-      location = "$HOME/more-games/TODO.iso";
-      cloudDir = "more-games";
+      location = "$HOME/more-games/TwilightPrincess.iso";
+      cloudDir = "games2";
     }
-    # ^^^^ TODO
+    {
+      name = "melee";
+      description = "Super Smash Bros. Melee.";
+      location = "$HOME/more-games/Melee.iso";
+      cloudDir = "games2";
+    }
+    {
+      name = "sunshine";
+      description = "Super Mario Sunshine.";
+      location = "$HOME/more-games/SuperMarioSunshine.iso";
+      cloudDir = "games2";
+    }
   ];
   gameNames = builtins.concatStringsSep "\n      "
     (map (x: "${x.name}	${x.description}") games);

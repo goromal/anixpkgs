@@ -23,11 +23,6 @@ with import ../dependencies.nix; {
         dirname = "secrets";
       }
       {
-        name = "games";
-        cloudname = "dropbox:games";
-        dirname = "games";
-      }
-      {
         name = "data";
         cloudname = "box:data";
         dirname = "data";
@@ -36,6 +31,16 @@ with import ../dependencies.nix; {
         name = "documents";
         cloudname = "drive:Documents";
         dirname = "Documents";
+      }
+      {
+        name = "games";
+        cloudname = "dropbox:games";
+        dirname = "games";
+      }
+      {
+        name = "games2";
+        cloudname = "drive:MoreGames";
+        dirname = "more-games";
       }
     ];
     enableOrchestrator = true;
