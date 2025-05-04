@@ -73,7 +73,7 @@ def main():
                             "y"
                         ] = yc
                         with open(self.keyfile, "w") as answer_file:
-                            answer_file.write(json.dumps(cities_json))
+                            answer_file.write(json.dumps(cities_json, indent=4))
 
                 if x >= 0 and y >= 0:
                     if (
