@@ -122,6 +122,15 @@ in {
         limits_config.allow_structured_metadata = false;
       };
     };
+systemd.services.loki = {
+  wantedBy = [ "multi-user.target" ];
+  after = [ "network-online.target" ];
+  requires = [ "network-online.target" ];
+  serviceConfig = {
+    Restart = "on-failure";
+    RestartSec = "5s";
+  };
+};
 
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
