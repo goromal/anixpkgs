@@ -17,6 +17,7 @@ Packages written (or glued together) in Bash.
 - [manage-gmail](./manage-gmail.md)
 - [gantter](./gantter.md)
 - [la-quiz](./la-quiz.md)
+- [play](./play.md)
 - [budget_report](./budget_report.md)
 - [md2pdf](./md2pdf.md)
 - [notabilify](./notabilify.md)

@@ -67,6 +67,7 @@
   - [manage-gmail](./bash/manage-gmail.md)
   - [gantter](./bash/gantter.md)
   - [la-quiz](./bash/la-quiz.md)
+  - [play](./bash/play.md)
   - [budget_report](./bash/budget_report.md)
   - [md2pdf](./bash/md2pdf.md)
   - [notabilify](./bash/notabilify.md)

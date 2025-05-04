@@ -10,16 +10,29 @@ in {
     graphical = false;
     recreational = false;
     developer = false;
-    loadATSServices = false;
+    isATS = false;
     serveNotesWiki = false;
     isInstaller = false;
+    cloudDirs = [
+      {
+        name = "configs";
+        cloudname = "dropbox:configs";
+        dirname = "configs";
+      }
+      {
+        name = "secrets";
+        cloudname = "dropbox:secrets";
+        dirname = "secrets";
+      }
+    ];
   };
 
-  services.rankserver = {
-    enable = true;
-    package = anixpkgs.rankserver-cpp;
-    dataDir = "rankables";
-    port = ports.rankserver;
-    openFirewall = true;
-  };
+  services.rankserver =
+    { # TODO make this a pc-base option and adopt mkProfileConfig
+      enable = true;
+      package = anixpkgs.rankserver-cpp;
+      dataDir = "rankables";
+      port = ports.rankserver;
+      openFirewall = true;
+    };
 }

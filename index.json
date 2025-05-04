@@ -383,6 +383,11 @@
                 "docs": true
             },
             {
+                "attr": "play",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "budget_report",
                 "ci": true,
                 "docs": true
