@@ -11,6 +11,7 @@ let
   rcrsyncConfigured = anixpkgs.rcrsync.override {
     cloudDirs = cfg.cloudDirs;
     homeDir = cfg.homeDir;
+rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
   };
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
