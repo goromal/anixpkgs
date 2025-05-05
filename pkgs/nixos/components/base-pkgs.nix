@@ -8,7 +8,11 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  rcrsyncConfigured = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+    homeDir = cfg.homeDir;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2 \
