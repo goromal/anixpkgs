@@ -123,8 +123,8 @@ in {
       };
     };
     systemd.services.loki.serviceConfig = {
-        Restart = lib.mkForce "on-failure";
-        RestartSec = lib.mkForce "5s";
+      Restart = lib.mkForce "on-failure";
+      RestartSec = lib.mkForce "5s";
     };
 
     # Check health with
