@@ -122,14 +122,9 @@ in {
         limits_config.allow_structured_metadata = false;
       };
     };
-    systemd.services.loki = {
-      wantedBy = [ "multi-user.target" ];
-      after = [ "network-online.target" ];
-      requires = [ "network-online.target" ];
-      serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = "5s";
-      };
+    systemd.services.loki.serviceConfig = {
+        Restart = lib.mkForce "on-failure";
+        RestartSec = lib.mkForce "5s";
     };
 
     # Check health with
