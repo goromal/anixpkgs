@@ -122,6 +122,10 @@ in {
         limits_config.allow_structured_metadata = false;
       };
     };
+    systemd.services.loki.serviceConfig = {
+      Restart = lib.mkForce "on-failure";
+      RestartSec = lib.mkForce "5s";
+    };
 
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
