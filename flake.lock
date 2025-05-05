@@ -209,6 +209,7 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "geometry",
         "type": "github"
       }
@@ -257,6 +258,7 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "manif-geom-cpp",
         "type": "github"
       }
