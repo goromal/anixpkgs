@@ -33,13 +33,18 @@ in {
     systemd.tmpfiles.rules = [
       "d ${cfg.htmlDir} - ${cfg.user} ${cfg.group}"
       "Z ${cfg.htmlDir} - ${cfg.user} ${cfg.group}"
+      "d ${cfg.htmlDir}/tactical - ${cfg.user} ${cfg.group}"
+      "Z ${cfg.htmlDir}/tactical - ${cfg.user} ${cfg.group}"
     ];
 
     # ^^^^ TODO service and CLI
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/tactical/" = { index = "${cfg.htmlDir}/${cfg.htmlFile}"; };
+      locations."/tactical/" = {
+        root = cfg.htmlDir;
+        index = cfg.htmlFile;
+      };
     };
   };
 }
