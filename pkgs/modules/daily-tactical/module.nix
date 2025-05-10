@@ -25,8 +25,7 @@ in {
     };
     package = lib.mkOption {
       type = lib.types.package;
-      description =
-        "Daily tactical server package";
+      description = "Daily tactical server package";
     };
   };
 
@@ -40,9 +39,7 @@ in {
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/tactical/" = {
-        index = "${cfg.htmlDir}/${cfg.htmlFile}";
-      };
+      locations."/tactical/" = { index = "${cfg.htmlDir}/${cfg.htmlFile}"; };
     };
   };
 }
