@@ -109,6 +109,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/daily-tactical/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/flasks/authui/module.nix
   ];
@@ -340,6 +341,15 @@ in {
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
+
+    # Daily Tactical ^^^^ TODO only ATS
+    services.daily-tactical = lib.mkIf true {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      htmlDir = "${cfg.homeDir}/test"; # ^^^^
+      # package = ;
+    };
 
     # Global packages
     environment.systemPackages = with pkgs;
