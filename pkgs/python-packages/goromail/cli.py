@@ -16,7 +16,7 @@ from task_tools.defaults import TaskToolsDefaults as TTD
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
 
-
+# ^^^^ TODO break out notion-tools pkg
 def create_notion_bulleted_list(data, level=0):
     if not isinstance(data, list):
         raise ValueError("Input data must be a list.")
