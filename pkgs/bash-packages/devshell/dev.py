@@ -116,6 +116,7 @@ class Context:
             self.max_reponame_len = max([len(repo[0]) for repo in self.repos])
             self.max_branch_len = max([len(repo[1]) for repo in self.repos])
             self.end_row = min(2 + len(self.repos), curses.LINES - 1)
+            self.repos.sort(key=lambda x: x[0])
 
     def save_ws_repo_branch(self, reponame, branch):
         hist_data = {}
