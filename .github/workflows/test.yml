@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  NIXOS_VERSION: 24.05
+  NIXOS_VERSION: 25.05
 
 jobs:
   lint:
