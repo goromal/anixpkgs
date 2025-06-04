@@ -11,6 +11,7 @@ make-title -c yellow "Testing orchestrator"
 cd $tmpdir
 mkdir orch_data
 orchoutpath="$tmpdir/orch_data"
+# ^^^^ TODO verify
 oinf1="$orchoutpath/sample_960x400_ocean_with_audio.webm"
 oinf2="$orchoutpath/sample_1280x720.webm"
 oinf3="$orchoutpath/sample_1920x1080.webm"
