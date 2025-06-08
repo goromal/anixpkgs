@@ -100,6 +100,22 @@
         "type": "github"
       }
     },
+    "daily_tactical_server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1749420502,
+        "narHash": "sha256-OUmHU8R/tcG8HfdTHwMAfAE3dC5zA4KwkU6UmCNJqdg=",
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "rev": "f4c9dc95eb45c0c0ef89a26a9fa87554cd599a09",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "type": "github"
+      }
+    },
     "easy-google-auth": {
       "flake": false,
       "locked": {
@@ -612,6 +628,7 @@
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
+        "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",
         "evil-hangman": "evil-hangman",
         "find_rotational_conventions": "find_rotational_conventions",

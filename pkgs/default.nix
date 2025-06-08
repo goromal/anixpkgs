@@ -128,6 +128,10 @@ let
               (pySelf.callPackage ./python-packages/book-notes-sync {
                 pkg-src = flakeInputs.book-notes-sync;
               });
+            daily_tactical_server = addDoc (pySelf.callPackage ./python-packages/daily_tactical_server {
+              inherit service-ports;
+              pkg-src = flakeInputs.daily_tactical_server;
+            }); 
             task-tools = addDoc
               (pySelf.callPackage ./python-packages/task-tools {
                 pkg-src = flakeInputs.task-tools;
@@ -270,6 +274,7 @@ in rec {
   flask-mp3server = final.python311.pkgs.flask-mp3server;
   flask-smfserver = final.python311.pkgs.flask-smfserver;
   flask-oatbox = final.python311.pkgs.flask-oatbox;
+  daily_tactical_server = final.python311.pkgs.daily_tactical_server;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
   symforce = final.python311.pkgs.symforce;
