@@ -1,15 +1,5 @@
-{ buildPythonPackage, pkg-src, lib, makeWrapper
-, click
-, aapis-py
-, grpcio
-, flask
-, colorama
-, statsd
-, aiosqlite
-, aiofiles
-, wiki-tools
-, task-tools
-, service-ports
+{ buildPythonPackage, pkg-src, lib, makeWrapper, click, aapis-py, grpcio, flask
+, colorama, statsd, aiosqlite, aiofiles, wiki-tools, task-tools, service-ports
 }:
 buildPythonPackage rec {
   pname = "daily_tactical_server";
@@ -30,14 +20,17 @@ buildPythonPackage rec {
   ];
   postInstall = ''
     wrapProgram $out/bin/tacticald \
-      --add-flags "--server-port ${builtins.toString service-ports.tactical.insecure} --web-port ${builtins.toString service-ports.tactical.web}"
+      --add-flags "--server-port ${
+        builtins.toString service-ports.tactical.insecure
+      } --web-port ${builtins.toString service-ports.tactical.web}"
     wrapProgram $out/bin/tactical \
-      --add-flags "--server-port ${builtins.toString service-ports.tactical.insecure}"
+      --add-flags "--server-port ${
+        builtins.toString service-ports.tactical.insecure
+      }"
   '';
   doCheck = false;
-meta = {
-    description =
-      "Daemon + CLI for managing a daily tactical webpage.";
+  meta = {
+    description = "Daemon + CLI for managing a daily tactical webpage.";
     longDescription = ''
       [Repository](https://github.com/goromal/daily_tactical_server)
     '';

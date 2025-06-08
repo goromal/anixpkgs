@@ -128,10 +128,11 @@ let
               (pySelf.callPackage ./python-packages/book-notes-sync {
                 pkg-src = flakeInputs.book-notes-sync;
               });
-            daily_tactical_server = addDoc (pySelf.callPackage ./python-packages/daily_tactical_server {
-              inherit service-ports;
-              pkg-src = flakeInputs.daily_tactical_server;
-            }); 
+            daily_tactical_server = addDoc
+              (pySelf.callPackage ./python-packages/daily_tactical_server {
+                inherit service-ports;
+                pkg-src = flakeInputs.daily_tactical_server;
+              });
             task-tools = addDoc
               (pySelf.callPackage ./python-packages/task-tools {
                 pkg-src = flakeInputs.task-tools;
