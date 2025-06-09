@@ -55,9 +55,7 @@ in {
       wantedBy = [ "multi-user.target" ];
     };
 
-    environment.systemPackages = [
-      cfg.tacticalPkg
-    ];
+    environment.systemPackages = [ cfg.tacticalPkg ];
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
