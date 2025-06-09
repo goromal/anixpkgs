@@ -16,6 +16,13 @@ def display_output(stdscr):
     except:
         pass
 
+def ord_map(n):
+    if n < 10:
+        return str(n)
+    elif n < 36:
+        return chr(ord('A') + n - 10)
+    else:
+        return "0"
 
 def main(stdscr):
     global selection
@@ -23,7 +30,7 @@ def main(stdscr):
     curses.curs_set(0)
     stdscr.clear()
 
-    idx_ords = [ord(str(i + 1)) for i in range(len(service_list))]
+    idx_ords = [ord(ord_map(i + 1)) for i in range(len(service_list))]
 
     while True:
         display_output(stdscr)
