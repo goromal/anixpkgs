@@ -40,7 +40,8 @@ in {
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.tacticalPkg}/bin/tacticald --db-path ${cfg.rootDir}/data.db --storage-path ${cfg.rootDir}/data.json"
+        ExecStart =
+          "${cfg.tacticalPkg}/bin/tacticald --db-path ${cfg.rootDir}/data.db --storage-path ${cfg.rootDir}/data.json"
           + lib.optionalString (cfg.statsdPort != null)
           " --statsd-port ${builtins.toString cfg.statsdPort}";
         ReadWritePaths = [ "/" ];
@@ -56,8 +57,9 @@ in {
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/tactical/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.tactical.web}/tactical/";
+        proxyPass = "http://127.0.0.1:${
+            builtins.toString service-ports.tactical.web
+          }/tactical/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
