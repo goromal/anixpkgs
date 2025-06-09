@@ -833,16 +833,15 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1749416023,
-        "narHash": "sha256-uthqkbn4PpS7rkm73aoKp/zFESC1Sxw2cq/hHUmgG80=",
+        "lastModified": 1749443612,
+        "narHash": "sha256-BJou0WDSH+uIanCDz3VXYAg0wyxON1L0sKwqXSVUwrM=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "49506efb224157ffd8226e7373088c520ecdb078",
+        "rev": "df4834e08a1f3057fdcc3523888ce5976e973829",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/dbn",
         "repo": "task-tools",
         "type": "github"
       }
