@@ -4,18 +4,6 @@ import curses
 service_list = sys.argv[1].split("/")
 selection = ""
 
-
-def display_output(stdscr):
-    global service_list
-    stdscr.clear()
-    try:
-        stdscr.addstr(0, 0, f"atstrigger: press <q> to quit...", curses.A_BOLD)
-        for i, service in enumerate(service_list):
-            stdscr.addstr(i + 2, 3, f"{i+1}: {service}")
-        stdscr.refresh()
-    except:
-        pass
-
 def ord_map(n):
     if n < 10:
         return str(n)
@@ -23,6 +11,17 @@ def ord_map(n):
         return chr(ord('A') + n - 10)
     else:
         return "0"
+
+def display_output(stdscr):
+    global service_list
+    stdscr.clear()
+    try:
+        stdscr.addstr(0, 0, f"atstrigger: press <q> to quit...", curses.A_BOLD)
+        for i, service in enumerate(service_list):
+            stdscr.addstr(i + 2, 3, f"{ord_map(i+1)}: {service}")
+        stdscr.refresh()
+    except:
+        pass
 
 def main(stdscr):
     global selection
