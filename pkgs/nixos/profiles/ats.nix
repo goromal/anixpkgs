@@ -141,16 +141,13 @@ with import ../dependencies.nix; {
       {
         name = "ats-grader";
         jobShellScript = pkgs.writeShellScript "ats-grader" ''
-          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+          authm refresh --headless || { logger -t ats-grader "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
           tmpdir=$(mktemp -d)
           echo "🧹 Daily Task Cleaning 🧹" > $tmpdir/out.txt
           echo "" >> $tmpdir/out.txt
           current_year=$(date +"%Y")
           task-tools clean --start-date "''${current_year}-01-01" >> $tmpdir/out.txt
-          gmail-manager gbot-send 6612105214@vzwpix.com "ats-grader" \
-              "$(cat $tmpdir/out.txt)"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-grader" \
-              "$(cat $tmpdir/out.txt)"
+          logger -t ats-grader "$(cat $tmpdir/out.txt)"
           rm -r $tmpdir
         '';
         timerCfg = {
@@ -159,56 +156,15 @@ with import ../dependencies.nix; {
         };
       }
       {
-        name = "ats-tasks-ranked";
-        jobShellScript = pkgs.writeShellScript "ats-tasks-ranked" ''
-          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
-          tmpdir=$(mktemp -d)
-          echo "🗓️ Pending Tasks:" > $tmpdir/out.txt
-          echo "" >> $tmpdir/out.txt
-          task-tools list ranked --no-ids >> $tmpdir/out.txt
-          gmail-manager gbot-send 6612105214@vzwpix.com "ats-tasks" \
-              "$(cat $tmpdir/out.txt)"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-tasks" \
-              "$(cat $tmpdir/out.txt)"
-          rm -r $tmpdir
-        '';
-        timerCfg = {
-          OnCalendar = [ "*-*-* 07:00:00" ];
-          Persistent = true;
-        };
-      }
-      {
         name = "ats-prov-tasker";
         jobShellScript = pkgs.writeShellScript "ats-prov-tasker" ''
-          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+          authm refresh --headless || { logger -t ats-prov-tasker "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
           providence-tasker --wiki-url http://${config.networking.hostName}.local 7 ${anixpkgs.redirects.suppress_all}
-          gmail-manager gbot-send 6612105214@vzwpix.com "ats-ptaskerd" \
-            "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ptaskerd" \
-            "[$(date)] 📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
+          logger -t ats-prov-tasker "📖 Happy Sunday! Providence-tasker has deployed for the coming week ✅"
         '';
         timerCfg = {
           OnCalendar = [ "Sun *-*-* 08:00:00" ];
           Persistent = false;
-        };
-      }
-      {
-        name = "ats-rand-journal";
-        jobShellScript = pkgs.writeShellScript "ats-rand-journal" ''
-          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
-          tmpdir=$(mktemp -d)
-          echo "🖊️ Random Journal Entry of the Day:" > $tmpdir/out.txt
-          echo "" >> $tmpdir/out.txt
-          wiki-tools --url http://${config.networking.hostName}.local get-rand-journal >> $tmpdir/out.txt
-          gmail-manager journal-send 6612105214@vzwpix.com "ats-rand-journal" \
-            "$(cat $tmpdir/out.txt)"
-          gmail-manager journal-send andrew.torgesen@gmail.com "ats-rand-journal" \
-            "$(cat $tmpdir/out.txt)"
-          rm -r $tmpdir
-        '';
-        timerCfg = {
-          OnCalendar = [ "*-*-* 06:30:00" ];
-          Persistent = true;
         };
       }
       {
