@@ -342,8 +342,8 @@ in {
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
 
-    # Daily Tactical ^^^^ TODO only ATS
-    services.tacticald = lib.mkIf true {
+    # Daily Tactical
+    services.tacticald = lib.mkIf cfg.isATS {
       enable = true;
       user = "andrew";
       group = "dev";

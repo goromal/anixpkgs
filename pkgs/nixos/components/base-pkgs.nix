@@ -63,6 +63,7 @@ in {
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
     anixpkgs.orchestrator
+    anixpkgs.daily_tactical_server
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
     anixpkgs.rcdo

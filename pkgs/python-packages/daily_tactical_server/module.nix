@@ -1,5 +1,5 @@
 { pkgs, config, lib, ... }:
-with import ../../../nixos/dependencies.nix;
+with import ../../nixos/dependencies.nix;
 let cfg = config.services.tacticald;
 in {
   options.services.tacticald = {
@@ -54,8 +54,6 @@ in {
       };
       wantedBy = [ "multi-user.target" ];
     };
-
-    environment.systemPackages = [ cfg.tacticalPkg ];
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
