@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1749269212,
+        "lastModified": 1749440519,
         "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "db338c781e06a4a218d756d18f625557b4fcfc5f",
+        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/tactical",
         "repo": "aapis",
         "type": "github"
       }
@@ -103,16 +102,15 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1749435694,
-        "narHash": "sha256-u8ABExaZhnr8SpHvJ3IN1HDCSJsufcOFNndag7Sxi+Q=",
+        "lastModified": 1749440609,
+        "narHash": "sha256-ZHDqmz+2hE00HmCJs2Qd5kqE8qEcacB1TSWkF2RVjgY=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "0a44fa5ab0bf80f3156e43aedc47bf5a177ad0d8",
+        "rev": "07b0ecb3d22c46375dfe3c30b6b0de990cbb305d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/fixes",
         "repo": "daily_tactical_server",
         "type": "github"
       }

@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis?ref=dev/tactical";
+    aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
     ardupilot.url =
@@ -29,7 +29,7 @@
     crowcpp.flake = false;
 
     daily_tactical_server.url =
-      "github:goromal/daily_tactical_server?ref=dev/fixes";
+      "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
     manif-geom-cpp.url = "github:goromal/manif-geom-cpp";
