@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1734240005,
-        "narHash": "sha256-ydGzaszIULCfra4cMlSIDZCjKdn6b63C9TwgDOB25+E=",
+        "lastModified": 1749440519,
+        "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "bbd81c2974dc591cd309f473cd3d32559b8c1f7e",
+        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
         "type": "github"
       },
       "original": {
@@ -96,6 +96,22 @@
       "original": {
         "owner": "goromal",
         "repo": "Crow",
+        "type": "github"
+      }
+    },
+    "daily_tactical_server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1749440609,
+        "narHash": "sha256-ZHDqmz+2hE00HmCJs2Qd5kqE8qEcacB1TSWkF2RVjgY=",
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "rev": "07b0ecb3d22c46375dfe3c30b6b0de990cbb305d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
         "type": "github"
       }
     },
@@ -611,6 +627,7 @@
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
+        "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",
         "evil-hangman": "evil-hangman",
         "find_rotational_conventions": "find_rotational_conventions",

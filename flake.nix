@@ -28,6 +28,9 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
+    daily_tactical_server.url = "github:goromal/daily_tactical_server";
+    daily_tactical_server.flake = false;
+
     manif-geom-cpp.url = "github:goromal/manif-geom-cpp";
     manif-geom-cpp.flake = false;
 
