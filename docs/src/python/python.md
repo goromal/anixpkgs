@@ -5,6 +5,7 @@ Packages written (or bound) in Python.
 - [aapis-py](./aapis-py.md)
 - [fqt](./fqt.md)
 - [find_rotational_conventions](./find_rotational_conventions.md)
+- [daily_tactical_server](./daily_tactical_server.md)
 - [geometry](./geometry.md)
 - [pyceres](./pyceres.md)
 - [pyceres_factors](./pyceres_factors.md)

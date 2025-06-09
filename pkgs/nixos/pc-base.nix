@@ -110,6 +110,7 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../python-packages/orchestrator/module.nix
+    ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
   ];
 
@@ -340,6 +341,15 @@ in {
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
+
+    # Daily Tactical
+    services.tacticald = lib.mkIf cfg.isATS {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      tacticalPkg = anixpkgs.daily_tactical_server;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
 
     # Global packages
     environment.systemPackages = with pkgs;
