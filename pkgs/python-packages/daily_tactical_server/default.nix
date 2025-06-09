@@ -24,9 +24,7 @@ buildPythonPackage rec {
         builtins.toString service-ports.tactical.insecure
       } --web-port ${builtins.toString service-ports.tactical.web}"
     wrapProgram $out/bin/tactical \
-      --add-flags "--port ${
-        builtins.toString service-ports.tactical.insecure
-      }"
+      --add-flags "--port ${builtins.toString service-ports.tactical.insecure}"
   '';
   doCheck = false;
   meta = {
