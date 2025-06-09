@@ -222,6 +222,31 @@ with import ../dependencies.nix; {
           Persistent = false;
         };
       }
+      {
+        name = "ats-tactical-dailies";
+        jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
+          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+          tactical --wiki-url http://${config.networking.hostName}.local journal
+          tactical --wiki-url http://${config.networking.hostName}.local quote
+          tactical --wiki-url http://${config.networking.hostName}.local vocab
+          tactical --wiki-url http://${config.networking.hostName}.local wiki-url
+        '';
+        timerCfg = {
+          OnCalendar = [ "*-*-* 00:00:00" ];
+          Persistent = false;
+        };
+      }
+      {
+        name = "ats-tactical-intervaled";
+        jobShellScript = pkgs.writeShellScript "ats-tactical-intervaled" ''
+          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+          tactical --wiki-url http://${config.networking.hostName}.local tasks
+        '';
+        timerCfg = {
+          OnBootSec = "5m";
+          OnUnitActiveSec = "10m";
+        };
+      }
     ];
     extraOrchestratorPackages = [
       anixpkgs.wiki-tools
@@ -232,6 +257,7 @@ with import ../dependencies.nix; {
       anixpkgs.gmail-parser
       anixpkgs.scrape
       anixpkgs.providence-tasker
+      anixpkgs.daily_tactical_server
     ];
   }) // {
     users.users.andrew.hashedPassword = lib.mkForce
