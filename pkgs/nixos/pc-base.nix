@@ -225,6 +225,9 @@ in {
         domain = true;
         workstation = true;
       };
+      # Reflect mDNS through VPN
+      reflector = cfg.isATS;
+      interfaces = lib.mkIf cfg.isATS [ "wg0" ];
     };
 
     # Web server reverse proxy
