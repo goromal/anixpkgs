@@ -105,7 +105,8 @@ in {
     };
     wanInterface = lib.mkOption {
       type = lib.types.str;
-      description = "Network interface name for the default gateway (see `ip route | grep default`)";
+      description =
+        "Network interface name for the default gateway (see `ip route | grep default`)";
     };
   };
 

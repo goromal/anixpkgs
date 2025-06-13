@@ -30,13 +30,10 @@ in {
     networking.nat = {
       enable = true;
       externalInterface = globalCfg.wanInterface;
-      internalInterfaces = [
-        "wg0"
-      ];
+      internalInterfaces = [ "wg0" ];
     };
-    networking.firewall.allowedUDPPorts = lib.mkIf cfg.openFirewall [
-      service-ports.wireguard
-    ];
+    networking.firewall.allowedUDPPorts =
+      lib.mkIf cfg.openFirewall [ service-ports.wireguard ];
 
     networking.wireguard = {
       enable = true;
@@ -56,16 +53,14 @@ in {
             ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
           '';
           privateKeyFile = cfg.privateKeyPath;
-          peers = [
-            {
-              publicKey = cfg.publicKey;
-              # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
-              allowedIPs = [ "10.100.0.2/32" ];
-            }
-          ];
+          peers = [{
+            publicKey = cfg.publicKey;
+            # List of IPs assigned to this peer within the tunnel subnet. Used to configure routing.
+            allowedIPs = [ "10.100.0.2/32" ];
+          }];
         };
       };
     };
-    
-      };
+
+  };
 }
