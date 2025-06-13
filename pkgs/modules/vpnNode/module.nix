@@ -35,10 +35,14 @@ in {
     networking.firewall.allowedUDPPorts =
       lib.mkIf cfg.openFirewall [ service-ports.wireguard ];
 
+    # Reflect mDNS through VPN
+    services.avahi.reflector = true;
+    services.avahi.interfaces = [ "wg0" ];
+
     networking.wireguard = {
       enable = true;
       interfaces = {
-        wg0 = {
+        "wg0" = {
           # Determines the IP address and subnet of the server's end of the tunnel interface.
           ips = [ "10.100.0.1/24" ];
           # The port that WireGuard listens to. Must be accessible by the client.
