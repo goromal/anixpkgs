@@ -103,6 +103,10 @@ in {
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    wanInterface = lib.mkOption {
+      type = lib.types.str;
+      description = "Network interface name for the default gateway (see `ip route | grep default`)";
+    };
   };
 
   imports = [

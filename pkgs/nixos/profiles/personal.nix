@@ -56,5 +56,6 @@ with import ../dependencies.nix; {
       };
     }];
     extraOrchestratorPackages = [ ];
+    wanInterface = "wlp1s0";
   };
 }

@@ -17,4 +17,5 @@
     insecure = 60060;
     web = 60070;
   };
+  wireguard = 51820;
 }
