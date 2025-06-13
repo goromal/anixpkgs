@@ -15,12 +15,10 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [
-        pkgs.wireguard-tools
-    ];
+    environment.systemPackages = [ pkgs.wireguard-tools ];
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
       # TODO
     ];
 
- };
+  };
 }
