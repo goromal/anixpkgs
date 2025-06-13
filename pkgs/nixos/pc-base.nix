@@ -109,6 +109,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/vpnNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -341,6 +342,9 @@ in {
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
+
+    # VPN
+    services.vpnNode.enable = cfg.isATS;
 
     # Daily Tactical
     services.tacticald = lib.mkIf cfg.isATS {
