@@ -438,6 +438,7 @@ in {
         gping
         dog
         atsudo
+        networkmanager
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [

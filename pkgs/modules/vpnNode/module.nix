@@ -14,7 +14,7 @@ in {
     publicKey = lib.mkOption {
       type = lib.types.str;
       description = "Client public key";
-      default = "CoNZvdagKvjhLujsscYWRUCbENWHxUBlQ1h4bcjJ5gc=";
+      default = "Z9QCnsAEoQtYJgPIMxQYs6r1qx2/YArbRrrT+raljWw=";
     };
     openFirewall = lib.mkOption {
       type = lib.types.bool;
