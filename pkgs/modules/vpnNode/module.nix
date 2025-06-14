@@ -32,6 +32,7 @@ in {
       externalInterface = globalCfg.wanInterface;
       internalInterfaces = [ "wg0" ];
     };
+    networking.enableIPv4Forwarding = true;
     networking.firewall = lib.mkIf cfg.openFirewall {
       allowedUDPPorts = [ service-ports.wireguard ];
       allowPing = true;
