@@ -315,6 +315,7 @@ in {
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
+    networking.firewall.allowedUDPPorts = [ service-ports.wireguard ];
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";

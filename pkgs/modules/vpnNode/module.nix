@@ -25,6 +25,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # ^^^^ TODO https://wiki.nixos.org/wiki/WireGuard
     environment.systemPackages = [ pkgs.wireguard-tools ];
 
     # networking.nat = {
