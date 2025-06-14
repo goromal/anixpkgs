@@ -32,16 +32,15 @@ in {
       externalInterface = globalCfg.wanInterface;
       internalInterfaces = [ "wg0" ];
     };
-    networking.enableIPv4Forwarding = true;
     networking.firewall = lib.mkIf cfg.openFirewall {
       allowedUDPPorts = [ service-ports.wireguard ];
       allowPing = true;
       checkReversePath = false;
     };
 
-    # Reflect mDNS through VPN
-    services.avahi.reflector = true;
-    services.avahi.interfaces = [ "wg0" ];
+    # # Reflect mDNS through VPN
+    # services.avahi.reflector = true;
+    # services.avahi.interfaces = [ "wg0" ];
 
     networking.wireguard = {
       enable = true;
