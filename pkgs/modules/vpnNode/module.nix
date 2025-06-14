@@ -27,15 +27,18 @@ in {
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ pkgs.wireguard-tools ];
 
-    networking.nat = {
-      enable = true;
-      externalInterface = globalCfg.wanInterface;
-      internalInterfaces = [ "wg0" ];
-    };
+    # networking.nat = {
+    #   enable = true;
+    #   externalInterface = globalCfg.wanInterface;
+    #   internalInterfaces = [ "wg0" ];
+    # };
     networking.firewall = lib.mkIf cfg.openFirewall {
       allowedUDPPorts = [ service-ports.wireguard ];
       allowPing = true;
       checkReversePath = false;
+      extraCommands = ''
+        iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o ${globalCfg.wanInterface} -j MASQUERADE
+      '';
     };
 
     # # Reflect mDNS through VPN
