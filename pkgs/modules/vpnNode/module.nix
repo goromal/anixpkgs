@@ -32,8 +32,11 @@ in {
       externalInterface = globalCfg.wanInterface;
       internalInterfaces = [ "wg0" ];
     };
-    networking.firewall.allowedUDPPorts =
-      lib.mkIf cfg.openFirewall [ service-ports.wireguard ];
+    networking.firewall = lib.mkIf cfg.openFirewall {
+      allowedUDPPorts = [ service-ports.wireguard ];
+      allowPing = true;
+      checkReversePath = false;
+    };
 
     # Reflect mDNS through VPN
     services.avahi.reflector = true;
