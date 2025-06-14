@@ -103,12 +103,18 @@ in {
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    wanInterface = lib.mkOption {
+      type = lib.types.str;
+      description =
+        "Network interface name for the default gateway (see `ip route | grep default`)";
+    };
   };
 
   imports = [
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/vpnNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -309,6 +315,7 @@ in {
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
+    networking.firewall.allowedUDPPorts = [ service-ports.wireguard ];
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -341,6 +348,9 @@ in {
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
+
+    # VPN
+    services.vpnNode.enable = cfg.isATS;
 
     # Daily Tactical
     services.tacticald = lib.mkIf cfg.isATS {
@@ -429,6 +439,7 @@ in {
         gping
         dog
         atsudo
+        networkmanager
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [
