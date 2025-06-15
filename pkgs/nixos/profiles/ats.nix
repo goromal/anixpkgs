@@ -138,7 +138,7 @@ with import ../dependencies.nix; {
         };
       }
       {
-        name = "ats-grader"; # ^^^^ TODO how to trigger this from another job?
+        name = "ats-grader";
         jobShellScript = pkgs.writeShellScript "ats-grader" ''
           authm refresh --headless || { logger -t ats-grader "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
           tmpdir=$(mktemp -d)
@@ -226,7 +226,6 @@ with import ../dependencies.nix; {
       anixpkgs.scrape
       anixpkgs.providence-tasker
       anixpkgs.daily_tactical_server
-      pkgs.systemd # ^^^^ TODO useful without atsudo?
     ];
   }) // {
     users.users.andrew.hashedPassword = lib.mkForce
