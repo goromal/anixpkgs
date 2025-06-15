@@ -226,6 +226,7 @@ with import ../dependencies.nix; {
       anixpkgs.scrape
       anixpkgs.providence-tasker
       anixpkgs.daily_tactical_server
+      pkgs.systemd # ^^^^ TODO useful without atsudo?
     ];
   }) // {
     users.users.andrew.hashedPassword = lib.mkForce

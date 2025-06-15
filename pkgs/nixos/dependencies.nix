@@ -31,7 +31,7 @@ in rec {
             serviceConfig = {
               Type = "oneshot";
               ExecStart =
-                "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
+                "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'"; # ^^^^ TODO can this be referenced?
               ReadWritePaths = readWritePaths;
             };
           };
