@@ -31,8 +31,7 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    daily_tactical_server.url =
-      "github:goromal/daily_tactical_server";
+    daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
@@ -61,7 +60,8 @@
     manif-geom-rs.url = "github:goromal/manif-geom-rs";
     manif-geom-rs.flake = false;
 
-    mavlink.url = "github:mavlink/c_library_v2?rev=f9cec4814082af27c2fd27259aed302f52ce9cf7";
+    mavlink.url =
+      "github:mavlink/c_library_v2?rev=f9cec4814082af27c2fd27259aed302f52ce9cf7";
     mavlink.flake = false;
 
     mavlink-router.url = "github:mavlink-router/mavlink-router";
