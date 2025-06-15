@@ -84,7 +84,6 @@ with import ../dependencies.nix; {
         jobShellScript = pkgs.writeShellScript "ats-mailman" ''
           authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
-          # TODO warn about expiration
           goromail --wiki-url http://${config.networking.hostName}.local --headless bot ${anixpkgs.redirects.suppress_all}
           goromail --wiki-url http://${config.networking.hostName}.local --headless journal ${anixpkgs.redirects.suppress_all}
           if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
@@ -201,6 +200,19 @@ with import ../dependencies.nix; {
         timerCfg = {
           OnBootSec = "5m";
           OnUnitActiveSec = "10m";
+        };
+      }
+      {
+        name = "ats-itns-nudge";
+        jobShellScript = pkgs.writeShellScript "ats-itns-nudge" ''
+          authm refresh --headless || { >&2 echo "authm refresh error!"; exit 1; }
+          rcrsync sync configs || { >&2 echo "configs sync error!"; exit 1; }
+          output=$(goromail itns-nudge)
+          logger -t ats-itns-nudge "$output"
+        '';
+        timerCfg = {
+          OnCalendar = [ "Mon,Wed,Fri 12:00" ];
+          Persistent = false;
         };
       }
     ];
