@@ -138,7 +138,7 @@ with import ../dependencies.nix; {
         };
       }
       {
-        name = "ats-grader";
+        name = "ats-grader"; # ^^^^ TODO how to trigger this from another job?
         jobShellScript = pkgs.writeShellScript "ats-grader" ''
           authm refresh --headless || { logger -t ats-grader "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
           tmpdir=$(mktemp -d)
