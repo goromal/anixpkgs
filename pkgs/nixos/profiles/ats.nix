@@ -211,7 +211,7 @@ with import ../dependencies.nix; {
           logger -t ats-itns-nudge "$output"
         '';
         timerCfg = {
-          OnCalendar = [ "Mon,Wed,Fri 12:00" ];
+          OnCalendar = [ "Mon,Fri 12:00" ];
           Persistent = false;
         };
       }
