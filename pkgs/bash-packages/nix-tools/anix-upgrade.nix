@@ -101,7 +101,7 @@ in (writeArgparseScriptBin pkgname usage_str [
   if [[ "$boot" == "1" ]]; then
     ${
       if standalone == false then ''
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
+        atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
       '' else ''
         ${printYellow} "Ignoring boot flag for home switch" && home-manager switch && ${printYellow} "Done."
       ''
@@ -109,7 +109,7 @@ in (writeArgparseScriptBin pkgname usage_str [
   else
     ${
       if standalone == false then ''
-        sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
+        atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
       '' else ''
         home-manager switch && ${printYellow} "Done."
       ''
