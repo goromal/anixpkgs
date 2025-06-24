@@ -10,7 +10,12 @@ let
       args+="$word "
     done
     args=''${args% }
-    sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+    pfile="${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt"
+    if [[ -f "$pfile" ]]; then
+      sudo -S $args < "$pfile" 2>/dev/null
+    else
+      sudo $args
+    fi
   '';
   machine-rcrsync = anixpkgs.rcrsync.override {
     homeDir = cfg.homeDir;
