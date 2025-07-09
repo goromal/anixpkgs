@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1734240005,
-        "narHash": "sha256-ydGzaszIULCfra4cMlSIDZCjKdn6b63C9TwgDOB25+E=",
+        "lastModified": 1749440519,
+        "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "bbd81c2974dc591cd309f473cd3d32559b8c1f7e",
+        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
         "type": "github"
       },
       "original": {
@@ -96,6 +96,22 @@
       "original": {
         "owner": "goromal",
         "repo": "Crow",
+        "type": "github"
+      }
+    },
+    "daily_tactical_server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1750651335,
+        "narHash": "sha256-fxwc7w8Y5unDLZRf2Qa/JZmm6cFP6Qayvp9c2V7iKv0=",
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "rev": "11c315385d2e746b131456e4a728d08596bd8c80",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
         "type": "github"
       }
     },
@@ -290,17 +306,18 @@
       "original": {
         "owner": "mavlink",
         "repo": "c_library_v2",
+        "rev": "f9cec4814082af27c2fd27259aed302f52ce9cf7",
         "type": "github"
       }
     },
     "mavlink-router": {
       "flake": false,
       "locked": {
-        "lastModified": 1724248737,
-        "narHash": "sha256-/RkuEb/N/jtik+H9Q+9xZ/VkDX8pGNcf/t13hTRrcfo=",
+        "lastModified": 1735840064,
+        "narHash": "sha256-jCqguWNaXN1rH4i8uG9htQQRF3V9LKNjAE4F5z6WZlU=",
         "owner": "mavlink-router",
         "repo": "mavlink-router",
-        "rev": "c20337bbc61abda21463e7482172d58b654e66b6",
+        "rev": "51983a46cd1f632a5934a29da2dbe5fd7d5c38d4",
         "type": "github"
       },
       "original": {
@@ -611,6 +628,7 @@
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
+        "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",
         "evil-hangman": "evil-hangman",
         "find_rotational_conventions": "find_rotational_conventions",
@@ -816,11 +834,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1740958593,
-        "narHash": "sha256-z2S7DmCIvwHfQ7iYVUe1+Ee30yMRnhG8HXrc1r7jH9Y=",
+        "lastModified": 1752025683,
+        "narHash": "sha256-BloNfs1okKrT0ePDxKLm4rP+CLahxaWrzj/fB+/C8OE=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "f63509631abb6934eb98bf265127414b86a31337",
+        "rev": "0bc3e0733410b018058515a7580114a9c344f5fa",
         "type": "github"
       },
       "original": {
