@@ -835,15 +835,16 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1752025683,
-        "narHash": "sha256-BloNfs1okKrT0ePDxKLm4rP+CLahxaWrzj/fB+/C8OE=",
+        "lastModified": 1752468540,
+        "narHash": "sha256-ASSPotYJzF9Waun9RHOnKcZhf0B2fcYDV+xFL7b4EJs=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "0bc3e0733410b018058515a7580114a9c344f5fa",
+        "rev": "88dec6e57d5ccf1e829cd6e7b9772af93d26e989",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/fix",
         "repo": "task-tools",
         "type": "github"
       }

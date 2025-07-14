@@ -138,7 +138,7 @@
     symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
     symforce.flake = false;
 
-    task-tools.url = "github:goromal/task-tools";
+    task-tools.url = "github:goromal/task-tools?ref=dev/fix";
     task-tools.flake = false;
 
     trafficsim.url =
