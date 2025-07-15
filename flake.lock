@@ -102,16 +102,15 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1752466270,
+        "lastModified": 1752554154,
         "narHash": "sha256-JasJH4mPmjojOZG2oQfgyE7o213w93lWC8wU5ZQp6Gw=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "ae0d1274eed659267d90a409328ea7c6a92bc675",
+        "rev": "6289f74e93a003b9ea9d56c2cca49fbfe07bb323",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/surveys",
         "repo": "daily_tactical_server",
         "type": "github"
       }
@@ -835,16 +834,15 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1752468540,
+        "lastModified": 1752554106,
         "narHash": "sha256-ASSPotYJzF9Waun9RHOnKcZhf0B2fcYDV+xFL7b4EJs=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "88dec6e57d5ccf1e829cd6e7b9772af93d26e989",
+        "rev": "7f782b0ba05546b93f76b434f3f82ed1287fdd9e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/fix",
         "repo": "task-tools",
         "type": "github"
       }
