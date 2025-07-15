@@ -32,7 +32,7 @@
     crowcpp.flake = false;
 
     daily_tactical_server.url =
-      "github:goromal/daily_tactical_server?ref=dev/surveys";
+      "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
@@ -138,7 +138,7 @@
     symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
     symforce.flake = false;
 
-    task-tools.url = "github:goromal/task-tools?ref=dev/fix";
+    task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
 
     trafficsim.url =
