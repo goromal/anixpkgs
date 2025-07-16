@@ -41,12 +41,7 @@ in (writeArgparseScriptBin pkgname ''
   meta = {
     description =
       "Recursively claim ownership of all files and folders in dir.";
-    longDescription = ''
-      ```
-      usage: fix-perms dir
-      ```
-
-      Attempts to deduce special cases such as `~/.ssh/*`.
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }
