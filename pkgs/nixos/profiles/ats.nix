@@ -68,10 +68,7 @@ with import ../dependencies.nix; {
             echo "[$(date)] 🧮 Triage Calculations:" \
               | cat - $HOME/goromail/annotate.log > $HOME/goromail/temp2 \
               && mv $HOME/goromail/temp2 $HOME/goromail/annotate.log
-            gmail-manager gbot-send 6612105214@vzwpix.com "ats-triaging" \
-              "$(cat $HOME/goromail/annotate.log)"
-            gmail-manager gbot-send andrew.torgesen@gmail.com "ats-triaging" \
-              "$(cat $HOME/goromail/annotate.log)"
+            logger -t ats-triaging "$(cat $HOME/goromail/annotate.log)"
           fi
         '';
         timerCfg = {
@@ -91,45 +88,14 @@ with import ../dependencies.nix; {
             echo "[$(date)] 📬 Bot mail received:" \
               | cat - $HOME/goromail/bot.log > $HOME/goromail/temp \
               && mv $HOME/goromail/temp $HOME/goromail/bot.log
-            gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-              "$(cat $HOME/goromail/bot.log)"
-            gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
-              "$(cat $HOME/goromail/bot.log)"
-            if [[ ! -z "$(grep 'Calories entry' $HOME/goromail/bot.log)" ]]; then
-              echo "Notifying of calorie total..."
-              lines="$(wiki-tools --url "http://${config.networking.hostName}.local" get --page-id calorie-journal | grep $(printf '%(%Y-%m-%d)T\n' -1))"
-              if [[ -z $lines ]]; then
-                exit
-              fi
-              ctotal=0
-              clim=1950
-              while IFS= read -r line; do
-                c=`echo ''${line##* }`
-                ctotal=$(( ctotal + c ))
-              done <<< "$lines"
-              echo $ctotal
-              if (( ctotal <= clim )); then
-                gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-                  "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
-                gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-                  "[$(date)] 🗒️ Calorie counter: $ctotal / $clim ✅"
-              else
-                gmail-manager gbot-send 6612105214@vzwpix.com "ats-ccounterd" \
-                  "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
-                gmail-manager gbot-send andrew.torgesen@gmail.com "ats-ccounterd" \
-                  "[$(date)] 🗒️ Calorie counter: $ctotal / $clim - Watch out! 🚨"
-              fi
-            fi
+            logger -t ats-mailman "$(cat $HOME/goromail/bot.log)"
           fi
           if [[ ! -z "$(cat $HOME/goromail/journal.log)" ]]; then
             echo "Notifying about processed journal mail..."
             echo "[$(date)] 📖 Journal mail received:" \
               | cat - $HOME/goromail/journal.log > $HOME/goromail/temp \
               && mv $HOME/goromail/temp $HOME/goromail/journal.log
-            gmail-manager gbot-send 6612105214@vzwpix.com "ats-mailman" \
-              "$(cat $HOME/goromail/journal.log)"
-            gmail-manager gbot-send andrew.torgesen@gmail.com "ats-mailman" \
-              "$(cat $HOME/goromail/journal.log)"
+            logger -t ats-mailman "$(cat $HOME/goromail/journal.log)"
           fi
         '';
         timerCfg = {
