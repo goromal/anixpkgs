@@ -55,7 +55,8 @@ def append_text_to_notion_page(token, id, msg, text):
     url = f"https://api.notion.com/v1/blocks/{id}/children"
     response = requests.patch(url, json=data, headers=headers)
     if response.status_code == 200:
-        msg.moveToTrash()
+        if msg is not None:
+            msg.moveToTrash()
     else:
         sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
         exit(1)
@@ -121,7 +122,9 @@ def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
         "Notion-Version": "2022-06-28",
     }
     content = get_page_blocks(headers, notion_page_id)
-    bullet_count, keyword_count = count_bullet_points_and_keywords(content, ["\\u23f0"]) # ⏰
+    bullet_count, keyword_count = count_bullet_points_and_keywords(
+        content, ["\\u23f0"]
+    )  # ⏰
     new_title = f"{keyword_count} - {bullet_count} - {keyword}"
     if not dry_run:
         update_page_title(headers, notion_page_id, new_title)
@@ -129,7 +132,14 @@ def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
 
 
 def process_keyword(
-    text, datestr, keyword, notion_api_token, notion_page_id, msg, dry_run, logfile=None
+    text,
+    datestr,
+    keyword,
+    notion_api_token,
+    notion_page_id,
+    msg=None,
+    dry_run=False,
+    logfile=None,
 ):
     n = len(keyword)
     if text[: (n + 1)].lower() == f"{keyword}:":
@@ -364,7 +374,7 @@ def cli(
 )
 def bot(ctx: click.Context, categories_csv, dry_run):
     """Process all pending bot commands."""
-    from gmail_parser.corpus import GBotCorpus, JournalCorpus
+    from gmail_parser.corpus import GBotCorpus
     from task_tools.manage import TaskManager
 
     if ctx.obj["headless"]:
@@ -497,6 +507,55 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 @cli.command()
 @click.pass_context
 @click.option(
+    "--categories-csv",
+    "categories_csv",
+    type=click.Path(),
+    default="~/configs/goromail-categories.csv",
+    show_default=True,
+    help="CSV that maps keywords to notion pages.",
+)
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Do a dry run; no message deletions.",
+)
+def itns_nudge(ctx: click.Context, categories_csv, dry_run):
+    """Randomly pick an ITNS topic to nudge with an action item."""
+    import random
+
+    try:
+        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
+            secrets = json.load(nsf)
+        notion_api_token = secrets["auth"]
+    except:
+        sys.stderr.write(f"Failed to load Notion API key")
+        exit(1)
+    notion_pages = []
+    if categories_csv is not None:
+        with open(os.path.expanduser(categories_csv), "r") as categories:
+            for line in categories:
+                keyword, notion_page_id = (
+                    line.split(",")[0],
+                    line.split(",")[1].strip(),
+                )
+                notion_pages.append((keyword, notion_page_id))
+    chosen_keyword, chosen_page_id = random.choice(notion_pages)
+    if not process_keyword(
+        text=f"{chosen_keyword}: action: Notice me!",
+        datestr=datetime.today().strftime("%m/%d/%Y"),
+        keyword=chosen_keyword,
+        notion_api_token=notion_api_token,
+        notion_page_id=chosen_page_id,
+        dry_run=dry_run,
+    ):
+        sys.stderr.write(f"Failed to upload nudge to Notion")
+        exit(1)
+
+
+@cli.command()
+@click.pass_context
+@click.option(
     "--dry-run",
     "dry_run",
     is_flag=True,
@@ -504,7 +563,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
 )
 def journal(ctx: click.Context, dry_run):
     """Process all pending journal entries."""
-    from gmail_parser.corpus import GBotCorpus, JournalCorpus
+    from gmail_parser.corpus import JournalCorpus
     from task_tools.manage import TaskManager
 
     if ctx.obj["headless"]:

@@ -13,4 +13,8 @@
     public = 5556;
   };
   authui = 4242;
+  tactical = {
+    insecure = 60060;
+    web = 60070;
+  };
 }

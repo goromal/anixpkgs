@@ -56,6 +56,7 @@ Options:
 Commands:
   annotate-triage-pages  Re-title triage pages based on content.
   bot                    Process all pending bot commands.
+  itns-nudge             Randomly pick an ITNS topic to nudge with an...
   journal                Process all pending journal entries.
 
 
