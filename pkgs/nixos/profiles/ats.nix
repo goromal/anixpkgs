@@ -186,9 +186,9 @@ with import ../dependencies.nix; {
         jobShellScript = pkgs.writeShellScript "ats-refresh-reminder" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           gmail-manager gbot-send 6612105214@vzwpix.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://${config.networking.hostName}.local/auth/"
+            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
           gmail-manager gbot-send andrew.torgesen@gmail.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://${config.networking.hostName}.local/auth/"
+            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
         '';
         timerCfg = {
           OnCalendar = [ "Sun 19:00" ];
