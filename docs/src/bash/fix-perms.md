@@ -3,7 +3,7 @@
 Recursively claim ownership of all files and folders in dir.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: fix-perms dir
@@ -22,7 +22,6 @@ Current directory is a normal directory:
 
   find . -type d -exec chmod 755 {} \;
   find . -type f -exec chmod 644 {} \;
-
 
 ```
 

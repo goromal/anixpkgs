@@ -62,7 +62,7 @@ Quaternion Conventions for manif-geom-cpp/geometry:
     Quaternion Directionality: Body-to-World
 ```
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 
@@ -126,7 +126,6 @@ Quaternion Conventions for manif-geom-cpp/geometry:
     Quaternion Handedness:     Right-Handed
     Quaternion Function:       Passive
     Quaternion Directionality: Body-to-World
-
 
 ```
 

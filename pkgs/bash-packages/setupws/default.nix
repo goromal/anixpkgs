@@ -105,11 +105,8 @@ in (writeArgparseScriptBin "setupws" usage_str [
   meta = {
     description = "Create standalone development workspaces.";
     longDescription = ''
-      Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI:
-
-      ```
-      ${usage_str}
-      ```
+      Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI.
     '';
+    autoGenUsageCmd = "--help";
   };
 }

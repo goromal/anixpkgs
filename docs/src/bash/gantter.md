@@ -2,7 +2,10 @@
 
 Generate Gantt charts from text files.
 
-```
+
+## Usage
+
+```bash
 usage: gantter specfile
 
 Create a Gantt-based dependency chart for tasks, laid out by the specfile.
@@ -24,5 +27,6 @@ indicate estimated time units required (assumes 1 if none given).
 
 REQUIRES pdflatex to be in your system path (not interested in shipping 
 texlive-full in its entirety with this little tool).
+
 ```
 

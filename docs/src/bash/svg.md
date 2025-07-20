@@ -3,7 +3,7 @@
 Generate and edit SVG files from a variety of source formats.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: svg inputfile outputfile
@@ -21,7 +21,6 @@ Options:
     --poppler | svg [x] abc [ ] pdf [x]
     --scour   | svg [x] abc [x] pdf [x]
     --rmwhite | svg [x] abc [x] pdf [x]
-
 
 ```
 

@@ -28,15 +28,13 @@ let
       auto-usage-doc = (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
         (if pkg-attr.meta.autoGenUsageCmd != null then ''
 
-          ## Usage (Auto-Generated)
+          ## Usage
 
-          ```bash
           ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
             packageAttr = pkg-attr;
             helpCmd = pkg-attr.meta.autoGenUsageCmd;
             subCmds = sub-cmds;
           }}
-          ```
         '' else
           "")
       else

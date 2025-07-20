@@ -4,7 +4,7 @@
 
 This tool gives you a method to store, extract, and replace files (again, one at a time) in the directory from which the tool is run.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: flask_oatbox [-h] [--port PORT]
@@ -12,6 +12,5 @@ usage: flask_oatbox [-h] [--port PORT]
 options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
-
 ```
 

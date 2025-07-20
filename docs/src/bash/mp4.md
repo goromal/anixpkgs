@@ -3,7 +3,7 @@
 Generate and edit MP4 video files using `ffmpeg`.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: mp4 inputfile outputfile
@@ -29,7 +29,6 @@ Options:
     -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
     -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
     -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
-
 
 ```
 

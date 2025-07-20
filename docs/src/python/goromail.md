@@ -21,7 +21,7 @@ The following workflows are supported, all via text messaging:
 
 - Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: goromail [OPTIONS] COMMAND [ARGS]...
@@ -58,9 +58,12 @@ Commands:
   bot                    Process all pending bot commands.
   itns-nudge             Randomly pick an ITNS topic to nudge with an...
   journal                Process all pending journal entries.
+```
+
+### bot
 
 
-
+```bash
 Usage: goromail bot [OPTIONS]
 
   Process all pending bot commands.
@@ -70,9 +73,12 @@ Options:
                          ~/configs/goromail-categories.csv]
   --dry-run              Do a dry run; no message deletions.
   --help                 Show this message and exit.
+```
+
+### journal
 
 
-
+```bash
 Usage: goromail journal [OPTIONS]
 
   Process all pending journal entries.
@@ -80,6 +86,35 @@ Usage: goromail journal [OPTIONS]
 Options:
   --dry-run  Do a dry run; no message deletions.
   --help     Show this message and exit.
+```
 
+### annotate-triage-pages
+
+
+```bash
+Usage: goromail annotate-triage-pages [OPTIONS]
+
+  Re-title triage pages based on content.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; don't actually rename the pages.
+  --help                 Show this message and exit.
+```
+
+### itns-nudge
+
+
+```bash
+Usage: goromail itns-nudge [OPTIONS]
+
+  Randomly pick an ITNS topic to nudge with an action item.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; no message deletions.
+  --help                 Show this message and exit.
 ```
 
