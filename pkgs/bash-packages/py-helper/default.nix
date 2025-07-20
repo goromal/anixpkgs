@@ -111,10 +111,7 @@ in (writeArgparseScriptBin pkgname usage_str [
 '') // {
   meta = {
     description = "Developer tools for creating Python packages.";
-    longDescription = ''
-      ```
-      ${usage_str}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }
