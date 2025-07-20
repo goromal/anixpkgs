@@ -29,7 +29,8 @@ in (writeArgparseScriptBin pkgname ''
   meta = {
     description =
       "Get the Git info about all sources in a `devshell` workspace.";
-    longDescription = "**NOTE:** This command needs to be run with a `devshell` workspace created with `setupws`.";
+    longDescription =
+      "**NOTE:** This command needs to be run with a `devshell` workspace created with `setupws`.";
     autoGenUsageCmd = "--help";
   };
 }
