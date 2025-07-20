@@ -96,15 +96,12 @@ in (writeArgparseScriptBin pkgname usage_str [
   meta = {
     description = "Print out a progress bar.";
     longDescription = ''
-      ```
-      ${usage}
-      ```
-
       Example usage:
 
       ```
       ${example}
       ```
     '';
+    autoGenUsageCmd = "--help";
   };
 }
