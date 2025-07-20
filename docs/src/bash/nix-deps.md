@@ -3,7 +3,7 @@
 Recurse the dependencies of a Nix package.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: nix-deps derivation
@@ -11,7 +11,6 @@ usage: nix-deps derivation
        nix-deps '<nixpkgs>' -A pkgname
 
 Recurse the dependencies of a Nix package.
-
 
 ```
 

@@ -4,7 +4,7 @@ CLI tools for managing my wiki notes site.
 
 [Repository](https://github.com/goromal/wiki-tools)
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: wiki-tools [OPTIONS] COMMAND [ARGS]...
@@ -27,9 +27,12 @@ Commands:
   put-dir           Put a directory of pages into a DokuWiki namespace.
   put-md            Put Markdown content onto a DokuWiki page.
   put-md-dir        Put a directory of Markdown pages into a DokuWiki...
+```
+
+### get
 
 
-
+```bash
 Usage: wiki-tools get [OPTIONS]
 
   Read the content of a DokuWiki page.
@@ -39,9 +42,12 @@ Options:
   --output TEXT   Output text file name. Will print to terminal if not
                   specified.
   --help          Show this message and exit.
+```
+
+### get-md
 
 
-
+```bash
 Usage: wiki-tools get-md [OPTIONS]
 
   Read the content of a DokuWiki page in Markdown format.
@@ -51,9 +57,12 @@ Options:
   --output TEXT   Output Markdown file name. Will print to terminal if not
                   specified.
   --help          Show this message and exit.
+```
+
+### get-rand-journal
 
 
-
+```bash
 Usage: wiki-tools get-rand-journal [OPTIONS]
 
   Get a random journal entry between 2013 and now.
@@ -63,9 +72,12 @@ Options:
   --output TEXT     Output text file name. Will print to terminal if not
                     specified.
   --help            Show this message and exit.
+```
+
+### put
 
 
-
+```bash
 Usage: wiki-tools put [OPTIONS]
 
   Put content onto a DokuWiki page.
@@ -76,9 +88,12 @@ Options:
   --content TEXT  Content to put on the page if file is not specified. NOTE:
                   This argument is mutually exclusive with content_file
   --help          Show this message and exit.
+```
+
+### put-dir
 
 
-
+```bash
 Usage: wiki-tools put-dir [OPTIONS]
 
   Put a directory of pages into a DokuWiki namespace.
@@ -87,9 +102,12 @@ Options:
   --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
   --namespace TEXT       Namespace to upload the pages to.  [required]
   --help                 Show this message and exit.
+```
+
+### put-md
 
 
-
+```bash
 Usage: wiki-tools put-md [OPTIONS]
 
   Put Markdown content onto a DokuWiki page.
@@ -101,9 +119,12 @@ Options:
                   specified. NOTE: This argument is mutually exclusive with
                   content_file
   --help          Show this message and exit.
+```
+
+### put-md-dir
 
 
-
+```bash
 Usage: wiki-tools put-md-dir [OPTIONS]
 
   Put a directory of Markdown pages into a DokuWiki namespace.
@@ -112,6 +133,5 @@ Options:
   --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
   --namespace TEXT       Namespace to upload the pages to.  [required]
   --help                 Show this message and exit.
-
 ```
 

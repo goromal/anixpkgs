@@ -24,7 +24,7 @@ This is a simple tool that assumes you want to download files from a straightfor
 
 [sample_640x360 (mp4)](https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4)
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: scrape [-h] [--xpath XPATH] [--ext EXT] [-o DIRNAME]
@@ -43,6 +43,5 @@ options:
   --ext EXT             Optionally specify the file extension
   -o DIRNAME, --output DIRNAME
                         Output directory.
-
 ```
 
