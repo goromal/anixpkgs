@@ -48,7 +48,7 @@ with import ../dependencies.nix; {
       name = "budgets-backup";
       jobShellScript = pkgs.writeShellScript "budgets-backup" ''
         rcrsync override data budgets || { logger -t budgets-backup "Budgets backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
-        logger -t budgets-backup "Budgets backup successful!"
+        logger -t budgets-backup "Budgets backup successful 🎆"
       '';
       timerCfg = {
         OnBootSec = "5m";

@@ -12,7 +12,7 @@ let
     args=''${args% }
     pfile="${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt"
     if [[ -f "$pfile" ]]; then
-      sudo -S $args < "$pfile" 2>/dev/null
+      cat "$pfile" | sudo -S $args
     else
       sudo $args
     fi
