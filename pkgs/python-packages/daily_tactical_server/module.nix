@@ -21,7 +21,8 @@ in {
     };
     rootDirSource = lib.mkOption {
       type = lib.types.str;
-      description = "Root directory (symlinked by rootDir) for data and configuration";
+      description =
+        "Root directory (symlinked by rootDir) for data and configuration";
       default = "/data/andrew/data/tacticald";
     };
     tacticalPkg = lib.mkOption {
@@ -36,9 +37,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [
-      "L ${cfg.rootDir} - - - - ${cfg.rootDirSource}"
-    ];
+    systemd.tmpfiles.rules =
+      [ "L ${cfg.rootDir} - - - - ${cfg.rootDirSource}" ];
     systemd.services.tacticald = {
       enable = true;
       description = "tactical daemon";
