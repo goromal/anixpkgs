@@ -82,8 +82,8 @@ in {
       configuration = {
         auth_enabled = false;
         limits_config = {
-          ingestion_rate_mb = 16;         # Increase limit (default is 4)
-          ingestion_burst_size_mb = 32;   # Allow bursts above the rate
+          ingestion_rate_mb = 16; # Increase limit (default is 4)
+          ingestion_burst_size_mb = 32; # Allow bursts above the rate
         };
         server = { http_listen_port = service-ports.loki; };
         common = {
