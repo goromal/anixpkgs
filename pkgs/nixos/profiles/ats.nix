@@ -144,6 +144,17 @@ with import ../dependencies.nix; {
         };
       }
       {
+        name = "ats-tactical-backup";
+        jobShellScript = pkgs.writeShellScript "ats-tactical-backup" ''
+          rcrsync override data tacticald || { logger -t authm "Tacticald Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+          logger -t ats-tactical-backup "Backup successful!"
+        '';
+        timerCfg = {
+          OnCalendar = [ "*-*-* 00:00:00" ];
+          Persistent = false;
+        };
+      }
+      {
         name = "ats-tactical-dailies";
         jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
