@@ -97,6 +97,15 @@ in {
     Install.WantedBy = [ "default.target" ];
   };
 
+  programs.bash = {
+    enable = true;
+    initExtra = ''
+      mkcd() {
+        [[ "$1" == "-h" || "$1" == "--help" ]] && echo "usage: mkcd [-t|DIRNAME]" || ([[ "$1" == "-t" ]] && cd "$(mktemp -d)" || { mkdir -p "$1" && cd "$1"; });
+      }
+    '';
+  };
+
   programs.vim = {
     enable = true;
     extraConfig = ''
