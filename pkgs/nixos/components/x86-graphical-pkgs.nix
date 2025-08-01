@@ -55,6 +55,7 @@ in {
       kooha # wayland-compatible screen recorder
       gnome3.gnome-tweaks
       gnomeExtensions.vitals
+      sqlitebrowser
       vlc
       evince
       calibre
