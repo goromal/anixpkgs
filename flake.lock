@@ -834,15 +834,16 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1752554106,
-        "narHash": "sha256-ASSPotYJzF9Waun9RHOnKcZhf0B2fcYDV+xFL7b4EJs=",
+        "lastModified": 1754109701,
+        "narHash": "sha256-F71h7Bp1FxVQ9izh2c07dZdHktHC543z2gD9n0fPd3E=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "7f782b0ba05546b93f76b434f3f82ed1287fdd9e",
+        "rev": "0b0d1136beee21215b48306298d903f8e9d0bf74",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/quarter",
         "repo": "task-tools",
         "type": "github"
       }
