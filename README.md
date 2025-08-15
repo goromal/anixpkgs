@@ -10,7 +10,7 @@
 
 A collection of personal (or otherwise personally useful) repositories and NixOS closures packaged as a [nixpkgs](https://github.com/NixOS/nixpkgs) overlay.
 
-## Update Dependencies
+## Update Dependencies 
 
 To systematically update all (self-owned) dependencies, run
 
