@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1749440519,
-        "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
+        "lastModified": 1755925210,
+        "narHash": "sha256-xndtvHHVZ63lwGZYSycNUsAn39Xwmqj2gayM1RicC04=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
+        "rev": "6dce2ec6d32e8c288b76bbefe29cec9ba8e178c9",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/dirs",
         "repo": "aapis",
         "type": "github"
       }
@@ -248,11 +249,11 @@
     "makepyshell": {
       "flake": false,
       "locked": {
-        "lastModified": 1690955602,
-        "narHash": "sha256-Q3Mlqmiklk77ezqb3wvjcQq9iB3ovAggFm15i4KrL3U=",
+        "lastModified": 1754799137,
+        "narHash": "sha256-W9dUALrxhQ9uS2AuRi8moFsj77PZ0ZECczuo/Ry9G30=",
         "ref": "refs/heads/main",
-        "rev": "f9205485cc2f073cb3caa35e2fffeb2cc1ed6c1d",
-        "revCount": 4,
+        "rev": "2423b7bcffb4d7f1b6af517e0a598d5d18fc0f6c",
+        "revCount": 5,
         "type": "git",
         "url": "https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31"
       },
