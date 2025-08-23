@@ -1,6 +1,7 @@
 import os
 import re
 import argparse
+import threading
 import flask
 import flask_login
 import flask_wtf
@@ -39,10 +40,6 @@ if args.data_dir[0] == '/':
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
-
-app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
-app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
-login_manager = flask_login.LoginManager()
 
 class StampServer:
     STAMP = "asdfkl;ajsd;lkfj;ljkasdf"
@@ -208,11 +205,19 @@ def zzz():
         stamps={}
     )
 
-def run():
-    global args
+def create_flask_app(shared_state, subdomain, main_loop):
+    app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
+    app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+    login_manager = flask_login.LoginManager()
+
+def run_flask(port, state, subdomain, main_loop):
     login_manager.init_app(app)
     login_manager.login_view = "login"
     app.run(host="0.0.0.0", port=args.port)
+
+def run():
+    global args
+    # ^^^^
 
 if __name__ == "__main__":
     run()
