@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1749440519,
-        "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
+        "lastModified": 1755925210,
+        "narHash": "sha256-xndtvHHVZ63lwGZYSycNUsAn39Xwmqj2gayM1RicC04=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
+        "rev": "6dce2ec6d32e8c288b76bbefe29cec9ba8e178c9",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/dirs",
         "repo": "aapis",
         "type": "github"
       }

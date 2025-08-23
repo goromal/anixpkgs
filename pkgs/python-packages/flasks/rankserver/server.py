@@ -10,12 +10,19 @@ from pysorting import (
     restfulQuickSort,
 )
 
+from aapis.fileserver.v1 import fileserver_pb2_grpc, fileserver_pb2
+
+DEFAULT_INSECURE_PORT = 60505
+DEFAULT_UIUXPAGE_PORT = 60515
+
 UINT32_MAX = 0xffffffff
 LOGNAME = "sort_state.log"
 MAPNAME = "file_map.log"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
+parser.add_argument("--port", action="store", type=int, default=DEFAULT_UIUXPAGE_PORT, help="Port to run the web server on")
+parser.add_argument("--server-port", action="store", type=int, default=DEFAULT_INSECURE_PORT, help="Port to run the gRPC server on")
+parser.add_argument("--subdomain", action="store", type=str, default="/rank", help="Subdomain for the web server")
 parser.add_argument("--data-dir", action="store", type=str, default="", help="Directory containing the rankable elements")
 args = parser.parse_args()
 

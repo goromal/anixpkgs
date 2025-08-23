@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/dirs";
     aapis.flake = false;
 
     ardupilot.url =
