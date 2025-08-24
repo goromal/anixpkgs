@@ -48,7 +48,7 @@ in {
         ExecStart =
           "${cfg.tacticalPkg}/bin/tacticald --db-path ${cfg.rootDir}/data.db --storage-path ${cfg.rootDir}/data.json"
           + lib.optionalString (cfg.statsdPort != null)
-          " --statsd-port ${builtins.toString cfg.statsdPort}";
+          " --statsd-port ${builtins.toString cfg.statsdPort} --subdomain /tactical";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";

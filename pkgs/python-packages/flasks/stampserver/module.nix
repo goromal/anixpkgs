@@ -1,13 +1,13 @@
 { pkgs, config, lib, ... }:
 with import ../../../nixos/dependencies.nix;
-let cfg = config.services.rankserver;
+let cfg = config.services.stampserver;
 in {
-  options.services.rankserver = {
-    enable = lib.mkEnableOption "enable rank server";
+  options.services.stampserver = {
+    enable = lib.mkEnableOption "enable stamp server";
     package = lib.mkOption {
       type = lib.types.package;
-      description = "The rank server package to use";
-      default = pkgs.rankserver;
+      description = "The stamp server package to use";
+      default = pkgs.stampserver;
     };
     rootDir = lib.mkOption {
       type = lib.types.str;
@@ -18,28 +18,29 @@ in {
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [
-      "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -"
+      "d ${cfg.rootDir}                   - andrew dev"
+      "d ${cfg.rootDir}/defaultStampables - andrew dev"
     ];
 
-    systemd.services.rankserver-setup = {
-      description = "Reset rankables symlink to defaultRankables";
+    systemd.services.stampserver-setup = {
+      description = "Reset stampables symlink to defaultStampables";
       wantedBy = [ "multi-user.target" ];
-      before = [ "rankserver.service" ];
+      before = [ "stampserver.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultRankables ${cfg.rootDir}/rankables";
+        ExecStart = "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultStampables ${cfg.rootDir}/stampables";
       };
     };
 
-    systemd.services.rankserver = {
+    systemd.services.stampserver = {
       enable = true;
-      description = "Rank server";
+      description = "Stamp server";
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/rankserver --port ${
-            builtins.toString service-ports.rankserver
-          } --data-dir ${cfg.rootDir}/rankables --subdomain /rank";
+        ExecStart = "${cfg.package}/bin/stampserver --port ${
+            builtins.toString service-ports.stampserver
+          } --data-dir ${cfg.rootDir}/stampables --subdomain /stamp";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
@@ -52,9 +53,9 @@ in {
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/rank/" = {
+      locations."/stamp/" = {
         proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.rankserver}/rank/";
+          "http://127.0.0.1:${builtins.toString service-ports.stampserver}/stamp/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
