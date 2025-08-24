@@ -17,9 +17,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -"
-    ];
+    systemd.tmpfiles.rules =
+      [ "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -" ];
 
     systemd.services.rankserver-setup = {
       description = "Reset rankables symlink to defaultRankables";
@@ -27,7 +26,8 @@ in {
       before = [ "rankserver.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultRankables ${cfg.rootDir}/rankables";
+        ExecStart =
+          "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultRankables ${cfg.rootDir}/rankables";
       };
     };
 
@@ -53,8 +53,9 @@ in {
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/rank/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.rankserver}/rank/";
+        proxyPass = "http://127.0.0.1:${
+            builtins.toString service-ports.rankserver
+          }/rank/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;

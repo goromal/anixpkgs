@@ -28,7 +28,8 @@ in {
       before = [ "stampserver.service" ];
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultStampables ${cfg.rootDir}/stampables";
+        ExecStart =
+          "${pkgs.coreutils}/bin/ln -sfn ${cfg.rootDir}/defaultStampables ${cfg.rootDir}/stampables";
       };
     };
 
@@ -54,8 +55,9 @@ in {
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/stamp/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.stampserver}/stamp/";
+        proxyPass = "http://127.0.0.1:${
+            builtins.toString service-ports.stampserver
+          }/stamp/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
