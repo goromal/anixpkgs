@@ -1,6 +1,10 @@
 import os
 import argparse
 import flask
+import flask_login
+import flask_wtf
+from wtforms import StringField, PasswordField, SubmitField
+from werkzeug.security import generate_password_hash, check_password_hash
 from pysorting import (
     ComparatorLeft,
     ComparatorResult,
@@ -16,13 +20,41 @@ MAPNAME = "file_map.log"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
+parser.add_argument("--subdomain", action="store", type=str, default="/rank", help="Subdomain for a reverse proxy")
 parser.add_argument("--data-dir", action="store", type=str, default="", help="Directory containing the rankable elements")
 args = parser.parse_args()
 
-PWD = os.getcwd()
-RES_DIR = os.path.join(PWD, args.data_dir)
+urlroot = args.subdomain
+if urlroot != "/":
+    urlroot += "/"
+url_for_prefix = args.subdomain.replace("/", "")
+if len(url_for_prefix) > 0:
+    url_for_prefix += "."
 
-app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
+bp = flask.Blueprint("rank", __name__, url_prefix=args.subdomain)
+
+class LoginForm(flask_wtf.FlaskForm):
+    username = StringField("Username")
+    password = PasswordField("Password")
+    submit = SubmitField("Submit")
+
+class User(flask_login.UserMixin):
+    def check_password(self, password):
+        return check_password_hash("pbkdf2:sha256:260000$lZSRuIMsXegmiXNl$8a1fde09226a09391218ec3b1f07f6d8373a055f0469b69d0855f9cc29a53e31", password)
+    def get_id(self):
+        return "anonymous"
+
+user = User()
+
+PWD = os.getcwd()
+if args.data_dir[0] == '/':
+    RES_DIR = args.data_dir
+else:
+    RES_DIR = os.path.join(PWD, args.data_dir)
+
+app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
+app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+login_manager = flask_login.LoginManager()
 
 class RankServer:
     def __init__(self):
@@ -87,8 +119,6 @@ class RankServer:
         return self.rev_rank_list
 
     def getCompFiles(self):
-        # print(f"arr={self.state.arr}")
-        # print(f"p={self.state.p} i={self.state.i} j={self.state.j}")
         rightfile = self.file_map[self.state.arr[self.state.p]]
         if self.state.l == int(ComparatorLeft.I):
             leftfile = self.file_map[self.state.arr[self.state.i]]
@@ -127,34 +157,67 @@ class RankServer:
 
 rankserver = RankServer()
 
-@app.route("/", methods=["GET","POST"])
+@login_manager.user_loader
+def load_user(user_id):
+    global user
+    if user_id == "anonymous":
+        return user
+    else:
+        return None
+
+@bp.route("/login", methods=["GET", "POST"])
+def login():
+    global user
+    global url_for_prefix
+    if flask_login.current_user.is_authenticated:
+        return flask.redirect(flask.url_for(url_for_prefix + 'index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        if form.username.data != user.get_id() or not user.check_password(form.password.data):
+            return flask.redirect(flask.url_for(url_for_prefix + "login"))
+        flask_login.login_user(user, remember=True)
+        next = flask.request.args.get('next')
+        return flask.redirect(next or flask.url_for(url_for_prefix + 'index'))
+    return flask.render_template("login.html", title="Sign In", form=form)
+      
+@bp.route("/logout")
+@flask_login.login_required
+def logout():
+    global url_for_prefix
+    flask_login.logout_user()
+    return flask.redirect(flask.url_for(url_for_prefix + "login"))
+
+@bp.route("/", methods=["GET","POST"])
+@flask_login.login_required
 def index():
     global args
     global rankserver
+    global urlroot
     if flask.request.method == "POST":
         if rankserver.sortingComplete():
             rankserver.resetState()
         else:
             if "choose_l" in flask.request.form:
-                # print("CHOOSE LEFT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_GREATER))
             else:
-                # print("CHOOSE_RIGHT")
                 rankserver.submitChoice(int(ComparatorResult.LEFT_LESS))
         rankserver.save()
     
     res, msg = rankserver.load()
     if not res:
-        return flask.render_template("index.html", err=True, done=False, msg=msg, rlist=[], l="", n="")
+        return flask.render_template("index.html", urlroot=urlroot, err=True, done=False, msg=msg, rlist=[], l="", n="")
     rlist = rankserver.getRankList()
     if rankserver.sortingComplete():
-        return flask.render_template("index.html", err=False, done=True, msg="", rlist=rlist, l="", n="")
+        return flask.render_template("index.html", urlroot=urlroot, err=False, done=True, msg="", rlist=rlist, l="", n="")
     else:
         l, r = rankserver.getCompFiles()
-        return flask.render_template("index.html", err=False, done=False, msg="", rlist=rlist, l=l, r=r)
+        return flask.render_template("index.html", urlroot=urlroot, err=False, done=False, msg="", rlist=rlist, l=l, r=r)
 
 def run():
     global args
+    app.register_blueprint(bp)
+    login_manager.init_app(app)
+    login_manager.login_view = "rank.login"
     app.run(host="0.0.0.0", port=args.port)
 
 if __name__ == "__main__":

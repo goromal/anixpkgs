@@ -12,6 +12,7 @@ with import ../dependencies.nix; {
     notesWikiPort = 8080;
     isInstaller = false;
     enableMetrics = true;
+    enableFileServers = true;
     cloudDirs = [
       {
         name = "configs";

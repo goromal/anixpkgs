@@ -23,6 +23,11 @@
 </head>
 
 <body>
+    <nav>
+        <ul>
+            <li><a href="{{ urlroot }}logout">Logout</a></li>
+        </ul>
+    </nav>
     <h1>Rank Server</h1>
     {% if err %}
     <p>Server returned error:</p>
@@ -30,7 +35,7 @@
     {% else %}
     {% if done %}
     <p>Sorting complete!</p>
-    <form action="/" method="POST">
+    <form action="{{ urlroot }}" method="POST">
         <input type="submit" name="refine" value="Refine Rankings" />
     </form>
     {% else %}
@@ -39,10 +44,10 @@
             {% if l.endswith('.txt') %}
             <b>{{ l }}</b>
             {% else %}
-            <img src="/{{ l }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
+            <img src="{{ urlroot }}{{ l }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
             {% endif %}
             <br>
-            <form action="/" method="POST">
+            <form action="{{ urlroot }}" method="POST">
                 <input type="submit" name="choose_l" value="Choose" />
             </form>
         </div>
@@ -50,10 +55,10 @@
             {% if r.endswith('.txt') %}
             <b>{{ r }}</b>
             {% else %}
-            <img src="/{{ r }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
+            <img src="{{ urlroot }}{{ r }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
             {% endif %}
             <br>
-            <form action="/" method="POST">
+            <form action="{{ urlroot }}" method="POST">
                 <input type="submit" name="choose_r" value="Choose" />
             </form>
         </div>
@@ -64,9 +69,10 @@
         {% for item in rlist %}
         <li>
             {% if item.endswith('.txt') %}
-            <b>{{ item }}</b>
+            <b>{{ urlroot }}{{ item }}</b>
             {% else %}
-            <img src="/{{ item }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
+            <img src="{{ urlroot }}{{ item }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px"
+                alt="" />
             {% endif %}
         </li>
         {% endfor %}

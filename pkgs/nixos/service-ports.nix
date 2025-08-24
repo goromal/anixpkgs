@@ -1,6 +1,7 @@
 {
   orchestrator = 40040;
   rankserver = 4018;
+  stampserver = 5018;
   statsd = 9000;
   prometheus = {
     input = 9598;

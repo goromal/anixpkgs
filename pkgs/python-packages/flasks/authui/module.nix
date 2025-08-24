@@ -41,7 +41,7 @@ in {
       unitConfig = { StartLimitIntervalSec = 0; };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/authui --port ${
+        ExecStart = "${cfg.package}/bin/authui --subdomain /auth --port ${
             builtins.toString service-ports.authui
           } --memory-file ${cfg.rootDir}/refresh_times.json --init-script ${cfg.initScript} --reset-script ${cfg.resetScript}";
         ReadWritePaths = [ "/" "${cfg.rootDir}" "${globalCfg.homeDir}" ];
