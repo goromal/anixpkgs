@@ -52,12 +52,9 @@ let
       };
     };
 
-  minJRE = prev.jre_minimal.override {
-    modules = [ "java.base" "java.logging" ];
-  };
-  baseJavaArgs = {
-    jre = minJRE;
-  };
+  minJRE =
+    prev.jre_minimal.override { modules = [ "java.base" "java.logging" ]; };
+  baseJavaArgs = { jre = minJRE; };
 
   baseModuleArgs = {
     pkgs = final;
