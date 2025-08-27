@@ -88,6 +88,11 @@ in {
       default = false;
       description = "Whether to export OS metrics";
     };
+    enableFileServers = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to turn on file servers";
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
@@ -117,6 +122,8 @@ in {
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
+    ../python-packages/flasks/rankserver/module.nix
+    ../python-packages/flasks/stampserver/module.nix
   ];
 
   config = {
@@ -248,6 +255,18 @@ in {
         ${machine-rcrsync}/bin/rcrsync override secrets
         ${pkgs.systemd}/bin/systemctl start orchestratord
       '') + "/bin/atsauthui-finish";
+    };
+
+    services.rankserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.rankserver;
+      rootDir = "${cfg.homeDir}/fileservers";
+    };
+
+    services.stampserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.stampserver;
+      rootDir = "${cfg.homeDir}/fileservers";
     };
 
     environment.gnome =
