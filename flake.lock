@@ -134,15 +134,16 @@
     "evil-hangman": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693382,
-        "narHash": "sha256-uu1Fuvfh1Gq9Hl9MnG4Zy8V4Ad94FQACI/QAI5/S1FQ=",
+        "lastModified": 1756272386,
+        "narHash": "sha256-K5c2zp79c2ypC5cgy0fDpgFqpycNekeR7Eetu8O6lVA=",
         "owner": "goromal",
         "repo": "evil-hangman",
-        "rev": "fbd190eec9b5f0b28d316e2db4eabb4e35347dfd",
+        "rev": "d0fd00a98bcdc0f4a59986bb41904e30564f0665",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/25.05",
         "repo": "evil-hangman",
         "type": "github"
       }
@@ -723,15 +724,16 @@
     "simple-image-editor": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693423,
-        "narHash": "sha256-y9vqK+ItS0bUWMWIEPoUb3LFpXNdlFx6yCJIwT0KNyg=",
+        "lastModified": 1756272770,
+        "narHash": "sha256-wsocjQy95Kv1OYyivBBpi7lWkCt18LaI2nCxGjlWDlM=",
         "owner": "goromal",
         "repo": "simple-image-editor",
-        "rev": "64160a1901a91ae941dabcff069d00057d318e06",
+        "rev": "06695d25b911a298755653ec98af9e0fe4ac4b35",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/25.05",
         "repo": "simple-image-editor",
         "type": "github"
       }
@@ -755,15 +757,16 @@
     "spelling-corrector": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693401,
-        "narHash": "sha256-mwncICz15GKpR/Cxe4w8koG9bHBsUdKH0ps32dxiFnw=",
+        "lastModified": 1756272668,
+        "narHash": "sha256-iTmqoloY9ql9t/2Sum/qdnFeOigM+G3cM4b8y4OGaAk=",
         "owner": "goromal",
         "repo": "spelling-corrector",
-        "rev": "8a4a1bf61aa8bb08fae09dd403ebfdf9980684fc",
+        "rev": "32c6c6b2b6a1397f97a4ceb1a7d9ee5ff5afecb6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/25.05",
         "repo": "spelling-corrector",
         "type": "github"
       }

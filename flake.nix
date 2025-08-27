@@ -37,7 +37,7 @@
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
-    evil-hangman.url = "github:goromal/evil-hangman";
+    evil-hangman.url = "github:goromal/evil-hangman?ref=dev/25.05";
     evil-hangman.flake = false;
 
     find_rotational_conventions.url =
@@ -122,13 +122,13 @@
     signals-cpp.url = "github:goromal/signals-cpp";
     signals-cpp.flake = false;
 
-    simple-image-editor.url = "github:goromal/simple-image-editor";
+    simple-image-editor.url = "github:goromal/simple-image-editor?ref=dev/25.05";
     simple-image-editor.flake = false;
 
     sorting.url = "github:goromal/sorting";
     sorting.flake = false;
 
-    spelling-corrector.url = "github:goromal/spelling-corrector";
+    spelling-corrector.url = "github:goromal/spelling-corrector?ref=dev/25.05";
     spelling-corrector.flake = false;
 
     sunnyside.url = "github:goromal/sunnyside";

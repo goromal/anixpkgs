@@ -52,13 +52,13 @@ let
       };
     };
 
-  minJDK = prev.jdk11_headless;
+  # minJDK = prev.jdk12_headless; ^^^^ TODO
   minJRE = prev.jre_minimal.override {
-    jdk = minJDK;
+    # jdk = minJDK;
     modules = [ "java.base" "java.logging" ];
   };
   baseJavaArgs = {
-    jdk = minJDK;
+    # jdk = minJDK;
     jre = minJRE;
   };
 
