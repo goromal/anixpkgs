@@ -486,6 +486,15 @@ in {
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+       mkcd() {
+          if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+              echo "usage: mkcd [-t|DIRNAME]"
+          elif [[ "$1" == "-t" ]]; then
+              cd "$(mktemp -d)" || return
+          else
+              mkdir -p "$1" && cd "$1" || return
+          fi
+      }
     '';
 
     environment.shellAliases = {
