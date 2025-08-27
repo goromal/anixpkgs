@@ -53,10 +53,7 @@ in (writeArgparseScriptBin pkgname usagestr [
 '') // {
   meta = {
     inherit description;
-    longDescription = ''
-      ```
-      ${usagestr}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

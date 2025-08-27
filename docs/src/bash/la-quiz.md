@@ -3,7 +3,7 @@
 Spawn a LA geography quiz.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: la-quiz [options] [N|C|E|S]
@@ -25,7 +25,6 @@ NOTE: This program assumes that you have the place location JSON keyfiles stored
                   GLAA-E.json
                   GLAA-N.json
                   GLAA-S.json
-
 
 ```
 

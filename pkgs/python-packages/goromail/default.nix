@@ -30,5 +30,5 @@ callPackage ../pythonPkgFromScript.nix {
     - Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
   '';
   autoGenUsageCmd = "--help";
-  subCmds = [ "bot" "journal" ];
+  subCmds = [ "bot" "journal" "annotate-triage-pages" "itns-nudge" ];
 }

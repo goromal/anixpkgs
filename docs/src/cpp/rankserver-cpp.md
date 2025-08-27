@@ -11,14 +11,13 @@ is created and maintained within the `data-dir` directory so that the ranking ex
 where it left off between different spawnings of the server. At this point, only the ranking of `.txt` and
 `.png` files is possible; other file types in `data-dir` will be ignored.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Options:
   -h [ --help ]         print usage
   -p [ --port ] arg     port to serve on (default: 4000)
   -d [ --data-dir ] arg data directory to process (default: ./data)
-
 
 ```
 

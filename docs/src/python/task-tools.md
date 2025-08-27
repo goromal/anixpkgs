@@ -4,7 +4,7 @@ CLI tools for managing Google Tasks.
 
 [Repository](https://github.com/goromal/task-tools)
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: task-tools [OPTIONS] COMMAND [ARGS]...
@@ -29,9 +29,12 @@ Commands:
   list            List pending tasks according to a filter ∈ [all, p0,...
   put             Upload a task.
   put-spec        Read a CSV of task specifications and idempotently put...
+```
+
+### list
 
 
-
+```bash
 Usage: task-tools list [OPTIONS] FILTER
 
   List pending tasks according to a filter ∈ [all, p0, p1, p2, p3, late,
@@ -39,21 +42,27 @@ Usage: task-tools list [OPTIONS] FILTER
 
 Options:
   --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
-                     2025-07-09]
+                     2025-07-20]
   --no-ids           Don't show the UUIDs.
   --help             Show this message and exit.
+```
+
+### delete
 
 
-
+```bash
 Usage: task-tools delete [OPTIONS] TASK_ID
 
   Delete a particular task by UUID.
 
 Options:
   --help  Show this message and exit.
+```
+
+### put
 
 
-
+```bash
 Usage: task-tools put [OPTIONS]
 
   Upload a task.
@@ -61,13 +70,16 @@ Usage: task-tools put [OPTIONS]
 Options:
   --name TEXT         Name of the task.  [required]
   --notes TEXT        Notes to add to the task description.
-  --date [%Y-%m-%d]   Task due date.  [default: 2025-07-09]
+  --date [%Y-%m-%d]   Task due date.  [default: 2025-07-20]
   --until [%Y-%m-%d]  Specify an end date if for multiple days.  [default:
-                      2025-07-09]
+                      2025-07-20]
   --help              Show this message and exit.
+```
+
+### grader
 
 
-
+```bash
 Usage: task-tools grader [OPTIONS]
 
   Generate a CSV report of how consistently tasks have been completed within
@@ -99,13 +111,12 @@ Usage: task-tools grader [OPTIONS]
 
 Options:
   --start-date [%Y-%m-%d]  First day of the grading window.  [default:
-                           2025-07-02]
+                           2025-07-13]
   --end-date [%Y-%m-%d]    Last day of the grading window.  [default:
-                           2025-07-09]
+                           2025-07-20]
   -o, --out PATH           CSV file to generate the report in.  [default:
                            ~/data/task_grades/log.csv]
   --dry-run                Do a dry run; no task deletions.
   --help                   Show this message and exit.
-
 ```
 
