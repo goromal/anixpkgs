@@ -1,10 +1,10 @@
-{ callPackage, meson, ninja, systemd, git, python39, stdenv, overrideCC
+{ callPackage, meson, ninja, systemd, git, python311, stdenv, overrideCC
 , pkg-config, gcc10, gcc-arm-embedded-10, flakeInputs }:
 let
   arduSitlEnv = overrideCC stdenv gcc10;
   arduEmbdEnv = overrideCC stdenv gcc-arm-embedded-10;
   pythonWithPkgs =
-    python39.withPackages (ps: [ ps.empy ps.pexpect ps.future ps.setuptools ]);
+    python311.withPackages (ps: [ ps.empy ps.pexpect ps.future ps.setuptools ]);
   mkArduCopter = { arduEnv, board, installPhase }:
     arduEnv.mkDerivation rec {
       name = "arducopter-${flakeInputs.ardupilot.shortRev}-${board}";
