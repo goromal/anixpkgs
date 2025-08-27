@@ -4,7 +4,7 @@ rustPlatform.buildRustPackage rec {
   version = "0.1.0";
   src = pkg-src;
   useFetchCargoVendor = true;
-  cargoHash = "sha256-Aq2PPn1n4/AgMY51TyB460nXcd4SjFx00QqCSwq1eiU=";
+  cargoHash = "sha256-iKjsrQ/u9SwQZNlSMPjJOxLRSbBuE21Ae0jnJ60fKoE=";
   meta = {
     description = "File scrambler.";
     longDescription = ''

@@ -4,7 +4,7 @@ rustPlatform.buildRustPackage rec {
   version = "0.0.0";
   src = pkg-src;
   useFetchCargoVendor = true;
-  cargoHash = "sha256-ceayumOzXbEFi2j42BIXXo9L3r/VFgUyfNUuk3vhYu8=";
+  cargoHash = "sha256-9DtJHwyxkw1f7ANVG9xGv79j4ljwE99YQ3b952aqZJo=";
   meta = {
     description =
       "Rust implementation of [manif-geom-cpp](https://github.com/goromal/manif-geom-cpp) (*under construction*).";

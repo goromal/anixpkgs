@@ -5,7 +5,7 @@ rustPlatform.buildRustPackage rec {
   src = pkg-src;
   useFetchCargoVendor = true;
   cargoHash =
-    "sha256-AO01Q2gyrwtjy2ng5TxkT3qh1C/WBIRjSR7USeObpwg="; # lib.fakeHash
+    "sha256-w8OiSJpzTI++xDtCQpKwn2RnzqOXICh3SX4Gyiij30I="; # lib.fakeHash
   meta = {
     description = "Daemon for the Neato XV LiDAR (*not quite finished*).";
     longDescription = ''
