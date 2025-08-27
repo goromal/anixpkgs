@@ -122,7 +122,8 @@
     signals-cpp.url = "github:goromal/signals-cpp";
     signals-cpp.flake = false;
 
-    simple-image-editor.url = "github:goromal/simple-image-editor?ref=dev/25.05";
+    simple-image-editor.url =
+      "github:goromal/simple-image-editor?ref=dev/25.05";
     simple-image-editor.flake = false;
 
     sorting.url = "github:goromal/sorting";
