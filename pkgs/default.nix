@@ -52,15 +52,9 @@ let
       };
     };
 
-  minJDK = prev.jdk11_headless;
-  minJRE = prev.jre_minimal.override {
-    jdk = minJDK;
-    modules = [ "java.base" "java.logging" ];
-  };
-  baseJavaArgs = {
-    jdk = minJDK;
-    jre = minJRE;
-  };
+  minJRE =
+    prev.jre_minimal.override { modules = [ "java.base" "java.logging" ]; };
+  baseJavaArgs = { jre = minJRE; };
 
   baseModuleArgs = {
     pkgs = final;
