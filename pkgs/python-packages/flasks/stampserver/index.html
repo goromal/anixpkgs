@@ -8,7 +8,7 @@
 <body>
     <nav>
         <ul>
-            <li><a href="/logout">Logout</a></li>
+            <li><a href="{{ urlroot }}logout">Logout</a></li>
         </ul>
     </nav>
     <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
@@ -16,10 +16,10 @@
     <p>{{ msg }}</p>
     {% else %}
     {% if ftype == "PNG" %}
-    <img src="/{{ file }}" alt="" />
+    <img src="{{ file }}" alt="" />
     {% elif ftype == "MP4" %}
     <video controls loop width="250">
-        <source src="/{{ file }}" type="video/mp4" />
+        <source src="{{ file }}" type="video/mp4" />
     </video>
     {% elif ftype == "WEBM_EXT" %}
     <video controls loop width="250">
@@ -30,7 +30,7 @@
         <source src="{{ file }}" type="video/mp4" />
     </video>
     {% endif %}
-    <form action="/{{ root }}" method="POST">
+    <form action="{{ urlroot }}{{ root }}" method="POST">
         <br><br>
         <br><br>
         <br><br>
@@ -46,9 +46,9 @@
     <br><br>
     <ul>
         {% for stamp, nstamps in stamps.items() %}
-        <li><a href="/restamp/{{ stamp }}">{{ stamp }}</a> ({{ nstamps }})</li>
+        <li><a href="{{ urlroot }}restamp/{{ stamp }}">{{ stamp }}</a> ({{ nstamps }})</li>
         {% endfor %}
-        <li><a href="/">ROOT</a></li>
+        <li><a href="{{ urlroot }}">ROOT</a></li>
     </ul>
 </body>
 

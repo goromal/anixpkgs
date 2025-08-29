@@ -7,11 +7,14 @@ Spins up a flask webserver (on the specified port) whose purpose is to help a us
 ## Usage
 
 ```bash
-usage: rankserver [-h] [--port PORT] [--data-dir DATA_DIR]
+usage: rankserver [-h] [--port PORT] [--subdomain SUBDOMAIN]
+                  [--data-dir DATA_DIR]
 
 options:
-  -h, --help           show this help message and exit
-  --port PORT          Port to run the server on
-  --data-dir DATA_DIR  Directory containing the rankable elements
+  -h, --help            show this help message and exit
+  --port PORT           Port to run the server on
+  --subdomain SUBDOMAIN
+                        Subdomain for a reverse proxy
+  --data-dir DATA_DIR   Directory containing the rankable elements
 ```
 
