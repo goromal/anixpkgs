@@ -11,6 +11,7 @@ with import ../dependencies.nix; {
     serveNotesWiki = false;
     isInstaller = false;
     enableMetrics = true;
+    enableFileServers = false;
     cloudDirs = [
       {
         name = "configs";
