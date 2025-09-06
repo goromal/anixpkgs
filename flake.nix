@@ -138,7 +138,7 @@
     symforce.flake = false;
 
     task-tools.url =
-      "github:goromal/task-tools?ref=dev/quarter&rev=c176e705c095bec1201c0255c638e875e221a2d4";
+      "github:goromal/task-tools";
     task-tools.flake = false;
 
     trafficsim.url =
