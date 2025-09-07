@@ -273,7 +273,7 @@ in {
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         excludePackages = with pkgs;
           [ gnome-photos gnome-tour ] ++ (with gnome; [
-            cheese
+            pkgs.cheese
             gnome-music
             epiphany
             geary
