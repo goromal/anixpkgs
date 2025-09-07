@@ -31,8 +31,7 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    daily_tactical_server.url =
-      "github:goromal/daily_tactical_server";
+    daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
@@ -125,8 +124,7 @@
     signals-cpp.url = "github:goromal/signals-cpp";
     signals-cpp.flake = false;
 
-    simple-image-editor.url =
-      "github:goromal/simple-image-editor";
+    simple-image-editor.url = "github:goromal/simple-image-editor";
     simple-image-editor.flake = false;
 
     sorting.url = "github:goromal/sorting";
