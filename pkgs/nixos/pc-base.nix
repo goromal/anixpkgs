@@ -272,8 +272,9 @@ in {
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         excludePackages = with pkgs;
-          [ gnome-photos gnome-tour ] ++ (with gnome; [
-            pkgs.cheese
+          [ gnome-photos
+            gnome-tour
+            cheese
             gnome-music
             epiphany
             geary
@@ -283,7 +284,7 @@ in {
             iagno
             hitori
             atomix
-          ]);
+          ];
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
