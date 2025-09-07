@@ -225,12 +225,6 @@ jobs:
         cd test && nix-shell --run "bash test.sh"
   machines:
     name: Machine Checks
-    needs:
-    - cpp
-    - rust
-    - python
-    - bash
-    - java
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
