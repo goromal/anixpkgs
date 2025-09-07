@@ -1,5 +1,5 @@
 { writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
-, color-prints, mavproxy, git, python39, stdenv, overrideCC, gcc10 }:
+, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10 }:
 let
   pkgname = "aptest";
   printErr = "${color-prints}/bin/echo_red";
@@ -18,18 +18,18 @@ let
         ];
         buildInputs = [
           ${mavproxy}
-          ${python39}
-          ${python39.pkgs.pexpect}
-          ${python39.pkgs.setuptools}
-          ${python39.pkgs.pymavlink}
-          ${python39.pkgs.dronecan}
-          ${python39.pkgs.empy}
-          ${python39.pkgs.requests}
-          ${python39.pkgs.monotonic}
-          ${python39.pkgs.geocoder}
-          ${python39.pkgs.configparser}
-          ${python39.pkgs.click}
-          ${python39.pkgs.decorator}
+          ${python}
+          ${python.pkgs.pexpect}
+          ${python.pkgs.setuptools}
+          ${python.pkgs.pymavlink}
+          ${python.pkgs.dronecan}
+          ${python.pkgs.empy}
+          ${python.pkgs.requests}
+          ${python.pkgs.monotonic}
+          ${python.pkgs.geocoder}
+          ${python.pkgs.configparser}
+          ${python.pkgs.click}
+          ${python.pkgs.decorator}
         ];
       }
     '';

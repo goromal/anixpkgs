@@ -79,7 +79,7 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator";
+    orchestrator.url = "github:goromal/orchestrator?ref=dev/warn-suppress";
     orchestrator.flake = false;
 
     orchestrator-cpp.url = "github:goromal/orchestrator-cpp";

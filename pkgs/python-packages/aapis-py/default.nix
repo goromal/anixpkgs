@@ -1,6 +1,8 @@
 { buildPythonPackage, python, protobuf, apis-fds, pkg-src, grpc-support ? true
 }:
 let
+  # TODO: for now, gRPC warnings must be suppressed until grpcio-tools upgrades
+  # to version 1.73.0, which bumps protobuf to v6.
   bldCmd = if grpc-support then
     (let py = python.withPackages (p: with p; [ mypy-protobuf grpcio-tools ]);
     in ''
