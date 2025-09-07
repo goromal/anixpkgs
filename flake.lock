@@ -102,16 +102,15 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1757255790,
+        "lastModified": 1757261352,
         "narHash": "sha256-mZXG+sQrmbZma7wVw9u2jn++nLHEK+rHg0mhycYJeaA=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "bbfc8a8223af0d22455651bed1b381e0f1fe2aab",
+        "rev": "7c73cfd871778ea9b21099080205acdae5442a8e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/warn-suppress",
         "repo": "daily_tactical_server",
         "type": "github"
       }
@@ -135,16 +134,15 @@
     "evil-hangman": {
       "flake": false,
       "locked": {
-        "lastModified": 1756272386,
+        "lastModified": 1757261291,
         "narHash": "sha256-K5c2zp79c2ypC5cgy0fDpgFqpycNekeR7Eetu8O6lVA=",
         "owner": "goromal",
         "repo": "evil-hangman",
-        "rev": "d0fd00a98bcdc0f4a59986bb41904e30564f0665",
+        "rev": "d6f51fdc7ac3062dd28b1148f5df97740c3a93fb",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.05",
         "repo": "evil-hangman",
         "type": "github"
       }
@@ -427,16 +425,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1757222189,
+        "lastModified": 1757261342,
         "narHash": "sha256-GNwa2e1TtTldycO7nhvLaK8n0he1he0uHcdMmv4U4Uc=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "faa3db320dd947e2743d942fca6ebf25e909d625",
+        "rev": "6cfb7407eb5def81f610bceed6963f51d804fda9",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/warn-suppress",
         "repo": "orchestrator",
         "type": "github"
       }
@@ -726,16 +723,15 @@
     "simple-image-editor": {
       "flake": false,
       "locked": {
-        "lastModified": 1756272770,
+        "lastModified": 1757261329,
         "narHash": "sha256-wsocjQy95Kv1OYyivBBpi7lWkCt18LaI2nCxGjlWDlM=",
         "owner": "goromal",
         "repo": "simple-image-editor",
-        "rev": "06695d25b911a298755653ec98af9e0fe4ac4b35",
+        "rev": "7ad93d4b527055eb9d84092c9aa421c22352c610",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.05",
         "repo": "simple-image-editor",
         "type": "github"
       }
@@ -759,16 +755,15 @@
     "spelling-corrector": {
       "flake": false,
       "locked": {
-        "lastModified": 1756272668,
+        "lastModified": 1757261311,
         "narHash": "sha256-iTmqoloY9ql9t/2Sum/qdnFeOigM+G3cM4b8y4OGaAk=",
         "owner": "goromal",
         "repo": "spelling-corrector",
-        "rev": "32c6c6b2b6a1397f97a4ceb1a7d9ee5ff5afecb6",
+        "rev": "5bb421ff190c051e899c84ac7fbae985abe58a01",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.05",
         "repo": "spelling-corrector",
         "type": "github"
       }
