@@ -310,7 +310,7 @@ in {
 
     services.udev.packages = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-      [ pkgs.dolphinEmu ];
+      [ pkgs.dolphin-emu ];
 
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
