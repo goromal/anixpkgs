@@ -295,7 +295,7 @@ in {
     services.blueman.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    hardware.pulseaudio.enable = lib.mkIf
+    services.pulseaudio.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       false;
     security.rtkit.enable = lib.mkIf
