@@ -503,7 +503,6 @@ in {
       code = "codium";
       nohistory = "set +o history";
     };
-    environment.noXlibs = false;
 
     systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
 
