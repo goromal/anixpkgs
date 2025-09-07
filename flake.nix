@@ -31,7 +31,7 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    daily_tactical_server.url = "github:goromal/daily_tactical_server";
+    daily_tactical_server.url = "github:goromal/daily_tactical_server?ref=dev/warn-suppress";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
@@ -49,6 +49,8 @@
 
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
+
+    # TODO gradebook would need dev/warn-suppress branch
 
     makepyshell.url =
       "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
