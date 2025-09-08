@@ -42,7 +42,7 @@ Usage: task-tools list [OPTIONS] FILTER
 
 Options:
   --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
-                     2025-09-06]
+                     2025-09-07]
   --no-ids           Don't show the UUIDs.
   --help             Show this message and exit.
 ```
@@ -69,10 +69,10 @@ Usage: task-tools put [OPTIONS]
 
 Options:
   --name TEXT         Name of the task.  [required]
-  --notes TEXT        Notes to add to the task description.
-  --date [%Y-%m-%d]   Task due date.  [default: 2025-09-06]
+  --notes TEXT        Notes to add to the task description.  [default: ""]
+  --date [%Y-%m-%d]   Task due date.  [default: 2025-09-07]
   --until [%Y-%m-%d]  Specify an end date if for multiple days.  [default:
-                      2025-09-06]
+                      2025-09-07]
   --help              Show this message and exit.
 ```
 
@@ -111,9 +111,9 @@ Usage: task-tools grader [OPTIONS]
 
 Options:
   --start-date [%Y-%m-%d]  First day of the grading window.  [default:
-                           2025-08-30]
+                           2025-08-31]
   --end-date [%Y-%m-%d]    Last day of the grading window.  [default:
-                           2025-09-06]
+                           2025-09-07]
   -o, --out PATH           CSV file to generate the report in.  [default:
                            ~/data/task_grades/log.csv]
   --dry-run                Do a dry run; no task deletions.
