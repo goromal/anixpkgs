@@ -52,15 +52,9 @@ let
       };
     };
 
-  minJDK = prev.jdk11_headless;
-  minJRE = prev.jre_minimal.override {
-    jdk = minJDK;
-    modules = [ "java.base" "java.logging" ];
-  };
-  baseJavaArgs = {
-    jdk = minJDK;
-    jre = minJRE;
-  };
+  minJRE =
+    prev.jre_minimal.override { modules = [ "java.base" "java.logging" ]; };
+  baseJavaArgs = { jre = minJRE; };
 
   baseModuleArgs = {
     pkgs = final;
@@ -244,8 +238,6 @@ in rec {
 
   php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
 
-  python38 = pythonOverridesFor prev.python38;
-  python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
@@ -263,7 +255,7 @@ in rec {
   pysignals = final.python311.pkgs.pysignals;
   mesh-plotter = final.python311.pkgs.mesh-plotter;
   scrape = final.python311.pkgs.scrape;
-  spleeter = final.python38.pkgs.spleeter;
+  # spleeter = final.python38.pkgs.spleeter;
   find_rotational_conventions =
     final.python311.pkgs.find_rotational_conventions;
   trafficsim = final.python311.pkgs.trafficsim;

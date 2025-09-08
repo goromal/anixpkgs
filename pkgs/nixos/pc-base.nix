@@ -271,19 +271,20 @@ in {
 
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-        excludePackages = with pkgs;
-          [ gnome-photos gnome-tour ] ++ (with gnome; [
-            cheese
-            gnome-music
-            epiphany
-            geary
-            evince
-            totem
-            tali
-            iagno
-            hitori
-            atomix
-          ]);
+        excludePackages = with pkgs; [
+          gnome-photos
+          gnome-tour
+          cheese
+          gnome-music
+          epiphany
+          geary
+          evince
+          totem
+          tali
+          iagno
+          hitori
+          atomix
+        ];
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
@@ -295,7 +296,7 @@ in {
     services.blueman.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    hardware.pulseaudio.enable = lib.mkIf
+    services.pulseaudio.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       false;
     security.rtkit.enable = lib.mkIf
@@ -310,7 +311,7 @@ in {
 
     services.udev.packages = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-      [ pkgs.dolphinEmu ];
+      [ pkgs.dolphin-emu ];
 
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
@@ -502,7 +503,6 @@ in {
       code = "codium";
       nohistory = "set +o history";
     };
-    environment.noXlibs = false;
 
     systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
 

@@ -15,21 +15,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
-      service-ports.grafana.internal
-      service-ports.netdata
-    ];
-
-    services.netdata = {
-      enable = true;
-      config = {
-        global = { "memory mode" = "ram"; };
-        plugins = { "cgroup plugin" = "yes"; };
-        web = {
-          "bind to" = "tcp:0.0.0.0:${builtins.toString service-ports.netdata}";
-        };
-      };
-    };
+    networking.firewall.allowedTCPPorts =
+      lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
 
     services.vector = {
       enable = true;
@@ -137,13 +124,26 @@ in {
       enable = true;
       port = service-ports.prometheus.output;
       retentionTime = "15d";
-      scrapeConfigs = [{
-        job_name = "vector";
-        static_configs = [{
-          targets =
-            [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
-        }];
-      }];
+      scrapeConfigs = [
+        {
+          job_name = "vector";
+          static_configs = [{
+            targets =
+              [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
+          }];
+        }
+        {
+          job_name = "node";
+          static_configs = [{
+            targets =
+              [ "127.0.0.1:${builtins.toString service-ports.node-exporter}" ];
+          }];
+        }
+      ];
+      exporters.node = {
+        enable = true;
+        port = service-ports.node-exporter;
+      };
     };
 
     services.grafana = {
@@ -180,10 +180,6 @@ in {
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_set_header X-Forwarded-Host $host;
         '';
-      };
-      locations."/netdata/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.netdata}/";
       };
     };
   };

@@ -16,7 +16,7 @@ in {
       [
         eamodio.gitlens
         ms-python.vscode-pylance
-        matklad.rust-analyzer
+        rust-lang.rust-analyzer
         jnoortheen.nix-ide
         yzhang.markdown-all-in-one
         xaver.clang-format
