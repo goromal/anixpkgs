@@ -152,7 +152,8 @@ in {
     ];
     users.users.grafana.extraGroups = [ "dev" ];
     fileSystems."/var/lib/grafana/dashboards" = {
-      device = "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
+      device =
+        "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
       fsType = "none";
       options = [ "bind" ];
     };
