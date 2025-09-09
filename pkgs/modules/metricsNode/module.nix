@@ -176,9 +176,7 @@ in {
       exporters.node = {
         enable = true;
         port = service-ports.node-exporter;
-        extraFlags = [
-          "--collector.textfile.directory=${textfileDir}"
-        ];
+        extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
       };
     };
 
