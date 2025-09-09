@@ -146,6 +146,22 @@ in {
       };
     };
 
+    systemd.tmpfiles.rules = [
+      "d /var/lib/grafana/dashboards 0750 grafana grafana -"
+      "d ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} 0750 andrew dev -"
+    ];
+    users.users.grafana.extraGroups = [ "dev" ];
+    fileSystems."/var/lib/grafana/dashboards" = {
+      device =
+        "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+    system.activationScripts.grafanaPerms.text = ''
+      chmod -R g+rx ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}
+      find ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} -type f -exec chmod g+r {} +
+    '';
+
     services.grafana = {
       enable = true;
       settings = {
@@ -157,6 +173,15 @@ in {
         };
       };
       provision = {
+        enable = true;
+        dashboards = {
+          settings = {
+            providers = [{
+              name = config.networking.hostName;
+              options.path = "/var/lib/grafana/dashboards";
+            }];
+          };
+        };
         datasources.settings.datasources = [{
           name = "Loki";
           type = "loki";
