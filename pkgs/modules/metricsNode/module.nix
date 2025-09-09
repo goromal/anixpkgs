@@ -3,6 +3,22 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.metricsNode;
+  textfileDir = "/var/lib/node_exporter/textfile_collector";
+  fileMonitorScript = pkgs.writeShellScriptBin "home-dir-file-counts" ''
+    #!/usr/bin/env bash
+    mkdir -p ${textfileDir}
+    out="${textfileDir}/home_file_counts.prom"
+    tmp="$(mktemp)"
+
+    for dir in "$HOME"/*/; do
+      count=$(find "$dir" -type f | wc -l)
+      name=$(basename "$dir")
+      echo "home_dir_file_count{dir=\"$name\"} $count" >> "$tmp"
+    done
+
+    mv "$tmp" "$out"
+    chmod 644 "$out"
+  '';
 in {
   options.services.metricsNode = {
     enable = lib.mkEnableOption "enable metrics node services";
@@ -118,6 +134,23 @@ in {
       RestartSec = lib.mkForce "5s";
     };
 
+    systemd.services.homeDirFileCounts = {
+      description = "Generate file counts per home subdirectory";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${fileMonitorScript}/bin/home-dir-file-counts";
+        Environment = "HOME=${globalCfg.homeDir}";
+      };
+    };
+    systemd.timers.homeDirFileCounts = {
+      description = "Run homeDirFileCounts every 60 minutes";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitActiveSec = "60m";
+      };
+    };
+
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
     services.prometheus = {
@@ -143,12 +176,14 @@ in {
       exporters.node = {
         enable = true;
         port = service-ports.node-exporter;
+        extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
       };
     };
 
     systemd.tmpfiles.rules = [
       "d /var/lib/grafana/dashboards 0750 grafana grafana -"
       "d ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} 0750 andrew dev -"
+      "d ${textfileDir} 0755 node-exporter node-exporter -"
     ];
     users.users.grafana.extraGroups = [ "dev" ];
     fileSystems."/var/lib/grafana/dashboards" = {
