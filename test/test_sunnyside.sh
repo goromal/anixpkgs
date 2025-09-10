@@ -7,7 +7,7 @@ fi
 mkdir $tmpdir
 cd $tmpdir
 
-make-title -c yellow "Testing sunnyside"
+make-title -c yellow "Testing sunnyside and sread"
 echo "SUCCESS" > test.py
 sunnyside -t test.py -s 4 -k u
 rm test.py
@@ -16,6 +16,14 @@ sunnyside -t xiwx3tC.tyz -s 4 -k u
 [[ -f test.py ]] || { echo_red "sunnyside re-rename failed"; exit 1; }
 if [[ -z $(cat test.py | grep SUCCESS) ]]; then
     echo_red "sunnyside reconstruction failed"
+    exit 1
+fi
+
+sunnyside -t test.py -s 0 -k u
+echo "u" > cipher
+ccontent=$(sread -c cipher test.py.tyz)
+if [[ "$ccontent" != "SUCCESS" ]]; then
+    echo_red "sread failed: $ccontent != SUCCESS"
     exit 1
 fi
 

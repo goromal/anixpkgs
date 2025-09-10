@@ -413,6 +413,11 @@
                 "docs": true
             },
             {
+                "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "make-title",
                 "ci": true,
                 "docs": true
