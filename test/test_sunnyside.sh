@@ -19,5 +19,7 @@ if [[ -z $(cat test.py | grep SUCCESS) ]]; then
     exit 1
 fi
 
+# ^^^^ test sread
+
 # Cleanup
 rm -rf "$tmpdir"

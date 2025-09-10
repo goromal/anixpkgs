@@ -10,9 +10,9 @@ let
       args+="$word "
     done
     args=''${args% }
-    pfile="${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt"
-    if [[ -f "$pfile" ]]; then
-      cat "$pfile" | sudo -S $args
+    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
+    if [[ ! -z "$pw" ]]; then
+      echo "$pw" | sudo -S $args
     else
       sudo $args
     fi

@@ -29,7 +29,7 @@ let
       words+="$word "
     done
     words=''${words% }
-    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$words" remote
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(${anixpkgs.sread}/bin/sread ~/secrets/ats/p.txt.tyz)" "$words" remote
   '';
 in {
   home.stateVersion = cfg.homeState;
