@@ -9,14 +9,12 @@ in (writeArgparseScriptBin pkgname ''
 
   Options:
     -c /path/to/cipher (default: ${cpath})
-'' [
-  {
-    var = "CIPHER";
-    isBool = false;
-    default = cpath;
-    flags = "-c";
-  }
-] ''
+'' [{
+  var = "CIPHER";
+  isBool = false;
+  default = cpath;
+  flags = "-c";
+}] ''
   if [[ -z "$1" ]]; then
     echo ""
     exit
