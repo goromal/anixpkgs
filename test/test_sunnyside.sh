@@ -7,7 +7,7 @@ fi
 mkdir $tmpdir
 cd $tmpdir
 
-make-title -c yellow "Testing sunnyside"
+make-title -c yellow "Testing sunnyside and sread"
 echo "SUCCESS" > test.py
 sunnyside -t test.py -s 4 -k u
 rm test.py
@@ -19,7 +19,13 @@ if [[ -z $(cat test.py | grep SUCCESS) ]]; then
     exit 1
 fi
 
-# ^^^^ test sread
+sunnyside -t test.py -s 0 -k u
+echo "u" > cipher
+ccontent=$(sread -c cipher test.py.tyz)
+if [[ "$ccontent" != "SUCCESS" ]]; then
+    echo_red "sread failed: $ccontent != SUCCESS"
+    exit 1
+fi
 
 # Cleanup
 rm -rf "$tmpdir"
