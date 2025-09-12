@@ -146,7 +146,7 @@
       "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
     trafficsim.flake = false;
 
-    wiki-tools.url = "github:goromal/wiki-tools";
+    wiki-tools.url = "github:goromal/wiki-tools?ref=dev/sec2";
     wiki-tools.flake = false;
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";

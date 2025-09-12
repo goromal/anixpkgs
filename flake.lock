@@ -884,15 +884,16 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870970,
-        "narHash": "sha256-mMB/Vj6jA7nJqsJPPX8FX1EwaJDJuxP/gzXT3cyOZkg=",
+        "lastModified": 1757638309,
+        "narHash": "sha256-7g3U7VJGqd9tJGM9IDEwhq9mGd1vz+48QGYYl7VnlmY=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "60619a5e7f0c0005903153074c6963782984b479",
+        "rev": "b0a43709ca48caf14349dbea41a846af662acf2b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/sec2",
         "repo": "wiki-tools",
         "type": "github"
       }
