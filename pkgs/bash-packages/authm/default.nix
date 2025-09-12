@@ -15,9 +15,6 @@ let
         colorama
         easy-google-auth
         gmail-parser
-        task-tools
-        wiki-tools
-        book-notes-sync
       ];
       checkPkgs = [ ];
     });
