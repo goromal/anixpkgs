@@ -311,7 +311,8 @@ in rec {
   });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
-  sread = addDoc (prev.callPackage ./bash-packages/sread { });
+  sread = addDoc (prev.callPackage ./bash-packages/srw/sread.nix { });
+  swrite = addDoc (prev.callPackage ./bash-packages/srw/swrite.nix { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });

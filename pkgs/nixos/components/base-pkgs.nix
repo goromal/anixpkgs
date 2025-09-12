@@ -55,6 +55,8 @@ in {
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
+    anixpkgs.sread
+    anixpkgs.swrite
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
