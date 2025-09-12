@@ -46,6 +46,7 @@ in {
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
+    anixpkgs.local-ssh-proxy
     anixpkgs.wiki-tools
     anixpkgs.task-tools
     anixpkgs.photos-tools

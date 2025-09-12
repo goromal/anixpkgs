@@ -288,6 +288,7 @@ in rec {
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python311;
   });
+  local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
     python = final.python311;
     blank-svg = pkgData.img.blank-svg;
