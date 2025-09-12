@@ -22,7 +22,7 @@
       "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
     ardupilot.flake = false;
 
-    book-notes-sync.url = "github:goromal/book-notes-sync";
+    book-notes-sync.url = "github:goromal/book-notes-sync?ref=dev/sec2";
     book-notes-sync.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
