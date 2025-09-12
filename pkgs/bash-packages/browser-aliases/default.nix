@@ -1,5 +1,5 @@
-{ stdenv, writeArgparseScriptBin, color-prints, redirects, wiki-tools
-, sread, browserExec }:
+{ stdenv, writeArgparseScriptBin, color-prints, redirects, wiki-tools, sread
+, browserExec }:
 let
   printErr = "${color-prints}/bin/echo_red";
   wikiuser = "$(cat $HOME/secrets/wiki/u.txt)";
