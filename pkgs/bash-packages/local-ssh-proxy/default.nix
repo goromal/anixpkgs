@@ -1,6 +1,6 @@
 { writeArgparseScriptBin, color-prints, sshpass, sread }:
 let
-  pkgname = "local-ssh-proxy";
+  pkgname = "lssh";
   printErr = "${color-prints}/bin/echo_red";
 in (writeArgparseScriptBin pkgname ''
   usage: ${pkgname} [options] hostname
