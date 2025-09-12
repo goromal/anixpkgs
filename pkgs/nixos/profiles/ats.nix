@@ -159,10 +159,10 @@ with import ../dependencies.nix; {
         name = "ats-tactical-dailies";
         jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          tactical --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local journal
-          tactical --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local quote
-          tactical --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local vocab
-          tactical --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local wiki-url
+          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local journal
+          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local quote
+          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local vocab
+          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local wiki-url
         '';
         timerCfg = {
           OnCalendar = [ "*-*-* 00:00:00" ];
@@ -173,7 +173,7 @@ with import ../dependencies.nix; {
         name = "ats-tactical-intervaled";
         jobShellScript = pkgs.writeShellScript "ats-tactical-intervaled" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          tactical --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local tasks
+          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local tasks
         '';
         timerCfg = {
           OnBootSec = "5m";
