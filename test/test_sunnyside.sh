@@ -19,8 +19,8 @@ if [[ -z $(cat test.py | grep SUCCESS) ]]; then
     exit 1
 fi
 
-sunnyside -t test.py -s 0 -k u
 echo "u" > cipher
+swrite -c cipher test.py
 ccontent=$(sread -c cipher test.py.tyz)
 if [[ "$ccontent" != "SUCCESS" ]]; then
     echo_red "sread failed: $ccontent != SUCCESS"

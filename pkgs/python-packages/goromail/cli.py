@@ -271,12 +271,18 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     help="URL of the DokuWiki instance (https).",
 )
 @click.option(
-    "--wiki-secrets-file",
-    "wiki_secrets_file",
-    type=click.Path(),
-    default=WTD.WIKI_SECRETS_FILE,
-    show_default=True,
-    help="Path to the DokuWiki login secrets JSON file.",
+    "--wiki-user",
+    "wiki_user",
+    type=str,
+    required=True,
+    help="Wiki account username.",
+)
+@click.option(
+    "--wiki-pass",
+    "wiki_pass",
+    type=str,
+    required=True,
+    help="Wiki account password.",
 )
 @click.option(
     "--task-secrets-file",
@@ -331,7 +337,8 @@ def cli(
     journal_refresh_file,
     num_messages,
     wiki_url,
-    wiki_secrets_file,
+    wiki_user,
+    wiki_pass,
     task_secrets_file,
     notion_secrets_file,
     task_refresh_token,
@@ -347,7 +354,8 @@ def cli(
         "journal_refresh_file": journal_refresh_file,
         "num_messages": num_messages,
         "wiki_url": wiki_url,
-        "wiki_secrets_file": wiki_secrets_file,
+        "wiki_user": wiki_user,
+        "wiki_pass": wiki_pass,
         "task_secrets_file": task_secrets_file,
         "notion_secrets_file": notion_secrets_file,
         "task_refresh_token": task_refresh_token,
@@ -412,7 +420,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
         exit(1)
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
-        wiki_secrets_file=ctx.obj["wiki_secrets_file"],
+        wiki_user=ctx.obj["wiki_user"],
+        wiki_pass=ctx.obj["wiki_pass"],
         enable_logging=ctx.obj["enable_logging"],
     )
     try:
@@ -592,7 +601,8 @@ def journal(ctx: click.Context, dry_run):
         return
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
-        wiki_secrets_file=ctx.obj["wiki_secrets_file"],
+        wiki_user=ctx.obj["wiki_user"],
+        wiki_pass=ctx.obj["wiki_pass"],
         enable_logging=ctx.obj["enable_logging"],
     )
     print(

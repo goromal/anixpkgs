@@ -18,6 +18,7 @@ mkShell {
     pkgshell
     sunnyside
     sread
+    swrite
     secure-delete
     time
   ];

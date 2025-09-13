@@ -1,7 +1,7 @@
 { writeArgparseScriptBin, sunnyside, file, redirects }:
 let
   pkgname = "sread";
-  cpath = "/dev/shm/c";
+  cpath = "/.c/c";
 in (writeArgparseScriptBin pkgname ''
   usage: ${pkgname} [opts] file
 
