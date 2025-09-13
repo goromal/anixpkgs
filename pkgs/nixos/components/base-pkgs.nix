@@ -46,6 +46,7 @@ in {
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
+    anixpkgs.local-ssh-proxy
     anixpkgs.wiki-tools
     anixpkgs.task-tools
     anixpkgs.photos-tools
@@ -55,6 +56,8 @@ in {
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
+    anixpkgs.sread
+    anixpkgs.swrite
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
