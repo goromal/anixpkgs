@@ -63,7 +63,7 @@ with import ../dependencies.nix; {
         jobShellScript = pkgs.writeShellScript "ats-triaging" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          goromail --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
           if [[ ! -z "$(cat $HOME/goromail/annotate.log)" ]]; then
             echo "Notifying about processed triage pages..."
             echo "[$(date)] 🧮 Triage Calculations:" \
@@ -82,8 +82,8 @@ with import ../dependencies.nix; {
         jobShellScript = pkgs.writeShellScript "ats-mailman" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          goromail --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local --headless bot ${anixpkgs.redirects.suppress_all}
-          goromail --wiki-user $(cat $HOME/secrets/wiki/u.txt) --wiki-pass $(sread $HOME/secrets/wiki/p.txt.tyz) --wiki-url http://${config.networking.hostName}.local --headless journal ${anixpkgs.redirects.suppress_all}
+          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless bot ${anixpkgs.redirects.suppress_all}
+          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless journal ${anixpkgs.redirects.suppress_all}
           if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
             echo "Notifying about processed bot mail..."
             echo "[$(date)] 📬 Bot mail received:" \

@@ -1,7 +1,7 @@
 { writeArgparseScriptBin, color-prints, sunnyside, file, redirects }:
 let
   pkgname = "swrite";
-  cpath = "/dev/shm/c";
+  cpath = "/.c/c";
   printErr = "${color-prints}/bin/echo_red";
 in (writeArgparseScriptBin pkgname ''
   usage: ${pkgname} [opts] file
