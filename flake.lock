@@ -54,11 +54,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1717871019,
-        "narHash": "sha256-0ic7jZirFebHbYtQDoFcdJmuVKAkwiKVq8lmE0byy9I=",
+        "lastModified": 1757732366,
+        "narHash": "sha256-88f6xe4Ycgg9SqmdPU80JM5SOeYrYUKmWLHPnW2Vd6o=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "3f96818f223520e45dea7a98f7b3287ab23b5a5a",
+        "rev": "619a9a6b4aa32784b28d2f501f4939c60ec96c3e",
         "type": "github"
       },
       "original": {
@@ -102,11 +102,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1757261352,
-        "narHash": "sha256-mZXG+sQrmbZma7wVw9u2jn++nLHEK+rHg0mhycYJeaA=",
+        "lastModified": 1757732376,
+        "narHash": "sha256-UfWYR+ihLU58AGX9o+YrRaNynnC/G2HSS5XR6D82MVY=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "7c73cfd871778ea9b21099080205acdae5442a8e",
+        "rev": "7bbc799070dcecc807016da2516000a3d8fac31c",
         "type": "github"
       },
       "original": {
@@ -884,11 +884,11 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870970,
-        "narHash": "sha256-mMB/Vj6jA7nJqsJPPX8FX1EwaJDJuxP/gzXT3cyOZkg=",
+        "lastModified": 1757732353,
+        "narHash": "sha256-7g3U7VJGqd9tJGM9IDEwhq9mGd1vz+48QGYYl7VnlmY=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "60619a5e7f0c0005903153074c6963782984b479",
+        "rev": "2829dcf9f77be1927dede3e0faa720c552cdf2f0",
         "type": "github"
       },
       "original": {
