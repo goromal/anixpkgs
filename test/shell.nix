@@ -17,6 +17,7 @@ mkShell {
     cpp-helper
     pkgshell
     sunnyside
+    sread
     secure-delete
     time
   ];

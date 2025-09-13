@@ -19,8 +19,8 @@ experimental-features = nix-command flakes auto-allocate-uids
 4. Add these Nix channels via `nix-channel --add URL NAME`:
 ```bash
 $ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-24.05
+home-manager https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz
+nixpkgs https://nixos.org/channels/nixos-25.05
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
@@ -212,10 +212,10 @@ sudo reboot
 Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
 
 ```bash
-# e.g., upgrading to 24.05:
-home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
-nixos https://nixos.org/channels/nixos-24.05
-nixpkgs https://nixos.org/channels/nixos-24.05
+# e.g., upgrading to 25.05:
+home-manager https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz
+nixos https://nixos.org/channels/nixos-25.05
+nixpkgs https://nixos.org/channels/nixos-25.05
 ```
 
 `sudo nix-channel --update`. Then upgrade with

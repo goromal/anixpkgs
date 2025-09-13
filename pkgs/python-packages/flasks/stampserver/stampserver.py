@@ -10,8 +10,18 @@ from random import shuffle
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
+parser.add_argument("--subdomain", action="store", type=str, default="/", help="Subdomain for a reverse proxy")
 parser.add_argument("--data-dir", action="store", type=str, default="", help="Directory containing the stampable elements")
 args = parser.parse_args()
+
+urlroot = args.subdomain
+if urlroot != "/":
+    urlroot += "/"
+url_for_prefix = args.subdomain.replace("/", "")
+if len(url_for_prefix) > 0:
+    url_for_prefix += "."
+
+bp = flask.Blueprint("stamp", __name__, url_prefix=args.subdomain)
 
 class LoginForm(flask_wtf.FlaskForm):
     username = StringField("Username")
@@ -33,7 +43,7 @@ else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
 
-app = flask.Flask(__name__, static_url_path="", static_folder=RES_DIR)
+app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
 login_manager = flask_login.LoginManager()
 
@@ -102,25 +112,19 @@ class StampServer:
         return stamps
 
     def stamp(self, stamp):
-        try:
-            dirname = os.path.dirname(self.filedeck)
-            basename = os.path.basename(self.filedeck)
-            os.rename(self.filedeck, os.path.join(dirname, f"stamped.{stamp}." + basename))
-            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
-        except:
-            pass
+        dirname = RES_DIR
+        basename = os.path.basename(self.filedeck)
+        os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, f"stamped.{stamp}." + basename))
+        self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
     def replace_stamp(self, stamp, new_stamp):
-        try:
-            dirname = os.path.dirname(self.filedeck)
-            basename = os.path.basename(self.filedeck)
-            split_basename = basename.split(".")
-            split_basename[1] = new_stamp
-            new_basename = ".".join(split_basename)
-            os.rename(self.filedeck, os.path.join(dirname, new_basename))
-            self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
-        except:
-            pass
+        dirname = RES_DIR
+        basename = os.path.basename(self.filedeck)
+        split_basename = basename.split(".")
+        split_basename[1] = new_stamp
+        new_basename = ".".join(split_basename)
+        os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
+        self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
 stampserver = StampServer()
 
@@ -132,48 +136,51 @@ def load_user(user_id):
     else:
         return None
       
-@app.route("/login", methods=["GET", "POST"])
+@bp.route("/login", methods=["GET", "POST"])
 def login():
     global user
+    global url_for_prefix
     if flask_login.current_user.is_authenticated:
-        return flask.redirect(flask.url_for('index'))
+        return flask.redirect(flask.url_for(url_for_prefix + 'index'))
     form = LoginForm()
     if form.validate_on_submit():
         if form.username.data != user.get_id() or not user.check_password(form.password.data):
-            return flask.redirect(flask.url_for("login"))
+            return flask.redirect(flask.url_for(url_for_prefix + "login"))
         flask_login.login_user(user, remember=True)
         next = flask.request.args.get('next')
-        # if not url_has_allowed_host_and_scheme(next, flask.request.host):
-        #     return flask.abort(400)
-        return flask.redirect(next or flask.url_for('index'))
+        return flask.redirect(next or flask.url_for(url_for_prefix + 'index'))
     return flask.render_template("login.html", title="Sign In", form=form)
       
-@app.route("/logout")
+@bp.route("/logout")
 @flask_login.login_required
 def logout():
+    global url_for_prefix
     flask_login.logout_user()
-    return flask.redirect(flask.url_for("login"))
+    return flask.redirect(flask.url_for(url_for_prefix + "login"))
 
-@app.route("/", methods=["GET","POST"])
+@bp.route("/", methods=["GET","POST"])
 @flask_login.login_required
 def index():
     global args
     global stampserver
+    global urlroot
     if flask.request.method == "POST":
         if flask.request.form["text"] != "":
             stampserver.stamp(flask.request.form["text"])
     res, msg = stampserver.load()
     stamps = stampserver.getstamps()
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root="", nleft="?", datadir=SHORT_RESDIR, stamps=stamps)
+        return flask.render_template("index.html", urlroot=urlroot, err=True, msg=msg, file="", ftype="", root="", nleft="?", datadir=SHORT_RESDIR, stamps=stamps)
     file, ftype, numleft = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root="", nleft=str(numleft), datadir=SHORT_RESDIR, stamps=stamps)
+    file = urlroot + file
+    return flask.render_template("index.html", urlroot=urlroot, err=False, msg="", file=file, ftype=ftype, root="", nleft=str(numleft), datadir=SHORT_RESDIR, stamps=stamps)
 
-@app.route("/restamp/<stamp>", methods=["GET","POST"])
+@bp.route("/restamp/<stamp>", methods=["GET","POST"])
 @flask_login.login_required
 def stamped(stamp):
     global args
     global stampserver
+    global urlroot
     if flask.request.method == "POST":
         if flask.request.form["text"] == "":
             new_stamp = stamp
@@ -182,15 +189,18 @@ def stamped(stamp):
         stampserver.replace_stamp(stamp, new_stamp)
     res, msg = stampserver.load_stamped(stamp)
     if not res:
-        return flask.render_template("index.html", err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR, stamps={})
+        return flask.render_template("index.html", urlroot=urlroot, err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR, stamps={})
     file, ftype, numleft = stampserver.getfile()
-    return flask.render_template("index.html", err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}", nleft=str(numleft), datadir=SHORT_RESDIR, stamps={})
+    file = urlroot + file
+    return flask.render_template("index.html", urlroot=urlroot, err=False, msg="", file=file, ftype=ftype, root=f"restamp/{stamp}", nleft=str(numleft), datadir=SHORT_RESDIR, stamps={})
 
-@app.route("/zzz", methods=["GET","POST"])
+@bp.route("/zzz", methods=["GET","POST"])
 @flask_login.login_required
 def zzz():
+    global urlroot
     return flask.render_template(
         "index.html",
+        urlroot=urlroot,
         err=False,
         msg="",
         file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4",
@@ -203,8 +213,10 @@ def zzz():
 
 def run():
     global args
+    global url_for_prefix
+    app.register_blueprint(bp)
     login_manager.init_app(app)
-    login_manager.login_view = "login"
+    login_manager.login_view = url_for_prefix + "login"
     app.run(host="0.0.0.0", port=args.port)
 
 if __name__ == "__main__":

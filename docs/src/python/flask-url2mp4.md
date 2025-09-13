@@ -2,7 +2,7 @@
 
 Convert URL's pointing to videos to MP4's, powered by Python's flask library.
 
-The server page takes a URL string and either uses `wget` or `youtube-dl` to download the video and convert it to MP4 using the [mp4](../bash/mp4.md) tool.
+The server page takes a URL string and either uses `wget` or `yt-dlp` to download the video and convert it to MP4 using the [mp4](../bash/mp4.md) tool.
 
 ## Usage
 

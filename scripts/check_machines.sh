@@ -22,7 +22,7 @@ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 
-configurations=(personal-inspiron ats-alderlake ats-pi rankserver-pi)
+configurations=(personal-inspiron ats-alderlake ats-pi)
 for configuration in ${configurations[@]}; do
     echo "Checking derivation for configuration: $configuration..."
     nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run --show-trace

@@ -40,7 +40,7 @@ Usage: wiki-tools get [OPTIONS]
 Options:
   --page-id TEXT  ID of the DokuWiki page.  [required]
   --output TEXT   Output text file name. Will print to terminal if not
-                  specified.
+                  specified.  [default: ""]
   --help          Show this message and exit.
 ```
 
@@ -55,7 +55,7 @@ Usage: wiki-tools get-md [OPTIONS]
 Options:
   --page-id TEXT  ID of the DokuWiki page.  [required]
   --output TEXT   Output Markdown file name. Will print to terminal if not
-                  specified.
+                  specified.  [default: ""]
   --help          Show this message and exit.
 ```
 
@@ -70,7 +70,7 @@ Usage: wiki-tools get-rand-journal [OPTIONS]
 Options:
   --namespace TEXT  Journal pages namespace.  [default: journals]
   --output TEXT     Output text file name. Will print to terminal if not
-                    specified.
+                    specified.  [default: ""]
   --help            Show this message and exit.
 ```
 

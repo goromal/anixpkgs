@@ -3,6 +3,22 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.metricsNode;
+  textfileDir = "/var/lib/node_exporter/textfile_collector";
+  fileMonitorScript = pkgs.writeShellScriptBin "home-dir-file-counts" ''
+    #!/usr/bin/env bash
+    mkdir -p ${textfileDir}
+    out="${textfileDir}/home_file_counts.prom"
+    tmp="$(mktemp)"
+
+    for dir in "$HOME"/*/; do
+      count=$(find "$dir" -type f | wc -l)
+      name=$(basename "$dir")
+      echo "home_dir_file_count{dir=\"$name\"} $count" >> "$tmp"
+    done
+
+    mv "$tmp" "$out"
+    chmod 644 "$out"
+  '';
 in {
   options.services.metricsNode = {
     enable = lib.mkEnableOption "enable metrics node services";
@@ -15,21 +31,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
-      service-ports.grafana.internal
-      service-ports.netdata
-    ];
-
-    services.netdata = {
-      enable = true;
-      config = {
-        global = { "memory mode" = "ram"; };
-        plugins = { "cgroup plugin" = "yes"; };
-        web = {
-          "bind to" = "tcp:0.0.0.0:${builtins.toString service-ports.netdata}";
-        };
-      };
-    };
+    networking.firewall.allowedTCPPorts =
+      lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
 
     services.vector = {
       enable = true;
@@ -131,20 +134,68 @@ in {
       RestartSec = lib.mkForce "5s";
     };
 
+    systemd.services.homeDirFileCounts = {
+      description = "Generate file counts per home subdirectory";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${fileMonitorScript}/bin/home-dir-file-counts";
+        Environment = "HOME=${globalCfg.homeDir}";
+      };
+    };
+    systemd.timers.homeDirFileCounts = {
+      description = "Run homeDirFileCounts every 60 minutes";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitActiveSec = "60m";
+      };
+    };
+
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
     services.prometheus = {
       enable = true;
       port = service-ports.prometheus.output;
       retentionTime = "15d";
-      scrapeConfigs = [{
-        job_name = "vector";
-        static_configs = [{
-          targets =
-            [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
-        }];
-      }];
+      scrapeConfigs = [
+        {
+          job_name = "vector";
+          static_configs = [{
+            targets =
+              [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
+          }];
+        }
+        {
+          job_name = "node";
+          static_configs = [{
+            targets =
+              [ "127.0.0.1:${builtins.toString service-ports.node-exporter}" ];
+          }];
+        }
+      ];
+      exporters.node = {
+        enable = true;
+        port = service-ports.node-exporter;
+        extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
+      };
     };
+
+    systemd.tmpfiles.rules = [
+      "d /var/lib/grafana/dashboards 0750 grafana grafana -"
+      "d ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} 0750 andrew dev -"
+      "d ${textfileDir} 0755 node-exporter node-exporter -"
+    ];
+    users.users.grafana.extraGroups = [ "dev" ];
+    fileSystems."/var/lib/grafana/dashboards" = {
+      device =
+        "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+    system.activationScripts.grafanaPerms.text = ''
+      chmod -R g+rx ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}
+      find ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} -type f -exec chmod g+r {} +
+    '';
 
     services.grafana = {
       enable = true;
@@ -157,6 +208,15 @@ in {
         };
       };
       provision = {
+        enable = true;
+        dashboards = {
+          settings = {
+            providers = [{
+              name = config.networking.hostName;
+              options.path = "/var/lib/grafana/dashboards";
+            }];
+          };
+        };
         datasources.settings.datasources = [{
           name = "Loki";
           type = "loki";
@@ -180,10 +240,6 @@ in {
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_set_header X-Forwarded-Host $host;
         '';
-      };
-      locations."/netdata/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.netdata}/";
       };
     };
   };
