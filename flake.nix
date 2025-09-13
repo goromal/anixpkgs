@@ -22,7 +22,7 @@
       "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
     ardupilot.flake = false;
 
-    book-notes-sync.url = "github:goromal/book-notes-sync?ref=dev/sec2";
+    book-notes-sync.url = "github:goromal/book-notes-sync";
     book-notes-sync.flake = false;
 
     ceres-factors.url = "github:goromal/ceres-factors";
@@ -32,7 +32,7 @@
     crowcpp.flake = false;
 
     daily_tactical_server.url =
-      "github:goromal/daily_tactical_server?ref=dev/sec2";
+      "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
@@ -147,7 +147,7 @@
       "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
     trafficsim.flake = false;
 
-    wiki-tools.url = "github:goromal/wiki-tools?ref=dev/sec2";
+    wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
