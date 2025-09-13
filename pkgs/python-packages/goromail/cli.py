@@ -274,14 +274,14 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
     "--wiki-user",
     "wiki_user",
     type=str,
-    required=True,
+    default="",
     help="Wiki account username.",
 )
 @click.option(
     "--wiki-pass",
     "wiki_pass",
     type=str,
-    required=True,
+    default="",
     help="Wiki account password.",
 )
 @click.option(
