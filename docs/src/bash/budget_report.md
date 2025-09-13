@@ -3,7 +3,7 @@
 Generate a budget report.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: budget_report [OPTIONS] COMMAND [ARGS]...
@@ -25,9 +25,12 @@ Commands:
   transactions-process  Process raw transactions.
   transactions-status   Get the status of raw transactions.
   transactions-upload   Upload missing raw transactions to the budget sheet.
+```
+
+### transactions-process
 
 
-
+```bash
 Usage: budget_report transactions-process [OPTIONS]
 
   Process raw transactions.
@@ -35,18 +38,24 @@ Usage: budget_report transactions-process [OPTIONS]
 Options:
   --dry-run  Activate dry run mode.
   --help     Show this message and exit.
+```
+
+### transactions-status
 
 
-
+```bash
 Usage: budget_report transactions-status [OPTIONS]
 
   Get the status of raw transactions.
 
 Options:
   --help  Show this message and exit.
+```
+
+### transactions-upload
 
 
-
+```bash
 Usage: budget_report transactions-upload [OPTIONS]
 
   Upload missing raw transactions to the budget sheet.
@@ -56,9 +65,12 @@ Options:
   --account TEXT  Account type from the config file.  [required]
   --dry-run       Activate dry run mode.
   --help          Show this message and exit.
+```
+
+### transactions-bin
 
 
-
+```bash
 Usage: budget_report transactions-bin [OPTIONS]
 
   Bin all transactions from a category sheet.
@@ -66,6 +78,5 @@ Usage: budget_report transactions-bin [OPTIONS]
 Options:
   --category TEXT  Category from the Config sheet.  [required]
   --help           Show this message and exit.
-
 ```
 

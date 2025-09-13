@@ -8,7 +8,11 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  rcrsyncConfigured = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+    homeDir = cfg.homeDir;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2 \
@@ -25,7 +29,7 @@ let
       words+="$word "
     done
     words=''${words% }
-    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(cat ~/secrets/ats/p.txt)" "$words" remote
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(${anixpkgs.sread}/bin/sread ~/secrets/ats/p.txt.tyz)" "$words" remote
   '';
 in {
   home.stateVersion = cfg.homeState;
@@ -59,6 +63,7 @@ in {
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
     anixpkgs.orchestrator
+    anixpkgs.daily_tactical_server
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
     anixpkgs.rcdo

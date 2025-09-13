@@ -28,15 +28,13 @@ let
       auto-usage-doc = (if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
         (if pkg-attr.meta.autoGenUsageCmd != null then ''
 
-          ## Usage (Auto-Generated)
+          ## Usage
 
-          ```bash
           ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
             packageAttr = pkg-attr;
             helpCmd = pkg-attr.meta.autoGenUsageCmd;
             subCmds = sub-cmds;
           }}
-          ```
         '' else
           "")
       else
@@ -54,15 +52,9 @@ let
       };
     };
 
-  minJDK = prev.jdk11_headless;
-  minJRE = prev.jre_minimal.override {
-    jdk = minJDK;
-    modules = [ "java.base" "java.logging" ];
-  };
-  baseJavaArgs = {
-    jdk = minJDK;
-    jre = minJRE;
-  };
+  minJRE =
+    prev.jre_minimal.override { modules = [ "java.base" "java.logging" ]; };
+  baseJavaArgs = { jre = minJRE; };
 
   baseModuleArgs = {
     pkgs = final;
@@ -127,6 +119,11 @@ let
             book-notes-sync = addDoc
               (pySelf.callPackage ./python-packages/book-notes-sync {
                 pkg-src = flakeInputs.book-notes-sync;
+              });
+            daily_tactical_server = addDoc
+              (pySelf.callPackage ./python-packages/daily_tactical_server {
+                inherit service-ports;
+                pkg-src = flakeInputs.daily_tactical_server;
               });
             task-tools = addDoc
               (pySelf.callPackage ./python-packages/task-tools {
@@ -241,8 +238,6 @@ in rec {
 
   php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
 
-  python38 = pythonOverridesFor prev.python38;
-  python39 = pythonOverridesFor prev.python39;
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
 
@@ -260,7 +255,7 @@ in rec {
   pysignals = final.python311.pkgs.pysignals;
   mesh-plotter = final.python311.pkgs.mesh-plotter;
   scrape = final.python311.pkgs.scrape;
-  spleeter = final.python38.pkgs.spleeter;
+  # spleeter = final.python38.pkgs.spleeter;
   find_rotational_conventions =
     final.python311.pkgs.find_rotational_conventions;
   trafficsim = final.python311.pkgs.trafficsim;
@@ -270,6 +265,7 @@ in rec {
   flask-mp3server = final.python311.pkgs.flask-mp3server;
   flask-smfserver = final.python311.pkgs.flask-smfserver;
   flask-oatbox = final.python311.pkgs.flask-oatbox;
+  daily_tactical_server = final.python311.pkgs.daily_tactical_server;
   imutils-cv4 = final.python311.pkgs.imutils-cv4;
   vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
   symforce = final.python311.pkgs.symforce;
@@ -315,6 +311,7 @@ in rec {
   });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
+  sread = addDoc (prev.callPackage ./bash-packages/sread { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });

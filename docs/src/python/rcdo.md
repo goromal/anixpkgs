@@ -4,7 +4,7 @@ Run commands on remote machines.
 
 [Repository](https://github.com/goromal/rcdo)
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: rcdo [OPTIONS] REMOTE_HOST CMD COMMAND [ARGS]...
@@ -26,6 +26,5 @@ Options:
 Commands:
   local   The command is from your local machine.
   remote  The command is from the remote machine.
-
 ```
 

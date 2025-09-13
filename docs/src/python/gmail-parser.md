@@ -43,7 +43,7 @@ Mark an entire sub-inbox as read:
 subInbox.markAllAsRead()
 ```
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
@@ -67,9 +67,12 @@ Commands:
   gbot-send     Send an email from GBot.
   journal-send  Send an email from Journal.
   send          Send an email.
+```
+
+### clean
 
 
-
+```bash
 Usage: gmail-manager clean [OPTIONS]
 
   Clean out promotions and social emails.
@@ -78,33 +81,41 @@ Options:
   --num-messages INTEGER  Number of messages to poll before cleaning.
                           [default: 1000]
   --help                  Show this message and exit.
+```
+
+### send
 
 
-
+```bash
 Usage: gmail-manager send [OPTIONS] RECIPIENT SUBJECT BODY
 
   Send an email.
 
 Options:
   --help  Show this message and exit.
+```
+
+### gbot-send
 
 
-
+```bash
 Usage: gmail-manager gbot-send [OPTIONS] RECIPIENT SUBJECT BODY
 
   Send an email from GBot.
 
 Options:
   --help  Show this message and exit.
+```
+
+### journal-send
 
 
-
+```bash
 Usage: gmail-manager journal-send [OPTIONS] RECIPIENT SUBJECT BODY
 
   Send an email from Journal.
 
 Options:
   --help  Show this message and exit.
-
 ```
 

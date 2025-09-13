@@ -221,7 +221,6 @@ in {
       jfu = "journalctl -fu";
       nohistory = "set +o history";
     };
-    environment.noXlibs = true;
 
     systemd.tmpfiles.rules = [ "d ${cfg.homeRoot} 0777 root root" ];
 

@@ -64,10 +64,7 @@ in (writeArgparseScriptBin pkgname usage_str [
 '') // {
   meta = {
     description = "Flexible Nix shell.";
-    longDescription = ''
-      ```
-      ${usage_str}
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

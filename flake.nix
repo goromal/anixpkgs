@@ -3,7 +3,7 @@
     "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.05";
 
     phps.url = "github:fossar/nix-phps";
 
@@ -22,63 +22,23 @@
       "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
     ardupilot.flake = false;
 
+    book-notes-sync.url = "github:goromal/book-notes-sync";
+    book-notes-sync.flake = false;
+
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    manif-geom-cpp.url =
-      "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
-    manif-geom-cpp.flake = false;
-
-    mavlink.url = "github:mavlink/c_library_v2";
-    mavlink.flake = false;
-
-    mavlink-router.url = "github:mavlink-router/mavlink-router";
-    mavlink-router.flake = false;
-
-    mfn.url = "github:goromal/mfn";
-    mfn.flake = false;
-
-    mscpp.url = "github:goromal/mscpp";
-    mscpp.flake = false;
-
-    orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
-    orchestrator-cpp.flake = false;
-
-    quad-sim-cpp.url = "github:goromal/quad-sim-cpp";
-    quad-sim-cpp.flake = false;
-
-    rankserver-cpp.url = "github:goromal/rankserver-cpp";
-    rankserver-cpp.flake = false;
-
-    secure-delete.url = "github:goromal/secure-delete";
-    secure-delete.flake = false;
-
-    signals-cpp.url = "github:goromal/signals-cpp";
-    signals-cpp.flake = false;
-
-    sorting.url = "github:goromal/sorting";
-    sorting.flake = false;
-
-    symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
-    symforce.flake = false;
-
-    evil-hangman.url = "github:goromal/evil-hangman";
-    evil-hangman.flake = false;
-
-    simple-image-editor.url = "github:goromal/simple-image-editor";
-    simple-image-editor.flake = false;
-
-    spelling-corrector.url = "github:goromal/spelling-corrector";
-    spelling-corrector.flake = false;
-
-    book-notes-sync.url = "github:goromal/book-notes-sync";
-    book-notes-sync.flake = false;
+    daily_tactical_server.url = "github:goromal/daily_tactical_server";
+    daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
+
+    evil-hangman.url = "github:goromal/evil-hangman";
+    evil-hangman.flake = false;
 
     find_rotational_conventions.url =
       "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
@@ -90,9 +50,24 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    # TODO gradebook would need dev/warn-suppress branch
+
     makepyshell.url =
       "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
     makepyshell.flake = false;
+
+    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
+    manif-geom-cpp.flake = false;
+
+    manif-geom-rs.url = "github:goromal/manif-geom-rs";
+    manif-geom-rs.flake = false;
+
+    mavlink.url =
+      "github:mavlink/c_library_v2?rev=f9cec4814082af27c2fd27259aed302f52ce9cf7";
+    mavlink.flake = false;
+
+    mavlink-router.url = "github:mavlink-router/mavlink-router";
+    mavlink-router.flake = false;
 
     mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
@@ -100,8 +75,17 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
+    mfn.url = "github:goromal/mfn";
+    mfn.flake = false;
+
+    mscpp.url = "github:goromal/mscpp";
+    mscpp.flake = false;
+
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
+
+    orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
+    orchestrator-cpp.flake = false;
 
     photos-tools.url = "github:goromal/photos-tools";
     photos-tools.flake = false;
@@ -122,11 +106,38 @@
     python-dokuwiki.url = "github:fmenabe/python-dokuwiki?ref=refs/tags/1.3.3";
     python-dokuwiki.flake = false;
 
+    quad-sim-cpp.url = "github:goromal/quad-sim-cpp";
+    quad-sim-cpp.flake = false;
+
+    rankserver-cpp.url = "github:goromal/rankserver-cpp";
+    rankserver-cpp.flake = false;
+
     rcdo.url = "github:goromal/rcdo";
     rcdo.flake = false;
 
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
+
+    secure-delete.url = "github:goromal/secure-delete";
+    secure-delete.flake = false;
+
+    signals-cpp.url = "github:goromal/signals-cpp";
+    signals-cpp.flake = false;
+
+    simple-image-editor.url = "github:goromal/simple-image-editor";
+    simple-image-editor.flake = false;
+
+    sorting.url = "github:goromal/sorting";
+    sorting.flake = false;
+
+    spelling-corrector.url = "github:goromal/spelling-corrector";
+    spelling-corrector.flake = false;
+
+    sunnyside.url = "github:goromal/sunnyside";
+    sunnyside.flake = false;
+
+    symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
+    symforce.flake = false;
 
     task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
@@ -138,14 +149,8 @@
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
 
-    manif-geom-rs.url = "github:goromal/manif-geom-rs";
-    manif-geom-rs.flake = false;
-
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
     xv-lidar-rs.flake = false;
-
-    sunnyside.url = "github:goromal/sunnyside";
-    sunnyside.flake = false;
   };
 
   outputs = { self, nixpkgs, flake-utils, ... }@inputs:

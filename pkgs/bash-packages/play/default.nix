@@ -1,5 +1,5 @@
 { standalone-opt ? false, callPackage, color-prints, writeArgparseScriptBin
-, dolphinEmu }:
+, dolphin-emu }:
 with import ../../nixos/dependencies.nix;
 let
   pkgname = "play";
@@ -87,9 +87,9 @@ in (writeArgparseScriptBin pkgname ''
   cp "$MEMRY_CRD" "$MMCRD_DSK" || { ${printYlw} "WARNING: Copy failed!"; }
   ${printCyn} "Launching the emulator..."
   ${if standalone-opt then
-    "nix run --override-input nixpkgs nixpkgs/nixos-${nixos-version} --impure github:guibou/nixGL -- ${dolphinEmu}/bin/dolphin-emu -e $GAMES_ROM"
+    "nix run --override-input nixpkgs nixpkgs/nixos-${nixos-version} --impure github:guibou/nixGL -- ${dolphin-emu}/bin/dolphin-emu -e $GAMES_ROM"
   else
-    "${dolphinEmu}/bin/dolphin-emu -a LLE -e $GAMES_ROM"}
+    "${dolphin-emu}/bin/dolphin-emu -a LLE -e $GAMES_ROM"}
   ${printCyn} "Copying memory card from disk to cloud..."
   cp "$MMCRD_DSK" "$MEMRY_CRD" || { ${printYlw} "WARNING: Copy failed!"; }
   ${printCyn} "Syncing the Games directory..."

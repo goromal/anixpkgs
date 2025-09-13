@@ -25,6 +25,7 @@
   - [aapis-py](./python/aapis-py.md)
   - [fqt](./python/fqt.md)
   - [find_rotational_conventions](./python/find_rotational_conventions.md)
+  - [daily_tactical_server](./python/daily_tactical_server.md)
   - [geometry](./python/geometry.md)
   - [pyceres](./python/pyceres.md)
   - [pyceres_factors](./python/pyceres_factors.md)

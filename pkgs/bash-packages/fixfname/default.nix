@@ -14,12 +14,7 @@ in (writeArgparseScriptBin pkgname ''
 '') // {
   meta = {
     description = "Unix-ify filenames.";
-    longDescription = ''
-      ```
-      usage: fixfname FILE
-
-      Replace spaces and remove [], () characters from a filename (in place).
-      ```
-    '';
+    longDescription = "";
+    autoGenUsageCmd = "--help";
   };
 }

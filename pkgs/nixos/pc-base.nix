@@ -10,7 +10,12 @@ let
       args+="$word "
     done
     args=''${args% }
-    sudo -S $args < ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt 2>/dev/null
+    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
+    if [[ ! -z "$pw" ]]; then
+      echo "$pw" | sudo -S $args
+    else
+      sudo $args
+    fi
   '';
   machine-rcrsync = anixpkgs.rcrsync.override {
     homeDir = cfg.homeDir;
@@ -83,6 +88,11 @@ in {
       default = false;
       description = "Whether to export OS metrics";
     };
+    enableFileServers = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to turn on file servers";
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
@@ -110,7 +120,10 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../python-packages/orchestrator/module.nix
+    ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
+    ../python-packages/flasks/rankserver/module.nix
+    ../python-packages/flasks/stampserver/module.nix
   ];
 
   config = {
@@ -244,21 +257,34 @@ in {
       '') + "/bin/atsauthui-finish";
     };
 
+    services.rankserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.rankserver;
+      rootDir = "${cfg.homeDir}/fileservers";
+    };
+
+    services.stampserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.stampserver;
+      rootDir = "${cfg.homeDir}/fileservers";
+    };
+
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-        excludePackages = with pkgs;
-          [ gnome-photos gnome-tour ] ++ (with gnome; [
-            cheese
-            gnome-music
-            epiphany
-            geary
-            evince
-            totem
-            tali
-            iagno
-            hitori
-            atomix
-          ]);
+        excludePackages = with pkgs; [
+          gnome-photos
+          gnome-tour
+          cheese
+          gnome-music
+          epiphany
+          geary
+          evince
+          totem
+          tali
+          iagno
+          hitori
+          atomix
+        ];
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
@@ -270,7 +296,7 @@ in {
     services.blueman.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    hardware.pulseaudio.enable = lib.mkIf
+    services.pulseaudio.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       false;
     security.rtkit.enable = lib.mkIf
@@ -285,7 +311,7 @@ in {
 
     services.udev.packages = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-      [ pkgs.dolphinEmu ];
+      [ pkgs.dolphin-emu ];
 
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
@@ -340,6 +366,15 @@ in {
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
+
+    # Daily Tactical
+    services.tacticald = lib.mkIf cfg.isATS {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      tacticalPkg = anixpkgs.daily_tactical_server;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
 
     # Global packages
     environment.systemPackages = with pkgs;
@@ -452,6 +487,15 @@ in {
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+       mkcd() {
+          if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+              echo "usage: mkcd [-t|DIRNAME]"
+          elif [[ "$1" == "-t" ]]; then
+              cd "$(mktemp -d)" || return
+          else
+              mkdir -p "$1" && cd "$1" || return
+          fi
+      }
     '';
 
     environment.shellAliases = {
@@ -459,7 +503,6 @@ in {
       code = "codium";
       nohistory = "set +o history";
     };
-    environment.noXlibs = false;
 
     systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
 
