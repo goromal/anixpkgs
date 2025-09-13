@@ -56,7 +56,8 @@
       "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
     makepyshell.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
+    manif-geom-cpp.url =
+      "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
     manif-geom-cpp.flake = false;
 
     manif-geom-rs.url = "github:goromal/manif-geom-rs";
