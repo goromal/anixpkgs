@@ -10,7 +10,7 @@ buildPythonPackage rec {
     longDescription = ''
       [Repository](https://github.com/goromal/wiki-tools)
     '';
-    autoGenUsageCmd = "--help --wiki-user none --wiki-pass none";
+    autoGenUsageCmd = "--help";
     subCmds = [
       "get"
       "get-md"
