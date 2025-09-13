@@ -504,11 +504,8 @@ in {
       nohistory = "set +o history";
     };
 
-    systemd.tmpfiles.rules = [
-      "d /data 0777 root root"
-      "d /.c 0750 andrew dev -"
-      "x /.c - - -"
-    ];
+    systemd.tmpfiles.rules =
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {
