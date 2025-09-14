@@ -383,6 +383,11 @@
                 "docs": true
             },
             {
+                "attr": "local-ssh-proxy",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
                 "ci": true,
                 "docs": true
@@ -414,6 +419,11 @@
             },
             {
                 "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "swrite",
                 "ci": true,
                 "docs": false
             },

@@ -288,6 +288,8 @@ in rec {
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python311;
   });
+  local-ssh-proxy =
+    addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
     python = final.python311;
     blank-svg = pkgData.img.blank-svg;
@@ -311,7 +313,8 @@ in rec {
   });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
-  sread = addDoc (prev.callPackage ./bash-packages/sread { });
+  sread = addDoc (prev.callPackage ./bash-packages/srw/sread.nix { });
+  swrite = addDoc (prev.callPackage ./bash-packages/srw/swrite.nix { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
