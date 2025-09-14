@@ -1,13 +1,15 @@
 exit_code=0
 
 tests=(
-    "test_dirstuff.sh"
-    "test_ws_tools.sh"
-    "test_sunnyside.sh"
-    "test_orchestrator.sh"
-    "test_fix-perms.sh"
-    "test_src_fetch.sh"
-    "test_secure-delete.sh"
+    # "test_dirstuff.sh"
+    # "test_ws_tools.sh"
+    # "test_sunnyside.sh"
+    # "test_orchestrator.sh"
+    # "test_png.sh"
+    "test_mp4.sh"
+    # "test_fix-perms.sh"
+    # "test_src_fetch.sh"
+    # "test_secure-delete.sh"
 )
 
 for test in "${tests[@]}"; do

@@ -1,4 +1,4 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
+{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg, openssl
 }:
 let
   name = "mp4";
@@ -16,6 +16,7 @@ let
         .mov
         .avi
         .webm
+        .random (e.g., seed-width-height-frames.random)
 
     Options:
         -v | --verbose               Print verbose output from ffmpeg
@@ -86,6 +87,7 @@ let
     }
   ];
 
+  printWarn = "${color-prints}/bin/echo_yellow";
   printErr = ">&2 ${color-prints}/bin/echo_red";
 
   qualityRule = ''
@@ -158,7 +160,42 @@ let
           ${ffmpeg}/bin/ffmpeg -i "$infile" "''${ffmpeg_args[@]}" "$outfile"
       fi
     '';
-  }];
+  }
+  {
+    extension = "random|RANDOM|rand|RAND";
+    commands = ''
+      if [[ ! "$infile" =~ ^([^-]+)-([0-9]+)-([0-9]+)-([0-9]+)\.random$ ]]; then
+        ${printErr} "Random inputfile must be of form seed-width-height-frames.random"
+        exit 1
+      fi
+      tmpdir=$(mktemp -d)
+      seed="''${BASH_REMATCH[1]}"
+      width="''${BASH_REMATCH[2]}"
+      height="''${BASH_REMATCH[3]}"
+      frames="''${BASH_REMATCH[4]}"
+      ${printWarn} "Generating a random ''${frames}-frame ''${width}x''${height} MP4 with seed $seed -> ''${outfile}..."
+      key=$(printf "%s" "$seed" | sha256sum | awk '{print $1}')
+      nbytes=$((width * height * 3 * frames))
+      dd if=/dev/zero bs=$nbytes count=1 2>/dev/null \
+        | ${openssl}/bin/openssl enc -aes-256-ctr -K "$key" -iv 0 \
+        > $tmpdir/rand.rgb
+      ${ffmpeg}/bin/ffmpeg -y \
+        -f rawvideo -pix_fmt rgb24 -s:v ''${width}x''${height} -r 30 -i $tmpdir/rand.rgb \
+        -frames:v "$frames" \
+        -an \
+        -vcodec libx264 \
+        -preset veryfast \
+        -crf 0 \
+        -movflags +faststart \
+        -fflags +bitexact \
+        -flags:v +bitexact \
+        -map_metadata -1 \
+        -metadata creation_time=0 \
+        "$outfile"
+      rm -r $tmpdir
+    '';
+  }
+  ];
 in callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
   inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
