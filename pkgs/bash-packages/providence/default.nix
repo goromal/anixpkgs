@@ -28,10 +28,10 @@ in (writeArgparseScriptBin pkgname usage_str [{
   fi
   domain="$1"
   if [[ "$domain" == "patriarchal" ]]; then
-      readarray -t sentences <<< $(${wikitools} --url $wiki_url --wiki_user ${wikiuser} --wiki_pass ${wikipass} get --page-id andrews-blessing | tr '\n' ' ' | sed -e :1 -e 's/\([.?!]\)[[:blank:]]\{1,\}\([^[:blank:]]\)/\1\n\2/;t1')
+      readarray -t sentences <<< $(${wikitools} --url $wiki_url --wiki-user ${wikiuser} --wiki-pass ${wikipass} get --page-id andrews-blessing | tr '\n' ' ' | sed -e :1 -e 's/\([.?!]\)[[:blank:]]\{1,\}\([^[:blank:]]\)/\1\n\2/;t1')
       echo ''${sentences[ $SRANDOM % ''${#sentences[@]} ]}
   elif [[ "$domain" == "passage" ]]; then
-      readarray -t scriplist <<< $(${wikitools} --url $wiki_url --wiki_user ${wikiuser} --wiki_pass ${wikipass} get --page-id backend:scriptural-canon)
+      readarray -t scriplist <<< $(${wikitools} --url $wiki_url --wiki-user ${wikiuser} --wiki-pass ${wikipass} get --page-id backend:scriptural-canon)
       scripdesc=''${scriplist[ $SRANDOM % ''${#scriplist[@]} ]}
       readarray -d '!' -t scriptdat <<< "$scripdesc"
       scripname="''${scriptdat[0]}"
@@ -43,7 +43,7 @@ in (writeArgparseScriptBin pkgname usage_str [{
       chap=$(( ( SRANDOM % $chapsnum )  + 1 ))
       echo "''${scripname} -> ''${bookname} $chap"
   elif [[ "$domain" == "talk" ]]; then
-      readarray -t talklist <<< $(${wikitools} --url $wiki_url --wiki_user ${wikiuser} --wiki_pass ${wikipass} get --page-id backend:talks)
+      readarray -t talklist <<< $(${wikitools} --url $wiki_url --wiki-user ${wikiuser} --wiki-pass ${wikipass} get --page-id backend:talks)
       talkdesc=''${talklist[ $SRANDOM % ''${#talklist[@]} ]}
       readarray -d '!' -t talkdat <<< "$talkdesc"
       session="''${talkdat[0]}"
