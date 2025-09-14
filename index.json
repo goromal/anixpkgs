@@ -358,6 +358,11 @@
                 "docs": false
             },
             {
+                "attr": "ckfile",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "color-prints",
                 "ci": true,
                 "docs": true

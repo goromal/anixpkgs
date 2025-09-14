@@ -304,6 +304,7 @@ in rec {
   redirects =
     addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
+  ckfile = addDoc (prev.callPackage ./bash-packages/ckfile { });
   cpp-helper = addDoc
     (prev.callPackage ./bash-packages/cpp-helper { inherit anixpkgs-version; });
   py-helper = addDoc

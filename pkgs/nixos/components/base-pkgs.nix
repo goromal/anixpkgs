@@ -52,6 +52,7 @@ in {
     anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
+    anixpkgs.ckfile
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
