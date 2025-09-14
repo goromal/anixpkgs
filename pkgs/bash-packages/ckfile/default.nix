@@ -22,12 +22,13 @@ in (writeArgparseScriptBin pkgname ''
   fi
   COMPUTED_MD5=$(${pv}/bin/pv "$1" | md5sum | awk '{print $1}')
   if [[ -z "$EXPECTED_MD5" ]]; then
+    ${printGrn} "$COMPUTED_MD5"
     exit
   fi
   if [ "$COMPUTED_MD5" = "$EXPECTED_MD5" ]; then
     ${printGrn} "PASS"
   else
-    ${printErr} "FAIL"
+    ${printErr} "FAIL: $COMPUTED_MD5"
     exit 1
   fi
 '') // {
