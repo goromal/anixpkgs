@@ -18,6 +18,7 @@ Inputs:
     .mov
     .avi
     .webm
+    .random (e.g., seed-width-height-frames.random)
 
 Options:
     -v | --verbose               Print verbose output from ffmpeg

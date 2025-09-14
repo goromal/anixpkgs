@@ -62,6 +62,7 @@
   - [mp4](./bash/mp4.md)
   - [png](./bash/png.md)
   - [svg](./bash/svg.md)
+  - [ckfile](./bash/ckfile.md)
   - [color-prints](./bash/color-prints.md)
   - [dirgroups](./bash/dirgroups.md)
   - [dirgather](./bash/dirgather.md)

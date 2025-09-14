@@ -11,6 +11,7 @@ Packages written (or glued together) in Bash.
 - [mp4](./mp4.md)
 - [png](./png.md)
 - [svg](./svg.md)
+- [ckfile](./ckfile.md)
 - [color-prints](./color-prints.md)
 - [dirgroups](./dirgroups.md)
 - [dirgather](./dirgather.md)
