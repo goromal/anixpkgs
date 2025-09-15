@@ -119,6 +119,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/plexNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -375,6 +376,9 @@ in {
       tacticalPkg = anixpkgs.daily_tactical_server;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+
+    # Media
+    services.plexNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;
