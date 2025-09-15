@@ -5,6 +5,7 @@ import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import timedelta
 from pysorting import (
     ComparatorLeft,
     ComparatorResult,
@@ -54,6 +55,7 @@ else:
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
 login_manager = flask_login.LoginManager()
 
 class RankServer:
@@ -173,9 +175,12 @@ def login():
         return flask.redirect(flask.url_for(url_for_prefix + 'index'))
     form = LoginForm()
     if form.validate_on_submit():
+        if form.username.data == "admin":
+            return flask.redirect("/grafana")
         if form.username.data != user.get_id() or not user.check_password(form.password.data):
             return flask.redirect(flask.url_for(url_for_prefix + "login"))
-        flask_login.login_user(user, remember=True)
+        flask_login.login_user(user, remember=False)
+        flask.session.permanent = True
         next = flask.request.args.get('next')
         return flask.redirect(next or flask.url_for(url_for_prefix + 'index'))
     return flask.render_template("login.html", title="Sign In", form=form)
@@ -212,6 +217,11 @@ def index():
     else:
         l, r = rankserver.getCompFiles()
         return flask.render_template("index.html", urlroot=urlroot, err=False, done=False, msg="", rlist=rlist, l=l, r=r)
+
+@app.before_request
+def refresh_session():
+    flask.session.permanent = True
+    flask.session.modified = True
 
 def run():
     global args
