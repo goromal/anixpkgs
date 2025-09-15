@@ -210,6 +210,10 @@ in {
       '';
     };
 
+    services.udev.extraRules = ''
+      KERNEL=="sd*", SUBSYSTEM=="block", ENV{ID_SERIAL}=="TOSHIBA_MQ01ACF050_179EC2UUT", SYMLINK+="media-empire"
+    '';
+
     services.xserver =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
         enable = true;
