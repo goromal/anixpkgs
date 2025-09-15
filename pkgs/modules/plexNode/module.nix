@@ -7,7 +7,7 @@ in {
     enable = lib.mkEnableOption "enable plex node services";
   };
   config = lib.mkIf cfg.enable {
-    # Hard drive partition mount
+    # Hard drive partition mount (lsblk -f)
     fileSystems."/mnt/media-empire" = {
       device = "/dev/disk/by-uuid/40E4C87FE4C878A4";
       fsType = "ntfs-3g";
