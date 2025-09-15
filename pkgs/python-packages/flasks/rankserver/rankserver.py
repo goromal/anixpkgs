@@ -41,9 +41,7 @@ class LoginForm(flask_wtf.FlaskForm):
 
 class User(flask_login.UserMixin):
     def check_password(self, password):
-        return check_password_hash("pbkdf2:sha256:260000$lZSRuIMsXegmiXNl$8a1fde09226a09391218ec3b1f07f6d8373a055f0469b69d0855f9cc29a53e31", password)
-    def get_id(self):
-        return "anonymous"
+        return check_password_hash("scrypt:32768:8:1$acPu0meyxPfx0SnS$26a570af250e0593c2dbb6bfb1d037a7366109a0ba4886e68191237efdabb2fca07de6c81c337b5e275390c2d7ff96f3455f47b7a05027a7e0ebf1628f537498", password)
 
 user = User()
 
@@ -177,7 +175,7 @@ def login():
     if form.validate_on_submit():
         if form.username.data == "admin":
             return flask.redirect("/grafana")
-        if form.username.data != user.get_id() or not user.check_password(form.password.data):
+        if form.username.data != form.password.data or not user.check_password(form.password.data):
             return flask.redirect(flask.url_for(url_for_prefix + "login"))
         flask_login.login_user(user, remember=False)
         flask.session.permanent = True
