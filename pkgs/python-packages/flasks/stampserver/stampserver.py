@@ -7,6 +7,7 @@ import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
 from werkzeug.security import generate_password_hash, check_password_hash
 from random import shuffle
+from datetime import timedelta
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
@@ -30,7 +31,7 @@ class LoginForm(flask_wtf.FlaskForm):
 
 class User(flask_login.UserMixin):
     def check_password(self, password):
-        return check_password_hash("pbkdf2:sha256:260000$lZSRuIMsXegmiXNl$8a1fde09226a09391218ec3b1f07f6d8373a055f0469b69d0855f9cc29a53e31", password)
+        return check_password_hash("scrypt:32768:8:1$acPu0meyxPfx0SnS$26a570af250e0593c2dbb6bfb1d037a7366109a0ba4886e68191237efdabb2fca07de6c81c337b5e275390c2d7ff96f3455f47b7a05027a7e0ebf1628f537498", password)
     def get_id(self):
         return "anonymous"
 
@@ -45,6 +46,7 @@ SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
 login_manager = flask_login.LoginManager()
 
 class StampServer:
@@ -140,15 +142,29 @@ def load_user(user_id):
 def login():
     global user
     global url_for_prefix
+    global urlroot
     if flask_login.current_user.is_authenticated:
         return flask.redirect(flask.url_for(url_for_prefix + 'index'))
     form = LoginForm()
     if form.validate_on_submit():
+        if form.username.data == "admin":
+            return flask.redirect("/grafana")
         if form.username.data != user.get_id() or not user.check_password(form.password.data):
             return flask.redirect(flask.url_for(url_for_prefix + "login"))
-        flask_login.login_user(user, remember=True)
-        next = flask.request.args.get('next')
-        return flask.redirect(next or flask.url_for(url_for_prefix + 'index'))
+        flask_login.login_user(user, remember=False)
+        flask.session.permanent = True
+        return flask.render_template(
+            "index.html",
+            urlroot=urlroot,
+            err=False,
+            msg="",
+            file="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4",
+            ftype="MP4_EXT",
+            root="zzz",
+            nleft="?",
+            datadir=SHORT_RESDIR,
+            stamps={}
+        )
     return flask.render_template("login.html", title="Sign In", form=form)
       
 @bp.route("/logout")
@@ -210,6 +226,11 @@ def zzz():
         datadir=SHORT_RESDIR,
         stamps={}
     )
+
+@app.before_request
+def refresh_session():
+    flask.session.permanent = True
+    flask.session.modified = True
 
 def run():
     global args
