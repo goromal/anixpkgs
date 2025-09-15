@@ -10,7 +10,7 @@ in {
     fileSystems."/mnt/media-empire" = {
       device = "/dev/disk/by-uuid/40E4C87FE4C878A4";
       fsType = "ntfs-3g";
-      options = [ "defaults" "nofail" "uid=1000" "gid=100" "umask=022" ]; 
+      options = [ "defaults" "nofail" "uid=1000" "gid=100" "umask=022" ];
     };
   };
 }
