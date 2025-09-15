@@ -30,8 +30,11 @@ class LoginForm(flask_wtf.FlaskForm):
     submit = SubmitField("Submit")
 
 class User(flask_login.UserMixin):
+    _user = None
     def check_password(self, password):
         return check_password_hash("scrypt:32768:8:1$acPu0meyxPfx0SnS$26a570af250e0593c2dbb6bfb1d037a7366109a0ba4886e68191237efdabb2fca07de6c81c337b5e275390c2d7ff96f3455f47b7a05027a7e0ebf1628f537498", password)
+    def get_id(self):
+        return self._user
 
 user = User()
 
