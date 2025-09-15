@@ -211,7 +211,7 @@ in {
     };
 
     services.udev.extraRules = ''
-      KERNEL=="sd*", SUBSYSTEM=="block", ENV{ID_SERIAL}=="TOSHIBA_MQ01ACF050_179EC2UUT", SYMLINK+="media-empire"
+      KERNEL=="sd*", SUBSYSTEM=="block", ENV{ID_SERIAL}=="TOSHIBA_MQ01ACF050_179EC2UUT", SYMLINK+="media-empire", MODE="0660", GROUP="dev"
     '';
 
     services.xserver =
