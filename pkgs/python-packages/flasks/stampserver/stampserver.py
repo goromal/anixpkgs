@@ -152,6 +152,7 @@ def login():
             return flask.redirect("/grafana")
         if form.username.data != form.password.data or not user.check_password(form.password.data):
             return flask.redirect(flask.url_for(url_for_prefix + "login"))
+        user._user = form.username.data
         flask_login.login_user(user, remember=False)
         flask.session.permanent = True
         return flask.render_template(
