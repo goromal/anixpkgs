@@ -23,14 +23,12 @@ in {
     };
 
     # Define a 'media' group
-    users.groups.media = {};
+    users.groups.media = { };
 
     # Make sure the Plex user can read media
     users.users.plex.extraGroups = [ "media" ];
 
     # Ensure the drive has appropriate permissions
-    systemd.tmpfiles.rules = [
-      "d /mnt/media-empire 0755 plex media -"
-    ];
+    systemd.tmpfiles.rules = [ "d /mnt/media-empire 0755 plex media -" ];
   };
 }
