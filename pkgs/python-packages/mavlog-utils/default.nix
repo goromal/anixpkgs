@@ -1,8 +1,8 @@
-{ buildPythonPackage, pymavlink, progressbar2, pkg-src }:
+{ buildPythonPackage, pymavlink, progressbar2, numpy, pkg-src }:
 buildPythonPackage rec {
   pname = "mavlog_utils";
   version = "0.0.0";
-  propagatedBuildInputs = [ pymavlink progressbar2 ];
+  propagatedBuildInputs = [ pymavlink progressbar2 numpy ];
   src = pkg-src;
   meta = {
     description = "Assorted tools for processing mavlink .bin logs.";
