@@ -329,16 +329,15 @@
     "mavlog-utils": {
       "flake": false,
       "locked": {
-        "lastModified": 1758037390,
+        "lastModified": 1758083814,
         "narHash": "sha256-MJckvugf68LBnYeUXCqg6A6qy6QJg/On8pQeiztSxBM=",
         "owner": "goromal",
         "repo": "mavlog-utils",
-        "rev": "aaf33b8b06e205fd17330eaa022ba18798442bc7",
+        "rev": "810fc49ae42d4235c70ab92dd4977e97536bff7c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/overhaul",
         "repo": "mavlog-utils",
         "type": "github"
       }
