@@ -69,7 +69,7 @@
     mavlink-router.url = "github:mavlink-router/mavlink-router";
     mavlink-router.flake = false;
 
-    mavlog-utils.url = "github:goromal/mavlog-utils?ref=dev/overhaul";
+    mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
 
     mesh-plotter.url = "github:goromal/mesh-plotter";
