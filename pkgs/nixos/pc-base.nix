@@ -248,6 +248,13 @@ in {
       };
     };
 
+    services.dnsmasq = lib.mkIf cfg.isATS {
+      enable = true;
+      extraConfig = ''
+        conf-file=${cfg.homeDir}/secrets/dnsmasq.hosts
+      '';
+    };
+
     services.authui = {
       enable = cfg.isATS;
       initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
@@ -513,7 +520,11 @@ in {
     };
 
     systemd.tmpfiles.rules =
-      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ]
+      ++ (if cfg.isATS then
+        [ "f ${cfg.homeDir}/secrets/dnsmasq.hosts 0640 andrew dev -" ]
+      else
+        [ ]);
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {

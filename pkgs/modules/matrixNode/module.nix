@@ -59,8 +59,6 @@ in {
     # register_new_matrix_user -k [host].matrix-synapse http://localhost:[port] -u andrew -p [pass] -a
     # register_new_matrix_user -k ats.matrix-synapse http://localhost:[port] -u bot -p [pass]
 
-    # requires local DNS static mapping in router:
-    # [IP_ADDRESS] matrix.[host].local
     machines.base.runWebServer = true;
     services.nginx = {
       enable = true;
