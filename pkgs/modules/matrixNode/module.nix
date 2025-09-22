@@ -37,12 +37,12 @@ in {
       settings.public_baseurl =
         "http://${config.networking.hostName}.local:8008/";
       database_type = "psycopg2";
-      database_config = {
-        name = "matrix-synapse";
-        user = "matrix-synapse";
-        password = ""; # if you want password auth, set it via a secret
-        host = "/run/postgresql"; # unix socket path
-      };
+      # database_config = {
+      #   name = "matrix-synapse";
+      #   user = "matrix-synapse";
+      #   password = ""; # if you want password auth, set it via a secret
+      #   host = "/run/postgresql"; # unix socket path
+      # };
     };
 
     networking.firewall.allowedTCPPorts =
