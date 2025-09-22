@@ -34,7 +34,8 @@ in {
     services.matrix-synapse = {
       enable = true;
       settings.server_name = config.networking.hostName;
-      settings.public_baseurl = "http://${config.networking.hostName}.local:8008/";
+      settings.public_baseurl =
+        "http://${config.networking.hostName}.local:8008/";
       database_type = "psycopg2";
       database_config = {
         name = "matrix-synapse";
