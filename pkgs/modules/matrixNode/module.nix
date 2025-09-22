@@ -36,7 +36,8 @@ in {
       settings.server_name = config.networking.hostName;
       settings.public_baseurl =
         "http://${config.networking.hostName}.local:8008/";
-      database_type = "psycopg2";
+      settings.database.name = "psycopg2";
+      settings.database.user = "matrix-synapse";
       # database_config = {
       #   name = "matrix-synapse";
       #   user = "matrix-synapse";
