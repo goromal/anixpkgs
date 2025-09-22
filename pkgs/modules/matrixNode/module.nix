@@ -15,7 +15,6 @@ in {
   };
   config = lib.mkIf cfg.enable {
     # Before deploying synapse server, a postgresql database must be set up. For that, please make sure that postgresql is running and the following SQL statements to create a user & database called matrix-synapse were executed before synapse starts up:
-    #
     # CREATE ROLE "matrix-synapse";
     # CREATE DATABASE "matrix-synapse" WITH OWNER "matrix-synapse"
     #   TEMPLATE template0
@@ -23,7 +22,6 @@ in {
     #   LC_CTYPE = "C";
     services.postgresql = {
       enable = true;
-      # package = pkgs.postgresql_15; # or pkgs.postgresql_16 if you want the newest
       ensureDatabases = [ "matrix-synapse" ];
       ensureUsers = [{
         name = "matrix-synapse";
@@ -40,6 +38,8 @@ in {
       '';
     };
 
+    environment.systemPackages = [ pkgs.matrix-synapse ];
+
     services.matrix-synapse = {
       enable = true;
       settings.server_name = config.networking.hostName;
@@ -47,12 +47,6 @@ in {
         "http://${config.networking.hostName}.local:8008/";
       settings.database.name = "psycopg2";
       settings.database.user = "matrix-synapse";
-      # database_config = {
-      #   name = "matrix-synapse";
-      #   user = "matrix-synapse";
-      #   password = ""; # if you want password auth, set it via a secret
-      #   host = "/run/postgresql"; # unix socket path
-      # };
     };
 
     networking.firewall.allowedTCPPorts =
