@@ -6,12 +6,6 @@ let
 in {
   options.services.matrixNode = {
     enable = lib.mkEnableOption "enable matrix node services";
-    openFirewall = lib.mkOption {
-      type = lib.types.bool;
-      description =
-        "Whether to open the specific firewall port for inter-computer usage";
-      default = true;
-    };
   };
   config = lib.mkIf cfg.enable {
     # Before deploying synapse server, a postgresql database must be set up. For that, please make sure that postgresql is running and the following SQL statements to create a user & database called matrix-synapse were executed before synapse starts up:
@@ -42,19 +36,39 @@ in {
 
     services.matrix-synapse = {
       enable = true;
-      settings.server_name = config.networking.hostName;
-      settings.public_baseurl =
-        "http://${config.networking.hostName}.local:8008/";
-      settings.database.name = "psycopg2";
-      settings.database.user = "matrix-synapse";
-      settings.registration_shared_secret =
-        "${config.networking.hostName}.matrix-synapse";
+      settings = {
+        server_name = "${config.networking.hostName}.local";
+        public_baseurl = "https://matrix.${config.networking.hostName}.local/";
+        database.name = "psycopg2";
+        database.user = "matrix-synapse";
+        registration_shared_secret =
+          "${config.networking.hostName}.matrix-synapse";
+        listeners = [{
+          port = service-ports.matrix;
+          bind_addresses = [ "127.0.0.1" ];
+          type = "http";
+          tls = false;
+          resources = [{
+            names = [ "client" "federation" ];
+            compress = false;
+          }];
+        }];
+      };
     };
 
-    # register_new_matrix_user -k [host].matrix-synapse http://localhost:8008 -u andrew -p [pass] -a
-    # register_new_matrix_user -k ats.matrix-synapse http://localhost:8008 -u bot -p [pass]
+    # register_new_matrix_user -k [host].matrix-synapse http://localhost:[port] -u andrew -p [pass] -a
+    # register_new_matrix_user -k ats.matrix-synapse http://localhost:[port] -u bot -p [pass]
 
-    networking.firewall.allowedTCPPorts =
-      lib.mkIf cfg.openFirewall [ service-ports.matrix ];
+    # requires local DNS static mapping in router:
+    # [IP_ADDRESS] matrix.[host].local
+    machines.base.runWebServer = true;
+    services.nginx = {
+      enable = true;
+      virtualHosts."matrix.${config.networking.hostName}.local" = {
+        forceSSL = false;
+        locations."/_matrix/" = { proxyPass = "http://127.0.0.1:8008"; };
+        locations."/_synapse/" = { proxyPass = "http://127.0.0.1:8008"; };
+      };
+    };
   };
 }
