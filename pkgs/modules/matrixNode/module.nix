@@ -51,6 +51,9 @@ in {
         "${config.networking.hostName}.matrix-synapse";
     };
 
+    # register_new_matrix_user -k [host].matrix-synapse http://localhost:8008 -u andrew -p [pass] -a
+    # register_new_matrix_user -k ats.matrix-synapse http://localhost:8008 -u bot -p [pass]
+
     networking.firewall.allowedTCPPorts =
       lib.mkIf cfg.openFirewall [ service-ports.matrix ];
   };
