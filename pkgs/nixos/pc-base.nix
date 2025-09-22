@@ -119,6 +119,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/matrixNode/module.nix
     ../modules/plexNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
@@ -247,6 +248,12 @@ in {
       };
     };
 
+    services.dnsmasq = lib.mkIf cfg.isATS {
+      enable = true;
+      settings = { conf-file = "${cfg.homeDir}/secrets/dnsmasq.hosts"; };
+    };
+    users.users.dnsmasq.extraGroups = lib.mkIf cfg.isATS [ "dev" ];
+
     services.authui = {
       enable = cfg.isATS;
       initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
@@ -364,6 +371,9 @@ in {
     # Metrics
     services.metricsNode.enable = cfg.enableMetrics;
     services.metricsNode.openFirewall = cfg.enableMetrics;
+
+    # Matrix messaging
+    services.matrixNode.enable = cfg.isATS;
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
@@ -509,7 +519,11 @@ in {
     };
 
     systemd.tmpfiles.rules =
-      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ]
+      ++ (if cfg.isATS then
+        [ "f ${cfg.homeDir}/secrets/dnsmasq.hosts 0640 andrew dev -" ]
+      else
+        [ ]);
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {
