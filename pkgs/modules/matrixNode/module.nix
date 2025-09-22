@@ -47,6 +47,20 @@ in {
         "http://${config.networking.hostName}.local:8008/";
       settings.database.name = "psycopg2";
       settings.database.user = "matrix-synapse";
+      settings.registration_shared_secret =
+        "${config.networking.hostName}.matrix-synapse";
+      registration.users = [
+        {
+          username = "andrew";
+          password = "changeme";
+          admin = true;
+        }
+        {
+          username = "bot";
+          password = "botpass";
+          admin = false;
+        }
+      ];
     };
 
     networking.firewall.allowedTCPPorts =
