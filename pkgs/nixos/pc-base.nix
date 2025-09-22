@@ -250,9 +250,7 @@ in {
 
     services.dnsmasq = lib.mkIf cfg.isATS {
       enable = true;
-      settings = ''
-        conf-file=${cfg.homeDir}/secrets/dnsmasq.hosts
-      '';
+      settings = { conf-file = "${cfg.homeDir}/secrets/dnsmasq.hosts"; };
     };
     users.users.dnsmasq.extraGroups = lib.mkIf cfg.isATS [ "dev" ];
 
