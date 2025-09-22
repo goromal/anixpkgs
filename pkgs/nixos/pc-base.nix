@@ -119,6 +119,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/matrixNode/module.nix
     ../modules/plexNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
@@ -364,6 +365,9 @@ in {
     # Metrics
     services.metricsNode.enable = cfg.enableMetrics;
     services.metricsNode.openFirewall = cfg.enableMetrics;
+
+    # Matrix messaging
+    services.matrixNode.enable = cfg.isATS;
 
     # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
