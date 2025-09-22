@@ -14,8 +14,8 @@ in {
   config = lib.mkIf cfg.enable {
     services.matrix-synapse = {
       enable = true;
-      server_name = "ats";
       settings = {
+        server_name = "ats";
         listeners = [{
           port = service-ports.matrix;
           bind_addresses = [ "0.0.0.0" "::" ];
