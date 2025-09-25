@@ -38,6 +38,11 @@ with import ../dependencies.nix; {
       description = "Executable name to open your browser of choice";
       default = null;
     };
+    wallpaperImage = lib.mkOption {
+      type = lib.types.path;
+      description = "Path to desired wallpaper (for graphical distributions)";
+      default = anixpkgs.pkgData.img.wallpaper.data;
+    };
     screenResolution = lib.mkOption {
       type = lib.types.str;
       description = "Screen resolution in [width]x[height] format";
