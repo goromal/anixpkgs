@@ -667,6 +667,7 @@
         "sunnyside": "sunnyside",
         "symforce": "symforce",
         "task-tools": "task-tools",
+        "tinyMediaManager": "tinyMediaManager",
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
         "xv-lidar-rs": "xv-lidar-rs"
@@ -845,6 +846,22 @@
         "owner": "goromal",
         "repo": "task-tools",
         "type": "github"
+      }
+    },
+    "tinyMediaManager": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1759536123,
+        "narHash": "sha256-sr5paccHqmRw6fwf6kLSc3rOVo6eOQc+Fe7Wx+FNVuA=",
+        "owner": "tinyMediaManager",
+        "repo": "tinyMediaManager",
+        "rev": "7c1f5d690d890bb93174ea5766ecd8ab8b5a1e24",
+        "type": "gitlab"
+      },
+      "original": {
+        "owner": "tinyMediaManager",
+        "repo": "tinyMediaManager",
+        "type": "gitlab"
       }
     },
     "trafficsim": {

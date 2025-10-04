@@ -142,6 +142,9 @@
     task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
 
+    tinyMediaManager.url = "gitlab:tinyMediaManager/tinyMediaManager";
+    tinyMediaManager.flake = false;
+
     trafficsim.url =
       "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
     trafficsim.flake = false;
