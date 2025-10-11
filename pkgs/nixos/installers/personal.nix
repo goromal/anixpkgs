@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }: 
+{ config, pkgs, lib, ... }:
 with import ../dependencies.nix; {
   imports = [
     <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix>
