@@ -79,10 +79,6 @@ in {
       description = "Public insecure port for the notes wiki site.";
       default = 80;
     };
-    isInstaller = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for an ISO install image.";
-    };
     enableMetrics = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -134,10 +130,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
-        else
-          pkgs.linuxPackages_latest));
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -331,7 +324,7 @@ in {
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = !cfg.isInstaller;
+    networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);

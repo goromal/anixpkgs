@@ -10,7 +10,6 @@ with import ../dependencies.nix; {
     isATS = true;
     serveNotesWiki = true;
     notesWikiPort = 8080;
-    isInstaller = false;
     enableMetrics = true;
     enableFileServers = true;
     cloudDirs = [
