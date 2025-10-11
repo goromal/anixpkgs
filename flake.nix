@@ -115,6 +115,9 @@
     rcdo.url = "github:goromal/rcdo";
     rcdo.flake = false;
 
+    scanly.url = "github:amcgready/Scanly";
+    scanly.flake = false;
+
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
