@@ -144,24 +144,6 @@ sudo nix-channel --update
 12. Run `anix-init` 
 13. Enjoy!
 
-...
-
-13. Log into Github and generate an SSH key for authentication.
-14. Clone and link an editable version of the configuration:
-```bash
-mkdir -p /data/andrew/sources # or in an alternate location, for now
-git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
-cat /etc/nixos/hardware-configuration.nix > /data/andrew/sources/anixpkgs/pkgs/nixos/hardware/[hardware-configuration.nix] # update link/headings in configuration.nix
-sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
-sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
-sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
-```
-1.   Make other needed updates to the configuration, then apply:
-```bash
-sudo nixos-rebuild boot
-sudo reboot
-```
-
 ## Upgrading NixOS versions with `anixpkgs`
 
 Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
