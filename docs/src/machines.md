@@ -135,11 +135,18 @@ sudo nix-channel --update
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
 5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Connect to the internet
-7. Within the installer, run `sudo anix-install`
-8. If everything went well, reboot
-9.  Log into Github and generate an SSH key for authentication.
-10. Clone and link an editable version of the configuration:
+6. Login as the user `andrew`
+7. Connect to the internet
+8. Within the installer, run `sudo anix-install`
+9. If everything went well, reboot
+10. On the next reboot, login as user `andrew` again
+11. Connect to the internet
+12. Run `anix-init` 
+
+...
+
+13. Log into Github and generate an SSH key for authentication.
+14. Clone and link an editable version of the configuration:
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs

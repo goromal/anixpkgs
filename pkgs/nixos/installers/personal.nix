@@ -88,16 +88,22 @@ with import ../dependencies.nix; {
 
       # --- INSTALL NIXOS ---
       echo
-      echo "💻 Installing NixOS..."
+      echo "💻 Installing NixOS profile..."
       nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
       nix-channel --update
       nixos-generate-config --root /mnt/nixos
+      # ^^^^ TODO setup the real config
+      sudo -u andrew bash <<'EOF'
+      cd $HOME
+      # ^^^^ TODO clone anixpkgs and link (TMP branch)
+      EOF
       nixos-install --root /mnt/nixos
       echo "✅ Done!"
 
       # --- SET UP ANIX-UPGRADE ---
       echo
       echo "⚠️ TODO: Set up anix-upgrade and rcrsync scaffolding."
+      mkdir -p 
     '')
   ];
 }
