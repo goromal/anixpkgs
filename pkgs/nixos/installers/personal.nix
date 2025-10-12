@@ -95,7 +95,7 @@ with import ../dependencies.nix; {
       nixos-generate-config --root /mnt/nixos
       sudo -u andrew bash <<'EOF'
       cd /data/andrew
-      git clone --branch dev/machine-directions https://github.com/goromal/anixpkgs.git
+      git clone https://github.com/goromal/anixpkgs.git
       cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
       cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
       sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
@@ -110,7 +110,7 @@ with import ../dependencies.nix; {
       ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
       nixos-install --root /mnt/nixos
       echo "✅ Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
-    '') # ^^^^ TODO remove that dev/machine-directions branch
+    '')
   ];
 }
 # NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix
