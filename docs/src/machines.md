@@ -133,20 +133,13 @@ sudo nix-channel --update
 1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
-4. Burn ISO to USB stick with 
-```bash
-cp nixos-xxx.iso /dev/sdX
-# OR
-dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
-```
+4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
 5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Within the installer, run `sudo anix-install`
-7. If everything went well:
-```bash
-reboot
-```
-8.  Log into Github and generate an SSH key for authentication.
-9.  Clone and link an editable version of the configuration:
+6. Connect to the internet
+7. Within the installer, run `sudo anix-install`
+8. If everything went well, reboot
+9.  Log into Github and generate an SSH key for authentication.
+10. Clone and link an editable version of the configuration:
 ```bash
 mkdir -p /data/andrew/sources # or in an alternate location, for now
 git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
@@ -155,7 +148,7 @@ sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
 sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
 sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
 ```
-10.  Make other needed updates to the configuration, then apply:
+1.   Make other needed updates to the configuration, then apply:
 ```bash
 sudo nixos-rebuild boot
 sudo reboot

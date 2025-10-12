@@ -335,6 +335,13 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+    fonts.packages = with pkgs; [
+      dejavu_fonts
+      liberation_ttf
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+    ];
 
     security.sudo.extraConfig = ''
       ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}

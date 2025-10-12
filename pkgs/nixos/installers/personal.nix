@@ -73,11 +73,12 @@ with import ../dependencies.nix; {
 
       # --- MOUNT PARTITIONS ---
       echo "📂 Mounting partitions..."
+      sleep 10
       mkdir -p /mnt/nixos
-      mount "/dev/disk/by-label/$ROOT_LABEL" /mnt/nixos
+      mount /dev/disk/by-label/''${ROOT_LABEL} /mnt/nixos
 
       mkdir -p /mnt/nixos/boot
-      mount "/dev/disk/by-label/$BOOT_LABEL" /mnt/nixos/boot
+      mount /dev/disk/by-label/''${BOOT_LABEL} /mnt/nixos/boot
       echo
       echo "✅ Done!"
       echo "Partitions created and mounted as:"
@@ -88,6 +89,8 @@ with import ../dependencies.nix; {
       # --- INSTALL NIXOS ---
       echo
       echo "💻 Installing NixOS..."
+      nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+      nix-channel --update
       nixos-generate-config --root /mnt/nixos
       nixos-install --root /mnt/nixos
       echo "✅ Done!"
