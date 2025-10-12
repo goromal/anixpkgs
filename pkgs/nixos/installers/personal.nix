@@ -90,21 +90,30 @@ with import ../dependencies.nix; {
       echo
       echo "💻 Installing NixOS profile..."
       nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+      nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
       nix-channel --update
       nixos-generate-config --root /mnt/nixos
-      # ^^^^ TODO setup the real config
       sudo -u andrew bash <<'EOF'
-      cd $HOME
-      # ^^^^ TODO clone anixpkgs and link (TMP branch)
+      cd /data/andrew
+      git clone --branch dev/machine-directions https://github.com/goromal/anixpkgs.git
+      cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
+      cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+      sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+      sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+      mkdir -p ~/config/nixpkgs
+      echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
       EOF
+      mkdir -p /root/.config/nixpkgs
+      cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
+      rm /mnt/nixos/etc/nixos/*
+      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
       nixos-install --root /mnt/nixos
       echo "✅ Done!"
 
       # --- SET UP ANIX-UPGRADE ---
       echo
       echo "⚠️ TODO: Set up anix-upgrade and rcrsync scaffolding."
-      mkdir -p 
     '')
   ];
-}
+} # ^^^^ TODO nixos-generate-config --show-hardware-config
 # NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix
