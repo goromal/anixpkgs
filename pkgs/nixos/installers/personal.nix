@@ -109,7 +109,7 @@ with import ../dependencies.nix; {
       ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
       nixos-install --root /mnt/nixos
       echo "✅ Done!"
-    '')
+    '') # ^^^^ TODO remove that dev/machine-directions branch
   ];
 }
 # NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix
