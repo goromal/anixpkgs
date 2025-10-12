@@ -108,7 +108,7 @@ with import ../dependencies.nix; {
       rm /mnt/nixos/etc/nixos/*
       ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
       nixos-install --root /mnt/nixos
-      echo "✅ Done!"
+      echo "✅ Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
     '') # ^^^^ TODO remove that dev/machine-directions branch
   ];
 }
