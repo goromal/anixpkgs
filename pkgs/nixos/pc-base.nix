@@ -354,6 +354,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {

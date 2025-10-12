@@ -12,7 +12,7 @@ in {
   programs.vscode = {
     enable = true;
     package = unstable.vscodium;
-    extensions = with pkgs.vscode-extensions;
+    profiles.default.extensions = with pkgs.vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
