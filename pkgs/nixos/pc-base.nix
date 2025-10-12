@@ -42,7 +42,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;

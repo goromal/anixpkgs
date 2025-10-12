@@ -109,10 +109,6 @@ with import ../dependencies.nix; {
       ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
       nixos-install --root /mnt/nixos
       echo "✅ Done!"
-
-      # --- SET UP ANIX-UPGRADE ---
-      echo
-      echo "⚠️ TODO: Set up anix-upgrade and rcrsync scaffolding."
     '')
   ];
 } # ^^^^ TODO nixos-generate-config --show-hardware-config
