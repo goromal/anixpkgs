@@ -95,6 +95,7 @@ with import ../dependencies.nix; {
         echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
         echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
         echo_yellow "  - Run anix-upgrade"
+        echo_yellow "  - Create new secrets and configs entries"
         echo
         echo_green "Have fun!"
       '')
