@@ -98,7 +98,7 @@ with import ../dependencies.nix; {
         else
           echo_yellow "Skipping SSH config setup"
         fi
-        
+
         sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
         sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
         sudo nix-channel --update
