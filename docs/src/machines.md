@@ -142,6 +142,7 @@ sudo nix-channel --update
 10. On the next reboot, login as user `andrew` again
 11. Connect to the internet
 12. Run `anix-init` 
+13. Enjoy!
 
 ...
 

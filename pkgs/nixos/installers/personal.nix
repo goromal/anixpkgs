@@ -111,5 +111,5 @@ with import ../dependencies.nix; {
       echo "✅ Done!"
     '')
   ];
-} # ^^^^ TODO nixos-generate-config --show-hardware-config
+}
 # NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix
