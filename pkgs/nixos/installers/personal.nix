@@ -100,6 +100,7 @@ with import ../dependencies.nix; {
       cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
       sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
       sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+      sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
       mkdir -p ~/.config/nixpkgs
       echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
       EOF
