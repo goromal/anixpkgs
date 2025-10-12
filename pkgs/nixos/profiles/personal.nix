@@ -85,6 +85,7 @@ with import ../dependencies.nix; {
         rcrsync -v init games2
 
         make-title -c yellow "Setting up SSH and Nix"
+
         DO_SSH=y
         if [[ -d $HOME/.ssh ]]; then
           read -rp ".ssh directory already present, proceed anyway? (y|n): " DO_SSH
