@@ -42,7 +42,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;
@@ -78,10 +78,6 @@ in {
       type = lib.types.int;
       description = "Public insecure port for the notes wiki site.";
       default = 80;
-    };
-    isInstaller = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for an ISO install image.";
     };
     enableMetrics = lib.mkOption {
       type = lib.types.bool;
@@ -134,10 +130,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
-        else
-          pkgs.linuxPackages_latest));
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -331,7 +324,7 @@ in {
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = !cfg.isInstaller;
+    networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
@@ -342,6 +335,13 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+    fonts.packages = with pkgs; [
+      dejavu_fonts
+      liberation_ttf
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+    ];
 
     security.sudo.extraConfig = ''
       ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
@@ -354,6 +354,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {

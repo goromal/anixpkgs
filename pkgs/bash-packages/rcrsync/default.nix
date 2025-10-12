@@ -49,8 +49,12 @@ in (writeArgparseScriptBin pkgname longDescription [{
   fi
   if [[ "$1" == "init" ]]; then
     if [[ -d "$LOCAL_DIR" ]]; then
-      ${printYlw} "Local directory $LOCAL_DIR present. Delete it if you wish to start fresh."
-      exit
+      ${printYlw} "Local directory $LOCAL_DIR present."
+      read -rp "Proceed anyway with a fresh download? (y|n): " DO_INIT
+      if [[ "$DO_INIT" != "y" ]]; then
+        exit
+      fi
+      sudo rm -rf "$LOCAL_DIR"
     fi
     ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
     _success=1

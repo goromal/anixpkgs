@@ -25,7 +25,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
   };
 
@@ -104,6 +104,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {
