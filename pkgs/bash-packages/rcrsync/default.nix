@@ -59,7 +59,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${rclone}/bin/rclone --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout} || { _success=0; }
+      ${rclone}/bin/rclone -vvv --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout} || { _success=0; }
     else
       ${rclone}/bin/rclone --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all} || { _success=0; }
     fi
@@ -76,7 +76,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} bisync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone -vvv --config ${rcloneCfg} bisync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
     else
       ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} bisync $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
     fi
@@ -84,7 +84,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
       ${printYlw} "Bisync failed; attempting with --resync..."
       _success=1
       if [[ "$verbose" == "1" ]]; then
-        ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} bisync --resync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+        ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone -vvv --config ${rcloneCfg} bisync --resync $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
       else
         ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} bisync --resync $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
       fi
@@ -102,7 +102,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Copying $CLOUD_DIR to $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone -vvv --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
     else
       ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR ${redirects.suppress_all}" || { _success=0; }
     fi
@@ -119,7 +119,7 @@ in (writeArgparseScriptBin pkgname longDescription [{
     ${printCyn} "Overriding $CLOUD_DIR with $LOCAL_DIR..."
     _success=1
     if [[ "$verbose" == "1" ]]; then
-      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} copy $LOCAL_DIR $CLOUD_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
+      ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone -vvv --config ${rcloneCfg} copy $LOCAL_DIR $CLOUD_DIR ${redirects.stderr_to_stdout}" || { _success=0; }
     else
       ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone --config ${rcloneCfg} copy $LOCAL_DIR $CLOUD_DIR ${redirects.suppress_all}" || { _success=0; }
     fi
