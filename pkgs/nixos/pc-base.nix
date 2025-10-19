@@ -505,7 +505,6 @@ in {
 
     environment.shellAliases = {
       jfu = "journalctl -fu";
-      code = "codium";
       nohistory = "set +o history";
     };
 
