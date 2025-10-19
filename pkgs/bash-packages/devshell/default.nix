@@ -1,4 +1,4 @@
-{ writeArgparseScriptBin, python3, color-prints, setupws, editorName ? "codium"
+{ writeArgparseScriptBin, python3, color-prints, setupws, editorName ? "code"
 }:
 let
   pkgname = "devshell";

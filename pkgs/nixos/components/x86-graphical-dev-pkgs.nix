@@ -5,14 +5,14 @@ in {
   home.packages = [ pkgs.black pkgs.clang-tools anixpkgs.aptest ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
-    "org/gnome/shell" = { "favorite-apps" = [ "codium.desktop" ]; };
+    "org/gnome/shell" = { "favorite-apps" = [ "vscode.desktop" ]; };
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
   programs.vscode = {
     enable = true;
-    package = unstable.vscodium;
-    profiles.default.extensions = with pkgs.vscode-extensions;
+    package = unstable.vscode;
+    profiles.default.extensions = with unstable.vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
@@ -25,7 +25,7 @@ in {
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
         ms-vscode.cpptools
-      ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+      ] ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";
           publisher = "twxs";
@@ -49,7 +49,7 @@ in {
   };
 
   home.file = with anixpkgs.pkgData; {
-    ".config/VSCodium/User/settings.json".source = ../res/vscode-settings.json;
+    ".config/VSCode/User/settings.json".source = ../res/vscode-settings.json;
     ".config/gtk-3.0/bookmarks".text = ''
       file://${cfg.homeDir}/dev Development
       file://${cfg.homeDir}/data Data

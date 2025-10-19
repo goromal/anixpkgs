@@ -4,5 +4,6 @@
     "workbench.startupEditor": "none",
     "security.workspace.trust.untrustedFiles": "open",
     "editor.formatOnSave": true,
-    "files.hotExit": "off"
+    "files.hotExit": "off",
+    "C_Cpp.default.compilerPath": "clang"
 }
