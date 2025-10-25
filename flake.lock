@@ -377,15 +377,16 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1760768607,
-        "narHash": "sha256-f+h30sxSudytbX+Z9XBipR9gMFxMHjpWRNhfOGFJonY=",
+        "lastModified": 1761371228,
+        "narHash": "sha256-j+C1vKHrk58cjNlPiB7QRLKA6j+/SdO24Y8EmIITNSQ=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "98b27d5b0dc868eb8010be7f70d81af708403efb",
+        "rev": "6e39931cda764417b989855ad4ab66b183872a1c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/spdlog-catch2",
         "repo": "mscpp",
         "type": "github"
       }

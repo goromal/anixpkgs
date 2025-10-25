@@ -1,10 +1,10 @@
-{ clangStdenv, cmake, boost, pkg-src }:
+{ clangStdenv, cmake, catch2, spdlog, pkg-src }:
 clangStdenv.mkDerivation {
   name = "mscpp";
   version = "1.0.0";
   src = pkg-src;
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ boost ];
+  buildInputs = [ catch2 spdlog ];
   preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
