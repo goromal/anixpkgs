@@ -102,15 +102,16 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1757796284,
-        "narHash": "sha256-O6+OuMksMcYwZ9/MMqTdOIaw0rfY76qLb5k+1ggyyys=",
+        "lastModified": 1761544216,
+        "narHash": "sha256-s6yldjPs3obBysuy/kLGQrB0AjNUiFnBvRhdT/LMXi8=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "fc94ecc2a79accc21daf30582af739d85a539452",
+        "rev": "d1e1b7ab5222b1246b6b3d103e2ba188fa0409f7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/rss",
         "repo": "daily_tactical_server",
         "type": "github"
       }
