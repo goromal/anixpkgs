@@ -19,16 +19,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1762065821,
+        "lastModified": 1762067619,
         "narHash": "sha256-wrBvgF+Kha+mw1jzx2M9Jub6cbGHbmtk5MmsoyCRRxw=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "6772fef304f07dc13075d88eb9e2abaa87f312a0",
+        "rev": "e160c1191f8187d80b0793994721f1ec7fb16246",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/wallpapers",
         "repo": "anixdata",
         "type": "github"
       }
