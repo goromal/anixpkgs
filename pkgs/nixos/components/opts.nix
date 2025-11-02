@@ -39,9 +39,9 @@ with import ../dependencies.nix; {
       default = null;
     };
     wallpaperImage = lib.mkOption {
-      type = lib.types.path;
+      type = lib.types.nullOr lib.types.path;
       description = "Path to desired wallpaper (for graphical distributions)";
-      default = anixpkgs.pkgData.img.wallpaper.data;
+      default = null;
     };
     screenResolution = lib.mkOption {
       type = lib.types.str;
