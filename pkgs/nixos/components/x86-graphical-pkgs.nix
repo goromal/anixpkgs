@@ -8,8 +8,8 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  version-string = "anix ${
-      if local-build then "(Local Build)" else "v${anixpkgs-version}"
+  version-string = "anix - ${
+      if local-build then "Local Build" else "v${anixpkgs-version}"
     } - ${if cfg.standalone then "Home-Manager" else "NixOS"} ${nixos-version}";
   wallpaper = pkgs.callPackage ../../bash-packages/mkWallpaper {
     pkgData = anixpkgs.pkgData;
