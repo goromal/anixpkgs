@@ -435,4 +435,9 @@ in rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  testWallpaper = prev.callPackage ./bash-packages/mkWallpaper {
+    screenResolution = "1920x1080";
+    label = "TEST WALLPAPER";
+  };
 }
