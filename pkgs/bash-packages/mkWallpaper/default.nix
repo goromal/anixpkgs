@@ -32,7 +32,7 @@ let
 in runCommand "make-wallpaper-${builtins.toString randomInt}" { } ''
   ${imagemagick}/bin/magick -font ${pkgData.fonts.nexa.data} -pointsize 30 -fill white \
     ${sourceImage} \
-    -resize ${screenResolution}^ \
+    -resize ${screenResolution}^ -gravity west -extent ${screenResolution} -gravity northwest \
     \( ${pkgData.img.ajt-logo-white.data} -resize ${builtins.toString logo_w}x${
       builtins.toString logo_h
     }! \) -geometry +${builtins.toString logo_x}+${
