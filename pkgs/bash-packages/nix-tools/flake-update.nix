@@ -27,7 +27,7 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
   readarray -t sources < <(git diff flake.nix | grep -oP '^\+\s+\K\S+(?=\.url)')
   for source in "''${sources[@]}"; do
       ${printYlw} "Detected changed source $source"
-      nix flake lock --update-input "$source"
+      nix flake update "$source"
   done
   ${printGrn} Done.
 '') // {
