@@ -319,6 +319,21 @@ in {
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+    systemd.timers."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
+    description = "Restart orchestratord weekly";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "Sun 03:00";
+      Persistent = true;
+    };
+  };
+  systemd.services."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
+    description = "Restart orchestratord weekly";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
+    };
+  };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
