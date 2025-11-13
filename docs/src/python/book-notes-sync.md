@@ -18,8 +18,8 @@ Options:
                              [default: ~/secrets/google/refresh.json]
   --wiki-url TEXT            URL of the DokuWiki instance (https).  [default:
                              https://notes.andrewtorgesen.com]
-  --wiki-secrets-file TEXT   Path to the DokuWiki login secrets JSON file.
-                             [default: ~/secrets/wiki/secrets.json]
+  --wiki-user TEXT           Wiki account username.
+  --wiki-pass TEXT           Wiki account password.
   --enable-logging BOOLEAN   Whether to enable logging.  [default: True]
   --help                     Show this message and exit.
 

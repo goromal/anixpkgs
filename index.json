@@ -358,6 +358,11 @@
                 "docs": false
             },
             {
+                "attr": "ckfile",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "color-prints",
                 "ci": true,
                 "docs": true
@@ -379,6 +384,11 @@
             },
             {
                 "attr": "gantter",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "local-ssh-proxy",
                 "ci": true,
                 "docs": true
             },
@@ -414,6 +424,11 @@
             },
             {
                 "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "swrite",
                 "ci": true,
                 "docs": false
             },

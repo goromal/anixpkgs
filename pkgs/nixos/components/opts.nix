@@ -31,11 +31,16 @@ with import ../dependencies.nix; {
     editor = lib.mkOption {
       type = lib.types.str;
       description = "Code editor (executable) of choice";
-      default = "codium";
+      default = "code";
     };
     browserExec = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       description = "Executable name to open your browser of choice";
+      default = null;
+    };
+    wallpaperImage = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      description = "Path to desired wallpaper (for graphical distributions)";
       default = null;
     };
     screenResolution = lib.mkOption {

@@ -39,8 +39,8 @@ Options:
                                (each).  [default: 1000]
   --wiki-url TEXT              URL of the DokuWiki instance (https).
                                [default: https://notes.andrewtorgesen.com]
-  --wiki-secrets-file PATH     Path to the DokuWiki login secrets JSON file.
-                               [default: ~/secrets/wiki/secrets.json]
+  --wiki-user TEXT             Wiki account username.
+  --wiki-pass TEXT             Wiki account password.
   --task-secrets-file PATH     Google Tasks client secrets file.  [default:
                                ~/secrets/google/client_secrets.json]
   --notion-secrets-file PATH   Notion client secrets file.  [default:

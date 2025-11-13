@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1757484547,
-        "narHash": "sha256-RI61xt3GjdCm6JDW24ZaGWkGMtwHg0bQArkRkC4DLMs=",
+        "lastModified": 1762067619,
+        "narHash": "sha256-wrBvgF+Kha+mw1jzx2M9Jub6cbGHbmtk5MmsoyCRRxw=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "adfad973332c984bd3f6528b45fad04275e17b88",
+        "rev": "e160c1191f8187d80b0793994721f1ec7fb16246",
         "type": "github"
       },
       "original": {
@@ -54,11 +54,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1717871019,
-        "narHash": "sha256-0ic7jZirFebHbYtQDoFcdJmuVKAkwiKVq8lmE0byy9I=",
+        "lastModified": 1757796240,
+        "narHash": "sha256-Zzwg+0sIU2BlquPHTmowdCLoy2KX/p1D48mGIVgRNeg=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "3f96818f223520e45dea7a98f7b3287ab23b5a5a",
+        "rev": "36ed429e6a81bb9e6e688b08c6f6df37309f29f1",
         "type": "github"
       },
       "original": {
@@ -102,11 +102,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1757261352,
-        "narHash": "sha256-mZXG+sQrmbZma7wVw9u2jn++nLHEK+rHg0mhycYJeaA=",
+        "lastModified": 1757796284,
+        "narHash": "sha256-O6+OuMksMcYwZ9/MMqTdOIaw0rfY76qLb5k+1ggyyys=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "7c73cfd871778ea9b21099080205acdae5442a8e",
+        "rev": "fc94ecc2a79accc21daf30582af739d85a539452",
         "type": "github"
       },
       "original": {
@@ -329,11 +329,11 @@
     "mavlog-utils": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694240,
-        "narHash": "sha256-0Jn0QdvBhC8Qh0PQmEkhIedslSmeGGfv/UJzvowZsS0=",
+        "lastModified": 1758083814,
+        "narHash": "sha256-MJckvugf68LBnYeUXCqg6A6qy6QJg/On8pQeiztSxBM=",
         "owner": "goromal",
         "repo": "mavlog-utils",
-        "rev": "516bc15b3cf5bbdcc82ea84548202d1f72fe56ef",
+        "rev": "810fc49ae42d4235c70ab92dd4977e97536bff7c",
         "type": "github"
       },
       "original": {
@@ -377,11 +377,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1728191989,
-        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
+        "lastModified": 1760768607,
+        "narHash": "sha256-f+h30sxSudytbX+Z9XBipR9gMFxMHjpWRNhfOGFJonY=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
+        "rev": "98b27d5b0dc868eb8010be7f70d81af708403efb",
         "type": "github"
       },
       "original": {
@@ -884,11 +884,11 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870970,
-        "narHash": "sha256-mMB/Vj6jA7nJqsJPPX8FX1EwaJDJuxP/gzXT3cyOZkg=",
+        "lastModified": 1757796195,
+        "narHash": "sha256-dA92/r7qPZfDgAjgX5s625YA6FqoGC7p/MZDFTjuuPI=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "60619a5e7f0c0005903153074c6963782984b479",
+        "rev": "43c9aeac48c26a678daf0a8913549b6e4478f608",
         "type": "github"
       },
       "original": {

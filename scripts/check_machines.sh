@@ -18,6 +18,7 @@ on_exit() {
 trap on_exit ERR SIGINT EXIT
 
 export NIXPKGS_ALLOW_UNFREE=1
+export NIXPKGS_ALLOW_INSECURE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
@@ -38,7 +39,7 @@ for sim in ${sims[@]}; do
     echo ""
 done
 
-# installers=(ats-pi)
+# installers=(personal)
 # for installer in ${installers[@]}; do
 #     echo "Checking derivation for installer: $installer..."
 #     nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=${DIR}/../pkgs/nixos/installers/${installer}.nix --no-out-link --dry-run

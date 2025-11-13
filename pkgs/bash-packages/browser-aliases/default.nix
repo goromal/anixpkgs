@@ -1,7 +1,9 @@
-{ stdenv, writeArgparseScriptBin, color-prints, redirects, wiki-tools
+{ stdenv, writeArgparseScriptBin, color-prints, redirects, wiki-tools, sread
 , browserExec }:
 let
   printErr = "${color-prints}/bin/echo_red";
+  wikiuser = "$(cat $HOME/secrets/wiki/u.txt)";
+  wikipass = "$(${sread}/bin/sread $HOME/secrets/wiki/p.txt.tyz)";
   anix-compare = writeArgparseScriptBin "anix-compare" ''
     usage: anix-compare TAG1 TAG2
 
@@ -54,14 +56,14 @@ let
         ${printErr} "No ticket description given."
         exit 1
     fi
-    idx=$(${wiki-tools}/bin/wiki-tools get --page-id a4s:internal:idx)
+    idx=$(${wiki-tools}/bin/wiki-tools --wiki_user ${wikiuser} --wiki_pass ${wikipass} get --page-id a4s:internal:idx)
     idx=$((idx+1))
     tmpdir=$(mktemp -d)
     echo "====== [P''${1}] A4S-''${idx}: ''${2} ======" > $tmpdir/ticket.txt
     echo -e "\n" >> $tmpdir/ticket.txt
     echo -e "==== Description ====\n\n  * ...\n\n==== Requirements ====\n\n  * ...\n\n==== PRs ====\n\n  * ...\n\n==== Miscellaneous ====\n\n  * ...\n\n" >> $tmpdir/ticket.txt
-    ${wiki-tools}/bin/wiki-tools put --page-id a4s:backlog:a4s''${idx} --file $tmpdir/ticket.txt
-    ${wiki-tools}/bin/wiki-tools put --page-id a4s:internal:idx --content "$idx"
+    ${wiki-tools}/bin/wiki-tools --wiki_user ${wikiuser} --wiki_pass ${wikipass} put --page-id a4s:backlog:a4s''${idx} --file $tmpdir/ticket.txt
+    ${wiki-tools}/bin/wiki-tools --wiki_user ${wikiuser} --wiki_pass ${wikipass} put --page-id a4s:internal:idx --content "$idx"
     rm -rf $tmpdir
     ${browserExec} "https://notes.andrewtorgesen.com/doku.php?id=a4s:backlog:a4s''${idx}" ${redirects.suppress_all}
   '';

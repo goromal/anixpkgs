@@ -46,15 +46,19 @@ in {
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
+    anixpkgs.local-ssh-proxy
     anixpkgs.wiki-tools
     anixpkgs.task-tools
     anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
+    anixpkgs.ckfile
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
+    anixpkgs.sread
+    anixpkgs.swrite
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups

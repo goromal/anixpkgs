@@ -42,7 +42,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;
@@ -78,10 +78,6 @@ in {
       type = lib.types.int;
       description = "Public insecure port for the notes wiki site.";
       default = 80;
-    };
-    isInstaller = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for an ISO install image.";
     };
     enableMetrics = lib.mkOption {
       type = lib.types.bool;
@@ -119,6 +115,7 @@ in {
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/plexNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -133,10 +130,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
-        else
-          pkgs.linuxPackages_latest));
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -330,7 +324,7 @@ in {
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = !cfg.isInstaller;
+    networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
@@ -341,6 +335,13 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+    fonts.packages = with pkgs; [
+      dejavu_fonts
+      liberation_ttf
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+    ];
 
     security.sudo.extraConfig = ''
       ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
@@ -353,6 +354,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {
@@ -375,6 +377,9 @@ in {
       tacticalPkg = anixpkgs.daily_tactical_server;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+
+    # Media
+    services.plexNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;
@@ -500,11 +505,11 @@ in {
 
     environment.shellAliases = {
       jfu = "journalctl -fu";
-      code = "codium";
       nohistory = "set +o history";
     };
 
-    systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
+    systemd.tmpfiles.rules =
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {

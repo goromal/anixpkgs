@@ -10,15 +10,7 @@ let
       inherit description longDescription;
       script-file = ./authm.py;
       inherit pytestCheckHook buildPythonPackage;
-      propagatedBuildInputs = [
-        click
-        colorama
-        easy-google-auth
-        gmail-parser
-        task-tools
-        wiki-tools
-        book-notes-sync
-      ];
+      propagatedBuildInputs = [ click colorama easy-google-auth gmail-parser ];
       checkPkgs = [ ];
     });
   printErr = ">&2 ${color-prints}/bin/echo_red";
