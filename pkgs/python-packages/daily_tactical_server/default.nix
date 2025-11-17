@@ -1,6 +1,6 @@
 { buildPythonPackage, pkg-src, lib, makeWrapper, click, aapis-py, grpcio, flask
-, colorama, statsd, aiosqlite, aiofiles, wiki-tools, task-tools, service-ports, sqlalchemy
-}:
+, colorama, statsd, aiosqlite, aiofiles, wiki-tools, task-tools, service-ports
+, sqlalchemy }:
 buildPythonPackage rec {
   pname = "daily_tactical_server";
   version = "0.0.0";
