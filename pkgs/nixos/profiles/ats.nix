@@ -207,6 +207,20 @@ with import ../dependencies.nix; {
           Persistent = false;
         };
       }
+      {
+        name = "ats-gmail-clean";
+        jobShellScript = pkgs.writeShellScript "ats-gmail-clean" ''
+          sleep 5
+          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+          sleep 5
+          gmail-manager clean --num-messages 4000
+          logger -t ats-gmail-clean "GMail cleaning complete"
+        '';
+        timerCfg = {
+          OnCalendar = [ "Sat 23:00" ];
+          Persistent = false;
+        };
+      }
     ];
     extraOrchestratorPackages = [
       anixpkgs.wiki-tools
