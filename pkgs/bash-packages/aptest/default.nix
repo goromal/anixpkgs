@@ -1,5 +1,6 @@
 { writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
 , color-prints, mavproxy, git, python310, stdenv, overrideCC, gcc10 }:
+# NOTE: Python currently needs to be <= 311 for the "imp" module to exist
 let
   pkgname = "aptest";
   printErr = "${color-prints}/bin/echo_red";
@@ -65,9 +66,9 @@ in (writeArgparseScriptBin pkgname ''
   sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc10}/bin/gcc"#g' libraries/AP_Scripting/wscript
   sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
   unset shellHook
-  nix-shell -p ${stdenv} --run "patchShebangs ./waf && patchShebangs ./Tools"
+  nix-shell -p ${python310} -p ${stdenv} --pure --run "patchShebangs ./waf && patchShebangs ./modules/waf && patchShebangs ./Tools"
   ${printYlw} "Running the SITL"
-  nix-shell ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
+  nix-shell --pure ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
 
   ${printYlw} "Cleaning up"
   popd
