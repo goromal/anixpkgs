@@ -1,6 +1,5 @@
 { writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
-, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10
-}:
+, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10 }:
 # NOTE: Python currently needs to be <= 311 for the "imp" module to exist
 let
   pkgname = "aptest";
