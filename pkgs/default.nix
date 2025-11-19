@@ -196,6 +196,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
             authui =
               addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
+            pinned-mavproxy =
+              addDoc (pySelf.callPackage ./python-packages/mavproxy { });
           });
       }));
 in rec {
@@ -362,7 +364,10 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
-  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest {
+    python = python311;
+    mavproxy = python311.pkgs.pinned-mavproxy;
+  });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
