@@ -412,6 +412,9 @@ in rec {
   simple-image-editor = addDoc
     (prev.callPackage ./java-packages/simple-image-editor
       (baseJavaArgs // { pkg-src = flakeInputs.simple-image-editor; }));
+  tinyMediaManager = addDoc (prev.callPackage ./java-packages/tinyMediaManager {
+    pkg-src = flakeInputs.tinyMediaManager;
+  });
 
   manif-geom-rs = addDoc (prev.callPackage ./rust-packages/manif-geom-rs {
     pkg-src = flakeInputs.manif-geom-rs;
