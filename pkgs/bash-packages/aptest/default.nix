@@ -31,6 +31,7 @@ let
           ${python310.pkgs.configparser}
           ${python310.pkgs.click}
           ${python310.pkgs.decorator}
+          ${python310.pkgs.lxml}
         ];
       }
     '';
