@@ -4,6 +4,7 @@ let cfg = config.mods.opts;
 in {
   home.packages = [
     pkgs.direnv
+    anixpkgs.aapis-grpcurl
     anixpkgs.flake-update
     anixpkgs.git-cc
     anixpkgs.git-shortcuts
