@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/streaks";
     aapis.flake = false;
 
     ardupilot.url =
@@ -31,7 +31,8 @@
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
-    daily_tactical_server.url = "github:goromal/daily_tactical_server";
+    daily_tactical_server.url =
+      "github:goromal/daily_tactical_server?ref=dev/rss";
     daily_tactical_server.flake = false;
 
     easy-google-auth.url = "github:goromal/easy-google-auth";

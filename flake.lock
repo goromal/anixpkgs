@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1749440519,
-        "narHash": "sha256-qRaF+RsEDqUibt7t+PFcJnpfai7HHd0/1TJ70UM1Lrg=",
+        "lastModified": 1763012981,
+        "narHash": "sha256-EXw4HW7/dI+WGcH9eqei/oucEbrKygd+zbrS+19QH8U=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "8a2e728a1b91d923af9a3c4db768b8d772d073e7",
+        "rev": "8639fc0c355eedda82cbc83d97afd516576e353a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/streaks",
         "repo": "aapis",
         "type": "github"
       }
@@ -102,15 +103,16 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1757796284,
-        "narHash": "sha256-O6+OuMksMcYwZ9/MMqTdOIaw0rfY76qLb5k+1ggyyys=",
+        "lastModified": 1763874814,
+        "narHash": "sha256-1mIXDQjQVnWgmd8WeadLzP4tjCSddaVXKkrVrmVxvmI=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "fc94ecc2a79accc21daf30582af739d85a539452",
+        "rev": "fc70019621a43103991162fadb11626612d38fda",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/rss",
         "repo": "daily_tactical_server",
         "type": "github"
       }

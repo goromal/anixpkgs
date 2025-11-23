@@ -1,6 +1,6 @@
 { buildPythonPackage, pkg-src, lib, makeWrapper, click, aapis-py, grpcio, flask
 , colorama, statsd, aiosqlite, aiofiles, wiki-tools, task-tools, service-ports
-}:
+, sqlalchemy }:
 buildPythonPackage rec {
   pname = "daily_tactical_server";
   version = "0.0.0";
@@ -17,6 +17,7 @@ buildPythonPackage rec {
     aiofiles
     wiki-tools
     task-tools
+    sqlalchemy
   ];
   postInstall = ''
     wrapProgram $out/bin/tacticald \

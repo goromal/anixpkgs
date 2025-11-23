@@ -188,7 +188,7 @@ with import ../dependencies.nix; {
           logger -t ats-itns-nudge "$output"
         '';
         timerCfg = {
-          OnCalendar = [ "Mon,Fri 12:00" ];
+          OnCalendar = [ "Mon 12:00" ];
           Persistent = false;
         };
       }
@@ -204,6 +204,20 @@ with import ../dependencies.nix; {
         '';
         timerCfg = {
           OnCalendar = [ "Sun 19:00" ];
+          Persistent = false;
+        };
+      }
+      {
+        name = "ats-gmail-clean";
+        jobShellScript = pkgs.writeShellScript "ats-gmail-clean" ''
+          sleep 5
+          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+          sleep 5
+          gmail-manager clean --num-messages 4000
+          logger -t ats-gmail-clean "GMail cleaning complete"
+        '';
+        timerCfg = {
+          OnCalendar = [ "Sat 23:00" ];
           Persistent = false;
         };
       }
