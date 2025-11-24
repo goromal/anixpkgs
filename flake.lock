@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1763012981,
+        "lastModified": 1763963299,
         "narHash": "sha256-EXw4HW7/dI+WGcH9eqei/oucEbrKygd+zbrS+19QH8U=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "8639fc0c355eedda82cbc83d97afd516576e353a",
+        "rev": "e1445785286124f5152c762621a396181e41ec74",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/streaks",
         "repo": "aapis",
         "type": "github"
       }
@@ -103,16 +102,15 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1763961377,
+        "lastModified": 1763963253,
         "narHash": "sha256-RUulxtos9LJFwrUM82tyi+HIz22B90qqPhWKpmtJTGY=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "acb8925808ef6fdbc0ff3d3dc20f467131e55822",
+        "rev": "81ce19e63f64cc8ddf742116823d979351a32edd",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/rss",
         "repo": "daily_tactical_server",
         "type": "github"
       }
