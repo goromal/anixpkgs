@@ -162,6 +162,7 @@ with import ../dependencies.nix; {
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local quote
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local vocab
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local wiki-url
+          surveys_report upload-results
         '';
         timerCfg = {
           OnCalendar = [ "*-*-* 00:00:00" ];
@@ -188,7 +189,7 @@ with import ../dependencies.nix; {
           logger -t ats-itns-nudge "$output"
         '';
         timerCfg = {
-          OnCalendar = [ "Mon,Fri 12:00" ];
+          OnCalendar = [ "Mon 12:00" ];
           Persistent = false;
         };
       }
@@ -207,6 +208,20 @@ with import ../dependencies.nix; {
           Persistent = false;
         };
       }
+      {
+        name = "ats-gmail-clean";
+        jobShellScript = pkgs.writeShellScript "ats-gmail-clean" ''
+          sleep 5
+          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+          sleep 5
+          gmail-manager clean --num-messages 4000
+          logger -t ats-gmail-clean "GMail cleaning complete"
+        '';
+        timerCfg = {
+          OnCalendar = [ "Sat 23:00" ];
+          Persistent = false;
+        };
+      }
     ];
     extraOrchestratorPackages = [
       anixpkgs.wiki-tools
@@ -219,6 +234,7 @@ with import ../dependencies.nix; {
       anixpkgs.scrape
       anixpkgs.providence-tasker
       anixpkgs.daily_tactical_server
+      anixpkgs.surveys_report
     ];
   }) // {
     users.users.andrew.hashedPassword = lib.mkForce
