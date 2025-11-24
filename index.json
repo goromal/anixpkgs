@@ -408,6 +408,11 @@
                 "docs": true
             },
             {
+                "attr": "surveys_report",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "md2pdf",
                 "ci": true,
                 "docs": true

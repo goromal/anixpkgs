@@ -79,6 +79,8 @@ let
             });
             budget_report =
               addDoc (pySelf.callPackage ./python-packages/budget-report { });
+            surveys_report =
+              addDoc (pySelf.callPackage ./python-packages/surveys-report { });
             easy-google-auth = addDoc
               (pySelf.callPackage ./python-packages/easy-google-auth {
                 pkg-src = flakeInputs.easy-google-auth;
@@ -245,6 +247,7 @@ in rec {
 
   aapis-py = final.python311.pkgs.aapis-py;
   budget_report = final.python311.pkgs.budget_report;
+  surveys_report = final.python311.pkgs.surveys_report;
   makepyshell = final.python311.pkgs.makepyshell;
   mavlog-utils = final.python311.pkgs.mavlog-utils;
   fqt = final.python311.pkgs.fqt;
