@@ -21,7 +21,17 @@ in {
         virtual_uid_maps = "static:994";
         virtual_gid_maps = "static:993";
       };
+      extraMasterConf = ''
+        gorogatherer  unix  -  n  n  -  -  pipe
+          flags=Rq user=goromail argv=/usr/local/bin/gorogather -- ''${recipient}
+      '';
     };
+
+    environment.systemPackages = [
+      (pkgs.writeShellScriptBin "gorogather" ''
+        echo - > /data/andrew/TMPMAIL
+      '')
+    ];
 
     # Open the firewall
     # NOTE: requires router port-forwarding as well
