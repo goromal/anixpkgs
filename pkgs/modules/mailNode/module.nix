@@ -8,19 +8,21 @@ in {
     # Postfix: receive-only mail server
     services.postfix = {
       enable = true;
+      openFirewall = true;
 
-      # Accept mail for your domain
-      domains = [ "andrewtorgesen.com" ];
+      # Modern configuration location (NixOS ≥ 23.11)
+      settings = {
+        myhostname = "mail.andrewtorgesen.com";
+        mydomain = "andrewtorgesen.com";
 
-      # Deliver to local UNIX mailboxes (e.g., /var/mail/goromail)
-      enableLocalRecipient = true;
+        # Domains Postfix should treat as local email
+        # (i.e., mail delivered locally, not relayed)
+        mydestination = "localhost, $myhostname, $mydomain";
 
-      # No outbound mail = no relayhost
-      relayHost = null;
-
-      # Reduce exposed surface
-      openFirewall = true; # opens port 25
-      rootAlias = "goromail"; # route root mail to goromail user
+        # Local delivery to /var/mail/<user>
+        home_mailbox = "";
+        mailbox_command = ""; # default local delivery agent
+      };
     };
 
     # Create a user that will receive mail
