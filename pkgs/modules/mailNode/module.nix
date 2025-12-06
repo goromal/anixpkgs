@@ -1,6 +1,5 @@
-{ pkgs, config, lib, ...}:
-let
-  cfg = config.services.mailNode;
+{ pkgs, config, lib, ... }:
+let cfg = config.services.mailNode;
 in {
   options.services.mailNode = {
     enable = lib.mkEnableOption "enable mail node services";
@@ -20,15 +19,15 @@ in {
       relayHost = null;
 
       # Reduce exposed surface
-      openFirewall = true;   # opens port 25
-      rootAlias = "goromail";  # route root mail to goromail user
+      openFirewall = true; # opens port 25
+      rootAlias = "goromail"; # route root mail to goromail user
     };
 
     # Create a user that will receive mail
     users.users.goromail = {
       isSystemUser = true;
       home = "/var/mail/goromail";
-      createHome = false;  # mailboxes get created automatically
+      createHome = false; # mailboxes get created automatically
     };
 
     # OPTIONAL: pipe incoming mail automatically to a script
