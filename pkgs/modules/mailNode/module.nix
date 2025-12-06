@@ -32,16 +32,17 @@ in {
       group = "goromail";
     };
     users.groups.goromail = { gid = 993; };
+    user.users.andrew.extraGroups = [ "goromail" ];
 
-    systemd.tmpfiles.rules = [
-      "d ${globalCfg.homeDir}/mail 0770 andrew dev -"
-      "d ${globalCfg.homeDir}/mail/tmp 0770 andrew dev -"
-    ];
-    users.users.goromail.extraGroups = [ "dev" ];
-    fileSystems."/var/mail/goromail" = {
-      device = "${globalCfg.homeDir}/mail";
-      fsType = "none";
-      options = [ "bind" ];
-    };
+    # systemd.tmpfiles.rules = [
+    #   "d ${globalCfg.homeDir}/mail 0770 andrew dev -"
+    #   "d ${globalCfg.homeDir}/mail/tmp 0770 andrew dev -"
+    # ];
+    # users.users.goromail.extraGroups = [ "dev" ];
+    # fileSystems."/var/mail/goromail" = {
+    #   device = "${globalCfg.homeDir}/mail";
+    #   fsType = "none";
+    #   options = [ "bind" ];
+    # };
   };
 }
