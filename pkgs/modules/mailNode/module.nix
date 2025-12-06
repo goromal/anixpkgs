@@ -32,7 +32,7 @@ in {
       group = "goromail";
     };
     users.groups.goromail = { gid = 993; };
-    user.users.andrew.extraGroups = [ "goromail" ];
+    users.users.andrew.extraGroups = [ "goromail" ];
 
     # systemd.tmpfiles.rules = [
     #   "d ${globalCfg.homeDir}/mail 0770 andrew dev -"
