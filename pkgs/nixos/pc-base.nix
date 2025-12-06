@@ -116,6 +116,7 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
+    ../modules/mailNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -398,6 +399,9 @@ in {
 
     # Media
     services.plexNode.enable = cfg.isATS;
+
+    # Mail
+    services.mailNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;
