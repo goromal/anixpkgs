@@ -33,9 +33,8 @@ in {
     };
     users.groups.goromail = { gid = 993; };
 
-    systemd.tmpfiles.rules = [
-      "d ${globalCfg.homeDir}/mail 0770 andrew dev -"
-    ];
+    systemd.tmpfiles.rules =
+      [ "d ${globalCfg.homeDir}/mail 0770 andrew dev -" ];
     users.users.goromail.extraGroups = [ "dev" ];
     fileSystems."/var/mail/goromail" = {
       device = "${globalCfg.homeDir}/mail";
