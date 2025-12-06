@@ -34,8 +34,7 @@ in {
     users.groups.goromail = { gid = 993; };
     users.users.andrew.extraGroups = [ "goromail" ];
 
-    systemd.tmpfiles.rules = [
-      "z /var/mail/goromail 0750 goromail goromail -"
-    ];
+    systemd.tmpfiles.rules =
+      [ "z /var/mail/goromail 0750 goromail goromail -" ];
   };
 }
