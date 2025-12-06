@@ -12,8 +12,8 @@ in {
       config = {
         virtual_mailbox_base = "/var/mail/goromail/";
         virtual_mailbox_domains = "andrewtorgesen.com";
-        virtual_uid_maps = "static:1000"; # ^^^^ TODO: make configurable
-        virtual_gid_maps = "static:1000";
+        virtual_uid_maps = "static:994";
+        virtual_gid_maps = "static:993";
       };
     };
 
@@ -22,13 +22,13 @@ in {
     #       test with `nc -zv <public_ip> 25`
     networking.firewall.allowedTCPPorts = [ 25 ];
 
-    # users.users.goromail = {
-    #   isSystemUser = true;
-    #   home = "/var/mail/goromail";
-    #   createHome = false;
-    #   uid = 994;
-    #   group = "goromail";
-    # };
-    # users.groups.goromail = { gid = 993; };
+    users.users.goromail = {
+      isSystemUser = true;
+      home = "/var/mail/goromail";
+      createHome = false;
+      uid = 994;
+      group = "goromail";
+    };
+    users.groups.goromail = { gid = 993; };
   };
 }
