@@ -35,8 +35,6 @@ in {
       uid = 994;
       group = "goromail";
     };
-    users.groups.goromail = {
-      gid = 993;
-    };
+    users.groups.goromail = { gid = 993; };
   };
 }
