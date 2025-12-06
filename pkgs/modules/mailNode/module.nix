@@ -1,5 +1,7 @@
 { pkgs, config, lib, ... }:
-let cfg = config.services.mailNode;
+let
+  globalCfg = config.machines.base;
+  cfg = config.services.mailNode;
 in {
   options.services.mailNode = {
     enable = lib.mkEnableOption "enable mail node services";
@@ -30,5 +32,16 @@ in {
       group = "goromail";
     };
     users.groups.goromail = { gid = 993; };
+
+    systemd.tmpfiles.rules = [
+      "d ${globalCfg.homeDir}/mail 0750 andrew dev -"
+    ];
+    users.users.goromail.extraGroups = [ "dev" ];
+    fileSystems."/var/mail/goromail" = {
+      device =
+        "${globalCfg.homeDir}/mail";
+      fsType = "none";
+      options = [ "bind" ];
+    };
   };
 }
