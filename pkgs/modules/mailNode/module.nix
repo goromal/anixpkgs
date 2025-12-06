@@ -8,7 +8,6 @@ in {
     # Postfix: receive-only mail server
     services.postfix = {
       enable = true;
-      openFirewall = true;
 
       # Modern configuration location (NixOS ≥ 23.11)
       settings = {
@@ -24,6 +23,9 @@ in {
         mailbox_command = ""; # default local delivery agent
       };
     };
+
+    # Open the firewall
+    networking.firewall.allowedTCPPorts = [ 25 ];
 
     # Create a user that will receive mail
     users.users.goromail = {
