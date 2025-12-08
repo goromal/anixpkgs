@@ -41,5 +41,32 @@ in {
       "z /var/mail/goromail/new 0770 goromail goromail -"
       "z /var/mail/goromail/tmp 0770 goromail goromail -"
     ];
+
+    systemd.services.fix-mail-perms = {
+      description = "Fix permissions of new Postfix mail files";
+      # Run as root (default when no User= is specified)
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = ''
+          for f in /var/mail/goromail/new/*; do
+            # Skip nonexistent matches
+            [ -e "$f" ] || exit 0
+            chmod 660 "$f"
+          done
+        '';
+      };
+    };
+
+    systemd.paths.fix-mail-perms = {
+      description = "Watch for new mail files for goromail";
+      pathConfig = {
+        # Directory to watch
+        PathChanged = "/var/mail/goromail/new";
+        PathModified = "/var/mail/goromail/new";
+        # You could also use DirectoryNotEmpty=
+        # DirectoryNotEmpty = "/var/mail/goromail/new";
+      };
+      wantedBy = [ "multi-user.target" ];
+    };
   };
 }

@@ -17,19 +17,6 @@ let
       sudo $args
     fi
   '';
-  atsudo-headless = pkgs.writeShellScriptBin "atsudo-headless" ''
-    args=""
-    for word in "$@"; do
-      args+="$word "
-    done
-    args=''${args% }
-    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
-    if [[ ! -z "$pw" ]]; then
-      echo "$pw" | sudo -S $args
-    else
-      exit 1
-    fi
-  '';
   machine-rcrsync = anixpkgs.rcrsync.override {
     homeDir = cfg.homeDir;
     cloudDirs = cfg.cloudDirs;
@@ -337,7 +324,6 @@ in {
           machine-rcrsync
           machine-authm
           sudo
-          atsudo-headless
         ] ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
@@ -502,7 +488,6 @@ in {
         gping
         dog
         atsudo
-        atsudo-headless
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [

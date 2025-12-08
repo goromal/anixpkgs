@@ -82,7 +82,6 @@ with import ../dependencies.nix; {
           if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
             exit
           fi
-          atsudo-headless chmod 660 /var/mail/goromail/new/* || { >&2 logger -t ats-mailman "permissions change error!"; exit 1; }
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
           goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
