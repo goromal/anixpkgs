@@ -45,9 +45,7 @@ in {
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
 
-      serviceConfig = {
-        Type = "oneshot";
-      };
+      serviceConfig = { Type = "oneshot"; };
 
       # NixOS will generate an ExecStart script automatically.
       script = ''
