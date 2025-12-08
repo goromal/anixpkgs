@@ -44,9 +44,7 @@ in {
 
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
-      serviceConfig = {
-        Type = "oneshot";
-      };
+      serviceConfig = { Type = "oneshot"; };
       script = ''
         for f in /var/mail/goromail/new/*; do
           [ -e "$f" ] || exit 0
