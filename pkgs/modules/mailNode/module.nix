@@ -44,10 +44,9 @@ in {
 
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
-
-      serviceConfig = { Type = "oneshot"; };
-
-      # NixOS will generate an ExecStart script automatically.
+      serviceConfig = {
+        Type = "oneshot";
+      };
       script = ''
         for f in /var/mail/goromail/new/*; do
           [ -e "$f" ] || exit 0
@@ -58,12 +57,10 @@ in {
 
     systemd.paths.fix-mail-perms = {
       description = "Watch for new mail files for goromail";
-
       pathConfig = {
         PathChanged = "/var/mail/goromail/new";
         PathModified = "/var/mail/goromail/new";
       };
-
       wantedBy = [ "multi-user.target" ];
     };
   };

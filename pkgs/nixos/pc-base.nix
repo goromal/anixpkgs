@@ -316,7 +316,7 @@ in {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = with pkgs;
-        [ bash coreutils util-linux rclone machine-rcrsync machine-authm sudo ]
+        [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
