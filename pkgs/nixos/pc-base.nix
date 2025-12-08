@@ -12,9 +12,9 @@ let
     args=''${args% }
     pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
     if [[ ! -z "$pw" ]]; then
-      echo "$pw" | ${pkgs.sudo}/bin/sudo -S $args
+      echo "$pw" | sudo -S $args
     else
-      ${pkgs.sudo}/bin/sudo $args
+      sudo $args
     fi
   '';
   atsudo-headless = pkgs.writeShellScriptBin "atsudo-headless" ''
@@ -25,7 +25,7 @@ let
     args=''${args% }
     pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
     if [[ ! -z "$pw" ]]; then
-      echo "$pw" | ${pkgs.sudo}/bin/sudo -S $args
+      echo "$pw" | sudo -S $args
     else
       exit 1
     fi
@@ -336,6 +336,7 @@ in {
           rclone
           machine-rcrsync
           machine-authm
+          sudo
           atsudo-headless
         ] ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
