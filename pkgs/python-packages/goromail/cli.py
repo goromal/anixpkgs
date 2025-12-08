@@ -406,7 +406,7 @@ def cli(
     help="Do a dry run; no message deletions.",
 )
 def postfix(ctx: click.Context, categories_csv, dry_run):
-    """Process all pending bot commands."""
+    """Process all pending postfix commands."""
     import mailbox
     from task_tools.manage import TaskManager
 
@@ -469,10 +469,10 @@ def postfix(ctx: click.Context, categories_csv, dry_run):
 
             if text[:8].lower() == f"journal:":
                 text = text[8:]
-                predate = re.match(r"\d\d?/\d\d?/\d\d\d\d:", text)
+                predate = re.match(r"\s*\d\d?/\d\d?/\d\d\d\d:", text)
                 if predate:
                     date = datetime.strptime(
-                        re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
+                        re.match(r"\s*(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
                     )
                     text = text.split(":")[1].strip()
                 print(f"  Journal entry for {date}")
