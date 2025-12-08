@@ -12,9 +12,9 @@ let
     args=''${args% }
     pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
     if [[ ! -z "$pw" ]]; then
-      echo "$pw" | sudo -S $args
+      echo "$pw" | ${pkgs.sudo}/bin/sudo -S $args
     else
-      sudo $args
+      ${pkgs.sudo}/bin/sudo $args
     fi
   '';
   atsudo-headless = pkgs.writeShellScriptBin "atsudo-headless" ''
@@ -25,7 +25,7 @@ let
     args=''${args% }
     pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
     if [[ ! -z "$pw" ]]; then
-      echo "$pw" | sudo -S $args
+      echo "$pw" | ${pkgs.sudo}/bin/sudo -S $args
     else
       exit 1
     fi
