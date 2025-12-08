@@ -16,6 +16,7 @@ in {
         virtual_mailbox_domains = "andrewtorgesen.com";
         virtual_uid_maps = "static:994";
         virtual_gid_maps = "static:993";
+        virtual_mailbox_mode = 0660;
       };
     };
 
