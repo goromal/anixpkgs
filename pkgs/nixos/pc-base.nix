@@ -329,8 +329,15 @@ in {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
       pathPkgs = with pkgs;
-        [ bash coreutils util-linux rclone machine-rcrsync machine-authm atsudo-headless ]
-        ++ cfg.extraOrchestratorPackages;
+        [
+          bash
+          coreutils
+          util-linux
+          rclone
+          machine-rcrsync
+          machine-authm
+          atsudo-headless
+        ] ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
     systemd.timers."weekly-orchestratord-restart" =
