@@ -5,6 +5,8 @@ import sys
 import json
 import requests
 import time
+from email import policy
+from email.parser import BytesParser
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -15,7 +17,31 @@ from task_tools.defaults import TaskToolsDefaults as TTD
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
+MAILDIR_PATH = "/var/mail/goromail"
 
+class PostfixMessage:
+    def __init__(self, maildir, key, msg):
+        self.key = key
+        self.maildir = maildir
+        msg = BytesParser(policy=policy.default).parsebytes(msg.as_bytes())
+        self.sender = msg["From"]
+        self.recipient = msg["To"]
+        self.subject = msg["Subject"]
+        self.date = datetime.strptime(msg["Date"], "%a, %d %b %Y %H:%M:%S %z")
+        text_parts = []
+        for part in msg.walk():
+            if part.get_content_type() == "text/plain":
+                text_parts.append(part.get_content())
+        self.text = "\n".join(text_parts)
+    
+    def getText(self):
+        return self.text
+    
+    def getDate(self):
+        return self.date
+    
+    def moveToTrash(self):
+        self.maildir.remove(self.key)
 
 def create_notion_bulleted_list(data, level=0):
     if not isinstance(data, list):
@@ -362,6 +388,168 @@ def cli(
         "headless": headless,
         "headless_logdir": os.path.expanduser(headless_logdir),
     }
+
+@cli.command()
+@click.pass_context
+@click.option(
+    "--categories-csv",
+    "categories_csv",
+    type=click.Path(),
+    default="~/configs/goromail-categories.csv",
+    show_default=True,
+    help="CSV that maps keywords to notion pages.",
+)
+@click.option(
+    "--dry-run",
+    "dry_run",
+    is_flag=True,
+    help="Do a dry run; no message deletions.",
+)
+def postfix(ctx: click.Context, categories_csv, dry_run):
+    """Process all pending bot commands."""
+    import mailbox
+    from task_tools.manage import TaskManager
+
+    if ctx.obj["headless"]:
+        Path(ctx.obj["headless_logdir"]).mkdir(parents=True, exist_ok=True)
+        logfile = open(os.path.join(ctx.obj["headless_logdir"], "postfix.log"), "w")
+    else:
+        logfile = None
+    try:
+        maildir = mailbox.Maildir(MAILDIR_PATH, factory=None)
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
+    try:
+        msgs = []
+        for key, msg in maildir.iteritems():
+            msgs.append(PostfixMessage(maildir, key, msg))
+    except KeyError:
+        print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        if logfile is not None:
+            logfile.close()
+        return
+    try:
+        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
+            secrets = json.load(nsf)
+        notion_api_token = secrets["auth"]
+    except:
+        sys.stderr.write(f"Failed to load Notion API key")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
+    wiki = WikiTools(
+        wiki_url=ctx.obj["wiki_url"],
+        wiki_user=ctx.obj["wiki_user"],
+        wiki_pass=ctx.obj["wiki_pass"],
+        enable_logging=ctx.obj["enable_logging"],
+    )
+    try:
+        task = TaskManager(
+            task_secrets_file=ctx.obj["task_secrets_file"],
+            task_refresh_token=ctx.obj["task_refresh_token"],
+            enable_logging=ctx.obj["enable_logging"],
+        )
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
+    print(
+        Fore.YELLOW
+        + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..."
+        + Style.RESET_ALL
+    )
+    try:
+        for msg in reversed(msgs):
+            text = msg.getText().strip()
+            date = msg.getDate()
+
+            if text[:8].lower() == f"journal:":
+                text = text[8:]
+                predate = re.match(r"\d\d?/\d\d?/\d\d\d\d:", text)
+                if predate:
+                    date = datetime.strptime(
+                        re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
+                    )
+                    text = text.split(":")[1].strip()
+                print(f"  Journal entry for {date}")
+                if logfile is not None:
+                    logfile.write(f"{date}\n")
+                if dry_run:
+                    print(text)
+                if not dry_run:
+                    add_journal_entry_to_wiki(wiki, msg, date, text)
+                continue
+
+            matched = False
+            if categories_csv is not None:
+                with open(os.path.expanduser(categories_csv), "r") as categories:
+                    for line in categories:
+                        keyword, notion_page_id = (
+                            line.split(",")[0],
+                            line.split(",")[1].strip(),
+                        )
+                        matched = process_keyword(
+                            text,
+                            date.strftime("%m/%d/%Y"),
+                            keyword,
+                            notion_api_token,
+                            notion_page_id,
+                            msg,
+                            dry_run,
+                            logfile,
+                        )
+                        if matched:
+                            break
+            if matched:
+                continue
+            if text.lstrip("-+").isdigit():
+                print(f"  Calorie intake on {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Calories entry\n")
+                if not dry_run:
+                    caljo_doku = None
+                    caljo_doku = wiki.getPage(id="calorie-journal")
+                    new_caljo_doku = f"""{caljo_doku}
+    * ({date}) {text}"""
+                    wiki.putPage(id="calorie-journal", content=new_caljo_doku)
+                    if caljo_doku is not None:
+                        msg.moveToTrash()
+            elif (
+                text[:3].lower() == "p0:"
+                or text[:3].lower() == "p1:"
+                or text[:3].lower() == "p2:"
+                or text[:3].lower() == "p3:"
+            ):
+                print(f"  {text[:2]} task for {date}: {text[3:]}")
+                if logfile is not None:
+                    logfile.write("Task entry\n")
+                if not dry_run:
+                    task.putTask(
+                        text,
+                        f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
+                        datetime.today(),
+                    )
+                    msg.moveToTrash()
+            else:
+                print(f"  ITNS from {date}: {text}")
+                if logfile is not None:
+                    logfile.write("Notion:ITNS entry\n")
+                if not dry_run:
+                    append_text_to_notion_page(
+                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
+                    )
+    except Exception as e:
+        sys.stderr.write(f"Program error: {e}")
+        if logfile is not None:
+            logfile.close()
+        exit(1)
+    if logfile is not None:
+        logfile.close()
+    print(Fore.GREEN + f"Done." + Style.RESET_ALL)
 
 
 @cli.command()
