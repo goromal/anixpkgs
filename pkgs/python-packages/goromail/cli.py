@@ -19,6 +19,7 @@ MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
 MAILDIR_PATH = "/var/mail/goromail"
 
+
 class PostfixMessage:
     def __init__(self, maildir, key, msg):
         self.key = key
@@ -33,15 +34,16 @@ class PostfixMessage:
             if part.get_content_type() == "text/plain":
                 text_parts.append(part.get_content())
         self.text = "\n".join(text_parts)
-    
+
     def getText(self):
         return self.text
-    
+
     def getDate(self):
         return self.date
-    
+
     def moveToTrash(self):
         self.maildir.remove(self.key)
+
 
 def create_notion_bulleted_list(data, level=0):
     if not isinstance(data, list):
@@ -389,6 +391,7 @@ def cli(
         "headless_logdir": os.path.expanduser(headless_logdir),
     }
 
+
 @cli.command()
 @click.pass_context
 @click.option(
@@ -472,7 +475,8 @@ def postfix(ctx: click.Context, categories_csv, dry_run):
                 predate = re.match(r"\s*\d\d?/\d\d?/\d\d\d\d:", text)
                 if predate:
                     date = datetime.strptime(
-                        re.match(r"\s*(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
+                        re.match(r"\s*(\d\d?/\d\d?/\d\d\d\d):", text).group(1),
+                        "%m/%d/%Y",
                     )
                     text = text.split(":")[1].strip()
                 print(f"  Journal entry for {date}")
