@@ -79,23 +79,19 @@ with import ../dependencies.nix; {
       {
         name = "ats-mailman";
         jobShellScript = pkgs.writeShellScript "ats-mailman" ''
+          if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
+            exit
+          fi
+          atsudo-headless chmod 660 /var/mail/goromail/new/* || { >&2 logger -t ats-mailman "permissions change error!"; exit 1; }
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless bot ${anixpkgs.redirects.suppress_all}
-          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless journal ${anixpkgs.redirects.suppress_all}
-          if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
+          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
+          if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
             echo "Notifying about processed bot mail..."
-            echo "[$(date)] 📬 Bot mail received:" \
-              | cat - $HOME/goromail/bot.log > $HOME/goromail/temp \
-              && mv $HOME/goromail/temp $HOME/goromail/bot.log
-            logger -t ats-mailman "$(cat $HOME/goromail/bot.log)"
-          fi
-          if [[ ! -z "$(cat $HOME/goromail/journal.log)" ]]; then
-            echo "Notifying about processed journal mail..."
-            echo "[$(date)] 📖 Journal mail received:" \
-              | cat - $HOME/goromail/journal.log > $HOME/goromail/temp \
-              && mv $HOME/goromail/temp $HOME/goromail/journal.log
-            logger -t ats-mailman "$(cat $HOME/goromail/journal.log)"
+            echo "[$(date)] 📬 Postfix mail received:" \
+              | cat - $HOME/goromail/postfix.log > $HOME/goromail/temp \
+              && mv $HOME/goromail/temp $HOME/goromail/postfix.log
+            logger -t ats-mailman "$(cat $HOME/goromail/postfix.log)"
           fi
         '';
         timerCfg = {
