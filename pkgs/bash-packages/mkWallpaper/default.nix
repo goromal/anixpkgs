@@ -1,5 +1,5 @@
 { runCommand, imagemagick, pkgData, screenResolution, label, forcedImage ? null
-}:
+, forcedIdx ? null }:
 let
   minWpIdx = 1;
   maxWpIdx = 12;
@@ -10,7 +10,10 @@ let
         builtins.toString maxWpIdx
       })) > $out
     '';
-  randomInt = builtins.fromJSON (builtins.readFile randomIntDrv);
+  randomInt = if forcedIdx != null then
+    forcedIdx
+  else
+    builtins.fromJSON (builtins.readFile randomIntDrv);
   sourceImage = if forcedImage != null then
     forcedImage
   else

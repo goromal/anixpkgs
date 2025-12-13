@@ -16,6 +16,7 @@ let
     screenResolution = cfg.screenResolution;
     label = version-string;
     forcedImage = cfg.wallpaperImage;
+    forcedIdx = 3; # temporarily pin the wallpaper idx
   };
 in {
   dconf.settings = ({
