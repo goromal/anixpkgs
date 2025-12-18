@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1762067619,
-        "narHash": "sha256-wrBvgF+Kha+mw1jzx2M9Jub6cbGHbmtk5MmsoyCRRxw=",
+        "lastModified": 1765609263,
+        "narHash": "sha256-YWj/YG1QxkTc3wM1ljUNAx39me1ppgwqJbSkA18KguE=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "e160c1191f8187d80b0793994721f1ec7fb16246",
+        "rev": "a375857fa89d2ff9c0718395c689720a02714f75",
         "type": "github"
       },
       "original": {
@@ -102,11 +102,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1763963253,
-        "narHash": "sha256-RUulxtos9LJFwrUM82tyi+HIz22B90qqPhWKpmtJTGY=",
+        "lastModified": 1766035688,
+        "narHash": "sha256-/lq485V/warVmf38ICCN2tK44xKzlxHMyQuriq+RGto=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "81ce19e63f64cc8ddf742116823d979351a32edd",
+        "rev": "9ff6f97ce5c193f95996e8a886c5995ab5ff86dd",
         "type": "github"
       },
       "original": {
