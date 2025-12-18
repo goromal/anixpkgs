@@ -10,10 +10,13 @@ from email.parser import BytesParser
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
+import asyncio
+from grpc import aio
 from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
 from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.defaults import TaskToolsDefaults as TTD
+from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
@@ -256,6 +259,33 @@ def add_journal_entry_to_wiki(wiki, msg, date, text):
         msg.moveToTrash()
 
 
+def report_journal_entry_to_tactical(tactical_port, date):
+    async def cmd_impl(port, year, month, day):
+        async with aio.insecure_channel(f"localhost:{port}") as channel:
+            stub = tactical_pb2_grpc.TacticalServiceStub(channel)
+            try:
+                _ = await stub.SubmitSurveyResult(
+                    tactical_pb2.SubmitSurveyResultRequest(
+                        result=tactical_pb2.SurveyResult(
+                            year=year,
+                            month=month,
+                            day=day,
+                            survey_name="Journaling",
+                            results=[
+                                tactical_pb2.SurveyQuestionResult(
+                                    question_name="Submitted entry",
+                                    result=tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT,
+                                )
+                            ],
+                        )
+                    )
+                )
+            except:
+                pass
+
+    asyncio.run(cmd_impl(tactical_port, date.year, date.month, date.day))
+
+
 @click.group()
 @click.pass_context
 @click.option(
@@ -403,12 +433,20 @@ def cli(
     help="CSV that maps keywords to notion pages.",
 )
 @click.option(
+    "--tactical-port",
+    "tactical_port",
+    type=int,
+    default=60060,
+    show_default=True,
+    help="Tactical server port to hit",
+)
+@click.option(
     "--dry-run",
     "dry_run",
     is_flag=True,
     help="Do a dry run; no message deletions.",
 )
-def postfix(ctx: click.Context, categories_csv, dry_run):
+def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
     """Process all pending postfix commands."""
     import mailbox
     from task_tools.manage import TaskManager
@@ -486,6 +524,7 @@ def postfix(ctx: click.Context, categories_csv, dry_run):
                     print(text)
                 if not dry_run:
                     add_journal_entry_to_wiki(wiki, msg, date, text)
+                    report_journal_entry_to_tactical(tactical_port, date)
                 continue
 
             matched = False
