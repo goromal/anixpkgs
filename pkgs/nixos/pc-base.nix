@@ -537,7 +537,7 @@ in {
 
     programs.captive-browser = {
       enable = cfg.graphical;
-      interface = cfg.wifiInterfaceName
+      interface = cfg.wifiInterfaceName;
     };
 
     systemd.tmpfiles.rules =
