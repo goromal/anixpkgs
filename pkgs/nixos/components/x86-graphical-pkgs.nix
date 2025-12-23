@@ -98,6 +98,8 @@ in {
     };
   };
 
+  # ^^^^ TODO: if standalone == false, then browser-alias for captive browser
+
   home.file = with anixpkgs.pkgData;
     ({
       ".config/terminator/config".source =

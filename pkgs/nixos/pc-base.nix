@@ -530,6 +530,8 @@ in {
       nohistory = "set +o history";
     };
 
+    programs.captive-browser.enable = true;
+
     systemd.tmpfiles.rules =
       [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
 
