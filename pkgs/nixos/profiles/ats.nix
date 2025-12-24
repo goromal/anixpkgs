@@ -95,7 +95,7 @@ with import ../dependencies.nix; {
         '';
         timerCfg = {
           OnBootSec = "5m";
-          OnUnitActiveSec = "10m";
+          OnUnitActiveSec = "30m";
         };
       }
       {

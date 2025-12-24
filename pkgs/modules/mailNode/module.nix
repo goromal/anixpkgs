@@ -50,6 +50,9 @@ in {
           [ -e "$f" ] || exit 0
           chmod 660 "$f"
         done
+        if [ ! -z "$( ls -A '/var/mail/goromail/new' )" ]; then
+          systemctl start ats-mailman.service
+        fi
       '';
     };
 
