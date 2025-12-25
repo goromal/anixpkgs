@@ -16,7 +16,7 @@
     anixdata.flake = false;
 
     aapis.url = "github:goromal/aapis";
-    aapis.flake = false; 
+    aapis.flake = false;
 
     ardupilot.url =
       "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
