@@ -707,11 +707,11 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1766630052,
-        "narHash": "sha256-TavxvibvKZYLOSXne4axcnziAz02aLRdjHecUlj3FLo=",
+        "lastModified": 1766630500,
+        "narHash": "sha256-Qjp5QusWxFzMJO3GdIcSIw3swlbLDdf3e8s7+PV0OcE=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "32a80c5789d8a8bf434781e3b8566ccee62fc491",
+        "rev": "07fe68734b219e5a00f8f54590ee2861f54bb7e5",
         "type": "github"
       },
       "original": {
