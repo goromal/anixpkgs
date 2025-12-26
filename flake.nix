@@ -97,7 +97,7 @@
     pyceres_factors.url = "github:goromal/pyceres_factors";
     pyceres_factors.flake = false;
 
-    pysignals.url = "github:goromal/pysignals";
+    pysignals.url = "github:goromal/pysignals?ref=dev/zerotypes";
     pysignals.flake = false;
 
     pysorting.url = "github:goromal/pysorting";
