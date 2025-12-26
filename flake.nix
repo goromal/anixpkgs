@@ -97,7 +97,7 @@
     pyceres_factors.url = "github:goromal/pyceres_factors";
     pyceres_factors.flake = false;
 
-    pysignals.url = "github:goromal/pysignals?ref=dev/zerotypes";
+    pysignals.url = "github:goromal/pysignals";
     pysignals.flake = false;
 
     pysorting.url = "github:goromal/pysorting";
@@ -121,7 +121,7 @@
     secure-delete.url = "github:goromal/secure-delete";
     secure-delete.flake = false;
 
-    signals-cpp.url = "github:goromal/signals-cpp?ref=dev/zerotypes";
+    signals-cpp.url = "github:goromal/signals-cpp";
     signals-cpp.flake = false;
 
     simple-image-editor.url = "github:goromal/simple-image-editor";
