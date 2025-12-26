@@ -526,16 +526,15 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1766719612,
-        "narHash": "sha256-HoStZVt4Z8h0lrFDTa8ve7HPr7xDnpahXEfFrLx+170=",
+        "lastModified": 1766781420,
+        "narHash": "sha256-lkXATLuWtUU3q2cTcSL8sbgf78CX/BgiwT+EOB/pL6Y=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "8b596cfa8bce7f61ee4d38f29aa0b283a6c79967",
+        "rev": "55c464a90ad44dad8ca963158430fa2da5dc7b67",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/zerotypes",
         "repo": "pysignals",
         "type": "github"
       }
@@ -708,16 +707,15 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1766779485,
+        "lastModified": 1766780194,
         "narHash": "sha256-S/f3zyZZ26Q2s2jOl+/RLSMzMa4RT1YT9BYyV/eqbJ8=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "1de07cb3228ed42e879eea09325b0a816e65a1da",
+        "rev": "3e3fa06a6ab91cb4817285dcaed066307c80f3c0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/zerotypes",
         "repo": "signals-cpp",
         "type": "github"
       }
