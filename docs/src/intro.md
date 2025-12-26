@@ -8,7 +8,7 @@ My open source software is packaged and deployed from a central repository: **an
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v7.12.1](https://github.com/goromal/anixpkgs/tree/v7.12.1)**
+**LATEST RELEASE: [v7.13.0](https://github.com/goromal/anixpkgs/tree/v7.13.0)**
 
 **[Repository](https://github.com/goromal/anixpkgs)**
 
@@ -47,7 +47,7 @@ The software packaged in `anixpkgs` is buildable both through [Nix flakes](https
 
 ### Accessing the Packages Using Flakes
 
-Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v7.12.1`) while also giving you access to the public cache to avoid building from source on your machine:
+Here is a `flake.nix` file that will get you a shell with select `anixpkgs` software (version `v7.13.0`) while also giving you access to the public cache to avoid building from source on your machine:
 
 ```nix
 {
@@ -61,7 +61,7 @@ Here is a `flake.nix` file that will get you a shell with select `anixpkgs` soft
     "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
   ];
   inputs = {
-    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v7.12.1";
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v7.13.0";
   };
   outputs = { self, nixpkgs }:
     let pkgs = nixpkgs.legacyPackages.x86_64-linux;
@@ -81,12 +81,12 @@ Access the packages with `nix develop`.
 
 ### Accessing the Packages Using shell.nix
 
-Here are some `shell.nix` files to access Python packages (using version `v7.12.1` of the packages):
+Here are some `shell.nix` files to access Python packages (using version `v7.13.0` of the packages):
 
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.12.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.13.0.tar.gz") {};
   python-with-my-packages = pkgs.python311.withPackages (p: with p; [
     numpy
     matplotlib
@@ -102,7 +102,7 @@ or:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.12.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.13.0.tar.gz") {};
 in pkgs.mkShell {
   buildInputs = [
     pkgs.python311
@@ -126,7 +126,7 @@ And for general software packages:
 ```nix
 let
   pkgs = import (builtins.fetchTarball
-    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.12.1.tar.gz") {};
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v7.13.0.tar.gz") {};
 in with pkgs; mkShell {
   buildInputs = [
     pb
