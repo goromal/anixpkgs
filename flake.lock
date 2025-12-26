@@ -245,6 +245,22 @@
         "type": "github"
       }
     },
+    "gnc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1766782308,
+        "narHash": "sha256-Cf7vnos2IpkcrgqkWRL5Ht7kPexUenFaRN5RYYY4XBc=",
+        "owner": "goromal",
+        "repo": "gnc",
+        "rev": "b80521a95217b37747d65e1efb1e52378e437b2c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "gnc",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -636,6 +652,7 @@
         "flake-utils": "flake-utils",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
+        "gnc": "gnc",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
