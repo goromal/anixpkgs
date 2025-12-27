@@ -11,6 +11,7 @@
   - [quad-sim-cpp](./cpp/quad-sim-cpp.md)
   - [ceres-factors](./cpp/ceres-factors.md)
   - [signals-cpp](./cpp/signals-cpp.md)
+  - [gnc](./cpp/gnc.md)
   - [secure-delete](./cpp/secure-delete.md)
   - [sorting](./cpp/sorting.md)
   - [crowcpp](./cpp/crowcpp.md)

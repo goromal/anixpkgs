@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
