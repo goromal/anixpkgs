@@ -41,22 +41,22 @@ with import ../dependencies.nix; {
     ];
     enableOrchestrator = true;
     timedOrchJobs = [
-      {
-        name = "ats-greeting";
-        jobShellScript = pkgs.writeShellScript "ats-greeting" ''
-          sleep 5
-          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          sleep 5
-          gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
-            "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
-            "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
-        '';
-        timerCfg = {
-          OnBootSec = "1m";
-          Persistent = false;
-        };
-      }
+      # {
+      #   name = "ats-greeting";
+      #   jobShellScript = pkgs.writeShellScript "ats-greeting" ''
+      #     sleep 5
+      #     authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+      #     sleep 5
+      #     gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
+      #       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+      #     gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
+      #       "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
+      #   '';
+      #   timerCfg = {
+      #     OnBootSec = "1m";
+      #     Persistent = false;
+      #   };
+      # }
       {
         name = "ats-triaging";
         jobShellScript = pkgs.writeShellScript "ats-triaging" ''
@@ -188,21 +188,21 @@ with import ../dependencies.nix; {
           Persistent = false;
         };
       }
-      {
-        name = "ats-refresh-reminder";
-        jobShellScript = pkgs.writeShellScript "ats-refresh-reminder" ''
-          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          rcrsync copy configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          gmail-manager gbot-send 6612105214@vzwpix.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
-        '';
-        timerCfg = {
-          OnCalendar = [ "Sun 19:00" ];
-          Persistent = false;
-        };
-      }
+      # {
+      #   name = "ats-refresh-reminder";
+      #   jobShellScript = pkgs.writeShellScript "ats-refresh-reminder" ''
+      #     authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+      #     rcrsync copy configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
+      #     gmail-manager gbot-send 6612105214@vzwpix.com "Gentle Reminder" \
+      #       "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
+      #     gmail-manager gbot-send andrew.torgesen@gmail.com "Gentle Reminder" \
+      #       "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
+      #   '';
+      #   timerCfg = {
+      #     OnCalendar = [ "Sun 19:00" ];
+      #     Persistent = false;
+      #   };
+      # }
       {
         name = "ats-gmail-clean";
         jobShellScript = pkgs.writeShellScript "ats-gmail-clean" ''
