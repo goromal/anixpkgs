@@ -43,11 +43,11 @@ GENERATOR_CONFIGS = {
         "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
         "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("gbot_refresh_file")),
     },
-    "journal": {
-        "name": "Journal",
-        "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
-        "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("journal_refresh_file")),
-    },
+    # "journal": {
+    #     "name": "Journal",
+    #     "secrets_file": expanduser_for("andrew", GPD.getKwargsOrDefault("gmail_secrets_json")),
+    #     "refresh_token": expanduser_for("andrew", GPD.getKwargsOrDefault("journal_refresh_file")),
+    # },
 }
 
 generators = {}
