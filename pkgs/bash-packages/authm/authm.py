@@ -40,36 +40,36 @@ def refresh(headless, force):
             f"Refresh of {GPD.getKwargsOrDefault('gmail_refresh_file')} needed."
         )
         exit(1)
-    print(Fore.YELLOW + "Refreshing Bot Tokens..." + Style.RESET_ALL)
-    try:
-        getGoogleService(
-            "gmail",
-            "v1",
-            GPD.getKwargsOrDefault("gmail_secrets_json"),
-            GPD.getKwargsOrDefault("gbot_refresh_file"),
-            headless=headless,
-            force=force,
-        )
-    except CredentialsRefreshException:
-        sys.stderr.write(
-            f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed."
-        )
-        exit(1)
-    print(Fore.YELLOW + "Refreshing Journal Tokens..." + Style.RESET_ALL)
-    try:
-        getGoogleService(
-            "gmail",
-            "v1",
-            GPD.getKwargsOrDefault("gmail_secrets_json"),
-            GPD.getKwargsOrDefault("journal_refresh_file"),
-            headless=headless,
-            force=force,
-        )
-    except CredentialsRefreshException:
-        sys.stderr.write(
-            f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed."
-        )
-        exit(1)
+    # print(Fore.YELLOW + "Refreshing Bot Tokens..." + Style.RESET_ALL)
+    # try:
+    #     getGoogleService(
+    #         "gmail",
+    #         "v1",
+    #         GPD.getKwargsOrDefault("gmail_secrets_json"),
+    #         GPD.getKwargsOrDefault("gbot_refresh_file"),
+    #         headless=headless,
+    #         force=force,
+    #     )
+    # except CredentialsRefreshException:
+    #     sys.stderr.write(
+    #         f"Refresh of {GPD.getKwargsOrDefault('gbot_refresh_file')} needed."
+    #     )
+    #     exit(1)
+    # print(Fore.YELLOW + "Refreshing Journal Tokens..." + Style.RESET_ALL)
+    # try:
+    #     getGoogleService(
+    #         "gmail",
+    #         "v1",
+    #         GPD.getKwargsOrDefault("gmail_secrets_json"),
+    #         GPD.getKwargsOrDefault("journal_refresh_file"),
+    #         headless=headless,
+    #         force=force,
+    #     )
+    # except CredentialsRefreshException:
+    #     sys.stderr.write(
+    #         f"Refresh of {GPD.getKwargsOrDefault('journal_refresh_file')} needed."
+    #     )
+    #     exit(1)
     print(Fore.GREEN + "DONE" + Style.RESET_ALL)
 
 
