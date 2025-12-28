@@ -78,7 +78,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp?ref=dev/spdlog-catch2";
+    mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
     orchestrator.url = "github:goromal/orchestrator";
