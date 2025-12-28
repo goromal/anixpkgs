@@ -17,7 +17,6 @@
   - [crowcpp](./cpp/crowcpp.md)
   - [rankserver-cpp](./cpp/rankserver-cpp.md)
   - [mfn](./cpp/mfn.md)
-  - [orchestrator-cpp](./cpp/orchestrator-cpp.md)
 - [Rust Packages](./rust/rust.md)
   - [manif-geom-rs](./rust/manif-geom-rs.md)
   - [xv-lidar-rs](./rust/xv-lidar-rs.md)
