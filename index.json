@@ -63,8 +63,8 @@
             },
             {
                 "attr": "orchestrator-cpp",
-                "ci": true,
-                "docs": true
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ardurouter",
