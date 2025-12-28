@@ -53,6 +53,8 @@ in {
     ".config/gtk-3.0/bookmarks".text = ''
       file://${cfg.homeDir}/dev Development
       file://${cfg.homeDir}/data Data
+      file://${cfg.homeDir}/Documents Documents
+      file://${cfg.homeDir}/Downloads Downloads
     '';
   };
 }
