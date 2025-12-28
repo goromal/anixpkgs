@@ -42,22 +42,6 @@ with import ../dependencies.nix; {
     enableOrchestrator = true;
     timedOrchJobs = [
       {
-        name = "ats-greeting";
-        jobShellScript = pkgs.writeShellScript "ats-greeting" ''
-          sleep 5
-          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          sleep 5
-          gmail-manager gbot-send 6612105214@vzwpix.com "ats-greeting" \
-            "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "ats-greeting" \
-            "[$(date)] 🌞 Hello, world! I'm awake! authm refreshed successfully ✅"
-        '';
-        timerCfg = {
-          OnBootSec = "1m";
-          Persistent = false;
-        };
-      }
-      {
         name = "ats-triaging";
         jobShellScript = pkgs.writeShellScript "ats-triaging" ''
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
@@ -79,33 +63,28 @@ with import ../dependencies.nix; {
       {
         name = "ats-mailman";
         jobShellScript = pkgs.writeShellScript "ats-mailman" ''
+          if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
+            exit
+          fi
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless bot ${anixpkgs.redirects.suppress_all}
-          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless journal ${anixpkgs.redirects.suppress_all}
-          if [[ ! -z "$(cat $HOME/goromail/bot.log)" ]]; then
+          goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
+          if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
             echo "Notifying about processed bot mail..."
-            echo "[$(date)] 📬 Bot mail received:" \
-              | cat - $HOME/goromail/bot.log > $HOME/goromail/temp \
-              && mv $HOME/goromail/temp $HOME/goromail/bot.log
-            logger -t ats-mailman "$(cat $HOME/goromail/bot.log)"
-          fi
-          if [[ ! -z "$(cat $HOME/goromail/journal.log)" ]]; then
-            echo "Notifying about processed journal mail..."
-            echo "[$(date)] 📖 Journal mail received:" \
-              | cat - $HOME/goromail/journal.log > $HOME/goromail/temp \
-              && mv $HOME/goromail/temp $HOME/goromail/journal.log
-            logger -t ats-mailman "$(cat $HOME/goromail/journal.log)"
+            echo "[$(date)] 📬 Postfix mail received:" \
+              | cat - $HOME/goromail/postfix.log > $HOME/goromail/temp \
+              && mv $HOME/goromail/temp $HOME/goromail/postfix.log
+            logger -t ats-mailman "$(cat $HOME/goromail/postfix.log)"
           fi
         '';
         timerCfg = {
           OnBootSec = "5m";
-          OnUnitActiveSec = "10m";
+          OnUnitActiveSec = "60m";
         };
       }
       {
-        name = "ats-grader";
-        jobShellScript = pkgs.writeShellScript "ats-grader" ''
+        name = "ats-task-migrator";
+        jobShellScript = pkgs.writeShellScript "ats-task-migrator" ''
           authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
           tmpdir=$(mktemp -d)
           echo "🧹 Daily Task Cleaning 🧹" > $tmpdir/out.txt
@@ -162,21 +141,11 @@ with import ../dependencies.nix; {
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local quote
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local vocab
           tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local wiki-url
+          surveys_report upload-results
         '';
         timerCfg = {
           OnCalendar = [ "*-*-* 00:00:00" ];
           Persistent = false;
-        };
-      }
-      {
-        name = "ats-tactical-intervaled";
-        jobShellScript = pkgs.writeShellScript "ats-tactical-intervaled" ''
-          authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local tasks
-        '';
-        timerCfg = {
-          OnBootSec = "5m";
-          OnUnitActiveSec = "10m";
         };
       }
       {
@@ -188,22 +157,21 @@ with import ../dependencies.nix; {
           logger -t ats-itns-nudge "$output"
         '';
         timerCfg = {
-          OnCalendar = [ "Mon,Fri 12:00" ];
+          OnCalendar = [ "Mon 12:00" ];
           Persistent = false;
         };
       }
       {
-        name = "ats-refresh-reminder";
-        jobShellScript = pkgs.writeShellScript "ats-refresh-reminder" ''
+        name = "ats-gmail-clean";
+        jobShellScript = pkgs.writeShellScript "ats-gmail-clean" ''
+          sleep 5
           authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-          rcrsync copy configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-          gmail-manager gbot-send 6612105214@vzwpix.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
-          gmail-manager gbot-send andrew.torgesen@gmail.com "Gentle Reminder" \
-            "[$(date)] 👋 When you have a second, please refresh my credentials at http://$(cat ~/secrets/ats/i.txt)/auth/"
+          sleep 5
+          gmail-manager clean --num-messages 4000
+          logger -t ats-gmail-clean "GMail cleaning complete"
         '';
         timerCfg = {
-          OnCalendar = [ "Sun 19:00" ];
+          OnCalendar = [ "Sat 23:00" ];
           Persistent = false;
         };
       }
@@ -219,6 +187,7 @@ with import ../dependencies.nix; {
       anixpkgs.scrape
       anixpkgs.providence-tasker
       anixpkgs.daily_tactical_server
+      anixpkgs.surveys_report
     ];
   }) // {
     users.users.andrew.hashedPassword = lib.mkForce

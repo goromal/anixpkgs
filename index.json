@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -406,6 +411,11 @@
                 "attr": "budget_report",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "surveys_report",
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "md2pdf",

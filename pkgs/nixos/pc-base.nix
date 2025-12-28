@@ -116,6 +116,7 @@ in {
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
+    ../modules/mailNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -319,6 +320,24 @@ in {
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+    systemd.timers."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun 03:00";
+          Persistent = true;
+        };
+      };
+    systemd.services."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart =
+            "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
+        };
+      };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
@@ -380,6 +399,9 @@ in {
 
     # Media
     services.plexNode.enable = cfg.isATS;
+
+    # Mail
+    services.mailNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;

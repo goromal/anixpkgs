@@ -79,6 +79,8 @@ let
             });
             budget_report =
               addDoc (pySelf.callPackage ./python-packages/budget-report { });
+            surveys_report =
+              addDoc (pySelf.callPackage ./python-packages/surveys-report { });
             easy-google-auth = addDoc
               (pySelf.callPackage ./python-packages/easy-google-auth {
                 pkg-src = flakeInputs.easy-google-auth;
@@ -196,6 +198,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
             authui =
               addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
+            pinned-mavproxy =
+              addDoc (pySelf.callPackage ./python-packages/mavproxy { });
           });
       }));
 in rec {
@@ -243,6 +247,7 @@ in rec {
 
   aapis-py = final.python311.pkgs.aapis-py;
   budget_report = final.python311.pkgs.budget_report;
+  surveys_report = final.python311.pkgs.surveys_report;
   makepyshell = final.python311.pkgs.makepyshell;
   mavlog-utils = final.python311.pkgs.mavlog-utils;
   fqt = final.python311.pkgs.fqt;
@@ -362,7 +367,10 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
-  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest {
+    python = python311;
+    mavproxy = python311.pkgs.pinned-mavproxy;
+  });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
@@ -386,6 +394,8 @@ in rec {
   signals-cpp = addDoc (prev.callPackage ./cxx-packages/signals-cpp {
     pkg-src = flakeInputs.signals-cpp;
   });
+  gnc =
+    addDoc (prev.callPackage ./cxx-packages/gnc { pkg-src = flakeInputs.gnc; });
   secure-delete = addDoc (prev.callPackage ./cxx-packages/secure-delete {
     pkg-src = flakeInputs.secure-delete;
   });
@@ -435,4 +445,9 @@ in rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  testWallpaper = prev.callPackage ./bash-packages/mkWallpaper {
+    screenResolution = "1920x1080";
+    label = "TEST WALLPAPER";
+  };
 }

@@ -8,6 +8,7 @@ Packages written in C++.
 - [quad-sim-cpp](./quad-sim-cpp.md)
 - [ceres-factors](./ceres-factors.md)
 - [signals-cpp](./signals-cpp.md)
+- [gnc](./gnc.md)
 - [secure-delete](./secure-delete.md)
 - [sorting](./sorting.md)
 - [crowcpp](./crowcpp.md)

@@ -58,6 +58,7 @@ Commands:
   bot                    Process all pending bot commands.
   itns-nudge             Randomly pick an ITNS topic to nudge with an...
   journal                Process all pending journal entries.
+  postfix                Process all pending postfix commands.
 ```
 
 ### bot
