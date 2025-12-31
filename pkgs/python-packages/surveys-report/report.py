@@ -3,7 +3,9 @@ import click
 import sys
 import os
 import json
-from datetime import datetime
+import importlib.util
+from types import ModuleType
+from typing import Callable
 import asyncio
 from grpc import aio
 
@@ -14,542 +16,61 @@ from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 import gspread
 
 
-def process_daily_log(row):
-    def get_date(row):
-        day_str = row.get("What day is this for?", "").strip()
-        if day_str:
-            dt = datetime.strptime(day_str, "%m/%d/%Y")
-        else:
-            ts = row["Timestamp"]
-            dt = datetime.strptime(ts, "%m/%d/%Y %H:%M:%S")
+def _api_res_from_int(i):
+    if i == 1:
+        return (
+            tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+        )
+    elif i == 2:
+        return (
+            tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
+        )
+    elif i == 3:
+        return (
+            tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
+        )
+    else:
+        return tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
 
-        return dt.year, dt.month, dt.day
 
-    def get_brush_teeth(row):
-        ans = row["Did you brush your teeth?"]
-        if "morning" in ans.lower() and "evening" in ans.lower():
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        elif "morning" in ans.lower() or "evening" in ans.lower():
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
+def _load_module_from_path(path: str) -> ModuleType:
+    abs_path = os.path.abspath(os.path.expanduser(path))
 
-    def get_back_pain(row):
-        ans = row["Did you have back stiffness or pain today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif "None" in ans:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            n = len(ans.split(","))
-            if n == 1:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-                )
+    if not os.path.isfile(abs_path):
+        raise FileNotFoundError(f"Module file not found: {abs_path}")
 
-    def get_back_care(row):
-        ans = row["Did you do back exercises today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "No":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
+    module_name = "dynamic_module"
+    spec = importlib.util.spec_from_file_location(module_name, abs_path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Unable to create spec for module: {abs_path}")
 
-    def get_sick(row):
-        ans = row["Did you feel sick at all today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
-    def get_do_it(row):
-        ans = row["Did you do it?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "No":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
 
-    def get_not_do_it(row):
-        ans = row["Did you not do it?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
+def _get_responses_from_survey(survey):
+    def _translate_response_types(response):
+        translated_response = []
+        for survey_name, survey_date, survey_responses in response:
+            translated_response_item_list = []
+            for q_name, q_resp in survey_responses:
+                translated_response_item_list.append(
+                    (q_name, _api_res_from_int(q_resp))
+                )
+            translated_response.append(
+                (survey_name, survey_date, translated_response_item_list)
             )
-        elif ans == "No":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
+        return translated_response
 
-    def get_disciplined_eating(row):
-        ans1 = row["Were you disciplined in how much you ate today?"]
-        ans2 = row["Were you mindful of the content of the food you ate today?"]
-        if ans1 == "":
-            if ans2 == "":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-                )
-            elif ans2 == "Yes":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-                )
-        if ans1 == "Yes":
-            if ans2 == "" or ans2 == "No":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-                )
-        else:
-            if ans2 == "":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-                )
-            elif ans2 == "Yes":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-                )
-
-    def get_motivation(row):
-        ans = row[
-            "Did you feel exhausted and/or without motivation at any point today?"
+    responses = []
+    if survey["row_func"] is not None:
+        responses = [
+            _translate_response_types(survey["row_func"](row)) for row in survey["data"]
         ]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-
-    def get_fight(row):
-        ans1 = row["Did you get in a fight today?"]
-        ans2 = row[
-            "If you were firm today, were you at least discrete AND actually helpful?"
-        ]
-        if ans1 == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans1 == "Big one":
-            if ans2 == "Yes":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-                )
-        elif ans1 == "Small one":
-            if ans2 == "Yes":
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-                )
-            else:
-                return (
-                    tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-                )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-
-    def get_kids(row):
-        ans = row["Did you lose your temper with the kids today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Nope":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        elif ans == "A little":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_proud(row):
-        ans = row["Are you proud of today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        elif ans == "Kind of":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_floss(row):
-        ans = row["Did you floss?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_skin_care(row):
-        ans = row["Did you take care of your skin?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        elif ans == "Sort Of":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_stronger(row):
-        ans = row["Did you do something to get stronger today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_sleep(row):
-        ans = row["Did you sleep >= 7 hours last night?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_headache(row):
-        ans = row["Did you have a headache today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-
-    def get_laptop(row):
-        ans = row["Did you go on your laptop tonight?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-
-    def get_artistic(row):
-        ans = row["Did you do something artistic today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_spiritual(row):
-        ans = row["Did you ponder something spiritual today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_pray(row):
-        ans = row["Did you pray on your own today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_mouth_care(row):
-        ans1 = row["Did you use mouthwash?"]
-        ans2 = row["Did you use a waterpik?"]
-        if ans1 == "" and ans2 == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans1 == "Yes" and ans2 == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        elif ans1 == "Yes" or ans2 == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_prioritization(row):
-        ans = row[
-            "Did you prioritize life management practices before your body lost motivation?"
-        ]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_statin(row):
-        ans = row["Did you take your statin?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "Yes":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    def get_presence(row):
-        ans = row["Were you present today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        score = 0
-        if "Yes (Y)" in ans:
-            score += 1
-        if "Yes (K)" in ans:
-            score += 2
-        if "No (Y)" in ans:
-            score -= 1
-        if "No (K)" in ans:
-            score -= 2
-        if score < 0:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-        elif score > 0:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-            )
-
-    def get_soda(row):
-        ans = row["How was your water : soda ratio today?"]
-        if ans == "":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_INVALID
-            )
-        elif ans == "High":
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-            )
-        else:
-            return (
-                tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
-            )
-
-    return [
-        (
-            "Heart Care",
-            get_date(row),
-            [
-                ("Discipline in eating", get_disciplined_eating(row)),
-                ("Statin usage", get_statin(row)),
-                ("Strength training", get_stronger(row)),
-            ],
-        ),
-        (
-            "Mouth Care",
-            get_date(row),
-            [
-                ("Brushing teeth", get_brush_teeth(row)),
-                ("Flossing", get_floss(row)),
-                ("Auxiliary care", get_mouth_care(row)),
-            ],
-        ),
-        (
-            "Back Care",
-            get_date(row),
-            [("Back pain", get_back_pain(row)), ("Back exercises", get_back_care(row))],
-        ),
-        (
-            "Misc. Care",
-            get_date(row),
-            [
-                ("Adequate sleep", get_sleep(row)),
-                ("Avoid headaches", get_headache(row)),
-                ("Limit soda", get_soda(row)),
-                ("Skin care", get_skin_care(row)),
-                ("Avoiding illness", get_sick(row)),
-            ],
-        ),
-        (
-            "Discipline",
-            get_date(row),
-            [
-                ("Do it", get_do_it(row)),
-                ("Don't do it", get_not_do_it(row)),
-                ("Avoiding lethargy", get_motivation(row)),
-                ("Prioritizing important things", get_prioritization(row)),
-            ],
-        ),
-        (
-            "Interpersonal Skills",
-            get_date(row),
-            [("Fighting right", get_fight(row)), ("Patience with kids", get_kids(row))],
-        ),
-        (
-            "Well-Roundedness",
-            get_date(row),
-            [
-                ("Avoiding laptop monopoly", get_laptop(row)),
-                ("Artistic development", get_artistic(row)),
-            ],
-        ),
-        (
-            "Presence and Reflection",
-            get_date(row),
-            [
-                ("Presence", get_presence(row)),
-                ("Spiritual reflection", get_spiritual(row)),
-                ("Prayer", get_pray(row)),
-                ("Pride in my day", get_proud(row)),
-            ],
-        ),
-    ]
+    else:
+        print(f"WARNING: could not process survey: {survey['name']}")
+    return responses
 
 
 @click.group()
@@ -596,6 +117,7 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
     if enable_logging:
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     ctx.obj = {"config": config, "surveys": []}
+    module_path = config["modules_path"]
     for survey in config["surveys"]:
         sheet = gspread.authorize(
             getGoogleCreds(
@@ -605,11 +127,48 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
             )
         ).open_by_key(survey["spreadsheetId"])
         data = sheet.worksheet(survey["sheetName"]).get_all_records()
+
+        row_func = None
+        try:
+            function_name = survey["funcName"]
+            module = _load_module_from_path(module_path)
+
+            if not hasattr(module, function_name):
+                raise AttributeError(
+                    f"Function '{function_name}' not found in module {module_path}"
+                )
+
+            func = getattr(module, function_name)
+
+            if not callable(func):
+                raise TypeError(f"'{function_name}' is not callable")
+
+            import inspect
+
+            sig = inspect.signature(func)
+            params = [
+                p
+                for p in sig.parameters.values()
+                if p.kind
+                not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+            ]
+            if len(params) != 1:
+                raise ValueError(
+                    f"Function '{function_name}' must take exactly one argument"
+                )
+
+            row_func = func
+        except Exception as e:
+            print(
+                f"WARNING: unable to import row function for survey {survey['name']}: {e}"
+            )
+
         ctx.obj["surveys"].append(
             {
                 "name": survey["name"],
                 "sheet": sheet,
                 "data": data,
+                "row_func": row_func,
             }
         )
 
@@ -620,10 +179,7 @@ def list_results(ctx: click.Context):
     """List outstanding survey results from the cloud"""
     for survey in ctx.obj["surveys"]:
         print(f"Survey: {survey['name']}")
-        if survey["name"] == "Daily Log":
-            responses = [process_daily_log(row) for row in survey["data"]]
-        else:
-            responses = ["UNSUPPORTED SURVEY"]
+        responses = _get_responses_from_survey(survey)
         for response in responses:
             print(f"    {response}")
             print()
@@ -673,21 +229,17 @@ def upload_results(ctx: click.Context, port):
     counter = 1
     for survey in ctx.obj["surveys"]:
         print(f"Survey: {survey['name']}")
-        if survey["name"] == "Daily Log":
-            responses = [process_daily_log(row) for row in survey["data"]]
-            for survey_response in responses:
-                print(f"  Uploading entry {counter}")
-                for subsurvey_response in survey_response:
-                    survey_name = subsurvey_response[0]
-                    year, month, day = subsurvey_response[1]
-                    question_responses = subsurvey_response[2]
-                    # print(f"    Survey map: {survey_name}")
-                    asyncio.run(
-                        cmd_impl(
-                            port, survey_name, year, month, day, question_responses
-                        )
-                    )
-                counter += 1
+        responses = _get_responses_from_survey(survey)
+        for survey_response in responses:
+            print(f"  Uploading entry {counter}")
+            for subsurvey_response in survey_response:
+                survey_name = subsurvey_response[0]
+                year, month, day = subsurvey_response[1]
+                question_responses = subsurvey_response[2]
+                asyncio.run(
+                    cmd_impl(port, survey_name, year, month, day, question_responses)
+                )
+            counter += 1
 
 
 def main():
