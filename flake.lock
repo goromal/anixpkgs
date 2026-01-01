@@ -851,15 +851,16 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1757190335,
-        "narHash": "sha256-IFA2yj9d/EakBjxPkHNXnP+BBwoeBBs01c24gyxcsTY=",
+        "lastModified": 1767226958,
+        "narHash": "sha256-zYvvI2k/rDuF+9uvQFCsQQzMPmhnXLZO6nLPlgeUYFc=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "736cc0bc04c51fae673fc490cfc742a27c75356c",
+        "rev": "143a846dec627f20675430e7f8c1cb9b6e703c92",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/task-jumps",
         "repo": "task-tools",
         "type": "github"
       }
