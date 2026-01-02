@@ -14,6 +14,7 @@
     public = 5556;
   };
   authui = 4242;
+  budget_ui = 4343;
   tactical = {
     insecure = 60060;
     web = 60070;

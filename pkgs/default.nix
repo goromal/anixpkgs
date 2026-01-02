@@ -198,6 +198,8 @@ let
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
             authui =
               addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
+            budget_ui = addDoc
+              (pySelf.callPackage ./python-packages/flasks/budget_ui { });
             pinned-mavproxy =
               addDoc (pySelf.callPackage ./python-packages/mavproxy { });
           });
@@ -278,6 +280,7 @@ in rec {
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
   authui = final.python311.pkgs.authui;
+  budget_ui = final.python311.pkgs.budget_ui;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
   photos-tools = final.python311.pkgs.photos-tools;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Budget Tool - Config</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Budget Tool Configuration</h1>
+    {% if has_default %}
+    <p>Default config loaded from: <code>{{ config_path }}</code></p>
+    <p><a href="{{ url_for('budget.index') }}">Continue to CSV uploads →</a></p>
+    {% else %}
+    <p>No default config found. Please upload one.</p>
+    {% endif %}
+
+    <h2>Upload New Config (Optional)</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="config" accept=".json">
+        <button type="submit">Upload Config</button>
+    </form>
+</body>
+
+</html>
