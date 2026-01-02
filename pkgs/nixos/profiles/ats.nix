@@ -48,15 +48,11 @@ with import ../dependencies.nix; {
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
           goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
           if [[ ! -z "$(cat $HOME/goromail/annotate.log)" ]]; then
-            echo "Notifying about processed triage pages..."
-            echo "[$(date)] 🧮 Triage Calculations:" \
-              | cat - $HOME/goromail/annotate.log > $HOME/goromail/temp2 \
-              && mv $HOME/goromail/temp2 $HOME/goromail/annotate.log
-            logger -t ats-triaging "$(cat $HOME/goromail/annotate.log)"
+            logger -t ats-triaging "Triaged notion pages"
           fi
         '';
         timerCfg = {
-          OnCalendar = [ "*-*-* 06:30:00" "*-*-* 18:30:00" ];
+          OnCalendar = [ "*-*-* 00:00:00" ];
           Persistent = true;
         };
       }
@@ -70,11 +66,10 @@ with import ../dependencies.nix; {
           rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
           goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
           if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
-            echo "Notifying about processed bot mail..."
-            echo "[$(date)] 📬 Postfix mail received:" \
-              | cat - $HOME/goromail/postfix.log > $HOME/goromail/temp \
-              && mv $HOME/goromail/temp $HOME/goromail/postfix.log
-            logger -t ats-mailman "$(cat $HOME/goromail/postfix.log)"
+            logger -t ats-mailman "Processed mail"
+            if grep -qi "notion" $HOME/goromail/postfix.log; then
+              goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+            fi
           fi
         '';
         timerCfg = {
