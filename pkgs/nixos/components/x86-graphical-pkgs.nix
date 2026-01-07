@@ -84,7 +84,17 @@ in {
       unstable.audacity
       blender
     ] else
-      [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
+      [ ]) ++ (if browser-aliases != null then
+        ([ browser-aliases ] ++ (if cfg.standalone == true then
+          [
+            (pkgs.writeShellScriptBin "captive-browser" ''
+              ${cfg.browserExec} "http://nmcheck.gnome.org/" ${anixpkgs.redirects.suppress_all}
+            '')
+          ]
+        else
+          [ ]))
+      else
+        [ ]);
 
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;
