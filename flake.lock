@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1768104892,
-        "narHash": "sha256-9sAKat4v3cDRuYjPIQ9HL/wvDPfJM/moUWCpCF4jOnY=",
+        "lastModified": 1768144916,
+        "narHash": "sha256-SlA5mbKsWjSnoGFw8HE44efy2BB6QeUmX6IHDMMrbxo=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "e57d9275583bffb1a345b39a172bde9ad569104f",
+        "rev": "e7cad057b29a7acbcf2409fb9e899f7864a4c08a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/pngorch",
         "repo": "aapis",
         "type": "github"
       }
@@ -442,16 +441,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1768112245,
-        "narHash": "sha256-dxRZnL5XFKxsquzpvY4MOmRdMzDdpAzsnLRenTy6L5w=",
+        "lastModified": 1768144730,
+        "narHash": "sha256-XXVUr4wjiEptVKD8pGVXnE3zlR1feqrDmNcxSeK3io4=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "3d94bb15f04926328abda6fdfa8444fa48f5db32",
+        "rev": "1289cdf8a530468419c7a3339b61f1cb49ce13cc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/pngorch",
         "repo": "orchestrator",
         "type": "github"
       }
