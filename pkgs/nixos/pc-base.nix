@@ -497,6 +497,8 @@ in {
         gping
         dog
         atsudo
+        ffmpeg-headless
+        ffmpegthumbnailer
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [
