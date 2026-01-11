@@ -15,7 +15,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/pngorch";
     aapis.flake = false;
 
     ardupilot.url =
@@ -84,7 +84,7 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator";
+    orchestrator.url = "github:goromal/orchestrator?ref=dev/pngorch";
     orchestrator.flake = false;
 
     orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
