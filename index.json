@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -58,8 +63,8 @@
             },
             {
                 "attr": "orchestrator-cpp",
-                "ci": true,
-                "docs": true
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ardurouter",

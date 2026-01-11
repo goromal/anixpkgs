@@ -71,7 +71,7 @@ let
       commands = ''
         tmpdir=$(mktemp -d)
         _stp1="$tmpdir/_stp1.png"
-        ${libheif}/bin/heif-dec "$infile" "$_stp1" ${redirects.suppress_all}
+        ${libheif}/bin/heif-dec "$infile" "$_stp1" ${redirects.suppress_all} || ${imagemagick}/bin/convert "$infile" "$_stp1" ${redirects.suppress_all}
         if [[ ! -z "$resize" ]]; then
             ${apply_resize "$tmpdir" "$_stp1" "_stp2"}
         else

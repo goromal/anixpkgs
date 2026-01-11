@@ -125,6 +125,7 @@ in {
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
+    ../python-packages/flasks/budget_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
   ];
@@ -257,6 +258,20 @@ in {
       '') + "/bin/atsauthui-finish";
     };
 
+    services.budget_ui = {
+      enable = cfg.isATS;
+      pathPkgs = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.util-linux
+        pkgs.rclone
+        machine-rcrsync
+        machine-authm
+        anixpkgs.budget_report
+        anixpkgs.fixfname
+      ];
+    };
+
     services.rankserver = {
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.rankserver;
@@ -320,6 +335,7 @@ in {
     services.orchestratord = lib.mkIf cfg.enableOrchestrator {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
+      threads = if cfg.isATS then 1 else 2;
       pathPkgs = with pkgs;
         [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
         ++ cfg.extraOrchestratorPackages;

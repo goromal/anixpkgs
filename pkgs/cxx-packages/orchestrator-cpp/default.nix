@@ -9,6 +9,7 @@ clangStdenv.mkDerivation {
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
+    broken = true;
     description =
       "C++ implementation of a multi-threaded job manager for my OS.";
     longDescription = ''
