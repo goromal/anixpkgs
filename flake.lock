@@ -248,15 +248,16 @@
     "gnc": {
       "flake": false,
       "locked": {
-        "lastModified": 1766782308,
-        "narHash": "sha256-Cf7vnos2IpkcrgqkWRL5Ht7kPexUenFaRN5RYYY4XBc=",
+        "lastModified": 1766816127,
+        "narHash": "sha256-/NJguaJXx2/GqEIbdQT3m2Zc2rIUFw72SaRet3cBBsM=",
         "owner": "goromal",
         "repo": "gnc",
-        "rev": "b80521a95217b37747d65e1efb1e52378e437b2c",
+        "rev": "fe473a6ab905ce725f98fa5f661220824b2e637e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/quad",
         "repo": "gnc",
         "type": "github"
       }
