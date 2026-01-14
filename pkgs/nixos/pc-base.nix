@@ -370,7 +370,11 @@ in {
     networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
-      ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort cfg.webServerSecurePort ] else [ ]);
+      ++ (if cfg.runWebServer then [
+        cfg.webServerInsecurePort
+        cfg.webServerSecurePort
+      ] else
+        [ ]);
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
