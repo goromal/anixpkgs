@@ -242,9 +242,9 @@ in {
       virtualHosts."${config.networking.hostName}.local" = {
         listen = [{
           addr = "0.0.0.0";
-          port = cfg.webServerInsecurePort;
+          port = cfg.webServerSecurePort;
         }];
-        enableSSL = true;
+        forceSSL = true;
         sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
       };
