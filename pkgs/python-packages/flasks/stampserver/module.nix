@@ -14,11 +14,6 @@ in {
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
-    secretsDir = lib.mkOption {
-      type = lib.types.str;
-      description = "Secrets location for SSL";
-      default = "/data/andrew";
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -59,10 +54,6 @@ in {
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      enableSSL = true;
-      forceSSL = true;
-      sslCertificateKey = "${cfg.secretsDir}/key.pem";
-      sslCertificate = "${cfg.secretsDir}/chain.pem";
       locations."/stamp/" = {
         proxyPass = "http://127.0.0.1:${
             builtins.toString service-ports.stampserver
