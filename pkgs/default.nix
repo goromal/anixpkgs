@@ -118,6 +118,9 @@ let
               (pySelf.callPackage ./python-packages/python-dokuwiki {
                 pkg-src = flakeInputs.python-dokuwiki;
               });
+            scanly = addDoc (pySelf.callPackage ./python-packages/scanly {
+              pkg-src = flakeInputs.scanly;
+            });
             book-notes-sync = addDoc
               (pySelf.callPackage ./python-packages/book-notes-sync {
                 pkg-src = flakeInputs.book-notes-sync;
@@ -253,6 +256,7 @@ in rec {
   makepyshell = final.python311.pkgs.makepyshell;
   mavlog-utils = final.python311.pkgs.mavlog-utils;
   fqt = final.python311.pkgs.fqt;
+  scanly = final.python311.pkgs.scanly;
   ichabod = final.python311.pkgs.ichabod;
   norbert = final.python311.pkgs.norbert;
   geometry = final.python311.pkgs.geometry;

@@ -675,6 +675,7 @@
         "quad-sim-cpp": "quad-sim-cpp",
         "rankserver-cpp": "rankserver-cpp",
         "rcdo": "rcdo",
+        "scanly": "scanly",
         "scrape": "scrape",
         "secure-delete": "secure-delete",
         "signals-cpp": "signals-cpp",
@@ -687,6 +688,22 @@
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
         "xv-lidar-rs": "xv-lidar-rs"
+      }
+    },
+    "scanly": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1754857508,
+        "narHash": "sha256-lj8oDCoJhV18eZfQ7Tq/K78E5o5W2/oLL/bdxTwj158=",
+        "owner": "amcgready",
+        "repo": "Scanly",
+        "rev": "092b3ff699529f1ba172f0fae05767dbf2878af9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "amcgready",
+        "repo": "Scanly",
+        "type": "github"
       }
     },
     "scrape": {
