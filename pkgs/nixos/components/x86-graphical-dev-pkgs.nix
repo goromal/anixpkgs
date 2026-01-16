@@ -35,7 +35,6 @@ in {
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
         ms-vscode.cpptools
-        anthropic.claude-code
       ] ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";
