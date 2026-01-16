@@ -20,9 +20,7 @@ in {
       "editor.formatOnSave" = true;
       "files.hotExit" = "off";
       "C_Cpp.default.compilerPath" = "clang";
-      "terminal.integrated.env.linux" = {
-        "TMPDIR" = "/tmp";
-      };
+      "terminal.integrated.env.linux" = { "TMPDIR" = "/tmp"; };
     };
     profiles.default.extensions = with unstable.vscode-extensions;
       [
