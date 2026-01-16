@@ -2,7 +2,7 @@
 with import ../dependencies.nix;
 let cfg = config.mods.opts;
 in {
-  home.packages = [ pkgs.black pkgs.clang-tools anixpkgs.aptest ];
+  home.packages = [ pkgs.black pkgs.clang-tools pkgs.nodejs anixpkgs.aptest ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
     "org/gnome/shell" = { "favorite-apps" = [ "code.desktop" ]; };
@@ -47,6 +47,12 @@ in {
           publisher = "statiolake";
           version = "0.1.2";
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
+        }
+        {
+          name = "claude-code";
+          publisher = "anthropic";
+          version = "2.0.34";
+          sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
         }
       ];
     mutableExtensionsDir = false;
