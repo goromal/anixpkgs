@@ -19,6 +19,7 @@ in {
     anixpkgs.py-helper
     anixpkgs.rust-helper
     anixpkgs.makepyshell
+    unstable.claude-code
   ];
 
   programs.git = {
