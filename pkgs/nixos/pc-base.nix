@@ -335,7 +335,7 @@ in {
     services.orchestratord = lib.mkIf cfg.enableOrchestrator {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
-      threads = if cfg.isATS then 1 else 2;
+      threads = 2;
       pathPkgs = with pkgs;
         [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
         ++ cfg.extraOrchestratorPackages;
@@ -502,6 +502,8 @@ in {
         gping
         dog
         atsudo
+        ffmpeg-headless
+        ffmpegthumbnailer
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [
