@@ -12,6 +12,18 @@ in {
   programs.vscode = {
     enable = true;
     package = unstable.vscode;
+    userSettings = {
+      "editor.minimap.enabled" = false;
+      "window.zoomLevel" = -1;
+      "workbench.startupEditor" = "none";
+      "security.workspace.trust.untrustedFiles" = "open";
+      "editor.formatOnSave" = true;
+      "files.hotExit" = "off";
+      "C_Cpp.default.compilerPath" = "clang";
+      "terminal.integrated.env.linux" = {
+        "TMPDIR" = "/tmp";
+      };
+    };
     profiles.default.extensions = with unstable.vscode-extensions;
       [
         eamodio.gitlens
@@ -25,6 +37,7 @@ in {
         b4dm4n.vscode-nixpkgs-fmt
         zxh404.vscode-proto3
         ms-vscode.cpptools
+        anthropic.claude-code
       ] ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
         {
           name = "cmake";
@@ -38,18 +51,11 @@ in {
           version = "0.1.2";
           sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
         }
-        {
-          name = "claude-dev";
-          publisher = "saoudrizwan";
-          version = "3.3.1";
-          sha256 = "sha256-9TltcgehgOi3kCYwSlYg6h2lhsEj0DmhrArf/eD59YM=";
-        }
       ];
     mutableExtensionsDir = false;
   };
 
   home.file = with anixpkgs.pkgData; {
-    ".config/Code/User/settings.json".source = ../res/vscode-settings.json;
     ".config/gtk-3.0/bookmarks".text = ''
       file://${cfg.homeDir}/dev Development
       file://${cfg.homeDir}/data Data
