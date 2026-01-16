@@ -12,17 +12,18 @@ in {
   programs.vscode = {
     enable = true;
     package = unstable.vscode;
-    userSettings = {
-      "editor.minimap.enabled" = false;
-      "window.zoomLevel" = -1;
-      "workbench.startupEditor" = "none";
-      "security.workspace.trust.untrustedFiles" = "open";
-      "editor.formatOnSave" = true;
-      "files.hotExit" = "off";
-      "C_Cpp.default.compilerPath" = "clang";
-      "terminal.integrated.env.linux" = { "TMPDIR" = "/tmp"; };
-    };
-    profiles.default.extensions = with unstable.vscode-extensions;
+    profiles.default = {
+      userSettings = {
+        "editor.minimap.enabled" = false;
+        "window.zoomLevel" = -1;
+        "workbench.startupEditor" = "none";
+        "security.workspace.trust.untrustedFiles" = "open";
+        "editor.formatOnSave" = true;
+        "files.hotExit" = "off";
+        "C_Cpp.default.compilerPath" = "clang";
+        "terminal.integrated.env.linux" = { "TMPDIR" = "/tmp"; };
+      };
+      extensions = with unstable.vscode-extensions;
       [
         eamodio.gitlens
         ms-python.vscode-pylance
@@ -55,6 +56,7 @@ in {
           sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
         }
       ];
+    };
     mutableExtensionsDir = false;
   };
 
