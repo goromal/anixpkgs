@@ -65,6 +65,11 @@ in {
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
+    wifiInterfaceName = lib.mkOption {
+      type = lib.types.str;
+      description = "Network interface name for the WiFi.";
+      default = "wlo1";
+    };
     webServerInsecurePort = lib.mkOption {
       type = lib.types.int;
       description = "Public insecure port";
@@ -546,6 +551,11 @@ in {
     environment.shellAliases = {
       jfu = "journalctl -fu";
       nohistory = "set +o history";
+    };
+
+    programs.captive-browser = {
+      enable = cfg.graphical;
+      interface = cfg.wifiInterfaceName;
     };
 
     systemd.tmpfiles.rules =
