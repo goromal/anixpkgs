@@ -139,7 +139,7 @@ with import ../dependencies.nix; {
           rcrsync copy configs && surveys_report upload-results
         '';
         timerCfg = {
-          OnCalendar = [ "*-*-* 00:00:00" ];
+          OnCalendar = [ "*-*-* 16:00:00" ];
           Persistent = false;
         };
       }
