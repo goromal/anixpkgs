@@ -90,7 +90,7 @@ with import ../dependencies.nix; {
           rm -r $tmpdir
         '';
         timerCfg = {
-          OnCalendar = [ "*-*-* 06:00:00" ];
+          OnCalendar = [ "*-*-* 23:00:00" ];
           Persistent = true;
         };
       }
