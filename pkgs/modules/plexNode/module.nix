@@ -11,8 +11,17 @@ in {
     fileSystems."/mnt/media-empire" = {
       device = "/dev/disk/by-uuid/40E4C87FE4C878A4";
       fsType = "ntfs-3g";
-      options = [ "defaults" "rw" "nofail" "uid=1000" "gid=100" "umask=022" ];
+      options = [ 
+        "rw"
+        "nofail"  # Don't block boot if drive fails
+        "uid=1000"
+        "gid=100"
+        "umask=022"
+        "x-systemd.device-timeout=300"
+        "recover"  # Auto-recover from errors
+      ];
     };
+    services.smartd.enable = true;
 
     # Enable Plex Media Server
     services.plex = {
