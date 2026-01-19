@@ -447,6 +447,7 @@ in {
         iotop
         iperf
         iftop
+        smartmontools
         python3
         xsel
         htop
