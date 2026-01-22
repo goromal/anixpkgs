@@ -19,7 +19,18 @@ in {
     anixpkgs.py-helper
     anixpkgs.rust-helper
     anixpkgs.makepyshell
+    pkgs.universal-ctags
     unstable.claude-code
+    (pkgs.writeShellScriptBin "claude-setup" ''
+      if ! command -v claude &> /dev/null; then
+        echo_red "Error: claude not found in PATH"
+        exit 1
+      fi
+      echo_yellow "Installing claude plugins..."
+      claude plugin marketplace add DevonMorris/claude-ctags 2>/dev/null || true
+      claude plugin install claude-ctags@claude-ctags 2>/dev/null || true
+      echo_green "Done! Verify installed plugins with \"claude plugin list\""
+    '')
   ];
 
   programs.git = {
