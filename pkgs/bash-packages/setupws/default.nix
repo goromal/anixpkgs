@@ -52,6 +52,23 @@ in (writeArgparseScriptBin "setupws" usage_str [
   if [[ ! -d data ]]; then
       ln -s $data_ws_dir data
   fi
+  readonly TARGET_DIR="$PWD/data/.claude"
+  readonly LINK_LOCATIONS=(
+    ".claude"
+    "sources/.claude"
+  )
+  mkdir -p "$TARGET_DIR"
+  for link_path in "''${LINK_LOCATIONS[@]}"; do
+    if [ -L "$link_path" ] && [ "$(readlink "$link_path")" == "$TARGET_DIR" ]; then
+      continue
+    fi
+    if [ -e "$link_path" ]; then
+      mv -- "$link_path" "$TARGET_DIR/"
+    fi
+    mkdir -p "$(dirname "$link_path")"
+    ln -sf -- "$TARGET_DIR" "$link_path"
+  done
+  touch "$TARGET_DIR/CLAUDE.md"
   if [[ ! -d sources ]]; then
       mkdir sources
   fi
