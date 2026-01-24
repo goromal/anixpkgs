@@ -19,6 +19,7 @@ in {
     anixpkgs.py-helper
     anixpkgs.rust-helper
     anixpkgs.makepyshell
+    pkgs.gh
     pkgs.universal-ctags
     unstable.claude-code
     (pkgs.writeShellScriptBin "claude-setup" ''
@@ -27,9 +28,20 @@ in {
         exit 1
       fi
       echo_yellow "Installing claude plugins..."
-      claude plugin marketplace add DevonMorris/claude-ctags 2>/dev/null || true
-      claude plugin install claude-ctags@claude-ctags 2>/dev/null || true
+      ${lib.concatMapStringsSep "\n      " (marketplace:
+        "claude plugin marketplace add ${marketplace} 2>/dev/null || true")
+      cfg.claudeMarketplaces}
+      ${lib.concatMapStringsSep "\n      "
+      (plugin: "claude plugin install ${plugin} 2>/dev/null || true")
+      cfg.claudePlugins}
       echo_green "Done! Verify installed plugins with \"claude plugin list\""
+
+      echo_yellow "Other setup..."
+      read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        gh auth login
+      fi
     '')
   ];
 
@@ -57,4 +69,13 @@ in {
 
   programs.vim.plugins = lib.mkIf (cfg.standalone == false)
     (with pkgs.vimPlugins; [ vim-gitgutter YouCompleteMe ]);
+
+  home.file.".claude/settings.json".text = let
+    pluginsObj = builtins.listToAttrs (map (plugin: {
+      name = plugin;
+      value = true;
+    }) cfg.claudePlugins);
+    baseConfig = { enabledPlugins = pluginsObj; };
+    mergedConfig = baseConfig // cfg.extraClaudeSettings;
+  in builtins.toJSON mergedConfig;
 }
