@@ -1,13 +1,21 @@
 { callPackage, pytestCheckHook, buildPythonPackage, easy-google-auth, click
-, colorama, gmail-parser, task-tools, wiki-tools }:
+, colorama, gmail-parser, task-tools, wiki-tools, aapis-py, grpcio }:
 callPackage ../pythonPkgFromScript.nix {
   pname = "goromail";
   version = "1.0.0";
   description = "Manage mail for GBot and Journal.";
   script-file = ./cli.py;
   inherit pytestCheckHook buildPythonPackage;
-  propagatedBuildInputs =
-    [ easy-google-auth click colorama gmail-parser task-tools wiki-tools ];
+  propagatedBuildInputs = [
+    easy-google-auth
+    click
+    colorama
+    gmail-parser
+    task-tools
+    wiki-tools
+    aapis-py
+    grpcio
+  ];
   checkPkgs = [ ];
   longDescription = ''
     The following workflows are supported, all via text messaging:
@@ -30,5 +38,5 @@ callPackage ../pythonPkgFromScript.nix {
     - Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
   '';
   autoGenUsageCmd = "--help";
-  subCmds = [ "bot" "journal" ];
+  subCmds = [ "bot" "journal" "annotate-triage-pages" "itns-nudge" ];
 }

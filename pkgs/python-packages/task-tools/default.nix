@@ -1,7 +1,7 @@
 { buildPythonPackage, pytestCheckHook, click, easy-google-auth, pkg-src }:
 buildPythonPackage rec {
   pname = "task-tools";
-  version = "0.0.0";
+  version = "0.0.1";
   src = pkg-src;
   propagatedBuildInputs = [ click easy-google-auth ];
   doCheck = true;

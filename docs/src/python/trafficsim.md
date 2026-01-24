@@ -6,7 +6,7 @@ Simulate traffic.
 
 Simple traffic simulator on a circular road. Cars have two control objectives: maintain a consistent distance between cars and maintain a consistent car speed.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: trafficsim [-h] [--num_cars NUM_CARS] [--vel_des VEL_DES]
@@ -34,6 +34,5 @@ options:
   --pos_col_thresh POS_COL_THRESH
                         Distance threshold for collision avoidance (default:
                         0.15)
-
 ```
 

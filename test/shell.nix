@@ -17,6 +17,12 @@ mkShell {
     cpp-helper
     pkgshell
     sunnyside
+    sread
+    swrite
+    secure-delete
+    time
+    png
+    ckfile
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."

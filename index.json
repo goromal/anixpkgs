@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -58,8 +63,8 @@
             },
             {
                 "attr": "orchestrator-cpp",
-                "ci": true,
-                "docs": true
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ardurouter",
@@ -102,6 +107,11 @@
             },
             {
                 "attr": "find_rotational_conventions",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "daily_tactical_server",
                 "ci": true,
                 "docs": true
             },
@@ -241,6 +251,11 @@
                 "docs": false
             },
             {
+                "attr": "rcdo",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "task-tools",
                 "ci": true,
                 "docs": true
@@ -264,6 +279,11 @@
                 "attr": "goromail",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "symforce",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [
@@ -343,6 +363,11 @@
                 "docs": false
             },
             {
+                "attr": "ckfile",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "color-prints",
                 "ci": true,
                 "docs": true
@@ -368,7 +393,17 @@
                 "docs": true
             },
             {
+                "attr": "local-ssh-proxy",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "play",
                 "ci": true,
                 "docs": true
             },
@@ -376,6 +411,11 @@
                 "attr": "budget_report",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "surveys_report",
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "md2pdf",
@@ -391,6 +431,16 @@
                 "attr": "fix-perms",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "swrite",
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "make-title",

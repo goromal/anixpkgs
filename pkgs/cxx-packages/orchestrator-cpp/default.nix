@@ -1,14 +1,15 @@
-{ clangStdenv, cmake, boost, mscpp, pkg-src }:
+{ clangStdenv, cmake, boost, mscpp, aapis-cpp, protobuf, pkg-src }:
 clangStdenv.mkDerivation {
   name = "orchestrator-cpp";
   version = "0.0.0";
   src = pkg-src;
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ boost mscpp ];
+  buildInputs = [ boost mscpp aapis-cpp protobuf ];
   preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
+    broken = true;
     description =
       "C++ implementation of a multi-threaded job manager for my OS.";
     longDescription = ''

@@ -10,15 +10,7 @@ let
       inherit description longDescription;
       script-file = ./authm.py;
       inherit pytestCheckHook buildPythonPackage;
-      propagatedBuildInputs = [
-        click
-        colorama
-        easy-google-auth
-        gmail-parser
-        task-tools
-        wiki-tools
-        book-notes-sync
-      ];
+      propagatedBuildInputs = [ click colorama easy-google-auth gmail-parser ];
       checkPkgs = [ ];
     });
   printErr = ">&2 ${color-prints}/bin/echo_red";
@@ -26,6 +18,7 @@ in (writeShellScriptBin pkgname ''
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]]; then
     ${rcrsync}/bin/rcrsync copy secrets
   fi
+  export OAUTHLIB_INSECURE_TRANSPORT=1
   ${authm}/bin/${pkgname} $@ || { ${printErr} "Authm automatic refresh failed!"; exit 1; }
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
     ${rcrsync}/bin/rcrsync override secrets

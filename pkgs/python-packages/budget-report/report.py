@@ -238,22 +238,31 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     if acct_cfg is None:
         raise Exception(f"Could not find config for account {account}")
     transactions = []
+    amount_cols = acct_cfg["Amount"]
     with open(raw_csv, "r", newline="") as csvfile:
         reader = csv.reader(csvfile)
         for i, row in enumerate(reader):
             if i >= acct_cfg["StartRow"]:
-                try:
-                    row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
-                    transactions.append(
-                        (
-                            account.replace("_", " "),
-                            row[acct_cfg["Date"]],
-                            row_desc,
-                            float(row[acct_cfg["Amount"]])
-                            * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                processed_line = False
+                row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
+                for amount_col in amount_cols:
+                    if "ORIG CO NAME" in row_desc:
+                        continue
+                    try:
+                        transactions.append(
+                            (
+                                account.replace("_", " "),
+                                row[acct_cfg["Date"]],
+                                row_desc,
+                                float(row[amount_col])
+                                * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+                            )
                         )
-                    )
-                except ValueError:
+                        processed_line = True
+                        break
+                    except ValueError:
+                        continue
+                if not processed_line:
                     print(f"{Fore.YELLOW} WARNING: Did not process transaction {row_desc} due to unexpected value formatting {Style.RESET_ALL}")
     new_transactions = [
         transaction

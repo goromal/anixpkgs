@@ -2,7 +2,10 @@
 
 Spawn a LA geography quiz.
 
-```
+
+## Usage
+
+```bash
 usage: la-quiz [options] [N|C|E|S]
 
 Spawn a LA geography quiz! Will pull up the general region you specify:
@@ -14,13 +17,14 @@ Spawn a LA geography quiz! Will pull up the general region you specify:
 
 Options:
 
---debug|-d    Open in debug mode (will print click positions to the screen).
+--debug|-d    Open in debug mode (will write your clicks to the keyfile).
 
-NOTE: This program assumes that you have the place location JSON files stored in
+NOTE: This program assumes that you have the place location JSON keyfiles stored in
 
   ~/games/la-quiz/GLAA-C.json
                   GLAA-E.json
                   GLAA-N.json
                   GLAA-S.json
+
 ```
 

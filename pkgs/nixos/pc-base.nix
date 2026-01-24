@@ -4,6 +4,25 @@ let
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball
     "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  atsudo = pkgs.writeShellScriptBin "atsudo" ''
+    args=""
+    for word in "$@"; do
+      args+="$word "
+    done
+    args=''${args% }
+    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
+    if [[ ! -z "$pw" ]]; then
+      echo "$pw" | sudo -S $args
+    else
+      sudo $args
+    fi
+  '';
+  machine-rcrsync = anixpkgs.rcrsync.override {
+    homeDir = cfg.homeDir;
+    cloudDirs = cfg.cloudDirs;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
+  machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
 in {
   options.machines.base = {
     homeDir = lib.mkOption {
@@ -23,7 +42,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;
@@ -37,9 +56,24 @@ in {
       type = lib.types.bool;
       description = "Whether the closure includes developer packages.";
     };
-    loadATSServices = lib.mkOption {
+    isATS = lib.mkOption {
       type = lib.types.bool;
       description = "Whether the closure is for a personal server instance.";
+    };
+    runWebServer = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to spawn a reverse proxy webserver.";
+      default = false;
+    };
+    wifiInterfaceName = lib.mkOption {
+      type = lib.types.str;
+      description = "Network interface name for the WiFi.";
+      default = "wlo1";
+    };
+    webServerInsecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public insecure port";
+      default = 80;
     };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
@@ -50,53 +84,72 @@ in {
       description = "Public insecure port for the notes wiki site.";
       default = 80;
     };
-    isInstaller = lib.mkOption {
+    enableMetrics = lib.mkOption {
       type = lib.types.bool;
-      description = "Whether the closure is for an ISO install image.";
+      default = false;
+      description = "Whether to export OS metrics";
+    };
+    enableFileServers = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to turn on file servers";
     };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description =
-        "List of {name,cloudname,dirname} attributes defining the syncable directories by rcrsync";
+        "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
+    };
+    enableOrchestrator = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the orchestrator daemon";
+    };
+    timedOrchJobs = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      description = "Orchestrator job definitions";
+      default = [ ];
+    };
+    extraOrchestratorPackages = lib.mkOption {
+      type = lib.types.listOf lib.types.package;
+      description = "Packages to add to orchestrator's path";
+      default = [ ];
+    };
+    claudeMarketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "DevonMorris/claude-ctags" ];
+      description = "List of extra plugin marketplaces to install";
+    };
+    claudePlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
       default = [
-        {
-          name = "configs";
-          cloudname = "dropbox:configs";
-          dirname = "$HOME/configs";
-          autosync = true;
-        }
-        {
-          name = "secrets";
-          cloudname = "dropbox:secrets";
-          dirname = "$HOME/secrets";
-          autosync = false;
-        }
-        {
-          name = "games";
-          cloudname = "dropbox:games";
-          dirname = "$HOME/games";
-          autosync = true;
-        }
-        {
-          name = "data";
-          cloudname = "box:data";
-          dirname = "$HOME/data";
-          autosync = true;
-        }
-        {
-          name = "documents";
-          cloudname = "drive:Documents";
-          dirname = "$HOME/Documents";
-          autosync = true;
-        }
+        "claude-ctags@claude-ctags"
+        "code-review@claude-plugins-official"
+        "frontend-design@claude-plugins-official"
+        "github@claude-plugins-official"
+        "feature-dev@claude-plugins-official"
+        "pr-review-toolkit@claude-plugins-official"
       ];
+      description = "List of claude plugins to install";
+    };
+    extraClaudeSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Attrs describing the Claude JSON settings";
     };
   };
 
   imports = [
     (import "${home-manager}/nixos")
-    ../modules/ats/modules.nix
     ../modules/notes-wiki/module.nix
+    ../modules/metricsNode/module.nix
+    ../modules/plexNode/module.nix
+    ../modules/mailNode/module.nix
+    ../python-packages/orchestrator/module.nix
+    ../python-packages/daily_tactical_server/module.nix
+    ../python-packages/flasks/authui/module.nix
+    ../python-packages/flasks/budget_ui/module.nix
+    ../python-packages/flasks/rankserver/module.nix
+    ../python-packages/flasks/stampserver/module.nix
   ];
 
   config = {
@@ -106,10 +159,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
-        else
-          pkgs.linuxPackages_latest));
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -190,21 +240,88 @@ in {
         desktopManager.gnome.enable = true;
       };
 
+    services.printing.enable =
+      (cfg.machineType == "x86_linux" && cfg.graphical);
+
+    services.avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+      # Web server DNS
+      publish = lib.mkIf cfg.runWebServer {
+        enable = true;
+        addresses = true;
+        domain = true;
+        workstation = true;
+      };
+    };
+
+    # Web server reverse proxy
+    services.nginx = lib.mkIf cfg.runWebServer {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      virtualHosts."${config.networking.hostName}.local" = {
+        listen = [{
+          addr = "0.0.0.0";
+          port = cfg.webServerInsecurePort;
+        }];
+      };
+    };
+
+    services.authui = {
+      enable = cfg.isATS;
+      initScript = (pkgs.writeShellScriptBin "atsauthui-start" ''
+        ${pkgs.systemd}/bin/systemctl stop orchestratord
+      '') + "/bin/atsauthui-start";
+      resetScript = (pkgs.writeShellScriptBin "atsauthui-finish" ''
+        ${machine-rcrsync}/bin/rcrsync override secrets
+        ${pkgs.systemd}/bin/systemctl start orchestratord
+      '') + "/bin/atsauthui-finish";
+    };
+
+    services.budget_ui = {
+      enable = cfg.isATS;
+      pathPkgs = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.util-linux
+        pkgs.rclone
+        machine-rcrsync
+        machine-authm
+        anixpkgs.budget_report
+        anixpkgs.fixfname
+      ];
+    };
+
+    services.rankserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.rankserver;
+      rootDir = "${cfg.homeDir}/fileservers";
+    };
+
+    services.stampserver = {
+      enable = cfg.isATS || cfg.enableFileServers;
+      package = anixpkgs.stampserver;
+      rootDir = "${cfg.homeDir}/fileservers";
+    };
+
     environment.gnome =
       lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-        excludePackages = with pkgs;
-          [ gnome-photos gnome-tour ] ++ (with gnome; [
-            cheese
-            gnome-music
-            epiphany
-            geary
-            evince
-            totem
-            tali
-            iagno
-            hitori
-            atomix
-          ]);
+        excludePackages = with pkgs; [
+          gnome-photos
+          gnome-tour
+          cheese
+          gnome-music
+          epiphany
+          geary
+          evince
+          totem
+          tali
+          iagno
+          hitori
+          atomix
+        ];
       };
 
     # Specialized bluetooth and sound settings for Apple AirPods
@@ -216,7 +333,7 @@ in {
     services.blueman.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       true;
-    hardware.pulseaudio.enable = lib.mkIf
+    services.pulseaudio.enable = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
       false;
     security.rtkit.enable = lib.mkIf
@@ -231,18 +348,48 @@ in {
 
     services.udev.packages = lib.mkIf
       (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-      [ pkgs.dolphinEmu ];
+      [ pkgs.dolphin-emu ];
 
     # Set your time zone.
     time.timeZone = "America/Los_Angeles";
+
+    # Orchestrator jobs
+    services.orchestratord = lib.mkIf cfg.enableOrchestrator {
+      enable = true;
+      orchestratorPkg = anixpkgs.orchestrator;
+      threads = 2;
+      pathPkgs = with pkgs;
+        [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
+        ++ cfg.extraOrchestratorPackages;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
+    systemd.timers."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun 03:00";
+          Persistent = true;
+        };
+      };
+    systemd.services."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart =
+            "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
+        };
+      };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = !cfg.isInstaller;
+    networking.networkmanager.enable = true;
 
-    networking.firewall.allowedTCPPorts = [ 4444 ];
+    networking.firewall.allowedTCPPorts = [ 4444 ]
+      ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
@@ -250,6 +397,17 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+    fonts.packages = with pkgs; [
+      dejavu_fonts
+      liberation_ttf
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+    ];
+
+    security.sudo.extraConfig = ''
+      ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
+    '';
 
     # Enable the OpenSSH daemon.
     services.openssh = {
@@ -258,6 +416,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {
@@ -265,11 +424,27 @@ in {
       rateLimitInterval = "0s";
     };
 
-    # Server processes
-    services.ats.enable = cfg.loadATSServices;
+    # Metrics
+    services.metricsNode.enable = cfg.enableMetrics;
+    services.metricsNode.openFirewall = cfg.enableMetrics;
+
+    # Notes Wiki
     services.notes-wiki.enable = cfg.serveNotesWiki;
-    services.notes-wiki.insecurePort = cfg.notesWikiPort;
-    services.notes-wiki.openFirewall = true;
+
+    # Daily Tactical
+    services.tacticald = lib.mkIf cfg.isATS {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      tacticalPkg = anixpkgs.daily_tactical_server;
+      statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
+    };
+
+    # Media
+    services.plexNode.enable = cfg.isATS;
+
+    # Mail
+    services.mailNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;
@@ -294,6 +469,7 @@ in {
         iotop
         iperf
         iftop
+        smartmontools
         python3
         xsel
         htop
@@ -348,20 +524,65 @@ in {
         glances
         gping
         dog
-      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ]);
+        atsudo
+        ffmpeg-headless
+        ffmpegthumbnailer
+      ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
+      ++ (if cfg.enableOrchestrator then
+        [
+          (let
+            servicelist = builtins.concatStringsSep "/"
+              (map (x: "${x.name}.service") cfg.timedOrchJobs);
+            triggerscript = ./otrigger.py;
+          in pkgs.writeShellScriptBin "otrigger" ''
+            servicelist="${builtins.toString servicelist}"
+            tmpdir=$(mktemp -d)
+            ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
+            serviceselection=$(cat $tmpdir/selection)
+            rm -r $tmpdir
+            if [[ ! -z "$serviceselection" ]]; then
+              echo "sudo systemctl restart ''${serviceselection}"
+              ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
+            fi
+          '')
+        ]
+      else
+        [ ]) ++ (if cfg.isATS then
+          [
+            (pkgs.writeShellScriptBin "atsrefresh" ''
+              ${atsudo}/bin/atsudo systemctl stop orchestratord
+              authm refresh --headless --force && rcrsync override secrets
+              ${atsudo}/bin/atsudo systemctl start orchestratord
+            '')
+          ]
+        else
+          [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+       mkcd() {
+          if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+              echo "usage: mkcd [-t|DIRNAME]"
+          elif [[ "$1" == "-t" ]]; then
+              cd "$(mktemp -d)" || return
+          else
+              mkdir -p "$1" && cd "$1" || return
+          fi
+      }
     '';
 
     environment.shellAliases = {
       jfu = "journalctl -fu";
-      code = "codium";
       nohistory = "set +o history";
     };
-    environment.noXlibs = false;
 
-    systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
+    programs.captive-browser = {
+      enable = cfg.graphical;
+      interface = cfg.wifiInterfaceName;
+    };
+
+    systemd.tmpfiles.rules =
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {
@@ -447,8 +668,11 @@ in {
         else
           null;
         cloudDirs = cfg.cloudDirs;
-        userOrchestrator = !cfg.loadATSServices;
-        cloudAutoSync = false; # !cfg.loadATSServices;
+        userOrchestrator = false;
+        enableMetrics = cfg.enableMetrics;
+        claudeMarketplaces = cfg.claudeMarketplaces;
+        claudePlugins = cfg.claudePlugins;
+        extraClaudeSettings = cfg.extraClaudeSettings;
       };
     };
   };

@@ -2,7 +2,10 @@
 
 Get the screen resolution of this computer.
 
-```
+
+## Usage
+
+```bash
 usage: getres [opts]
 
 Get the screen resolution of this computer.

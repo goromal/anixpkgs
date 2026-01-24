@@ -3,7 +3,7 @@
 Generate and edit MP4 video files using `ffmpeg`.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: mp4 inputfile outputfile
@@ -18,6 +18,7 @@ Inputs:
     .mov
     .avi
     .webm
+    .random (e.g., seed-width-height-frames.random)
 
 Options:
     -v | --verbose               Print verbose output from ffmpeg
@@ -29,7 +30,6 @@ Options:
     -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
     -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
     -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
-
 
 ```
 

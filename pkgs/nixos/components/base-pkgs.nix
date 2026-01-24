@@ -8,20 +8,28 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
-  rcrsyncConfigured = anixpkgs.rcrsync.override { cloudDirs = cfg.cloudDirs; };
+  rcrsyncConfigured = anixpkgs.rcrsync.override {
+    cloudDirs = cfg.cloudDirs;
+    homeDir = cfg.homeDir;
+    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
+  };
   oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
-    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2
+    PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2 \
+      ${
+        if cfg.enableMetrics then
+          "--statsd-port ${builtins.toString service-ports.statsd}"
+        else
+          ""
+      }
   '';
-  auto_sync_cloud_dirs =
-    builtins.filter (x: !builtins.hasAttr "autosync" x || x.autosync)
-    cfg.cloudDirs;
-  cloud_dir_list =
-    builtins.concatStringsSep " " (map (x: "${x.name}") auto_sync_cloud_dirs);
-  launchSyncJobsScript = pkgs.writeShellScriptBin "launch-sync-jobs" ''
-    for cloud_dir in ${cloud_dir_list}; do
-      ${anixpkgs.orchestrator}/bin/orchestrator sync $cloud_dir
+  atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
+    words=""
+    for word in "$@"; do
+      words+="$word "
     done
+    words=''${words% }
+    ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(${anixpkgs.sread}/bin/sread ~/secrets/ats/p.txt.tyz)" "$words" remote
   '';
 in {
   home.stateVersion = cfg.homeState;
@@ -38,15 +46,20 @@ in {
     anixpkgs.goromail
     anixpkgs.manage-gmail
     anixpkgs.gmail-parser
+    anixpkgs.local-ssh-proxy
     anixpkgs.wiki-tools
     anixpkgs.task-tools
     anixpkgs.photos-tools
     anixpkgs.book-notes-sync
     anixpkgs.budget_report
+    anixpkgs.surveys_report
+    anixpkgs.ckfile
     anixpkgs.color-prints
     anixpkgs.fix-perms
     anixpkgs.secure-delete
     anixpkgs.sunnyside
+    anixpkgs.sread
+    anixpkgs.swrite
     anixpkgs.make-title
     anixpkgs.pb
     anixpkgs.dirgroups
@@ -55,8 +68,11 @@ in {
     anixpkgs.nix-deps
     anixpkgs.nix-diffs
     anixpkgs.orchestrator
+    anixpkgs.daily_tactical_server
     anixpkgs.rankserver-cpp
     anixpkgs.stampserver
+    anixpkgs.rcdo
+    atsRunScript
     anixpkgs.gantter
     anixpkgs.md2pdf
     anixpkgs.notabilify
@@ -84,25 +100,6 @@ in {
       Restart = "always";
     };
     Install.WantedBy = [ "default.target" ];
-  };
-
-  systemd.user.services.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-    Unit = { Description = "cloud dirs sync script"; };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${launchSyncJobsScript}/bin/launch-sync-jobs";
-      Restart = "on-failure";
-      ReadWritePaths = [ cfg.homeDir ];
-    };
-  };
-  systemd.user.timers.cloud-dirs-sync = lib.mkIf cfg.cloudAutoSync {
-    Unit = { Description = "cloud dirs sync timer"; };
-    Timer = {
-      OnBootSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-      OnUnitActiveSec = "${builtins.toString cfg.cloudAutoSyncInterval}m";
-      Unit = "cloud-dirs-sync.service";
-    };
-    Install.WantedBy = [ "timers.target" ];
   };
 
   programs.vim = {

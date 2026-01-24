@@ -1,5 +1,6 @@
 { writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
-, color-prints, mavproxy, git, python39, stdenv, overrideCC, gcc10 }:
+, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10 }:
+# NOTE: Python currently needs to be <= 311 for the "imp" module to exist
 let
   pkgname = "aptest";
   printErr = "${color-prints}/bin/echo_red";
@@ -18,18 +19,18 @@ let
         ];
         buildInputs = [
           ${mavproxy}
-          ${python39}
-          ${python39.pkgs.pexpect}
-          ${python39.pkgs.setuptools}
-          ${python39.pkgs.pymavlink}
-          ${python39.pkgs.dronecan}
-          ${python39.pkgs.empy}
-          ${python39.pkgs.requests}
-          ${python39.pkgs.monotonic}
-          ${python39.pkgs.geocoder}
-          ${python39.pkgs.configparser}
-          ${python39.pkgs.click}
-          ${python39.pkgs.decorator}
+          ${python}
+          ${python.pkgs.pexpect}
+          ${python.pkgs.setuptools}
+          ${python.pkgs.pymavlink}
+          ${python.pkgs.dronecan}
+          ${python.pkgs.empy}
+          ${python.pkgs.requests}
+          ${python.pkgs.monotonic}
+          ${python.pkgs.geocoder}
+          ${python.pkgs.configparser}
+          ${python.pkgs.click}
+          ${python.pkgs.decorator}
         ];
       }
     '';
@@ -64,10 +65,13 @@ in (writeArgparseScriptBin pkgname ''
   ${printYlw} "Patching the source"
   sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc10}/bin/gcc"#g' libraries/AP_Scripting/wscript
   sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
+  sed -i 's/rU/r/g' modules/waf/wscript
+  sed -i 's/rU/r/g' modules/waf/waflib/ConfigSet.py
+  sed -i 's/rU/r/g' modules/waf/waflib/Context.py
   unset shellHook
-  nix-shell -p ${stdenv} --run "patchShebangs ./waf && patchShebangs ./Tools"
+  nix-shell -p ${python} -p ${stdenv} --pure --run "patchShebangs ./waf && patchShebangs ./modules/waf && patchShebangs ./Tools"
   ${printYlw} "Running the SITL"
-  nix-shell ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
+  nix-shell --pure ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
 
   ${printYlw} "Cleaning up"
   popd
