@@ -55,12 +55,12 @@ with import ../dependencies.nix; {
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [];
+      default = [ ];
       description = "List of claude plugins to install";
     };
     extraClaudeSettings = lib.mkOption {
