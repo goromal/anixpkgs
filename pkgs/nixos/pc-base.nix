@@ -114,6 +114,28 @@ in {
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    claudeMarketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "DevonMorris/claude-ctags" ];
+      description = "List of extra plugin marketplaces to install";
+    };
+    claudePlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "claude-ctags@claude-ctags"
+        "code-review@claude-plugins-official"
+        "frontend-design@claude-plugins-official"
+        "github@claude-plugins-official"
+        "feature-dev@claude-plugins-official"
+        "pr-review-toolkit@claude-plugins-official"
+      ];
+      description = "List of claude plugins to install";
+    };
+    extraClaudeSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Attrs describing the Claude JSON settings";
+    };
   };
 
   imports = [
@@ -648,6 +670,9 @@ in {
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = false;
         enableMetrics = cfg.enableMetrics;
+        claudeMarketplaces = cfg.claudeMarketplaces;
+        claudePlugins = cfg.claudePlugins;
+        extraClaudeSettings = cfg.extraClaudeSettings;
       };
     };
   };
