@@ -9,7 +9,6 @@ with import ../dependencies.nix; {
     developer = true;
     isATS = false;
     serveNotesWiki = false;
-    isInstaller = false;
     enableMetrics = false;
     enableFileServers = false;
     cloudDirs = [

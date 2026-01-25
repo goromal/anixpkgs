@@ -79,6 +79,8 @@ let
             });
             budget_report =
               addDoc (pySelf.callPackage ./python-packages/budget-report { });
+            surveys_report =
+              addDoc (pySelf.callPackage ./python-packages/surveys-report { });
             easy-google-auth = addDoc
               (pySelf.callPackage ./python-packages/easy-google-auth {
                 pkg-src = flakeInputs.easy-google-auth;
@@ -196,6 +198,10 @@ let
               (pySelf.callPackage ./python-packages/flasks/stampserver { });
             authui =
               addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
+            budget_ui = addDoc
+              (pySelf.callPackage ./python-packages/flasks/budget_ui { });
+            pinned-mavproxy =
+              addDoc (pySelf.callPackage ./python-packages/mavproxy { });
           });
       }));
 in rec {
@@ -243,6 +249,7 @@ in rec {
 
   aapis-py = final.python311.pkgs.aapis-py;
   budget_report = final.python311.pkgs.budget_report;
+  surveys_report = final.python311.pkgs.surveys_report;
   makepyshell = final.python311.pkgs.makepyshell;
   mavlog-utils = final.python311.pkgs.mavlog-utils;
   fqt = final.python311.pkgs.fqt;
@@ -273,6 +280,7 @@ in rec {
   rcdo = final.python311.pkgs.rcdo;
   stampserver = final.python311.pkgs.stampserver;
   authui = final.python311.pkgs.authui;
+  budget_ui = final.python311.pkgs.budget_ui;
   easy-google-auth = final.python311.pkgs.easy-google-auth;
   task-tools = final.python311.pkgs.task-tools;
   photos-tools = final.python311.pkgs.photos-tools;
@@ -288,6 +296,8 @@ in rec {
   manage-gmail = addDoc (prev.callPackage ./bash-packages/manage-gmail {
     python = final.python311;
   });
+  local-ssh-proxy =
+    addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
   gantter = addDoc (prev.callPackage ./bash-packages/gantter {
     python = final.python311;
     blank-svg = pkgData.img.blank-svg;
@@ -302,6 +312,7 @@ in rec {
   redirects =
     addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
   color-prints = addDoc (prev.callPackage ./bash-packages/color-prints { });
+  ckfile = addDoc (prev.callPackage ./bash-packages/ckfile { });
   cpp-helper = addDoc
     (prev.callPackage ./bash-packages/cpp-helper { inherit anixpkgs-version; });
   py-helper = addDoc
@@ -311,7 +322,8 @@ in rec {
   });
   dirgroups = addDoc (prev.callPackage ./bash-packages/dirgroups { });
   dirgather = addDoc (prev.callPackage ./bash-packages/dirgather { });
-  sread = addDoc (prev.callPackage ./bash-packages/sread { });
+  sread = addDoc (prev.callPackage ./bash-packages/srw/sread.nix { });
+  swrite = addDoc (prev.callPackage ./bash-packages/srw/swrite.nix { });
   git-cc = addDoc (prev.callPackage ./bash-packages/git-cc { });
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
@@ -358,7 +370,10 @@ in rec {
     addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
-  aptest = addDoc (prev.callPackage ./bash-packages/aptest { });
+  aptest = addDoc (prev.callPackage ./bash-packages/aptest {
+    python = python311;
+    mavproxy = python311.pkgs.pinned-mavproxy;
+  });
 
   aapis-cpp = addDoc (prev.callPackage ./cxx-packages/aapis-cpp {
     pkg-src = flakeInputs.aapis;
@@ -382,6 +397,8 @@ in rec {
   signals-cpp = addDoc (prev.callPackage ./cxx-packages/signals-cpp {
     pkg-src = flakeInputs.signals-cpp;
   });
+  gnc =
+    addDoc (prev.callPackage ./cxx-packages/gnc { pkg-src = flakeInputs.gnc; });
   secure-delete = addDoc (prev.callPackage ./cxx-packages/secure-delete {
     pkg-src = flakeInputs.secure-delete;
   });
@@ -431,4 +448,9 @@ in rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  testWallpaper = prev.callPackage ./bash-packages/mkWallpaper {
+    screenResolution = "1920x1080";
+    label = "TEST WALLPAPER";
+  };
 }

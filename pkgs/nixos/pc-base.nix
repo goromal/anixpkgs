@@ -42,7 +42,7 @@ in {
       type = lib.types.str;
       description =
         "(x86_linux) Boot partition mount point (default: /boot/efi)";
-      default = "/boot/efi";
+      default = "/boot";
     };
     graphical = lib.mkOption {
       type = lib.types.bool;
@@ -65,6 +65,11 @@ in {
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
+    wifiInterfaceName = lib.mkOption {
+      type = lib.types.str;
+      description = "Network interface name for the WiFi.";
+      default = "wlo1";
+    };
     webServerInsecurePort = lib.mkOption {
       type = lib.types.int;
       description = "Public insecure port";
@@ -78,10 +83,6 @@ in {
       type = lib.types.int;
       description = "Public insecure port for the notes wiki site.";
       default = 80;
-    };
-    isInstaller = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for an ISO install image.";
     };
     enableMetrics = lib.mkOption {
       type = lib.types.bool;
@@ -113,15 +114,40 @@ in {
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    claudeMarketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "DevonMorris/claude-ctags" ];
+      description = "List of extra plugin marketplaces to install";
+    };
+    claudePlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        "claude-ctags@claude-ctags"
+        "code-review@claude-plugins-official"
+        "frontend-design@claude-plugins-official"
+        "github@claude-plugins-official"
+        "feature-dev@claude-plugins-official"
+        "pr-review-toolkit@claude-plugins-official"
+      ];
+      description = "List of claude plugins to install";
+    };
+    extraClaudeSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Attrs describing the Claude JSON settings";
+    };
   };
 
   imports = [
     (import "${home-manager}/nixos")
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
+    ../modules/plexNode/module.nix
+    ../modules/mailNode/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
+    ../python-packages/flasks/budget_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
   ];
@@ -133,10 +159,7 @@ in {
       kernelPackages = (if cfg.machineType == "pi4" then
         pkgs.linuxPackages_rpi4
       else
-        (if cfg.isInstaller then
-          pkgs.linuxPackages_6_1
-        else
-          pkgs.linuxPackages_latest));
+        pkgs.linuxPackages_latest);
       kernel.sysctl = {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
@@ -257,6 +280,20 @@ in {
       '') + "/bin/atsauthui-finish";
     };
 
+    services.budget_ui = {
+      enable = cfg.isATS;
+      pathPkgs = [
+        pkgs.bash
+        pkgs.coreutils
+        pkgs.util-linux
+        pkgs.rclone
+        machine-rcrsync
+        machine-authm
+        anixpkgs.budget_report
+        anixpkgs.fixfname
+      ];
+    };
+
     services.rankserver = {
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.rankserver;
@@ -320,17 +357,36 @@ in {
     services.orchestratord = lib.mkIf cfg.enableOrchestrator {
       enable = true;
       orchestratorPkg = anixpkgs.orchestrator;
+      threads = 2;
       pathPkgs = with pkgs;
         [ bash coreutils util-linux rclone machine-rcrsync machine-authm ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+    systemd.timers."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = "Sun 03:00";
+          Persistent = true;
+        };
+      };
+    systemd.services."weekly-orchestratord-restart" =
+      lib.mkIf cfg.enableOrchestrator {
+        description = "Restart orchestratord weekly";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart =
+            "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
+        };
+      };
 
     # The global useDHCP flag is deprecated, therefore explicitly set to false here.
     # Per-interface useDHCP will be mandatory in the future, so this generated config
     # replicates the default behaviour.
     networking.useDHCP = false;
-    networking.networkmanager.enable = !cfg.isInstaller;
+    networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
       ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
@@ -341,6 +397,13 @@ in {
       font = "Lat2-Terminus16";
       keyMap = "us";
     };
+    fonts.packages = with pkgs; [
+      dejavu_fonts
+      liberation_ttf
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+    ];
 
     security.sudo.extraConfig = ''
       ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
@@ -353,6 +416,7 @@ in {
     };
     programs.ssh.startAgent = true;
 
+    programs.vim.enable = true;
     programs.vim.defaultEditor = true;
 
     services.journald = {
@@ -375,6 +439,12 @@ in {
       tacticalPkg = anixpkgs.daily_tactical_server;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
     };
+
+    # Media
+    services.plexNode.enable = cfg.isATS;
+
+    # Mail
+    services.mailNode.enable = cfg.isATS;
 
     # Global packages
     environment.systemPackages = with pkgs;
@@ -399,6 +469,7 @@ in {
         iotop
         iperf
         iftop
+        smartmontools
         python3
         xsel
         htop
@@ -454,6 +525,8 @@ in {
         gping
         dog
         atsudo
+        ffmpeg-headless
+        ffmpegthumbnailer
       ] ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
       ++ (if cfg.enableOrchestrator then
         [
@@ -500,11 +573,16 @@ in {
 
     environment.shellAliases = {
       jfu = "journalctl -fu";
-      code = "codium";
       nohistory = "set +o history";
     };
 
-    systemd.tmpfiles.rules = [ "d /data 0777 root root" ];
+    programs.captive-browser = {
+      enable = cfg.graphical;
+      interface = cfg.wifiInterfaceName;
+    };
+
+    systemd.tmpfiles.rules =
+      [ "d /data 0777 root root" "d /.c 0750 andrew dev -" "x /.c - - -" ];
 
     users.groups.dev = { gid = 1000; };
     users.users.andrew = {
@@ -592,6 +670,9 @@ in {
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = false;
         enableMetrics = cfg.enableMetrics;
+        claudeMarketplaces = cfg.claudeMarketplaces;
+        claudePlugins = cfg.claudePlugins;
+        extraClaudeSettings = cfg.extraClaudeSettings;
       };
     };
   };

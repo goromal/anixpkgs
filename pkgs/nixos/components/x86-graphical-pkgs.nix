@@ -8,6 +8,16 @@ let
     (anixpkgs.callPackage ../../bash-packages/browser-aliases {
       browserExec = cfg.browserExec;
     });
+  version-string = "anix - ${
+      if local-build then "Local Build" else "v${anixpkgs-version}"
+    } - ${if cfg.standalone then "Home-Manager" else "NixOS"} ${nixos-version}";
+  wallpaper = pkgs.callPackage ../../bash-packages/mkWallpaper {
+    pkgData = anixpkgs.pkgData;
+    screenResolution = cfg.screenResolution;
+    label = version-string;
+    forcedImage = cfg.wallpaperImage;
+    # forcedIdx = 11; # pin the wallpaper idx
+  };
 in {
   dconf.settings = ({
     "org/gnome/desktop/background" = {
@@ -74,7 +84,17 @@ in {
       unstable.audacity
       blender
     ] else
-      [ ]) ++ (if browser-aliases != null then [ browser-aliases ] else [ ]);
+      [ ]) ++ (if browser-aliases != null then
+        ([ browser-aliases ] ++ (if cfg.standalone == true then
+          [
+            (pkgs.writeShellScriptBin "captive-browser" ''
+              ${cfg.browserExec} "http://nmcheck.gnome.org/" ${anixpkgs.redirects.suppress_all}
+            '')
+          ]
+        else
+          [ ]))
+      else
+        [ ]);
 
   gtk = lib.mkIf (cfg.standalone == false) {
     enable = true;
@@ -96,19 +116,7 @@ in {
         (pkgs.writeShellScript "terminal" "terminator");
       ".config/nautilus/scripts-accels".text = "F4 terminal";
       "Templates/EmptyDocument".text = "";
-      ".background-image".source = ((pkgs.runCommand "make-wallpaper" { } ''
-        mkdir $out
-        ${pkgs.imagemagick}/bin/convert -font ${fonts.nexa.data} \
-           -pointsize 30 \
-           -fill black \
-           -draw 'text 320,1343 "${
-             if local-build then "Local Build" else "v${anixpkgs-version}"
-           } - ${
-             if cfg.standalone then "Home-Manager" else "NixOS"
-           } ${nixos-version}"' \
-           -resize ${cfg.screenResolution}! \
-           ${img.wallpaper.data} $out/wallpaper.png
-      '') + "/wallpaper.png");
+      ".background-image".source = wallpaper;
     } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
       ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =

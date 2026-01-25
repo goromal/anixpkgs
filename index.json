@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -58,8 +63,8 @@
             },
             {
                 "attr": "orchestrator-cpp",
-                "ci": true,
-                "docs": true
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ardurouter",
@@ -358,6 +363,11 @@
                 "docs": false
             },
             {
+                "attr": "ckfile",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "color-prints",
                 "ci": true,
                 "docs": true
@@ -383,6 +393,11 @@
                 "docs": true
             },
             {
+                "attr": "local-ssh-proxy",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
                 "ci": true,
                 "docs": true
@@ -396,6 +411,11 @@
                 "attr": "budget_report",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "surveys_report",
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "md2pdf",
@@ -414,6 +434,11 @@
             },
             {
                 "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "swrite",
                 "ci": true,
                 "docs": false
             },

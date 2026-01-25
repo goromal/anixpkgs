@@ -31,11 +31,16 @@ with import ../dependencies.nix; {
     editor = lib.mkOption {
       type = lib.types.str;
       description = "Code editor (executable) of choice";
-      default = "codium";
+      default = "code";
     };
     browserExec = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       description = "Executable name to open your browser of choice";
+      default = null;
+    };
+    wallpaperImage = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      description = "Path to desired wallpaper (for graphical distributions)";
       default = null;
     };
     screenResolution = lib.mkOption {
@@ -47,6 +52,21 @@ with import ../dependencies.nix; {
       type = lib.types.bool;
       default = false;
       description = "Whether to export OS metrics";
+    };
+    claudeMarketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of extra plugin marketplaces to install";
+    };
+    claudePlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of claude plugins to install";
+    };
+    extraClaudeSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Attrs describing the Claude JSON settings";
     };
   };
 }

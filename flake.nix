@@ -50,6 +50,9 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    gnc.url = "github:goromal/gnc";
+    gnc.flake = false;
+
     # TODO gradebook would need dev/warn-suppress branch
 
     makepyshell.url =
