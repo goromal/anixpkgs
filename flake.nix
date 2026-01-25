@@ -62,7 +62,7 @@
     manif-geom-cpp.url = "github:goromal/manif-geom-cpp";
     manif-geom-cpp.flake = false;
 
-    manif-geom-rs.url = "github:goromal/manif-geom-rs?ref=dev/impl";
+    manif-geom-rs.url = "github:goromal/manif-geom-rs";
     manif-geom-rs.flake = false;
 
     mavlink.url =
