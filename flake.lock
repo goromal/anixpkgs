@@ -544,16 +544,16 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1769400700,
+        "lastModified": 1769402418,
         "narHash": "sha256-VSIKJNwPmegMIN8WtNcGpwRRFFQL54xefTz6ly+V5so=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "e9f4f7edbce74fe8628704bfe366888d950518b0",
+        "rev": "ab56839b3525f9cc6d1404f990397fed51c0781e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "release/1",
+        "ref": "refs/tags/release/1.0",
         "repo": "pysignals",
         "type": "github"
       }
