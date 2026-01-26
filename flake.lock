@@ -225,6 +225,7 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "geometry",
         "type": "github"
       }
@@ -248,11 +249,11 @@
     "gnc": {
       "flake": false,
       "locked": {
-        "lastModified": 1766782308,
-        "narHash": "sha256-Cf7vnos2IpkcrgqkWRL5Ht7kPexUenFaRN5RYYY4XBc=",
+        "lastModified": 1769404494,
+        "narHash": "sha256-rSVQkLqNaQjG5ELajLpZiL7QBVd+KQBk3KntqeNybR4=",
         "owner": "goromal",
         "repo": "gnc",
-        "rev": "b80521a95217b37747d65e1efb1e52378e437b2c",
+        "rev": "82fe050acea9c1524168b1ec85d046d3d31ed1b0",
         "type": "github"
       },
       "original": {
@@ -280,15 +281,16 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1746337994,
-        "narHash": "sha256-4MEQqEmZs7D2asF5c/rc3NzDDui/0uAlZWlasGUdlRo=",
+        "lastModified": 1742189520,
+        "narHash": "sha256-0xF03b3GfZrJpjspc7MsJYiTl/mBrbVjVNl4c4iYrxQ=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "f7013ab24f5ac59a220d960994d627beb2ffdd6c",
+        "rev": "9bbb6c47c8d0b2d90a53e868cfea855354106bad",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "manif-geom-cpp",
         "type": "github"
       }
@@ -542,15 +544,16 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1766781420,
-        "narHash": "sha256-lkXATLuWtUU3q2cTcSL8sbgf78CX/BgiwT+EOB/pL6Y=",
+        "lastModified": 1769402418,
+        "narHash": "sha256-VSIKJNwPmegMIN8WtNcGpwRRFFQL54xefTz6ly+V5so=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "55c464a90ad44dad8ca963158430fa2da5dc7b67",
+        "rev": "ab56839b3525f9cc6d1404f990397fed51c0781e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "pysignals",
         "type": "github"
       }
@@ -724,15 +727,16 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1766780194,
-        "narHash": "sha256-S/f3zyZZ26Q2s2jOl+/RLSMzMa4RT1YT9BYyV/eqbJ8=",
+        "lastModified": 1769400792,
+        "narHash": "sha256-DqqqR7OBHEiNhuYkdKs9OR9mPhsAJtqFXMgTTwAJnSA=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "3e3fa06a6ab91cb4817285dcaed066307c80f3c0",
+        "rev": "5a29ba71d2eb7f903bdca76249a23c098a2d5dbe",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "signals-cpp",
         "type": "github"
       }
