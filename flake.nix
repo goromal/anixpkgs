@@ -50,7 +50,7 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
-    gnc.url = "github:goromal/gnc";
+    gnc.url = "github:goromal/gnc?ref=refs/heads/goromal-patch-1";
     gnc.flake = false;
 
     # TODO gradebook would need dev/warn-suppress branch
