@@ -125,7 +125,7 @@
     secure-delete.url = "github:goromal/secure-delete";
     secure-delete.flake = false;
 
-    signals-cpp.url = "github:goromal/signals-cpp?ref=release/1";
+    signals-cpp.url = "github:goromal/signals-cpp?ref=release/1" ;
     signals-cpp.flake = false;
 
     simple-image-editor.url = "github:goromal/simple-image-editor";
