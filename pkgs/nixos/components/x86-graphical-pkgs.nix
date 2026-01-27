@@ -11,12 +11,10 @@ let
   version-string = "anix - ${
       if local-build then "Local Build" else "v${anixpkgs-version}"
     } - ${if cfg.standalone then "Home-Manager" else "NixOS"} ${nixos-version}";
-  wallpaper = pkgs.callPackage ../../bash-packages/mkWallpaper {
+  wallpaper-regen = pkgs.callPackage ../../bash-packages/wallpaper-regen {
     pkgData = anixpkgs.pkgData;
     screenResolution = cfg.screenResolution;
     label = version-string;
-    forcedImage = cfg.wallpaperImage;
-    # forcedIdx = 11; # pin the wallpaper idx
   };
 in {
   dconf.settings = ({
@@ -116,11 +114,35 @@ in {
         (pkgs.writeShellScript "terminal" "terminator");
       ".config/nautilus/scripts-accels".text = "F4 terminal";
       "Templates/EmptyDocument".text = "";
-      ".background-image".source = wallpaper;
     } // (if (cfg.standalone == false) then {
       ".face".source = img.ajt-logo-white.data;
       ".config/gtk-4.0/${themes.nordic-gtk4.thumbnail.name}".source =
         themes.nordic-gtk4.thumbnail.data;
     } else
       { }));
+
+  systemd.user.services.wallpaper-regen = {
+    Unit = {
+      Description = "Regenerate desktop wallpaper";
+      After = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${wallpaper-regen}/bin/wallpaper-regen";
+    };
+    Install = { WantedBy = [ "default.target" ]; };
+  };
+
+  systemd.user.timers.wallpaper-regen = {
+    Unit = {
+      Description = "Regenerate desktop wallpaper every 15 minutes";
+      After = [ "graphical-session.target" ];
+    };
+    Timer = {
+      OnBootSec = "0min";
+      OnUnitActiveSec = "15min";
+      Persistent = true;
+    };
+    Install = { WantedBy = [ "timers.target" ]; };
+  };
 }
