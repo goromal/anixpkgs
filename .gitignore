@@ -3,6 +3,3 @@ result*
 build/*
 *.log
 .nixos-test-history
-
-# Claude Code ctags index
-.claude/tags
