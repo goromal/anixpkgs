@@ -11,7 +11,7 @@ let
   version-string = "anix - ${
       if local-build then "Local Build" else "v${anixpkgs-version}"
     } - ${if cfg.standalone then "Home-Manager" else "NixOS"} ${nixos-version}";
-  wallpaper-regen = anixpkgs.callPackage ../../bash-packages/wallpaper-regen {
+  wallpaper-regen = pkgs.callPackage ../../bash-packages/wallpaper-regen {
     pkgData = anixpkgs.pkgData;
     screenResolution = cfg.screenResolution;
     label = version-string;
