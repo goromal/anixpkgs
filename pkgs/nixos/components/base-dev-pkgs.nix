@@ -28,12 +28,11 @@ in {
         exit 1
       fi
       echo_yellow "Installing claude plugins..."
-      ${lib.concatMapStringsSep "\n      " (marketplace:
-        "claude plugin marketplace add ${marketplace} 2>/dev/null || true")
+      ${lib.concatMapStringsSep "\n      "
+      (marketplace: "claude plugin marketplace add ${marketplace}")
       cfg.claudeMarketplaces}
       ${lib.concatMapStringsSep "\n      "
-      (plugin: "claude plugin install ${plugin} 2>/dev/null || true")
-      cfg.claudePlugins}
+      (plugin: "claude plugin install ${plugin}") cfg.claudePlugins}
       echo_green "Done! Verify installed plugins with \"claude plugin list\""
 
       echo_yellow "Other setup..."
@@ -70,12 +69,53 @@ in {
   programs.vim.plugins = lib.mkIf (cfg.standalone == false)
     (with pkgs.vimPlugins; [ vim-gitgutter YouCompleteMe ]);
 
-  home.file.".claude/settings.json".text = let
+  systemd.user.services.claude-settings-update = let
     pluginsObj = builtins.listToAttrs (map (plugin: {
       name = plugin;
       value = true;
     }) cfg.claudePlugins);
     baseConfig = { enabledPlugins = pluginsObj; };
-    mergedConfig = baseConfig // cfg.extraClaudeSettings;
-  in builtins.toJSON mergedConfig;
+    nixosSettings = baseConfig // cfg.extraClaudeSettings;
+    nixosSettingsJson = builtins.toJSON nixosSettings;
+
+    mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
+      set -e
+
+      SETTINGS_DIR="$HOME/.claude"
+      SETTINGS_FILE="$SETTINGS_DIR/settings.json"
+      NIXOS_SETTINGS='${nixosSettingsJson}'
+
+      # Create directory if it doesn't exist
+      mkdir -p "$SETTINGS_DIR"
+
+      # If settings file doesn't exist, just write the NixOS settings
+      if [ ! -f "$SETTINGS_FILE" ]; then
+        echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
+        echo "Created new Claude settings file with NixOS configuration"
+        exit 0
+      fi
+
+      # Merge existing settings with NixOS settings
+      # NixOS settings take precedence for conflicts
+      ${pkgs.jq}/bin/jq -n \
+        --argjson existing "$(cat "$SETTINGS_FILE")" \
+        --argjson nixos "$NIXOS_SETTINGS" \
+        '$existing * $nixos' > "$SETTINGS_FILE.tmp"
+
+      mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+      echo "Updated Claude settings, preserving user modifications"
+    '';
+  in {
+    Unit = {
+      Description = "Update Claude Code settings with NixOS configuration";
+      After = [ "graphical-session-pre.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${mergeScript}";
+      RemainAfterExit = true;
+    };
+    Install = { WantedBy = [ "default.target" ]; };
+  };
 }
