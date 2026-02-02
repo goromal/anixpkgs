@@ -3,6 +3,77 @@
 
 <head>
     <title>Stamp Server</title>
+    <style>
+        .controls-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .control-group {
+            margin: 10px 0;
+        }
+        .control-group label {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+        }
+        .control-group input {
+            margin: 0 5px;
+        }
+        .btn {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            display: none;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+        #cropCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            display: none;
+        }
+        .crop-info {
+            font-family: monospace;
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,21 +83,77 @@
         </ul>
     </nav>
     <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
+
+    <div id="statusMessage" class="status-message"></div>
+
     {% if err %}
     <p>{{ msg }}</p>
     {% else %}
     {% if ftype == "PNG" %}
-    <img src="{{ file }}" alt="" style="max-width: 100%; height: auto;" />
+    <div class="controls-section">
+        <h3>Image Controls</h3>
+
+        <div class="control-group">
+            <label>Rotate:</label>
+            <button class="btn" onclick="rotateImage(90)">90° CW</button>
+            <button class="btn" onclick="rotateImage(-90)">90° CCW</button>
+            <button class="btn" onclick="rotateImage(180)">180°</button>
+        </div>
+
+        <div class="control-group">
+            <label>Crop:</label>
+            <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Draw Crop Area</button>
+            <button class="btn btn-danger" id="applyCropBtn" onclick="applyCrop()" style="display: none;">Apply Crop</button>
+            <button class="btn" id="cancelCropBtn" onclick="cancelCrop()" style="display: none;">Cancel</button>
+        </div>
+        <div id="cropInfo" class="crop-info" style="display: none;">
+            Click and drag on the image to select crop area
+        </div>
+
+        <div class="control-group">
+            <label>File:</label>
+            <button class="btn" onclick="duplicateImage()">Duplicate Image</button>
+        </div>
+    </div>
+
+    <div class="image-container">
+        <img id="currentImage" src="{{ file }}" alt="" style="max-width: 100%; height: auto;" />
+        <canvas id="cropCanvas"></canvas>
+    </div>
+
     {% elif ftype == "MP4" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/mp4" />
     </video>
+
     {% elif ftype == "WEBM_EXT" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/webm" />
     </video>
+
     {% elif ftype == "MP4_EXT" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/mp4" />
     </video>
     {% endif %}
@@ -50,6 +177,396 @@
         {% endfor %}
         <li><a href="{{ urlroot }}">ROOT</a></li>
     </ul>
+
+    <script>
+        // Helper function to show status messages
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + (isError ? 'status-error' : 'status-success');
+            statusDiv.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Helper function to get current filename from URL
+        function getCurrentFilename() {
+            const imgElement = document.getElementById('currentImage');
+            const videoElement = document.getElementById('currentVideo');
+
+            if (imgElement) {
+                const src = imgElement.src;
+                // Extract filename and remove any query parameters (e.g., cache-busting ?t=...)
+                const filename = src.substring(src.lastIndexOf('/') + 1);
+                return filename.split('?')[0];
+            } else if (videoElement) {
+                const src = videoElement.querySelector('source').src;
+                const filename = src.substring(src.lastIndexOf('/') + 1);
+                return filename.split('?')[0];
+            }
+            return null;
+        }
+
+        // Rotate image function
+        function rotateImage(degrees) {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            // Normalize degrees to 0-359 range
+            const normalizedDegrees = ((degrees % 360) + 360) % 360;
+
+            fetch('{{ urlroot }}api/rotate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    degrees: normalizedDegrees
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image rotated successfully!');
+                    // Force reload the image with cache-busting
+                    const img = document.getElementById('currentImage');
+                    const timestamp = new Date().getTime();
+                    img.src = img.src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Crop-related global variables
+        let cropMode = false;
+        let cropStartX = 0;
+        let cropStartY = 0;
+        let cropEndX = 0;
+        let cropEndY = 0;
+        let isDrawing = false;
+
+        // Initialize canvas overlay when image loads
+        window.addEventListener('load', function() {
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+
+            if (img && canvas) {
+                img.onload = function() {
+                    updateCanvasSize();
+                };
+                // If image is already loaded (cached)
+                if (img.complete) {
+                    updateCanvasSize();
+                }
+            }
+        });
+
+        function updateCanvasSize() {
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+            if (img && canvas) {
+                canvas.width = img.offsetWidth;
+                canvas.height = img.offsetHeight;
+            }
+        }
+
+        function enableCropMode() {
+            cropMode = true;
+            const canvas = document.getElementById('cropCanvas');
+            const cropInfo = document.getElementById('cropInfo');
+            const enableBtn = document.getElementById('enableCropBtn');
+            const applyBtn = document.getElementById('applyCropBtn');
+            const cancelBtn = document.getElementById('cancelCropBtn');
+
+            canvas.style.display = 'block';
+            cropInfo.style.display = 'block';
+            enableBtn.style.display = 'none';
+            applyBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+
+            updateCanvasSize();
+            setupCropHandlers();
+        }
+
+        function cancelCrop() {
+            cropMode = false;
+            isDrawing = false;
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            const cropInfo = document.getElementById('cropInfo');
+            const enableBtn = document.getElementById('enableCropBtn');
+            const applyBtn = document.getElementById('applyCropBtn');
+            const cancelBtn = document.getElementById('cancelCropBtn');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+            cropInfo.style.display = 'none';
+            enableBtn.style.display = 'inline-block';
+            applyBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+        }
+
+        function setupCropHandlers() {
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Helper function to get coordinates from mouse or touch event
+            function getCoordinates(e, rect) {
+                if (e.touches && e.touches.length > 0) {
+                    // Touch event
+                    return {
+                        x: e.touches[0].clientX - rect.left,
+                        y: e.touches[0].clientY - rect.top
+                    };
+                } else {
+                    // Mouse event
+                    return {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                }
+            }
+
+            // Helper function to draw the crop overlay
+            function drawCropOverlay() {
+                // Clear and redraw
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw semi-transparent overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Clear the crop rectangle area
+                const x = Math.min(cropStartX, cropEndX);
+                const y = Math.min(cropStartY, cropEndY);
+                const width = Math.abs(cropEndX - cropStartX);
+                const height = Math.abs(cropEndY - cropStartY);
+
+                ctx.clearRect(x, y, width, height);
+
+                // Draw crop rectangle border
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, width, height);
+
+                // Display dimensions
+                const cropInfo = document.getElementById('cropInfo');
+                cropInfo.textContent = `Selection: ${Math.round(width)}x${Math.round(height)} at (${Math.round(x)}, ${Math.round(y)})`;
+            }
+
+            // Mouse events
+            canvas.onmousedown = function(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const coords = getCoordinates(e, rect);
+                cropStartX = coords.x;
+                cropStartY = coords.y;
+            };
+
+            canvas.onmousemove = function(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+
+                const rect = canvas.getBoundingClientRect();
+                const coords = getCoordinates(e, rect);
+                cropEndX = coords.x;
+                cropEndY = coords.y;
+
+                drawCropOverlay();
+            };
+
+            canvas.onmouseup = function(e) {
+                e.preventDefault();
+                isDrawing = false;
+            };
+
+            canvas.onmouseleave = function(e) {
+                if (isDrawing) {
+                    isDrawing = false;
+                }
+            };
+
+            // Touch events
+            canvas.ontouchstart = function(e) {
+                e.preventDefault();
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const coords = getCoordinates(e, rect);
+                cropStartX = coords.x;
+                cropStartY = coords.y;
+            };
+
+            canvas.ontouchmove = function(e) {
+                if (!isDrawing) return;
+                e.preventDefault();
+
+                const rect = canvas.getBoundingClientRect();
+                const coords = getCoordinates(e, rect);
+                cropEndX = coords.x;
+                cropEndY = coords.y;
+
+                drawCropOverlay();
+            };
+
+            canvas.ontouchend = function(e) {
+                e.preventDefault();
+                isDrawing = false;
+            };
+
+            canvas.ontouchcancel = function(e) {
+                e.preventDefault();
+                if (isDrawing) {
+                    isDrawing = false;
+                }
+            };
+        }
+
+        function applyCrop() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            // Calculate actual crop coordinates based on image scale
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+
+            const scaleX = img.naturalWidth / img.offsetWidth;
+            const scaleY = img.naturalHeight / img.offsetHeight;
+
+            const x = Math.min(cropStartX, cropEndX);
+            const y = Math.min(cropStartY, cropEndY);
+            const width = Math.abs(cropEndX - cropStartX);
+            const height = Math.abs(cropEndY - cropStartY);
+
+            if (width <= 0 || height <= 0) {
+                showStatus('Error: Please draw a crop area first', true);
+                return;
+            }
+
+            // Scale to actual image coordinates
+            const actualX = Math.round(x * scaleX);
+            const actualY = Math.round(y * scaleY);
+            const actualWidth = Math.round(width * scaleX);
+            const actualHeight = Math.round(height * scaleY);
+
+            fetch('{{ urlroot }}api/crop-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    x: actualX,
+                    y: actualY,
+                    width: actualWidth,
+                    height: actualHeight
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image cropped successfully!');
+                    cancelCrop();
+                    // Force reload the image with cache-busting
+                    const img = document.getElementById('currentImage');
+                    const timestamp = new Date().getTime();
+                    img.src = img.src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Duplicate image function
+        function duplicateImage() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            fetch('{{ urlroot }}api/duplicate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image duplicated as: ' + data.new_filename);
+                    // Reload the page to show the new duplicate
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Save screenshot function
+        function saveScreenshot() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            const videoElement = document.getElementById('currentVideo');
+            if (!videoElement) {
+                showStatus('Error: No video element found', true);
+                return;
+            }
+
+            const timestamp = videoElement.currentTime;
+
+            fetch('{{ urlroot }}api/save-screenshot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    timestamp: timestamp
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Screenshot saved as: ' + data.new_filename);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+    </script>
 </body>
 
 </html>

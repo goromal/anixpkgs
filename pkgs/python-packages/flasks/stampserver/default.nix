@@ -1,5 +1,5 @@
 { buildPythonPackage, flask, flask_login, flask_wtf, wtforms, werkzeug
-, writeShellScript, python }:
+, pillow, opencv4, writeShellScript, python }:
 let pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
 in buildPythonPackage rec {
   pname = "stampserver";
@@ -10,7 +10,7 @@ in buildPythonPackage rec {
     cp ${./index.html} $out/${pythonLibDir}/templates/index.html
     cp ${./login.html} $out/${pythonLibDir}/templates/login.html
   '';
-  propagatedBuildInputs = [ flask flask_login flask_wtf wtforms werkzeug ];
+  propagatedBuildInputs = [ flask flask_login flask_wtf wtforms werkzeug pillow opencv4 ];
   meta = {
     description =
       "Provides an interface for stamping metadata on PNGs and MP4s.";
