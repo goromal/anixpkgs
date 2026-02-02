@@ -5,12 +5,11 @@ import flask
 import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from random import shuffle
 from datetime import timedelta
 from PIL import Image
 import cv2
-import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
