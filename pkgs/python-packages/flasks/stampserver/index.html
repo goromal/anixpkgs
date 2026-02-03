@@ -272,6 +272,7 @@
         let dragStartX = 0;
         let dragStartY = 0;
         let initialCropRect = null;
+        let resizeObserver = null;
 
         // Initialize canvas overlay when image loads
         window.addEventListener('load', function() {
@@ -325,6 +326,36 @@
 
             setupCropHandlers();
             drawCropOverlay();
+
+            // Set up resize observer to handle window resize during crop mode
+            const img = document.getElementById('currentImage');
+            if (img && typeof ResizeObserver !== 'undefined') {
+                resizeObserver = new ResizeObserver(() => {
+                    if (cropMode) {
+                        // Store the current crop as a fraction of image dimensions
+                        const oldWidth = canvas.width;
+                        const oldHeight = canvas.height;
+                        const leftRatio = cropRect.left / oldWidth;
+                        const topRatio = cropRect.top / oldHeight;
+                        const rightRatio = cropRect.right / oldWidth;
+                        const bottomRatio = cropRect.bottom / oldHeight;
+
+                        // Update canvas size to match new image size
+                        updateCanvasSize();
+
+                        // Restore crop rect as the same fraction of new dimensions
+                        cropRect = {
+                            left: leftRatio * canvas.width,
+                            top: topRatio * canvas.height,
+                            right: rightRatio * canvas.width,
+                            bottom: bottomRatio * canvas.height
+                        };
+
+                        drawCropOverlay();
+                    }
+                });
+                resizeObserver.observe(img);
+            }
         }
 
         function cancelCrop() {
@@ -343,6 +374,12 @@
             enableBtn.style.display = 'inline-block';
             applyBtn.style.display = 'none';
             cancelBtn.style.display = 'none';
+
+            // Clean up resize observer
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+                resizeObserver = null;
+            }
         }
 
         function setupCropHandlers() {
@@ -561,11 +598,23 @@
                 return;
             }
 
-            // Scale to actual image coordinates
-            const actualX = Math.round(cropRect.left * scaleX);
-            const actualY = Math.round(cropRect.top * scaleY);
-            const actualWidth = Math.round(width * scaleX);
-            const actualHeight = Math.round(height * scaleY);
+            // Scale to actual image coordinates with floor/ceil to avoid rounding errors
+            // Use floor for starting position to be conservative
+            const actualX = Math.floor(cropRect.left * scaleX);
+            const actualY = Math.floor(cropRect.top * scaleY);
+
+            // Calculate width/height from the actual positions to avoid accumulating errors
+            // Use floor for end position, then compute dimensions
+            const actualRight = Math.floor(cropRect.right * scaleX);
+            const actualBottom = Math.floor(cropRect.bottom * scaleY);
+            const actualWidth = actualRight - actualX;
+            const actualHeight = actualBottom - actualY;
+
+            // Ensure we stay within image bounds (defense against any edge case)
+            const safeX = Math.max(0, Math.min(actualX, img.naturalWidth - 1));
+            const safeY = Math.max(0, Math.min(actualY, img.naturalHeight - 1));
+            const safeWidth = Math.max(1, Math.min(actualWidth, img.naturalWidth - safeX));
+            const safeHeight = Math.max(1, Math.min(actualHeight, img.naturalHeight - safeY));
 
             fetch('{{ urlroot }}api/crop-image', {
                 method: 'POST',
@@ -574,10 +623,10 @@
                 },
                 body: JSON.stringify({
                     filename: filename,
-                    x: actualX,
-                    y: actualY,
-                    width: actualWidth,
-                    height: actualHeight
+                    x: safeX,
+                    y: safeY,
+                    width: safeWidth,
+                    height: safeHeight
                 })
             })
             .then(response => response.json())
