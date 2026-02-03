@@ -64,14 +64,31 @@
             position: absolute;
             top: 0;
             left: 0;
-            cursor: crosshair;
+            cursor: default;
             display: none;
+            touch-action: none;
         }
         .crop-info {
             font-family: monospace;
             font-size: 12px;
             color: #666;
             margin: 5px 0;
+        }
+        .crop-handle {
+            position: absolute;
+            background: white;
+            border: 2px solid #00ff00;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            touch-action: none;
+            z-index: 10;
+        }
+        .crop-edge {
+            position: absolute;
+            touch-action: none;
+            z-index: 5;
         }
     </style>
 </head>
@@ -102,12 +119,12 @@
 
         <div class="control-group">
             <label>Crop:</label>
-            <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Draw Crop Area</button>
+            <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Crop Image</button>
             <button class="btn btn-danger" id="applyCropBtn" onclick="applyCrop()" style="display: none;">Apply Crop</button>
             <button class="btn" id="cancelCropBtn" onclick="cancelCrop()" style="display: none;">Cancel</button>
         </div>
         <div id="cropInfo" class="crop-info" style="display: none;">
-            Click and drag on the image to select crop area
+            Drag edges or corners to adjust crop area
         </div>
 
         <div class="control-group">
@@ -250,11 +267,11 @@
 
         // Crop-related global variables
         let cropMode = false;
-        let cropStartX = 0;
-        let cropStartY = 0;
-        let cropEndX = 0;
-        let cropEndY = 0;
-        let isDrawing = false;
+        let cropRect = { left: 0, top: 0, right: 0, bottom: 0 }; // In canvas pixels
+        let dragState = null; // null, 'move', 'nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let initialCropRect = null;
 
         // Initialize canvas overlay when image loads
         window.addEventListener('load', function() {
@@ -296,12 +313,23 @@
             cancelBtn.style.display = 'inline-block';
 
             updateCanvasSize();
+
+            // Initialize crop rect to full image with small margin
+            const margin = Math.min(canvas.width, canvas.height) * 0.1;
+            cropRect = {
+                left: margin,
+                top: margin,
+                right: canvas.width - margin,
+                bottom: canvas.height - margin
+            };
+
             setupCropHandlers();
+            drawCropOverlay();
         }
 
         function cancelCrop() {
             cropMode = false;
-            isDrawing = false;
+            dragState = null;
             const canvas = document.getElementById('cropCanvas');
             const ctx = canvas.getContext('2d');
             const cropInfo = document.getElementById('cropInfo');
@@ -322,15 +350,14 @@
             const ctx = canvas.getContext('2d');
 
             // Helper function to get coordinates from mouse or touch event
-            function getCoordinates(e, rect) {
+            function getCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
                 if (e.touches && e.touches.length > 0) {
-                    // Touch event
                     return {
                         x: e.touches[0].clientX - rect.left,
                         y: e.touches[0].clientY - rect.top
                     };
                 } else {
-                    // Mouse event
                     return {
                         x: e.clientX - rect.left,
                         y: e.clientY - rect.top
@@ -338,9 +365,48 @@
                 }
             }
 
-            // Helper function to draw the crop overlay
+            // Detect what part of the crop rect is being dragged
+            function detectDragTarget(x, y) {
+                const handleSize = 30; // Touch-friendly size
+                const edgeThreshold = 15;
+
+                // Check corners first (larger hit area)
+                if (Math.abs(x - cropRect.left) < handleSize && Math.abs(y - cropRect.top) < handleSize) {
+                    return 'nw';
+                }
+                if (Math.abs(x - cropRect.right) < handleSize && Math.abs(y - cropRect.top) < handleSize) {
+                    return 'ne';
+                }
+                if (Math.abs(x - cropRect.left) < handleSize && Math.abs(y - cropRect.bottom) < handleSize) {
+                    return 'sw';
+                }
+                if (Math.abs(x - cropRect.right) < handleSize && Math.abs(y - cropRect.bottom) < handleSize) {
+                    return 'se';
+                }
+
+                // Check edges
+                if (Math.abs(y - cropRect.top) < edgeThreshold && x > cropRect.left && x < cropRect.right) {
+                    return 'n';
+                }
+                if (Math.abs(y - cropRect.bottom) < edgeThreshold && x > cropRect.left && x < cropRect.right) {
+                    return 's';
+                }
+                if (Math.abs(x - cropRect.left) < edgeThreshold && y > cropRect.top && y < cropRect.bottom) {
+                    return 'w';
+                }
+                if (Math.abs(x - cropRect.right) < edgeThreshold && y > cropRect.top && y < cropRect.bottom) {
+                    return 'e';
+                }
+
+                // Check if inside crop area (for moving)
+                if (x > cropRect.left && x < cropRect.right && y > cropRect.top && y < cropRect.bottom) {
+                    return 'move';
+                }
+
+                return null;
+            }
+
             function drawCropOverlay() {
-                // Clear and redraw
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Draw semi-transparent overlay
@@ -348,89 +414,129 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 // Clear the crop rectangle area
-                const x = Math.min(cropStartX, cropEndX);
-                const y = Math.min(cropStartY, cropEndY);
-                const width = Math.abs(cropEndX - cropStartX);
-                const height = Math.abs(cropEndY - cropStartY);
-
-                ctx.clearRect(x, y, width, height);
+                const width = cropRect.right - cropRect.left;
+                const height = cropRect.bottom - cropRect.top;
+                ctx.clearRect(cropRect.left, cropRect.top, width, height);
 
                 // Draw crop rectangle border
                 ctx.strokeStyle = '#00ff00';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, width, height);
+                ctx.strokeRect(cropRect.left, cropRect.top, width, height);
+
+                // Draw corner handles
+                const handleSize = 20;
+                const corners = [
+                    { x: cropRect.left, y: cropRect.top },
+                    { x: cropRect.right, y: cropRect.top },
+                    { x: cropRect.left, y: cropRect.bottom },
+                    { x: cropRect.right, y: cropRect.bottom }
+                ];
+
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+
+                corners.forEach(corner => {
+                    ctx.beginPath();
+                    ctx.arc(corner.x, corner.y, handleSize / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+
+                // Draw edge handles (midpoints)
+                const edges = [
+                    { x: (cropRect.left + cropRect.right) / 2, y: cropRect.top },
+                    { x: (cropRect.left + cropRect.right) / 2, y: cropRect.bottom },
+                    { x: cropRect.left, y: (cropRect.top + cropRect.bottom) / 2 },
+                    { x: cropRect.right, y: (cropRect.top + cropRect.bottom) / 2 }
+                ];
+
+                edges.forEach(edge => {
+                    ctx.beginPath();
+                    ctx.arc(edge.x, edge.y, handleSize / 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                });
 
                 // Display dimensions
                 const cropInfo = document.getElementById('cropInfo');
-                cropInfo.textContent = `Selection: ${Math.round(width)}x${Math.round(height)} at (${Math.round(x)}, ${Math.round(y)})`;
+                cropInfo.textContent = `Selection: ${Math.round(width)}x${Math.round(height)} at (${Math.round(cropRect.left)}, ${Math.round(cropRect.top)})`;
+            }
+
+            // Start drag
+            function startDrag(e) {
+                e.preventDefault();
+                const coords = getCoordinates(e);
+                dragState = detectDragTarget(coords.x, coords.y);
+                if (dragState) {
+                    dragStartX = coords.x;
+                    dragStartY = coords.y;
+                    initialCropRect = { ...cropRect };
+                }
+            }
+
+            // During drag
+            function doDrag(e) {
+                if (!dragState) return;
+                e.preventDefault();
+
+                const coords = getCoordinates(e);
+                const dx = coords.x - dragStartX;
+                const dy = coords.y - dragStartY;
+
+                const minSize = 50; // Minimum crop size
+
+                if (dragState === 'move') {
+                    // Move entire crop rect
+                    const width = initialCropRect.right - initialCropRect.left;
+                    const height = initialCropRect.bottom - initialCropRect.top;
+
+                    cropRect.left = Math.max(0, Math.min(canvas.width - width, initialCropRect.left + dx));
+                    cropRect.top = Math.max(0, Math.min(canvas.height - height, initialCropRect.top + dy));
+                    cropRect.right = cropRect.left + width;
+                    cropRect.bottom = cropRect.top + height;
+                } else if (dragState === 'nw') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 'ne') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 'sw') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'se') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'n') {
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 's') {
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'w') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                } else if (dragState === 'e') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                }
+
+                drawCropOverlay();
+            }
+
+            // End drag
+            function endDrag(e) {
+                e.preventDefault();
+                dragState = null;
             }
 
             // Mouse events
-            canvas.onmousedown = function(e) {
-                e.preventDefault();
-                isDrawing = true;
-                const rect = canvas.getBoundingClientRect();
-                const coords = getCoordinates(e, rect);
-                cropStartX = coords.x;
-                cropStartY = coords.y;
-            };
-
-            canvas.onmousemove = function(e) {
-                if (!isDrawing) return;
-                e.preventDefault();
-
-                const rect = canvas.getBoundingClientRect();
-                const coords = getCoordinates(e, rect);
-                cropEndX = coords.x;
-                cropEndY = coords.y;
-
-                drawCropOverlay();
-            };
-
-            canvas.onmouseup = function(e) {
-                e.preventDefault();
-                isDrawing = false;
-            };
-
-            canvas.onmouseleave = function(e) {
-                if (isDrawing) {
-                    isDrawing = false;
-                }
-            };
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', doDrag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
 
             // Touch events
-            canvas.ontouchstart = function(e) {
-                e.preventDefault();
-                isDrawing = true;
-                const rect = canvas.getBoundingClientRect();
-                const coords = getCoordinates(e, rect);
-                cropStartX = coords.x;
-                cropStartY = coords.y;
-            };
-
-            canvas.ontouchmove = function(e) {
-                if (!isDrawing) return;
-                e.preventDefault();
-
-                const rect = canvas.getBoundingClientRect();
-                const coords = getCoordinates(e, rect);
-                cropEndX = coords.x;
-                cropEndY = coords.y;
-
-                drawCropOverlay();
-            };
-
-            canvas.ontouchend = function(e) {
-                e.preventDefault();
-                isDrawing = false;
-            };
-
-            canvas.ontouchcancel = function(e) {
-                e.preventDefault();
-                if (isDrawing) {
-                    isDrawing = false;
-                }
-            };
+            canvas.addEventListener('touchstart', startDrag, { passive: false });
+            canvas.addEventListener('touchmove', doDrag, { passive: false });
+            canvas.addEventListener('touchend', endDrag, { passive: false });
+            canvas.addEventListener('touchcancel', endDrag, { passive: false });
         }
 
         function applyCrop() {
@@ -447,19 +553,17 @@
             const scaleX = img.naturalWidth / img.offsetWidth;
             const scaleY = img.naturalHeight / img.offsetHeight;
 
-            const x = Math.min(cropStartX, cropEndX);
-            const y = Math.min(cropStartY, cropEndY);
-            const width = Math.abs(cropEndX - cropStartX);
-            const height = Math.abs(cropEndY - cropStartY);
+            const width = cropRect.right - cropRect.left;
+            const height = cropRect.bottom - cropRect.top;
 
             if (width <= 0 || height <= 0) {
-                showStatus('Error: Please draw a crop area first', true);
+                showStatus('Error: Invalid crop area', true);
                 return;
             }
 
             // Scale to actual image coordinates
-            const actualX = Math.round(x * scaleX);
-            const actualY = Math.round(y * scaleY);
+            const actualX = Math.round(cropRect.left * scaleX);
+            const actualY = Math.round(cropRect.top * scaleY);
             const actualWidth = Math.round(width * scaleX);
             const actualHeight = Math.round(height * scaleY);
 
