@@ -75,6 +75,11 @@ in {
       description = "Public insecure port";
       default = 80;
     };
+    webServerSecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public secure port";
+      default = 443;
+    };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to serve the notes wiki site.";
@@ -264,8 +269,11 @@ in {
       virtualHosts."${config.networking.hostName}.local" = {
         listen = [{
           addr = "0.0.0.0";
-          port = cfg.webServerInsecurePort;
+          port = cfg.webServerSecurePort;
         }];
+        forceSSL = true;
+        sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
+        sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
       };
     };
 
@@ -389,7 +397,11 @@ in {
     networking.networkmanager.enable = true;
 
     networking.firewall.allowedTCPPorts = [ 4444 ]
-      ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
+      ++ (if cfg.runWebServer then [
+        cfg.webServerInsecurePort
+        cfg.webServerSecurePort
+      ] else
+        [ ]);
 
     # Select internationalisation properties.
     i18n.defaultLocale = "en_US.UTF-8";
