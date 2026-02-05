@@ -460,7 +460,7 @@ def run():
     global url_for_prefix
     app.register_blueprint(bp)
     login_manager.init_app(app)
-    login_manager.login_view = "stamp.login"
+    login_manager.login_view = url_for_prefix + "login"
     app.run(host="0.0.0.0", port=args.port)
 
 if __name__ == "__main__":
