@@ -1,11 +1,20 @@
-{ buildPythonPackage, setuptools, python-dokuwiki, click, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  python-dokuwiki,
+  click,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "wiki-tools";
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
   src = pkg-src;
-  propagatedBuildInputs = [ python-dokuwiki click ];
+  propagatedBuildInputs = [
+    python-dokuwiki
+    click
+  ];
   doCheck = false;
   meta = {
     description = "CLI tools for managing my wiki notes site.";

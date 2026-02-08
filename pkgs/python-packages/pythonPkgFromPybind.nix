@@ -1,7 +1,24 @@
-{ pname, version, description, longDescription, clangStdenv, pkg-src
-, cppNativeBuildInputs, cppBuildInputs, cppSetup ? null, cppTarget ? null
-, hasTests ? false, pybind11, python, pythonOlder, pytestCheckHook
-, buildPythonPackage, setuptools, propagatedBuildInputs, checkPkgs }:
+{
+  pname,
+  version,
+  description,
+  longDescription,
+  clangStdenv,
+  pkg-src,
+  cppNativeBuildInputs,
+  cppBuildInputs,
+  cppSetup ? null,
+  cppTarget ? null,
+  hasTests ? false,
+  pybind11,
+  python,
+  pythonOlder,
+  pytestCheckHook,
+  buildPythonPackage,
+  setuptools,
+  propagatedBuildInputs,
+  checkPkgs,
+}:
 let
   copyTarget = if cppTarget != null then cppTarget else "${pname}.cpython*";
   pyboundPkg = clangStdenv.mkDerivation {
@@ -21,11 +38,15 @@ let
   };
   pyboundTarget = "${pyboundPkg}/lib/${pname}*";
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
-  testsCpyCmd = if hasTests then ''
-    cp ${pkg-src}/tests/* tests/
-  '' else
-    "";
-in buildPythonPackage rec {
+  testsCpyCmd =
+    if hasTests then
+      ''
+        cp ${pkg-src}/tests/* tests/
+      ''
+    else
+      "";
+in
+buildPythonPackage rec {
   inherit pname;
   inherit version;
   pyproject = true;

@@ -1,5 +1,8 @@
-{ buildPythonPackage, setuptools, lib
-# ADD deps
+{
+  buildPythonPackage,
+  setuptools,
+  lib,
+  # ADD deps
 }:
 buildPythonPackage rec {
   pname = "REPLACEME";

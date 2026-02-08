@@ -1,4 +1,8 @@
-{ buildPythonPackage, setuptools, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "python_dokuwiki";
   version = "0.0.0";

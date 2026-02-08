@@ -1,5 +1,11 @@
 # TODO BROKEN; no running DHCP service. Build sd-aarch64 instead of the installer.
-{ config, pkgs, lib, ... }: {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
   imports = [
     # <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> <- Non-SD, for x86
     <nixpkgs/nixos/modules/installer/sd-card/sd-image-aarch64.nix>

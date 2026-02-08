@@ -1,20 +1,34 @@
-{ writeShellScriptBin, rcrsync, color-prints, redirects, callPackage, python }:
+{
+  writeShellScriptBin,
+  rcrsync,
+  color-prints,
+  redirects,
+  callPackage,
+  python,
+}:
 let
   pkgname = "authm";
   description = "Manage secrets.";
   longDescription = "";
-  authm = with python.pkgs;
+  authm =
+    with python.pkgs;
     (callPackage ../../python-packages/pythonPkgFromScript.nix {
       pname = pkgname;
       version = "1.0.0";
       inherit description longDescription;
       script-file = ./authm.py;
       inherit pytestCheckHook buildPythonPackage setuptools;
-      propagatedBuildInputs = [ click colorama easy-google-auth gmail-parser ];
+      propagatedBuildInputs = [
+        click
+        colorama
+        easy-google-auth
+        gmail-parser
+      ];
       checkPkgs = [ ];
     });
   printErr = ">&2 ${color-prints}/bin/echo_red";
-in (writeShellScriptBin pkgname ''
+in
+(writeShellScriptBin pkgname ''
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]]; then
     ${rcrsync}/bin/rcrsync copy secrets
   fi
@@ -23,10 +37,14 @@ in (writeShellScriptBin pkgname ''
   if ([[ "$*" == *"refresh"* ]] || [[ "$*" == *"validate"* ]]) && [[ "$*" != *"--help"* ]] && [[ "$*" != *"--headless"* ]]; then
     ${rcrsync}/bin/rcrsync override secrets
   fi
-'') // {
+'')
+// {
   meta = {
     inherit description longDescription;
     autoGenUsageCmd = "--help";
-    subCmds = [ "refresh" "validate" ];
+    subCmds = [
+      "refresh"
+      "validate"
+    ];
   };
 }

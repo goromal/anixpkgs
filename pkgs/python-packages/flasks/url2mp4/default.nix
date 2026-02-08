@@ -1,9 +1,26 @@
-{ buildPythonPackage, flask, mp4, yt-dlp, strings, redirects, wget-pkg
-, writeTextFile, callPackage, writeShellScript, python }:
+{
+  buildPythonPackage,
+  flask,
+  mp4,
+  yt-dlp,
+  strings,
+  redirects,
+  wget-pkg,
+  writeTextFile,
+  callPackage,
+  writeShellScript,
+  python,
+}:
 callPackage ../builders/mkSimpleFlaskApp.nix {
   pname = "flask_url2mp4";
   version = "0.0.0";
-  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  inherit
+    buildPythonPackage
+    flask
+    writeTextFile
+    writeShellScript
+    python
+    ;
   scriptPropagatedBuildInputs = [ ];
   flaskScript = ''
     from subprocess import Popen, PIPE
@@ -59,8 +76,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     fi
     echo "$PWD/$fname.mp4"
   '';
-  description =
-    "Convert URL's pointing to videos to MP4's, powered by Python's flask library.";
+  description = "Convert URL's pointing to videos to MP4's, powered by Python's flask library.";
   longDescription = ''
     The server page takes a URL string and either uses `wget` or `yt-dlp` to download the video and convert it to MP4 using the [mp4](../bash/mp4.md) tool.
   '';

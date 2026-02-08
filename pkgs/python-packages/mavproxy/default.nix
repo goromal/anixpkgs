@@ -1,6 +1,19 @@
-{ stdenv, lib, buildPythonPackage, fetchFromGitHub, lxml, matplotlib, numpy
-, opencv-python, pymavlink, pyserial, setuptools, wxpython, billiard
-, gnureadline, }:
+{
+  stdenv,
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  lxml,
+  matplotlib,
+  numpy,
+  opencv-python,
+  pymavlink,
+  pyserial,
+  setuptools,
+  wxpython,
+  billiard,
+  gnureadline,
+}:
 
 buildPythonPackage rec {
   pname = "MAVProxy";
@@ -23,7 +36,11 @@ buildPythonPackage rec {
     pyserial
     setuptools
     wxpython
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ billiard gnureadline ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    billiard
+    gnureadline
+  ];
 
   # No tests
   doCheck = false;

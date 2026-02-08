@@ -1,19 +1,32 @@
-{ buildPythonPackage, setuptools, click, wiki-tools, easy-google-auth, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  click,
+  wiki-tools,
+  easy-google-auth,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "book-notes-sync";
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
   src = pkg-src;
-  propagatedBuildInputs = [ click wiki-tools easy-google-auth ];
+  propagatedBuildInputs = [
+    click
+    wiki-tools
+    easy-google-auth
+  ];
   doCheck = false;
   meta = {
-    description =
-      "Utility for syncing Google Play Books notes with my personal wiki.";
+    description = "Utility for syncing Google Play Books notes with my personal wiki.";
     longDescription = ''
       [Repository](https://github.com/goromal/book-notes-sync)
     '';
     autoGenUsageCmd = "--help";
-    subCmds = [ "sync" "sync-from-csv" ];
+    subCmds = [
+      "sync"
+      "sync-from-csv"
+    ];
   };
 }

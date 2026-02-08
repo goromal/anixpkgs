@@ -1,5 +1,18 @@
-{ buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, mp4
-, mp4unite, scrape, statsd, service-ports, setuptools, pkg-src }:
+{
+  buildPythonPackage,
+  makeWrapper,
+  click,
+  aapis-py,
+  grpcio,
+  colorama,
+  mp4,
+  mp4unite,
+  scrape,
+  statsd,
+  service-ports,
+  setuptools,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "orchestrator";
   version = "0.0.0";
@@ -7,8 +20,16 @@ buildPythonPackage rec {
   buildInputs = [ makeWrapper ];
   pyproject = true;
   build-system = [ setuptools ];
-  propagatedBuildInputs =
-    [ click aapis-py grpcio colorama mp4 mp4unite scrape statsd ];
+  propagatedBuildInputs = [
+    click
+    aapis-py
+    grpcio
+    colorama
+    mp4
+    mp4unite
+    scrape
+    statsd
+  ];
   postInstall = ''
     wrapProgram $out/bin/orchestratord \
       --add-flags "--port ${builtins.toString service-ports.orchestrator}"
@@ -17,8 +38,7 @@ buildPythonPackage rec {
   '';
   doCheck = false;
   meta = {
-    description =
-      "Daemon + CLI for managing select background tasks on my computer.";
+    description = "Daemon + CLI for managing select background tasks on my computer.";
     longDescription = ''
       [Repository](https://github.com/goromal/orchestrator)
 

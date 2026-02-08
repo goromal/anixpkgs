@@ -1,4 +1,8 @@
-{ lib, rustPlatform, pkg-src }:
+{
+  lib,
+  rustPlatform,
+  pkg-src,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "sunnyside";
   version = "0.1.0";

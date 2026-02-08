@@ -9,7 +9,8 @@
 #   hardware.nvidia-jetpack.carrierBoard = "devkit";
 # }
 
-{}
+{
+}
 
 # { config, pkgs, lib, ... }:
 # with import ../dependencies.nix; {

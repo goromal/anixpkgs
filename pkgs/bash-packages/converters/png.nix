@@ -1,5 +1,14 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
-, imagemagick, openssl, libheif, exiftool }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  imagemagick,
+  openssl,
+  libheif,
+  exiftool,
+}:
 let
   name = "png";
   extension = "png";
@@ -117,8 +126,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
   description = "Generate PNG images from a variety of similar formats.";
 }

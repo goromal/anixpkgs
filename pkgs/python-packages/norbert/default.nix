@@ -1,4 +1,10 @@
-{ buildPythonPackage, setuptools, fetchPypi, pythonOlder, scipy }:
+{
+  buildPythonPackage,
+  setuptools,
+  fetchPypi,
+  pythonOlder,
+  scipy,
+}:
 buildPythonPackage rec {
   pname = "norbert";
   version = "0.2.1";

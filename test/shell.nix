@@ -1,7 +1,13 @@
-let pkgs = import ../default.nix { };
-in with pkgs;
+let
+  pkgs = import ../default.nix { };
+in
+with pkgs;
 mkShell {
-  nativeBuildInputs = [ git direnv lorri ];
+  nativeBuildInputs = [
+    git
+    direnv
+    lorri
+  ];
   buildInputs = [
     make-title
     devshell

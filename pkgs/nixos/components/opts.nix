@@ -1,16 +1,20 @@
-{ pkgs, config, lib, ... }:
-with import ../dependencies.nix; {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+with import ../dependencies.nix;
+{
   options.mods.opts = {
     standalone = lib.mkOption {
       type = lib.types.bool;
-      description =
-        "Whether this is a standalone Nix installation (default: false)";
+      description = "Whether this is a standalone Nix installation (default: false)";
       default = false;
     };
     homeDir = lib.mkOption {
       type = lib.types.str;
-      description =
-        "Home directory to put the wallpaper in (default: /data/andrew)";
+      description = "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
     homeState = lib.mkOption {
@@ -19,14 +23,12 @@ with import ../dependencies.nix; {
     };
     userOrchestrator = lib.mkOption {
       type = lib.types.bool;
-      description =
-        "Whether to run a user-domain instance of orchestratord (default: true)";
+      description = "Whether to run a user-domain instance of orchestratord (default: true)";
       default = true;
     };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
-      description =
-        "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
+      description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
     };
     editor = lib.mkOption {
       type = lib.types.str;

@@ -1,17 +1,41 @@
-{ callPackage, meson, ninja, systemd, git, python310, stdenv, overrideCC
-, pkg-config, gcc13, gcc-arm-embedded-13, flakeInputs }:
+{
+  callPackage,
+  meson,
+  ninja,
+  systemd,
+  git,
+  python310,
+  stdenv,
+  overrideCC,
+  pkg-config,
+  gcc13,
+  gcc-arm-embedded-13,
+  flakeInputs,
+}:
 let
   arduSitlEnv = overrideCC stdenv gcc13;
   arduEmbdEnv = overrideCC stdenv gcc-arm-embedded-13;
-  pythonWithPkgs =
-    python310.withPackages (ps: [ ps.empy ps.pexpect ps.future ps.setuptools ]);
-  mkArduCopter = { arduEnv, board, installPhase }:
+  pythonWithPkgs = python310.withPackages (ps: [
+    ps.empy
+    ps.pexpect
+    ps.future
+    ps.setuptools
+  ]);
+  mkArduCopter =
+    {
+      arduEnv,
+      board,
+      installPhase,
+    }:
     arduEnv.mkDerivation rec {
       name = "arducopter-${flakeInputs.ardupilot.shortRev}-${board}";
       version = flakeInputs.ardupilot.shortRev;
       src = flakeInputs.ardupilot;
       inherit board;
-      nativeBuildInputs = [ git pythonWithPkgs ];
+      nativeBuildInputs = [
+        git
+        pythonWithPkgs
+      ];
       patchPhase = ''
         git init
         git add modules/ChibiOS modules/mavlink modules/gtest
@@ -30,16 +54,25 @@ let
       '';
       inherit installPhase;
     };
-in rec {
+in
+rec {
   router = stdenv.mkDerivation rec {
     pname = "mavlink-router";
     version = "0.0.1";
     src = flakeInputs.mavlink-router;
-    nativeBuildInputs = [ pkg-config meson ninja systemd ];
+    nativeBuildInputs = [
+      pkg-config
+      meson
+      ninja
+      systemd
+    ];
     prePatch = ''
       cp -r ${flakeInputs.mavlink}/* modules/mavlink_c_library_v2/.
     '';
-    mesonFlags = [ "--buildtype=release" "-Dsystemdsystemunitdir=daemon" ];
+    mesonFlags = [
+      "--buildtype=release"
+      "-Dsystemdsystemunitdir=daemon"
+    ];
   };
   copter = {
     sitl = mkArduCopter {

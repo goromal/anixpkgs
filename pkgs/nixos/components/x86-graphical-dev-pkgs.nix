@@ -1,11 +1,25 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../dependencies.nix;
-let cfg = config.mods.opts;
-in {
-  home.packages = [ pkgs.black pkgs.clang-tools pkgs.nodejs anixpkgs.aptest ];
+let
+  cfg = config.mods.opts;
+in
+{
+  home.packages = [
+    pkgs.black
+    pkgs.clang-tools
+    pkgs.nodejs
+    anixpkgs.aptest
+  ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
-    "org/gnome/shell" = { "favorite-apps" = [ "code.desktop" ]; };
+    "org/gnome/shell" = {
+      "favorite-apps" = [ "code.desktop" ];
+    };
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
@@ -21,9 +35,12 @@ in {
         "editor.formatOnSave" = true;
         "files.hotExit" = "off";
         "C_Cpp.default.compilerPath" = "clang";
-        "terminal.integrated.env.linux" = { "TMPDIR" = "/tmp"; };
+        "terminal.integrated.env.linux" = {
+          "TMPDIR" = "/tmp";
+        };
       };
-      extensions = with unstable.vscode-extensions;
+      extensions =
+        with unstable.vscode-extensions;
         [
           eamodio.gitlens
           ms-python.vscode-pylance
@@ -36,7 +53,8 @@ in {
           b4dm4n.vscode-nixpkgs-fmt
           zxh404.vscode-proto3
           ms-vscode.cpptools
-        ] ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+        ]
+        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "cmake";
             publisher = "twxs";

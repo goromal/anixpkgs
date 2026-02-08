@@ -1,8 +1,14 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   globalCfg = config.machines.base;
   cfg = config.services.mailNode;
-in {
+in
+{
   options.services.mailNode = {
     enable = lib.mkEnableOption "enable mail node services";
   };
@@ -32,7 +38,9 @@ in {
       uid = 994;
       group = "goromail";
     };
-    users.groups.goromail = { gid = 993; };
+    users.groups.goromail = {
+      gid = 993;
+    };
     users.users.andrew.extraGroups = [ "goromail" ];
 
     systemd.tmpfiles.rules = [
@@ -44,7 +52,9 @@ in {
 
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
-      serviceConfig = { Type = "oneshot"; };
+      serviceConfig = {
+        Type = "oneshot";
+      };
       script = ''
         for f in /var/mail/goromail/new/*; do
           [ -e "$f" ] || exit 0

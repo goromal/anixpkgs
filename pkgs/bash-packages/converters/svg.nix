@@ -1,5 +1,13 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
-, inkscape, abcm2ps, scour }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  inkscape,
+  abcm2ps,
+  scour,
+}:
 let
   name = "svg";
   extension = "svg";
@@ -52,8 +60,7 @@ let
       flags = "--poppler";
     }
   ];
-  scour_args =
-    "--enable-viewboxing --enable-id-stripping --enable-comment-stripping --shorten-ids --indent=none";
+  scour_args = "--enable-viewboxing --enable-id-stripping --enable-comment-stripping --shorten-ids --indent=none";
   convOptCmds = [
     {
       extension = "svg|SVG";
@@ -113,8 +120,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
   description = "Generate and edit SVG files from a variety of source formats.";
 }

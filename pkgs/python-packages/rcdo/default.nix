@@ -1,12 +1,23 @@
-{ buildPythonPackage, setuptools, pytestCheckHook, click, paramiko, scp
-, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  pytestCheckHook,
+  click,
+  paramiko,
+  scp,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "rcdo";
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
   src = pkg-src;
-  propagatedBuildInputs = [ click paramiko scp ];
+  propagatedBuildInputs = [
+    click
+    paramiko
+    scp
+  ];
   doCheck = false;
   checkInputs = [ pytestCheckHook ];
   meta = {

@@ -1,11 +1,20 @@
-{ buildPythonPackage, setuptools, click, easy-google-auth, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  click,
+  easy-google-auth,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "photos-tools";
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
   src = pkg-src;
-  propagatedBuildInputs = [ click easy-google-auth ];
+  propagatedBuildInputs = [
+    click
+    easy-google-auth
+  ];
   doCheck = false;
   meta = {
     description = "CLI tools for managing Google Photos.";
