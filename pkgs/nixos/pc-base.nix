@@ -501,6 +501,7 @@ in {
         fish
         screen
         minicom
+        picocom
         exiftool
         dhcpcd
         dnsutils
