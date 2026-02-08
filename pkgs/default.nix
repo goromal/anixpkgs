@@ -302,64 +302,65 @@ rec {
 
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;
+  python313 = pythonOverridesFor prev.python313;
 
-  aapis-py = final.python311.pkgs.aapis-py;
-  budget_report = final.python311.pkgs.budget_report;
-  surveys_report = final.python311.pkgs.surveys_report;
-  makepyshell = final.python311.pkgs.makepyshell;
-  mavlog-utils = final.python311.pkgs.mavlog-utils;
-  fqt = final.python311.pkgs.fqt;
-  ichabod = final.python311.pkgs.ichabod;
-  norbert = final.python311.pkgs.norbert;
-  geometry = final.python311.pkgs.geometry;
-  pyceres = final.python311.pkgs.pyceres;
-  pyceres_factors = final.python311.pkgs.pyceres_factors;
-  pysorting = final.python311.pkgs.pysorting;
-  pysignals = final.python311.pkgs.pysignals;
-  mesh-plotter = final.python311.pkgs.mesh-plotter;
-  scrape = final.python311.pkgs.scrape;
+  aapis-py = final.python313.pkgs.aapis-py;
+  budget_report = final.python313.pkgs.budget_report;
+  surveys_report = final.python313.pkgs.surveys_report;
+  makepyshell = final.python313.pkgs.makepyshell;
+  mavlog-utils = final.python313.pkgs.mavlog-utils;
+  fqt = final.python313.pkgs.fqt;
+  ichabod = final.python313.pkgs.ichabod;
+  norbert = final.python313.pkgs.norbert;
+  geometry = final.python313.pkgs.geometry;
+  pyceres = final.python313.pkgs.pyceres;
+  pyceres_factors = final.python313.pkgs.pyceres_factors;
+  pysorting = final.python313.pkgs.pysorting;
+  pysignals = final.python313.pkgs.pysignals;
+  mesh-plotter = final.python313.pkgs.mesh-plotter;
+  scrape = final.python313.pkgs.scrape;
   # spleeter = final.python38.pkgs.spleeter;
-  find_rotational_conventions = final.python311.pkgs.find_rotational_conventions;
-  trafficsim = final.python311.pkgs.trafficsim;
-  flask-hello-world = final.python311.pkgs.flask-hello-world;
-  flask-url2mp4 = final.python311.pkgs.flask-url2mp4;
-  flask-mp4server = final.python311.pkgs.flask-mp4server;
-  flask-mp3server = final.python311.pkgs.flask-mp3server;
-  flask-smfserver = final.python311.pkgs.flask-smfserver;
-  flask-oatbox = final.python311.pkgs.flask-oatbox;
-  daily_tactical_server = final.python311.pkgs.daily_tactical_server;
-  imutils-cv4 = final.python311.pkgs.imutils-cv4;
-  vidstab-cv4 = final.python311.pkgs.vidstab-cv4;
-  symforce = final.python311.pkgs.symforce;
-  rankserver = final.python311.pkgs.rankserver;
-  rcdo = final.python311.pkgs.rcdo;
-  stampserver = final.python311.pkgs.stampserver;
-  authui = final.python311.pkgs.authui;
-  budget_ui = final.python311.pkgs.budget_ui;
-  easy-google-auth = final.python311.pkgs.easy-google-auth;
-  task-tools = final.python311.pkgs.task-tools;
-  photos-tools = final.python311.pkgs.photos-tools;
-  python-dokuwiki = final.python311.pkgs.python-dokuwiki;
-  wiki-tools = final.python311.pkgs.wiki-tools;
-  book-notes-sync = final.python311.pkgs.book-notes-sync;
-  gmail-parser = final.python311.pkgs.gmail-parser;
-  goromail = final.python311.pkgs.goromail;
-  orchestrator = final.python311.pkgs.orchestrator;
+  find_rotational_conventions = final.python313.pkgs.find_rotational_conventions;
+  trafficsim = final.python313.pkgs.trafficsim;
+  flask-hello-world = final.python313.pkgs.flask-hello-world;
+  flask-url2mp4 = final.python313.pkgs.flask-url2mp4;
+  flask-mp4server = final.python313.pkgs.flask-mp4server;
+  flask-mp3server = final.python313.pkgs.flask-mp3server;
+  flask-smfserver = final.python313.pkgs.flask-smfserver;
+  flask-oatbox = final.python313.pkgs.flask-oatbox;
+  daily_tactical_server = final.python313.pkgs.daily_tactical_server;
+  imutils-cv4 = final.python313.pkgs.imutils-cv4;
+  vidstab-cv4 = final.python313.pkgs.vidstab-cv4;
+  symforce = final.python313.pkgs.symforce;
+  rankserver = final.python313.pkgs.rankserver;
+  rcdo = final.python313.pkgs.rcdo;
+  stampserver = final.python313.pkgs.stampserver;
+  authui = final.python313.pkgs.authui;
+  budget_ui = final.python313.pkgs.budget_ui;
+  easy-google-auth = final.python313.pkgs.easy-google-auth;
+  task-tools = final.python313.pkgs.task-tools;
+  photos-tools = final.python313.pkgs.photos-tools;
+  python-dokuwiki = final.python313.pkgs.python-dokuwiki;
+  wiki-tools = final.python313.pkgs.wiki-tools;
+  book-notes-sync = final.python313.pkgs.book-notes-sync;
+  gmail-parser = final.python313.pkgs.gmail-parser;
+  goromail = final.python313.pkgs.goromail;
+  orchestrator = final.python313.pkgs.orchestrator;
 
-  authm = addDoc (prev.callPackage ./bash-packages/authm { python = python311; });
+  authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
     prev.callPackage ./bash-packages/manage-gmail {
-      python = final.python311;
+      python = final.python313;
     }
   );
   local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
   gantter = addDoc (
     prev.callPackage ./bash-packages/gantter {
-      python = final.python311;
+      python = final.python313;
       blank-svg = pkgData.img.blank-svg;
     }
   );
-  la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz { python = final.python311; });
+  la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz { python = final.python313; });
   play = addDoc (prev.callPackage ./bash-packages/play { });
   aapis-grpcurl = addDoc (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
   strings = addDoc (prev.callPackage ./bash-packages/bash-utils/strings.nix { });
@@ -396,7 +397,7 @@ rec {
   png = addDoc (prev.callPackage ./bash-packages/converters/png.nix { });
   svg = addDoc (
     prev.callPackage ./bash-packages/converters/svg.nix {
-      scour = final.python311.pkgs.scour;
+      scour = final.python313.pkgs.scour;
     }
   );
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
@@ -418,7 +419,7 @@ rec {
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
-      python = python311;
+      python = python313;
       mavproxy = python311.pkgs.pinned-mavproxy;
     }
   );

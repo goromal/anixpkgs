@@ -29,6 +29,7 @@ callPackage ../pythonPkgFromPybind.nix {
     suitesparse
   ];
   cppSetup = ''
+    sed -i 's|cmake_minimum_required(VERSION [0-9.]*)|cmake_minimum_required(VERSION 3.5)|g' CMakeLists.txt
     sed -i 's|set(CMAKE_MODULE_PATH "''${CMAKE_CURRENT_SOURCE_DIR}/cmake")|set(CMAKE_CXX_FLAGS "''${CMAKE_CXX_FLAGS} -std=c++17")|g' CMakeLists.txt
     sed -i 's|add_subdirectory(pybind11)|find_package(pybind11 REQUIRED)|g' CMakeLists.txt
     sed -i 's|include_directories(''${CERES_INCLUDE_DIR})||g' CMakeLists.txt

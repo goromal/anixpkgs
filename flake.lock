@@ -588,15 +588,16 @@
     "pyceres_factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1700917664,
-        "narHash": "sha256-72lOVW6SGFCHjG/BRPqA6Xh1eV+3tYwm+T3h060knqM=",
+        "lastModified": 1770565679,
+        "narHash": "sha256-c8XygoGBTra1DjRTkQqWOZxeHK63NY7TJuXHKws5r60=",
         "owner": "goromal",
         "repo": "pyceres_factors",
-        "rev": "5fee04d810bb954b90238a01f3bb1aea3edfc632",
+        "rev": "d471c5591b509319edda21be3f3cb62cd8e04ec7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/25.11",
         "repo": "pyceres_factors",
         "type": "github"
       }
@@ -604,16 +605,16 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1769402418,
-        "narHash": "sha256-VSIKJNwPmegMIN8WtNcGpwRRFFQL54xefTz6ly+V5so=",
+        "lastModified": 1770566480,
+        "narHash": "sha256-MBMnAeMUM/i/YA91um0wEElXLEgpPnz4DdDwsCHLyZo=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "ab56839b3525f9cc6d1404f990397fed51c0781e",
+        "rev": "b8ba86d953cb57fd2bd5daecaec5da0c9d173433",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/tags/release/1.0",
+        "ref": "dev/25.11",
         "repo": "pysignals",
         "type": "github"
       }
@@ -621,15 +622,16 @@
     "pysorting": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694136,
-        "narHash": "sha256-nP9sUskrz3v69gFrBVJzLp5yoeZyZR0z2Bn6cchLBGI=",
+        "lastModified": 1770565827,
+        "narHash": "sha256-2gzKKQe3g0pwoBFegDyANFbCAw+JvP8hQ4lXfM2BtUc=",
         "owner": "goromal",
         "repo": "pysorting",
-        "rev": "09b008e7073e944c67f523d75e606a32c1ca7ae5",
+        "rev": "6c56bc34b8dcc2eb7789947607add390a84a6f64",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/25.11",
         "repo": "pysorting",
         "type": "github"
       }

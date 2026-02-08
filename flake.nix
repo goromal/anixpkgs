@@ -93,13 +93,13 @@
     pyceres.url = "github:Edwinem/ceres_python_bindings?rev=2106d043bce37adcfef450dd23d3005480948c37";
     pyceres.flake = false;
 
-    pyceres_factors.url = "github:goromal/pyceres_factors";
+    pyceres_factors.url = "github:goromal/pyceres_factors?ref=dev/25.11";
     pyceres_factors.flake = false;
 
-    pysignals.url = "github:goromal/pysignals?ref=refs/tags/release/1.0";
+    pysignals.url = "github:goromal/pysignals?ref=dev/25.11";
     pysignals.flake = false;
 
-    pysorting.url = "github:goromal/pysorting";
+    pysorting.url = "github:goromal/pysorting?ref=dev/25.11";
     pysorting.flake = false;
 
     python-dokuwiki.url = "github:fmenabe/python-dokuwiki?ref=refs/tags/1.3.3";
