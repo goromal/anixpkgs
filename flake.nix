@@ -19,7 +19,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=Copter-4.4&submodules=1";
+    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
     ardupilot.flake = false;
 
     book-notes-sync.url = "github:goromal/book-notes-sync";

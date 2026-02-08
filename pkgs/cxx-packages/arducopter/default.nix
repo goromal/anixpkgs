@@ -4,7 +4,7 @@
   ninja,
   systemd,
   git,
-  python310,
+  python,
   stdenv,
   overrideCC,
   pkg-config,
@@ -15,10 +15,9 @@
 let
   arduSitlEnv = overrideCC stdenv gcc13;
   arduEmbdEnv = overrideCC stdenv gcc-arm-embedded-13;
-  pythonWithPkgs = python310.withPackages (ps: [
+  pythonWithPkgs = python.withPackages (ps: [
     ps.empy
     ps.pexpect
-    ps.future
     ps.setuptools
   ]);
   mkArduCopter =
@@ -38,7 +37,7 @@ let
       ];
       patchPhase = ''
         git init
-        git add modules/ChibiOS modules/mavlink modules/gtest
+        git add modules/ChibiOS modules/mavlink modules/gtest modules/littlefs
         echo ${flakeInputs.ardupilot.rev} > .git/HEAD
         patchShebangs ./waf
         sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc13}/bin/gcc"#g' libraries/AP_Scripting/wscript

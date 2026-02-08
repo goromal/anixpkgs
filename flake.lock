@@ -35,17 +35,17 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1717112455,
-        "narHash": "sha256-4sZlPIGYr9ivk1V5CHG1wsIxzqrHFxpb2inWT5IfDT4=",
-        "ref": "Copter-4.4",
-        "rev": "865cffa5f2a850f892ab43def2d4ad21b8a9adca",
-        "revCount": 57489,
+        "lastModified": 1770503432,
+        "narHash": "sha256-QrilSQb87TDkQBXC0x3saQgdC08z5YWW+VZsY9FOlRg=",
+        "ref": "master",
+        "rev": "4fb7f3bb865e6bc523c0f5bfb8609f4a9daf0ef2",
+        "revCount": 70888,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
-        "ref": "Copter-4.4",
+        "ref": "master",
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
