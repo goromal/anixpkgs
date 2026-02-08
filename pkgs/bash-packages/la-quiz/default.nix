@@ -7,7 +7,7 @@ let
       version = "0.0.0";
       description = "LA quiz driver.";
       script-file = ./quiz.py;
-      inherit pytestCheckHook buildPythonPackage;
+      inherit pytestCheckHook buildPythonPackage setuptools;
       propagatedBuildInputs = [ tkinter pillow ];
       checkPkgs = [ ];
     });

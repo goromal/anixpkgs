@@ -1,10 +1,12 @@
-{ buildPythonPackage, flask, flask_login, flask_wtf, wtforms, werkzeug
-, pysorting, strings, redirects, writeTextFile, callPackage, writeShellScript
-, python }:
+{ buildPythonPackage, setuptools, flask, flask-login, flask-wtf, wtforms
+, werkzeug, pysorting, strings, redirects, writeTextFile, callPackage
+, writeShellScript, python }:
 let pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
 in buildPythonPackage rec {
   pname = "rankserver";
   version = "0.0.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = ./.;
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
@@ -12,7 +14,7 @@ in buildPythonPackage rec {
     cp ${./login.html} $out/${pythonLibDir}/templates/login.html
   '';
   propagatedBuildInputs =
-    [ flask flask_login flask_wtf wtforms werkzeug pysorting ];
+    [ flask flask-login flask-wtf wtforms werkzeug pysorting ];
   meta = {
     description =
       "A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.";

@@ -1,5 +1,5 @@
-{ buildPythonPackage, python, protobuf, apis-fds, pkg-src, grpc-support ? true
-}:
+{ buildPythonPackage, setuptools, python, protobuf, apis-fds, pkg-src
+, grpc-support ? true }:
 let
   # TODO: for now, gRPC warnings must be suppressed until grpcio-tools upgrades
   # to version 1.73.0, which bumps protobuf to v6.
@@ -22,6 +22,8 @@ let
 in buildPythonPackage rec {
   pname = "aapis-py";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = pkg-src;
   propagatedBuildInputs = [ protobuf ];
   patchPhase = ''

@@ -1,8 +1,10 @@
-{ lib, buildPythonPackage, fetchPypi, opencv4 }:
+{ lib, buildPythonPackage, setuptools, fetchPypi, opencv4 }:
 
 buildPythonPackage rec {
   version = "0.5.4-cv4";
   pname = "imutils";
+  pyproject = true;
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit pname;

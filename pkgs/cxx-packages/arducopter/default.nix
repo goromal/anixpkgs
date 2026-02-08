@@ -1,8 +1,8 @@
 { callPackage, meson, ninja, systemd, git, python310, stdenv, overrideCC
-, pkg-config, gcc10, gcc-arm-embedded-10, flakeInputs }:
+, pkg-config, gcc13, gcc-arm-embedded-13, flakeInputs }:
 let
-  arduSitlEnv = overrideCC stdenv gcc10;
-  arduEmbdEnv = overrideCC stdenv gcc-arm-embedded-10;
+  arduSitlEnv = overrideCC stdenv gcc13;
+  arduEmbdEnv = overrideCC stdenv gcc-arm-embedded-13;
   pythonWithPkgs =
     python310.withPackages (ps: [ ps.empy ps.pexpect ps.future ps.setuptools ]);
   mkArduCopter = { arduEnv, board, installPhase }:
@@ -17,8 +17,9 @@ let
         git add modules/ChibiOS modules/mavlink modules/gtest
         echo ${flakeInputs.ardupilot.rev} > .git/HEAD
         patchShebangs ./waf
-        sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc10}/bin/gcc"#g' libraries/AP_Scripting/wscript
+        sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc13}/bin/gcc"#g' libraries/AP_Scripting/wscript
         sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
+        sed -i '1s/^/#include <cstdint>\n/' libraries/AP_HAL_SITL/CANSocketIface.cpp
       '';
       configurePhase = ''
         ./waf configure --board ${board}

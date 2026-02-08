@@ -402,7 +402,7 @@ in {
       liberation_ttf
       noto-fonts
       noto-fonts-cjk-sans
-      noto-fonts-emoji
+      noto-fonts-color-emoji
     ];
 
     security.sudo.extraConfig = ''
@@ -414,7 +414,7 @@ in {
       enable = true;
       settings = { X11Forwarding = true; };
     };
-    programs.ssh.startAgent = true;
+    # programs.ssh.startAgent = true;
 
     programs.vim.enable = true;
     programs.vim.defaultEditor = true;

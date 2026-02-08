@@ -3,7 +3,9 @@
     "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
+
+    jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
     phps.url = "github:fossar/nix-phps";
 
@@ -157,16 +159,283 @@
     xv-lidar-rs.flake = false;
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }@inputs:
-    let supported-systems = [ "x86_64-linux" "aarch64-linux" ];
+  outputs = { self, nixpkgs, flake-utils, jetpack-nixos, ... }@inputs:
+    let
+      supported-systems = [ "x86_64-linux" "aarch64-linux" ];
+      nixos-version = builtins.readFile ./NIXOS_VERSION;
+      anixpkgsOverlay = import ./overlay.nix;
     in flake-utils.lib.eachSystem supported-systems (system: {
       legacyPackages = import nixpkgs {
         inherit system;
-        overlays = [ (import ./overlay.nix) ];
+        overlays = [ anixpkgsOverlay ];
         config = {
           allowUnfree = true;
           flakeInputs = inputs;
         };
       };
-    });
+    }) // {
+      nixosConfigurations = {
+        # x86_64 personal installer ISO
+        # Build: nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage
+        installer-personal = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit nixos-version; };
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
+            ./pkgs/nixos/profiles/personal.nix
+            ({ lib, pkgs, ... }: {
+              nixpkgs.overlays = [ anixpkgsOverlay ];
+              nixpkgs.config.allowUnfree = true;
+              networking.wireless.enable = lib.mkForce false;
+              machines.base.nixosState = nixos-version;
+
+              environment.systemPackages = [
+                (pkgs.writeShellScriptBin "anix-install" ''
+                  set -euo pipefail
+
+                  # --- CONFIGURATION ---
+                  BOOT_LABEL="EFI"
+                  ROOT_LABEL="NixOS"
+                  BOOT_SIZE="512MiB"
+
+                  # --- DETECT DRIVE ---
+                  echo "Detecting drives..."
+                  lsblk -dno NAME,SIZE,MODEL | grep -v loop
+                  echo
+                  read -rp "Enter target disk (e.g., sda, nvme0n1): " DRIVE
+
+                  DISK="/dev/$DRIVE"
+                  if [ ! -b "$DISK" ]; then
+                    echo "Error: $DISK does not exist."
+                    exit 1
+                  fi
+
+                  echo "WARNING: This will ERASE ALL DATA on $DISK"
+                  read -rp "Type 'YES' to continue: " CONFIRM
+                  if [ "$CONFIRM" != "YES" ]; then
+                    echo "Aborted."
+                    exit 1
+                  fi
+
+                  # --- WIPE EXISTING SIGNATURES ---
+                  echo "Wiping filesystem signatures..."
+                  wipefs --all "$DISK"
+
+                  # --- CREATE PARTITIONS ---
+                  echo "Creating GPT partition table..."
+                  parted -s "$DISK" mklabel gpt
+
+                  echo "Creating EFI partition..."
+                  parted -s "$DISK" mkpart primary fat32 1MiB "$BOOT_SIZE"
+                  parted -s "$DISK" set 1 esp on
+                  parted -s "$DISK" name 1 "$BOOT_LABEL"
+
+                  echo "Creating root partition..."
+                  parted -s "$DISK" mkpart primary ext4 "$BOOT_SIZE" 100%
+                  parted -s "$DISK" name 2 "$ROOT_LABEL"
+
+                  # --- FORMAT PARTITIONS ---
+                  EFI_PART="''${DISK}1"
+                  ROOT_PART="''${DISK}2"
+
+                  # Adjust naming for NVMe drives (nvme0n1p1 etc.)
+                  if [[ "$DRIVE" == nvme* ]]; then
+                    EFI_PART="''${DISK}p1"
+                    ROOT_PART="''${DISK}p2"
+                  fi
+
+                  echo "Formatting EFI partition as FAT32..."
+                  mkfs.fat -F 32 -n "$BOOT_LABEL" "$EFI_PART"
+
+                  echo "Formatting root partition as ext4..."
+                  mkfs.ext4 -L "$ROOT_LABEL" "$ROOT_PART"
+
+                  # --- MOUNT PARTITIONS ---
+                  echo "Mounting partitions..."
+                  sleep 10
+                  mkdir -p /mnt/nixos
+                  mount /dev/disk/by-label/''${ROOT_LABEL} /mnt/nixos
+
+                  mkdir -p /mnt/nixos/boot
+                  mount /dev/disk/by-label/''${BOOT_LABEL} /mnt/nixos/boot
+                  echo
+                  echo "Done!"
+                  echo "Partitions created and mounted as:"
+                  lsblk "$DISK"
+                  echo
+                  echo "Mounted at /mnt/nixos and /mnt/nixos/boot"
+
+                  # --- INSTALL NIXOS ---
+                  echo
+                  echo "Installing NixOS profile..."
+                  nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+                  nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
+                  nix-channel --update
+                  nixos-generate-config --root /mnt/nixos
+                  sudo -u andrew bash <<'EOF'
+                  cd /data/andrew
+                  git clone https://github.com/goromal/anixpkgs.git
+                  cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
+                  cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                  sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                  sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                  sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                  mkdir -p ~/.config/nixpkgs
+                  echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                  EOF
+                  mkdir -p /root/.config/nixpkgs
+                  cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
+                  rm /mnt/nixos/etc/nixos/*
+                  ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                  nixos-install --root /mnt/nixos
+                  echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
+                '')
+              ];
+            })
+          ];
+        };
+
+        # aarch64 ATS Pi SD image
+        # Build: nix build .#nixosConfigurations.installer-ats-pi.config.system.build.sdImage
+        installer-ats-pi = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
+            ./pkgs/nixos/profiles/ats.nix
+            ({ lib, ... }: {
+              nixpkgs.overlays = [ anixpkgsOverlay ];
+              nixpkgs.config.allowUnfree = true;
+              machines.base.machineType = lib.mkForce "pi4";
+              machines.base.nixosState = nixos-version;
+            })
+          ];
+        };
+
+        # aarch64 JetPack installer ISO (cross-compiled from x86_64)
+        # Build: nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
+        installer-jetpack =
+          let jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;
+          in jetpackNixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            modules = [
+              "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+              "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
+              jetpack-nixos.nixosModules.default
+              ./pkgs/nixos/profiles/jetpack.nix
+              ({ lib, pkgs, ... }: {
+                nixpkgs.config.allowUnfree = true;
+                hardware.nvidia-jetpack.enable = true; # ^^^^ TODO uh-oh...need 25.11??
+                hardware.enableAllHardware = lib.mkForce false;
+                nixpkgs.hostPlatform = "aarch64-linux";
+                nixpkgs.buildPlatform = "x86_64-linux";
+
+                environment.systemPackages = [ # ^^^^
+                  (pkgs.writeShellScriptBin "anix-install" ''
+                    set -euo pipefail
+
+                    # --- CONFIGURATION ---
+                    BOOT_LABEL="EFI"
+                    ROOT_LABEL="NixOS"
+                    BOOT_SIZE="512MiB"
+
+                    # --- DETECT DRIVE ---
+                    echo "Detecting drives..."
+                    lsblk -dno NAME,SIZE,MODEL | grep -v loop
+                    echo
+                    read -rp "Enter target disk (e.g., sda, nvme0n1): " DRIVE
+
+                    DISK="/dev/$DRIVE"
+                    if [ ! -b "$DISK" ]; then
+                      echo "Error: $DISK does not exist."
+                      exit 1
+                    fi
+
+                    echo "WARNING: This will ERASE ALL DATA on $DISK"
+                    read -rp "Type 'YES' to continue: " CONFIRM
+                    if [ "$CONFIRM" != "YES" ]; then
+                      echo "Aborted."
+                      exit 1
+                    fi
+
+                    # --- WIPE EXISTING SIGNATURES ---
+                    echo "Wiping filesystem signatures..."
+                    wipefs --all "$DISK"
+
+                    # --- CREATE PARTITIONS ---
+                    echo "Creating GPT partition table..."
+                    parted -s "$DISK" mklabel gpt
+
+                    echo "Creating EFI partition..."
+                    parted -s "$DISK" mkpart primary fat32 1MiB "$BOOT_SIZE"
+                    parted -s "$DISK" set 1 esp on
+                    parted -s "$DISK" name 1 "$BOOT_LABEL"
+
+                    echo "Creating root partition..."
+                    parted -s "$DISK" mkpart primary ext4 "$BOOT_SIZE" 100%
+                    parted -s "$DISK" name 2 "$ROOT_LABEL"
+
+                    # --- FORMAT PARTITIONS ---
+                    EFI_PART="''${DISK}1"
+                    ROOT_PART="''${DISK}2"
+
+                    # Adjust naming for NVMe drives (nvme0n1p1 etc.)
+                    if [[ "$DRIVE" == nvme* ]]; then
+                      EFI_PART="''${DISK}p1"
+                      ROOT_PART="''${DISK}p2"
+                    fi
+
+                    echo "Formatting EFI partition as FAT32..."
+                    mkfs.fat -F 32 -n "$BOOT_LABEL" "$EFI_PART"
+
+                    echo "Formatting root partition as ext4..."
+                    mkfs.ext4 -L "$ROOT_LABEL" "$ROOT_PART"
+
+                    # --- MOUNT PARTITIONS ---
+                    echo "Mounting partitions..."
+                    sleep 10
+                    mkdir -p /mnt/nixos
+                    mount /dev/disk/by-label/''${ROOT_LABEL} /mnt/nixos
+
+                    mkdir -p /mnt/nixos/boot
+                    mount /dev/disk/by-label/''${BOOT_LABEL} /mnt/nixos/boot
+                    echo
+                    echo "Done!"
+                    echo "Partitions created and mounted as:"
+                    lsblk "$DISK"
+                    echo
+                    echo "Mounted at /mnt/nixos and /mnt/nixos/boot"
+
+                    # --- INSTALL NIXOS ---
+                    echo
+                    echo "Installing NixOS profile..."
+                    nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+                    nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
+                    nix-channel --update
+                    nixos-generate-config --root /mnt/nixos
+                    sudo -u andrew bash <<'EOF'
+                    cd /data/andrew
+                    git clone https://github.com/goromal/anixpkgs.git
+                    cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
+                    cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                    sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                    sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                    sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                    mkdir -p ~/.config/nixpkgs
+                    echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                    EOF
+                    mkdir -p /root/.config/nixpkgs
+                    cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
+                    rm /mnt/nixos/etc/nixos/*
+                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                    nixos-install --root /mnt/nixos
+                    echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
+                  '')
+                ];
+              })
+            ];
+          };
+      };
+    };
 }

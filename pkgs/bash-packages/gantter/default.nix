@@ -8,7 +8,7 @@ let
       version = "0.0.0";
       description = ".tex worker script for gantter.";
       script-file = ./texmaker.py;
-      inherit pytestCheckHook buildPythonPackage;
+      inherit pytestCheckHook buildPythonPackage setuptools;
       propagatedBuildInputs = [ numpy scipy ];
       checkPkgs = [ ];
     });

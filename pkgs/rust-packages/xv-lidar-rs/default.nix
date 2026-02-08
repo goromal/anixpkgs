@@ -3,7 +3,6 @@ rustPlatform.buildRustPackage rec {
   pname = "xv-lidar-rs";
   version = "0.0.1";
   src = pkg-src;
-  useFetchCargoVendor = true;
   cargoHash =
     "sha256-w8OiSJpzTI++xDtCQpKwn2RnzqOXICh3SX4Gyiij30I="; # lib.fakeHash
   meta = {

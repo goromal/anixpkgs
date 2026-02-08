@@ -1,5 +1,5 @@
 { writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
-, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10 }:
+, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc13 }:
 # NOTE: Python currently needs to be <= 311 for the "imp" module to exist
 let
   pkgname = "aptest";
@@ -11,8 +11,8 @@ let
       { pkgs ? import <nixpkgs> {} }:
       pkgs.mkShell {
         nativeBuildInputs = [
-          ${overrideCC stdenv gcc10}
-          ${gcc10}
+          ${overrideCC stdenv gcc13}
+          ${gcc13}
           ${coreutils}
           ${procps}
           ${git}
@@ -63,8 +63,9 @@ in (writeArgparseScriptBin pkgname ''
   cd ardupilot
 
   ${printYlw} "Patching the source"
-  sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc10}/bin/gcc"#g' libraries/AP_Scripting/wscript
+  sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc13}/bin/gcc"#g' libraries/AP_Scripting/wscript
   sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
+  sed -i '1s/^/#include <cstdint>\n/' libraries/AP_HAL_SITL/CANSocketIface.cpp
   sed -i 's/rU/r/g' modules/waf/wscript
   sed -i 's/rU/r/g' modules/waf/waflib/ConfigSet.py
   sed -i 's/rU/r/g' modules/waf/waflib/Context.py

@@ -1,8 +1,10 @@
-{ buildPythonPackage, pythonOlder, google-api-python-client, google-auth
-, google-auth-oauthlib, oauth2client, pkg-src }:
+{ buildPythonPackage, setuptools, pythonOlder, google-api-python-client
+, google-auth, google-auth-oauthlib, oauth2client, pkg-src }:
 buildPythonPackage rec {
   pname = "easy_google_auth";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.8";
   propagatedBuildInputs =
     [ google-api-python-client google-auth google-auth-oauthlib oauth2client ];

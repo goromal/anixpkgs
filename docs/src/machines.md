@@ -19,8 +19,8 @@ experimental-features = nix-command flakes auto-allocate-uids
 4. Add these Nix channels via `nix-channel --add URL NAME`:
 ```bash
 $ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-25.05
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixpkgs https://nixos.org/channels/nixos-25.11
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
@@ -101,7 +101,7 @@ Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` pa
 ## Build a Raspberry Pi NixOS SD Installer Image
 
 ```bash
-nixos-generate -f sd-aarch64-installer --system aarch64-linux -c /path/to/rpi/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+nix build .#nixosConfigurations.installer-ats-pi.config.system.build.sdImage
 ```
 
 ```bash
@@ -119,18 +119,14 @@ sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
 sudo nix-channel --update
 ```
 
-## Installation Instructions on a New Machine
+## Personal Machine Installation Instructions
 
 *Sources*
 
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
-***Note***: You can replace steps 1-8 with a `kexec` kernel load and disk formatting with `disko`:
-- [kexec directions](https://github.com/nix-community/nixos-images#kexec-tarballs)
-- [disko directions](https://github.com/nix-community/disko)
-
-1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=pkgs/nixos/installers/personal.nix`
+1. Build the installation ISO with `nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
@@ -144,15 +140,31 @@ sudo nix-channel --update
 12. Run `anix-init` 
 13. Enjoy!
 
+## JetPack Machine Installation Instructions
+
+1. Build the installation ISO with `nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
+2. Plug in a USB stick large enough to accommodate the image.
+3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
+4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
+5. Insert the USB drive into the Jetson device. On the AGX devkits, I've had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.
+6. Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the "Boot Manager", select the correct USB device and boot directly into it.
+7. Connect to the internet
+8. Within the installer, run `sudo anix-install`
+9.  If everything went well, reboot
+10. On the next reboot, login as user `andrew` again
+11. Connect to the internet
+12. Run `anix-init` 
+13. Enjoy!
+
 ## Upgrading NixOS versions with `anixpkgs`
 
 Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
 
 ```bash
-# e.g., upgrading to 25.05:
-home-manager https://github.com/nix-community/home-manager/archive/release-25.05.tar.gz
-nixos https://nixos.org/channels/nixos-25.05
-nixpkgs https://nixos.org/channels/nixos-25.05
+# e.g., upgrading to 25.11:
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixos https://nixos.org/channels/nixos-25.11
+nixpkgs https://nixos.org/channels/nixos-25.11
 ```
 
 `sudo nix-channel --update`. Then upgrade with
@@ -171,6 +183,18 @@ The following mount points are recommended (using [rclone](https://rclone.org/) 
 - `box:data` -> `rclone copy` -> `~/data`
 - `box:.devrc` -> `rclone copy` -> `~/.devrc`
 - `drive:Documents` -> `rclone copy` -> `~/Documents`
+
+## Build a JetPack Installer ISO
+
+Cross-compiled from x86_64. Requires `binfmt` support for aarch64 (enabled by default on NixOS with `boot.binfmt.emulatedSystems`).
+
+```bash
+nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
+```
+
+```bash
+dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
+```
 
 ## Build a NixOS ISO Image
 

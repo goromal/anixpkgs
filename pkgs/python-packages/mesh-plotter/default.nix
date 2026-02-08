@@ -1,8 +1,10 @@
-{ buildPythonPackage, fetchPypi, pythonOlder, numpy, matplotlib, geometry
-, pysignals, pkg-src }:
+{ buildPythonPackage, setuptools, fetchPypi, pythonOlder, numpy, matplotlib
+, geometry, pysignals, pkg-src }:
 buildPythonPackage rec {
   pname = "mesh_plotter";
   version = "0.0.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.6";
   doCheck = false;
   propagatedBuildInputs = [ numpy matplotlib geometry pysignals ];

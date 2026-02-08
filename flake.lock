@@ -99,6 +99,31 @@
         "type": "github"
       }
     },
+    "cuda-legacy": {
+      "inputs": {
+        "flake-parts": [
+          "jetpack-nixos",
+          "cuda-legacy"
+        ],
+        "nixpkgs": [
+          "jetpack-nixos",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768505959,
+        "narHash": "sha256-oFCx/ApQ+S1/apUKWsvT9vq+Eo1m2vINWEDkW7/nckA=",
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
+        "rev": "86ad7e2c2e314f0234539cbbc66b5cd7746bcd32",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
+        "type": "github"
+      }
+    },
     "daily_tactical_server": {
       "flake": false,
       "locked": {
@@ -262,6 +287,25 @@
         "type": "github"
       }
     },
+    "jetpack-nixos": {
+      "inputs": {
+        "cuda-legacy": "cuda-legacy",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1770229245,
+        "narHash": "sha256-dMC/OzvG+y5OaF0zTR/Onx6EcVcLt/DX/cucOC4MqCk=",
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "rev": "0910e7d6e219e8dab0e30cee03f71d1b3553d1e1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -410,21 +454,37 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1748026580,
-        "narHash": "sha256-rWtXrcIzU5wm/C8F9LWvUfBGu5U5E7cFzPYT1pHIJaQ=",
-        "owner": "NixOS",
+        "lastModified": 1768773494,
+        "narHash": "sha256-XsM7GP3jHlephymxhDE+/TKKO1Q16phz/vQiLBGhpF4=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "11cb3517b3af6af300dd6c055aeda73c9bf52c48",
+        "rev": "77ef7a29d276c6d8303aece3444d61118ef71ac2",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "refs/tags/25.05",
+        "owner": "nixos",
+        "ref": "nixos-25.11",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1764521362,
+        "narHash": "sha256-M101xMtWdF1eSD0xhiR8nG8CXRlHmv6V+VoY65Smwf4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "871b9fd269ff6246794583ce4ee1031e1da71895",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "refs/tags/25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1718276985,
         "narHash": "sha256-u1fA0DYQYdeG+5kDm1bOoGcHtX0rtC7qs2YA2N1X++I=",
@@ -491,7 +551,7 @@
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "utils": "utils"
       },
       "locked": {
@@ -656,6 +716,7 @@
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
+        "jetpack-nixos": "jetpack-nixos",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -665,7 +726,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
         "photos-tools": "photos-tools",

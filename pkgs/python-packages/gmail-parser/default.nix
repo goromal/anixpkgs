@@ -1,8 +1,10 @@
-{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text
-, progressbar2, pkg-src }:
+{ buildPythonPackage, setuptools, pythonOlder, click, easy-google-auth
+, html2text, progressbar2, pkg-src }:
 buildPythonPackage rec {
   pname = "gmail_parser";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.8";
   propagatedBuildInputs = [ click easy-google-auth html2text progressbar2 ];
   src = pkg-src;

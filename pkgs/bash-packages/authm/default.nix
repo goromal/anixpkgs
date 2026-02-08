@@ -9,7 +9,7 @@ let
       version = "1.0.0";
       inherit description longDescription;
       script-file = ./authm.py;
-      inherit pytestCheckHook buildPythonPackage;
+      inherit pytestCheckHook buildPythonPackage setuptools;
       propagatedBuildInputs = [ click colorama easy-google-auth gmail-parser ];
       checkPkgs = [ ];
     });

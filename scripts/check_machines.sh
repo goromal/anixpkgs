@@ -39,10 +39,15 @@ for sim in ${sims[@]}; do
     echo ""
 done
 
-# installers=(personal)
-# for installer in ${installers[@]}; do
-#     echo "Checking derivation for installer: $installer..."
-#     nix-build '<nixpkgs/nixos>' -A config.system.build.isoImage -I nixos-config=${DIR}/../pkgs/nixos/installers/${installer}.nix --no-out-link --dry-run
-#     echo "Checks out!"
-#     echo ""
-# done
+declare -A installer_artifacts=(
+    [installer-personal]="isoImage"
+    [installer-ats-pi]="sdImage"
+    [installer-jetpack]="isoImage"
+)
+for installer in "${!installer_artifacts[@]}"; do
+    artifact=${installer_artifacts[$installer]}
+    echo "Checking derivation for installer: $installer ($artifact)..."
+    nix build ${DIR}/..#nixosConfigurations.${installer}.config.system.build.${artifact} --no-link --dry-run --impure --show-trace
+    echo "Checks out!"
+    echo ""
+done

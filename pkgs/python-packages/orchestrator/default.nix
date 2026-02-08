@@ -1,10 +1,12 @@
 { buildPythonPackage, makeWrapper, click, aapis-py, grpcio, colorama, mp4
-, mp4unite, scrape, statsd, service-ports, pkg-src }:
+, mp4unite, scrape, statsd, service-ports, setuptools, pkg-src }:
 buildPythonPackage rec {
   pname = "orchestrator";
   version = "0.0.0";
   src = pkg-src;
   buildInputs = [ makeWrapper ];
+  pyproject = true;
+  build-system = [ setuptools ];
   propagatedBuildInputs =
     [ click aapis-py grpcio colorama mp4 mp4unite scrape statsd ];
   postInstall = ''

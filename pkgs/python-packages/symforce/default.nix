@@ -1,9 +1,11 @@
-{ python, lib, fetchPypi, buildPythonPackage, fetchurl, pythonOlder, black
-, jinja2 }:
+{ python, lib, fetchPypi, buildPythonPackage, setuptools, fetchurl, pythonOlder
+, black, jinja2 }:
 let
   symforce-sym = buildPythonPackage rec {
     version = "0.9.0";
     pname = "symforce-sym";
+    pyproject = true;
+    build-system = [ setuptools ];
     disabled = pythonOlder "3.11";
 
     src = fetchPypi {

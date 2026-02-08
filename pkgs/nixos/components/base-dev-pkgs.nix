@@ -45,7 +45,7 @@ in {
   ];
 
   programs.git = {
-    package = pkgs.gitAndTools.gitFull;
+    package = pkgs.gitFull;
     enable = true;
     userName = "Andrew Torgesen";
     userEmail = "andrew.torgesen@gmail.com";

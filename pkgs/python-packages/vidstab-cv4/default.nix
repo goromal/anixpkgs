@@ -1,9 +1,11 @@
-{ lib, buildPythonPackage, fetchPypi, numpy, pandas, imutils-cv4, progress
-, matplotlib }:
+{ lib, buildPythonPackage, setuptools, fetchPypi, numpy, pandas, imutils-cv4
+, progress, matplotlib }:
 
 buildPythonPackage rec {
   version = "1.7.4-cv4";
   pname = "vidstab";
+  pyproject = true;
+  build-system = [ setuptools ];
 
   src = fetchPypi {
     inherit pname;

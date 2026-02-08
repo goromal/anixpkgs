@@ -74,7 +74,7 @@ in {
       pinta
       pandoc
       texlive.combined.scheme-full
-      poppler_utils
+      poppler-utils
       meld
       libreoffice-qt
       unstable.google-chrome

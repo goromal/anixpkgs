@@ -1,7 +1,7 @@
 # https://github.com/deezer/spleeter
-{ buildPythonPackage, fetchPypi, pythonAtLeast, pythonOlder, pandas, tensorflow
-, ffmpeg, libsndfile, ffmpeg-python, norbert, typer, llvmlite, numpy, httpx
-, librosa }:
+{ buildPythonPackage, setuptools, fetchPypi, pythonAtLeast, pythonOlder, pandas
+, tensorflow, ffmpeg, libsndfile, ffmpeg-python, norbert, typer, llvmlite
+, numpy, httpx, librosa }:
 let
   adjustDependency = ppackage: ppSpec: sSpec: pSpec: ''
     substituteInPlace pyproject.toml --replace '${ppackage.pname}${ppSpec}' '${ppackage.pname} = "${ppackage.version}"'
@@ -12,6 +12,8 @@ let
 in buildPythonPackage rec {
   pname = "spleeter";
   version = "2.3.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   nativeBuildInputs = [ ffmpeg libsndfile ];
   disabled = pythonOlder "3.8" || pythonAtLeast "3.9";
   broken = true;

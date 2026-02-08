@@ -1,8 +1,10 @@
-{ buildPythonPackage, flask, werkzeug, python }:
+{ buildPythonPackage, setuptools, flask, werkzeug, python }:
 let pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
 in buildPythonPackage rec {
   pname = "budget_ui";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = ./.;
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates

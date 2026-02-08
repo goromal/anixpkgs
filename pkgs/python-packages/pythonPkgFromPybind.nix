@@ -1,7 +1,7 @@
 { pname, version, description, longDescription, clangStdenv, pkg-src
 , cppNativeBuildInputs, cppBuildInputs, cppSetup ? null, cppTarget ? null
 , hasTests ? false, pybind11, python, pythonOlder, pytestCheckHook
-, buildPythonPackage, propagatedBuildInputs, checkPkgs }:
+, buildPythonPackage, setuptools, propagatedBuildInputs, checkPkgs }:
 let
   copyTarget = if cppTarget != null then cppTarget else "${pname}.cpython*";
   pyboundPkg = clangStdenv.mkDerivation {
@@ -28,6 +28,8 @@ let
 in buildPythonPackage rec {
   inherit pname;
   inherit version;
+  pyproject = true;
+  build-system = [ setuptools ];
   src = ./pkgTemplate/.;
   disabled = pythonOlder "3.6";
   inherit propagatedBuildInputs;

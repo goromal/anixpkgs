@@ -1,7 +1,9 @@
-{ buildPythonPackage, click, wiki-tools, easy-google-auth, pkg-src }:
+{ buildPythonPackage, setuptools, click, wiki-tools, easy-google-auth, pkg-src }:
 buildPythonPackage rec {
   pname = "book-notes-sync";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = pkg-src;
   propagatedBuildInputs = [ click wiki-tools easy-google-auth ];
   doCheck = false;

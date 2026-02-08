@@ -3,3 +3,4 @@ result*
 build/*
 *.log
 .nixos-test-history
+.claude/tags

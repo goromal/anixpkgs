@@ -1,7 +1,9 @@
-{ buildPythonPackage, fetchPypi, pythonOlder, scipy }:
+{ buildPythonPackage, setuptools, fetchPypi, pythonOlder, scipy }:
 buildPythonPackage rec {
   pname = "norbert";
   version = "0.2.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.6";
   propagatedBuildInputs = [ scipy ];
   src = fetchPypi {

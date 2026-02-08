@@ -1,7 +1,7 @@
-{ pname, version, buildPythonPackage, flask, writeTextFile, flaskScript
-, overrideFullFlaskScript ? false, helperScript ? null, templateText ? null
-, writeShellScript, scriptPropagatedBuildInputs, python, description
-, longDescription ? "", autoGenUsageCmd ? "--help" }:
+{ pname, version, buildPythonPackage, setuptools, flask, writeTextFile
+, flaskScript, overrideFullFlaskScript ? false, helperScript ? null
+, templateText ? null, writeShellScript, scriptPropagatedBuildInputs, python
+, description, longDescription ? "", autoGenUsageCmd ? "--help" }:
 let
   use_template = templateText != null;
   use_helper = helperScript != null;
@@ -75,6 +75,8 @@ let
 in buildPythonPackage rec {
   inherit pname;
   inherit version;
+  pyproject = true;
+  build-system = [ setuptools ];
   src = ./.;
   prePatch = ''
     ${template_file_setup}

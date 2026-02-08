@@ -1,7 +1,8 @@
 { pname, version, description, longDescription ? "", autoGenUsageCmd ? "--help"
 , script-file, is-exec ? true, test-dir ? null, pytestCheckHook
-, buildPythonPackage, nativeBuildInputs ? [ ], propagatedBuildInputs ? [ ]
-, checkPkgs ? [ ], subCmds ? [ ], postConfigure ? "" }:
+, buildPythonPackage, setuptools, nativeBuildInputs ? [ ]
+, propagatedBuildInputs ? [ ], checkPkgs ? [ ], subCmds ? [ ]
+, postConfigure ? "" }:
 let
   testsCpyCmd = if test-dir != null then ''
     cp ${test-dir}/* tests/
@@ -10,6 +11,8 @@ let
 in buildPythonPackage rec {
   inherit pname;
   inherit version;
+  pyproject = true;
+  build-system = [ setuptools ];
   src = ./pkgTemplate/.;
   inherit nativeBuildInputs;
   inherit propagatedBuildInputs;
