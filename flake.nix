@@ -43,7 +43,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    geometry.url = "github:goromal/geometry?ref=refs/tags/release/1.0";
+    geometry.url = "github:goromal/geometry?ref=dev/25.11";
     geometry.flake = false;
 
     gmail-parser.url = "github:goromal/gmail_parser";

@@ -241,16 +241,16 @@
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1742189535,
-        "narHash": "sha256-rMySYxi15Cp1Li8H38DZfHyrm0N5MAbfIDRgsCRG1iY=",
+        "lastModified": 1770563054,
+        "narHash": "sha256-uohG/reDsIXDZNltH6m+FR4gPVrEPlwDWr1KixqQZP8=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "d67ec20d64a8e9d04798306febe49b5aafa76c0e",
+        "rev": "d4cd4cbaa98c6e09730b8f54caa04c79fc3f7784",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/tags/release/1.0",
+        "ref": "dev/25.11",
         "repo": "geometry",
         "type": "github"
       }
