@@ -340,11 +340,14 @@
                 {
                   nixpkgs.overlays = [ anixpkgsOverlay ];
                   nixpkgs.config.allowUnfree = true;
-                  hardware.enableAllHardware = lib.mkForce false;
                   nixpkgs.hostPlatform = "aarch64-linux";
                   nixpkgs.buildPlatform = "x86_64-linux";
                   networking.wireless.enable = lib.mkForce false;
                   machines.base.nixosState = nixos-version;
+                  # The installer only needs to boot and run anix-install; disable CUDA
+                  # to avoid capability/cross-compilation assertion failures in nixpkgs.
+                  hardware.nvidia-jetpack.configureCuda = lib.mkForce false;
+                  hardware.enableAllHardware = lib.mkForce false;
 
                   environment.systemPackages = [
                     (pkgs.writeShellScriptBin "anix-install" ''
