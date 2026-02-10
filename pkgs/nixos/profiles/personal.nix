@@ -111,6 +111,7 @@ with import ../dependencies.nix;
           fi
 
           sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
           sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
           sudo nix-channel --update
           echo

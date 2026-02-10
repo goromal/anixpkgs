@@ -334,19 +334,19 @@
             modules = [
               "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
               "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
-              jetpack-nixos.nixosModules.default
               ./pkgs/nixos/profiles/jetpack.nix
               (
                 { lib, pkgs, ... }:
                 {
+                  nixpkgs.overlays = [ anixpkgsOverlay ];
                   nixpkgs.config.allowUnfree = true;
-                  hardware.nvidia-jetpack.enable = true; # ^^^^ TODO uh-oh...need 25.11??
                   hardware.enableAllHardware = lib.mkForce false;
                   nixpkgs.hostPlatform = "aarch64-linux";
                   nixpkgs.buildPlatform = "x86_64-linux";
+                  networking.wireless.enable = lib.mkForce false;
+                  machines.base.nixosState = nixos-version;
 
                   environment.systemPackages = [
-                    # ^^^^
                     (pkgs.writeShellScriptBin "anix-install" ''
                       set -euo pipefail
 
@@ -434,9 +434,8 @@
                       git clone https://github.com/goromal/anixpkgs.git
                       cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
                       cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                      sed -i 's/orin-nx/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       mkdir -p ~/.config/nixpkgs
                       echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
                       EOF

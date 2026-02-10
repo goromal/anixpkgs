@@ -43,6 +43,7 @@ in
       type = lib.types.enum [
         "x86_linux"
         "pi4"
+        "jetson"
       ];
       description = "Machine type that the closure is targeting.";
     };
@@ -156,12 +157,18 @@ in
     ../python-packages/flasks/budget_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
+    (
+      let
+        jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
+      in
+      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
+    )
   ];
 
   config = {
     system.stateVersion = cfg.nixosState;
 
-    boot = {
+    boot = lib.mkIf (cfg.machineType != "jetson") {
       kernelPackages = (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
       );
@@ -203,6 +210,11 @@ in
       );
     };
 
+    hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
+    hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
+      enable = true;
+    };
+
     # https://github.com/NixOS/nixpkgs/issues/154163
     nixpkgs.overlays = lib.mkIf (cfg.machineType == "pi4") [
       (final: super: {
@@ -237,11 +249,13 @@ in
       '';
     };
 
-    services.xserver = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
-      enable = true;
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
-    };
+    services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
+    services.displayManager.gdm.enable = lib.mkIf (
+      cfg.machineType == "x86_linux" && cfg.graphical
+    ) true;
+    services.desktopManager.gnome.enable = lib.mkIf (
+      cfg.machineType == "x86_linux" && cfg.graphical
+    ) true;
 
     services.printing.enable = (cfg.machineType == "x86_linux" && cfg.graphical);
 
@@ -434,7 +448,7 @@ in
         X11Forwarding = true;
       };
     };
-    # programs.ssh.startAgent = true;
+    programs.ssh.startAgent = (cfg.graphical == false);
 
     programs.vim.enable = true;
     programs.vim.defaultEditor = true;

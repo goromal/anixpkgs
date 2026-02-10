@@ -53,17 +53,19 @@ in
   programs.git = {
     package = pkgs.gitFull;
     enable = true;
-    userName = "Andrew Torgesen";
-    userEmail = "andrew.torgesen@gmail.com";
-    aliases = {
-      aa = "add -A";
-      cm = "commit -m";
-      co = "checkout";
-      cp = "cherry-pick";
-      s = "status";
-      d = "diff";
-    };
-    extraConfig = {
+    settings = {
+      user = {
+        name = "Andrew Torgesen";
+        email = "andrew.torgesen@gmail.com";
+      };
+      alias = {
+        aa = "add -A";
+        cm = "commit -m";
+        co = "checkout";
+        cp = "cherry-pick";
+        s = "status";
+        d = "diff";
+      };
       init = {
         defaultBranch = "master";
       };
