@@ -174,11 +174,15 @@
       anixpkgs-version = builtins.readFile ./ANIX_VERSION;
       lockNodes = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes;
       nixpkgsTag = builtins.elemAt (builtins.match "nixos-(.+)" lockNodes.nixpkgs.original.ref) 0;
-      anixpkgsSrcTag = builtins.elemAt (builtins.match "refs/tags/v(.+)" lockNodes."anixpkgs-src".original.ref) 0;
+      anixpkgsSrcTag = builtins.elemAt (builtins.match "refs/tags/v(.+)"
+        lockNodes."anixpkgs-src".original.ref
+      ) 0;
       anixpkgsOverlay =
-        assert nixpkgsTag == nixos-version
+        assert
+          nixpkgsTag == nixos-version
           || builtins.throw "flake.nix nixpkgs input tag '${nixpkgsTag}' does not match NIXOS_VERSION '${nixos-version}'; update the nixpkgs input URL";
-        assert anixpkgsSrcTag == anixpkgs-version
+        assert
+          anixpkgsSrcTag == anixpkgs-version
           || builtins.throw "flake.nix anixpkgs-src input tag '${anixpkgsSrcTag}' does not match ANIX_VERSION '${anixpkgs-version}'; update the anixpkgs-src input URL";
         import ./overlay.nix;
     in

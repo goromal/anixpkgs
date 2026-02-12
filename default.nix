@@ -45,4 +45,5 @@ import nixpkgs {
   inherit system;
   overlays = [ (import ./overlay.nix) ] ++ overlays;
   config.flakeInputs = flakeInputs;
-} // args
+}
+// args

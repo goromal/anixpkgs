@@ -1,4 +1,6 @@
-{ system ? builtins.currentSystem }:
+{
+  system ? builtins.currentSystem,
+}:
 let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
