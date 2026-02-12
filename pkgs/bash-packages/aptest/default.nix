@@ -12,7 +12,6 @@
   overrideCC,
   gcc13,
 }:
-# NOTE: Python currently needs to be <= 311 for the "imp" module to exist
 let
   pkgname = "aptest";
   printErr = "${color-prints}/bin/echo_red";
@@ -39,7 +38,6 @@ let
           ${python.pkgs.empy}
           ${python.pkgs.requests}
           ${python.pkgs.monotonic}
-          ${python.pkgs.geocoder}
           ${python.pkgs.configparser}
           ${python.pkgs.click}
           ${python.pkgs.decorator}

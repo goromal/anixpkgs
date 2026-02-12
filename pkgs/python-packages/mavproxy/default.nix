@@ -17,14 +17,13 @@
 
 buildPythonPackage rec {
   pname = "MAVProxy";
-  version = "1.8.74";
+  version = "master";
   format = "setuptools";
 
-  src = fetchFromGitHub {
-    owner = "ArduPilot";
-    repo = "MAVProxy";
-    tag = "v${version}";
-    hash = "sha256-1/bp3vlCXt4Hg36zwMKSzPSxW7xlxpfx2o+2uQixdos=";
+  src = builtins.fetchGit {
+    url = "https://github.com/ArduPilot/MAVProxy.git";
+    ref = "master";
+    rev = "4948a269a63288103633ae30c60b861656fbc16b";
   };
 
   propagatedBuildInputs = [

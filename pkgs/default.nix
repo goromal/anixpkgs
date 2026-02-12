@@ -419,8 +419,8 @@ rec {
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
-      python = python311;
-      mavproxy = python311.pkgs.pinned-mavproxy;
+      python = python313;
+      mavproxy = python313.pkgs.pinned-mavproxy;
     }
   );
 
