@@ -4,7 +4,7 @@
   lib,
   ...
 }:
-with import ../../../nixos/dependencies.nix;
+with import ../../../nixos/dependencies.nix { system = pkgs.stdenv.hostPlatform.system; };
 let
   cfg = config.services.stampserver;
 in

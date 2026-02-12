@@ -298,7 +298,7 @@ rec {
       ''
     );
 
-  php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
+  php74 = flakeInputs.phps.packages.${final.stdenv.hostPlatform.system}.php74;
 
   python310 = pythonOverridesFor prev.python310;
   python311 = pythonOverridesFor prev.python311;

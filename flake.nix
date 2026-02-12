@@ -2,9 +2,15 @@
   description = "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11"; # keep in sync with NIXOS_VERSION
 
-    jetpack-nixos.url = "github:anduril/jetpack-nixos";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs?ref=nixpkgs-unstable";
+    nixpkgs-unstable.flake = false;
+
+    anixpkgs-src.url = "github:goromal/anixpkgs?ref=refs/tags/v7.25.1"; # keep in sync with ANIX_VERSION
+    anixpkgs-src.flake = false;
+
+    jetpack-nixos.url = "github:anduril/jetpack-nixos?rev=39be29c948c8374ca5b0f090174dac548a85177d";
 
     phps.url = "github:fossar/nix-phps";
 
@@ -165,7 +171,16 @@
         "aarch64-linux"
       ];
       nixos-version = builtins.readFile ./NIXOS_VERSION;
-      anixpkgsOverlay = import ./overlay.nix;
+      anixpkgs-version = builtins.readFile ./ANIX_VERSION;
+      lockNodes = (builtins.fromJSON (builtins.readFile ./flake.lock)).nodes;
+      nixpkgsTag = builtins.elemAt (builtins.match "nixos-(.+)" lockNodes.nixpkgs.original.ref) 0;
+      anixpkgsSrcTag = builtins.elemAt (builtins.match "refs/tags/v(.+)" lockNodes."anixpkgs-src".original.ref) 0;
+      anixpkgsOverlay =
+        assert nixpkgsTag == nixos-version
+          || builtins.throw "flake.nix nixpkgs input tag '${nixpkgsTag}' does not match NIXOS_VERSION '${nixos-version}'; update the nixpkgs input URL";
+        assert anixpkgsSrcTag == anixpkgs-version
+          || builtins.throw "flake.nix anixpkgs-src input tag '${anixpkgsSrcTag}' does not match ANIX_VERSION '${anixpkgs-version}'; update the anixpkgs-src input URL";
+        import ./overlay.nix;
     in
     flake-utils.lib.eachSystem supported-systems (system: {
       legacyPackages = import nixpkgs {
@@ -193,6 +208,7 @@
               {
                 nixpkgs.overlays = [ anixpkgsOverlay ];
                 nixpkgs.config.allowUnfree = true;
+                nixpkgs.config.flakeInputs = inputs;
                 networking.wireless.enable = lib.mkForce false;
                 machines.base.nixosState = nixos-version;
 
@@ -316,6 +332,7 @@
               {
                 nixpkgs.overlays = [ anixpkgsOverlay ];
                 nixpkgs.config.allowUnfree = true;
+                nixpkgs.config.flakeInputs = inputs;
                 machines.base.machineType = lib.mkForce "pi4";
                 machines.base.nixosState = nixos-version;
               }
@@ -340,6 +357,7 @@
                 {
                   nixpkgs.overlays = [ anixpkgsOverlay ];
                   nixpkgs.config.allowUnfree = true;
+                  nixpkgs.config.flakeInputs = inputs;
                   nixpkgs.hostPlatform = "aarch64-linux";
                   nixpkgs.buildPlatform = "x86_64-linux";
                   networking.wireless.enable = lib.mkForce false;

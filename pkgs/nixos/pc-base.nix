@@ -4,10 +4,13 @@
   lib,
   ...
 }:
-with import ./dependencies.nix;
+with import ./dependencies.nix { system = pkgs.stdenv.hostPlatform.system; };
 let
   cfg = config.machines.base;
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  home-manager = builtins.fetchTarball {
+    url = "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+    sha256 = "1kqxy6r4ahnbazmpa4pncdp62najdikdaw8hvrv8nl6qxvbmf9fy";
+  };
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
@@ -157,12 +160,7 @@ in
     ../python-packages/flasks/budget_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
-    (
-      let
-        jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
-      in
-      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    )
+    (import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix")))
   ];
 
   config = {
@@ -554,7 +552,6 @@ in
         ncdu
         nmap
         navi
-        unstable.mprocs
         bandwhich
         btop
         glances

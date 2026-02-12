@@ -4,7 +4,7 @@
   config,
   ...
 }:
-with import ../../../nixos/dependencies.nix;
+with import ../../../nixos/dependencies.nix { system = pkgs.stdenv.hostPlatform.system; };
 let
   globalCfg = config.machines.base;
   cfg = config.services.authui;

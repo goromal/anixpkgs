@@ -4,7 +4,7 @@
   lib,
   ...
 }:
-with import ./dependencies.nix;
+with import ./dependencies.nix { system = pkgs.stdenv.hostPlatform.system; };
 let
   cfg = config.drone.base;
 in
