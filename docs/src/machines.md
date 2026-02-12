@@ -69,56 +69,6 @@ export NIXPKGS_ALLOW_UNFREE=1
 # eval "$(direnv hook bash)"
 ```
 
-## Build and Deploy a Raspberry Pi NixOS SD Configuration
-
-Since the hardware configuration for the Raspberry Pi is well understood, it makes sense to skip the installer step and deploy a fully-fledged clusure instead.
-
-```bash
-nixos-generate -f sd-aarch64 --system aarch64-linux -c /path/to/anixpkgs/pkgs/nixos/configurations/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
-```
-
-```bash
-nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
-```
-
-```bash
-sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
-```
-
-On the Pi, connect to the internet, copy over SSH keys (maybe no need for `/root/.ssh/`) and then set up the Nix channel(s):
-
-```bash
-sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
-sudo nix-channel --update
-```
-
-Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` packages (that's something for me to look into) so the `anix-upgrade` setup steps are especially important:
-
-- Make a `~/sources` directory
-- Symlink the configuration file even if it doesn't exist yet
-- Run `anix-upgrade` to aarch-ify everything
-
-## Build a Raspberry Pi NixOS SD Installer Image
-
-```bash
-nix build .#nixosConfigurations.installer-ats-pi.config.system.build.sdImage
-```
-
-```bash
-nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
-```
-
-```bash
-sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
-```
-
-On the Pi, copy over SSH keys (including to `/root/.ssh/`!) and then set up the Nix channel:
-
-```bash
-sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
-sudo nix-channel --update
-```
-
 ## Personal Machine Installation Instructions
 
 *Sources*
@@ -126,7 +76,7 @@ sudo nix-channel --update
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
-1. Build the installation ISO with `nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
+1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
@@ -142,7 +92,7 @@ sudo nix-channel --update
 
 ## JetPack Machine Installation Instructions
 
-1. Build the installation ISO with `nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
+1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`

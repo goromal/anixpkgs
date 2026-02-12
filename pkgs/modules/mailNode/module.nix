@@ -15,9 +15,9 @@ in
   config = lib.mkIf cfg.enable {
     services.postfix = {
       enable = true;
-      hostname = "mail.andrewtorgesen.com";
-      domain = "andrewtorgesen.com";
-      config = {
+      settings.main = {
+        myhostname = "mail.andrewtorgesen.com";
+        mydomain = "andrewtorgesen.com";
         virtual_mailbox_base = "/var/mail/goromail/";
         virtual_mailbox_domains = "andrewtorgesen.com";
         virtual_uid_maps = "static:994";

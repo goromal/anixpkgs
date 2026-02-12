@@ -187,14 +187,13 @@
           modules = [
             "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
             "${nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
-            ./pkgs/nixos/profiles/personal.nix
+            ./pkgs/nixos/installation-base.nix
             (
               { lib, pkgs, ... }:
               {
                 nixpkgs.overlays = [ anixpkgsOverlay ];
                 nixpkgs.config.allowUnfree = true;
                 networking.wireless.enable = lib.mkForce false;
-                machines.base.nixosState = nixos-version;
 
                 environment.systemPackages = [
                   (pkgs.writeShellScriptBin "anix-install" ''
@@ -303,26 +302,6 @@
           ];
         };
 
-        # aarch64 ATS Pi SD image
-        # Build: nix build .#nixosConfigurations.installer-ats-pi.config.system.build.sdImage
-        installer-ats-pi = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = [
-            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
-            ./pkgs/nixos/profiles/ats.nix
-            (
-              { lib, ... }:
-              {
-                nixpkgs.overlays = [ anixpkgsOverlay ];
-                nixpkgs.config.allowUnfree = true;
-                machines.base.machineType = lib.mkForce "pi4";
-                machines.base.nixosState = nixos-version;
-              }
-            )
-          ];
-        };
-
         # aarch64 JetPack installer ISO (cross-compiled from x86_64)
         # Build: nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
         installer-jetpack =
@@ -334,7 +313,8 @@
             modules = [
               "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
               "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
-              ./pkgs/nixos/profiles/jetpack.nix
+              jetpack-nixos.nixosModules.default
+              ./pkgs/nixos/installation-base.nix
               (
                 { lib, pkgs, ... }:
                 {
@@ -343,7 +323,6 @@
                   nixpkgs.hostPlatform = "aarch64-linux";
                   nixpkgs.buildPlatform = "x86_64-linux";
                   networking.wireless.enable = lib.mkForce false;
-                  machines.base.nixosState = nixos-version;
                   # The installer only needs to boot and run anix-install; disable CUDA
                   # to avoid capability/cross-compilation assertion failures in nixpkgs.
                   hardware.nvidia-jetpack.configureCuda = lib.mkForce false;
@@ -434,7 +413,8 @@
                       nixos-generate-config --root /mnt/nixos
                       sudo -u andrew bash <<'EOF'
                       cd /data/andrew
-                      git clone https://github.com/goromal/anixpkgs.git
+                      # ^^^^ TODO remove branch
+                      git clone --branch dev/orin https://github.com/goromal/anixpkgs.git
                       cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
                       cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       sed -i 's/orin-nx/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix

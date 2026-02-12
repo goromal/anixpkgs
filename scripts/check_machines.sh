@@ -41,7 +41,7 @@ done
 
 declare -A installer_artifacts=(
     [installer-personal]="isoImage"
-    [installer-ats-pi]="sdImage"
+    # [installer-ats-pi]="sdImage"
     [installer-jetpack]="isoImage"
 )
 for installer in "${!installer_artifacts[@]}"; do
