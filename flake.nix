@@ -3,7 +3,7 @@
     "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.05"; 
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.05";
 
     phps.url = "github:fossar/nix-phps";
 
