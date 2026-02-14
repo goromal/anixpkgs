@@ -2,6 +2,8 @@
   orchestrator = 40040;
   rankserver = 4018;
   stampserver = 5018;
+  outline = 3010;
+  dex = 5557;
   statsd = 9000;
   prometheus = {
     input = 9598;

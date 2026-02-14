@@ -152,6 +152,7 @@ in
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
+    ../modules/outline/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -295,6 +296,11 @@ in
         anixpkgs.budget_report
         anixpkgs.fixfname
       ];
+    };
+
+    services.outlineNode = {
+      enable = true; # ^^^^
+      rootDir = "${cfg.homeDir}/outline";
     };
 
     services.rankserver = {
