@@ -92,19 +92,20 @@ export NIXPKGS_ALLOW_UNFREE=1
 
 ## JetPack Machine Installation Instructions
 
-1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
-2. Plug in a USB stick large enough to accommodate the image.
-3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
-4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
-5. Insert the USB drive into the Jetson device. On the AGX devkits, I've had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.
-6. Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the "Boot Manager", select the correct USB device and boot directly into it.
-7. Connect to the internet
-8. Within the installer, run `sudo anix-install`
-9.  If everything went well, reboot
-10. On the next reboot, login as user `andrew` again
-11. Connect to the internet
-12. Run `anix-init` 
-13. Enjoy!
+1. Ensure that the device has UEFI firmware installed. See https://github.com/anduril/jetpack-nixos.
+2. Build the installation ISO with `nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
+3. Plug in a USB stick large enough to accommodate the image.
+4. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
+5. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
+6. Insert the USB drive into the Jetson device. On the AGX devkits, I've had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.
+7. Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the "Boot Manager", select the correct USB device and boot directly into it.
+8. Connect to the internet
+9. Within the installer, run `sudo anix-install`
+10. If everything went well, reboot
+11. On the next reboot, login as user `andrew` again
+12. Connect to the internet
+13. Run `anix-init` 
+14. Enjoy!
 
 ## Upgrading NixOS versions with `anixpkgs`
 

@@ -196,6 +196,7 @@
                 networking.wireless.enable = lib.mkForce false;
 
                 environment.systemPackages = [
+                  pkgs.git
                   (pkgs.writeShellScriptBin "anix-install" ''
                     set -euo pipefail
 
@@ -312,21 +313,24 @@
             system = "aarch64-linux";
             modules = [
               "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-              "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
+              # "${jetpackNixpkgs}/nixos/modules/installer/cd-dvd/channel.nix"
               jetpack-nixos.nixosModules.default
               ./pkgs/nixos/installation-base.nix
               (
                 { lib, pkgs, ... }:
                 {
-                  nixpkgs.overlays = [ anixpkgsOverlay ];
-                  nixpkgs.config.allowUnfree = true;
-                  nixpkgs.hostPlatform = "aarch64-linux";
-                  nixpkgs.buildPlatform = "x86_64-linux";
-                  networking.wireless.enable = lib.mkForce false;
+                  # nixpkgs.overlays = [ anixpkgsOverlay ];
+                  # nixpkgs.config.allowUnfree = true;
+                  nixpkgs.hostPlatform.system = "aarch64-linux";
+                  nixpkgs.buildPlatform.system = "x86_64-linux";
+
+                  # isoImage.volumeID = "NIXOS_ISO";
+
                   # The installer only needs to boot and run anix-install; disable CUDA
                   # to avoid capability/cross-compilation assertion failures in nixpkgs.
-                  hardware.nvidia-jetpack.configureCuda = lib.mkForce false;
+                  # hardware.nvidia-jetpack.configureCuda = lib.mkForce false;
                   hardware.enableAllHardware = lib.mkForce false;
+                  hardware.nvidia-jetpack.enable = true;
 
                   environment.systemPackages = [
                     (pkgs.writeShellScriptBin "anix-install" ''
@@ -437,3 +441,30 @@
       };
     };
 }
+
+# loading module dm_mod...
+# loading module loop...
+# loading module nls_cp437...
+# loading module nls_iso8859-1...
+# loading module overlay...
+# loading module vfat...
+# running udev...
+# Starting systemd-udevd version 258.2
+# kbd_mode: KDSKBMODE: Inappropriate ioctl for device
+# starting device mapper and LVM...
+# mounting tmpfs on /...
+# waiting for device /dev/root to appear.......................
+# Timed out waiting for device /dev/root, trying to mount anyway.
+# mounting /dev/root on /iso...
+# mount: /mnt-root/iso: fsconfig() failed: /dev/root: Can't lookup blockdev.
+#        dmesg(1) may have more information after failed mount system call.
+
+# An error occurred in stage 1 of the boot process, which must mount the
+# root filesystem on `/mnt-root' and then start stage 2.  Press one
+# of the following keys:
+
+#   i) to launch an interactive shell
+#   f) to start an interactive shell having pid 1 (needed if you want to
+#      start stage 2's init manually)
+#   r) to reboot immediately
+#   *) to ignore the error and continue
