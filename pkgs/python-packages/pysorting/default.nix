@@ -1,5 +1,15 @@
-{ callPackage, clangStdenv, cmake, sorting, pybind11, python, pythonOlder
-, pytestCheckHook, buildPythonPackage, pkg-src }:
+{
+  callPackage,
+  clangStdenv,
+  cmake,
+  sorting,
+  pybind11,
+  python,
+  pythonOlder,
+  pytestCheckHook,
+  buildPythonPackage,
+  pkg-src,
+}:
 callPackage ../pythonPkgFromPybind.nix {
   pname = "pysorting";
   version = "1.0.0";

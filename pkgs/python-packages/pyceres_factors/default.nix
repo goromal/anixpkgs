@@ -1,6 +1,21 @@
-{ callPackage, clangStdenv, cmake, ceres-solver, ceres-factors, manif-geom-cpp
-, eigen, numpy, geometry, pyceres, pybind11, python, pythonOlder
-, pytestCheckHook, buildPythonPackage, pkg-src }:
+{
+  callPackage,
+  clangStdenv,
+  cmake,
+  ceres-solver,
+  ceres-factors,
+  manif-geom-cpp,
+  eigen,
+  numpy,
+  geometry,
+  pyceres,
+  pybind11,
+  python,
+  pythonOlder,
+  pytestCheckHook,
+  buildPythonPackage,
+  pkg-src,
+}:
 callPackage ../pythonPkgFromPybind.nix {
   pname = "PyCeresFactors";
   version = "1.0.0";
@@ -8,7 +23,12 @@ callPackage ../pythonPkgFromPybind.nix {
   inherit clangStdenv;
   inherit pkg-src;
   cppNativeBuildInputs = [ cmake ];
-  cppBuildInputs = [ ceres-solver ceres-factors manif-geom-cpp eigen ];
+  cppBuildInputs = [
+    ceres-solver
+    ceres-factors
+    manif-geom-cpp
+    eigen
+  ];
   hasTests = true;
   inherit pybind11;
   inherit python;
@@ -16,7 +36,11 @@ callPackage ../pythonPkgFromPybind.nix {
   inherit pytestCheckHook;
   inherit buildPythonPackage;
   propagatedBuildInputs = [ ];
-  checkPkgs = [ numpy geometry pyceres ];
+  checkPkgs = [
+    numpy
+    geometry
+    pyceres
+  ];
   longDescription = ''
     [Repository](https://github.com/goromal/pyceres_factors)
 

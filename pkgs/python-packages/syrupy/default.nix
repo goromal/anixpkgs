@@ -1,7 +1,17 @@
-{ lib, buildPythonPackage, fetchFromGitHub, poetry-core, colored, invoke
-, coverage, pytest, pytest-benchmark, pytest-xdist
-# , pytestCheckHook
-, pythonOlder }:
+{
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  poetry-core,
+  colored,
+  invoke,
+  coverage,
+  pytest,
+  pytest-benchmark,
+  pytest-xdist,
+  # , pytestCheckHook
+  pythonOlder,
+}:
 
 buildPythonPackage rec {
   pname = "syrupy";
@@ -19,8 +29,14 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ poetry-core ];
 
-  propagatedBuildInputs =
-    [ colored invoke coverage pytest pytest-benchmark pytest-xdist ];
+  propagatedBuildInputs = [
+    colored
+    invoke
+    coverage
+    pytest
+    pytest-benchmark
+    pytest-xdist
+  ];
 
   doCheck = false;
 }

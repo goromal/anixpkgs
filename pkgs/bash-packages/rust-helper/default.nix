@@ -1,5 +1,15 @@
-{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc
-, anixpkgs-version, cargo, rustc, rustfmt, python3 }:
+{
+  writeArgparseScriptBin,
+  writeShellScript,
+  color-prints,
+  redirects,
+  git-cc,
+  anixpkgs-version,
+  cargo,
+  rustc,
+  rustfmt,
+  python3,
+}:
 let
   pkgname = "rust-helper";
   usage_str = ''
@@ -63,33 +73,38 @@ let
         fi
     fi
   '';
-in (writeArgparseScriptBin pkgname usage_str [
-  {
-    var = "makenix";
-    isBool = true;
-    default = "0";
-    flags = "nix";
-  }
-  {
-    var = "dev";
-    isBool = true;
-    default = "0";
-    flags = "dev";
-  }
-  {
-    var = "makevscode";
-    isBool = false;
-    default = "";
-    flags = "vscode";
-  }
-] ''
-  set -e
-  tmpdir=$(mktemp -d)
-  ${makenixRule}
-  ${makevscodeRule}
-  rm -rf "$tmpdir"
-  ${makedevRule}
-'') // {
+in
+(writeArgparseScriptBin pkgname usage_str
+  [
+    {
+      var = "makenix";
+      isBool = true;
+      default = "0";
+      flags = "nix";
+    }
+    {
+      var = "dev";
+      isBool = true;
+      default = "0";
+      flags = "dev";
+    }
+    {
+      var = "makevscode";
+      isBool = false;
+      default = "";
+      flags = "vscode";
+    }
+  ]
+  ''
+    set -e
+    tmpdir=$(mktemp -d)
+    ${makenixRule}
+    ${makevscodeRule}
+    rm -rf "$tmpdir"
+    ${makedevRule}
+  ''
+)
+// {
   meta = {
     description = "Convenience tools for setting up Rust projects.";
     longDescription = "";

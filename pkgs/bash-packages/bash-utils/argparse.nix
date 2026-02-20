@@ -10,7 +10,8 @@ let
     ;;
   '') optsWithVarsAndDefaults;
   arg_opt_assigns = builtins.concatStringsSep "\n" arg_opt_assign_list;
-in ''
+in
+''
   ${def_assigns}
   POSITIONAL=()
   while [[ $# -gt 0 ]]

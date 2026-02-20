@@ -1,8 +1,14 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   globalCfg = config.machines.base;
   cfg = config.services.plexNode;
-in {
+in
+{
   options.services.plexNode = {
     enable = lib.mkEnableOption "enable plex node services";
   };

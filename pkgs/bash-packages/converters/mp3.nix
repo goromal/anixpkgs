@@ -1,5 +1,14 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
-, rubberband, abcmidi, timidity }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  ffmpeg,
+  rubberband,
+  abcmidi,
+  timidity,
+}:
 let
   name = "mp3";
   extension = "mp3";
@@ -19,12 +28,14 @@ let
             Powered by https://github.com/breakfastquay/rubberband.
         --TODO
   '';
-  optsWithVarsAndDefaults = [{
-    var = "transpose";
-    isBool = false;
-    default = "NULL";
-    flags = "--transpose";
-  }];
+  optsWithVarsAndDefaults = [
+    {
+      var = "transpose";
+      isBool = false;
+      default = "NULL";
+      flags = "--transpose";
+    }
+  ];
   apply_transpose = tmpdir_var: infile_var: outfile_varname: ''
     ext=`${strings.getExtension} ${infile_var}`
     if [[ "$ext" != "wav" && "$ext" != "WAV" ]]; then
@@ -90,8 +101,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
   description = "Generate (or modify) an MP3 file from similar formats.";
 }

@@ -1,7 +1,14 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../dependencies.nix;
-let cfg = config.mods.opts;
-in {
+let
+  cfg = config.mods.opts;
+in
+{
   home.packages = [
     anixpkgs.fqt
     anixpkgs.mfn
@@ -11,10 +18,8 @@ in {
   ];
 
   home.file = with anixpkgs.pkgData; {
-    "models/gender/${models.gender.proto.name}".source =
-      models.gender.proto.data;
-    "models/gender/${models.gender.weights.name}".source =
-      models.gender.weights.data;
+    "models/gender/${models.gender.proto.name}".source = models.gender.proto.data;
+    "models/gender/${models.gender.weights.name}".source = models.gender.weights.data;
     "spleeter/pretrained_models/2stems/${models.spleeter.checkpoint.name}".source =
       models.spleeter.checkpoint.data;
     "spleeter/pretrained_models/2stems/${models.spleeter.model-data.name}".source =

@@ -1,4 +1,5 @@
-{ writeShellScript }: rec {
+{ writeShellScript }:
+rec {
   getBasename = writeShellScript "getBasename" ''
     filename=$(basename -- "$1")
     echo "$filename"

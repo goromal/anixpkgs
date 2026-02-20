@@ -35,17 +35,17 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1717112455,
-        "narHash": "sha256-4sZlPIGYr9ivk1V5CHG1wsIxzqrHFxpb2inWT5IfDT4=",
-        "ref": "Copter-4.4",
-        "rev": "865cffa5f2a850f892ab43def2d4ad21b8a9adca",
-        "revCount": 57489,
+        "lastModified": 1770503432,
+        "narHash": "sha256-QrilSQb87TDkQBXC0x3saQgdC08z5YWW+VZsY9FOlRg=",
+        "ref": "master",
+        "rev": "4fb7f3bb865e6bc523c0f5bfb8609f4a9daf0ef2",
+        "revCount": 70888,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
-        "ref": "Copter-4.4",
+        "ref": "master",
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
@@ -96,6 +96,31 @@
       "original": {
         "owner": "goromal",
         "repo": "Crow",
+        "type": "github"
+      }
+    },
+    "cuda-legacy": {
+      "inputs": {
+        "flake-parts": [
+          "jetpack-nixos",
+          "cuda-legacy"
+        ],
+        "nixpkgs": [
+          "jetpack-nixos",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768505959,
+        "narHash": "sha256-oFCx/ApQ+S1/apUKWsvT9vq+Eo1m2vINWEDkW7/nckA=",
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
+        "rev": "86ad7e2c2e314f0234539cbbc66b5cd7746bcd32",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
         "type": "github"
       }
     },
@@ -216,16 +241,15 @@
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1742189535,
-        "narHash": "sha256-rMySYxi15Cp1Li8H38DZfHyrm0N5MAbfIDRgsCRG1iY=",
+        "lastModified": 1771609177,
+        "narHash": "sha256-tJgSBbC9lHSJdWy4HSW2POk5XZr2IIM+l0ABEaI+IDA=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "d67ec20d64a8e9d04798306febe49b5aafa76c0e",
+        "rev": "27564549b423069373d8e2324bc87d8c36d2b4bf",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/tags/release/1.0",
         "repo": "geometry",
         "type": "github"
       }
@@ -259,6 +283,25 @@
       "original": {
         "owner": "goromal",
         "repo": "gnc",
+        "type": "github"
+      }
+    },
+    "jetpack-nixos": {
+      "inputs": {
+        "cuda-legacy": "cuda-legacy",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1770229245,
+        "narHash": "sha256-dMC/OzvG+y5OaF0zTR/Onx6EcVcLt/DX/cucOC4MqCk=",
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "rev": "0910e7d6e219e8dab0e30cee03f71d1b3553d1e1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
         "type": "github"
       }
     },
@@ -410,21 +453,37 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1748026580,
-        "narHash": "sha256-rWtXrcIzU5wm/C8F9LWvUfBGu5U5E7cFzPYT1pHIJaQ=",
-        "owner": "NixOS",
+        "lastModified": 1768773494,
+        "narHash": "sha256-XsM7GP3jHlephymxhDE+/TKKO1Q16phz/vQiLBGhpF4=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "11cb3517b3af6af300dd6c055aeda73c9bf52c48",
+        "rev": "77ef7a29d276c6d8303aece3444d61118ef71ac2",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "refs/tags/25.05",
+        "owner": "nixos",
+        "ref": "nixos-25.11",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1764521362,
+        "narHash": "sha256-M101xMtWdF1eSD0xhiR8nG8CXRlHmv6V+VoY65Smwf4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "871b9fd269ff6246794583ce4ee1031e1da71895",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "refs/tags/25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1718276985,
         "narHash": "sha256-u1fA0DYQYdeG+5kDm1bOoGcHtX0rtC7qs2YA2N1X++I=",
@@ -491,7 +550,7 @@
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "utils": "utils"
       },
       "locked": {
@@ -528,11 +587,11 @@
     "pyceres_factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1700917664,
-        "narHash": "sha256-72lOVW6SGFCHjG/BRPqA6Xh1eV+3tYwm+T3h060knqM=",
+        "lastModified": 1771609357,
+        "narHash": "sha256-KUJQJVmtCzzoY02mIVvYyvcQLVOf7WlGFNfTKhLfndw=",
         "owner": "goromal",
         "repo": "pyceres_factors",
-        "rev": "5fee04d810bb954b90238a01f3bb1aea3edfc632",
+        "rev": "2c3917b4ffce0e8deb26afa10650417e76006cfc",
         "type": "github"
       },
       "original": {
@@ -544,16 +603,15 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1769402418,
-        "narHash": "sha256-VSIKJNwPmegMIN8WtNcGpwRRFFQL54xefTz6ly+V5so=",
+        "lastModified": 1771610243,
+        "narHash": "sha256-0vlzNBkQUgQCxz8Ei5uZiKw9jMx1jrzHLwY7hh07/NI=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "ab56839b3525f9cc6d1404f990397fed51c0781e",
+        "rev": "bf58a5baeba2e43abf937f11e52a08789048ef59",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/tags/release/1.0",
         "repo": "pysignals",
         "type": "github"
       }
@@ -561,11 +619,11 @@
     "pysorting": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694136,
-        "narHash": "sha256-nP9sUskrz3v69gFrBVJzLp5yoeZyZR0z2Bn6cchLBGI=",
+        "lastModified": 1771610446,
+        "narHash": "sha256-VtmSU+uQFerZ7cO82iuhLEdzTRKa4NNATuvQpBa9bq0=",
         "owner": "goromal",
         "repo": "pysorting",
-        "rev": "09b008e7073e944c67f523d75e606a32c1ca7ae5",
+        "rev": "89fb8a730567cc176cb2f6f3a28e65ae2708cdc6",
         "type": "github"
       },
       "original": {
@@ -656,6 +714,7 @@
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
+        "jetpack-nixos": "jetpack-nixos",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -665,7 +724,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
         "photos-tools": "photos-tools",

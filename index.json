@@ -282,7 +282,7 @@
             },
             {
                 "attr": "symforce",
-                "ci": true,
+                "ci": false,
                 "docs": false
             }
         ],

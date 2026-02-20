@@ -1,4 +1,8 @@
-{ writeArgparseScriptBin, color-prints, machines }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  machines,
+}:
 let
   cmd-name = "run-sitl-machine";
   machine-desc-list = map (x: "   - ${x.name}: ${x.description}") machines;
@@ -17,7 +21,8 @@ let
     ${usage_str}
     EOF
   '';
-in writeArgparseScriptBin cmd-name usage_str [ ] ''
+in
+writeArgparseScriptBin cmd-name usage_str [ ] ''
   machine_name=$1
   if [[ -z "$machine_name" ]]; then
       ${printerr} "ERROR: no machine-name specified."

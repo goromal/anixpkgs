@@ -10,14 +10,14 @@ with import ../dependencies.nix;
 
   config =
     (mkProfileConfig {
-      machineType = "x86_linux";
-      graphical = true;
-      recreational = true;
+      machineType = "jetson";
+      graphical = false;
+      recreational = false;
       developer = true;
       isATS = false;
       serveNotesWiki = false;
-      enableMetrics = true;
-      enableFileServers = false;
+      enableMetrics = false; # TODO: perhaps enable in the future
+      enableFileServers = true;
       cloudDirs = [
         {
           name = "configs";
@@ -34,39 +34,25 @@ with import ../dependencies.nix;
           cloudname = "box:data";
           dirname = "data";
         }
-        {
-          name = "documents";
-          cloudname = "drive:Documents";
-          dirname = "Documents";
-        }
-        {
-          name = "games";
-          cloudname = "dropbox:games";
-          dirname = "games";
-        }
-        {
-          name = "games2";
-          cloudname = "drive:MoreGames";
-          dirname = "more-games";
-        }
       ];
       enableOrchestrator = true;
-      timedOrchJobs = [
-        {
-          name = "budgets-backup";
-          jobShellScript = pkgs.writeShellScript "budgets-backup" ''
-            rcrsync override data budgets || { logger -t budgets-backup "Budgets backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
-            logger -t budgets-backup "Budgets backup successful 🎆"
-          '';
-          timerCfg = {
-            OnBootSec = "5m";
-            OnUnitActiveSec = "60m";
-          };
-        }
+      timedOrchJobs = [ ];
+      extraOrchestratorPackages = [
+        anixpkgs.wiki-tools
+        anixpkgs.task-tools
+        anixpkgs.mp4
+        anixpkgs.mp4unite
+        anixpkgs.goromail
+        anixpkgs.sread
+        anixpkgs.gmail-parser
+        anixpkgs.scrape
+        anixpkgs.providence-tasker
+        anixpkgs.daily_tactical_server
+        anixpkgs.surveys_report
       ];
-      extraOrchestratorPackages = [ ];
     })
     // {
+      users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
         (pkgs.writeShellScriptBin "anix-init" ''
           make-title -c yellow "Setting up rcrsync"
@@ -90,9 +76,6 @@ with import ../dependencies.nix;
           rcrsync -v init configs
           rcrsync -v init secrets
           rcrsync -v init data
-          rcrsync -v init documents
-          rcrsync -v init games
-          rcrsync -v init games2
 
           make-title -c yellow "Setting up SSH and Nix"
 

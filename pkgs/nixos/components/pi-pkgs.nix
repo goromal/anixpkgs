@@ -1,5 +1,11 @@
-{ pkgs, config, lib, ... }:
-with import ../dependencies.nix; {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+with import ../dependencies.nix;
+{
   home.packages = [
     (pkgs.writeShellScriptBin "wifi-connect" ''
       nmcli d wifi connect LANtasia password 2292238177 ifname wlp1s0u1u1

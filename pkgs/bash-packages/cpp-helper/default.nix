@@ -1,5 +1,12 @@
-{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc
-, anixpkgs-version, python3 }:
+{
+  writeArgparseScriptBin,
+  writeShellScript,
+  color-prints,
+  redirects,
+  git-cc,
+  anixpkgs-version,
+  python3,
+}:
 let
   pkgname = "cpp-helper";
   usage_str = ''
@@ -143,61 +150,66 @@ let
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
   '';
-in (writeArgparseScriptBin pkgname usage_str [
-  {
-    var = "makeff";
-    isBool = true;
-    default = "0";
-    flags = "format-file";
-  }
-  {
-    var = "makehot";
-    isBool = false;
-    default = "";
-    flags = "header-lib";
-  }
-  {
-    var = "makeexl";
-    isBool = false;
-    default = "";
-    flags = "exec-lib";
-  }
-  {
-    var = "makenix";
-    isBool = true;
-    default = "0";
-    flags = "nix";
-  }
-  {
-    var = "makevscode";
-    isBool = true;
-    default = "0";
-    flags = "vscode";
-  }
-  {
-    var = "maketarget";
-    isBool = false;
-    default = "";
-    flags = "make";
-  }
-  {
-    var = "challengetarget";
-    isBool = false;
-    default = "";
-    flags = "challenge";
-  }
-] ''
-  set -e
-  tmpdir=$(mktemp -d)
-  ${makeffRule}
-  ${makehotRule}
-  ${makeexlRule}
-  ${makenixRule}
-  ${makevscodeRule}
-  ${makeRule}
-  ${challengeRule}
-  rm -rf "$tmpdir"
-'') // {
+in
+(writeArgparseScriptBin pkgname usage_str
+  [
+    {
+      var = "makeff";
+      isBool = true;
+      default = "0";
+      flags = "format-file";
+    }
+    {
+      var = "makehot";
+      isBool = false;
+      default = "";
+      flags = "header-lib";
+    }
+    {
+      var = "makeexl";
+      isBool = false;
+      default = "";
+      flags = "exec-lib";
+    }
+    {
+      var = "makenix";
+      isBool = true;
+      default = "0";
+      flags = "nix";
+    }
+    {
+      var = "makevscode";
+      isBool = true;
+      default = "0";
+      flags = "vscode";
+    }
+    {
+      var = "maketarget";
+      isBool = false;
+      default = "";
+      flags = "make";
+    }
+    {
+      var = "challengetarget";
+      isBool = false;
+      default = "";
+      flags = "challenge";
+    }
+  ]
+  ''
+    set -e
+    tmpdir=$(mktemp -d)
+    ${makeffRule}
+    ${makehotRule}
+    ${makeexlRule}
+    ${makenixRule}
+    ${makevscodeRule}
+    ${makeRule}
+    ${challengeRule}
+    rm -rf "$tmpdir"
+  ''
+)
+// {
   meta = {
     description = "Convenience tools for setting up C++ projects.";
     longDescription = "";

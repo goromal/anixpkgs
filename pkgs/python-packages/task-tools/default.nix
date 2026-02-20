@@ -1,9 +1,21 @@
-{ buildPythonPackage, pytestCheckHook, click, easy-google-auth, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  pytestCheckHook,
+  click,
+  easy-google-auth,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "task-tools";
   version = "0.0.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = pkg-src;
-  propagatedBuildInputs = [ click easy-google-auth ];
+  propagatedBuildInputs = [
+    click
+    easy-google-auth
+  ];
   doCheck = true;
   checkInputs = [ pytestCheckHook ];
   meta = {
@@ -12,6 +24,11 @@ buildPythonPackage rec {
       [Repository](https://github.com/goromal/task-tools)
     '';
     autoGenUsageCmd = "--help";
-    subCmds = [ "list" "delete" "put" "grader" ];
+    subCmds = [
+      "list"
+      "delete"
+      "put"
+      "grader"
+    ];
   };
 }

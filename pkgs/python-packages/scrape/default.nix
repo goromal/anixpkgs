@@ -1,10 +1,24 @@
-{ buildPythonPackage, fetchPypi, pythonOlder, colorama, requests, lxml, pkg-src
+{
+  buildPythonPackage,
+  setuptools,
+  fetchPypi,
+  pythonOlder,
+  colorama,
+  requests,
+  lxml,
+  pkg-src,
 }:
 buildPythonPackage rec {
   pname = "scrape";
   version = "0.0.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.6";
-  propagatedBuildInputs = [ colorama requests lxml ];
+  propagatedBuildInputs = [
+    colorama
+    requests
+    lxml
+  ];
   src = pkg-src;
   meta = {
     description = "Scrape content off the internet, quickly.";
