@@ -241,16 +241,15 @@
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1771609045,
+        "lastModified": 1771609177,
         "narHash": "sha256-tJgSBbC9lHSJdWy4HSW2POk5XZr2IIM+l0ABEaI+IDA=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "c4747f75099c7c3ae7463f88b0fe090b9d03138f",
+        "rev": "27564549b423069373d8e2324bc87d8c36d2b4bf",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.11",
         "repo": "geometry",
         "type": "github"
       }
@@ -588,16 +587,15 @@
     "pyceres_factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1770565679,
-        "narHash": "sha256-c8XygoGBTra1DjRTkQqWOZxeHK63NY7TJuXHKws5r60=",
+        "lastModified": 1771609357,
+        "narHash": "sha256-KUJQJVmtCzzoY02mIVvYyvcQLVOf7WlGFNfTKhLfndw=",
         "owner": "goromal",
         "repo": "pyceres_factors",
-        "rev": "d471c5591b509319edda21be3f3cb62cd8e04ec7",
+        "rev": "2c3917b4ffce0e8deb26afa10650417e76006cfc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.11",
         "repo": "pyceres_factors",
         "type": "github"
       }
@@ -605,16 +603,15 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1770566480,
-        "narHash": "sha256-MBMnAeMUM/i/YA91um0wEElXLEgpPnz4DdDwsCHLyZo=",
+        "lastModified": 1771610243,
+        "narHash": "sha256-0vlzNBkQUgQCxz8Ei5uZiKw9jMx1jrzHLwY7hh07/NI=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "b8ba86d953cb57fd2bd5daecaec5da0c9d173433",
+        "rev": "bf58a5baeba2e43abf937f11e52a08789048ef59",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.11",
         "repo": "pysignals",
         "type": "github"
       }
@@ -622,16 +619,15 @@
     "pysorting": {
       "flake": false,
       "locked": {
-        "lastModified": 1770565827,
-        "narHash": "sha256-2gzKKQe3g0pwoBFegDyANFbCAw+JvP8hQ4lXfM2BtUc=",
+        "lastModified": 1771610446,
+        "narHash": "sha256-VtmSU+uQFerZ7cO82iuhLEdzTRKa4NNATuvQpBa9bq0=",
         "owner": "goromal",
         "repo": "pysorting",
-        "rev": "6c56bc34b8dcc2eb7789947607add390a84a6f64",
+        "rev": "89fb8a730567cc176cb2f6f3a28e65ae2708cdc6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/25.11",
         "repo": "pysorting",
         "type": "github"
       }

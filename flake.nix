@@ -43,7 +43,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    geometry.url = "github:goromal/geometry?ref=dev/25.11";
+    geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
     gmail-parser.url = "github:goromal/gmail_parser";
@@ -93,13 +93,13 @@
     pyceres.url = "github:Edwinem/ceres_python_bindings?rev=2106d043bce37adcfef450dd23d3005480948c37";
     pyceres.flake = false;
 
-    pyceres_factors.url = "github:goromal/pyceres_factors?ref=dev/25.11";
+    pyceres_factors.url = "github:goromal/pyceres_factors";
     pyceres_factors.flake = false;
 
-    pysignals.url = "github:goromal/pysignals?ref=dev/25.11";
+    pysignals.url = "github:goromal/pysignals";
     pysignals.flake = false;
 
-    pysorting.url = "github:goromal/pysorting?ref=dev/25.11";
+    pysorting.url = "github:goromal/pysorting";
     pysorting.flake = false;
 
     python-dokuwiki.url = "github:fmenabe/python-dokuwiki?ref=refs/tags/1.3.3";
