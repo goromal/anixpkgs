@@ -417,8 +417,7 @@
                       nixos-generate-config --root /mnt/nixos
                       sudo -u andrew bash <<'EOF'
                       cd /data/andrew
-                      # ^^^^ TODO remove branch
-                      git clone --branch dev/orin https://github.com/goromal/anixpkgs.git
+                      git clone https://github.com/goromal/anixpkgs.git
                       cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
                       cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       sed -i 's/orin-nx/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix

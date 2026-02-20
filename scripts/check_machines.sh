@@ -22,7 +22,7 @@ export NIXPKGS_ALLOW_INSECURE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
-# ^^^^ TODO add jetpack here
+# TODO: add jetpack here
 configurations=(personal-inspiron personal-panasonic ats-alderlake ats-pi)
 for configuration in ${configurations[@]}; do
     echo "Checking derivation for configuration: $configuration..."
