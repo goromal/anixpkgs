@@ -362,6 +362,7 @@ rec {
   );
   la-quiz = addDoc (prev.callPackage ./bash-packages/la-quiz { python = final.python313; });
   play = addDoc (prev.callPackage ./bash-packages/play { });
+  playabc = addDoc (prev.callPackage ./bash-packages/playabc { });
   aapis-grpcurl = addDoc (prev.callPackage ./bash-packages/aapis-grpcurl { apis-fds = aapis-fds; });
   strings = addDoc (prev.callPackage ./bash-packages/bash-utils/strings.nix { });
   redirects = addDoc (prev.callPackage ./bash-packages/bash-utils/redirects.nix { });
