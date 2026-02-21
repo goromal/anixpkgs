@@ -124,17 +124,6 @@ nixpkgs https://nixos.org/channels/nixos-25.11
 anix-upgrade [source specification] --local --boot
 ```
 
-### Cloud Syncing
-
-The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
-
-- `dropbox:secrets` -> `rclone copy` -> `~/secrets`
-- `dropbox:configs`-> `rclone copy` -> `~/configs`
-- `dropbox:Games` -> `rclone copy` -> `~/games`
-- `box:data` -> `rclone copy` -> `~/data`
-- `box:.devrc` -> `rclone copy` -> `~/.devrc`
-- `drive:Documents` -> `rclone copy` -> `~/Documents`
-
 ## Build a JetPack Installer ISO
 
 Cross-compiled from x86_64. Requires `binfmt` support for aarch64 (enabled by default on NixOS with `boot.binfmt.emulatedSystems`).
@@ -159,3 +148,25 @@ nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/t
 sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
+## Miscellaneous
+
+### Cloud Syncing
+
+The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
+
+- `dropbox:secrets` -> `rclone copy` -> `~/secrets`
+- `dropbox:configs`-> `rclone copy` -> `~/configs`
+- `dropbox:Games` -> `rclone copy` -> `~/games`
+- `box:data` -> `rclone copy` -> `~/data`
+- `box:.devrc` -> `rclone copy` -> `~/.devrc`
+- `drive:Documents` -> `rclone copy` -> `~/Documents`
+
+### Music with Tidal
+
+If you haven't already, run:
+
+```bash
+install-superdirt
+```
+
+Open VSCode, run `sclang` in the terminal, and open up a `.tidal` file and get to work.
