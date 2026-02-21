@@ -51,7 +51,6 @@ in
           ms-python.python
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
-          drblury.protobuf-vsc
           ms-vscode.cpptools
         ]
         ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
@@ -72,6 +71,12 @@ in
             publisher = "anthropic";
             version = "2.0.34";
             sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
+          }
+          {
+            name = "protobuf-vsc";
+            publisher = "DrBlury";
+            version = "1.0.1";
+            sha256 = "sha256-DFLm0efm7krqcObblbgAlO9PsEGDtw9vrsIDeCtjd14=s";
           }
         ];
     };
