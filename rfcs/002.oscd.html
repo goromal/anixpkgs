@@ -1,0 +1,320 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Continuous OS Deployment - anixpkgs</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-017785de.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-456ca1e4.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">anixpkgs</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="rfc-continuous-os-deployment"><a class="header" href="#rfc-continuous-os-deployment">RFC: Continuous OS Deployment</a></h1>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Operating System Continuous Deployment (OSCD) refers to the process of seamlessly upgrading my NixOS machines to the latest and greatest release with as little overhead and manual fiddling as possible. This RFC proposes an OSCD overhaul that achieves a greater level of automation and reproducibility in the OS upgrade process via a few added GitHub CD hooks, the new CLI tool <a href="../bash/anix-upgrade.html">anix-upgrade</a>, and some development process changes.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>NixOS upgrades on my machines are done using the <a href="https://nixos.wiki/wiki/Nixos-rebuild">nixos-rebuild</a> command, which builds the system configuration according to the (symlinked) file <code>/etc/nixos/configuration.nix</code>, which points to a mutable root configuration file in <code>~/sources/anixpkgs/</code>.</p>
+<p>This model lends itself best to rapid prototyping and test, as changes to the configuration can be immediately tested without having to commit any code. However, release deployment strategies are left to be more ad hoc and manual (and thus error-prone) under this model, as well. For example, to tag and deploy a new release off of master, the following manual steps must be taken:</p>
+<ol>
+<li>The desired release commit is tagged, either locally or via the GitHub releases page.</li>
+<li>The <code>dependencies.nix</code> file for all NixOS configurations is modified to refer to the new tag, manifesting as a new commit on the head of master.</li>
+<li><code>~/sources/anixpkgs/</code> is checked out to the commit from step 2 (<em>not</em> step 1, ironically). Any local dev changes need to be stashed.</li>
+<li>A <code>nixos-rebuild</code> command is run.</li>
+</ol>
+<p>This RFC calls for a mature, stable OSCD pipeline that removes the need for the manual steps listed above while maintaining flexibility for rapid (and decoupled) on-machine development and testing.</p>
+<h2 id="driving-requirements"><a class="header" href="#driving-requirements">Driving requirements</a></h2>
+<h3 id="system-level-requirements"><a class="header" href="#system-level-requirements">System-level requirements</a></h3>
+<ul>
+<li><strong>[R1]</strong> OSCD shall be totally decoupled from development work; there shall be no possibility of one accidentally polluting the other.</li>
+<li><strong>[R2]</strong> OSCD shall be atomic such that an upgrade cannot be corrupted via a mismanagement or erroneous execution of steps.</li>
+<li><strong>[R3]</strong> OS release tagging shall be wholly executable within an <code>anixpkgs</code> pull request, and shall be entirely automated except for a manual specification of the level of release (e.g., major, minor, patch) that the pull request corresponds to.</li>
+<li><strong>[R4]</strong> An OS upgrade on-machine shall take no more than one step to complete.</li>
+<li><strong>[R5]</strong> The same upgrade mechanism from <strong>[SR4]</strong> shall enable rapid prototyping of active development branches.</li>
+</ul>
+<h3 id="software-level-requirements"><a class="header" href="#software-level-requirements">Software-level requirements</a></h3>
+<ul>
+<li><strong>[R1.1]</strong> Development within <code>anixpkgs</code> shall happen in a separate location from the symlinked <code>~/sources/anixpkgs</code> directory, which shall be reserved for OS upgrades.</li>
+<li><strong>[R1.2]</strong> <code>~/sources/anixpkgs</code> shall be read-only.</li>
+<li><strong>[R2.1]</strong> The release tagging process shall execute all required steps automatically, prompted by a single initiatory step, within the remote CD pipeline.</li>
+<li><strong>[R2.2]</strong> All automated steps for <strong>[R2.1]</strong> shall kick off only after a pull request merge into master, which is push-protected.</li>
+<li><strong>[R2.3]</strong> The OS upgrade process shall consist of an atomic source preparation step followed by an atomic rebuild step, both chained together automatically.</li>
+<li><strong>[R3.1]</strong> The tagging process from <strong>[R2.1]</strong> shall be initiated via adding labels to a pull request. No further action should be required.</li>
+<li><strong>[R4.1]</strong> OS upgrades shall be offered by a CLI tool that, with no arguments specified, will upgrade the system to the most recent <code>anixpkgs</code> release off of master.</li>
+<li><strong>[R4.2]</strong> The OS upgrade CLI tool shall perform rebuild <code>switch</code> by default, but allow for rebuild <code>boot</code> to be manually specified instead.</li>
+<li><strong>[R5.1]</strong> The OS upgrade CLI tool shall allow (via provided arguments) for an upgrade to any particular tag, branch, or commit within the <em>remote</em> <code>anixpkgs</code> repository.</li>
+<li><strong>[R5.2]</strong> The OS upgrade CLI tool shall allow for builds with packages local to the specified build target, and not necessarily tied to that target’s prescribed release version.</li>
+</ul>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<p>The OSCD requirements are addressed with three components: an updated <code>deployment</code> pipeline within <code>anixpkgs</code> GitHub actions, an OS upgrade CLI tool, and a new policy for <code>anixpkgs</code> development and testing.</p>
+<h3 id="deployment-pipeline"><a class="header" href="#deployment-pipeline">Deployment pipeline</a></h3>
+<p>Requirements <strong>[R2.1-2,3.1]</strong> are proposed to be fulfilled by adding three GitHub actions jobs with write permissions on master to the deployment workflow. Each of these three jobs will be responsible for either tagging a new major release, minor release, or patch release, and will be triggered by a corresponding pull request label on a <em>merged</em> pull request only.</p>
+<p>Each of these jobs will consist of the following steps:</p>
+<ol>
+<li>Only execute if a merged pull request had the appropriate release label.</li>
+<li>Checkout <code>anixpkgs</code> master.</li>
+<li>Run a version increment script that increments the release version according to the release label.</li>
+<li>Commit the semantic version changes and tag that commit with the new semantic version string.</li>
+<li>Push the commit and corresponding tag to master.</li>
+</ol>
+<p>The version increment script will simply take as an input the release increment type (major, minor, or patch) and increment accordingly:</p>
+<ul>
+<li>(Major) <code>x.y.z</code> -&gt; <code>x+1.0.0</code></li>
+<li>(Minor) <code>x.y.z</code> -&gt; <code>x.y+1.0</code></li>
+<li>(Patch) <code>x.y.z</code> -&gt; <code>x.y.z+1</code></li>
+</ul>
+<p>In the event of a pull request getting merged with multiple labels, the execution order of the release tag jobs will be <code>major</code> -&gt; <code>minor</code> -&gt; <code>patch</code>, such that each successive tag will be visible in the resulting semantic version. If the order were reversed, for example, a patch release increment would be obscured by a minor release increment, which would zero out the patch field.</p>
+<h3 id="os-upgrade-cli-tool-anix-upgrade"><a class="header" href="#os-upgrade-cli-tool-anix-upgrade">OS upgrade CLI tool: anix-upgrade</a></h3>
+<p>One a new release has been properly and automatically tagged on <code>anixpkgs</code> remote, a CLI tool called <a href="../bash/anix-upgrade.html">anix-upgrade</a> is proposed to upgrade the system to the latest tag in an automated and incorruptible (i.e., no need nor opportunity to manually modify code or any configurations during the process) fashion and fulfill <strong>[R1.2,2.3,4.1-2,5.1-2]</strong>.</p>
+<p>As implied by <strong>[R2.3]</strong>, <code>anix-upgrade</code> will do two things:</p>
+<ol>
+<li>Prepare a read-only (and Git-less) version of <code>anixpkgs</code> in the <code>~/sources</code> directory according to the exact version specified via arguments through the CLI.</li>
+<li>Rebuild the system configuration according to the updated source/configuration.</li>
+</ol>
+<p>(1) may be naturally accomplished via a Nix derivation, which by definition must consist of a read-only (and reproducible) output with no tolerance for side effects from things like <code>.git</code> directories. The CLI tool will allow for (1) to be constructed from:</p>
+<ul>
+<li>No argument at all, which will assume that the target source corresponds to the current head of <code>anixpkgs</code> master. This will be the way to perform standard, non-dev-prototyping upgrades.</li>
+<li>An alternative release tag string <em>or</em> a development branch name (assumed to be at the head of that branch) <em>or</em> a commit hash.</li>
+<li>An optional specification that the OS packages should be built from the local packages in that specific version of the <code>anixpkgs</code> source tree, and not necessarily from the prescribed release version of the packages.</li>
+</ul>
+<p>Because Nix derivations cannot clone Git repositories, the Nix built-in tools <code>fetchGit</code> and <code>fetchTarball</code> must be used to fetch the exact right version of the source. In my experience, <code>fetchGit</code> does not consistently fetch the expected “head-of” commit when only a branch name is specified, so in this implementation <code>fetchTarball</code> is to be used for any version of (1) that does not specify the full commit hash. This is possible because of GitHub’s feature where it allows for URL-based fetching of zipped source archives from tag names and branch names (reliably delivering the head-of commit in the latter case).</p>
+<p>(2) is accomplished by aliasing to the <code>nixos-rebuild</code> command (exposing an optional flag to require a reboot for changes to take effect as per <strong>[R4.2]</strong>) and only executing once (1) has successfully completed.</p>
+<h3 id="development-policy-changes"><a class="header" href="#development-policy-changes">Development policy changes</a></h3>
+<p>All-in-all, the above changes serve to reduce the cognitive load associated with releasing and deploying a new version of <code>anixpkgs</code> once development is complete. In the same vein, the above changes are best served by fulfilling <strong>[R1.1]</strong> as well, which moves <code>anixpkgs</code> development out of the <code>~/sources</code> directory and into the <code>~/dev</code> directory, consistent with development on individual repositories. While mostly a clerical change, there are a couple of implications:</p>
+<ul>
+<li>The machines docs should be updated to modify instructions for setting up a new machine from scratch. The setup process may now be slightly more complicated on a one-time basis.</li>
+<li>The <code>~/.devrc</code> file on every development machine (see <a href="../bash/devshell.html">devshell</a>) should be modified to set the <code>pkgs_dir</code> variable to the <code>~/dev/</code> location and not the <code>~/sources/</code> one. This is to preserve the ability to mutate attribute-based sources with the same level of flexibility as before.</li>
+</ul>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<p>The principal drawback of this design is the new requirement to commit OS prototype changes to GitHub when prototyping new OS versions via the specification of a remote tag, branch, or commit with the OS upgrade tool.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<p>To address the slight OS prototyping drawback, an additional option may be added to <code>anix-upgrade</code> to point to a local <code>anixpkgs</code> source tree, which would symlink to the mutable source tree rather than an immutable nix derivation that pulls from GitHub.</p>
+<h2 id="unresolved-questions"><a class="header" href="#unresolved-questions">Unresolved questions</a></h2>
+<ul>
+<li>Must OS upgrades always be manually triggered via <code>anix-upgrade</code>, or might it be fruitful to execute automatic upgrades in the future?</li>
+<li>How may OSCD fruitfully apply to machine closures that import <code>anixpkgs</code> closures but specify their own configurations?</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../rfcs/rfcs.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../cpp/cpp.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../rfcs/rfcs.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../cpp/cpp.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>

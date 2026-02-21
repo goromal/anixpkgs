@@ -1,0 +1,2845 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>anixpkgs</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-017785de.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-456ca1e4.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">anixpkgs</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="andrews-software"><a class="header" href="#andrews-software">Andrew’s Software</a></h1>
+<p><img src="https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg" alt="example workflow"> <a href="https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml"><img src="https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push" alt="Deploy"></a> <a href="https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment"><img src="https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg" alt="pages-build-deployment"></a></p>
+<p>My open source software is packaged and deployed from a central repository: <strong>anixpkgs</strong>. See the navigation menu for individual package documentation.</p>
+<p><a href="https://andrewtorgesen.com">Return to main site</a></p>
+<p><img src="https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png" title="anixpkgs" alt=""></p>
+<p><strong>LATEST RELEASE: <a href="https://github.com/goromal/anixpkgs/tree/v8.2.0">v8.2.0</a></strong></p>
+<p><strong><a href="https://github.com/goromal/anixpkgs">Repository</a></strong></p>
+<p>This repository of personally maintained Nix derivations, overlays, and machine closures is essentially the centralized mechanism by which I maintain all of the software I write and use for both personal projects and recreation. In other words, I employ <a href="https://nixos.org">Nix</a> as both a package manager for my software as well as an operating system for all of my computers, Raspberry Pi’s, etc.</p>
+<p>These docs provide an overview of how I manage the OS’s of my <a href="#machine-management">machines</a> as well as the software that I personally maintain, all within the <a href="https://github.com/goromal/anixpkgs">anixpkgs</a> repo.</p>
+<h2 id="why-nix"><a class="header" href="#why-nix">Why Nix?</a></h2>
+<p>Some of the main reasons why I prefer Nix as a package manager:</p>
+<ul>
+<li>I highly value code that is not only compelling in its application but that is also <strong>maintainable</strong>. Code that is subject to compiler/interpreter and external dependency changes over time must be designed with the future in mind. Nix provides me an almost trivial mechanism to incrementally update (and roll back) external dependencies, compilers, or anything else pertaining to a software ecosystem that you can think of.</li>
+<li>When I write a cool piece of software on one machine, I want to be able to “deploy” that software across all my machines with minimal effort and without having to worry about broken or missing dependencies. With its hermetic build system, I have the peace of mind that the code that I package in Nix will be <strong>transferable</strong> to essentially any other machine that uses Nix.</li>
+</ul>
+<p>Some of the main reasons why I prefer NixOS as an operating system for all of my computers:</p>
+<ul>
+<li>The same things I value in packaging software, I also value in “packaging an operating system.” NixOS allows me to have <strong>total control</strong> over every single package in my OS, allowing me to customize every aspect and make changes with the peace of mind that I can always roll back breaking changes.</li>
+<li>There is something very satisfying and empowering to me about being able to <strong>declaratively define the OS closures for all of my machines in just several text files.</strong> The overlay-focused design of NixOS modules makes it so that I can design the OS’s of my machines hierarchically, defining packages that are shared between <em>all</em> of my computers as well as packages that are specific to certain computers only. Moreover, when I buy a replacement computer it takes a minimal amount of steps to turn that new computer into an <em>all-intents-and-purposes clone</em> of my old one, which is a capability I value very highly for a lot of reasons.</li>
+</ul>
+<p>Given the above, why do I prefer Nix over Docker?</p>
+<ul>
+<li>To be clear, I do think that Nix and Docker can be used together effectively. However:</li>
+<li>In general, one will require a mishmash of custom or third-party build and deployment tooling to construct and glue a bunch of Docker containers together if one is trying to architect a complete <em>system</em> using Docker (as could be the case with code running on a robot). Nix provides more of a unified framework to achieve the same benefits, and that ecosystem is much more aesthetically pleasing to me than e.g., “<a href="https://media.ccc.de/v/nixcon-2023-35290-nix-and-kubernetes-deployments-done-right#t=2">YAML engineering</a>.”</li>
+<li>Docker containers sit atop an already existing, fully fleshed out operating system. Nix allows me to (once agin, within a unified framework) control literally everything about even the operating system in an attempt to avoid unintended side effects at all levels of integration.</li>
+</ul>
+<h2 id="installation-and-usage-patterns"><a class="header" href="#installation-and-usage-patterns">Installation and Usage Patterns</a></h2>
+<p>The packages defined in this repo are accessible to anyone who uses <a href="https://nixos.org">Nix</a>, which can be <a href="https://nixos.org/download.html">installed</a> in two forms:</p>
+<ul>
+<li><strong>“Standalone” Nix:</strong> This will just install the package manager and is the easiest option if you just want access to the packages in this repo. This option could be augmented with a tool called <a href="https://nix-community.github.io/home-manager/">home-manager</a> to at least be able to use <em>some</em> of the closure components alongside your normal OS as well.</li>
+<li><strong>NixOS:</strong> This option is much more invasive as it wholesale replaces your entire operating system, and should only be done if you really know what you’re doing (and love Nix). More instructions in the <a href="#machine-management">machines</a> documentation.</li>
+</ul>
+<p>For either method, ensure that your Nix version is <code>&gt;= 2.4</code>.</p>
+<p>The software packaged in <code>anixpkgs</code> is buildable both through <a href="https://nixos.wiki/wiki/Flakes">Nix flakes</a> as well as through traditional Nix shells. It’s recommended to use flakes, as that method is more “pure” and allows for more portable integration with the public cache.</p>
+<h3 id="accessing-the-packages-using-flakes"><a class="header" href="#accessing-the-packages-using-flakes">Accessing the Packages Using Flakes</a></h3>
+<p>Here is a <code>flake.nix</code> file that will get you a shell with select <code>anixpkgs</code> software (version <code>v8.2.0</code>) while also giving you access to the public cache to avoid building from source on your machine:</p>
+<pre><code class="language-nix">{
+  description = "Nix shell for anixpkgs.";
+  nixConfig.substituters = [
+    "https://cache.nixos.org/"
+    "https://github-public.cachix.org"
+  ];
+  nixConfig.trusted-public-keys = [
+    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+  ];
+  inputs = {
+    nixpkgs.url = "github:goromal/anixpkgs?ref=refs/tags/v8.2.0";
+  };
+  outputs = { self, nixpkgs }:
+    let pkgs = nixpkgs.legacyPackages.x86_64-linux;
+    in with pkgs; {
+      devShell.x86_64-linux = mkShell {
+        buildInputs = [
+          pb
+          fixfname
+          pkgshell
+        ];
+      };
+    };
+}
+</code></pre>
+<p>Access the packages with <code>nix develop</code>.</p>
+<h3 id="accessing-the-packages-using-shellnix"><a class="header" href="#accessing-the-packages-using-shellnix">Accessing the Packages Using shell.nix</a></h3>
+<p>Here are some <code>shell.nix</code> files to access Python packages (using version <code>v8.2.0</code> of the packages):</p>
+<pre><code class="language-nix">let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v8.2.0.tar.gz") {};
+  python-with-my-packages = pkgs.python311.withPackages (p: with p; [
+    numpy
+    matplotlib
+    geometry
+    pyceres
+  ]);
+in
+python-with-my-packages.env
+</code></pre>
+<p>or:</p>
+<pre><code class="language-nix">let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v8.2.0.tar.gz") {};
+in pkgs.mkShell {
+  buildInputs = [
+    pkgs.python311
+    pkgs.python311.pkgs.numpy
+    pkgs.python311.pkgs.geometry
+    pkgs.python311.pkgs.find_rotational_conventions
+  ];
+  shellHook = ''
+    # Tells pip to put packages into $PIP_PREFIX instead of the usual locations.
+    # See https://pip.pypa.io/en/stable/user_guide/#environment-variables.
+    export PIP_PREFIX=$(pwd)/_build/pip_packages
+    export PYTHONPATH="$PIP_PREFIX/${pkgs.python311.sitePackages}:$PYTHONPATH"
+    export PATH="$PIP_PREFIX/bin:$PATH"
+    unset SOURCE_DATE_EPOCH
+  '';
+}
+</code></pre>
+<p>And for general software packages:</p>
+<pre><code class="language-nix">let
+  pkgs = import (builtins.fetchTarball
+    "https://github.com/goromal/anixpkgs/archive/refs/tags/v8.2.0.tar.gz") {};
+in with pkgs; mkShell {
+  buildInputs = [
+    pb
+    fixfname
+    pkgshell
+  ];
+}
+</code></pre>
+<p>Access the packages with <code>nix-shell</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="machine-management"><a class="header" href="#machine-management">Machine Management</a></h1>
+<p><em><strong>These notes are still a work-in-progress and are currently largely for my personal use only.</strong></em></p>
+<h2 id="home-manager-example"><a class="header" href="#home-manager-example">Home-Manager Example</a></h2>
+<ol>
+<li>Install Nix standalone:</li>
+</ol>
+<pre><code class="language-bash">curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+</code></pre>
+<ol start="3">
+<li>Set proper Nix settings in <code>/etc/nix/nix.conf</code>:</li>
+</ol>
+<pre><code>substituters = https://cache.nixos.org/ https://github-public.cachix.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+narinfo-cache-positive-ttl = 0
+narinfo-cache-negative-ttl = 0
+experimental-features = nix-command flakes auto-allocate-uids
+</code></pre>
+<ol start="4">
+<li>Add these Nix channels via <code>nix-channel --add URL NAME</code>:</li>
+</ol>
+<pre><code class="language-bash">$ nix-channel --list
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixpkgs https://nixos.org/channels/nixos-25.11
+</code></pre>
+<ol start="5">
+<li>Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone</li>
+</ol>
+<p>Example <code>home.nix</code> file for personal use:</p>
+<pre><code class="language-nix">{ config, pkgs, lib, ... }:
+let
+  user = "andrew";
+  homedir = "/home/${user}";
+  anixsrc = ./path/to/sources/anixpkgs/.;
+in with import ../dependencies.nix; {
+  home.username = user;
+  home.homeDirectory = homedir;
+  programs.home-manager.enable = true;
+
+  imports = [
+    "${anixsrc}/pkgs/nixos/components/opts.nix"
+    "${anixsrc}/pkgs/nixos/components/base-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/base-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-rec-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-rec-pkgs.nix"
+  ];
+
+  mods.opts.standalone = true;
+  mods.opts.homeDir = homedir;
+  mods.opts.homeState = "23.05";
+  mods.opts.browserExec = "google-chrome-stable";
+}
+
+</code></pre>
+<p><code>*-rec-*</code> packages can be removed for non-recreational use.</p>
+<p>Symlink to <code>~/.config/home-manager/home.nix</code>.</p>
+<p>Corresponding <code>~/.bashrc</code>:</p>
+<pre><code class="language-bash">export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+export NIXPKGS_ALLOW_UNFREE=1
+# alias code='codium'
+# eval "$(direnv hook bash)"
+</code></pre>
+<h2 id="personal-machine-installation-instructions"><a class="header" href="#personal-machine-installation-instructions">Personal Machine Installation Instructions</a></h2>
+<p><em>Sources</em></p>
+<ul>
+<li>https://nixos.wiki/wiki/NixOS_Installation_Guide</li>
+<li>https://alexherbo2.github.io/wiki/nixos/install-guide/</li>
+</ul>
+<ol>
+<li>Build the installation ISO with <code>NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage</code></li>
+<li>Plug in a USB stick large enough to accommodate the image.</li>
+<li>Find the right device with <code>lsblk</code> or <code>fdisk -l</code>. Replace <code>/dev/sdX</code> with the proper device (do not use <code>/dev/sdX1</code> or partitions of the disk; use the whole disk <code>/dev/sdX</code>).</li>
+<li>Burn ISO to USB stick with <code>dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync</code></li>
+<li>On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)</li>
+<li>Login as the user <code>andrew</code></li>
+<li>Connect to the internet</li>
+<li>Within the installer, run <code>sudo anix-install</code></li>
+<li>If everything went well, reboot</li>
+<li>On the next reboot, login as user <code>andrew</code> again</li>
+<li>Connect to the internet</li>
+<li>Run <code>anix-init</code></li>
+<li>Enjoy!</li>
+</ol>
+<h2 id="jetpack-machine-installation-instructions"><a class="header" href="#jetpack-machine-installation-instructions">JetPack Machine Installation Instructions</a></h2>
+<ol>
+<li>Ensure that the device has UEFI firmware installed. See https://github.com/anduril/jetpack-nixos.</li>
+<li>Build the installation ISO with <code>nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage</code></li>
+<li>Plug in a USB stick large enough to accommodate the image.</li>
+<li>Find the right device with <code>lsblk</code> or <code>fdisk -l</code>. Replace <code>/dev/sdX</code> with the proper device (do not use <code>/dev/sdX1</code> or partitions of the disk; use the whole disk <code>/dev/sdX</code>).</li>
+<li>Burn ISO to USB stick with <code>dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync</code></li>
+<li>Insert the USB drive into the Jetson device. On the AGX devkits, I’ve had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.</li>
+<li>Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the “Boot Manager”, select the correct USB device and boot directly into it.</li>
+<li>Connect to the internet</li>
+<li>Within the installer, run <code>sudo anix-install</code></li>
+<li>If everything went well, reboot</li>
+<li>On the next reboot, login as user <code>andrew</code> again</li>
+<li>Connect to the internet</li>
+<li>Run <code>anix-init</code></li>
+<li>Enjoy!</li>
+</ol>
+<h2 id="upgrading-nixos-versions-with-anixpkgs"><a class="header" href="#upgrading-nixos-versions-with-anixpkgs">Upgrading NixOS versions with <code>anixpkgs</code></a></h2>
+<p>Aside from the source code changes in <code>anixpkgs</code>, ensure that your channels have been updated <strong>for the root user</strong>:</p>
+<pre><code class="language-bash"># e.g., upgrading to 25.11:
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixos https://nixos.org/channels/nixos-25.11
+nixpkgs https://nixos.org/channels/nixos-25.11
+</code></pre>
+<p><code>sudo nix-channel --update</code>. Then upgrade with</p>
+<pre><code class="language-bash">anix-upgrade [source specification] --local --boot
+</code></pre>
+<h2 id="build-a-jetpack-installer-iso"><a class="header" href="#build-a-jetpack-installer-iso">Build a JetPack Installer ISO</a></h2>
+<p>Cross-compiled from x86_64. Requires <code>binfmt</code> support for aarch64 (enabled by default on NixOS with <code>boot.binfmt.emulatedSystems</code>).</p>
+<pre><code class="language-bash">nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
+</code></pre>
+<pre><code class="language-bash">dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
+</code></pre>
+<h2 id="build-a-nixos-iso-image"><a class="header" href="#build-a-nixos-iso-image">Build a NixOS ISO Image</a></h2>
+<p><em><strong>TODO (untested)</strong></em>; work out hardware configuration portion.</p>
+<pre><code class="language-bash">nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+</code></pre>
+<pre><code class="language-bash">sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
+</code></pre>
+<h2 id="miscellaneous"><a class="header" href="#miscellaneous">Miscellaneous</a></h2>
+<h3 id="cloud-syncing"><a class="header" href="#cloud-syncing">Cloud Syncing</a></h3>
+<p>The following mount points are recommended (using <a href="https://rclone.org/">rclone</a> to set up):</p>
+<ul>
+<li><code>dropbox:secrets</code> -&gt; <code>rclone copy</code> -&gt; <code>~/secrets</code></li>
+<li><code>dropbox:configs</code>-&gt; <code>rclone copy</code> -&gt; <code>~/configs</code></li>
+<li><code>dropbox:Games</code> -&gt; <code>rclone copy</code> -&gt; <code>~/games</code></li>
+<li><code>box:data</code> -&gt; <code>rclone copy</code> -&gt; <code>~/data</code></li>
+<li><code>box:.devrc</code> -&gt; <code>rclone copy</code> -&gt; <code>~/.devrc</code></li>
+<li><code>drive:Documents</code> -&gt; <code>rclone copy</code> -&gt; <code>~/Documents</code></li>
+</ul>
+<h3 id="music-with-tidal"><a class="header" href="#music-with-tidal">Music with Tidal</a></h3>
+<p>If you haven’t already, run:</p>
+<pre><code class="language-bash">install-superdirt
+</code></pre>
+<p>Open VSCode, run <code>sclang</code> in the terminal, and open up a <code>.tidal</code> file and get to work.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rfcs"><a class="header" href="#rfcs">RFCs</a></h1>
+<p>Request For Comments (RFC) documents are convenient for organizing and iterating on designs for pieces of software. They can serve as north stars for the implementation of more complex software. Below are some examples of RFCs that I’ve used to guide some personal projects.</p>
+<ul>
+<li><a href="#rfc-continuous-os-deployment">Continuous OS Deployment</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rfc-continuous-os-deployment"><a class="header" href="#rfc-continuous-os-deployment">RFC: Continuous OS Deployment</a></h1>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>Operating System Continuous Deployment (OSCD) refers to the process of seamlessly upgrading my NixOS machines to the latest and greatest release with as little overhead and manual fiddling as possible. This RFC proposes an OSCD overhaul that achieves a greater level of automation and reproducibility in the OS upgrade process via a few added GitHub CD hooks, the new CLI tool <a href="#anix-upgrade">anix-upgrade</a>, and some development process changes.</p>
+<h2 id="motivation"><a class="header" href="#motivation">Motivation</a></h2>
+<p>NixOS upgrades on my machines are done using the <a href="https://nixos.wiki/wiki/Nixos-rebuild">nixos-rebuild</a> command, which builds the system configuration according to the (symlinked) file <code>/etc/nixos/configuration.nix</code>, which points to a mutable root configuration file in <code>~/sources/anixpkgs/</code>.</p>
+<p>This model lends itself best to rapid prototyping and test, as changes to the configuration can be immediately tested without having to commit any code. However, release deployment strategies are left to be more ad hoc and manual (and thus error-prone) under this model, as well. For example, to tag and deploy a new release off of master, the following manual steps must be taken:</p>
+<ol>
+<li>The desired release commit is tagged, either locally or via the GitHub releases page.</li>
+<li>The <code>dependencies.nix</code> file for all NixOS configurations is modified to refer to the new tag, manifesting as a new commit on the head of master.</li>
+<li><code>~/sources/anixpkgs/</code> is checked out to the commit from step 2 (<em>not</em> step 1, ironically). Any local dev changes need to be stashed.</li>
+<li>A <code>nixos-rebuild</code> command is run.</li>
+</ol>
+<p>This RFC calls for a mature, stable OSCD pipeline that removes the need for the manual steps listed above while maintaining flexibility for rapid (and decoupled) on-machine development and testing.</p>
+<h2 id="driving-requirements"><a class="header" href="#driving-requirements">Driving requirements</a></h2>
+<h3 id="system-level-requirements"><a class="header" href="#system-level-requirements">System-level requirements</a></h3>
+<ul>
+<li><strong>[R1]</strong> OSCD shall be totally decoupled from development work; there shall be no possibility of one accidentally polluting the other.</li>
+<li><strong>[R2]</strong> OSCD shall be atomic such that an upgrade cannot be corrupted via a mismanagement or erroneous execution of steps.</li>
+<li><strong>[R3]</strong> OS release tagging shall be wholly executable within an <code>anixpkgs</code> pull request, and shall be entirely automated except for a manual specification of the level of release (e.g., major, minor, patch) that the pull request corresponds to.</li>
+<li><strong>[R4]</strong> An OS upgrade on-machine shall take no more than one step to complete.</li>
+<li><strong>[R5]</strong> The same upgrade mechanism from <strong>[SR4]</strong> shall enable rapid prototyping of active development branches.</li>
+</ul>
+<h3 id="software-level-requirements"><a class="header" href="#software-level-requirements">Software-level requirements</a></h3>
+<ul>
+<li><strong>[R1.1]</strong> Development within <code>anixpkgs</code> shall happen in a separate location from the symlinked <code>~/sources/anixpkgs</code> directory, which shall be reserved for OS upgrades.</li>
+<li><strong>[R1.2]</strong> <code>~/sources/anixpkgs</code> shall be read-only.</li>
+<li><strong>[R2.1]</strong> The release tagging process shall execute all required steps automatically, prompted by a single initiatory step, within the remote CD pipeline.</li>
+<li><strong>[R2.2]</strong> All automated steps for <strong>[R2.1]</strong> shall kick off only after a pull request merge into master, which is push-protected.</li>
+<li><strong>[R2.3]</strong> The OS upgrade process shall consist of an atomic source preparation step followed by an atomic rebuild step, both chained together automatically.</li>
+<li><strong>[R3.1]</strong> The tagging process from <strong>[R2.1]</strong> shall be initiated via adding labels to a pull request. No further action should be required.</li>
+<li><strong>[R4.1]</strong> OS upgrades shall be offered by a CLI tool that, with no arguments specified, will upgrade the system to the most recent <code>anixpkgs</code> release off of master.</li>
+<li><strong>[R4.2]</strong> The OS upgrade CLI tool shall perform rebuild <code>switch</code> by default, but allow for rebuild <code>boot</code> to be manually specified instead.</li>
+<li><strong>[R5.1]</strong> The OS upgrade CLI tool shall allow (via provided arguments) for an upgrade to any particular tag, branch, or commit within the <em>remote</em> <code>anixpkgs</code> repository.</li>
+<li><strong>[R5.2]</strong> The OS upgrade CLI tool shall allow for builds with packages local to the specified build target, and not necessarily tied to that target’s prescribed release version.</li>
+</ul>
+<h2 id="detailed-design"><a class="header" href="#detailed-design">Detailed design</a></h2>
+<p>The OSCD requirements are addressed with three components: an updated <code>deployment</code> pipeline within <code>anixpkgs</code> GitHub actions, an OS upgrade CLI tool, and a new policy for <code>anixpkgs</code> development and testing.</p>
+<h3 id="deployment-pipeline"><a class="header" href="#deployment-pipeline">Deployment pipeline</a></h3>
+<p>Requirements <strong>[R2.1-2,3.1]</strong> are proposed to be fulfilled by adding three GitHub actions jobs with write permissions on master to the deployment workflow. Each of these three jobs will be responsible for either tagging a new major release, minor release, or patch release, and will be triggered by a corresponding pull request label on a <em>merged</em> pull request only.</p>
+<p>Each of these jobs will consist of the following steps:</p>
+<ol>
+<li>Only execute if a merged pull request had the appropriate release label.</li>
+<li>Checkout <code>anixpkgs</code> master.</li>
+<li>Run a version increment script that increments the release version according to the release label.</li>
+<li>Commit the semantic version changes and tag that commit with the new semantic version string.</li>
+<li>Push the commit and corresponding tag to master.</li>
+</ol>
+<p>The version increment script will simply take as an input the release increment type (major, minor, or patch) and increment accordingly:</p>
+<ul>
+<li>(Major) <code>x.y.z</code> -&gt; <code>x+1.0.0</code></li>
+<li>(Minor) <code>x.y.z</code> -&gt; <code>x.y+1.0</code></li>
+<li>(Patch) <code>x.y.z</code> -&gt; <code>x.y.z+1</code></li>
+</ul>
+<p>In the event of a pull request getting merged with multiple labels, the execution order of the release tag jobs will be <code>major</code> -&gt; <code>minor</code> -&gt; <code>patch</code>, such that each successive tag will be visible in the resulting semantic version. If the order were reversed, for example, a patch release increment would be obscured by a minor release increment, which would zero out the patch field.</p>
+<h3 id="os-upgrade-cli-tool-anix-upgrade"><a class="header" href="#os-upgrade-cli-tool-anix-upgrade">OS upgrade CLI tool: anix-upgrade</a></h3>
+<p>One a new release has been properly and automatically tagged on <code>anixpkgs</code> remote, a CLI tool called <a href="#anix-upgrade">anix-upgrade</a> is proposed to upgrade the system to the latest tag in an automated and incorruptible (i.e., no need nor opportunity to manually modify code or any configurations during the process) fashion and fulfill <strong>[R1.2,2.3,4.1-2,5.1-2]</strong>.</p>
+<p>As implied by <strong>[R2.3]</strong>, <code>anix-upgrade</code> will do two things:</p>
+<ol>
+<li>Prepare a read-only (and Git-less) version of <code>anixpkgs</code> in the <code>~/sources</code> directory according to the exact version specified via arguments through the CLI.</li>
+<li>Rebuild the system configuration according to the updated source/configuration.</li>
+</ol>
+<p>(1) may be naturally accomplished via a Nix derivation, which by definition must consist of a read-only (and reproducible) output with no tolerance for side effects from things like <code>.git</code> directories. The CLI tool will allow for (1) to be constructed from:</p>
+<ul>
+<li>No argument at all, which will assume that the target source corresponds to the current head of <code>anixpkgs</code> master. This will be the way to perform standard, non-dev-prototyping upgrades.</li>
+<li>An alternative release tag string <em>or</em> a development branch name (assumed to be at the head of that branch) <em>or</em> a commit hash.</li>
+<li>An optional specification that the OS packages should be built from the local packages in that specific version of the <code>anixpkgs</code> source tree, and not necessarily from the prescribed release version of the packages.</li>
+</ul>
+<p>Because Nix derivations cannot clone Git repositories, the Nix built-in tools <code>fetchGit</code> and <code>fetchTarball</code> must be used to fetch the exact right version of the source. In my experience, <code>fetchGit</code> does not consistently fetch the expected “head-of” commit when only a branch name is specified, so in this implementation <code>fetchTarball</code> is to be used for any version of (1) that does not specify the full commit hash. This is possible because of GitHub’s feature where it allows for URL-based fetching of zipped source archives from tag names and branch names (reliably delivering the head-of commit in the latter case).</p>
+<p>(2) is accomplished by aliasing to the <code>nixos-rebuild</code> command (exposing an optional flag to require a reboot for changes to take effect as per <strong>[R4.2]</strong>) and only executing once (1) has successfully completed.</p>
+<h3 id="development-policy-changes"><a class="header" href="#development-policy-changes">Development policy changes</a></h3>
+<p>All-in-all, the above changes serve to reduce the cognitive load associated with releasing and deploying a new version of <code>anixpkgs</code> once development is complete. In the same vein, the above changes are best served by fulfilling <strong>[R1.1]</strong> as well, which moves <code>anixpkgs</code> development out of the <code>~/sources</code> directory and into the <code>~/dev</code> directory, consistent with development on individual repositories. While mostly a clerical change, there are a couple of implications:</p>
+<ul>
+<li>The machines docs should be updated to modify instructions for setting up a new machine from scratch. The setup process may now be slightly more complicated on a one-time basis.</li>
+<li>The <code>~/.devrc</code> file on every development machine (see <a href="#devshell">devshell</a>) should be modified to set the <code>pkgs_dir</code> variable to the <code>~/dev/</code> location and not the <code>~/sources/</code> one. This is to preserve the ability to mutate attribute-based sources with the same level of flexibility as before.</li>
+</ul>
+<h2 id="drawbacks"><a class="header" href="#drawbacks">Drawbacks</a></h2>
+<p>The principal drawback of this design is the new requirement to commit OS prototype changes to GitHub when prototyping new OS versions via the specification of a remote tag, branch, or commit with the OS upgrade tool.</p>
+<h2 id="alternatives"><a class="header" href="#alternatives">Alternatives</a></h2>
+<p>To address the slight OS prototyping drawback, an additional option may be added to <code>anix-upgrade</code> to point to a local <code>anixpkgs</code> source tree, which would symlink to the mutable source tree rather than an immutable nix derivation that pulls from GitHub.</p>
+<h2 id="unresolved-questions"><a class="header" href="#unresolved-questions">Unresolved questions</a></h2>
+<ul>
+<li>Must OS upgrades always be manually triggered via <code>anix-upgrade</code>, or might it be fruitful to execute automatic upgrades in the future?</li>
+<li>How may OSCD fruitfully apply to machine closures that import <code>anixpkgs</code> closures but specify their own configurations?</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="c-packages"><a class="header" href="#c-packages">C++ Packages</a></h1>
+<p>Packages written in C++.</p>
+<ul>
+<li><a href="#manif-geom-cpp">manif-geom-cpp</a></li>
+<li><a href="#aapis-cpp">aapis-cpp</a></li>
+<li><a href="#mscpp">mscpp</a></li>
+<li><a href="#quad-sim-cpp">quad-sim-cpp</a></li>
+<li><a href="#ceres-factors">ceres-factors</a></li>
+<li><a href="#signals-cpp">signals-cpp</a></li>
+<li><a href="#gnc">gnc</a></li>
+<li><a href="#secure-delete">secure-delete</a></li>
+<li><a href="#sorting">sorting</a></li>
+<li><a href="#crowcpp">crowcpp</a></li>
+<li><a href="#rankserver-cpp">rankserver-cpp</a></li>
+<li><a href="#mfn">mfn</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="manif-geom-cpp"><a class="header" href="#manif-geom-cpp">manif-geom-cpp</a></h1>
+<p>Templated, header-only implementations for SO(2), SE(2), SO(3), SE(3).</p>
+<p><a href="https://github.com/goromal/manif-geom-cpp">Repository</a></p>
+<p><a href="https://andrewtorgesen.com/manif-geom-cpp">Documentation</a></p>
+<p><a href="https://andrewtorgesen.com/manif-geom-cpp/coverage">Code Coverage</a></p>
+<p>Operationally very similar to variations on Eigen’s <code>Quaternion&lt;T&gt;</code> class, but with added chart maps and rules for addition and subtraction on tangent spaces. Meant to be used with nonlinear least-squares solvers like Ceres Solver which take advantage of templating to implement auto-differentiation on arbitrary mathematical formulations in code.</p>
+<p>The SO(3) math is based on <a href="https://andrewtorgesen.com/notes/Autonomy/Math_Fundamentals/3D_Geometry/Rotations_Robotics_Field_Guide.html">my notes</a> on 3D rotation representations.</p>
+<h2 id="including-in-your-project-with-cmake"><a class="header" href="#including-in-your-project-with-cmake">Including in Your Project With CMake</a></h2>
+<pre><code class="language-cmake"># ...
+
+find_package(Eigen3 REQUIRED)
+find_package(manif-geom-cpp REQUIRED)
+
+include_directories(
+    ${EIGEN3_INCLUDE_DIRS}
+)
+
+
+# ...
+
+target_link_libraries(target INTERFACE manif-geom-cpp)
+
+</code></pre>
+<h2 id="example-usage"><a class="header" href="#example-usage">Example Usage</a></h2>
+<p>Example usage of SO(3):</p>
+<pre><code class="language-cpp">// action
+SO3d     q = SO3d::random();
+Vector3d v;
+v.setRandom();
+
+Vector3d qv1 = q * v;
+Vector3d qv2 = q.R() * v;
+BOOST_CHECK_CLOSE(qv1.x(), qv2.x(), 1e-8);
+BOOST_CHECK_CLOSE(qv1.y(), qv2.y(), 1e-8);
+BOOST_CHECK_CLOSE(qv1.z(), qv2.z(), 1e-8);
+
+// inversion and composition
+SO3d q1    = SO3d::random();
+SO3d q2    = SO3d::random();
+SO3d q2inv = q2.inverse();
+SO3d q1p   = q1 * q2 * q2inv;
+
+BOOST_CHECK_CLOSE(q1.w(), q1p.w(), 1e-8);
+BOOST_CHECK_CLOSE(q1.x(), q1p.x(), 1e-8);
+BOOST_CHECK_CLOSE(q1.y(), q1p.y(), 1e-8);
+BOOST_CHECK_CLOSE(q1.z(), q1p.z(), 1e-8);
+
+// Euler conversions
+Vector3d euler;
+euler.setRandom();
+euler *= M_PI;
+SO3d q  = SO3d::fromEuler(euler.x(), euler.y(), euler.z());
+SO3d q2 = SO3d::fromEuler(q.roll(), q.pitch(), q.yaw());
+
+BOOST_CHECK_CLOSE(q.w(), q2.w(), 1e-8);
+BOOST_CHECK_CLOSE(q.x(), q2.x(), 1e-8);
+BOOST_CHECK_CLOSE(q.y(), q2.y(), 1e-8);
+BOOST_CHECK_CLOSE(q.z(), q2.z(), 1e-8);
+
+// plus / minus
+SO3d     q1 = SO3d::random();
+Vector3d q12;
+q12.setRandom();
+SO3d     q2   = q1 + q12;
+Vector3d q12p = q2 - q1;
+BOOST_CHECK_CLOSE(q12.x(), q12p.x(), 1e-8);
+BOOST_CHECK_CLOSE(q12.y(), q12p.y(), 1e-8);
+BOOST_CHECK_CLOSE(q12.z(), q12p.z(), 1e-8);
+
+// chart maps
+SO3d     q = SO3d::random();
+Vector3d w;
+w.setRandom();
+Vector3d qLog = SO3d::Log(q);
+SO3d     q2   = SO3d::Exp(qLog);
+BOOST_CHECK_CLOSE(q.w(), q2.w(), 1e-8);
+BOOST_CHECK_CLOSE(q.x(), q2.x(), 1e-8);
+BOOST_CHECK_CLOSE(q.y(), q2.y(), 1e-8);
+BOOST_CHECK_CLOSE(q.z(), q2.z(), 1e-8);
+
+SO3d     wExp = SO3d::Exp(w);
+Vector3d w2   = SO3d::Log(wExp);
+BOOST_CHECK_CLOSE(w.x(), w2.x(), 1e-8);
+BOOST_CHECK_CLOSE(w.y(), w2.y(), 1e-8);
+BOOST_CHECK_CLOSE(w.z(), w2.z(), 1e-8);
+
+// scaling
+SO3d qI  = SO3d::identity();
+SO3d qIs = 5.0 * qI;
+BOOST_CHECK_CLOSE(qIs.w(), qI.w(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.x(), qI.x(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.y(), qI.y(), 1e-8);
+BOOST_CHECK_CLOSE(qIs.z(), qI.z(), 1e-8);
+
+SO3d qr  = SO3d::random();
+SO3d qr2 = qr * 0.2; // if scale is too big, then the rotation will
+                    // wrap around the sphere, resulting in a reversed
+                    // or truncated tangent vector which can't be inverted
+                    // through scalar division
+SO3d qr3 = qr2 / 0.2;
+BOOST_CHECK_CLOSE(qr.w(), qr3.w(), 1e-8);
+BOOST_CHECK_CLOSE(qr.x(), qr3.x(), 1e-8);
+BOOST_CHECK_CLOSE(qr.y(), qr3.y(), 1e-8);
+BOOST_CHECK_CLOSE(qr.z(), qr3.z(), 1e-8);
+</code></pre>
+<h2 id="conventions"><a class="header" href="#conventions">Conventions</a></h2>
+<h3 id="ordering"><a class="header" href="#ordering">Ordering</a></h3>
+<p>Scalar term first:</p>
+<p>$$\mathbf{R} \in SO(2) \triangleq \begin{bmatrix} q_w &amp; q_x \end{bmatrix}.$$</p>
+<p>$$\mathbf{R} \in SO(3) \triangleq \begin{bmatrix} q_w &amp; q_x &amp; q_y &amp; q_z \end{bmatrix}.$$</p>
+<h3 id="handedness"><a class="header" href="#handedness">Handedness</a></h3>
+<p>Right-handed:</p>
+<p>$$\mathbf{q}_1 \otimes \mathbf{q}_2=[\mathbf{q}_1]_L\mathbf{q}_2=[\mathbf{q}_2]_R\mathbf{q}_1,$$</p>
+<p>$$[\mathbf{q}]_L \triangleq \begin{bmatrix}q_w &amp; -q_x &amp; -q_y &amp; -q_z \\ q_x &amp; q_w &amp; -q_z &amp; q_y \\ q_y &amp; q_z &amp; q_w &amp; -q_x \\ q_z &amp; -q_y &amp; q_x &amp; q_w\end{bmatrix},$$</p>
+<p>$$[\mathbf{q}]_R \triangleq \begin{bmatrix}q_w &amp; -q_x &amp; -q_y &amp; -q_z \\ q_x &amp; q_w &amp; q_z &amp; -q_y \\ q_y &amp; -q_z &amp; q_w &amp; q_x \\ q_z &amp; q_y &amp; -q_x &amp; q_w \end{bmatrix}.$$</p>
+<h3 id="function"><a class="header" href="#function">Function</a></h3>
+<p>Passive:</p>
+<p>$$\mathbf{R}_A^B~^A\mathbf{v}=^B\mathbf{v}.$$</p>
+<h3 id="directionality-and-perturbation"><a class="header" href="#directionality-and-perturbation">Directionality and Perturbation</a></h3>
+<p>Body-to-world with local perturbations:</p>
+<p>$$\mathbf{R}_B^W \oplus \tilde{\theta} \triangleq \mathbf{R}_B^W \text{Exp}\left(\tilde{\theta}\right).$$</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="aapis-cpp"><a class="header" href="#aapis-cpp">aapis-cpp</a></h1>
+<p>C++ bindings for <a href="https://github.com/goromal/aapis">my custom APIs</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mscpp"><a class="header" href="#mscpp">mscpp</a></h1>
+<p>Useful template classes for creating multithreaded, interdependent microservices in C++.</p>
+<p><a href="https://github.com/goromal/mscpp">Repository</a></p>
+<p><strong>Use cases pending.</strong></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quad-sim-cpp"><a class="header" href="#quad-sim-cpp">quad-sim-cpp</a></h1>
+<p>C++ library and daemon for simulating quadrotor dynamics from PWM motor inputs.</p>
+<p><a href="https://github.com/goromal/quad-sim-cpp">Repository</a></p>
+<p><em><strong>Under construction.</strong></em></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="ceres-factors"><a class="header" href="#ceres-factors">ceres-factors</a></h1>
+<p>C++ library with custom parameterizations and cost functions for the Ceres Solver.</p>
+<p><a href="https://github.com/goromal/ceres-factors">Repository</a></p>
+<p>Examples documented in the <a href="https://github.com/goromal/ceres-factors/tree/main/tests">unit tests</a>.</p>
+<p>Articles/tutorials showcasing some of the custom cost functions and parameterizations:</p>
+<ul>
+<li><a href="https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres">Ceres Solver Python Tutorial (Linux)</a></li>
+<li><a href="https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres-rangebearing">2D Range-Bearing Landmark Resolution with Ceres</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="signals-cpp"><a class="header" href="#signals-cpp">signals-cpp</a></h1>
+<p>Header-only templated C++ library implementing rigid-body dynamics, derivatives, integrals, and interpolation.</p>
+<p><a href="https://github.com/goromal/signals-cpp">Repository</a></p>
+<p><a href="https://andrewtorgesen.com/signals-cpp">Documentation</a></p>
+<p>Examples also documented in the <a href="https://github.com/goromal/signals-cpp/tree/master/tests">unit tests</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="gnc"><a class="header" href="#gnc">gnc</a></h1>
+<p>A collection of GNC algorithms, particularly for controlling small UAVs.</p>
+<p><a href="https://github.com/goromal/gnc">Repository</a></p>
+<p>Examples documented in the <a href="https://github.com/goromal/gnc/tree/master/tests">unit tests</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="secure-delete"><a class="header" href="#secure-delete">secure-delete</a></h1>
+<p>Secure file deletion utility, written in C.</p>
+<p><a href="https://github.com/goromal/secure-delete">Repository</a></p>
+<p>The deletion process is as follows:</p>
+<ol>
+<li>Overwrite the file with multiple passes. After each pass, the disk cache is flushed. The number of passes depends on the commanded mode:</li>
+</ol>
+<ul>
+<li>(default / secure mode) 38 passes:
+<ul>
+<li>1x overwrite with <code>0xff</code>.</li>
+<li>5x random passes.</li>
+<li>27x overwrites with <a href="https://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html">special values</a> to make the recovery from MFM- and RLL-encoded hard disks hard to impossible.</li>
+<li>5x random passes.</li>
+</ul>
+</li>
+<li>(insecure mode) 2 passes:
+<ul>
+<li>1x overwrite with <code>0xff</code>.</li>
+<li>1x random pass.</li>
+</ul>
+</li>
+<li>(totally insecure mode) 1 pass:
+<ul>
+<li>1x random pass.</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>Truncate the file, so that an observer wouldn’t know which diskblocks belonged to the file.</li>
+<li>Rename the file.</li>
+<li>Delete (unlink) the file.</li>
+</ol>
+<p>In 1 second you can approximately overwrite 1 to 2 MB of data (on a hard disk).</p>
+<p>In “totally insecure” mode, in 15 seconds you can approximately overwrite 100 MB of data. The same deletion takes about 60 minutes in totally secure mode.</p>
+<h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
+<pre><code class="language-bash">secure-delete [-dflrvz] file1 file2 etc.
+
+Options:
+        -d  ignore the two dot special files "." and "..".
+        -f  fast (and insecure mode): no /dev/urandom, no synchronize mode.
+        -l  lessens the security (use twice for total insecure mode).
+        -r  recursive mode, deletes all subdirectories.
+        -v  is verbose mode.
+        -z  last wipe writes zeros instead of random data.
+
+Does a secure overwrite/rename/delete of the target file(s).
+Default is secure mode (38 writes).
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="sorting"><a class="header" href="#sorting">sorting</a></h1>
+<p>A C++ library for sporadic, incremental sorting with client-side comparators.</p>
+<p><a href="https://github.com/goromal/sorting">Repository</a></p>
+<p><a href="https://github.com/goromal/sorting/blob/master/tests/SortingTest.cpp">Tests</a></p>
+<p>The main idea of this library is to take sorting algorithms like Quicksort and make them <em>stateless</em>
+across iterations. The sorting is performed within the “server” one step at a time where all the state information needed to perform
+the next step in the sort is passed in as an input from a “client.” The client must keep track of this state
+and also perform the binary comparisons requested by the server at each step.</p>
+<p>This non-traditional conception of sorting effectively allows a human to be placed in the middle of the sorting loop,
+dictating the atomic binary comparisons between elements in a sortable set. Since the outcomes of these comparisons dictate the
+final ordering of the elements from the sorting algorithm, this design provides a natural (and thorough) way for a person to topologically rank
+arbitrary sets of objects through the cognitively manageable task of successive binary choices of preference. The <a href="#rankserver-cpp">rankserver</a>
+experiment is powered by this library.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="crowcpp"><a class="header" href="#crowcpp">crowcpp</a></h1>
+<p>A minimally-patched <a href="https://github.com/goromal/Crow">fork</a> of <a href="https://github.com/CrowCpp/Crow">Crow</a>, a C++ webserver.</p>
+<p>The patch allows one to dynamically specify where the website’s assets directory is; a necessary feature for <a href="#rankserver-cpp">rankserver-cpp</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rankserver-cpp"><a class="header" href="#rankserver-cpp">rankserver-cpp</a></h1>
+<p>A portable webserver for RESTfully ranking files via binary manual comparisons.</p>
+<p><a href="https://github.com/goromal/rankserver-cpp">Repository</a></p>
+<p>Spins up a <a href="#crowcpp">crowcpp</a> webserver (on the specified port) whose purpose is to help a user
+rank files in the chosen <code>data-dir</code> directory via manual binary comparisons. The ranking is done via
+an incremental “RESTful” sorting strategy implemented within the <a href="#sorting">sorting</a> library. State
+is created and maintained within the <code>data-dir</code> directory so that the ranking exercise can pick back up
+where it left off between different spawnings of the server. At this point, only the ranking of <code>.txt</code> and
+<code>.png</code> files is possible; other file types in <code>data-dir</code> will be ignored.</p>
+<h2 id="usage-1"><a class="header" href="#usage-1">Usage</a></h2>
+<pre><code class="language-bash">Options:
+  -h [ --help ]         print usage
+  -p [ --port ] arg     port to serve on (default: 4000)
+  -d [ --data-dir ] arg data directory to process (default: ./data)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mfn"><a class="header" href="#mfn">mfn</a></h1>
+<p>Simple CLI tool meant to analyze an image of a single person and print whether the person appears to be a male (m), female (f), or neither (n).</p>
+<p><a href="https://github.com/goromal/mfn">Repository</a></p>
+<p>Uses vanilla OpenCV tools. Depending on the model, it can be pretty trigger-happy classifying genders even on inanimate objects, so for best results only use images of one person. Neural network model description and weights <strong>not included</strong>.</p>
+<h2 id="usage-2"><a class="header" href="#usage-2">Usage</a></h2>
+<pre><code class="language-bash">usage: mfn [Options] imgfile
+
+Options:
+  --model-proto arg     gender model description file
+  --model-weights arg   gender model weights file
+  --imgfile arg         image file to process
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rust-packages"><a class="header" href="#rust-packages">Rust Packages</a></h1>
+<p>Packages written in Rust.</p>
+<ul>
+<li><a href="#manif-geom-rs">manif-geom-rs</a></li>
+<li><a href="#xv-lidar-rs">xv-lidar-rs</a></li>
+<li><a href="#sunnyside">sunnyside</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="manif-geom-rs"><a class="header" href="#manif-geom-rs">manif-geom-rs</a></h1>
+<p>Rust implementation of <a href="https://github.com/goromal/manif-geom-cpp">manif-geom-cpp</a> (<em>under construction</em>).</p>
+<p><a href="https://github.com/goromal/manif-geom-rs">Repository</a></p>
+<p><em><strong>TODO</strong></em> Once finished, these docs will contrast the API with <code>manif-geom-cpp</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox" checked=""> SO2</li>
+<li><input disabled="" type="checkbox"> SO3</li>
+<li><input disabled="" type="checkbox"> SE2</li>
+<li><input disabled="" type="checkbox"> SE3</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="xv-lidar-rs"><a class="header" href="#xv-lidar-rs">xv-lidar-rs</a></h1>
+<p>Daemon for the Neato XV LiDAR (<em>not quite finished</em>).</p>
+<p>Written in Rust. <a href="https://github.com/goromal/xv-lidar-rs">Repository</a></p>
+<p>Currently the program will simply continuously print out 2D point cloud data to the console.
+I plan to instead have it stream gRPC 2D point cloud messages (defined in <a href="https://github.com/goromal/aapis">aapis</a>)
+to a <a href="#mscpp">mscpp</a>-based daemon for real-time pose estimation over <a href="#manif-geom-cpp">SE(2)</a>.</p>
+<h2 id="usage-3"><a class="header" href="#usage-3">Usage</a></h2>
+<pre><code class="language-bash">XV LiDAR Interface Daemon
+
+Usage: xv-lidar-rs [OPTIONS]
+
+Options:
+  -d, --device &lt;DEVICE&gt;  Device name [default: /dev/ttyACM0]
+  -h, --help             Print help information
+  -V, --version          Print version information
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="sunnyside"><a class="header" href="#sunnyside">sunnyside</a></h1>
+<p>File scrambler.</p>
+<p>Written in Rust. <a href="https://github.com/goromal/sunnyside">Repository</a></p>
+<h2 id="usage-4"><a class="header" href="#usage-4">Usage</a></h2>
+<pre><code class="language-bash">Make some scrambled eggs
+
+Usage: sunnyside --target &lt;TARGET&gt; --shift &lt;SHIFT&gt; --key &lt;KEY&gt;
+
+Options:
+  -t, --target &lt;TARGET&gt;  File target
+  -s, --shift &lt;SHIFT&gt;    Shift amount
+  -k, --key &lt;KEY&gt;        Scramble key
+  -h, --help             Print help
+  -V, --version          Print version
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="python-packages"><a class="header" href="#python-packages">Python Packages</a></h1>
+<p>Packages written (or bound) in Python.</p>
+<ul>
+<li><a href="#aapis-py">aapis-py</a></li>
+<li><a href="#fqt">fqt</a></li>
+<li><a href="#find_rotational_conventions">find_rotational_conventions</a></li>
+<li><a href="#daily_tactical_server">daily_tactical_server</a></li>
+<li><a href="#geometry">geometry</a></li>
+<li><a href="#pyceres">pyceres</a></li>
+<li><a href="#pyceres_factors">pyceres_factors</a></li>
+<li><a href="#pysorting">pysorting</a></li>
+<li><a href="#makepyshell">makepyshell</a></li>
+<li><a href="#scrape">scrape</a></li>
+<li><a href="#pysignals">pysignals</a></li>
+<li><a href="#mesh-plotter">mesh-plotter</a></li>
+<li><a href="#orchestrator">orchestrator</a></li>
+<li><a href="#gmail-parser">gmail-parser</a></li>
+<li><a href="#trafficsim">trafficsim</a></li>
+<li><a href="#flask-hello-world">flask-hello-world</a></li>
+<li><a href="#flask-url2mp4">flask-url2mp4</a></li>
+<li><a href="#flask-mp4server">flask-mp4server</a></li>
+<li><a href="#flask-mp3server">flask-mp3server</a></li>
+<li><a href="#flask-smfserver">flask-smfserver</a></li>
+<li><a href="#flask-oatbox">flask-oatbox</a></li>
+<li><a href="#rankserver">rankserver</a></li>
+<li><a href="#stampserver">stampserver</a></li>
+<li><a href="#easy-google-auth">easy-google-auth</a></li>
+<li><a href="#rcdo">rcdo</a></li>
+<li><a href="#task-tools">task-tools</a></li>
+<li><a href="#photos-tools">photos-tools</a></li>
+<li><a href="#wiki-tools">wiki-tools</a></li>
+<li><a href="#book-notes-sync">book-notes-sync</a></li>
+<li><a href="#goromail">goromail</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="aapis-py"><a class="header" href="#aapis-py">aapis-py</a></h1>
+<p>Python bindings for <a href="https://github.com/goromal/aapis">my custom APIs</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="fqt"><a class="header" href="#fqt">fqt</a></h1>
+<p>Four-quadrant tasking.</p>
+<p>This little CLI tool will suggest classes of activities to do based on configured priorities and preferences.</p>
+<p>Example config file:</p>
+<pre><code>Framework Learning:25
+Programming Projects:25
+The Arts:10
+Fun:10
+Family:30
+</code></pre>
+<h2 id="usage-5"><a class="header" href="#usage-5">Usage</a></h2>
+<pre><code class="language-bash">Usage: fqt [OPTIONS] COMMAND [ARGS]...
+
+  Four-quadrants tasking tools.
+
+Options:
+  --config-file PATH  Path to the config file.  [default: ~/fqt/config]
+  --log-file PATH     Path to the log file.  [default: ~/fqt/log]
+  --help              Show this message and exit.
+
+Commands:
+  analyze  Analyze past task performance.
+  task     Propose a task for the day.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="find_rotational_conventions"><a class="header" href="#find_rotational_conventions">find_rotational_conventions</a></h1>
+<p>Find rotational conventions of a Python transform library.</p>
+<p><a href="https://gist.github.com/goromal/fb15f44150ca4e0951acaee443f72d3e">Gist</a></p>
+<p>Conventions are defined in my <a href="https://andrewtorgesen.com/notes/Autonomy/Math_Fundamentals/3D_Geometry/Rotations_Robotics_Field_Guide.html">notes on rotations</a>. Example deduction of conventions used in the <a href="#geometry">geometry</a> library:</p>
+<pre><code class="language-python">from find_rotational_conventions import (                                
+    find_euler_conventions,                                              
+    find_axis_angle_conventions,                                         
+    find_quaternion_conventions,                                         
+)                                                                        
+import numpy as np                                                       
+from typing import Tuple                                                 
+from geometry import SO3 # https://github.com/goromal/geometry           
+                                                                        
+LIBNAME = "manif-geom-cpp/geometry" # Library being tested               
+                                                                        
+def euler2R(arg1: float, arg2: float, arg3: float) -&gt; np.ndarray:        
+    return SO3.fromEuler(arg1, arg2, arg3).R()                           
+                                                                        
+def axisAngle2R(axis: np.ndarray, angle: float) -&gt; np.ndarray:           
+    return SO3.fromAxisAngle(axis, angle).R()                            
+                                                                        
+def quat2R(q1: float, q2: float, q3: float, q4: float) -&gt; np.ndarray:    
+    return SO3.fromQuat(q1, q2, q3, q4).R()                              
+                                                                        
+def quatComp(                                                            
+    q1: Tuple[float, float, float, float],                               
+    q2: Tuple[float, float, float, float]                                
+) -&gt; Tuple[float, float, float, float]:                                  
+    q = SO3.fromQuat(*q1) * SO3.fromQuat(*q2)                            
+    return (q.w(), q.x(), q.y(), q.z())                                  
+                                                                        
+find_axis_angle_conventions(LIBNAME, axisAngle2R)                        
+find_euler_conventions(LIBNAME, euler2R)                                 
+find_quaternion_conventions(LIBNAME, quat2R, quatComp)
+</code></pre>
+<p>Yields the output:</p>
+<pre><code>Axis-Angle Conventions for manif-geom-cpp/geometry:
+
+    Rodrigues Directionality: Body-to-World
+
+
+Euler Angle Conventions for manif-geom-cpp/geometry:
+
+    Euler Argument Order: ['x', 'y', 'z']
+    Euler Matrix Order:   R = R(z)R(y)R(x)
+    Euler Directionality: Body-to-World
+
+
+Quaternion Conventions for manif-geom-cpp/geometry:
+
+    Quaternion Ordering:       Scalar First
+    Quaternion Handedness:     Right-Handed
+    Quaternion Function:       Passive
+    Quaternion Directionality: Body-to-World
+</code></pre>
+<h2 id="usage-6"><a class="header" href="#usage-6">Usage</a></h2>
+<pre><code class="language-bash">
+NOTE: You're running find_rotational_conventions.py standalone, but it's most useful as an import to deduce the rotational conventions of the particular library that you're using.
+
+Running an example from the following source code:
+=========
+test.py |=================================================================
+=========                                                                |
+from find_rotational_conventions import (                                |
+    find_euler_conventions,                                              |
+    find_axis_angle_conventions,                                         |
+    find_quaternion_conventions,                                         |
+)                                                                        |
+import numpy as np                                                       |
+from typing import Tuple                                                 |
+from geometry import SO3 # https://github.com/goromal/geometry           |
+                                                                         |
+LIBNAME = "manif-geom-cpp/geometry" # Library being tested               |
+                                                                         |
+def euler2R(arg1: float, arg2: float, arg3: float) -&gt; np.ndarray:        |
+    return SO3.fromEuler(arg1, arg2, arg3).R()                           |
+                                                                         |
+def axisAngle2R(axis: np.ndarray, angle: float) -&gt; np.ndarray:           |
+    return SO3.fromAxisAngle(axis, angle).R()                            |
+                                                                         |
+def quat2R(q1: float, q2: float, q3: float, q4: float) -&gt; np.ndarray:    |
+    return SO3.fromQuat(q1, q2, q3, q4).R()                              |
+                                                                         |
+def quatComp(                                                            |
+    q1: Tuple[float, float, float, float],                               |
+    q2: Tuple[float, float, float, float]                                |
+) -&gt; Tuple[float, float, float, float]:                                  |
+    q = SO3.fromQuat(*q1) * SO3.fromQuat(*q2)                            |
+    return (q.w(), q.x(), q.y(), q.z())                                  |
+                                                                         |
+find_axis_angle_conventions(LIBNAME, axisAngle2R)                        |
+find_euler_conventions(LIBNAME, euler2R)                                 |
+find_quaternion_conventions(LIBNAME, quat2R, quatComp)                   |
+                                                                         |
+==========================================================================
+
+With output:
+
+
+Axis-Angle Conventions for manif-geom-cpp/geometry:
+
+    Rodrigues Directionality: Body-to-World
+
+
+Euler Angle Conventions for manif-geom-cpp/geometry:
+
+    Euler Argument Order: ['x', 'y', 'z']
+    Euler Matrix Order:   R = R(z)R(y)R(x)
+    Euler Directionality: Body-to-World
+
+
+Quaternion Conventions for manif-geom-cpp/geometry:
+
+    Quaternion Ordering:       Scalar First
+    Quaternion Handedness:     Right-Handed
+    Quaternion Function:       Passive
+    Quaternion Directionality: Body-to-World
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="daily_tactical_server"><a class="header" href="#daily_tactical_server">daily_tactical_server</a></h1>
+<p>Daemon + CLI for managing a daily tactical webpage.</p>
+<p><a href="https://github.com/goromal/daily_tactical_server">Repository</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="geometry"><a class="header" href="#geometry">geometry</a></h1>
+<p>Implementations for SO(3) and SE(3).</p>
+<p><a href="https://github.com/goromal/geometry">Repository</a></p>
+<p>Python-wrapped version of the C++ <a href="#manif-geom-cpp">manif-geom-cpp</a> library.</p>
+<h2 id="example-usage-1"><a class="header" href="#example-usage-1">Example Usage</a></h2>
+<p>Example usage of SO3:</p>
+<pre><code class="language-python"># action
+q = SO3.random()
+v = np.random.random(3)
+qv1 = q * v
+qv2 = q.R().dot(v)
+assert np.allclose(qv1, qv2)
+
+# inversion and composition
+qI = SO3.identity()
+q1 = SO3.random()
+q1i = q1.inverse()
+q1I = q1 * q1i
+assert np.allclose(qI.array(), q1I.array())
+
+# Euler conversions
+roll = -1.2
+pitch = 0.6
+yaw = -0.4
+q = SO3.fromEuler(roll, pitch, yaw)
+rpy = q.toEuler()
+assert np.isclose(roll, rpy[0]) and np.isclose(pitch, rpy[1]) and np.isclose(yaw, rpy[2])
+
+# plus / minus
+R1 = SO3.random()
+w = np.array([0.5, 0.2, 0.1])
+R2 = R1 + w
+w2 = R2 - R1
+assert np.allclose(w, w2)
+
+# chart maps
+q = SO3.random()
+w = np.random.random(3)
+qlog = SO3.Log(q)
+q2 = SO3.Exp(qlog)
+assert np.allclose(q.array(), q2.array())
+wexp = SO3.Exp(w)
+w2 = SO3.Log(wexp)
+assert np.allclose(w, w2)
+
+# scaling
+qI = SO3.identity()
+qIs = 5.0 * qI
+assert np.allclose(qI.array(), qIs.array())
+qr = SO3.random()
+qr2 = qr * 0.2
+qr3 = qr2 / 0.2
+assert np.allclose(qr.array(), qr3.array())
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pyceres"><a class="header" href="#pyceres">pyceres</a></h1>
+<p>Python bindings for the Ceres Solver.</p>
+<p><strong><a href="https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres">Tutorial</a></strong> on how to use the library in conjunction with <a href="#pyceres_factors">pyceres_factors</a> and <a href="#geometry">geometry</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pyceres_factors"><a class="header" href="#pyceres_factors">pyceres_factors</a></h1>
+<p>Python bindings of ceres-factors.</p>
+<p><a href="https://github.com/goromal/pyceres_factors">Repository</a></p>
+<p><strong><a href="https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:implementation:opt-libs:ceres">Tutorial</a></strong> on how to use the library in conjunction with <a href="#pyceres">pyceres</a> and <a href="#geometry">geometry</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pysorting"><a class="header" href="#pysorting">pysorting</a></h1>
+<p>RESTful incremental sorting with client-side comparators.</p>
+<p><a href="https://github.com/goromal/pysorting">Repository</a></p>
+<p>This library is a Python-wrapped version of the C++ <a href="#sorting">sorting</a> library. As such, it is meant to be used in conjunction with a client that can solicit answers to binary comparisons for the purpose of incremental sorting.</p>
+<p>Example usage in a Python script:</p>
+<pre><code class="language-python"># key-value pairs to be sorted by values
+values = {0: 4.8, 1: 10.0, 2: 1.0, 3: 2.5, 4: 5.0}
+
+state = QuickSortState()
+state.n = 5
+state.arr = [i for i in values.keys()]
+state.stack = [0 for i in range(state.n)]
+# validateState(state)
+
+# proxy for user choices from some client; this will simply choose the larger
+# value, resulting in an ascending sort
+def updateComparator(a, b):
+    if a &lt; b:
+        return int(ComparatorResult.LEFT_LESS)
+    elif a &gt; b:
+        return int(ComparatorResult.LEFT_GREATER)
+    else:
+        return int(ComparatorResult.LEFT_EQUAL)
+    
+# simulate user choices until the list is sorted
+iter = 0
+maxIters = 50
+while not (state.top == UINT32_MAX and state.c != 0) and iter &lt; maxIters:
+    iter_success, state_out = restfulQuickSort(state)
+    state = state_out
+    if state.l == int(ComparatorLeft.I):
+        state.c = updateComparator(values[state.arr[state.i]], values[state.arr[state.p]])
+    elif state.l == int(ComparatorLeft.J):
+        state.c = updateComparator(values[state.arr[state.j]], values[state.arr[state.p]])
+    iter += 1
+    
+# sorted keys
+# state.arr == [2, 3, 0, 4, 1]
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="makepyshell"><a class="header" href="#makepyshell">makepyshell</a></h1>
+<p>Generate a nix-shell file for Python development.</p>
+<p><a href="https://gist.github.com/goromal/e64b6bdc8a176c38092e9bde4c434d31">Gist</a></p>
+<h2 id="usage-7"><a class="header" href="#usage-7">Usage</a></h2>
+<pre><code class="language-bash">usage: makepyshell [-h] [--nix-path NIX_PATH]
+                   [--modules MODULES [MODULES ...]]
+
+Generate a nix-shell file (shell.nix) for Python 3.9 development.
+
+options:
+  -h, --help            show this help message and exit
+  --nix-path NIX_PATH   Nix source path. (default: nixpkgs)
+  --modules MODULES [MODULES ...]
+                        Python modules for development. (default: [])
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="scrape"><a class="header" href="#scrape">scrape</a></h1>
+<p>Scrape content off the internet, quickly.</p>
+<p><a href="https://github.com/goromal/scrape">Repository</a></p>
+<p>This is a simple tool that assumes you want to download files from a straightforwardly-constructed HTML page. You’ll need an XPath specification to help narrow down the scraping.</p>
+<p><strong>Resource files for testing scrape:</strong></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_1280x720.webm">sample_1280x720</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_1920x1080.webm">sample_1920x1080</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_2560x1440.webm">sample_2560x1440</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_3840x2160.webm">sample_3840x2160</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.webm">sample_640x360</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_960x400_ocean_with_audio.webm">sample_960x400_ocean_with_audio</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_960x540.webm">sample_960x540</a></p>
+<p><a href="https://github.com/goromal/anixdata/raw/master/data/media/scrape-tests/sample_640x360.mp4">sample_640x360 (mp4)</a></p>
+<h2 id="usage-8"><a class="header" href="#usage-8">Usage</a></h2>
+<pre><code class="language-bash">usage: scrape [-h] [--xpath XPATH] [--ext EXT] [-o DIRNAME]
+              {simple-link-scraper,simple-image-scraper} page
+
+Scrape content off the internet, quickly.
+
+positional arguments:
+  {simple-link-scraper,simple-image-scraper}
+                        The type of content to be scraped.
+  page                  Webpage url.
+
+options:
+  -h, --help            show this help message and exit
+  --xpath XPATH         Optionally specify the XPath
+  --ext EXT             Optionally specify the file extension
+  -o, --output DIRNAME  Output directory.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pysignals"><a class="header" href="#pysignals">pysignals</a></h1>
+<p>Python bindings of signals-cpp.</p>
+<p><a href="https://github.com/goromal/pysignals">Repository</a></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mesh-plotter"><a class="header" href="#mesh-plotter">mesh-plotter</a></h1>
+<p>Tools for plotting transforms and line meshes in Python.</p>
+<p><a href="https://github.com/goromal/mesh-plotter">Repository</a></p>
+<p>Example usage:</p>
+<pre><code class="language-python">import numpy as np
+from geometry import SO3, SE3
+from mesh_plotter.meshes import Axes3DMesh
+from mesh_plotter.animator_3d import Animator3D
+
+times = [0.0, 5.0, 10.0, 15.0]
+
+se3_1 = SE3.identity()
+se3_2 = SE3.fromVecAndQuat(np.array([2.0,0.0,0.0]),
+                        SO3.fromEuler(1.5,-2.0,0.2))
+se3_3 = SE3.fromVecAndQuat(np.array([-1.5,-1.5,1.5]),
+                        SO3.random())
+
+transforms1 = [se3_1]*4
+transforms2 = [se3_2]*4
+transforms3 = [se3_3]*4
+transforms  = [se3_1, se3_2, se3_3, se3_1]
+
+animator = Animator3D(xlim=(-2.5,2.5), ylim=(-2.5,2.5), zlim=(0.,2.))
+animator.addMeshSequence(Axes3DMesh(scale=0.4), transforms1, times)
+animator.addMeshSequence(Axes3DMesh(scale=0.4), transforms2, times)
+animator.addMeshSequence(Axes3DMesh(scale=0.4), transforms3, times)
+animator.addMeshSequence(Axes3DMesh(), transforms, times)
+animator.animate(dt = 0.1)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="orchestrator"><a class="header" href="#orchestrator">orchestrator</a></h1>
+<p>Daemon + CLI for managing select background tasks on my computer.</p>
+<p><a href="https://github.com/goromal/orchestrator">Repository</a></p>
+<p><em><strong>Work in progress. Detailed description to come.</strong></em></p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="gmail-parser"><a class="header" href="#gmail-parser">gmail-parser</a></h1>
+<p>Assorted Python tools for semi-automated processing of GMail messages.</p>
+<p><a href="https://github.com/goromal/gmail_parser">Repository</a></p>
+<p>This package may be used either in CLI form or via an interactive Python shell.</p>
+<h2 id="interactive-shell"><a class="header" href="#interactive-shell">Interactive Shell</a></h2>
+<p>Import with</p>
+<pre><code class="language-python">from gmail_parser.corpus import GMailCorpus
+</code></pre>
+<p>Deleting promotions and social network emails:</p>
+<pre><code class="language-python">inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+inbox.clean()
+inbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+</code></pre>
+<p>Get all senders of unread emails:</p>
+<pre><code class="language-python">unread = inbox.fromUnread()
+print(unread.getSenders())
+</code></pre>
+<p>Read all unread emails from specific senders:</p>
+<pre><code class="language-python">msgs = unread.fromSenders(['his@email.com', 'her@email.com']).getMessages()
+for msg in msgs:
+    print(msg.getText())
+</code></pre>
+<p>Mark an entire sub-inbox as read:</p>
+<pre><code class="language-python">subInbox.markAllAsRead()
+</code></pre>
+<h2 id="usage-9"><a class="header" href="#usage-9">Usage</a></h2>
+<pre><code class="language-bash">Usage: gmail-manager [OPTIONS] COMMAND [ARGS]...
+
+  Manage GMail.
+
+Options:
+  --gmail-secrets-json PATH    GMail client secrets file.  [default:
+                               ~/secrets/google/client_secrets.json]
+  --gmail-refresh-file PATH    GMail refresh file (if it exists).  [default:
+                               ~/secrets/google/refresh.json]
+  --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
+                               ~/secrets/google/bot_refresh.json]
+  --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
+                               ~/secrets/google/journal_refresh.json]
+  --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
+  --help                       Show this message and exit.
+
+Commands:
+  clean         Clean out promotions and social emails.
+  gbot-send     Send an email from GBot.
+  journal-send  Send an email from Journal.
+  send          Send an email.
+</code></pre>
+<h3 id="clean"><a class="header" href="#clean">clean</a></h3>
+<pre><code class="language-bash">Usage: gmail-manager clean [OPTIONS]
+
+  Clean out promotions and social emails.
+
+Options:
+  --num-messages INTEGER  Number of messages to poll before cleaning.
+                          [default: 1000]
+  --help                  Show this message and exit.
+</code></pre>
+<h3 id="send"><a class="header" href="#send">send</a></h3>
+<pre><code class="language-bash">Usage: gmail-manager send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<h3 id="gbot-send"><a class="header" href="#gbot-send">gbot-send</a></h3>
+<pre><code class="language-bash">Usage: gmail-manager gbot-send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email from GBot.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<h3 id="journal-send"><a class="header" href="#journal-send">journal-send</a></h3>
+<pre><code class="language-bash">Usage: gmail-manager journal-send [OPTIONS] RECIPIENT SUBJECT BODY
+
+  Send an email from Journal.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="trafficsim"><a class="header" href="#trafficsim">trafficsim</a></h1>
+<p>Simulate traffic.</p>
+<p><a href="https://gist.github.com/goromal/c37629235750b65b9d0ec0e17456ee96">Gist</a></p>
+<p>Simple traffic simulator on a circular road. Cars have two control objectives: maintain a consistent distance between cars and maintain a consistent car speed.</p>
+<h2 id="usage-10"><a class="header" href="#usage-10">Usage</a></h2>
+<pre><code class="language-bash">usage: trafficsim [-h] [--num_cars NUM_CARS] [--vel_des VEL_DES]
+                  [--vel_max VEL_MAX] [--beta_mu BETA_MU]
+                  [--beta_sigma BETA_SIGMA] [--gamma_mu GAMMA_MU]
+                  [--gamma_sigma GAMMA_SIGMA]
+                  [--vel_col_thresh VEL_COL_THRESH]
+                  [--pos_col_thresh POS_COL_THRESH]
+
+Simple traffic simulator on a circular road.
+
+options:
+  -h, --help            show this help message and exit
+  --num_cars NUM_CARS   Number of cars to simulate. (default: 7)
+  --vel_des VEL_DES     Desired car velocity. (default: 1.0)
+  --vel_max VEL_MAX     Maximum allowed car velocity. (default: 1.5)
+  --beta_mu BETA_MU     Mean proportional gain. (default: 0.5)
+  --beta_sigma BETA_SIGMA
+                        Proportional gain standard deviation. (default: 0.5)
+  --gamma_mu GAMMA_MU   Mean derivative gain. (default: 0.5)
+  --gamma_sigma GAMMA_SIGMA
+                        Derivative gain standard deviation. (default: 0.5)
+  --vel_col_thresh VEL_COL_THRESH
+                        Distance threshold for slowing down. (default: 0.3)
+  --pos_col_thresh POS_COL_THRESH
+                        Distance threshold for collision avoidance (default:
+                        0.15)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-hello-world"><a class="header" href="#flask-hello-world">flask-hello-world</a></h1>
+<p>Spawn a trivial website, powered by Python’s flask library.</p>
+<h2 id="usage-11"><a class="header" href="#usage-11">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_hello_world [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-url2mp4"><a class="header" href="#flask-url2mp4">flask-url2mp4</a></h1>
+<p>Convert URL’s pointing to videos to MP4’s, powered by Python’s flask library.</p>
+<p>The server page takes a URL string and either uses <code>wget</code> or <code>yt-dlp</code> to download the video and convert it to MP4 using the <a href="#mp4">mp4</a> tool.</p>
+<h2 id="usage-12"><a class="header" href="#usage-12">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_url2mp4 [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-mp4server"><a class="header" href="#flask-mp4server">flask-mp4server</a></h1>
+<p>Spawn an MP4 conversion server, powered by Python’s flask library.</p>
+<p>The server page takes an input video file and converts it to an MP4 using the <a href="#mp4">mp4</a> tool.</p>
+<h2 id="usage-13"><a class="header" href="#usage-13">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_mp4server [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-mp3server"><a class="header" href="#flask-mp3server">flask-mp3server</a></h1>
+<p>Spawn an MP3 conversion server, powered by Python’s flask library.</p>
+<p>The server page takes an input audio file and converts it to an MP3 using the <a href="#mp3">mp3</a> tool. One can also specify a frequency transpose in terms of positive or negative half-steps.</p>
+<h2 id="usage-14"><a class="header" href="#usage-14">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_mp3server [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-smfserver"><a class="header" href="#flask-smfserver">flask-smfserver</a></h1>
+<p>Spawn an SMF “simple music file” conversion server, powered by Python’s flask library.</p>
+<p>The server page presents a text input area where you can type a song as specified by the simplified SMF music specification language:</p>
+<ul>
+<li>Notes are typed as letters with spaces between them.</li>
+<li>All notes are assumed to be the 4th octave unless a number is given <em>after</em> the letter.</li>
+<li>All notes are assumed to be quarter notes unless a number (multiplier) is given <em>before</em> the letter (or group of letters):
+<ul>
+<li>/3</li>
+<li>/2</li>
+<li>2</li>
+<li>4</li>
+</ul>
+</li>
+<li>Accidentals are typed <em>immediately after a letter</em>:
+<ul>
+<li>^ = sharp</li>
+<li>_ = flat</li>
+</ul>
+</li>
+<li>The dash (-) means a rest. Use it like a letter.</li>
+<li>Multiple letters in a group form a chord.</li>
+<li>Begin a line with a number and colon (e.g., 1:) to specify a unique voice.</li>
+</ul>
+<p>Under the hood, conversions to MP3 are done using the <a href="#abc">abc</a> and <a href="#mp3">mp3</a> tools.</p>
+<h2 id="usage-15"><a class="header" href="#usage-15">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_smfserver [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flask-oatbox"><a class="header" href="#flask-oatbox">flask-oatbox</a></h1>
+<p>“One at a time” (O.A.T.) Box. Store one file at a time, powered by Python’s flask library.</p>
+<p>This tool gives you a method to store, extract, and replace files (again, one at a time) in the directory from which the tool is run.</p>
+<h2 id="usage-16"><a class="header" href="#usage-16">Usage</a></h2>
+<pre><code class="language-bash">usage: flask_oatbox [-h] [--port PORT]
+
+options:
+  -h, --help   show this help message and exit
+  --port PORT  Port to run the server on
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rankserver"><a class="header" href="#rankserver">rankserver</a></h1>
+<p>A portable webserver for ranking files via binary manual comparisons, powered by Python’s flask library.</p>
+<p>Spins up a flask webserver (on the specified port) whose purpose is to help a user rank files in the chosen <code>data-dir</code> directory via manual binary comparisons. The ranking is done via an incremental “RESTful” sorting strategy implemented within the <a href="#pysorting">pysorting</a> library. State is created and maintained within the <code>data-dir</code> directory so that the ranking exercise can pick back up where it left off between different spawnings of the server. At this point, only the ranking of <code>.txt</code> and <code>.png</code> files is possible; other file types in <code>data-dir</code> will be ignored.</p>
+<h2 id="usage-17"><a class="header" href="#usage-17">Usage</a></h2>
+<pre><code class="language-bash">usage: rankserver [-h] [--port PORT] [--subdomain SUBDOMAIN]
+                  [--data-dir DATA_DIR]
+
+options:
+  -h, --help            show this help message and exit
+  --port PORT           Port to run the server on
+  --subdomain SUBDOMAIN
+                        Subdomain for a reverse proxy
+  --data-dir DATA_DIR   Directory containing the rankable elements
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="stampserver"><a class="header" href="#stampserver">stampserver</a></h1>
+<p>Provides an interface for stamping metadata on PNGs and MP4s.</p>
+<h2 id="usage-18"><a class="header" href="#usage-18">Usage</a></h2>
+<pre><code class="language-bash">usage: stampserver [-h] [--port PORT] [--subdomain SUBDOMAIN]
+                   [--data-dir DATA_DIR]
+
+options:
+  -h, --help            show this help message and exit
+  --port PORT           Port to run the server on
+  --subdomain SUBDOMAIN
+                        Subdomain for a reverse proxy
+  --data-dir DATA_DIR   Directory containing the stampable elements
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="easy-google-auth"><a class="header" href="#easy-google-auth">easy-google-auth</a></h1>
+<p>Convenience library for abstracting away Google API authorization protocols for my various Python libraries that use it.</p>
+<p><a href="https://github.com/goromal/easy-google-auth">Repository</a></p>
+<p>Also includes a dynamic API call rate limiter. Used as the authorization source for:</p>
+<ul>
+<li><a href="#gmail-parser">gmail-parser</a></li>
+<li><a href="#task-tools">task-tools</a></li>
+<li><a href="#book-notes-sync">book-notes-sync</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rcdo"><a class="header" href="#rcdo">rcdo</a></h1>
+<p>Run commands on remote machines.</p>
+<p><a href="https://github.com/goromal/rcdo">Repository</a></p>
+<h2 id="usage-19"><a class="header" href="#usage-19">Usage</a></h2>
+<pre><code class="language-bash">Usage: rcdo [OPTIONS] REMOTE_HOST CMD COMMAND [ARGS]...
+
+  Run a local command `cmd` on a remote machine.
+
+  `remote_host` can be a single or multi-step hop, e.g.,
+
+      user@hostname:password
+      user1@hostname1:password+user2@hostname2:password+...
+
+Options:
+  -i, --input TEXT   Remote file(s) to grab.
+  -o, --output TEXT  Local file(s) to create.
+  --ssh-config TEXT  Path to SSH config file.  [default: ~/.ssh/config]
+  -v, --verbose      Print out diagnostic information.
+  --help             Show this message and exit.
+
+Commands:
+  local   The command is from your local machine.
+  remote  The command is from the remote machine.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="task-tools"><a class="header" href="#task-tools">task-tools</a></h1>
+<p>CLI tools for managing Google Tasks.</p>
+<p><a href="https://github.com/goromal/task-tools">Repository</a></p>
+<h2 id="usage-20"><a class="header" href="#usage-20">Usage</a></h2>
+<pre><code class="language-bash">Usage: task-tools [OPTIONS] COMMAND [ARGS]...
+
+  Manage Google Tasks.
+
+Options:
+  --task-secrets-file PATH   Google Tasks client secrets file.  [default:
+                             ~/secrets/google/client_secrets.json]
+  --task-refresh-token PATH  Google Tasks refresh file (if it exists).
+                             [default: ~/secrets/google/refresh.json]
+  --task-list-id TEXT        UUID of the Task List to query.  [default:
+                             MDY2MzkyMzI4NTQ1MTA0NDUwODY6MDow]
+  --enable-logging BOOLEAN   Whether to enable logging.  [default: False]
+  --help                     Show this message and exit.
+
+Commands:
+  clean           Delete / clean up failed timed tasks.
+  delete          Delete a particular task by UUID.
+  delete-by-name  Delete all tasks in a range by name.
+  grader          Generate a CSV report of how consistently tasks have...
+  list            List pending tasks according to a filter ∈ [all, p0,...
+  put             Upload a task.
+  put-spec        Read a CSV of task specifications and idempotently put...
+</code></pre>
+<h3 id="list"><a class="header" href="#list">list</a></h3>
+<pre><code class="language-bash">Usage: task-tools list [OPTIONS] FILTER
+
+  List pending tasks according to a filter ∈ [all, p0, p1, p2, p3, late,
+  ranked].
+
+Options:
+  --date [%Y-%m-%d]  Maximum due date for filtering tasks.  [default:
+                     2026-02-08]
+  --no-ids           Don't show the UUIDs.
+  --help             Show this message and exit.
+</code></pre>
+<h3 id="delete"><a class="header" href="#delete">delete</a></h3>
+<pre><code class="language-bash">Usage: task-tools delete [OPTIONS] TASK_ID
+
+  Delete a particular task by UUID.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<h3 id="put"><a class="header" href="#put">put</a></h3>
+<pre><code class="language-bash">Usage: task-tools put [OPTIONS]
+
+  Upload a task.
+
+Options:
+  --name TEXT         Name of the task.  [required]
+  --notes TEXT        Notes to add to the task description.  [default: ""]
+  --date [%Y-%m-%d]   Task due date.  [default: 2026-02-08]
+  --until [%Y-%m-%d]  Specify an end date if for multiple days.  [default:
+                      2026-02-08]
+  --help              Show this message and exit.
+</code></pre>
+<h3 id="grader"><a class="header" href="#grader">grader</a></h3>
+<pre><code class="language-bash">Usage: task-tools grader [OPTIONS]
+
+  Generate a CSV report of how consistently tasks have been completed within
+  the specified window.
+
+  Grading criteria:
+
+  - P0: ... tasks must be completed same day. They will be carried over day to
+  day until completed.
+
+  - P1: ... tasks can wait until the next weekly planning session to get
+  scheduled.
+
+  - P2: ... tasks can wait until the next monthly planning session to get
+  scheduled.
+
+  Deletion / failure criteria:
+
+  - P[0-3]: [T] ... tasks that have not be completed within the appropriate
+  window.
+
+  Migration patterns:
+
+  - P0 manually generated tasks will be migrated to the current day.
+
+  - P1 tasks get migrated to P0 tasks at the start of next week.
+
+  - P2 tasks get migrated to P0 tasks at the start of next month.
+
+Options:
+  --start-date [%Y-%m-%d]  First day of the grading window.  [default:
+                           2026-02-01]
+  --end-date [%Y-%m-%d]    Last day of the grading window.  [default:
+                           2026-02-08]
+  -o, --out PATH           CSV file to generate the report in.  [default:
+                           ~/data/task_grades/log.csv]
+  --dry-run                Do a dry run; no task deletions.
+  --help                   Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="photos-tools"><a class="header" href="#photos-tools">photos-tools</a></h1>
+<p>CLI tools for managing Google Photos.</p>
+<p><a href="https://github.com/goromal/photos-tools">Repository</a></p>
+<p>For your photos management, follow these steps:</p>
+<ol>
+<li>Favorite <em>only</em> the media that you would like to “thin out”</li>
+<li>On a computer with space, run the clean method</li>
+<li>Move the whole Favorites directory to the trash</li>
+</ol>
+<h2 id="usage-21"><a class="header" href="#usage-21">Usage</a></h2>
+<pre><code class="language-bash">Usage: photos-tools [OPTIONS] COMMAND [ARGS]...
+
+  Manage Google Photos.
+
+Options:
+  --photos-secrets-file PATH   Google Photos client secrets file.  [default:
+                               ~/secrets/google/client_secrets.json]
+  --photos-refresh-token PATH  Google Photos refresh file (if it exists).
+                               [default: ~/secrets/google/refresh.json]
+  --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
+  --help                       Show this message and exit.
+
+Commands:
+  clean  Download favorited photos so that you can later delete them from...
+</code></pre>
+<h3 id="clean-1"><a class="header" href="#clean-1">clean</a></h3>
+<pre><code class="language-bash">Usage: photos-tools clean [OPTIONS]
+
+  Download favorited photos so that you can later delete them from the cloud.
+
+Options:
+  --output-dir PATH  Directory to download the media to.
+  --dry-run          Dry run only.
+  --help             Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="wiki-tools"><a class="header" href="#wiki-tools">wiki-tools</a></h1>
+<p>CLI tools for managing my wiki notes site.</p>
+<p><a href="https://github.com/goromal/wiki-tools">Repository</a></p>
+<h2 id="usage-22"><a class="header" href="#usage-22">Usage</a></h2>
+<pre><code class="language-bash">Usage: wiki-tools [OPTIONS] COMMAND [ARGS]...
+
+  Read and edit DokuWiki instance pages.
+
+Options:
+  --url TEXT                URL of the DokuWiki instance (https).  [default:
+                            https://notes.andrewtorgesen.com]
+  --wiki-user TEXT          Wiki account username.
+  --wiki-pass TEXT          Wiki account password.
+  --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
+  --help                    Show this message and exit.
+
+Commands:
+  get               Read the content of a DokuWiki page.
+  get-md            Read the content of a DokuWiki page in Markdown format.
+  get-rand-journal  Get a random journal entry between 2013 and now.
+  put               Put content onto a DokuWiki page.
+  put-dir           Put a directory of pages into a DokuWiki namespace.
+  put-md            Put Markdown content onto a DokuWiki page.
+  put-md-dir        Put a directory of Markdown pages into a DokuWiki...
+</code></pre>
+<h3 id="get"><a class="header" href="#get">get</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools get [OPTIONS]
+
+  Read the content of a DokuWiki page.
+
+Options:
+  --page-id TEXT  ID of the DokuWiki page.  [required]
+  --output TEXT   Output text file name. Will print to terminal if not
+                  specified.  [default: ""]
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="get-md"><a class="header" href="#get-md">get-md</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools get-md [OPTIONS]
+
+  Read the content of a DokuWiki page in Markdown format.
+
+Options:
+  --page-id TEXT  ID of the DokuWiki page.  [required]
+  --output TEXT   Output Markdown file name. Will print to terminal if not
+                  specified.  [default: ""]
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="get-rand-journal"><a class="header" href="#get-rand-journal">get-rand-journal</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools get-rand-journal [OPTIONS]
+
+  Get a random journal entry between 2013 and now.
+
+Options:
+  --namespace TEXT  Journal pages namespace.  [default: journals]
+  --output TEXT     Output text file name. Will print to terminal if not
+                    specified.  [default: ""]
+  --help            Show this message and exit.
+</code></pre>
+<h3 id="put-1"><a class="header" href="#put-1">put</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools put [OPTIONS]
+
+  Put content onto a DokuWiki page.
+
+Options:
+  --page-id TEXT  ID of the DokuWiki page.  [required]
+  --file PATH     File containing the target content.
+  --content TEXT  Content to put on the page if file is not specified. NOTE:
+                  This argument is mutually exclusive with content_file
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="put-dir"><a class="header" href="#put-dir">put-dir</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools put-dir [OPTIONS]
+
+  Put a directory of pages into a DokuWiki namespace.
+
+Options:
+  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
+  --namespace TEXT       Namespace to upload the pages to.  [required]
+  --help                 Show this message and exit.
+</code></pre>
+<h3 id="put-md"><a class="header" href="#put-md">put-md</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools put-md [OPTIONS]
+
+  Put Markdown content onto a DokuWiki page.
+
+Options:
+  --page-id TEXT  ID of the DokuWiki page.  [required]
+  --file PATH     Markdown file containing the target content.
+  --content TEXT  Markdown content to put on the page if file is not
+                  specified. NOTE: This argument is mutually exclusive with
+                  content_file
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="put-md-dir"><a class="header" href="#put-md-dir">put-md-dir</a></h3>
+<pre><code class="language-bash">Usage: wiki-tools put-md-dir [OPTIONS]
+
+  Put a directory of Markdown pages into a DokuWiki namespace.
+
+Options:
+  --pages-dir DIRECTORY  Directory with .txt pages to upload.  [required]
+  --namespace TEXT       Namespace to upload the pages to.  [required]
+  --help                 Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="book-notes-sync"><a class="header" href="#book-notes-sync">book-notes-sync</a></h1>
+<p>Utility for syncing Google Play Books notes with my personal wiki.</p>
+<p><a href="https://github.com/goromal/book-notes-sync">Repository</a></p>
+<h2 id="usage-23"><a class="header" href="#usage-23">Usage</a></h2>
+<pre><code class="language-bash">Usage: book-notes-sync [OPTIONS] COMMAND [ARGS]...
+
+  Synchronize Google Docs book notes with corresponding DokuWiki notes.
+
+Options:
+  --docs-secrets-file PATH   Google Docs client secrets file.  [default:
+                             ~/secrets/google/client_secrets.json]
+  --docs-refresh-token PATH  Google Docs refresh file (if it exists).
+                             [default: ~/secrets/google/refresh.json]
+  --wiki-url TEXT            URL of the DokuWiki instance (https).  [default:
+                             https://notes.andrewtorgesen.com]
+  --wiki-user TEXT           Wiki account username.
+  --wiki-pass TEXT           Wiki account password.
+  --enable-logging BOOLEAN   Whether to enable logging.  [default: True]
+  --help                     Show this message and exit.
+
+Commands:
+  sync           Sync a single Google Doc with a single DokuWiki page.
+  sync-from-csv  Sync a list of Google Docs with DokuWiki pages from a CSV.
+</code></pre>
+<h3 id="sync"><a class="header" href="#sync">sync</a></h3>
+<pre><code class="language-bash">Usage: book-notes-sync sync [OPTIONS]
+
+  Sync a single Google Doc with a single DokuWiki page.
+
+Options:
+  --docs-id TEXT  Document ID of the Google Doc.  [required]
+  --page-id TEXT  ID of the DokuWiki page.  [required]
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="sync-from-csv"><a class="header" href="#sync-from-csv">sync-from-csv</a></h3>
+<pre><code class="language-bash">Usage: book-notes-sync sync-from-csv [OPTIONS]
+
+  Sync a list of Google Docs with DokuWiki pages from a CSV.
+
+Options:
+  --sync-csv PATH  CSV specifying (docs-id, page-id) pairs.  [default:
+                   ~/configs/book-notes.csv]
+  --help           Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="goromail"><a class="header" href="#goromail">goromail</a></h1>
+<p>Manage mail for GBot and Journal.</p>
+<p>The following workflows are supported, all via text messaging:</p>
+<p><strong>GBot (<em>goromal.bot@gmail.com</em>):</strong></p>
+<ul>
+<li>Calorie counts via a solo number (e.g., <code>100</code>)</li>
+<li>Tasks via the keywords <code>P[0-3]:</code>
+<ul>
+<li><code>P0</code> = “Must do today”</li>
+<li><code>P1</code> = “Must do within a week”</li>
+<li><code>P2</code> = “Must do within a month”</li>
+<li><code>P3</code> = “Should do eventually”</li>
+</ul>
+</li>
+<li>Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the <code>bot</code> command:
+<ul>
+<li><code>KEYWORD: [P0-1:] ...</code></li>
+<li><code>Sort KEYWORD. [P0-1:] ...</code></li>
+</ul>
+</li>
+<li>ITNS additions via any other pattern</li>
+</ul>
+<p><strong>Journal (<em>goromal.journal@gmail.com</em>):</strong></p>
+<ul>
+<li>Any pattern will be added to the journal according to the date <em>in which the message was sent</em> <strong>unless</strong> prepended by the string <code>mm/dd/yyyy:</code>.</li>
+</ul>
+<h2 id="usage-24"><a class="header" href="#usage-24">Usage</a></h2>
+<pre><code class="language-bash">Usage: goromail [OPTIONS] COMMAND [ARGS]...
+
+  Manage the mail for GBot and Journal.
+
+Options:
+  --gmail-secrets-json PATH    GMail client secrets file.  [default:
+                               ~/secrets/google/client_secrets.json]
+  --gbot-refresh-file PATH     GBot refresh file (if it exists).  [default:
+                               ~/secrets/google/bot_refresh.json]
+  --journal-refresh-file PATH  Journal refresh file (if it exists).  [default:
+                               ~/secrets/google/journal_refresh.json]
+  --num-messages INTEGER       Number of messages to poll for GBot and Journal
+                               (each).  [default: 1000]
+  --wiki-url TEXT              URL of the DokuWiki instance (https).
+                               [default: https://notes.andrewtorgesen.com]
+  --wiki-user TEXT             Wiki account username.
+  --wiki-pass TEXT             Wiki account password.
+  --task-secrets-file PATH     Google Tasks client secrets file.  [default:
+                               ~/secrets/google/client_secrets.json]
+  --notion-secrets-file PATH   Notion client secrets file.  [default:
+                               ~/secrets/notion/secret.json]
+  --task-refresh-token PATH    Google Tasks refresh file (if it exists).
+                               [default: ~/secrets/google/refresh.json]
+  --enable-logging BOOLEAN     Whether to enable logging.  [default: False]
+  --headless                   Whether to run in headless (i.e., server) mode.
+  --headless-logdir PATH       Directory in which to store log files for
+                               headless mode.  [default: ~/goromail]
+  --help                       Show this message and exit.
+
+Commands:
+  annotate-triage-pages  Re-title triage pages based on content.
+  bot                    Process all pending bot commands.
+  itns-nudge             Randomly pick an ITNS topic to nudge with an...
+  journal                Process all pending journal entries.
+  postfix                Process all pending postfix commands.
+</code></pre>
+<h3 id="bot"><a class="header" href="#bot">bot</a></h3>
+<pre><code class="language-bash">Usage: goromail bot [OPTIONS]
+
+  Process all pending bot commands.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; no message deletions.
+  --help                 Show this message and exit.
+</code></pre>
+<h3 id="journal"><a class="header" href="#journal">journal</a></h3>
+<pre><code class="language-bash">Usage: goromail journal [OPTIONS]
+
+  Process all pending journal entries.
+
+Options:
+  --dry-run  Do a dry run; no message deletions.
+  --help     Show this message and exit.
+</code></pre>
+<h3 id="annotate-triage-pages"><a class="header" href="#annotate-triage-pages">annotate-triage-pages</a></h3>
+<pre><code class="language-bash">Usage: goromail annotate-triage-pages [OPTIONS]
+
+  Re-title triage pages based on content.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; don't actually rename the pages.
+  --help                 Show this message and exit.
+</code></pre>
+<h3 id="itns-nudge"><a class="header" href="#itns-nudge">itns-nudge</a></h3>
+<pre><code class="language-bash">Usage: goromail itns-nudge [OPTIONS]
+
+  Randomly pick an ITNS topic to nudge with an action item.
+
+Options:
+  --categories-csv PATH  CSV that maps keywords to notion pages.  [default:
+                         ~/configs/goromail-categories.csv]
+  --dry-run              Do a dry run; no message deletions.
+  --help                 Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="bash-packages"><a class="header" href="#bash-packages">Bash Packages</a></h1>
+<p>Packages written (or glued together) in Bash.</p>
+<ul>
+<li><a href="#aapis-grpcurl">aapis-grpcurl</a></li>
+<li><a href="#aptest">aptest</a></li>
+<li><a href="#authm">authm</a></li>
+<li><a href="#abc">abc</a></li>
+<li><a href="#getres">getres</a></li>
+<li><a href="#mp3">mp3</a></li>
+<li><a href="#mp4">mp4</a></li>
+<li><a href="#png">png</a></li>
+<li><a href="#svg">svg</a></li>
+<li><a href="#ckfile">ckfile</a></li>
+<li><a href="#color-prints">color-prints</a></li>
+<li><a href="#dirgroups">dirgroups</a></li>
+<li><a href="#dirgather">dirgather</a></li>
+<li><a href="#playabc">playabc</a></li>
+<li><a href="#manage-gmail">manage-gmail</a></li>
+<li><a href="#gantter">gantter</a></li>
+<li><a href="#local-ssh-proxy">local-ssh-proxy</a></li>
+<li><a href="#la-quiz">la-quiz</a></li>
+<li><a href="#play">play</a></li>
+<li><a href="#budget_report">budget_report</a></li>
+<li><a href="#md2pdf">md2pdf</a></li>
+<li><a href="#notabilify">notabilify</a></li>
+<li><a href="#fix-perms">fix-perms</a></li>
+<li><a href="#make-title">make-title</a></li>
+<li><a href="#pb">pb</a></li>
+<li><a href="#code2pdf">code2pdf</a></li>
+<li><a href="#cpp-helper">cpp-helper</a></li>
+<li><a href="#py-helper">py-helper</a></li>
+<li><a href="#rust-helper">rust-helper</a></li>
+<li><a href="#mp4unite">mp4unite</a></li>
+<li><a href="#git-cc">git-cc</a></li>
+<li><a href="#git-shortcuts">git-shortcuts</a></li>
+<li><a href="#setupws">setupws</a></li>
+<li><a href="#listsources">listsources</a></li>
+<li><a href="#pkgshell">pkgshell</a></li>
+<li><a href="#devshell">devshell</a></li>
+<li><a href="#providence">providence</a></li>
+<li><a href="#providence-tasker">providence-tasker</a></li>
+<li><a href="#fixfname">fixfname</a></li>
+<li><a href="#nix-deps">nix-deps</a></li>
+<li><a href="#nix-diffs">nix-diffs</a></li>
+<li><a href="#anix-version">anix-version</a></li>
+<li><a href="#anix-upgrade">anix-upgrade</a></li>
+<li><a href="#anix-changelog-compare">anix-changelog-compare</a></li>
+<li><a href="#flake-update">flake-update</a></li>
+<li><a href="#rcrsync">rcrsync</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="aapis-grpcurl"><a class="header" href="#aapis-grpcurl">aapis-grpcurl</a></h1>
+<p>Interact with gRPC servers using custom APIs.</p>
+<p>A wrapped version of the <a href="https://github.com/fullstorydev/grpcurl">grpcurl</a> tool that points to <a href="https://github.com/goromal/aapis">my custom API</a> definitions.</p>
+<p>Since I use gRPC for inter-process communication for most simulated robot platform personal projects, this is a useful CLI tool for debugging.</p>
+<p>Example:</p>
+<pre><code class="language-bash">aapis-grpcurl -plaintext -d '{"result": {"year": 2025,"month": 11, "day": 15, "survey_name": "Your Survey", "results": [{"question_name": "Second question", "result": 3}]}}' localhost:60060 aapis.tactical.v1.TacticalService/SubmitSurveyResult
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="aptest"><a class="header" href="#aptest">aptest</a></h1>
+<p>Run a SITL instance of ardupilot from source.</p>
+<h2 id="sample-commands-for-heli"><a class="header" href="#sample-commands-for-heli">Sample Commands (for heli)</a></h2>
+<ul>
+<li>If you’re running LUA scripts and have some in an <code>ardupilot/scripts</code> directory:
+<ul>
+<li><code>param set SCR_ENABLE 1</code></li>
+<li><code>reboot</code></li>
+</ul>
+</li>
+<li><code>param set DISARM_DELAY 0</code></li>
+<li><code>mode guided</code></li>
+<li><code>arm throttle</code></li>
+<li><code>takeoff 25</code></li>
+</ul>
+<h2 id="usage-25"><a class="header" href="#usage-25">Usage</a></h2>
+<pre><code class="language-bash">usage: aptest [options] path_to_ardupilot
+
+Run a SITL instance of ardupilot from source.
+
+Options:
+  -f|--frame     Copter frame to simulate [default: heli]
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="authm"><a class="header" href="#authm">authm</a></h1>
+<p>Manage secrets.</p>
+<h2 id="usage-26"><a class="header" href="#usage-26">Usage</a></h2>
+<pre><code class="language-bash">Usage: authm [OPTIONS] COMMAND [ARGS]...
+
+  Manage secrets.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  refresh   Refresh all auth tokens one-by-one.
+  validate  Validate the secrets files present on the filesystem.
+</code></pre>
+<h3 id="refresh"><a class="header" href="#refresh">refresh</a></h3>
+<pre><code class="language-bash">Usage: authm refresh [OPTIONS]
+
+  Refresh all auth tokens one-by-one.
+
+Options:
+  --headless  Run in headless mode.
+  --force     Force the auth files to be re-written. If headless, run a
+              headless refresh.
+  --help      Show this message and exit.
+</code></pre>
+<h3 id="validate"><a class="header" href="#validate">validate</a></h3>
+<pre><code class="language-bash">Usage: authm validate [OPTIONS]
+
+  Validate the secrets files present on the filesystem.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="abc"><a class="header" href="#abc">abc</a></h1>
+<p>Generate <a href="https://abcnotation.com/">abc music files</a> from similar formats.</p>
+<h2 id="usage-27"><a class="header" href="#usage-27">Usage</a></h2>
+<pre><code class="language-bash">usage: abc inputfile outputfile
+
+Create an abc file.
+
+Inputs:
+    .smf
+    .midi
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getres"><a class="header" href="#getres">getres</a></h1>
+<p>Get the screen resolution of this computer.</p>
+<h2 id="usage-28"><a class="header" href="#usage-28">Usage</a></h2>
+<pre><code class="language-bash">usage: getres [opts]
+
+Get the screen resolution of this computer.
+
+Options:
+  -v|--verbose   Print diagnostic information
+  --no-fail      Fall back to a reasonable default resolution if this
+                 computer's resolution can't be deduced
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mp3"><a class="header" href="#mp3">mp3</a></h1>
+<p>Generate (or modify) an MP3 file from similar formats.</p>
+<h2 id="usage-29"><a class="header" href="#usage-29">Usage</a></h2>
+<pre><code class="language-bash">usage: mp3 inputfile outputfile
+
+Create a mp3 file.
+
+Inputs:
+    .mp3
+    .mp4
+    .wav
+    .abc
+
+Options:
+    --transpose [+- # HALF STEPS]
+        Powered by https://github.com/breakfastquay/rubberband.
+    --TODO
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mp4"><a class="header" href="#mp4">mp4</a></h1>
+<p>Generate and edit MP4 video files using <code>ffmpeg</code>.</p>
+<h2 id="usage-30"><a class="header" href="#usage-30">Usage</a></h2>
+<pre><code class="language-bash">usage: mp4 inputfile outputfile
+
+Create a mp4 file.
+
+Inputs:
+    .mp4
+    .gif
+    .mpeg
+    .mkv
+    .mov
+    .avi
+    .webm
+    .random (e.g., seed-width-height-frames.random)
+
+Options:
+    -v | --verbose               Print verbose output from ffmpeg
+    -m | --mute                  Remove audio
+    -q | --quality CHAR          - for low, = for medium, + for high bit rate quality
+    -w | --width WIDTH           Constrain the video width (pixels)
+    -l | --label "STR"           Add label to bottom left corner of video
+    -f | --fontsize INT          Font size for added text
+    -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
+    -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
+    -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="png"><a class="header" href="#png">png</a></h1>
+<p>Generate PNG images from a variety of similar formats.</p>
+<h2 id="usage-31"><a class="header" href="#usage-31">Usage</a></h2>
+<pre><code class="language-bash">usage: png [opts] inputfile outputfile
+
+Create a png file.
+
+Inputs:
+    .png
+    .gif
+    .svg
+    .jpeg
+    .heic
+    .tiff
+    .random  (e.g., seed-width-height.random)
+
+Options:
+    -r|--resize [e.g., 50%]  Resize the image.
+    -s|--scrub               Scrub image metadata.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="svg"><a class="header" href="#svg">svg</a></h1>
+<p>Generate and edit SVG files from a variety of source formats.</p>
+<h2 id="usage-32"><a class="header" href="#usage-32">Usage</a></h2>
+<pre><code class="language-bash">usage: svg inputfile outputfile
+
+Create an svg file.
+
+Inputs:
+    .svg
+    .abc
+    .pdf
+
+Options:
+    --crop    | svg [x] abc [ ] pdf [x]
+    --rmtext  | svg [x] abc [ ] pdf [x]
+    --poppler | svg [x] abc [ ] pdf [x]
+    --scour   | svg [x] abc [x] pdf [x]
+    --rmwhite | svg [x] abc [x] pdf [x]
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="ckfile"><a class="header" href="#ckfile">ckfile</a></h1>
+<p>Verify the checksum of a file.</p>
+<h2 id="usage-33"><a class="header" href="#usage-33">Usage</a></h2>
+<pre><code class="language-bash">usage: ckfile [opts] file
+
+Verify the checksum of a file.
+
+Options:
+  -c CHECKSUM     Expected (md5sum) checksum of the file. Will return PASS|FAIL.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="color-prints"><a class="header" href="#color-prints">color-prints</a></h1>
+<p>Color-formatted wrapped <code>echo</code> commands.</p>
+<p>ANSI color codes referenced from <a href="https://en.wikipedia.org/wiki/ANSI_escape_code">Wikipedia</a>.</p>
+<ul>
+<li><code>echo_black</code></li>
+<li><code>echo_red</code></li>
+<li><code>echo_green</code></li>
+<li><code>echo_yellow</code></li>
+<li><code>echo_blue</code></li>
+<li><code>echo_magenta</code></li>
+<li><code>echo_cyan</code></li>
+<li><code>echo_white</code></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="dirgroups"><a class="header" href="#dirgroups">dirgroups</a></h1>
+<p>Split directories into smaller ones.</p>
+<h2 id="usage-34"><a class="header" href="#usage-34">Usage</a></h2>
+<pre><code class="language-bash">usage: dirgroups num_groups dir
+                OR
+       dirgroups --of group_size dir
+
+Split a large directory of files into smaller directories with evenly distributed files (not counting remainders). 
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="dirgather"><a class="header" href="#dirgather">dirgather</a></h1>
+<p>Gather all files in a directory tree into a single directory.</p>
+<h2 id="usage-35"><a class="header" href="#usage-35">Usage</a></h2>
+<pre><code class="language-bash">usage: dirgather [options] rootdir gatherdir
+
+Recursively take all files in rootdir's tree and gather them in a new gatherdir. Subsequently, clean up all empty directories in rootdir.
+
+Options:
+  --dry-run      Perform a dry run
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="playabc"><a class="header" href="#playabc">playabc</a></h1>
+<p>Play ABC music files through the computer speakers.</p>
+<p>Converts ABC notation files to MIDI and plays them using timidity.</p>
+<h2 id="usage-36"><a class="header" href="#usage-36">Usage</a></h2>
+<pre><code class="language-bash">usage: playabc FILE.abc
+
+Play an ABC music file through the computer speakers.
+
+This tool converts the ABC file to MIDI and plays it using timidity.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="manage-gmail"><a class="header" href="#manage-gmail">manage-gmail</a></h1>
+<p>Interactively manage your GMail inbox from the command line.</p>
+<p>Powered by <a href="#gmail-parser">gmail-parser</a>.</p>
+<h2 id="usage-37"><a class="header" href="#usage-37">Usage</a></h2>
+<pre><code class="language-bash">usage: manage-gmail
+
+Enter an interactive shell for managing a GMail inbox.
+
+Examples:
+
+    [Deleting promotions and social network emails]
+      
+    &gt;&gt; baseInbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+    &gt;&gt; baseInbox.clean()
+    &gt;&gt; baseInbox = GMailCorpus('your_email@gmail.com').Inbox(1000)
+
+    [Get all senders of unread emails]
+
+    &gt;&gt; unreadInbox = baseInbox.fromUnread()
+    &gt;&gt; print(unreadInbox.getSenders())
+
+    [Read all unread emails from specific senders]
+
+    &gt;&gt; msgs = unreadInbox.fromSenders(['his@email.com', 'her@email.com']).getMessages()
+    &gt;&gt; for msg in msgs:
+    &gt;&gt;   print(msg.getText())
+
+    [Mark an entire sub-inbox as read]
+
+    &gt;&gt; subInbox.markAllAsRead()
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="gantter"><a class="header" href="#gantter">gantter</a></h1>
+<p>Generate Gantt charts from text files.</p>
+<h2 id="usage-38"><a class="header" href="#usage-38">Usage</a></h2>
+<pre><code class="language-bash">usage: gantter specfile
+
+Create a Gantt-based dependency chart for tasks, laid out by the specfile.
+Example specfile contents:
+--------------------------------------------------------------------------
+1&gt;&gt; Coverage Planner
+1.1&gt;&gt; Learn interface for outer loop
+1.2&gt;&gt; [[1.1]] ((2)) Connect Lab 4 code with outer loop
+1.3&gt;&gt; [[2.1]] [[3.1]] ((3)) Waiting for SLAM
+
+2&gt;&gt; SLAM Algorithm
+2.1&gt;&gt; Something
+
+3&gt;&gt; System-Level Evaluation
+3.1&gt;&gt; Another thing
+--------------------------------------------------------------------------
+Double brackets [[]] indicate dependencies and double parentheses (()) 
+indicate estimated time units required (assumes 1 if none given).
+
+REQUIRES pdflatex to be in your system path (not interested in shipping 
+texlive-full in its entirety with this little tool).
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="local-ssh-proxy"><a class="header" href="#local-ssh-proxy">local-ssh-proxy</a></h1>
+<p>SSH proxy function for registered LAN hosts.</p>
+<h2 id="usage-39"><a class="header" href="#usage-39">Usage</a></h2>
+<pre><code class="language-bash">usage: lssh [options] hostname
+
+SSH proxy function for registered LAN hosts.
+
+Options:
+  -p              Port
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="la-quiz"><a class="header" href="#la-quiz">la-quiz</a></h1>
+<p>Spawn a LA geography quiz.</p>
+<h2 id="usage-40"><a class="header" href="#usage-40">Usage</a></h2>
+<pre><code class="language-bash">usage: la-quiz [options] [N|C|E|S]
+
+Spawn a LA geography quiz! Will pull up the general region you specify:
+
+    N = North
+    C = Central
+    E = East
+    S = South
+
+Options:
+
+--debug|-d    Open in debug mode (will write your clicks to the keyfile).
+
+NOTE: This program assumes that you have the place location JSON keyfiles stored in
+
+  ~/games/la-quiz/GLAA-C.json
+                  GLAA-E.json
+                  GLAA-N.json
+                  GLAA-S.json
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="play"><a class="header" href="#play">play</a></h1>
+<p>Play a game using the Dolphin Emulator.</p>
+<h2 id="usage-41"><a class="header" href="#usage-41">Usage</a></h2>
+<pre><code class="language-bash">usage: play GAME
+
+Play a game. Your options:
+      zelda	Legend of Zelda: Collector's Edition.
+      windwaker	The Wind Waker.
+      twilight	Twilight Princess.
+      melee	Super Smash Bros. Melee.
+      sunshine	Super Mario Sunshine.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="budget_report"><a class="header" href="#budget_report">budget_report</a></h1>
+<p>Generate a budget report.</p>
+<h2 id="usage-42"><a class="header" href="#usage-42">Usage</a></h2>
+<pre><code class="language-bash">Usage: budget_report [OPTIONS] COMMAND [ARGS]...
+
+  Tools for Budget Management.
+
+Options:
+  --secrets-json PATH       Client secrets file.  [default:
+                            ~/secrets/google/client_secrets.json]
+  --refresh-file PATH       Refresh file (if it exists).  [default:
+                            ~/secrets/google/refresh.json]
+  --config-json PATH        Budget tool config file.  [default:
+                            ~/configs/budget-tool.json]
+  --enable-logging BOOLEAN  Whether to enable logging.  [default: False]
+  --help                    Show this message and exit.
+
+Commands:
+  transactions-bin      Bin all transactions from a category sheet.
+  transactions-process  Process raw transactions.
+  transactions-status   Get the status of raw transactions.
+  transactions-upload   Upload missing raw transactions to the budget sheet.
+</code></pre>
+<h3 id="transactions-process"><a class="header" href="#transactions-process">transactions-process</a></h3>
+<pre><code class="language-bash">Usage: budget_report transactions-process [OPTIONS]
+
+  Process raw transactions.
+
+Options:
+  --dry-run  Activate dry run mode.
+  --help     Show this message and exit.
+</code></pre>
+<h3 id="transactions-status"><a class="header" href="#transactions-status">transactions-status</a></h3>
+<pre><code class="language-bash">Usage: budget_report transactions-status [OPTIONS]
+
+  Get the status of raw transactions.
+
+Options:
+  --help  Show this message and exit.
+</code></pre>
+<h3 id="transactions-upload"><a class="header" href="#transactions-upload">transactions-upload</a></h3>
+<pre><code class="language-bash">Usage: budget_report transactions-upload [OPTIONS]
+
+  Upload missing raw transactions to the budget sheet.
+
+Options:
+  --raw-csv PATH  Raw CSV file with transactions.  [required]
+  --account TEXT  Account type from the config file.  [required]
+  --dry-run       Activate dry run mode.
+  --help          Show this message and exit.
+</code></pre>
+<h3 id="transactions-bin"><a class="header" href="#transactions-bin">transactions-bin</a></h3>
+<pre><code class="language-bash">Usage: budget_report transactions-bin [OPTIONS]
+
+  Bin all transactions from a category sheet.
+
+Options:
+  --category TEXT  Category from the Config sheet.  [required]
+  --help           Show this message and exit.
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="md2pdf"><a class="header" href="#md2pdf">md2pdf</a></h1>
+<p>Convert Markdown files into formatted PDF files, powered by LaTeX.</p>
+<h2 id="usage-43"><a class="header" href="#usage-43">Usage</a></h2>
+<pre><code class="language-bash">usage: md2pdf input.md output.pdf
+
+Use LaTeX to convert a markdown file into a formatted pdf.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="notabilify"><a class="header" href="#notabilify">notabilify</a></h1>
+<p>Make any PDF document suitable for note taking in e.g., Notability.</p>
+<h2 id="usage-44"><a class="header" href="#usage-44">Usage</a></h2>
+<pre><code class="language-bash">usage: notabilify input.pdf output.pdf
+
+Takes a portrait PDF file and adds a large blank space to the right of every page for taking notes.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="fix-perms"><a class="header" href="#fix-perms">fix-perms</a></h1>
+<p>Recursively claim ownership of all files and folders in dir.</p>
+<h2 id="usage-45"><a class="header" href="#usage-45">Usage</a></h2>
+<pre><code class="language-bash">usage: fix-perms dir
+
+Recursively claim ownership of all files and folders in dir. Attempts to deduce special cases such as ~/.ssh/*.
+
+EXAMPLES:
+
+Current directory is ~/.ssh:
+
+  find . -type d -exec chmod 700 {} \;
+  find . -type f -exec chmod 600 {} \;
+  find . -type f -name \*.pub -exec chmod 644 {} \;
+
+Current directory is a normal directory:
+
+  find . -type d -exec chmod 755 {} \;
+  find . -type f -exec chmod 644 {} \;
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="make-title"><a class="header" href="#make-title">make-title</a></h1>
+<p>Print decorated titles.</p>
+<p>Example:</p>
+<pre><code>$ make-title "Hello, World"
+========================
+===== Hello, World =====
+========================
+</code></pre>
+<h2 id="usage-46"><a class="header" href="#usage-46">Usage</a></h2>
+<pre><code class="language-bash">usage: make-title [options] title
+
+Prints out a decorated title.
+
+Options:
+-h | --help     Print out the help documentation.
+-c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
+
+Arguments:
+title           word or phrase making up the title
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pb"><a class="header" href="#pb">pb</a></h1>
+<p>Print out a progress bar.</p>
+<p>Example usage:</p>
+<pre><code>N=0
+T=20
+while [ \$N -le \$T ]; do
+    pb \$N \$T
+    N=\$[\$N+1]
+    sleep 1
+done
+echo
+
+</code></pre>
+<h2 id="usage-47"><a class="header" href="#usage-47">Usage</a></h2>
+<pre><code class="language-bash">usage: pb [options] iternum itertot
+
+Prints a progress bar.
+
+Options:
+-h | --help     Print out the help documentation.
+-b | --barsize  Dictate the total progress bar length in chars (Default: 20).
+-c | --color    One of [black|red|green|yellow|blue|magenta|cyan|white].
+
+Arguments:
+iternum: current iteration number
+itertot: number of total iterations
+
+
+Example Usage:
+
+N=0
+T=20
+while [ $N -le $T ]; do
+    pb $N $T
+    N=$[$N+1]
+    sleep 1
+done
+echo
+
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="code2pdf"><a class="header" href="#code2pdf">code2pdf</a></h1>
+<p>Generate pretty-printed PDF files from source code files.</p>
+<h2 id="usage-48"><a class="header" href="#usage-48">Usage</a></h2>
+<pre><code class="language-bash">usage: code2pdf infile output.pdf
+
+Convert plain text code infile to color-coded pdf outfile.
+
+Recursive search example for C++ files:
+for f in $(find . -name '*.cpp' -or -name '*.h'); do code2pdf $f $f.pdf; done
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cpp-helper"><a class="header" href="#cpp-helper">cpp-helper</a></h1>
+<p>Convenience tools for setting up C++ projects.</p>
+<h2 id="usage-49"><a class="header" href="#usage-49">Usage</a></h2>
+<pre><code class="language-bash">usage: cpp-helper [options]
+
+Options:
+    exec-lib   CPPNAME      Generate a lib+exec package template
+    header-lib CPPNAME      Generate a header-only library template
+    format-file             Dumps a format rules file into .clang-format
+
+    nix                     Dump template shell.nix file
+    vscode                  Generate VSCode C++ header detection settings file
+    make       TARGET|all   Full CMake build command (run from repo root)
+    challenge  TARGET|all   Full CMake build command WITH SANITIZERS
+                            (run from repo root)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="py-helper"><a class="header" href="#py-helper">py-helper</a></h1>
+<p>Developer tools for creating Python packages.</p>
+<h2 id="usage-50"><a class="header" href="#usage-50">Usage</a></h2>
+<pre><code class="language-bash">usage: py-helper [options]
+
+Options:
+--make-pkg        NAME         Generate a template python package
+--make-pybind-lib NAME,CPPNAME Generate a pybind package wrapping a header-only library
+--make-nix                     Dump template default.nix and shell.nix files
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rust-helper"><a class="header" href="#rust-helper">rust-helper</a></h1>
+<p>Convenience tools for setting up Rust projects.</p>
+<h2 id="usage-51"><a class="header" href="#usage-51">Usage</a></h2>
+<pre><code class="language-bash">usage: rust-helper [options]
+
+Options:
+    dev                         Drop directly into a Rust development shell
+
+    nix                         Dump template shell.nix file
+    vscode DEFAULT[:OTHER:ENV]  Generate VSCode settings file for rust-analyzer
+                                (Run inside a Nix dev environment)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mp4unite"><a class="header" href="#mp4unite">mp4unite</a></h1>
+<p>Unite mp4 files, much like with the <code>pdfunite</code> tool.</p>
+<h2 id="usage-52"><a class="header" href="#usage-52">Usage</a></h2>
+<pre><code class="language-bash">usage: mp4unite [options] &lt;MP4-sourcefile-1&gt;..&lt;MP4-sourcefile-n&gt; &lt;MP4-destfile&gt;
+
+Combine MP4 source files into a single destination MP4 file.
+
+Options:
+-h | --help     Print out the help documentation.
+-v | --verbose  Print verbose output from ffmpeg
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="git-cc"><a class="header" href="#git-cc">git-cc</a></h1>
+<p>Create a carbon copy of a Git repo, but with Git removed.</p>
+<h2 id="usage-53"><a class="header" href="#usage-53">Usage</a></h2>
+<pre><code class="language-bash">usage: git-cc repo_dir des_dir
+
+Recursively backup a git repository (and its submodules) to a new, git-less source tree.
+Effectively wraps up an arbitrarily complex git repo into a flat-packaged mass of code.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="git-shortcuts"><a class="header" href="#git-shortcuts">git-shortcuts</a></h1>
+<p>Git shortcut commands.</p>
+<h2 id="usage-54"><a class="header" href="#usage-54">Usage</a></h2>
+<pre><code class="language-bash">usage: gitcm commit message ...
+
+"Git CoMmit, push, and get head revision." No quotes needed for commit message.
+
+``````bash
+usage: gitcop [-f] [branch_name]
+
+"Git CheckOut and Pull." Assumes remote is named origin. Optional -f flag fetches first.
+If no branch_name is provided, then only a pull will occur.
+
+``````bash
+usage: githead [repo_path]
+
+Gets the commit hash of the HEAD of the current (or specified) repo path.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="setupws"><a class="header" href="#setupws">setupws</a></h1>
+<p>Create standalone development workspaces.</p>
+<p>Unlike with <a href="#devshell">devshell</a>’s <code>setupcurrentws</code> command, this tool takes all of its setup info from the CLI.</p>
+<h2 id="usage-55"><a class="header" href="#usage-55">Usage</a></h2>
+<pre><code class="language-bash">usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...] [scriptname=scriptpath ...]
+
+Create a development workspace with specified git sources and scripts.
+
+Options:
+    --dev_dir [DIRNAME]        Specify the root directory where the [workspace_name] source
+                               directory will be created (default: ~/dev)
+
+    --data_dir [DIRNAME]       Specify the root directory where the [workspace_name] mutable 
+                               data will be stored (default: ~/data)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="listsources"><a class="header" href="#listsources">listsources</a></h1>
+<p>Get the Git info about all sources in a <code>devshell</code> workspace.</p>
+<p><strong>NOTE:</strong> This command needs to be run with a <code>devshell</code> workspace created with <code>setupws</code>.</p>
+<h2 id="usage-56"><a class="header" href="#usage-56">Usage</a></h2>
+<pre><code class="language-bash">usage: listsources
+
+List git information for all sources in a workspace. Must be run 
+within in a workspace created by setupws.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="pkgshell"><a class="header" href="#pkgshell">pkgshell</a></h1>
+<p>Flexible Nix shell.</p>
+<h2 id="usage-57"><a class="header" href="#usage-57">Usage</a></h2>
+<pre><code class="language-bash">usage: pkgshell [options] pkgs attr [--run CMD]
+
+Make a nix shell with package [attr] from [pkgs] (e.g., '&lt;nixpkgs&gt;').
+Optionally run a one-off command with --run CMD.
+
+Special values for [pkgs]:
+  anixpkgs      Fetch the latest anixpkgs from GitHub
+
+Options:
+-v|--verbose    Print verbose output.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="devshell"><a class="header" href="#devshell">devshell</a></h1>
+<p>Developer tool for creating siloed dev environments.</p>
+<p>A workspace has the directory tree structure:</p>
+<ul>
+<li><code>[dev_dir]/[workspace_name]</code>: Workspace root.
+<ul>
+<li><code>data/</code>: Directory for storing long-lived workspace data, symlinked to <code>[data_dir]/[workspace_name]</code>.</li>
+<li><code>.envrc</code>: <code>direnv</code> environment file defining important worksapce aliases.</li>
+<li><code>shell.nix</code>: Workspace shell file for <code>lorri</code> integrations.</li>
+<li><code>sources/</code>: Directory containing all workspace source repositories.</li>
+</ul>
+</li>
+</ul>
+<p>The <code>dev/</code> directory can be deleted and re-constructed as needed, whereas the <code>data/</code> directory holds stuff that’s meant to last.</p>
+<p>Once in the shell, the following commands are provided:</p>
+<ul>
+<li><code>setupcurrentws</code>: A wrapped version of <a href="#setupws">setupws</a> that will build your development workspace as specified in <code>~/.devrc</code>.</li>
+<li><code>godev</code>: An alias that will take you to the root of your development workspace.</li>
+<li><code>listsources</code>: See the <a href="#listsources">listsources</a> tool documentation.</li>
+<li><code>dev</code>: Enter an interactive menu for workspace source manipulation.</li>
+</ul>
+<h2 id="usage-58"><a class="header" href="#usage-58">Usage</a></h2>
+<pre><code class="language-bash">usage: devshell [-n|--new] [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
+
+Enter [workspace_name]'s development shell as defined in ~/.devrc
+(can specify an alternate path with -d DEVRC or history file with
+-s DEVHIST).
+Add a new workspace with the -n|--new flag.
+Optionally run a one-off command with --run CMD (e.g., --run dev).
+
+Example ~/.devrc:
+=================================================================
+dev_dir = ~/dev
+data_dir = ~/data
+pkgs_dir = ~/sources/anixpkgs
+pkgs_var = &lt;anixpkgs&gt;
+
+# repositories
+[manif-geom-cpp] = pkgs manif-geom-cpp
+[geometry] = pkgs python3.pkgs.geometry
+[pyvitools] = git@github.com:goromal/pyvitools.git
+[scrape] = git@github.com:goromal/scrape.git
+
+# scripts
+&lt;script_ref&gt; = data_dir_relative_path/script
+
+# workspaces
+signals = manif-geom-cpp geometry pyvitools script_ref
+=================================================================
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="providence"><a class="header" href="#providence">providence</a></h1>
+<p>Be randomly dictated to from passages of importance.</p>
+<p>Requires a wiki secrets file at <code>~/secrets/wiki/secrets.json</code>.</p>
+<h2 id="usage-59"><a class="header" href="#usage-59">Usage</a></h2>
+<pre><code class="language-bash">usage: providence [options] domain
+
+Pick randomly from a specified domain:
+- patriarchal
+- passage
+- talk
+
+Options:
+--wiki-url URL   URL of wiki to get data from (default: https://notes.andrewtorgesen.com)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="providence-tasker"><a class="header" href="#providence-tasker">providence-tasker</a></h1>
+<p>Providence + Google Tasks integration.</p>
+<p>Takes output from <code>providence</code> and places it into <code>[num_days]</code> consecutive days of Google Tasks.</p>
+<p>Requires a wiki secrets file at <code>~/secrets/wiki/secrets.json</code> and a Google Tasks secrets file
+at <code>~/secrets/task/secrets.json</code>.</p>
+<h2 id="usage-60"><a class="header" href="#usage-60">Usage</a></h2>
+<pre><code class="language-bash">usage: providence-tasker [options] num_days
+
+Generate [num_days] tasks derived from providence output.
+
+Options:
+--wiki-url URL   URL of wiki to get data from (default: https://notes.andrewtorgesen.com)
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="fixfname"><a class="header" href="#fixfname">fixfname</a></h1>
+<p>Unix-ify filenames.</p>
+<h2 id="usage-61"><a class="header" href="#usage-61">Usage</a></h2>
+<pre><code class="language-bash">usage: fixfname FILE
+
+Replace spaces and remove [], () characters from a filename (in place).
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="nix-deps"><a class="header" href="#nix-deps">nix-deps</a></h1>
+<p>Recurse the dependencies of a Nix package.</p>
+<h2 id="usage-62"><a class="header" href="#usage-62">Usage</a></h2>
+<pre><code class="language-bash">usage: nix-deps derivation
+   OR e.g.,
+       nix-deps '&lt;nixpkgs&gt;' -A pkgname
+
+Recurse the dependencies of a Nix package.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="nix-diffs"><a class="header" href="#nix-diffs">nix-diffs</a></h1>
+<p>Diff the Nix hashes of two closures or packages in nicely-formatted diffed text files (with ordering mostly preserved).</p>
+<h2 id="usage-63"><a class="header" href="#usage-63">Usage</a></h2>
+<pre><code class="language-bash">usage: nix-diffs derivation1 derivation2 out_dir
+
+Diff the Nix hashes of two closures or packages in nicely-formatted diffed text files (with ordering mostly preserved).
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="anix-version"><a class="header" href="#anix-version">anix-version</a></h1>
+<p>Get the current anixpkgs version of the operating system.</p>
+<h2 id="usage-64"><a class="header" href="#usage-64">Usage</a></h2>
+<pre><code class="language-bash">usage: anix-version
+
+Get the current anixpkgs version of the operating system.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="anix-upgrade"><a class="header" href="#anix-upgrade">anix-upgrade</a></h1>
+<p>Upgrade the operating system and view the delta.  [NIXOS VERSION]</p>
+<h2 id="usage-65"><a class="header" href="#usage-65">Usage</a></h2>
+<pre><code class="language-bash">usage: anix-upgrade [-v|--version VERSION;-c|--commit COMMIT;-b|--branch BRANCH;-s|--source SOURCETREE] [--local] [--boot]
+
+Upgrade the operating system and view the delta.  [NIXOS VERSION]
+
+For this to work properly, your configuration.nix file or home.nix file must be symlinked to some configuration file in ~/sources/anixpkgs (which is generated by this program).
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="anix-changelog-compare"><a class="header" href="#anix-changelog-compare">anix-changelog-compare</a></h1>
+<p>Compare the changelogs of two instances of anixpkgs.</p>
+<h2 id="usage-66"><a class="header" href="#usage-66">Usage</a></h2>
+<pre><code class="language-bash">usage: anix-changelog-compare anixpkgs_FROM anixpkgs_TO
+
+Compare the changelogs of two instances of anixpkgs.
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="flake-update"><a class="header" href="#flake-update">flake-update</a></h1>
+<p>Automatically update the flake lock of every changed ref (according to Git diff).</p>
+<h2 id="usage-67"><a class="header" href="#usage-67">Usage</a></h2>
+<pre><code class="language-bash">usage: flake-update [path/to/flake.nix]
+
+Automatically update the flake lock of every changed ref (according to Git diff).
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rcrsync"><a class="header" href="#rcrsync">rcrsync</a></h1>
+<p>Cloud directory management tool.</p>
+<h2 id="usage-68"><a class="header" href="#usage-68">Usage</a></h2>
+<pre><code class="language-bash">usage: rcrsync [OPTS] init|sync|copy|override CLOUD_DIR [subdir]
+
+Manage cloud directories with rclone.
+
+Options:
+      -v|--verbose     Print verbose output
+
+CLOUD_DIR options:
+
+      
+
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="java-packages"><a class="header" href="#java-packages">Java Packages</a></h1>
+<p>(Toy) Packages written in Java.</p>
+<ul>
+<li><a href="#evil-hangman">evil-hangman</a></li>
+<li><a href="#spelling-corrector">spelling-corrector</a></li>
+<li><a href="#simple-image-editor">simple-image-editor</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="evil-hangman"><a class="header" href="#evil-hangman">evil-hangman</a></h1>
+<p>Interactive hangman game where you’ll probably lose (because the computer is cheating).</p>
+<p>Written in Java. <a href="https://github.com/goromal/evil-hangman">Repository</a></p>
+<pre><code>usage: evil-hangman &lt;word-length&gt; &lt;num-guesses&gt;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="spelling-corrector"><a class="header" href="#spelling-corrector">spelling-corrector</a></h1>
+<p>Offer up spelling corrections for provided mispelled words.</p>
+<p>Written in Java. <a href="https://github.com/goromal/spelling-corrector">Repository</a></p>
+<p>The repository contains the text-file dictionary from which all word suggestions derive.</p>
+<pre><code>usage: spelling-corrector &lt;word&gt;
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="simple-image-editor"><a class="header" href="#simple-image-editor">simple-image-editor</a></h1>
+<p>Perform some simple image transformations from the command line.</p>
+<p>Written in Java. <a href="https://github.com/goromal/simple-image-editor">Repository</a></p>
+<p>Input and output images must be in the <a href="https://netpbm.sourceforge.net/doc/ppm.html">PPM</a> image format.</p>
+<pre><code>usage: simple-image-editor &lt;input.ppm&gt; &lt;output.ppm&gt; [grayscale|invert|emboss|motionblur motion-blur-length]
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>
