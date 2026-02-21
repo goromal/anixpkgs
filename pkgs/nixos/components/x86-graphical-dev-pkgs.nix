@@ -51,7 +51,7 @@ in
           ms-python.python
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
-          zxh404.vscode-proto3
+          drblury.protobuf-vsc
           ms-vscode.cpptools
         ]
         ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
