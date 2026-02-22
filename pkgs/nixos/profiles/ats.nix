@@ -151,7 +151,7 @@ with import ../dependencies.nix;
         }
         {
           name = "ats-survey-update";
-          jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
+          jobShellScript = pkgs.writeShellScript "ats-survey-update" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
             rcrsync copy configs && surveys_report upload-results
           '';
