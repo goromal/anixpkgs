@@ -172,7 +172,14 @@ in
     profiles.default = {
       userSettings = {
         # TidalCycles configuration
-        "tidalcycles.ghciPath" = "${pkgs.haskellPackages.ghcWithPackages (p: with p; [ tidal tidal-link ])}/bin/ghci";
+        "tidalcycles.ghciPath" = "${
+          pkgs.haskellPackages.ghcWithPackages (
+            p: with p; [
+              tidal
+              tidal-link
+            ]
+          )
+        }/bin/ghci";
         "tidalcycles.useBootFileInCurrentDirectory" = false;
         "files.associations" = {
           "*.tidal" = "haskell";
