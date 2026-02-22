@@ -169,4 +169,9 @@ If you haven't already, run:
 install-superdirt
 ```
 
-Open VSCode, run `sclang` in the terminal, and open up a `.tidal` file and get to work.
+Open VSCode, run `sclang` in the terminal (close with `0.exit`), and open up a `.tidal` file and get to work.
+
+Useful commands:
+
+- Install samples with e.g., `tidal-download-samples eddyflux/crate crate`
+- When `sclang` is running, associate with the correct audio device with `sc-route-audio`
