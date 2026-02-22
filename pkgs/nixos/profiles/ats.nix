@@ -143,10 +143,20 @@ with import ../dependencies.nix;
             tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local quote
             tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local vocab
             tactical --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local wiki-url
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:30:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-survey-update";
+          jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
+            authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
             rcrsync copy configs && surveys_report upload-results
           '';
           timerCfg = {
-            OnCalendar = [ "*-*-* 18:30:00" ];
+            OnCalendar = ["*-*-* 00:30:00" "*-*-* 18:30:00" ];
             Persistent = false;
           };
         }
