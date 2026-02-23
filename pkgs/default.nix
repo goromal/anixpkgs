@@ -169,6 +169,11 @@ let
                   pkg-src = flakeInputs.task-tools;
                 }
               );
+              workout-planner = addDoc (
+                pySelf.callPackage ./python-packages/workout-planner {
+                  pkg-src = flakeInputs.workout-planner;
+                }
+              );
               photos-tools = addDoc (
                 pySelf.callPackage ./python-packages/photos-tools {
                   pkg-src = flakeInputs.photos-tools;
