@@ -344,6 +344,7 @@ rec {
   budget_ui = final.python313.pkgs.budget_ui;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
+  workout-planner = final.python313.pkgs.workout-planner;
   photos-tools = final.python313.pkgs.photos-tools;
   python-dokuwiki = final.python313.pkgs.python-dokuwiki;
   wiki-tools = final.python313.pkgs.wiki-tools;
