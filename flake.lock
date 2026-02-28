@@ -981,11 +981,11 @@
     "workout-planner": {
       "flake": false,
       "locked": {
-        "lastModified": 1772260991,
-        "narHash": "sha256-pz59nLCPhlTqIrxRfST0UIuMOE/Ybw5Jrwc7qz1g0R0=",
+        "lastModified": 1772261839,
+        "narHash": "sha256-eKJSMzsKBv74F80rxfBnDfdm9Bs9/0rBCjgAngKh4eU=",
         "owner": "goromal",
         "repo": "workout-planner",
-        "rev": "c9e61007d876875af32623408d6097e4dd0d0600",
+        "rev": "ab4d3263ea70b70085a9170580c11d12dd2585e5",
         "type": "github"
       },
       "original": {
