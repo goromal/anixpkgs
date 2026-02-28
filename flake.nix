@@ -141,14 +141,14 @@
     task-tools.url = "github:goromal/task-tools";
     task-tools.flake = false;
 
-    workout-planner.url = "path:/data/andrew/dev/anix/sources/workout-planner";
-    workout-planner.flake = false;
-
     trafficsim.url = "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
     trafficsim.flake = false;
 
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
+
+    workout-planner.url = "github:goromal/workout-planner";
+    workout-planner.flake = false;
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
     xv-lidar-rs.flake = false;
