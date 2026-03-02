@@ -184,7 +184,7 @@ in
       After = [ "graphical-session.target" ];
     };
     Timer = {
-      OnBootSec = "0min";
+      OnBootSec = "5";
       OnUnitActiveSec = "15min";
       Persistent = true;
     };
