@@ -66,6 +66,7 @@
   - [color-prints](./bash/color-prints.md)
   - [dirgroups](./bash/dirgroups.md)
   - [dirgather](./bash/dirgather.md)
+  - [playabc](./bash/playabc.md)
   - [manage-gmail](./bash/manage-gmail.md)
   - [gantter](./bash/gantter.md)
   - [local-ssh-proxy](./bash/local-ssh-proxy.md)

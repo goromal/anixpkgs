@@ -350,6 +350,7 @@ in
       enable = true;
       alsa.enable = true;
       pulse.enable = true;
+      jack.enable = true;
     };
 
     services.udev.packages = lib.mkIf (
@@ -616,6 +617,9 @@ in
                   [ ./components/x86-graphical-pkgs.nix ]
                   ++ (if cfg.developer then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
                   ++ (if cfg.recreational then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
+                  ++ (
+                    if (cfg.developer && cfg.recreational) then [ ./components/x86-graphical-dev-rec-pkgs.nix ] else [ ]
+                  )
                 )
               else
                 [ ]

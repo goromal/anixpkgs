@@ -15,6 +15,7 @@ Packages written (or glued together) in Bash.
 - [color-prints](./color-prints.md)
 - [dirgroups](./dirgroups.md)
 - [dirgather](./dirgather.md)
+- [playabc](./playabc.md)
 - [manage-gmail](./manage-gmail.md)
 - [gantter](./gantter.md)
 - [local-ssh-proxy](./local-ssh-proxy.md)
