@@ -28,7 +28,32 @@ in
     anixpkgs.makepyshell
     pkgs.gh
     pkgs.universal-ctags
+    pkgs.dolt
     unstable.claude-code
+    (pkgs.buildGoModule rec {
+      pname = "beads";
+      version = "unstable-2024-01-01";
+      src = pkgs.fetchFromGitHub {
+        owner = "steveyegge";
+        repo = "beads";
+        rev = "main";
+        sha256 = "sha256-yJ38xi6nRnEZIV5CEgV8xZK1dky0dVMavfFg4J7gkqw=";
+      };
+      vendorHash = "sha256-OL6QGf4xSMpEbmU+41pFdO0Rrs3H162T3pdiW9UfWR0=";
+      subPackages = [ "cmd/bd" ];
+      nativeCheckInputs = [ pkgs.git ];
+      propagatedBuildInputs = [ pkgs.dolt ];
+      preCheck = ''
+        export HOME=$TMPDIR
+        git config --global user.email "test@example.com"
+        git config --global user.name "Test User"
+      '';
+      meta = {
+        description = "Distributed, git-backed graph issue tracker for AI agents";
+        homepage = "https://github.com/steveyegge/beads";
+        mainProgram = "bd";
+      };
+    })
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then
         echo_red "Error: claude not found in PATH"
