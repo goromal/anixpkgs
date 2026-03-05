@@ -76,5 +76,70 @@ pkgs.mkShell {
     alias godev='cd ${devDir}/${wsname}'
     setupcurrentws
     cd ${devDir}/${wsname}
+
+    # Start beads daemon if available and config exists
+    if command -v bd &> /dev/null && [ -f sources/.beads.yml ]; then
+      BEADS_LOCK_FILE="${devDir}/${wsname}/data/.beads/shell_count"
+      mkdir -p "$(dirname "$BEADS_LOCK_FILE")"
+
+      # Check if daemon is actually running
+      cd sources
+      DAEMON_RUNNING=0
+      if bd daemon status &> /dev/null; then
+        DAEMON_RUNNING=1
+      fi
+      cd ..
+
+      # If lock file exists but daemon is not running, reset the lock file
+      if [ -f "$BEADS_LOCK_FILE" ] && [ "$DAEMON_RUNNING" -eq 0 ]; then
+        echo "Detected stale lock file (daemon not running), resetting..."
+        rm -f "$BEADS_LOCK_FILE"
+      fi
+
+      # Increment shell count
+      if [ -f "$BEADS_LOCK_FILE" ]; then
+        SHELL_COUNT=$(cat "$BEADS_LOCK_FILE")
+      else
+        SHELL_COUNT=0
+      fi
+      SHELL_COUNT=$((SHELL_COUNT + 1))
+      echo "$SHELL_COUNT" > "$BEADS_LOCK_FILE"
+
+      # Start daemon if needed
+      if [ "$DAEMON_RUNNING" -eq 0 ]; then
+        cd sources
+        echo "Starting beads daemon for workspace ${wsname}..."
+        if ! bd daemon start 2>&1; then
+          echo "Warning: Failed to start beads daemon"
+        fi
+        cd ..
+      fi
+    fi
+
+    # Stop beads daemon on shell exit (only if last shell)
+    cleanup_beads() {
+      if command -v bd &> /dev/null && [ -f ${devDir}/${wsname}/sources/.beads.yml ]; then
+        BEADS_LOCK_FILE="${devDir}/${wsname}/data/.beads/shell_count"
+
+        if [ -f "$BEADS_LOCK_FILE" ]; then
+          SHELL_COUNT=$(cat "$BEADS_LOCK_FILE")
+          SHELL_COUNT=$((SHELL_COUNT - 1))
+
+          if [ "$SHELL_COUNT" -le 0 ]; then
+            # Last shell exiting, stop the daemon
+            cd ${devDir}/${wsname}/sources
+            if bd daemon status &> /dev/null; then
+              echo "Stopping beads daemon for workspace ${wsname}..."
+              bd daemon stop 2>/dev/null
+            fi
+            rm -f "$BEADS_LOCK_FILE"
+          else
+            # Other shells still active, just decrement count
+            echo "$SHELL_COUNT" > "$BEADS_LOCK_FILE"
+          fi
+        fi
+      fi
+    }
+    trap cleanup_beads EXIT
   '';
 }

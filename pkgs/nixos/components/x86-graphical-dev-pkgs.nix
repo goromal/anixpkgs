@@ -78,6 +78,12 @@ in
             version = "1.0.1";
             sha256 = "sha256-DFLm0efm7krqcObblbgAlO9PsEGDtw9vrsIDeCtjd14=s";
           }
+          {
+            name = "vscode-beads";
+            publisher = "planet57";
+            version = "0.1.0";
+            sha256 = "sha256-Uk/HnsDJPrKAZFr+b3Ax7dB1OcT9EnsIZGywXhEnK/M=";
+          }
         ];
     };
     mutableExtensionsDir = false;
