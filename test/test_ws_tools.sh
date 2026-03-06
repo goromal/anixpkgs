@@ -44,6 +44,39 @@ if [[ ! -f $tmpdir/dev/test_env/sources/.claude/CLAUDE.md ]]; then
     echo_red "Failed to create source claude boilerplate"
     exit 1
 fi
+if [[ ! -f $tmpdir/dev/test_env/.claude/AGENTS.md ]]; then
+    echo_red "Failed to create AGENTS.md with beans instructions"
+    exit 1
+fi
+if command -v beans &> /dev/null; then
+  # Check data directory has actual beans files
+  if [[ ! -f $tmpdir/data2/.beans.yml ]]; then
+      echo_red "Failed to create beans config in data directory"
+      exit 1
+  fi
+  if [[ ! -d $tmpdir/data2/.beans ]]; then
+      echo_red "Failed to create beans directory in data directory"
+      exit 1
+  fi
+  # Check workspace root has symlinks
+  if [[ ! -L $tmpdir/dev/test_env/.beans.yml ]] || [[ $(readlink $tmpdir/dev/test_env/.beans.yml) != "$tmpdir/data2/.beans.yml" ]]; then
+      echo_red "Failed to symlink beans config in workspace root"
+      exit 1
+  fi
+  if [[ ! -L $tmpdir/dev/test_env/.beans ]] || [[ $(readlink $tmpdir/dev/test_env/.beans) != "$tmpdir/data2/.beans" ]]; then
+      echo_red "Failed to symlink beans directory in workspace root"
+      exit 1
+  fi
+  # Check sources directory has symlinks
+  if [[ ! -L $tmpdir/dev/test_env/sources/.beans.yml ]] || [[ $(readlink $tmpdir/dev/test_env/sources/.beans.yml) != "$tmpdir/data2/.beans.yml" ]]; then
+      echo_red "Failed to symlink beans config in sources directory"
+      exit 1
+  fi
+  if [[ ! -L $tmpdir/dev/test_env/sources/.beans ]] || [[ $(readlink $tmpdir/dev/test_env/sources/.beans) != "$tmpdir/data2/.beans" ]]; then
+      echo_red "Failed to symlink beans directory in sources directory"
+      exit 1
+  fi
+fi
 [[ -d "$tmpdir/data2" ]] || { echo_red "Failed data dir override"; exit 1; }
 echo "<scr> = scripts/test" >> data/devrc
 echo "scr_env = geometry" >> data/devrc

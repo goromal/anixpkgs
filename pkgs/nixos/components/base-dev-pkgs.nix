@@ -29,6 +29,7 @@ in
     pkgs.gh
     pkgs.universal-ctags
     unstable.claude-code
+    anixpkgs.beans
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then
         echo_red "Error: claude not found in PATH"
@@ -98,6 +99,44 @@ in
       );
       baseConfig = {
         enabledPlugins = pluginsObj;
+        hooks = {
+          SessionStart = [
+            {
+              hooks = [
+                {
+                  type = "command";
+                  command = "sh";
+                  args = [
+                    "-c"
+                    ''
+                      if command -v beans >/dev/null 2>&1 && [ -f .beans.yml ]; then
+                        beans prime 2>/dev/null || true
+                      fi
+                    ''
+                  ];
+                }
+              ];
+            }
+          ];
+          PreCompact = [
+            {
+              hooks = [
+                {
+                  type = "command";
+                  command = "sh";
+                  args = [
+                    "-c"
+                    ''
+                      if command -v beans >/dev/null 2>&1 && [ -f .beans.yml ]; then
+                        beans prime 2>/dev/null || true
+                      fi
+                    ''
+                  ];
+                }
+              ];
+            }
+          ];
+        };
       };
       nixosSettings = baseConfig // cfg.extraClaudeSettings;
       nixosSettingsJson = builtins.toJSON nixosSettings;

@@ -418,6 +418,26 @@ rec {
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
+  beans = prev.buildGoModule rec {
+    pname = "beans";
+    version = "0.4.0";
+
+    src = prev.fetchFromGitHub {
+      owner = "hmans";
+      repo = "beans";
+      rev = "v${version}";
+      hash = "sha256-3SgTqR5DGAb5r+VU3YknoWATqglq8G7QV3kTVUSL9u4=";
+    };
+
+    vendorHash = "sha256-TprfPZ/clb7PLMAkxF0y78bCef4XarhgHlIhIPn1nQA=";
+
+    meta = with prev.lib; {
+      description = "CLI-based issue tracker for collaborative work between humans and AI agents";
+      homepage = "https://github.com/hmans/beans";
+      license = licenses.mit;
+      mainProgram = "beans";
+    };
+  };
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
       python = python313;
