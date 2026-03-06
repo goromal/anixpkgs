@@ -72,6 +72,54 @@ in
       ln -sf -- "$TARGET_DIR" "$link_path"
     done
     touch "$TARGET_DIR/CLAUDE.md"
+    if [[ ! -f "$TARGET_DIR/AGENTS.md" ]] || [[ ! -s "$TARGET_DIR/AGENTS.md" ]]; then
+      cat > "$TARGET_DIR/AGENTS.md" << 'EOF'
+# Agent Instructions
+
+**IMPORTANT**: Before you do anything else, run the `beans prime` command and heed its output.
+
+This project uses [beans](https://github.com/hmans/beans) for task tracking. Beans is a CLI-based issue tracker designed for collaborative work between humans and AI agents.
+
+## Beans Integration
+
+- Task data is stored in `.beans/` (persisted in data directory, symlinked to workspace)
+- Configuration is in `.beans.yml` (persisted in data directory)
+- Use `beans prime` to see current task context
+- Use `beans` TUI for interactive task management
+- Include relevant bean IDs in commit messages
+
+## Common Beans Commands
+
+- `beans prime` - Get current task context for AI agents
+- `beans tui` - Launch interactive TUI
+- `beans list` - List all beans
+- `beans show <id>` - Show details of a specific bean
+- `beans create` - Create a new task/bean
+- `beans update <id>` - Update a bean
+- `beans update <id> -s completed` - Mark a bean as completed
+EOF
+    fi
+    # Setup beans with symlinks to data directory (for persistence)
+    readonly BEANS_DATA_DIR="$PWD/data/.beans"
+    readonly BEANS_CONFIG="$PWD/data/.beans.yml"
+    if command -v beans &> /dev/null; then
+      # Initialize beans in data directory if not already done
+      if [[ ! -f "$BEANS_CONFIG" ]]; then
+        pushd "$PWD/data" > /dev/null
+        beans init 2>/dev/null || true
+        popd > /dev/null
+      fi
+      # Symlink .beans.yml to workspace root
+      if [[ ! -L .beans.yml ]] || [[ $(readlink .beans.yml 2>/dev/null) != "$BEANS_CONFIG" ]]; then
+        rm -f .beans.yml
+        ln -sf "$BEANS_CONFIG" .beans.yml
+      fi
+      # Symlink .beans directory to workspace root
+      if [[ ! -L .beans ]] || [[ $(readlink .beans 2>/dev/null) != "$BEANS_DATA_DIR" ]]; then
+        rm -rf .beans
+        ln -sf "$BEANS_DATA_DIR" .beans
+      fi
+    fi
     if [[ ! -d sources ]]; then
         mkdir sources
     fi
@@ -93,6 +141,20 @@ in
     popd
 
     cd sources
+
+    # Setup beans symlinks in sources directory
+    if command -v beans &> /dev/null; then
+      # Symlink .beans.yml to sources
+      if [[ ! -L .beans.yml ]] || [[ $(readlink .beans.yml 2>/dev/null) != "$BEANS_CONFIG" ]]; then
+        rm -f .beans.yml
+        ln -sf "$BEANS_CONFIG" .beans.yml
+      fi
+      # Symlink .beans directory to sources
+      if [[ ! -L .beans ]] || [[ $(readlink .beans 2>/dev/null) != "$BEANS_DATA_DIR" ]]; then
+        rm -rf .beans
+        ln -sf "$BEANS_DATA_DIR" .beans
+      fi
+    fi
 
     for i in ''${@:2}; do
         if [[ "$i" == *"="* ]]; then
