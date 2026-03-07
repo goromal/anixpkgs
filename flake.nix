@@ -16,7 +16,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=dev/ov2";
     aapis.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
@@ -78,7 +78,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp";
+    mscpp.url = "github:goromal/mscpp?ref=dev/reactor";
     mscpp.flake = false;
 
     orchestrator.url = "github:goromal/orchestrator";
