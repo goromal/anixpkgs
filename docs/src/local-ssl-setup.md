@@ -14,11 +14,10 @@ There is **no automatic redirect** from HTTP to HTTPS - you can use either proto
 
 ### 1. Generate SSL Certificates
 
-Run the certificate generation script:
+Run the certificate generation command (automatically available on servers with `runWebServer = true`):
 
 ```bash
-cd /data/andrew/dev/packages/sources/anixpkgs
-./scripts/generate-local-ssl-certs.sh
+generate-local-ssl-certs
 ```
 
 This will auto-detect your LAN IP address and create:
@@ -29,7 +28,7 @@ This will auto-detect your LAN IP address and create:
 
 You can also specify your server IP manually:
 ```bash
-./scripts/generate-local-ssl-certs.sh 192.168.1.100
+generate-local-ssl-certs 192.168.1.100
 ```
 
 ### 2. Install CA Certificate on Your Phone
@@ -122,8 +121,7 @@ If you see "Your connection is not private" or similar:
 
 If the certificate expires:
 ```bash
-cd /data/andrew/dev/packages/sources/anixpkgs
-./scripts/generate-local-ssl-certs.sh
+generate-local-ssl-certs
 ```
 
 The script will backup old certificates and create new ones.
@@ -148,7 +146,7 @@ The script will backup old certificates and create new ones.
 
 If your server's LAN IP changed:
 ```bash
-./scripts/generate-local-ssl-certs.sh [new-ip-address]
+generate-local-ssl-certs [new-ip-address]
 ```
 
 ## Security Notes

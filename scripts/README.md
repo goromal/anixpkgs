@@ -1,37 +1,15 @@
 # Scripts
 
-This directory contains utility scripts for managing the anixpkgs system.
+This directory may contain source scripts used during development or for creating Nix packages.
 
-## Available Scripts
+Most utility scripts are packaged in `pkgs/bash-packages/` and made available system-wide on configured NixOS machines, rather than being run directly from this directory.
 
-### generate-local-ssl-certs.sh
+## Note on Script Packaging
 
-Generates self-signed SSL certificates for local LAN HTTPS access.
+Previously, this directory contained standalone scripts. These have been migrated to proper Nix packages in `pkgs/bash-packages/` for better:
+- Dependency management
+- System-wide availability
+- Integration with NixOS configurations
+- Documentation and discoverability
 
-**Purpose**: Enable HTTPS connections from your phone (or other devices) to your local server without SSL warnings.
-
-**Usage**:
-```bash
-./generate-local-ssl-certs.sh [server-ip]
-```
-
-If `server-ip` is not provided, the script will auto-detect your LAN IP address.
-
-**What it does**:
-1. Creates a local Certificate Authority (CA)
-2. Generates a server certificate signed by that CA
-3. Saves certificates to `~/secrets/vpn/`
-4. Displays instructions for installing the CA certificate on your devices
-
-**Important**: After running this script, you must install `~/secrets/vpn/rootCA.pem` on your phone to avoid SSL certificate warnings.
-
-**See also**: [../docs/LOCAL_SSL_SETUP.md](../docs/LOCAL_SSL_SETUP.md) for complete setup instructions.
-
-**Requirements**:
-- `mkcert` (run in `nix-shell -p mkcert` if not available)
-
-**Output files**:
-- `~/secrets/vpn/rootCA.pem` - CA certificate (install on client devices)
-- `~/secrets/vpn/rootCA-key.pem` - CA private key (keep secret!)
-- `~/secrets/vpn/chain.pem` - Server certificate
-- `~/secrets/vpn/key.pem` - Server private key
+For example, the SSL certificate generation script is now packaged as `generate-local-ssl-certs` and is automatically available on any machine with `runWebServer = true`. See the [Local SSL Setup documentation](../docs/src/local-ssl-setup.md) for usage information.

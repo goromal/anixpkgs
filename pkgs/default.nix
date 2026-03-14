@@ -423,6 +423,7 @@ rec {
   anix-changelog-compare = addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
+  generate-local-ssl-certs = prev.callPackage ./bash-packages/generate-local-ssl-certs { };
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {

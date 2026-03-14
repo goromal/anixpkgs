@@ -156,11 +156,15 @@ For machines configured with `runWebServer = true` (like ATS), you can enable HT
 
 1. **Generate SSL certificates** on the server:
    ```bash
-   cd ~/sources/anixpkgs
-   ./scripts/generate-local-ssl-certs.sh
+   generate-local-ssl-certs
    ```
 
    The script will auto-detect your LAN IP address and create certificates in `~/secrets/vpn/`.
+
+   If you need to specify a different IP address:
+   ```bash
+   generate-local-ssl-certs 192.168.1.100
+   ```
 
 2. **Install the CA certificate on your client devices**:
 
@@ -202,8 +206,7 @@ For machines configured with `runWebServer = true` (like ATS), you can enable HT
 
 If your server IP changes or certificates expire:
 ```bash
-cd ~/sources/anixpkgs
-./scripts/generate-local-ssl-certs.sh [new-ip-address]
+generate-local-ssl-certs [new-ip-address]
 ```
 
 The script will backup old certificates and create new ones. You won't need to reinstall the CA on your devices if you're replacing server certificates signed by the same CA.
