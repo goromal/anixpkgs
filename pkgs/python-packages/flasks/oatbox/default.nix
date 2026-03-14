@@ -1,9 +1,21 @@
-{ buildPythonPackage, flask, writeTextFile, callPackage, writeShellScript
-, python }:
+{
+  buildPythonPackage,
+  flask,
+  writeTextFile,
+  callPackage,
+  writeShellScript,
+  python,
+}:
 callPackage ../builders/mkSimpleFlaskApp.nix {
   pname = "flask_oatbox";
   version = "0.0.0";
-  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  inherit
+    buildPythonPackage
+    flask
+    writeTextFile
+    writeShellScript
+    python
+    ;
   scriptPropagatedBuildInputs = [ ];
   overrideFullFlaskScript = true;
   flaskScript = ''
@@ -91,8 +103,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
       </body>
     </html>
   '';
-  description = ''
-    "One at a time" (O.A.T.) Box. Store one file at a time, powered by Python's flask library.'';
+  description = ''"One at a time" (O.A.T.) Box. Store one file at a time, powered by Python's flask library.'';
   longDescription = ''
     This tool gives you a method to store, extract, and replace files (again, one at a time) in the directory from which the tool is run.
   '';

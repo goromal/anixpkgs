@@ -1,9 +1,15 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 with import ../../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.budget_ui;
-in {
+in
+{
   options.services.budget_ui = {
     enable = lib.mkEnableOption "enable budget server";
     rootDir = lib.mkOption {
@@ -27,13 +33,17 @@ in {
     systemd.services.budget_ui = {
       enable = true;
       description = "Budget UI";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/budget_ui --subdomain /budget --port ${
-            builtins.toString service-ports.budget_ui
-          }";
-        ReadWritePaths = [ "/" "${cfg.rootDir}" "${globalCfg.homeDir}" ];
+        ExecStart = "${cfg.package}/bin/budget_ui --subdomain /budget --port ${builtins.toString service-ports.budget_ui}";
+        ReadWritePaths = [
+          "/"
+          "${cfg.rootDir}"
+          "${globalCfg.homeDir}"
+        ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
         RestartSec = 5;
@@ -47,9 +57,7 @@ in {
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/budget/" = {
-        proxyPass = "http://127.0.0.1:${
-            builtins.toString service-ports.budget_ui
-          }/budget/";
+        proxyPass = "http://127.0.0.1:${builtins.toString service-ports.budget_ui}/budget/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;

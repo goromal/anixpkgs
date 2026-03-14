@@ -1,4 +1,9 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, pkg-src }:
+{
+  callPackage,
+  pytestCheckHook,
+  buildPythonPackage,
+  pkg-src,
+}:
 callPackage ../pythonPkgFromScript.nix {
   pname = "makepyshell";
   version = "1.0.0";

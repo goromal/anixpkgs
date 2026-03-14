@@ -1,5 +1,12 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, ffmpeg
-, openssl }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  ffmpeg,
+  openssl,
+}:
 let
   name = "mp4";
   extension = "mp4";
@@ -197,8 +204,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
   description = "Generate and edit MP4 video files using `ffmpeg`.";
 }

@@ -1,6 +1,17 @@
-{ writeTextFile, mkShell, procps, coreutils, writeArgparseScriptBin
-, color-prints, mavproxy, git, python, stdenv, overrideCC, gcc10 }:
-# NOTE: Python currently needs to be <= 311 for the "imp" module to exist
+{
+  writeTextFile,
+  mkShell,
+  procps,
+  coreutils,
+  writeArgparseScriptBin,
+  color-prints,
+  mavproxy,
+  git,
+  python,
+  stdenv,
+  overrideCC,
+  gcc13,
+}:
 let
   pkgname = "aptest";
   printErr = "${color-prints}/bin/echo_red";
@@ -11,8 +22,8 @@ let
       { pkgs ? import <nixpkgs> {} }:
       pkgs.mkShell {
         nativeBuildInputs = [
-          ${overrideCC stdenv gcc10}
-          ${gcc10}
+          ${overrideCC stdenv gcc13}
+          ${gcc13}
           ${coreutils}
           ${procps}
           ${git}
@@ -27,7 +38,6 @@ let
           ${python.pkgs.empy}
           ${python.pkgs.requests}
           ${python.pkgs.monotonic}
-          ${python.pkgs.geocoder}
           ${python.pkgs.configparser}
           ${python.pkgs.click}
           ${python.pkgs.decorator}
@@ -35,48 +45,57 @@ let
       }
     '';
   };
-in (writeArgparseScriptBin pkgname ''
-  usage: ${pkgname} [options] path_to_ardupilot
+in
+(writeArgparseScriptBin pkgname
+  ''
+    usage: ${pkgname} [options] path_to_ardupilot
 
-  Run a SITL instance of ardupilot from source.
+    Run a SITL instance of ardupilot from source.
 
-  Options:
-    -f|--frame     Copter frame to simulate [default: heli]
-'' [{
-  var = "copter_frame";
-  isBool = false;
-  default = "heli";
-  flags = "-f|--frame";
-}] ''
-  if [[ -z "$1" ]]; then
-    ${printErr} "Must specify the path to ardupilot"
-    exit 1
-  fi
-  appath="$1"
-  pushd "$appath"
-  appath="$PWD"
-  cd $(mktemp -d)
-  tmppath="$PWD"
+    Options:
+      -f|--frame     Copter frame to simulate [default: heli]
+  ''
+  [
+    {
+      var = "copter_frame";
+      isBool = false;
+      default = "heli";
+      flags = "-f|--frame";
+    }
+  ]
+  ''
+    if [[ -z "$1" ]]; then
+      ${printErr} "Must specify the path to ardupilot"
+      exit 1
+    fi
+    appath="$1"
+    pushd "$appath"
+    appath="$PWD"
+    cd $(mktemp -d)
+    tmppath="$PWD"
 
-  ${printYlw} "Cloning the ardupilot source"
-  cp -r "$appath" "$tmppath/ardupilot"
-  cd ardupilot
+    ${printYlw} "Cloning the ardupilot source"
+    cp -r "$appath" "$tmppath/ardupilot"
+    cd ardupilot
 
-  ${printYlw} "Patching the source"
-  sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc10}/bin/gcc"#g' libraries/AP_Scripting/wscript
-  sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
-  sed -i 's/rU/r/g' modules/waf/wscript
-  sed -i 's/rU/r/g' modules/waf/waflib/ConfigSet.py
-  sed -i 's/rU/r/g' modules/waf/waflib/Context.py
-  unset shellHook
-  nix-shell -p ${python} -p ${stdenv} --pure --run "patchShebangs ./waf && patchShebangs ./modules/waf && patchShebangs ./Tools"
-  ${printYlw} "Running the SITL"
-  nix-shell --pure ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
+    ${printYlw} "Patching the source"
+    sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc13}/bin/gcc"#g' libraries/AP_Scripting/wscript
+    sed -i 's/-Werror//g' libraries/AP_Scripting/wscript
+    sed -i '1s/^/#include <cstdint>\n/' libraries/AP_HAL_SITL/CANSocketIface.cpp
+    sed -i 's/rU/r/g' modules/waf/wscript
+    sed -i 's/rU/r/g' modules/waf/waflib/ConfigSet.py
+    sed -i 's/rU/r/g' modules/waf/waflib/Context.py
+    unset shellHook
+    nix-shell -p ${python} -p ${stdenv} --pure --run "patchShebangs ./waf && patchShebangs ./modules/waf && patchShebangs ./Tools"
+    ${printYlw} "Running the SITL"
+    nix-shell --pure ${apShell} --run "./Tools/autotest/sim_vehicle.py -v ArduCopter -f $copter_frame --map --console"
 
-  ${printYlw} "Cleaning up"
-  popd
-  rm -rf "$tmppath"
-'') // {
+    ${printYlw} "Cleaning up"
+    popd
+    rm -rf "$tmppath"
+  ''
+)
+// {
   meta = {
     description = "Run a SITL instance of ardupilot from source.";
     longDescription = ''

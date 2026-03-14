@@ -1,27 +1,31 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
-  browser-aliases = if cfg.browserExec == null then
-    null
-  else
-    (anixpkgs.callPackage ../../bash-packages/browser-aliases {
-      browserExec = cfg.browserExec;
-    });
+  browser-aliases =
+    if cfg.browserExec == null then
+      null
+    else
+      (anixpkgs.callPackage ../../bash-packages/browser-aliases {
+        browserExec = cfg.browserExec;
+      });
   rcrsyncConfigured = anixpkgs.rcrsync.override {
     cloudDirs = cfg.cloudDirs;
     homeDir = cfg.homeDir;
     rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
   };
-  oPathPkgs = lib.makeBinPath [ pkgs.rclone rcrsyncConfigured ];
+  oPathPkgs = lib.makeBinPath [
+    pkgs.rclone
+    rcrsyncConfigured
+  ];
   launchOrchestratorScript = pkgs.writeShellScriptBin "launch-orchestrator" ''
     PATH=$PATH:/usr/bin:${oPathPkgs} ${anixpkgs.orchestrator}/bin/orchestratord -n 2 \
-      ${
-        if cfg.enableMetrics then
-          "--statsd-port ${builtins.toString service-ports.statsd}"
-        else
-          ""
-      }
+      ${if cfg.enableMetrics then "--statsd-port ${builtins.toString service-ports.statsd}" else ""}
   '';
   atsRunScript = pkgs.writeShellScriptBin "atsrun" ''
     words=""
@@ -31,69 +35,85 @@ let
     words=''${words% }
     ${anixpkgs.rcdo}/bin/rcdo "andrew@$(cat ~/secrets/ats/i.txt):$(${anixpkgs.sread}/bin/sread ~/secrets/ats/p.txt.tyz)" "$words" remote
   '';
-in {
+in
+{
   home.stateVersion = cfg.homeState;
 
-  home.packages = let
-    rcrsync = rcrsyncConfigured;
-    authm = anixpkgs.authm.override { inherit rcrsync; };
-  in ([
-    pkgs.rclone
-    authm
-    rcrsync
-    (anixpkgs.anix-version.override { standalone = cfg.standalone; })
-    (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
-    anixpkgs.goromail
-    anixpkgs.manage-gmail
-    anixpkgs.gmail-parser
-    anixpkgs.local-ssh-proxy
-    anixpkgs.wiki-tools
-    anixpkgs.task-tools
-    anixpkgs.photos-tools
-    anixpkgs.book-notes-sync
-    anixpkgs.budget_report
-    anixpkgs.surveys_report
-    anixpkgs.ckfile
-    anixpkgs.color-prints
-    anixpkgs.fix-perms
-    anixpkgs.secure-delete
-    anixpkgs.sunnyside
-    anixpkgs.sread
-    anixpkgs.swrite
-    anixpkgs.make-title
-    anixpkgs.pb
-    anixpkgs.dirgroups
-    anixpkgs.dirgather
-    anixpkgs.fixfname
-    anixpkgs.nix-deps
-    anixpkgs.nix-diffs
-    anixpkgs.orchestrator
-    anixpkgs.daily_tactical_server
-    anixpkgs.rankserver-cpp
-    anixpkgs.stampserver
-    anixpkgs.rcdo
-    atsRunScript
-    anixpkgs.gantter
-    anixpkgs.md2pdf
-    anixpkgs.notabilify
-    anixpkgs.code2pdf
-    anixpkgs.abc
-    anixpkgs.doku
-    anixpkgs.epub
-    anixpkgs.gif
-    anixpkgs.md
-    anixpkgs.mp3
-    anixpkgs.mp4
-    anixpkgs.mp4unite
-    anixpkgs.pdf
-    anixpkgs.png
-    anixpkgs.svg
-    anixpkgs.zipper
-    anixpkgs.scrape
-  ] ++ (if cfg.standalone == false then [ pkgs.docker pkgs.tmux ] else [ ]));
+  home.packages =
+    let
+      rcrsync = rcrsyncConfigured;
+      authm = anixpkgs.authm.override { inherit rcrsync; };
+    in
+    (
+      [
+        pkgs.rclone
+        authm
+        rcrsync
+        (anixpkgs.anix-version.override { standalone = cfg.standalone; })
+        (anixpkgs.anix-upgrade.override { standalone = cfg.standalone; })
+        anixpkgs.goromail
+        anixpkgs.manage-gmail
+        anixpkgs.gmail-parser
+        anixpkgs.local-ssh-proxy
+        anixpkgs.wiki-tools
+        anixpkgs.task-tools
+        anixpkgs.photos-tools
+        anixpkgs.book-notes-sync
+        anixpkgs.budget_report
+        anixpkgs.surveys_report
+        anixpkgs.ckfile
+        anixpkgs.color-prints
+        anixpkgs.fix-perms
+        anixpkgs.secure-delete
+        anixpkgs.sunnyside
+        anixpkgs.sread
+        anixpkgs.swrite
+        anixpkgs.make-title
+        anixpkgs.pb
+        anixpkgs.dirgroups
+        anixpkgs.dirgather
+        anixpkgs.fixfname
+        anixpkgs.nix-deps
+        anixpkgs.nix-diffs
+        anixpkgs.orchestrator
+        anixpkgs.daily_tactical_server
+        anixpkgs.rankserver-cpp
+        anixpkgs.stampserver
+        anixpkgs.rcdo
+        atsRunScript
+        anixpkgs.gantter
+        anixpkgs.md2pdf
+        anixpkgs.notabilify
+        anixpkgs.code2pdf
+        anixpkgs.abc
+        anixpkgs.doku
+        anixpkgs.epub
+        anixpkgs.gif
+        anixpkgs.md
+        anixpkgs.mp3
+        anixpkgs.mp4
+        anixpkgs.mp4unite
+        anixpkgs.pdf
+        anixpkgs.png
+        anixpkgs.svg
+        anixpkgs.zipper
+        anixpkgs.scrape
+      ]
+      ++ (
+        if cfg.standalone == false then
+          [
+            pkgs.docker
+            pkgs.tmux
+          ]
+        else
+          [ ]
+      )
+    );
 
   systemd.user.services.orchestratord = lib.mkIf cfg.userOrchestrator {
-    Unit = { Description = "User-domain Orchestrator daemon"; };
+    Unit = {
+      Description = "User-domain Orchestrator daemon";
+    };
     Service = {
       Type = "simple";
       ExecStart = "${launchOrchestratorScript}/bin/launch-orchestrator";
@@ -121,7 +141,9 @@ in {
       let g:mix_format_on_save = 1
       let g:mix_format_options = '--check-equivalent'
     '';
-    settings = { number = true; };
+    settings = {
+      number = true;
+    };
     plugins = with pkgs.vimPlugins; [
       vim-elixir
       sensible
@@ -134,8 +156,7 @@ in {
   };
 
   home.file = with anixpkgs.pkgData; {
-    ".anix-version".text =
-      if local-build then "Local Build" else "v${anixpkgs-version}";
+    ".anix-version".text = if local-build then "Local Build" else "v${anixpkgs-version}";
     ".anix-meta".text = anixpkgs-meta;
     "records/${records.crypt.name}".source = records.crypt.data;
     ".tmux.conf" = lib.mkIf (cfg.standalone == false) {

@@ -282,7 +282,7 @@
             },
             {
                 "attr": "symforce",
-                "ci": true,
+                "ci": false,
                 "docs": false
             }
         ],
@@ -379,6 +379,11 @@
             },
             {
                 "attr": "dirgather",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "playabc",
                 "ci": true,
                 "docs": true
             },

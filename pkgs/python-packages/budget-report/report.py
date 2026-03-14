@@ -217,6 +217,12 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
             break
     if transactions_sheet is None:
         raise Exception("Unable to find sheet metadata for transactions")
+    # Collect budget categories for the dropdown, excluding internal meta-entries.
+    budget_categories = [
+        entry["Category"]
+        for entry in ctx.obj["config_data"]
+        if not entry["Category"].startswith("_")
+    ]
     raw_transactions_sheet = ctx.obj["sheet"].worksheet(transactions_sheet)
     transactions_data = raw_transactions_sheet.get_all_records()
     raw_transactions = [
@@ -272,9 +278,52 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
     print("Uploading the following transactions:")
     for transaction in new_transactions:
         print(transaction)
-        if not dry_run:
+    if not dry_run and new_transactions:
+        # Determine the sheet ID and the 0-based column index of the
+        # "Categorization" column.  The append_row call writes:
+        #   col0=Processed?, col1=Account, col2=Date,
+        #   col3=Description,  col4=Amount, col5=Categorization
+        sheet_id = raw_transactions_sheet.id
+        categorization_col_index = 5  # 0-based
+
+        # Record the next available row before any appends so we can
+        # compute exact row indices for the validation requests later.
+        # get_all_values includes the header row, so len(...) gives the
+        # 0-based index of the first empty row; add 1 for the 1-based
+        # sheet row number used by the API.
+        first_new_row = len(raw_transactions_sheet.get_all_values()) + 1
+
+        # Append all new transactions, rate-limited to one request per second.
+        for transaction in new_transactions:
             time.sleep(1.0)
             raw_transactions_sheet.append_row(["", *transaction])
+
+        # Build one setDataValidation request per new row, then submit
+        # them all in a single batch_update call to minimise API usage.
+        validation_condition = {
+            "type": "ONE_OF_LIST",
+            "values": [{"userEnteredValue": cat} for cat in budget_categories],
+        }
+        requests = [
+            {
+                "setDataValidation": {
+                    "range": {
+                        "sheetId": sheet_id,
+                        "startRowIndex": first_new_row - 1 + offset,  # 0-based
+                        "endRowIndex": first_new_row + offset,         # exclusive
+                        "startColumnIndex": categorization_col_index,
+                        "endColumnIndex": categorization_col_index + 1,
+                    },
+                    "rule": {
+                        "condition": validation_condition,
+                        "showCustomUi": True,
+                        "strict": False,
+                    },
+                }
+            }
+            for offset, _ in enumerate(new_transactions)
+        ]
+        ctx.obj["sheet"].batch_update({"requests": requests})
 
 
 @cli.command()

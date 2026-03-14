@@ -1,5 +1,17 @@
-{ callPackage, clangStdenv, cmake, manif-geom-cpp, eigen, numpy, pybind11
-, python, pythonOlder, pytestCheckHook, buildPythonPackage, pkg-src }:
+{
+  callPackage,
+  clangStdenv,
+  cmake,
+  manif-geom-cpp,
+  eigen,
+  numpy,
+  pybind11,
+  python,
+  pythonOlder,
+  pytestCheckHook,
+  buildPythonPackage,
+  pkg-src,
+}:
 callPackage ../pythonPkgFromPybind.nix {
   pname = "geometry";
   version = "1.0.0";
@@ -7,7 +19,10 @@ callPackage ../pythonPkgFromPybind.nix {
   inherit clangStdenv;
   inherit pkg-src;
   cppNativeBuildInputs = [ cmake ];
-  cppBuildInputs = [ manif-geom-cpp eigen ];
+  cppBuildInputs = [
+    manif-geom-cpp
+    eigen
+  ];
   hasTests = true;
   inherit pybind11;
   inherit python;

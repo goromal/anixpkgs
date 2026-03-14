@@ -1,7 +1,14 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../../nixos/dependencies.nix;
-let cfg = config.services.tacticald;
-in {
+let
+  cfg = config.services.tacticald;
+in
+{
   options.services.tacticald = {
     enable = lib.mkEnableOption "enable tactical daemon";
     user = lib.mkOption {
@@ -21,8 +28,7 @@ in {
     };
     rootDirSource = lib.mkOption {
       type = lib.types.str;
-      description =
-        "Root directory (symlinked by rootDir) for data and configuration";
+      description = "Root directory (symlinked by rootDir) for data and configuration";
       default = "/data/andrew/data/tacticald";
     };
     tacticalPkg = lib.mkOption {
@@ -37,19 +43,20 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules =
-      [ "L ${cfg.rootDir} - - - - ${cfg.rootDirSource}" ];
+    systemd.tmpfiles.rules = [ "L ${cfg.rootDir} - - - - ${cfg.rootDirSource}" ];
     systemd.services.tacticald = {
       enable = true;
       description = "tactical daemon";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
       serviceConfig = {
         Type = "simple";
         ExecStart =
           "${cfg.tacticalPkg}/bin/tacticald --db-path ${cfg.rootDir}/data.db --storage-path ${cfg.rootDir}/data.json"
-          + lib.optionalString (cfg.statsdPort != null) " --statsd-port ${
-             builtins.toString cfg.statsdPort
-           } --subdomain /tactical";
+          + lib.optionalString (
+            cfg.statsdPort != null
+          ) " --statsd-port ${builtins.toString cfg.statsdPort} --subdomain /tactical";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
@@ -63,9 +70,7 @@ in {
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/tactical/" = {
-        proxyPass = "http://127.0.0.1:${
-            builtins.toString service-ports.tactical.web
-          }/tactical/";
+        proxyPass = "http://127.0.0.1:${builtins.toString service-ports.tactical.web}/tactical/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;

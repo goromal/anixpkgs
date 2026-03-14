@@ -1,22 +1,34 @@
-{ clangStdenv, cmake, eigen, boost, pkg-src }:
+{
+  clangStdenv,
+  cmake,
+  eigen,
+  boost,
+  pkg-src,
+}:
 clangStdenv.mkDerivation {
   name = "manif-geom-cpp";
   version = "1.0.0";
   src = pkg-src;
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ eigen boost ];
+  buildInputs = [
+    eigen
+    boost
+  ];
   preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
-    description =
-      "Templated, header-only implementations for SO(2), SE(2), SO(3), SE(3).";
+    description = "Templated, header-only implementations for SO(2), SE(2), SO(3), SE(3).";
     longDescription = ''
       [Repository](https://github.com/goromal/manif-geom-cpp)
 
+      [Documentation](https://andrewtorgesen.com/manif-geom-cpp)
+
+      [Code Coverage](https://andrewtorgesen.com/manif-geom-cpp/coverage)
+
       Operationally very similar to variations on Eigen's `Quaternion<T>` class, but with added chart maps and rules for addition and subtraction on tangent spaces. Meant to be used with nonlinear least-squares solvers like Ceres Solver which take advantage of templating to implement auto-differentiation on arbitrary mathematical formulations in code.
 
-      The SO(3) math is based on [my notes](https://notes.andrewtorgesen.com/doku.php?id=public:autonomy:math:3d-geometry:implementing-rotations) on 3D rotation representations.
+      The SO(3) math is based on [my notes](https://andrewtorgesen.com/notes/Autonomy/Math_Fundamentals/3D_Geometry/Rotations_Robotics_Field_Guide.html) on 3D rotation representations.
 
       ## Including in Your Project With CMake
 

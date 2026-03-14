@@ -5,9 +5,11 @@ import flask
 import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 from random import shuffle
 from datetime import timedelta
+from PIL import Image
+import cv2
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
@@ -226,6 +228,227 @@ def zzz():
         datadir=SHORT_RESDIR,
         stamps={}
     )
+
+@bp.route("/api/rotate-image", methods=["POST"])
+@flask_login.login_required
+def rotate_image_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        degrees = data.get('degrees')
+
+        if not filename or degrees is None:
+            return flask.jsonify({'success': False, 'error': 'Missing filename or degrees parameter'}), 400
+
+        # Construct full file path
+        file_path = os.path.join(RES_DIR, filename)
+
+        # Validate file exists and is a PNG
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.png'):
+            return flask.jsonify({'success': False, 'error': 'Only PNG files can be rotated'}), 400
+
+        # Open image with Pillow
+        img = Image.open(file_path)
+
+        # Rotate image (Pillow uses counter-clockwise rotation, so we negate)
+        # Also, convert degrees to the format Pillow expects
+        if degrees == 90:
+            rotated_img = img.rotate(-90, expand=True)
+        elif degrees == 270:
+            rotated_img = img.rotate(90, expand=True)
+        elif degrees == 180:
+            rotated_img = img.rotate(180, expand=True)
+        else:
+            rotated_img = img.rotate(-degrees, expand=True)
+
+        # Save to temporary file first, then rename (atomic operation)
+        temp_path = file_path + '.tmp'
+        rotated_img.save(temp_path, format='PNG')
+        os.replace(temp_path, file_path)
+
+        return flask.jsonify({'success': True})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/crop-image", methods=["POST"])
+@flask_login.login_required
+def crop_image_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        x = data.get('x')
+        y = data.get('y')
+        width = data.get('width')
+        height = data.get('height')
+
+        if not filename or x is None or y is None or width is None or height is None:
+            return flask.jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+        # Construct full file path
+        file_path = os.path.join(RES_DIR, filename)
+
+        # Validate file exists and is a PNG
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.png'):
+            return flask.jsonify({'success': False, 'error': 'Only PNG files can be cropped'}), 400
+
+        # Validate crop parameters
+        if width <= 0 or height <= 0:
+            return flask.jsonify({'success': False, 'error': 'Width and height must be positive'}), 400
+
+        # Open image with Pillow
+        img = Image.open(file_path)
+        img_width, img_height = img.size
+
+        # Validate crop bounds
+        if x < 0 or y < 0 or x + width > img_width or y + height > img_height:
+            return flask.jsonify({'success': False, 'error': f'Crop bounds exceed image dimensions ({img_width}x{img_height})'}), 400
+
+        # Crop image (box is left, upper, right, lower)
+        cropped_img = img.crop((x, y, x + width, y + height))
+
+        # Save to temporary file first, then rename (atomic operation)
+        temp_path = file_path + '.tmp'
+        cropped_img.save(temp_path, format='PNG')
+        os.replace(temp_path, file_path)
+
+        return flask.jsonify({'success': True})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/duplicate-image", methods=["POST"])
+@flask_login.login_required
+def duplicate_image_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+
+        if not filename:
+            return flask.jsonify({'success': False, 'error': 'Missing filename parameter'}), 400
+
+        # Construct full file path
+        file_path = os.path.join(RES_DIR, filename)
+
+        # Validate file exists and is a PNG
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.png'):
+            return flask.jsonify({'success': False, 'error': 'Only PNG files can be duplicated'}), 400
+
+        # Parse filename to preserve stamp metadata
+        # Format: [stamped.{stamp}.]basename.png
+        base_name = os.path.splitext(filename)[0]
+        extension = os.path.splitext(filename)[1]
+
+        # Check if file has stamp metadata
+        stamp_prefix = ""
+        actual_base = base_name
+        if base_name.startswith("stamped."):
+            parts = base_name.split(".", 2)  # Split into ['stamped', '{stamp}', 'basename']
+            if len(parts) >= 3:
+                stamp_prefix = f"stamped.{parts[1]}."
+                actual_base = parts[2]
+            elif len(parts) == 2:
+                stamp_prefix = f"stamped.{parts[1]}."
+                actual_base = ""
+
+        # Generate new filename with _copy suffix
+        counter = 1
+        while True:
+            if counter == 1:
+                new_basename = f"{actual_base}_copy"
+            else:
+                new_basename = f"{actual_base}_copy{counter}"
+
+            new_filename = f"{stamp_prefix}{new_basename}{extension}"
+            new_file_path = os.path.join(RES_DIR, new_filename)
+
+            if not os.path.exists(new_file_path):
+                break
+            counter += 1
+
+        # Copy the file using Pillow to ensure proper PNG handling
+        img = Image.open(file_path)
+        img.save(new_file_path, format='PNG')
+
+        return flask.jsonify({'success': True, 'new_filename': new_filename})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/save-screenshot", methods=["POST"])
+@flask_login.login_required
+def save_screenshot_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        timestamp = data.get('timestamp')
+
+        if not filename or timestamp is None:
+            return flask.jsonify({'success': False, 'error': 'Missing filename or timestamp parameter'}), 400
+
+        # Construct full file path
+        file_path = os.path.join(RES_DIR, filename)
+
+        # Validate file exists and is a video
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not (filename.lower().endswith('.mp4') or filename.lower().endswith('.webm')):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 and WEBM files can have screenshots taken'}), 400
+
+        # Open video with OpenCV
+        cap = cv2.VideoCapture(file_path)
+
+        if not cap.isOpened():
+            return flask.jsonify({'success': False, 'error': 'Could not open video file'}), 500
+
+        # Get video duration to validate timestamp
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        duration = total_frames / fps if fps > 0 else 0
+
+        if timestamp < 0 or timestamp > duration:
+            cap.release()
+            return flask.jsonify({'success': False, 'error': f'Timestamp {timestamp}s is outside video duration (0-{duration:.2f}s)'}), 400
+
+        # Seek to the specified timestamp
+        cap.set(cv2.CAP_PROP_POS_MSEC, timestamp * 1000)
+
+        # Read the frame
+        ret, frame = cap.read()
+        cap.release()
+
+        if not ret:
+            return flask.jsonify({'success': False, 'error': 'Could not read frame at specified timestamp'}), 500
+
+        # Generate new filename
+        base_name = os.path.splitext(filename)[0]
+        new_filename = f"{base_name}_screenshot_{timestamp:.2f}.png"
+        new_file_path = os.path.join(RES_DIR, new_filename)
+
+        # Check if file already exists, add counter if needed
+        counter = 1
+        while os.path.exists(new_file_path):
+            new_filename = f"{base_name}_screenshot_{timestamp:.2f}_{counter}.png"
+            new_file_path = os.path.join(RES_DIR, new_filename)
+            counter += 1
+
+        # Save frame as PNG
+        cv2.imwrite(new_file_path, frame)
+
+        return flask.jsonify({'success': True, 'new_filename': new_filename})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
 
 @app.before_request
 def refresh_session():

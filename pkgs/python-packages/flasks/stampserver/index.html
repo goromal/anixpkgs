@@ -3,6 +3,94 @@
 
 <head>
     <title>Stamp Server</title>
+    <style>
+        .controls-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+        }
+        .control-group {
+            margin: 10px 0;
+        }
+        .control-group label {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+        }
+        .control-group input {
+            margin: 0 5px;
+        }
+        .btn {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            display: none;
+        }
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+        #cropCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: default;
+            display: none;
+            touch-action: none;
+        }
+        .crop-info {
+            font-family: monospace;
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0;
+        }
+        .crop-handle {
+            position: absolute;
+            background: white;
+            border: 2px solid #00ff00;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            touch-action: none;
+            z-index: 10;
+        }
+        .crop-edge {
+            position: absolute;
+            touch-action: none;
+            z-index: 5;
+        }
+    </style>
 </head>
 
 <body>
@@ -12,21 +100,77 @@
         </ul>
     </nav>
     <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
+
+    <div id="statusMessage" class="status-message"></div>
+
     {% if err %}
     <p>{{ msg }}</p>
     {% else %}
     {% if ftype == "PNG" %}
-    <img src="{{ file }}" alt="" style="max-width: 100%; height: auto;" />
+    <div class="controls-section">
+        <h3>Image Controls</h3>
+
+        <div class="control-group">
+            <label>Rotate:</label>
+            <button class="btn" onclick="rotateImage(90)">90° CW</button>
+            <button class="btn" onclick="rotateImage(-90)">90° CCW</button>
+            <button class="btn" onclick="rotateImage(180)">180°</button>
+        </div>
+
+        <div class="control-group">
+            <label>Crop:</label>
+            <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Crop Image</button>
+            <button class="btn btn-danger" id="applyCropBtn" onclick="applyCrop()" style="display: none;">Apply Crop</button>
+            <button class="btn" id="cancelCropBtn" onclick="cancelCrop()" style="display: none;">Cancel</button>
+        </div>
+        <div id="cropInfo" class="crop-info" style="display: none;">
+            Drag edges or corners to adjust crop area
+        </div>
+
+        <div class="control-group">
+            <label>File:</label>
+            <button class="btn" onclick="duplicateImage()">Duplicate Image</button>
+        </div>
+    </div>
+
+    <div class="image-container">
+        <img id="currentImage" src="{{ file }}" alt="" style="max-width: 100%; height: auto;" />
+        <canvas id="cropCanvas"></canvas>
+    </div>
+
     {% elif ftype == "MP4" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/mp4" />
     </video>
+
     {% elif ftype == "WEBM_EXT" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/webm" />
     </video>
+
     {% elif ftype == "MP4_EXT" %}
-    <video controls loop width="250">
+    <div class="controls-section">
+        <h3>Video Controls</h3>
+        <div class="control-group">
+            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+        </div>
+    </div>
+
+    <video id="currentVideo" controls loop width="250">
         <source src="{{ file }}" type="video/mp4" />
     </video>
     {% endif %}
@@ -50,6 +194,532 @@
         {% endfor %}
         <li><a href="{{ urlroot }}">ROOT</a></li>
     </ul>
+
+    <script>
+        // Helper function to show status messages
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + (isError ? 'status-error' : 'status-success');
+            statusDiv.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Helper function to get current filename from URL
+        function getCurrentFilename() {
+            const imgElement = document.getElementById('currentImage');
+            const videoElement = document.getElementById('currentVideo');
+
+            if (imgElement) {
+                const src = imgElement.src;
+                // Extract filename and remove any query parameters (e.g., cache-busting ?t=...)
+                const filename = src.substring(src.lastIndexOf('/') + 1);
+                return filename.split('?')[0];
+            } else if (videoElement) {
+                const src = videoElement.querySelector('source').src;
+                const filename = src.substring(src.lastIndexOf('/') + 1);
+                return filename.split('?')[0];
+            }
+            return null;
+        }
+
+        // Rotate image function
+        function rotateImage(degrees) {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            // Normalize degrees to 0-359 range
+            const normalizedDegrees = ((degrees % 360) + 360) % 360;
+
+            fetch('{{ urlroot }}api/rotate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    degrees: normalizedDegrees
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image rotated successfully!');
+                    // Force reload the image with cache-busting
+                    const img = document.getElementById('currentImage');
+                    const timestamp = new Date().getTime();
+                    img.src = img.src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Crop-related global variables
+        let cropMode = false;
+        let cropRect = { left: 0, top: 0, right: 0, bottom: 0 }; // In canvas pixels
+        let dragState = null; // null, 'move', 'nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'
+        let dragStartX = 0;
+        let dragStartY = 0;
+        let initialCropRect = null;
+        let resizeObserver = null;
+
+        // Initialize canvas overlay when image loads
+        window.addEventListener('load', function() {
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+
+            if (img && canvas) {
+                img.onload = function() {
+                    updateCanvasSize();
+                };
+                // If image is already loaded (cached)
+                if (img.complete) {
+                    updateCanvasSize();
+                }
+            }
+        });
+
+        function updateCanvasSize() {
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+            if (img && canvas) {
+                canvas.width = img.offsetWidth;
+                canvas.height = img.offsetHeight;
+            }
+        }
+
+        function enableCropMode() {
+            cropMode = true;
+            const canvas = document.getElementById('cropCanvas');
+            const cropInfo = document.getElementById('cropInfo');
+            const enableBtn = document.getElementById('enableCropBtn');
+            const applyBtn = document.getElementById('applyCropBtn');
+            const cancelBtn = document.getElementById('cancelCropBtn');
+
+            canvas.style.display = 'block';
+            cropInfo.style.display = 'block';
+            enableBtn.style.display = 'none';
+            applyBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+
+            updateCanvasSize();
+
+            // Initialize crop rect to full image with small margin
+            const margin = Math.min(canvas.width, canvas.height) * 0.1;
+            cropRect = {
+                left: margin,
+                top: margin,
+                right: canvas.width - margin,
+                bottom: canvas.height - margin
+            };
+
+            setupCropHandlers();
+            drawCropOverlay();
+
+            // Set up resize observer to handle window resize during crop mode
+            const img = document.getElementById('currentImage');
+            if (img && typeof ResizeObserver !== 'undefined') {
+                resizeObserver = new ResizeObserver(() => {
+                    if (cropMode) {
+                        // Store the current crop as a fraction of image dimensions
+                        const oldWidth = canvas.width;
+                        const oldHeight = canvas.height;
+                        const leftRatio = cropRect.left / oldWidth;
+                        const topRatio = cropRect.top / oldHeight;
+                        const rightRatio = cropRect.right / oldWidth;
+                        const bottomRatio = cropRect.bottom / oldHeight;
+
+                        // Update canvas size to match new image size
+                        updateCanvasSize();
+
+                        // Restore crop rect as the same fraction of new dimensions
+                        cropRect = {
+                            left: leftRatio * canvas.width,
+                            top: topRatio * canvas.height,
+                            right: rightRatio * canvas.width,
+                            bottom: bottomRatio * canvas.height
+                        };
+
+                        drawCropOverlay();
+                    }
+                });
+                resizeObserver.observe(img);
+            }
+        }
+
+        function cancelCrop() {
+            cropMode = false;
+            dragState = null;
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            const cropInfo = document.getElementById('cropInfo');
+            const enableBtn = document.getElementById('enableCropBtn');
+            const applyBtn = document.getElementById('applyCropBtn');
+            const cancelBtn = document.getElementById('cancelCropBtn');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+            cropInfo.style.display = 'none';
+            enableBtn.style.display = 'inline-block';
+            applyBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+
+            // Clean up resize observer
+            if (resizeObserver) {
+                resizeObserver.disconnect();
+                resizeObserver = null;
+            }
+        }
+
+        function setupCropHandlers() {
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Helper function to get coordinates from mouse or touch event
+            function getCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0) {
+                    return {
+                        x: e.touches[0].clientX - rect.left,
+                        y: e.touches[0].clientY - rect.top
+                    };
+                } else {
+                    return {
+                        x: e.clientX - rect.left,
+                        y: e.clientY - rect.top
+                    };
+                }
+            }
+
+            // Detect what part of the crop rect is being dragged
+            function detectDragTarget(x, y) {
+                const handleSize = 30; // Touch-friendly size
+                const edgeThreshold = 15;
+
+                // Check corners first (larger hit area)
+                if (Math.abs(x - cropRect.left) < handleSize && Math.abs(y - cropRect.top) < handleSize) {
+                    return 'nw';
+                }
+                if (Math.abs(x - cropRect.right) < handleSize && Math.abs(y - cropRect.top) < handleSize) {
+                    return 'ne';
+                }
+                if (Math.abs(x - cropRect.left) < handleSize && Math.abs(y - cropRect.bottom) < handleSize) {
+                    return 'sw';
+                }
+                if (Math.abs(x - cropRect.right) < handleSize && Math.abs(y - cropRect.bottom) < handleSize) {
+                    return 'se';
+                }
+
+                // Check edges
+                if (Math.abs(y - cropRect.top) < edgeThreshold && x > cropRect.left && x < cropRect.right) {
+                    return 'n';
+                }
+                if (Math.abs(y - cropRect.bottom) < edgeThreshold && x > cropRect.left && x < cropRect.right) {
+                    return 's';
+                }
+                if (Math.abs(x - cropRect.left) < edgeThreshold && y > cropRect.top && y < cropRect.bottom) {
+                    return 'w';
+                }
+                if (Math.abs(x - cropRect.right) < edgeThreshold && y > cropRect.top && y < cropRect.bottom) {
+                    return 'e';
+                }
+
+                // Check if inside crop area (for moving)
+                if (x > cropRect.left && x < cropRect.right && y > cropRect.top && y < cropRect.bottom) {
+                    return 'move';
+                }
+
+                return null;
+            }
+
+            function drawCropOverlay() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw semi-transparent overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Clear the crop rectangle area
+                const width = cropRect.right - cropRect.left;
+                const height = cropRect.bottom - cropRect.top;
+                ctx.clearRect(cropRect.left, cropRect.top, width, height);
+
+                // Draw crop rectangle border
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(cropRect.left, cropRect.top, width, height);
+
+                // Draw corner handles
+                const handleSize = 20;
+                const corners = [
+                    { x: cropRect.left, y: cropRect.top },
+                    { x: cropRect.right, y: cropRect.top },
+                    { x: cropRect.left, y: cropRect.bottom },
+                    { x: cropRect.right, y: cropRect.bottom }
+                ];
+
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+
+                corners.forEach(corner => {
+                    ctx.beginPath();
+                    ctx.arc(corner.x, corner.y, handleSize / 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+
+                // Draw edge handles (midpoints)
+                const edges = [
+                    { x: (cropRect.left + cropRect.right) / 2, y: cropRect.top },
+                    { x: (cropRect.left + cropRect.right) / 2, y: cropRect.bottom },
+                    { x: cropRect.left, y: (cropRect.top + cropRect.bottom) / 2 },
+                    { x: cropRect.right, y: (cropRect.top + cropRect.bottom) / 2 }
+                ];
+
+                edges.forEach(edge => {
+                    ctx.beginPath();
+                    ctx.arc(edge.x, edge.y, handleSize / 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.stroke();
+                });
+
+                // Display dimensions
+                const cropInfo = document.getElementById('cropInfo');
+                cropInfo.textContent = `Selection: ${Math.round(width)}x${Math.round(height)} at (${Math.round(cropRect.left)}, ${Math.round(cropRect.top)})`;
+            }
+
+            // Start drag
+            function startDrag(e) {
+                e.preventDefault();
+                const coords = getCoordinates(e);
+                dragState = detectDragTarget(coords.x, coords.y);
+                if (dragState) {
+                    dragStartX = coords.x;
+                    dragStartY = coords.y;
+                    initialCropRect = { ...cropRect };
+                }
+            }
+
+            // During drag
+            function doDrag(e) {
+                if (!dragState) return;
+                e.preventDefault();
+
+                const coords = getCoordinates(e);
+                const dx = coords.x - dragStartX;
+                const dy = coords.y - dragStartY;
+
+                const minSize = 50; // Minimum crop size
+
+                if (dragState === 'move') {
+                    // Move entire crop rect
+                    const width = initialCropRect.right - initialCropRect.left;
+                    const height = initialCropRect.bottom - initialCropRect.top;
+
+                    cropRect.left = Math.max(0, Math.min(canvas.width - width, initialCropRect.left + dx));
+                    cropRect.top = Math.max(0, Math.min(canvas.height - height, initialCropRect.top + dy));
+                    cropRect.right = cropRect.left + width;
+                    cropRect.bottom = cropRect.top + height;
+                } else if (dragState === 'nw') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 'ne') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 'sw') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'se') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'n') {
+                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - minSize, initialCropRect.top + dy));
+                } else if (dragState === 's') {
+                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + minSize, initialCropRect.bottom + dy));
+                } else if (dragState === 'w') {
+                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - minSize, initialCropRect.left + dx));
+                } else if (dragState === 'e') {
+                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + minSize, initialCropRect.right + dx));
+                }
+
+                drawCropOverlay();
+            }
+
+            // End drag
+            function endDrag(e) {
+                e.preventDefault();
+                dragState = null;
+            }
+
+            // Mouse events
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', doDrag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
+
+            // Touch events
+            canvas.addEventListener('touchstart', startDrag, { passive: false });
+            canvas.addEventListener('touchmove', doDrag, { passive: false });
+            canvas.addEventListener('touchend', endDrag, { passive: false });
+            canvas.addEventListener('touchcancel', endDrag, { passive: false });
+        }
+
+        function applyCrop() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            // Calculate actual crop coordinates based on image scale
+            const img = document.getElementById('currentImage');
+            const canvas = document.getElementById('cropCanvas');
+
+            const scaleX = img.naturalWidth / img.offsetWidth;
+            const scaleY = img.naturalHeight / img.offsetHeight;
+
+            const width = cropRect.right - cropRect.left;
+            const height = cropRect.bottom - cropRect.top;
+
+            if (width <= 0 || height <= 0) {
+                showStatus('Error: Invalid crop area', true);
+                return;
+            }
+
+            // Scale to actual image coordinates with floor/ceil to avoid rounding errors
+            // Use floor for starting position to be conservative
+            const actualX = Math.floor(cropRect.left * scaleX);
+            const actualY = Math.floor(cropRect.top * scaleY);
+
+            // Calculate width/height from the actual positions to avoid accumulating errors
+            // Use floor for end position, then compute dimensions
+            const actualRight = Math.floor(cropRect.right * scaleX);
+            const actualBottom = Math.floor(cropRect.bottom * scaleY);
+            const actualWidth = actualRight - actualX;
+            const actualHeight = actualBottom - actualY;
+
+            // Ensure we stay within image bounds (defense against any edge case)
+            const safeX = Math.max(0, Math.min(actualX, img.naturalWidth - 1));
+            const safeY = Math.max(0, Math.min(actualY, img.naturalHeight - 1));
+            const safeWidth = Math.max(1, Math.min(actualWidth, img.naturalWidth - safeX));
+            const safeHeight = Math.max(1, Math.min(actualHeight, img.naturalHeight - safeY));
+
+            fetch('{{ urlroot }}api/crop-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    x: safeX,
+                    y: safeY,
+                    width: safeWidth,
+                    height: safeHeight
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image cropped successfully!');
+                    cancelCrop();
+                    // Force reload the image with cache-busting
+                    const img = document.getElementById('currentImage');
+                    const timestamp = new Date().getTime();
+                    img.src = img.src.split('?')[0] + '?t=' + timestamp;
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Duplicate image function
+        function duplicateImage() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            fetch('{{ urlroot }}api/duplicate-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Image duplicated as: ' + data.new_filename);
+                    // Reload the page to show the new duplicate
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+
+        // Save screenshot function
+        function saveScreenshot() {
+            const filename = getCurrentFilename();
+            if (!filename) {
+                showStatus('Error: Could not determine filename', true);
+                return;
+            }
+
+            const videoElement = document.getElementById('currentVideo');
+            if (!videoElement) {
+                showStatus('Error: No video element found', true);
+                return;
+            }
+
+            const timestamp = videoElement.currentTime;
+
+            fetch('{{ urlroot }}api/save-screenshot', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    filename: filename,
+                    timestamp: timestamp
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('Screenshot saved as: ' + data.new_filename);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(error => {
+                showStatus('Error: ' + error.message, true);
+            });
+        }
+    </script>
 </body>
 
 </html>

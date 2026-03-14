@@ -516,7 +516,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                         re.match(r"\s*(\d\d?/\d\d?/\d\d\d\d):", text).group(1),
                         "%m/%d/%Y",
                     )
-                    text = text.split(":")[1].strip()
+                    text = text.split(":", 1)[1].strip()
                 print(f"  Journal entry for {date}")
                 if logfile is not None:
                     logfile.write(f"{date}\n")
@@ -850,7 +850,7 @@ def journal(ctx: click.Context, dry_run):
             date = datetime.strptime(
                 re.match(r"(\d\d?/\d\d?/\d\d\d\d):", text).group(1), "%m/%d/%Y"
             )
-            text = text.split(":")[1].strip()
+            text = text.split(":", 1)[1].strip()
         print(f"  Journal entry for {date}")
         if logfile is not None:
             logfile.write(f"{date}\n")

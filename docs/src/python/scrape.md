@@ -41,7 +41,6 @@ options:
   -h, --help            show this help message and exit
   --xpath XPATH         Optionally specify the XPath
   --ext EXT             Optionally specify the file extension
-  -o DIRNAME, --output DIRNAME
-                        Output directory.
+  -o, --output DIRNAME  Output directory.
 ```
 

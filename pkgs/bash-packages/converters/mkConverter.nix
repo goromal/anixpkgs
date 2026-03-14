@@ -1,6 +1,16 @@
-{ writeArgparseScriptBin, color-prints, strings, name, extension, usage_str
-, optsWithVarsAndDefaults, convOptCmds, description ? "", longDescription ? ""
-, autoGenUsageCmd ? "--help" }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  strings,
+  name,
+  extension,
+  usage_str,
+  optsWithVarsAndDefaults,
+  convOptCmds,
+  description ? "",
+  longDescription ? "",
+  autoGenUsageCmd ? "--help",
+}:
 let
   conv_opt_list = map (x: ''
     ${x.extension})
@@ -15,7 +25,8 @@ let
     ${usage_str}
     EOF
   '';
-in (writeArgparseScriptBin name usage_str optsWithVarsAndDefaults ''
+in
+(writeArgparseScriptBin name usage_str optsWithVarsAndDefaults ''
   infile="$1"
   if [[ -z "$infile" ]]; then
       ${printerr} "ERROR: no input file specified."
@@ -37,6 +48,7 @@ in (writeArgparseScriptBin name usage_str optsWithVarsAndDefaults ''
   exit 1
   ;;
   esac
-'') // {
+'')
+// {
   meta = { inherit description longDescription autoGenUsageCmd; };
 }

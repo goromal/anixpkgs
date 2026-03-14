@@ -1,6 +1,13 @@
-{ pkgs, config, lib, ... }:
-let cfg = config.services.orchestratord;
-in {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+let
+  cfg = config.services.orchestratord;
+in
+{
   options.services.orchestratord = {
     enable = lib.mkEnableOption "enable orchestrator daemon";
     user = lib.mkOption {
@@ -42,13 +49,14 @@ in {
     systemd.services.orchestratord = {
       enable = true;
       description = "Orchestrator daemon";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.orchestratorPkg}/bin/orchestratord -n ${
-            builtins.toString cfg.threads
-          }" + lib.optionalString (cfg.statsdPort != null)
-          " --statsd-port ${builtins.toString cfg.statsdPort}";
+        ExecStart =
+          "${cfg.orchestratorPkg}/bin/orchestratord -n ${builtins.toString cfg.threads}"
+          + lib.optionalString (cfg.statsdPort != null) " --statsd-port ${builtins.toString cfg.statsdPort}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
