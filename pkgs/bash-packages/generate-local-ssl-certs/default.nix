@@ -109,7 +109,7 @@ writeShellScriptBin "generate-local-ssl-certs" ''
   echo "  1. Transfer ''${CERT_DIR}/rootCA.pem to your phone"
   echo "  2. Go to Settings > Security > Encryption & credentials > Install a certificate"
   echo "  3. Select 'CA certificate' and choose the rootCA.pem file"
-  echo "  4. Give it a name like '''${HOSTNAME} Local CA'"
+  echo "  4. Give it a name like \"''${HOSTNAME} Local CA\""
   echo
   echo "For iPhone/iPad:"
   echo "  1. Email rootCA.pem to yourself or transfer via AirDrop"
