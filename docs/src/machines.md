@@ -148,6 +148,79 @@ nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/t
 sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
+## Local SSL Setup for HTTPS Access
+
+For machines configured with `runWebServer = true` (like ATS), you can enable HTTPS access from devices on your local network (especially phones) to avoid browser security warnings.
+
+### Quick Start
+
+1. **Generate SSL certificates** on the server:
+   ```bash
+   cd ~/sources/anixpkgs
+   ./scripts/generate-local-ssl-certs.sh
+   ```
+
+   The script will auto-detect your LAN IP address and create certificates in `~/secrets/vpn/`.
+
+2. **Install the CA certificate on your client devices**:
+
+   Transfer `~/secrets/vpn/rootCA.pem` to your phone and install it:
+
+   **Android:**
+   - Settings → Security → Encryption & credentials → Install a certificate
+   - Choose "CA certificate" and select `rootCA.pem`
+   - Give it a name like "ATS Local CA"
+
+   **iPhone/iPad:**
+   - Email or AirDrop `rootCA.pem` to your device
+   - Open the file to install the profile
+   - Settings → General → VPN & Device Management → Install the profile
+   - Settings → General → About → Certificate Trust Settings → Enable full trust
+
+3. **Access your server via HTTPS**:
+   ```
+   https://ats.local:443
+   ```
+
+   Or use HTTP if you prefer (no automatic redirect):
+   ```
+   http://ats.local:80
+   ```
+
+### How It Works
+
+- The nginx server listens on **both** HTTP (port 80) and HTTPS (port 443)
+- There is **no automatic redirect** from HTTP to HTTPS - both protocols are supported
+- The certificates are valid for:
+  - `[hostname].local` (e.g., `ats.local`)
+  - `*.[hostname].local` (wildcard for subdomains)
+  - `localhost`, `127.0.0.1`, and your LAN IP address
+- Certificates are stored in `~/secrets/vpn/` and backed up by `rcrsync`
+- Certificates expire after ~825 days and can be regenerated anytime
+
+### Regenerating Certificates
+
+If your server IP changes or certificates expire:
+```bash
+cd ~/sources/anixpkgs
+./scripts/generate-local-ssl-certs.sh [new-ip-address]
+```
+
+The script will backup old certificates and create new ones. You won't need to reinstall the CA on your devices if you're replacing server certificates signed by the same CA.
+
+### Troubleshooting
+
+**SSL warnings still appear:**
+- Verify you installed `rootCA.pem` (the CA certificate), not `chain.pem`
+- On iOS, ensure you enabled full trust in Certificate Trust Settings
+- Try clearing browser cache or restarting the browser
+
+**Connection refused:**
+- Check firewall allows ports 80 and 443: `sudo iptables -L -n | grep -E '80|443'`
+- Verify nginx is running: `systemctl status nginx`
+
+See [Local SSL Setup](./local-ssl-setup.md) for complete documentation.
+
 ## Miscellaneous
 
 ### Cloud Syncing

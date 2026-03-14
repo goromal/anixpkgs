@@ -264,13 +264,20 @@ in
       user = "andrew";
       group = "dev";
       virtualHosts."${config.networking.hostName}.local" = {
-        forceSSL = true;
+        # Support both HTTP and HTTPS (no forced redirect)
+        forceSSL = false;
+        addSSL = true;
         sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
         listen = [
           {
             addr = "0.0.0.0";
+            port = cfg.webServerInsecurePort;
+          }
+          {
+            addr = "0.0.0.0";
             port = cfg.webServerSecurePort;
+            ssl = true;
           }
         ];
       };
