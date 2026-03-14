@@ -83,6 +83,11 @@ in
       description = "Public insecure port";
       default = 80;
     };
+    webServerSecurePort = lib.mkOption {
+      type = lib.types.int;
+      description = "Public secure port";
+      default = 443;
+    };
     serveNotesWiki = lib.mkOption {
       type = lib.types.bool;
       description = "Whether to serve the notes wiki site.";
@@ -259,10 +264,20 @@ in
       user = "andrew";
       group = "dev";
       virtualHosts."${config.networking.hostName}.local" = {
+        # Support both HTTP and HTTPS (no forced redirect)
+        forceSSL = false;
+        addSSL = true;
+        sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
+        sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
         listen = [
           {
             addr = "0.0.0.0";
             port = cfg.webServerInsecurePort;
+          }
+          {
+            addr = "0.0.0.0";
+            port = cfg.webServerSecurePort;
+            ssl = true;
           }
         ];
       };
@@ -394,7 +409,15 @@ in
     networking.firewall.allowedTCPPorts = [
       4444
     ]
-    ++ (if cfg.runWebServer then [ cfg.webServerInsecurePort ] else [ ]);
+    ++ (
+      if cfg.runWebServer then
+        [
+          cfg.webServerInsecurePort
+          cfg.webServerSecurePort
+        ]
+      else
+        [ ]
+    );
 
     fonts.packages = with pkgs; [
       dejavu_fonts
@@ -560,7 +583,8 @@ in
           ]
         else
           [ ]
-      );
+      )
+      ++ (if cfg.runWebServer then [ anixpkgs.generate-local-ssl-certs ] else [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}

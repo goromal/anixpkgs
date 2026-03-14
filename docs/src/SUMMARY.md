@@ -2,6 +2,7 @@
 
 - [Andrew's Software](./intro.md)
 - [Machine Management](./machines.md)
+  - [Local SSL Setup](./local-ssl-setup.md)
 - [RFCs](./rfcs/rfcs.md)
   - [Continuous OS Deployment](./rfcs/002.oscd.md)
 - [C++ Packages](./cpp/cpp.md)
