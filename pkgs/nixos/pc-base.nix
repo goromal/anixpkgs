@@ -584,12 +584,7 @@ in
         else
           [ ]
       )
-      ++ (
-        if cfg.runWebServer then
-          [ anixpkgs.generate-local-ssl-certs ]
-        else
-          [ ]
-      );
+      ++ (if cfg.runWebServer then [ anixpkgs.generate-local-ssl-certs ] else [ ]);
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
