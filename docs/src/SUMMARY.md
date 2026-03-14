@@ -48,6 +48,7 @@
   - [easy-google-auth](./python/easy-google-auth.md)
   - [rcdo](./python/rcdo.md)
   - [task-tools](./python/task-tools.md)
+  - [workout-planner](./python/workout-planner.md)
   - [photos-tools](./python/photos-tools.md)
   - [wiki-tools](./python/wiki-tools.md)
   - [book-notes-sync](./python/book-notes-sync.md)
