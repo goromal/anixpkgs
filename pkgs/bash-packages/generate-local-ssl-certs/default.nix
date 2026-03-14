@@ -4,6 +4,7 @@
   mkcert,
   coreutils,
   iproute2,
+  nettools,
 }:
 writeShellScriptBin "generate-local-ssl-certs" ''
   #
@@ -22,7 +23,7 @@ writeShellScriptBin "generate-local-ssl-certs" ''
   set -euo pipefail
 
   CERT_DIR="''${HOME}/secrets/vpn"
-  HOSTNAME=$(${coreutils}/bin/hostname)
+  HOSTNAME=$(${nettools}/bin/hostname)
   SERVER_IP="''${1:-}"
 
   # Auto-detect LAN IP if not provided
