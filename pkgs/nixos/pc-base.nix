@@ -399,12 +399,18 @@ in
       };
     };
 
-    networking.firewall.allowedTCPPorts = [ 4444 ]
-      ++ (if cfg.runWebServer then [
-        cfg.webServerInsecurePort
-        cfg.webServerSecurePort
-      ] else
-        [ ]);
+    networking.firewall.allowedTCPPorts = [
+      4444
+    ]
+    ++ (
+      if cfg.runWebServer then
+        [
+          cfg.webServerInsecurePort
+          cfg.webServerSecurePort
+        ]
+      else
+        [ ]
+    );
 
     fonts.packages = with pkgs; [
       dejavu_fonts
