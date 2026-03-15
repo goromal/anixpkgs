@@ -1,65 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stamp Server</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        nav {
+            background-color: #224abe;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        nav li {
+            margin: 0;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            background-color: #1e3a8a;
+        }
+
+        h1 {
+            color: #212529;
+            margin: 20px 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+        }
         .controls-section {
             margin: 20px 0;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 5px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
+
+        .controls-section h3 {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
         .control-group {
-            margin: 10px 0;
+            margin: 15px 0;
         }
+
         .control-group label {
-            display: inline-block;
-            width: 80px;
-            font-weight: bold;
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+            font-size: 1rem;
         }
-        .control-group input {
-            margin: 0 5px;
+
+        .control-group .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
+
         .btn {
-            padding: 8px 15px;
-            margin: 5px;
+            padding: 14px 24px;
+            margin: 0;
             cursor: pointer;
-            background-color: #007bff;
+            background-color: #4e73df;
             color: white;
             border: none;
-            border-radius: 3px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 48px;
+            flex: 1;
+            min-width: 120px;
         }
+
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #2e59d9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
         .btn-danger {
-            background-color: #dc3545;
+            background-color: #e74a3b;
         }
+
         .btn-danger:hover {
-            background-color: #c82333;
+            background-color: #d32f2f;
+        }
+
+        @media (max-width: 767px) {
+            .control-group .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                flex: none;
+            }
         }
         .status-message {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 3px;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
             display: none;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+
         .status-success {
             background-color: #d4edda;
             color: #155724;
-            border: 1px solid #c3e6cb;
+            border: 2px solid #c3e6cb;
         }
+
         .status-error {
             background-color: #f8d7da;
             color: #721c24;
-            border: 1px solid #f5c6cb;
+            border: 2px solid #f5c6cb;
         }
         .image-container {
             position: relative;
-            display: inline-block;
+            display: block;
+            max-width: 100%;
+            margin: 20px 0;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-container img,
+        .image-container video {
+            display: block;
+            width: 100%;
+            height: auto;
             max-width: 100%;
         }
+
         #cropCanvas {
             position: absolute;
             top: 0;
@@ -68,11 +196,15 @@
             display: none;
             touch-action: none;
         }
+
         .crop-info {
-            font-family: monospace;
-            font-size: 12px;
-            color: #666;
-            margin: 5px 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 6px;
         }
         .crop-handle {
             position: absolute;
@@ -85,10 +217,150 @@
             touch-action: none;
             z-index: 10;
         }
+
         .crop-edge {
             position: absolute;
             touch-action: none;
             z-index: 5;
+        }
+
+        /* Form Styles */
+        form {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            font-size: 1rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            resize: vertical;
+            transition: border-color 0.2s;
+            margin-bottom: 20px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78,115,223,0.15);
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #1cc88a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 56px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #17a673;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        input[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        /* Stamp List Styles */
+        .stamp-list {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+
+        .stamp-list h2 {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .stamp-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .stamp-list li {
+            margin: 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .stamp-list li:last-child {
+            border-bottom: none;
+        }
+
+        .stamp-list a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 12px;
+            color: #4e73df;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            border-radius: 6px;
+        }
+
+        .stamp-list a:hover {
+            background-color: #f8f9fa;
+            color: #2e59d9;
+        }
+
+        .stamp-count {
+            background-color: #4e73df;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .error-message {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 767px) {
+            .container {
+                padding: 10px;
+            }
+
+            .controls-section,
+            form,
+            .stamp-list {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
@@ -99,101 +371,130 @@
             <li><a href="{{ urlroot }}logout">Logout</a></li>
         </ul>
     </nav>
-    <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
 
-    <div id="statusMessage" class="status-message"></div>
+    <div class="container">
+        <h1>Stamp Server: {{ datadir }} ({{ nleft }} Left)</h1>
 
-    {% if err %}
-    <p>{{ msg }}</p>
-    {% else %}
-    {% if ftype == "PNG" %}
-    <div class="controls-section">
-        <h3>Image Controls</h3>
+        <div id="statusMessage" class="status-message"></div>
 
-        <div class="control-group">
-            <label>Rotate:</label>
-            <button class="btn" onclick="rotateImage(90)">90° CW</button>
-            <button class="btn" onclick="rotateImage(-90)">90° CCW</button>
-            <button class="btn" onclick="rotateImage(180)">180°</button>
+        {% if err %}
+        <div class="error-message">{{ msg }}</div>
+        {% else %}
+        {% if ftype == "PNG" %}
+        <div class="controls-section">
+            <h3>Image Controls</h3>
+
+            <div class="control-group">
+                <label>Rotate</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="rotateImage(90)">90° CW</button>
+                    <button class="btn" onclick="rotateImage(-90)">90° CCW</button>
+                    <button class="btn" onclick="rotateImage(180)">180°</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Crop</label>
+                <div class="btn-group">
+                    <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Crop Image</button>
+                    <button class="btn btn-danger" id="applyCropBtn" onclick="applyCrop()" style="display: none;">Apply Crop</button>
+                    <button class="btn" id="cancelCropBtn" onclick="cancelCrop()" style="display: none;">Cancel</button>
+                </div>
+                <div id="cropInfo" class="crop-info" style="display: none;">
+                    Drag edges or corners to adjust crop area
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>File Actions</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="duplicateImage()">Duplicate Image</button>
+                </div>
+            </div>
         </div>
 
-        <div class="control-group">
-            <label>Crop:</label>
-            <button class="btn" id="enableCropBtn" onclick="enableCropMode()">Crop Image</button>
-            <button class="btn btn-danger" id="applyCropBtn" onclick="applyCrop()" style="display: none;">Apply Crop</button>
-            <button class="btn" id="cancelCropBtn" onclick="cancelCrop()" style="display: none;">Cancel</button>
-        </div>
-        <div id="cropInfo" class="crop-info" style="display: none;">
-            Drag edges or corners to adjust crop area
+        <div class="image-container">
+            <img id="currentImage" src="{{ file }}" alt="" />
+            <canvas id="cropCanvas"></canvas>
         </div>
 
-        <div class="control-group">
-            <label>File:</label>
-            <button class="btn" onclick="duplicateImage()">Duplicate Image</button>
+        {% elif ftype == "MP4" %}
+        <div class="controls-section">
+            <h3>Video Controls</h3>
+            <div class="control-group">
+                <label>Screenshot</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="image-container">
+            <video id="currentVideo" controls loop>
+                <source src="{{ file }}" type="video/mp4" />
+            </video>
+        </div>
+
+        {% elif ftype == "WEBM_EXT" %}
+        <div class="controls-section">
+            <h3>Video Controls</h3>
+            <div class="control-group">
+                <label>Screenshot</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="image-container">
+            <video id="currentVideo" controls loop>
+                <source src="{{ file }}" type="video/webm" />
+            </video>
+        </div>
+
+        {% elif ftype == "MP4_EXT" %}
+        <div class="controls-section">
+            <h3>Video Controls</h3>
+            <div class="control-group">
+                <label>Screenshot</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="image-container">
+            <video id="currentVideo" controls loop>
+                <source src="{{ file }}" type="video/mp4" />
+            </video>
+        </div>
+        {% endif %}
+
+        <form action="{{ urlroot }}{{ root }}" method="POST">
+            <textarea id="text" name="text" placeholder="Enter stamp text here..."></textarea>
+            <input type="submit" value="Submit!">
+        </form>
+        {% endif %}
+
+        <div class="stamp-list">
+            <h2>Stamp Categories</h2>
+            <ul>
+                {% for stamp, nstamps in stamps.items() %}
+                <li>
+                    <a href="{{ urlroot }}restamp/{{ stamp }}">
+                        <span>{{ stamp }}</span>
+                        <span class="stamp-count">{{ nstamps }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+                <li>
+                    <a href="{{ urlroot }}">
+                        <span>ROOT</span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-
-    <div class="image-container">
-        <img id="currentImage" src="{{ file }}" alt="" style="max-width: 100%; height: auto;" />
-        <canvas id="cropCanvas"></canvas>
-    </div>
-
-    {% elif ftype == "MP4" %}
-    <div class="controls-section">
-        <h3>Video Controls</h3>
-        <div class="control-group">
-            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
-        </div>
-    </div>
-
-    <video id="currentVideo" controls loop width="250">
-        <source src="{{ file }}" type="video/mp4" />
-    </video>
-
-    {% elif ftype == "WEBM_EXT" %}
-    <div class="controls-section">
-        <h3>Video Controls</h3>
-        <div class="control-group">
-            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
-        </div>
-    </div>
-
-    <video id="currentVideo" controls loop width="250">
-        <source src="{{ file }}" type="video/webm" />
-    </video>
-
-    {% elif ftype == "MP4_EXT" %}
-    <div class="controls-section">
-        <h3>Video Controls</h3>
-        <div class="control-group">
-            <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
-        </div>
-    </div>
-
-    <video id="currentVideo" controls loop width="250">
-        <source src="{{ file }}" type="video/mp4" />
-    </video>
-    {% endif %}
-    <form action="{{ urlroot }}{{ root }}" method="POST">
-        <br><br>
-        <br><br>
-        <br><br>
-        <textarea id="text" name="text" rows="1" cols="10"></textarea>
-        <br><br>
-        <br><br>
-        <br><br>
-        <input type="submit" value="Submit!">
-    </form>
-    {% endif %}
-    <br><br>
-    <br><br>
-    <br><br>
-    <ul>
-        {% for stamp, nstamps in stamps.items() %}
-        <li><a href="{{ urlroot }}restamp/{{ stamp }}">{{ stamp }}</a> ({{ nstamps }})</li>
-        {% endfor %}
-        <li><a href="{{ urlroot }}">ROOT</a></li>
-    </ul>
 
     <script>
         // Helper function to show status messages
