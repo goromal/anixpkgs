@@ -29,14 +29,23 @@ class Context:
                 hist_data = json.loads(hf.read())
         except:
             hist_data = {}
-        self.scripts = [
-            f
-            for f in os.listdir(os.path.join(self.dev_dir, ".bin"))
-            if os.path.isfile(os.path.join(self.dev_dir, ".bin", f))
-            and os.access(os.path.join(self.dev_dir, ".bin", f), os.X_OK)
-        ]
-        for root, dirs, _ in os.walk(os.path.join(self.dev_dir, "sources")):
+        bin_dir = os.path.join(self.dev_dir, ".bin")
+        if os.path.isdir(bin_dir):
+            self.scripts = [
+                f
+                for f in os.listdir(bin_dir)
+                if os.path.isfile(os.path.join(bin_dir, f))
+                and os.access(os.path.join(bin_dir, f), os.X_OK)
+            ]
+        else:
+            self.scripts = []
+        sources_dir = os.path.join(self.dev_dir, "sources")
+        if not os.path.isdir(sources_dir):
+            return  # no sources directory, nothing to load
+        for root, dirs, _ in os.walk(sources_dir):
             if ".git" in dirs:
+                # Don't recurse into .git directories
+                dirs.remove(".git")
                 git_dir = os.path.join(root, ".git")
                 if os.path.isdir(git_dir):
                     reponame = os.path.basename(root)
@@ -58,22 +67,28 @@ class Context:
                         )
                     except:
                         continue  # no branch or remote yet
-                    clean = not bool(
-                        subprocess.check_output(
-                            ["git", "-C", root, "status", "--porcelain"],
-                            stderr=subprocess.PIPE,
+                    try:
+                        clean = not bool(
+                            subprocess.check_output(
+                                ["git", "-C", root, "status", "--porcelain"],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
-                    hash = (
-                        subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "HEAD"],
-                            stderr=subprocess.PIPE,
+                    except:
+                        continue  # corrupted git repo
+                    try:
+                        hash = (
+                            subprocess.check_output(
+                                ["git", "-C", root, "rev-parse", "HEAD"],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        continue  # no commits yet
                     try:
                         local = bool(
                             subprocess.check_output(
@@ -89,22 +104,25 @@ class Context:
                         sync_branch = hist_data[self.wsname][reponame]["branch"]
                     except:
                         sync_branch = None
-                    url = (
-                        subprocess.check_output(
-                            [
-                                "git",
-                                "-C",
-                                root,
-                                "remote",
-                                "get-url",
-                                "--push",
-                                "origin",
-                            ],
-                            stderr=subprocess.PIPE,
+                    try:
+                        url = (
+                            subprocess.check_output(
+                                [
+                                    "git",
+                                    "-C",
+                                    root,
+                                    "remote",
+                                    "get-url",
+                                    "--push",
+                                    "origin",
+                                ],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        url = None  # no remote configured
                     self.repos.append(
                         (reponame, branch, clean, hash, local, sync_branch, url)
                     )
@@ -459,6 +477,9 @@ def main(stdscr):
             elif key == ord("n"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
                 url = ctx.repos[ctx.current_row - ctx.start_row][6]
+                if url is None:
+                    ctx.status_msg = f"Cannot nuke {reponame}: no remote URL configured."
+                    continue
                 repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = branch_prompt(stdscr)
                 if not branch:
