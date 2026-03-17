@@ -750,6 +750,7 @@
         "task-tools": "task-tools",
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
+        "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
       }
     },
@@ -976,6 +977,22 @@
       "original": {
         "owner": "goromal",
         "repo": "wiki-tools",
+        "type": "github"
+      }
+    },
+    "workout-planner": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772261839,
+        "narHash": "sha256-eKJSMzsKBv74F80rxfBnDfdm9Bs9/0rBCjgAngKh4eU=",
+        "owner": "goromal",
+        "repo": "workout-planner",
+        "rev": "ab4d3263ea70b70085a9170580c11d12dd2585e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "workout-planner",
         "type": "github"
       }
     },

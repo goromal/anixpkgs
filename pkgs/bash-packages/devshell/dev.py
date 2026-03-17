@@ -29,14 +29,26 @@ class Context:
                 hist_data = json.loads(hf.read())
         except:
             hist_data = {}
-        self.scripts = [
-            f
-            for f in os.listdir(os.path.join(self.dev_dir, ".bin"))
-            if os.path.isfile(os.path.join(self.dev_dir, ".bin", f))
-            and os.access(os.path.join(self.dev_dir, ".bin", f), os.X_OK)
-        ]
-        for root, dirs, _ in os.walk(os.path.join(self.dev_dir, "sources")):
+        bin_dir = os.path.join(self.dev_dir, ".bin")
+        if os.path.isdir(bin_dir):
+            self.scripts = [
+                f
+                for f in os.listdir(bin_dir)
+                if os.path.isfile(os.path.join(bin_dir, f))
+                and os.access(os.path.join(bin_dir, f), os.X_OK)
+            ]
+        else:
+            self.scripts = []
+        sources_dir = os.path.join(self.dev_dir, "sources")
+        if not os.path.isdir(sources_dir):
+            return  # no sources directory, nothing to load
+        for root, dirs, _ in os.walk(sources_dir):
             if ".git" in dirs:
+                # Don't recurse into .git directories
+                dirs.remove(".git")
+                # Skip if .git is in the sources root itself (not a real repo)
+                if root == sources_dir:
+                    continue
                 git_dir = os.path.join(root, ".git")
                 if os.path.isdir(git_dir):
                     reponame = os.path.basename(root)
@@ -58,22 +70,28 @@ class Context:
                         )
                     except:
                         continue  # no branch or remote yet
-                    clean = not bool(
-                        subprocess.check_output(
-                            ["git", "-C", root, "status", "--porcelain"],
-                            stderr=subprocess.PIPE,
+                    try:
+                        clean = not bool(
+                            subprocess.check_output(
+                                ["git", "-C", root, "status", "--porcelain"],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
-                    hash = (
-                        subprocess.check_output(
-                            ["git", "-C", root, "rev-parse", "HEAD"],
-                            stderr=subprocess.PIPE,
+                    except:
+                        continue  # corrupted git repo
+                    try:
+                        hash = (
+                            subprocess.check_output(
+                                ["git", "-C", root, "rev-parse", "HEAD"],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        continue  # no commits yet
                     try:
                         local = bool(
                             subprocess.check_output(
@@ -89,22 +107,25 @@ class Context:
                         sync_branch = hist_data[self.wsname][reponame]["branch"]
                     except:
                         sync_branch = None
-                    url = (
-                        subprocess.check_output(
-                            [
-                                "git",
-                                "-C",
-                                root,
-                                "remote",
-                                "get-url",
-                                "--push",
-                                "origin",
-                            ],
-                            stderr=subprocess.PIPE,
+                    try:
+                        url = (
+                            subprocess.check_output(
+                                [
+                                    "git",
+                                    "-C",
+                                    root,
+                                    "remote",
+                                    "get-url",
+                                    "--push",
+                                    "origin",
+                                ],
+                                stderr=subprocess.PIPE,
+                            )
+                            .decode()
+                            .strip()
                         )
-                        .decode()
-                        .strip()
-                    )
+                    except:
+                        url = None  # no remote configured
                     self.repos.append(
                         (reponame, branch, clean, hash, local, sync_branch, url)
                     )
@@ -148,18 +169,19 @@ def display_output(stdscr):
         if ctx.help_mode:
             stdscr.addstr(2, 42, "-" * (ctx.max_script_len + 2))
             stdscr.addstr(3, 0, "[e]  Open in editor")
-            stdscr.addstr(4, 0, "[S]  Save off staged branch")
-            stdscr.addstr(5, 0, "[s]  Synchronize staged branch")
-            stdscr.addstr(6, 0, "[p]  Push current branch")
-            stdscr.addstr(7, 0, "[R]  Rebase-pull then push current branch")
-            stdscr.addstr(8, 0, "[b]  Create new branch")
-            stdscr.addstr(9, 0, "[c]  (Stash and) CheckOut and Pull")
-            stdscr.addstr(10, 0, "[H]  Display the full HEAD hash")
-            stdscr.addstr(11, 0, "[r]  Refresh")
-            stdscr.addstr(12, 0, "[n]  Nuke")
-            stdscr.addstr(13, 0, "[o]  Add source")
-            stdscr.addstr(14, 0, "[i]  Add script")
-            stdscr.addstr(15, 0, "[q]  Quit")
+            stdscr.addstr(4, 0, "[E]  Open sources directory in editor")
+            stdscr.addstr(5, 0, "[S]  Save off staged branch")
+            stdscr.addstr(6, 0, "[s]  Synchronize staged branch")
+            stdscr.addstr(7, 0, "[p]  Push current branch")
+            stdscr.addstr(8, 0, "[R]  Rebase-pull then push current branch")
+            stdscr.addstr(9, 0, "[b]  Create new branch")
+            stdscr.addstr(10, 0, "[c]  (Stash and) CheckOut and Pull")
+            stdscr.addstr(11, 0, "[H]  Display the full HEAD hash")
+            stdscr.addstr(12, 0, "[r]  Refresh")
+            stdscr.addstr(13, 0, "[n]  Nuke")
+            stdscr.addstr(14, 0, "[o]  Add source")
+            stdscr.addstr(15, 0, "[i]  Add script")
+            stdscr.addstr(16, 0, "[q]  Quit")
             for j, script in enumerate(ctx.scripts):
                 stdscr.addstr(3 + j, 42, f"| {script}")
 
@@ -280,6 +302,19 @@ def main(stdscr):
                     ctx.status_msg = f"Opening {reponame} in editor... UNSUCCESSFUL."
                     continue
                 ctx.status_msg = f"Opening {reponame} in editor... Done."
+
+            elif key == ord("E"):
+                ctx.status_msg = "Opening sources directory in editor..."
+                display_output(stdscr)
+                try:
+                    subprocess.check_output(
+                        [editor, os.path.join(ctx.dev_dir, "sources")],
+                        stderr=subprocess.PIPE,
+                    )
+                except:
+                    ctx.status_msg = "Opening sources directory in editor... UNSUCCESSFUL."
+                    continue
+                ctx.status_msg = "Opening sources directory in editor... Done."
 
             elif key == ord("S"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
@@ -459,6 +494,9 @@ def main(stdscr):
             elif key == ord("n"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
                 url = ctx.repos[ctx.current_row - ctx.start_row][6]
+                if url is None:
+                    ctx.status_msg = f"Cannot nuke {reponame}: no remote URL configured."
+                    continue
                 repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = branch_prompt(stdscr)
                 if not branch:

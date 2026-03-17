@@ -261,6 +261,11 @@
                 "docs": true
             },
             {
+                "attr": "workout-planner",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "photos-tools",
                 "ci": true,
                 "docs": true
