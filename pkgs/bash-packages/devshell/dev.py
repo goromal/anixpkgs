@@ -46,6 +46,9 @@ class Context:
             if ".git" in dirs:
                 # Don't recurse into .git directories
                 dirs.remove(".git")
+                # Skip if .git is in the sources root itself (not a real repo)
+                if root == sources_dir:
+                    continue
                 git_dir = os.path.join(root, ".git")
                 if os.path.isdir(git_dir):
                     reponame = os.path.basename(root)
