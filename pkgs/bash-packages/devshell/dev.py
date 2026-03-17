@@ -169,18 +169,19 @@ def display_output(stdscr):
         if ctx.help_mode:
             stdscr.addstr(2, 42, "-" * (ctx.max_script_len + 2))
             stdscr.addstr(3, 0, "[e]  Open in editor")
-            stdscr.addstr(4, 0, "[S]  Save off staged branch")
-            stdscr.addstr(5, 0, "[s]  Synchronize staged branch")
-            stdscr.addstr(6, 0, "[p]  Push current branch")
-            stdscr.addstr(7, 0, "[R]  Rebase-pull then push current branch")
-            stdscr.addstr(8, 0, "[b]  Create new branch")
-            stdscr.addstr(9, 0, "[c]  (Stash and) CheckOut and Pull")
-            stdscr.addstr(10, 0, "[H]  Display the full HEAD hash")
-            stdscr.addstr(11, 0, "[r]  Refresh")
-            stdscr.addstr(12, 0, "[n]  Nuke")
-            stdscr.addstr(13, 0, "[o]  Add source")
-            stdscr.addstr(14, 0, "[i]  Add script")
-            stdscr.addstr(15, 0, "[q]  Quit")
+            stdscr.addstr(4, 0, "[E]  Open sources directory in editor")
+            stdscr.addstr(5, 0, "[S]  Save off staged branch")
+            stdscr.addstr(6, 0, "[s]  Synchronize staged branch")
+            stdscr.addstr(7, 0, "[p]  Push current branch")
+            stdscr.addstr(8, 0, "[R]  Rebase-pull then push current branch")
+            stdscr.addstr(9, 0, "[b]  Create new branch")
+            stdscr.addstr(10, 0, "[c]  (Stash and) CheckOut and Pull")
+            stdscr.addstr(11, 0, "[H]  Display the full HEAD hash")
+            stdscr.addstr(12, 0, "[r]  Refresh")
+            stdscr.addstr(13, 0, "[n]  Nuke")
+            stdscr.addstr(14, 0, "[o]  Add source")
+            stdscr.addstr(15, 0, "[i]  Add script")
+            stdscr.addstr(16, 0, "[q]  Quit")
             for j, script in enumerate(ctx.scripts):
                 stdscr.addstr(3 + j, 42, f"| {script}")
 
@@ -301,6 +302,19 @@ def main(stdscr):
                     ctx.status_msg = f"Opening {reponame} in editor... UNSUCCESSFUL."
                     continue
                 ctx.status_msg = f"Opening {reponame} in editor... Done."
+
+            elif key == ord("E"):
+                ctx.status_msg = "Opening sources directory in editor..."
+                display_output(stdscr)
+                try:
+                    subprocess.check_output(
+                        [editor, os.path.join(ctx.dev_dir, "sources")],
+                        stderr=subprocess.PIPE,
+                    )
+                except:
+                    ctx.status_msg = "Opening sources directory in editor... UNSUCCESSFUL."
+                    continue
+                ctx.status_msg = "Opening sources directory in editor... Done."
 
             elif key == ord("S"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
