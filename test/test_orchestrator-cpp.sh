@@ -47,7 +47,8 @@ echo "---"
 echo "Test 1: Basic bash job execution via orchestratorctl"
 
 # Define a bash job type
-orchestratorctl -p $ORCH_PORT define bash "bash {input_0}"
+# Note: {input_0} will be substituted with the first input arg
+orchestratorctl -p $ORCH_PORT define bash "{input_0}"
 
 if [ $? -ne 0 ]; then
     echo_red "ERROR: failed to define bash job type"
