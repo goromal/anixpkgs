@@ -16,7 +16,10 @@ clangStdenv.mkDerivation {
   name = "orchestrator-cpp";
   version = "0.0.0";
   src = pkg-src;
-  nativeBuildInputs = [ cmake pkg-config ];
+  nativeBuildInputs = [
+    cmake
+    pkg-config
+  ];
   buildInputs = [
     boost
     mscpp
