@@ -84,7 +84,7 @@
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
-    orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
+    orchestrator-cpp.url = "github:goromal/orchestrator-cpp?ref=dev/jq-test";
     orchestrator-cpp.flake = false;
 
     photos-tools.url = "github:goromal/photos-tools";
