@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
-"""
-Vikunja MCP Server
-Provides Claude Code with direct access to Vikunja task management via MCP protocol
-"""
+# Vikunja MCP Server
+# Provides Claude Code with direct access to Vikunja task management
+# via MCP protocol
 
-import os
 import sys
 import json
 import subprocess
 from typing import Any
+
 
 def run_vikunja_cli(args: list[str]) -> dict[str, Any]:
     """Run vikunja-cli command and return parsed output"""
@@ -30,6 +29,7 @@ def run_vikunja_cli(args: list[str]) -> dict[str, Any]:
             "success": False,
             "error": e.stderr.strip() if e.stderr else str(e)
         }
+
 
 # MCP Tool Definitions
 TOOLS = [
@@ -92,7 +92,9 @@ TOOLS = [
             "properties": {
                 "project_id": {
                     "type": "string",
-                    "description": "The ID of the project to create the task in"
+                    "description": (
+                        "The ID of the project to create the task in"
+                    )
                 },
                 "title": {
                     "type": "string",
@@ -154,7 +156,9 @@ TOOLS = [
     },
     {
         "name": "vikunja_get_standing_instructions",
-        "description": "Get all standing instructions that Claude should keep in mind",
+        "description": (
+            "Get all standing instructions that Claude should keep in mind"
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -163,13 +167,17 @@ TOOLS = [
     },
     {
         "name": "vikunja_create_standing_instruction",
-        "description": "Create a new standing instruction for Claude to always follow",
+        "description": (
+            "Create a new standing instruction for Claude to always follow"
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "project_id": {
                     "type": "string",
-                    "description": "The project ID to create the instruction in"
+                    "description": (
+                        "The project ID to create the instruction in"
+                    )
                 },
                 "title": {
                     "type": "string",
@@ -177,7 +185,9 @@ TOOLS = [
                 },
                 "instruction": {
                     "type": "string",
-                    "description": "The instruction text that Claude should follow"
+                    "description": (
+                        "The instruction text that Claude should follow"
+                    )
                 }
             },
             "required": ["project_id", "title", "instruction"]
@@ -185,7 +195,9 @@ TOOLS = [
     },
     {
         "name": "vikunja_list_user_tasks",
-        "description": "List all tasks assigned to the user for review or action",
+        "description": (
+            "List all tasks assigned to the user for review or action"
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {},
@@ -208,7 +220,9 @@ TOOLS = [
     }
 ]
 
-def handle_tool_call(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+
+def handle_tool_call(tool_name: str, arguments: dict[str, Any]):
+
     """Handle a tool call from Claude Code"""
 
     if tool_name == "vikunja_list_projects":
@@ -236,7 +250,11 @@ def handle_tool_call(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any
         return run_vikunja_cli(["complete-task", arguments["task_id"]])
 
     elif tool_name == "vikunja_add_comment":
-        return run_vikunja_cli(["add-comment", arguments["task_id"], arguments["comment"]])
+        return run_vikunja_cli([
+            "add-comment",
+            arguments["task_id"],
+            arguments["comment"]
+        ])
 
     elif tool_name == "vikunja_get_comments":
         return run_vikunja_cli(["get-comments", arguments["task_id"]])
@@ -260,6 +278,7 @@ def handle_tool_call(tool_name: str, arguments: dict[str, Any]) -> dict[str, Any
 
     else:
         return {"success": False, "error": f"Unknown tool: {tool_name}"}
+
 
 def handle_request(request: dict[str, Any]) -> dict[str, Any]:
     """Handle an MCP request"""
@@ -289,6 +308,7 @@ def handle_request(request: dict[str, Any]) -> dict[str, Any]:
     else:
         return {"error": f"Unknown method: {method}"}
 
+
 def main():
     """Main MCP server loop"""
     # Read MCP protocol messages from stdin
@@ -305,6 +325,7 @@ def main():
             print(json.dumps({"error": "Invalid JSON"}), file=sys.stderr)
         except Exception as e:
             print(json.dumps({"error": str(e)}), file=sys.stderr)
+
 
 if __name__ == "__main__":
     main()
