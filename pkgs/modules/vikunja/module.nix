@@ -41,7 +41,7 @@ in
     environment.etc."vikunja/config.yml".text = ''
       service:
         interface: :${toString service-ports.vikunja}
-        frontendurl: http://${cfg.domain}/vikunja/
+        frontendurl: http://${cfg.domain}/vikunja
         enableregistration: false
         enablecaldav: true
         enablelinksharing: true
@@ -49,7 +49,8 @@ in
         enabletaskcomments: true
         enableemailreminders: false
         maxitemsperpage: 100
-        publicurl: http://${cfg.domain}/vikunja/
+        publicurl: http://${cfg.domain}/vikunja
+        rootpath: /vikunja
 
       database:
         type: sqlite
