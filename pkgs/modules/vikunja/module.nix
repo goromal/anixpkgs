@@ -62,7 +62,7 @@ in
         enabletaskcomments: true
         enableemailreminders: false
         maxitemsperpage: 100
-        publicurl: http://${cfg.domain}:${toString service-ports.vikunja.public}
+        publicurl: https://${cfg.domain}:${toString service-ports.vikunja.public}
 
       database:
         type: sqlite
@@ -106,7 +106,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-        VIKUNJA_SERVICE_PUBLICURL = "http://${cfg.domain}:${toString service-ports.vikunja.public}";
+        VIKUNJA_SERVICE_PUBLICURL = "https://${cfg.domain}:${toString service-ports.vikunja.public}";
       };
 
       serviceConfig = {
