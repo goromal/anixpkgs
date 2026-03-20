@@ -41,7 +41,7 @@ in
     environment.etc."vikunja/config.yml".text = ''
       service:
         interface: :${toString service-ports.vikunja}
-        frontendurl: http://${cfg.domain}/vikunja
+        frontendurl: http://vikunja.${cfg.domain}
         enableregistration: false
         enablecaldav: true
         enablelinksharing: true
@@ -49,8 +49,7 @@ in
         enabletaskcomments: true
         enableemailreminders: false
         maxitemsperpage: 100
-        publicurl: http://${cfg.domain}/vikunja
-        rootpath: /vikunja
+        publicurl: http://vikunja.${cfg.domain}
 
       database:
         type: sqlite
@@ -94,6 +93,7 @@ in
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
 
+
       serviceConfig = {
         Type = "simple";
         User = "vikunja";
@@ -119,9 +119,10 @@ in
     };
 
     # Configure nginx reverse proxy
+    # Vikunja doesn't properly support subpath deployment, so we serve it on a subdomain
     machines.base.runWebServer = true;
-    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/vikunja/" = {
+    services.nginx.virtualHosts."vikunja.${config.networking.hostName}.local" = {
+      locations."/" = {
         proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
         proxyWebsockets = true;
         extraConfig = ''
