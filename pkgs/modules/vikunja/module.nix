@@ -137,10 +137,9 @@ in
     environment.systemPackages = [
       pkgs.vikunja
       (pkgs.writeScriptBin "vikunja-cli" (builtins.readFile ./vikunja-cli.sh))
-      (pkgs.writers.writePython3Bin "vikunja-mcp-server"
-        { libraries = [ pkgs.python3Packages.requests ]; }
-        (builtins.readFile ./vikunja-mcp-server.py)
-      )
+      (pkgs.writers.writePython3Bin "vikunja-mcp-server" {
+        libraries = [ pkgs.python3Packages.requests ];
+      } (builtins.readFile ./vikunja-mcp-server.py))
     ];
   };
 }
