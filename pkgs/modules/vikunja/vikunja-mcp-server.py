@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3  # noqa: E265
 # Vikunja MCP Server
 # Provides Claude Code with direct access to Vikunja task management
 # via MCP protocol
