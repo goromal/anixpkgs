@@ -44,7 +44,7 @@ in
     environment.etc."vikunja/config.yml".text = ''
       service:
         interface: :${toString service-ports.vikunja}
-        enableregistration: false
+        enableregistration: true
         enablecaldav: true
         enablelinksharing: true
         enabletaskattachments: true
@@ -128,43 +128,41 @@ in
     # So we serve both the frontend on :3457 and proxy /vikunja/ on port 80
     machines.base.runWebServer = true;
 
-    # Serve frontend on dedicated port 3457
-    services.nginx.virtualHosts."${config.networking.hostName}.local" = mkMerge [
-      {
-        listen = [
-          {
-            addr = "0.0.0.0";
-            port = 3457;
-          }
-        ];
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-          '';
-        };
-      }
+    # Serve frontend on dedicated port 3457 (separate virtualHost)
+    services.nginx.virtualHosts."${config.networking.hostName}.local:3457" = {
+      listen = [
+        {
+          addr = "0.0.0.0";
+          port = 3457;
+        }
+      ];
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host;
+        '';
+      };
+    };
 
-      # Also proxy /vikunja/ on default port 80 for API access from frontend
-      {
-        locations."/vikunja/" = {
-          proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-          '';
-        };
-      }
-    ];
+    # Also proxy /vikunja/ on default port 80 for API access from frontend
+    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      locations."/vikunja/" = {
+        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header X-Forwarded-Host $host;
+        '';
+      };
+    };
 
     # Add vikunja-cli and vikunja-mcp-server to system packages
     environment.systemPackages = [
