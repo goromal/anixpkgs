@@ -74,24 +74,26 @@ in
       default = false;
     };
     webServices = lib.mkOption {
-      type = lib.types.listOf (lib.types.submodule {
-        options = {
-          name = lib.mkOption {
-            type = lib.types.str;
-            description = "Display name of the service";
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Display name of the service";
+            };
+            path = lib.mkOption {
+              type = lib.types.str;
+              description = "URL path or full URL to the service";
+            };
+            description = lib.mkOption {
+              type = lib.types.str;
+              description = "Brief description of the service";
+            };
           };
-          path = lib.mkOption {
-            type = lib.types.str;
-            description = "URL path or full URL to the service";
-          };
-          description = lib.mkOption {
-            type = lib.types.str;
-            description = "Brief description of the service";
-          };
-        };
-      });
+        }
+      );
       description = "List of web services to display on landing page";
-      default = [];
+      default = [ ];
     };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
@@ -308,8 +310,8 @@ in
             let
               hostname = config.networking.hostName;
               services = cfg.webServices;
-              serviceLinks = lib.concatMapStringsSep "\n" (s:
-                "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
+              serviceLinks = lib.concatMapStringsSep "\n" (
+                s: "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
               ) services;
             in
             ''
