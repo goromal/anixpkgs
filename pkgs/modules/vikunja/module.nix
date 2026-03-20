@@ -147,6 +147,9 @@ in
             port = service-ports.vikunja.public;
           }
         ];
+        forceSSL = false;
+        addSSL = false;
+        onlySSL = false;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString service-ports.vikunja.internal}/";
           proxyWebsockets = true;
