@@ -88,8 +88,7 @@ in
       cors:
         enable: true
         origins:
-          - http://${cfg.domain}:${toString service-ports.vikunja.public}
-          - https://${cfg.domain}:${toString service-ports.vikunja.public}
+          - "*"
         maxage: 0
 
       ratelimit:
