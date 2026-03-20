@@ -24,15 +24,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Register Stamp Server in the web services landing page
-    machines.base.webServices = [
-      {
-        name = "Stamp Server";
-        path = "/stamp/";
-        description = "Stamp tracking";
-      }
-    ];
-
     systemd.tmpfiles.rules = [
       "d ${cfg.rootDir}                   - andrew dev"
       "d ${cfg.rootDir}/defaultStampables - andrew dev"
