@@ -319,7 +319,7 @@ in
                     portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
                     port = if portMatch != null then builtins.head portMatch else "";
                   in
-                  "    <li><a href=\"#\" onclick=\"window.location.href=window.location.protocol+'//'+window.location.hostname+':${port}/'; return false;\">${s.name}</a> - ${s.description}</li>"
+                  "    <li><a href=\"#\" onclick=\"window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+':${port}/'; return false;\">${s.name}</a> - ${s.description}</li>"
                 else
                   "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
               ) services;
