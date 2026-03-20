@@ -224,6 +224,200 @@ The script will backup old certificates and create new ones. You won't need to r
 
 See [Local SSL Setup](./local-ssl-setup.md) for complete documentation.
 
+## Vikunja Task Management (ATS Only)
+
+ATS machines automatically include [Vikunja](https://vikunja.io/), an open-source task management system designed for collaboration between you and Claude Code.
+
+### Accessing Vikunja
+
+Once your ATS machine is running, Vikunja is accessible at:
+- **Web UI**: `http://ats.local/vikunja/` (or `https://ats.local/vikunja/` if SSL is configured)
+- **API**: `http://ats.local/vikunja/api/`
+
+The web UI is mobile-friendly and served through nginx, so you can manage tasks from your phone while on your home LAN.
+
+### Initial Setup
+
+1. **Create your first user** (registration is disabled after first use for security):
+   ```bash
+   ssh andrew@ats.local
+   # Open http://ats.local/vikunja/ in a browser and register
+   # After registration, the service will reject new registrations
+   ```
+
+2. **Configure CLI access** (on the machine running Claude Code):
+   ```bash
+   vikunja-cli login <username> <password>
+   # Token is saved to ~/.config/vikunja-cli/config
+   ```
+
+3. **Verify connection**:
+   ```bash
+   vikunja-cli list-projects
+   ```
+
+### Using Vikunja with Claude Code
+
+#### Setting Up a Project with Standing Instructions
+
+Standing instructions are special tasks that Claude Code reads at the start of every session to understand your preferences and requirements.
+
+```bash
+# Create a new project
+PROJECT_ID=$(vikunja-cli create-project "AI Development" "Projects for Claude Code" | jq -r '.id')
+
+# Add standing instructions
+vikunja-cli create-standing-instruction $PROJECT_ID \
+  "Code Style" \
+  "Always use functional programming patterns. Prefer immutability. Use descriptive variable names."
+
+vikunja-cli create-standing-instruction $PROJECT_ID \
+  "Testing" \
+  "Write tests for all new functions. Use property-based testing where applicable."
+
+vikunja-cli create-standing-instruction $PROJECT_ID \
+  "Documentation" \
+  "Add docstrings to all public functions. Keep comments up to date with code changes."
+```
+
+#### Claude Code Workflow
+
+When Claude Code works on your project, it can:
+
+1. **Read standing instructions** to understand your preferences:
+   ```bash
+   vikunja-cli get-standing-instructions
+   ```
+
+2. **List and work on tasks**:
+   ```bash
+   vikunja-cli list-tasks $PROJECT_ID
+   vikunja-cli get-task $TASK_ID
+   ```
+
+3. **Create subtasks** as it breaks down work:
+   ```bash
+   vikunja-cli create-task $PROJECT_ID "Implement user authentication" \
+     "Create login/logout endpoints with JWT tokens"
+   ```
+
+4. **Update progress** with comments:
+   ```bash
+   vikunja-cli add-comment $TASK_ID "Implemented JWT authentication. Tests passing."
+   vikunja-cli complete-task $TASK_ID
+   ```
+
+5. **Assign tasks to you** when input is needed:
+   ```bash
+   vikunja-cli assign-to-user $TASK_ID
+   ```
+
+#### Your Workflow (from Phone/Web)
+
+1. Open `http://ats.local/vikunja/` on your phone
+2. Create projects and tasks
+3. Add standing instructions with the "claude-standing-instructions" label
+4. Review tasks Claude has completed
+5. Check tasks assigned to you (labeled "user-assigned")
+6. Add comments with feedback or clarification
+
+### MCP Integration (Optional)
+
+For tighter integration, you can configure Claude Code to use the Vikunja MCP server.
+
+Add to your Claude Code MCP settings (typically `~/.config/claude-code/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "vikunja": {
+      "command": "vikunja-mcp-server",
+      "env": {
+        "VIKUNJA_URL": "http://ats.local/vikunja/api",
+        "VIKUNJA_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
+This gives Claude Code native access to Vikunja tools like:
+- `vikunja_list_projects`, `vikunja_get_project`
+- `vikunja_list_tasks`, `vikunja_get_task`, `vikunja_create_task`, `vikunja_complete_task`
+- `vikunja_add_comment`, `vikunja_get_comments`
+- `vikunja_get_standing_instructions`, `vikunja_create_standing_instruction`
+- `vikunja_list_user_tasks`, `vikunja_assign_to_user`
+
+### CLI Reference
+
+```bash
+# Authentication
+vikunja-cli login <username> <password>
+
+# Projects
+vikunja-cli list-projects
+vikunja-cli get-project <id>
+
+# Tasks
+vikunja-cli list-tasks [project_id]
+vikunja-cli get-task <id>
+vikunja-cli create-task <project_id> <title> [description]
+vikunja-cli update-task <id> <key=value>...
+vikunja-cli complete-task <id>
+
+# Comments
+vikunja-cli add-comment <task_id> <text>
+vikunja-cli get-comments <task_id>
+
+# Labels
+vikunja-cli list-labels
+vikunja-cli create-label <title> [color]
+vikunja-cli add-label <task_id> <label_id>
+
+# Claude Code Integration
+vikunja-cli get-standing-instructions
+vikunja-cli create-standing-instruction <project_id> <title> <instruction>
+vikunja-cli list-user-tasks
+vikunja-cli assign-to-user <task_id>
+```
+
+### Data Location
+
+- **Database**: `/var/lib/vikunja/vikunja.db` (SQLite)
+- **Files**: `/var/lib/vikunja/files/`
+- **Logs**: `/var/lib/vikunja/logs/`
+- **Configuration**: `/etc/vikunja/config.yml`
+
+### Backup
+
+The Vikunja database is automatically backed up daily at midnight by the `ats-vikunja-backup` orchestrator job:
+- Copies `/var/lib/vikunja/vikunja.db` to `~/data/vikunja/vikunja.db`
+- Syncs to cloud storage via `rcrsync override data vikunja`
+
+You can manually trigger a backup with:
+
+```bash
+ssh andrew@ats.local
+sudo systemctl start ats-vikunja-backup.service
+```
+
+Or manually copy the database:
+
+```bash
+ssh andrew@ats.local
+sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
+```
+
+### Architecture
+
+Vikunja is served through nginx as a reverse proxy:
+- Vikunja serves both the web UI and API from a single service
+- Accessible at `/vikunja/` (frontend and API)
+- Internal port: 3456 (centrally managed in `service-ports.nix`)
+- Public access: HTTP port 80, HTTPS port 443 (if SSL configured)
+
+The service runs on a localhost-only port and is proxied through nginx, following the same pattern as Grafana and other ATS services.
+
 ## Miscellaneous
 
 ### Cloud Syncing

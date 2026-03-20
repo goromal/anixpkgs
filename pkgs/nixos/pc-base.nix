@@ -157,6 +157,7 @@ in
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
+    ../modules/vikunja/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -462,6 +463,12 @@ in
 
     # Mail
     services.mailNode.enable = cfg.isATS;
+
+    # Vikunja Task Management
+    services.vikunja-ats = lib.mkIf cfg.isATS {
+      enable = true;
+      domain = "${config.networking.hostName}.local";
+    };
 
     # Global packages
     environment.systemPackages =

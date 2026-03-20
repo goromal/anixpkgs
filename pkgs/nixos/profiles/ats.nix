@@ -149,6 +149,20 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-vikunja-backup";
+          jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
+            mkdir -p $HOME/data/vikunja
+            sudo cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            sudo chown andrew:dev $HOME/data/vikunja/vikunja.db
+            rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-vikunja-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }

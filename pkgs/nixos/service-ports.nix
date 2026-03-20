@@ -19,4 +19,5 @@
     insecure = 60060;
     web = 60070;
   };
+  vikunja = 3456;
 }
