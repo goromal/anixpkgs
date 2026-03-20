@@ -16,8 +16,8 @@ This setup provides:
 ┌─────────────────┐         ┌──────────────────────────────────┐         ┌─────────────────┐
 │   Your Phone    │         │      ATS Machine (ats.local)     │         │ Claude Code     │
 │   (Mobile UI)   │◄────────┤                                  │◄────────┤ (via MCP/CLI)   │
-│                 │  HTTP   │  Nginx (Port 80/443)             │  REST   │                 │
-└─────────────────┘         │    vikunja.ats.local → :3456     │         └─────────────────┘
+│                 │  :3457  │  Nginx (Port 3457)               │  REST   │                 │
+└─────────────────┘         │    └─ Proxy → :3456              │         └─────────────────┘
                             │                                  │
                             │  Vikunja Server (127.0.0.1:3456) │
                             │  - Serves Web UI & API           │
@@ -65,22 +65,21 @@ Create the first Vikunja user:
 sudo systemctl restart vikunja
 
 # Register your user via the web UI
-# Visit http://vikunja.ats.local and create an account
+# Visit http://ats.local:3457 and create an account
 
 # After creating your account, disable registration again
 # (This will happen automatically if you redeploy with the config)
 ```
 
 Alternatively, access the web UI from your phone or any device on the LAN:
-- `http://vikunja.ats.local/`
-- `https://vikunja.ats.local/` (if SSL is configured)
+- `http://ats.local:3457/`
 
 ### 3. Configure vikunja-cli
 
 On the machine running Claude Code (your laptop):
 
 ```bash
-# The CLI defaults to http://vikunja.ats.local/api/v1
+# The CLI defaults to http://ats.local:3457/api/v1
 # You can override with VIKUNJA_URL if needed
 
 # Login and save your token
@@ -143,7 +142,7 @@ vikunja-cli assign-to-user $TASK_ID
 
 ### Workflow 3: Your Review and Direction (from Phone)
 
-1. Open Vikunja web UI on your phone: `http://vikunja.ats.local`
+1. Open Vikunja web UI on your phone: `http://ats.local:3457`
 2. Review tasks that Claude has assigned to you (labeled "user-assigned")
 3. Add comments with feedback or clarification
 4. Create new tasks or modify priorities
@@ -179,7 +178,7 @@ Add this to your Claude Code MCP settings (usually in `~/.config/claude-code/mcp
     "vikunja": {
       "command": "vikunja-mcp-server",
       "env": {
-        "VIKUNJA_URL": "http://vikunja.ats.local/api/v1",
+        "VIKUNJA_URL": "http://ats.local:3457/api/v1",
         "VIKUNJA_TOKEN": "your-token-here"
       }
     }
@@ -214,7 +213,7 @@ The system uses special labels for organization:
 
 ## Environment Variables
 
-- `VIKUNJA_URL` - Vikunja API URL (default: `http://vikunja.ats.local/api/v1`)
+- `VIKUNJA_URL` - Vikunja API URL (default: `http://ats.local:3457/api/v1`)
 - `VIKUNJA_TOKEN` - Authentication token (saved in `~/.config/vikunja-cli/config`)
 
 ## Troubleshooting
@@ -268,14 +267,14 @@ You can also interact directly with the Vikunja API:
 ```bash
 # Get all projects
 curl -H "Authorization: Bearer $VIKUNJA_TOKEN" \
-  http://vikunja.ats.local/api/v1/projects
+  http://ats.local:3457/api/v1/projects
 
 # Create a task
 curl -X POST \
   -H "Authorization: Bearer $VIKUNJA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title":"New Task","description":"Task description"}' \
-  http://vikunja.ats.local/api/v1/projects/1/tasks
+  http://ats.local:3457/api/v1/projects/1/tasks
 ```
 
 ## Security Considerations

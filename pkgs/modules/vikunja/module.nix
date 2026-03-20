@@ -27,6 +27,9 @@ in
   };
 
   config = mkIf cfg.enable {
+    # Open firewall port for Vikunja web access
+    networking.firewall.allowedTCPPorts = [ 3457 ];
+
     # Create the vikunja user
     users.users.vikunja = {
       isSystemUser = true;
@@ -41,7 +44,7 @@ in
     environment.etc."vikunja/config.yml".text = ''
       service:
         interface: :${toString service-ports.vikunja}
-        frontendurl: http://vikunja.${cfg.domain}
+        frontendurl: http://${cfg.domain}:3457
         enableregistration: false
         enablecaldav: true
         enablelinksharing: true
@@ -49,7 +52,7 @@ in
         enabletaskcomments: true
         enableemailreminders: false
         maxitemsperpage: 100
-        publicurl: http://vikunja.${cfg.domain}
+        publicurl: http://${cfg.domain}:3457
 
       database:
         type: sqlite
@@ -118,9 +121,13 @@ in
     };
 
     # Configure nginx reverse proxy
-    # Vikunja doesn't properly support subpath deployment, so we serve it on a subdomain
+    # Vikunja doesn't properly support subpath deployment, so we expose it on a separate port
+    # Users access it at http://ats.local:3457 (nginx proxies to internal :3456)
     machines.base.runWebServer = true;
-    services.nginx.virtualHosts."vikunja.${config.networking.hostName}.local" = {
+    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      listen = [
+        { addr = "0.0.0.0"; port = 3457; }
+      ];
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
         proxyWebsockets = true;

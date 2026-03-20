@@ -231,19 +231,19 @@ ATS machines automatically include [Vikunja](https://vikunja.io/), an open-sourc
 ### Accessing Vikunja
 
 Once your ATS machine is running, Vikunja is accessible at:
-- **Web UI**: `http://vikunja.ats.local/` (or `https://vikunja.ats.local/` if SSL is configured)
-- **API**: `http://vikunja.ats.local/api/v1/`
+- **Web UI**: `http://ats.local:3457/`
+- **API**: `http://ats.local:3457/api/v1/`
 
-The web UI is mobile-friendly and served through nginx on a subdomain, so you can manage tasks from your phone while on your home LAN.
+The web UI is mobile-friendly and served through nginx on a dedicated port, so you can manage tasks from your phone while on your home LAN.
 
-**Note**: Vikunja is served on a subdomain (`vikunja.ats.local`) rather than a subpath (`ats.local/vikunja/`) because it doesn't properly support subpath deployment.
+**Note**: Vikunja is served on a separate port (3457) rather than a subpath (like `/vikunja/`) because it doesn't properly support subpath deployment.
 
 ### Initial Setup
 
 1. **Create your first user** (registration is disabled after first use for security):
    ```bash
    ssh andrew@ats.local
-   # Open http://vikunja.ats.local/ in a browser and register
+   # Open http://ats.local:3457/ in a browser and register
    # After registration, the service will reject new registrations
    ```
 
@@ -316,7 +316,7 @@ When Claude Code works on your project, it can:
 
 #### Your Workflow (from Phone/Web)
 
-1. Open `http://vikunja.ats.local/` on your phone
+1. Open `http://ats.local:3457/` on your phone
 2. Create projects and tasks
 3. Add standing instructions with the "claude-standing-instructions" label
 4. Review tasks Claude has completed
@@ -335,7 +335,7 @@ Add to your Claude Code MCP settings (typically `~/.config/claude-code/mcp.json`
     "vikunja": {
       "command": "vikunja-mcp-server",
       "env": {
-        "VIKUNJA_URL": "http://vikunja.ats.local/api/v1",
+        "VIKUNJA_URL": "http://ats.local:3457/api/v1",
         "VIKUNJA_TOKEN": "your-token-here"
       }
     }
@@ -414,11 +414,11 @@ sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
 
 Vikunja is served through nginx as a reverse proxy:
 - Vikunja serves both the web UI and API from a single service
-- Accessible via subdomain at `vikunja.ats.local` (frontend at `/`, API at `/api/v1/`)
+- Accessible at `ats.local:3457` (frontend at `/`, API at `/api/v1/`)
 - Internal port: 3456 (centrally managed in `service-ports.nix`)
-- Public access: HTTP port 80, HTTPS port 443 (if SSL configured)
+- External port: 3457 (nginx proxy)
 
-The service runs on a localhost-only port and is proxied through nginx on a subdomain. Unlike Grafana which supports subpath deployment, Vikunja requires serving from the root path.
+The service runs on a localhost-only port (3456) and is proxied through nginx on port 3457. Unlike Grafana which supports subpath deployment, Vikunja requires serving from the root path.
 
 ## Miscellaneous
 
