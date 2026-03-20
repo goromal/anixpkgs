@@ -28,10 +28,11 @@ in
 
   config = mkIf cfg.enable {
     # Register Vikunja in the web services landing page
+    # Use protocol-relative URL to work with both hostname and IP access
     machines.base.webServices = [
       {
         name = "Vikunja";
-        path = "http://${config.networking.hostName}.local:${toString service-ports.vikunja.public}/";
+        path = "//:${toString service-ports.vikunja.public}/";
         description = "Task management system";
       }
     ];
