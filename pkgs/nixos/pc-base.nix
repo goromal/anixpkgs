@@ -310,8 +310,18 @@ in
             let
               hostname = config.networking.hostName;
               services = cfg.webServices;
+              # Generate service links with special handling for port-based services
               serviceLinks = lib.concatMapStringsSep "\n" (
-                s: "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
+                s:
+                if s.path == "#" then
+                  # Extract port from description (e.g., "Task management system (port 3457)")
+                  let
+                    portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+                    port = if portMatch != null then builtins.head portMatch else "";
+                  in
+                  "    <li><a href=\"#\" onclick=\"window.location.href=window.location.protocol+'//' +window.location.hostname+':${port}/'; return false;\">${s.name}</a> - ${s.description}</li>"
+                else
+                  "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
               ) services;
             in
             ''

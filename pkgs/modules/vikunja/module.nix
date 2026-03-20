@@ -28,12 +28,12 @@ in
 
   config = mkIf cfg.enable {
     # Register Vikunja in the web services landing page
-    # Use JavaScript to construct URL with current hostname and port
+    # Use onclick handler to construct URL with current hostname and port
     machines.base.webServices = [
       {
         name = "Vikunja";
-        path = "javascript:window.location.href=window.location.protocol+'//'+window.location.hostname+':${toString service-ports.vikunja.public}+'/'";
-        description = "Task management system";
+        path = "#";
+        description = "Task management system (port ${toString service-ports.vikunja.public})";
       }
     ];
 
