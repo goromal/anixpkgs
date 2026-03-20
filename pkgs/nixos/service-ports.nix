@@ -19,5 +19,8 @@
     insecure = 60060;
     web = 60070;
   };
-  vikunja = 3456;
+  vikunja = {
+    internal = 3456;
+    public = 3457;
+  };
 }

@@ -30,6 +30,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register wiki in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Wiki";
+        path = "/wiki/";
+        description = "DokuWiki notes and documentation";
+      }
+    ];
+
     services.phpfpm.pools.notes-wiki = {
       user = "andrew";
       group = "dev";

@@ -27,8 +27,17 @@ in
   };
 
   config = mkIf cfg.enable {
+    # Register Vikunja in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Vikunja";
+        path = "http://${config.networking.hostName}.local:${toString service-ports.vikunja.public}/";
+        description = "Task management system";
+      }
+    ];
+
     # Open firewall port for Vikunja web access
-    networking.firewall.allowedTCPPorts = [ 3457 ];
+    networking.firewall.allowedTCPPorts = [ service-ports.vikunja.public ];
 
     # Create the vikunja user
     users.users.vikunja = {
@@ -43,7 +52,7 @@ in
     # Vikunja configuration file
     environment.etc."vikunja/config.yml".text = ''
       service:
-        interface: :${toString service-ports.vikunja}
+        interface: :${toString service-ports.vikunja.internal}
         enableregistration: true
         enablecaldav: true
         enablelinksharing: true
@@ -51,7 +60,7 @@ in
         enabletaskcomments: true
         enableemailreminders: false
         maxitemsperpage: 100
-        publicurl: http://${cfg.domain}:3457
+        publicurl: http://${cfg.domain}:${toString service-ports.vikunja.public}
 
       database:
         type: sqlite
@@ -78,8 +87,8 @@ in
       cors:
         enable: true
         origins:
-          - http://${cfg.domain}:3457
-          - https://${cfg.domain}:3457
+          - http://${cfg.domain}:${toString service-ports.vikunja.public}
+          - https://${cfg.domain}:${toString service-ports.vikunja.public}
         maxage: 0
 
       ratelimit:
@@ -96,7 +105,7 @@ in
       wantedBy = [ "multi-user.target" ];
 
       environment = {
-        VIKUNJA_SERVICE_PUBLICURL = "http://${cfg.domain}:3457";
+        VIKUNJA_SERVICE_PUBLICURL = "http://${cfg.domain}:${toString service-ports.vikunja.public}";
       };
 
       serviceConfig = {
@@ -128,16 +137,16 @@ in
     # So we serve both the frontend on :3457 and proxy /vikunja/ on port 80
     machines.base.runWebServer = true;
 
-    # Serve frontend on dedicated port 3457 (separate virtualHost)
-    services.nginx.virtualHosts."${config.networking.hostName}.local:3457" = {
+    # Serve frontend on dedicated port (separate virtualHost)
+    services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.vikunja.public}" = {
       listen = [
         {
           addr = "0.0.0.0";
-          port = 3457;
+          port = service-ports.vikunja.public;
         }
       ];
       locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
+        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja.internal}/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
@@ -152,7 +161,7 @@ in
     # Also proxy /vikunja/ on default port 80 for API access from frontend
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/vikunja/" = {
-        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
+        proxyPass = "http://127.0.0.1:${toString service-ports.vikunja.internal}/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;

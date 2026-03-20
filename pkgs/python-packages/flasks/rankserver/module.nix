@@ -24,6 +24,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register Rank Server in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Rank Server";
+        path = "/rank/";
+        description = "Ranking system";
+      }
+    ];
+
     systemd.tmpfiles.rules = [ "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -" ];
 
     systemd.services.rankserver-setup = {

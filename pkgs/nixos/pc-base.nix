@@ -73,6 +73,26 @@ in
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
+    webServices = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          name = lib.mkOption {
+            type = lib.types.str;
+            description = "Display name of the service";
+          };
+          path = lib.mkOption {
+            type = lib.types.str;
+            description = "URL path or full URL to the service";
+          };
+          description = lib.mkOption {
+            type = lib.types.str;
+            description = "Brief description of the service";
+          };
+        };
+      });
+      description = "List of web services to display on landing page";
+      default = [];
+    };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
       description = "Network interface name for the WiFi.";
@@ -281,6 +301,82 @@ in
             ssl = true;
           }
         ];
+
+        # Landing page listing all available services
+        locations."= /" = {
+          return = "200 '${
+            let
+              hostname = config.networking.hostName;
+              services = cfg.webServices;
+              serviceLinks = lib.concatMapStringsSep "\n" (s:
+                "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
+              ) services;
+            in
+            ''
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset=\"UTF-8\">
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                <title>${hostname} Services</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    background: #f5f5f5;
+                  }
+                  .container {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                  }
+                  h1 {
+                    color: #333;
+                    margin-top: 0;
+                  }
+                  ul {
+                    list-style: none;
+                    padding: 0;
+                  }
+                  li {
+                    margin: 15px 0;
+                    padding: 10px;
+                    background: #f9f9f9;
+                    border-radius: 4px;
+                    border-left: 4px solid #007bff;
+                  }
+                  a {
+                    color: #007bff;
+                    text-decoration: none;
+                    font-weight: 600;
+                  }
+                  a:hover {
+                    text-decoration: underline;
+                  }
+                  .description {
+                    color: #666;
+                    font-size: 0.9em;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class=\"container\">
+                  <h1>${hostname} Services</h1>
+                  <ul>
+              ${serviceLinks}
+                  </ul>
+                </div>
+              </body>
+              </html>
+            ''
+          }'";
+          extraConfig = ''
+            default_type text/html;
+          '';
+        };
       };
     };
 

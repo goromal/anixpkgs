@@ -36,6 +36,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register Grafana in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Grafana";
+        path = "/grafana/";
+        description = "Metrics and monitoring dashboards";
+      }
+    ];
+
     networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
 
     services.vector = {
