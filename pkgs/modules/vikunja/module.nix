@@ -93,7 +93,6 @@ in
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
 
-
       serviceConfig = {
         Type = "simple";
         User = "vikunja";
