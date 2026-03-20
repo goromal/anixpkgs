@@ -7,6 +7,7 @@
 with lib;
 with import ../../nixos/dependencies.nix;
 let
+  globalCfg = config.machines.base;
   cfg = config.services.vikunja-ats;
 in
 {
@@ -140,15 +141,22 @@ in
     # Serve frontend on dedicated port (separate virtualHost)
     services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.vikunja.public}" =
       {
+        # Support both HTTP and HTTPS (no forced redirect)
+        forceSSL = false;
+        addSSL = true;
+        sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
+        sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
         listen = [
           {
             addr = "0.0.0.0";
             port = service-ports.vikunja.public;
           }
+          {
+            addr = "0.0.0.0";
+            port = service-ports.vikunja.public;
+            ssl = true;
+          }
         ];
-        forceSSL = false;
-        addSSL = false;
-        onlySSL = false;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString service-ports.vikunja.internal}/";
           proxyWebsockets = true;
