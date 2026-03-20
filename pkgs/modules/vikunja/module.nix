@@ -139,18 +139,14 @@ in
     machines.base.runWebServer = true;
 
     # Serve frontend on dedicated port (separate virtualHost)
+    # Note: Since we need both HTTP and HTTPS on the same port (3457),
+    # we use onlySSL=true to serve only HTTPS on 3457
     services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.vikunja.public}" =
       {
-        # Support both HTTP and HTTPS (no forced redirect)
-        forceSSL = false;
-        addSSL = true;
+        onlySSL = true;
         sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
         listen = [
-          {
-            addr = "0.0.0.0";
-            port = service-ports.vikunja.public;
-          }
           {
             addr = "0.0.0.0";
             port = service-ports.vikunja.public;
