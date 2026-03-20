@@ -126,7 +126,10 @@ in
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       listen = [
-        { addr = "0.0.0.0"; port = 3457; }
+        {
+          addr = "0.0.0.0";
+          port = 3457;
+        }
       ];
       locations."/" = {
         proxyPass = "http://127.0.0.1:${toString service-ports.vikunja}/";
