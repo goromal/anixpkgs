@@ -79,7 +79,7 @@ Alternatively, access the web UI from your phone or any device on the LAN:
 On the machine running Claude Code (your laptop):
 
 ```bash
-# The CLI defaults to http://ats.local:3457/api/v1
+# The CLI defaults to http://ats.local/vikunja/api/v1
 # You can override with VIKUNJA_URL if needed
 
 # Login and save your token
@@ -178,7 +178,7 @@ Add this to your Claude Code MCP settings (usually in `~/.config/claude-code/mcp
     "vikunja": {
       "command": "vikunja-mcp-server",
       "env": {
-        "VIKUNJA_URL": "http://ats.local:3457/api/v1",
+        "VIKUNJA_URL": "http://ats.local/vikunja/api/v1",
         "VIKUNJA_TOKEN": "your-token-here"
       }
     }
@@ -213,7 +213,7 @@ The system uses special labels for organization:
 
 ## Environment Variables
 
-- `VIKUNJA_URL` - Vikunja API URL (default: `http://ats.local:3457/api/v1`)
+- `VIKUNJA_URL` - Vikunja API URL (default: `http://ats.local/vikunja/api/v1`)
 - `VIKUNJA_TOKEN` - Authentication token (saved in `~/.config/vikunja-cli/config`)
 
 ## Troubleshooting
@@ -267,14 +267,14 @@ You can also interact directly with the Vikunja API:
 ```bash
 # Get all projects
 curl -H "Authorization: Bearer $VIKUNJA_TOKEN" \
-  http://ats.local:3457/api/v1/projects
+  http://ats.local/vikunja/api/v1/projects
 
 # Create a task
 curl -X POST \
   -H "Authorization: Bearer $VIKUNJA_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title":"New Task","description":"Task description"}' \
-  http://ats.local:3457/api/v1/projects/1/tasks
+  http://ats.local/vikunja/api/v1/projects/1/tasks
 ```
 
 ## Security Considerations

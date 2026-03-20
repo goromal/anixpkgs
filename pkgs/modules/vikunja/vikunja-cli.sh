@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Configuration
-VIKUNJA_URL="${VIKUNJA_URL:-http://ats.local:3457/api/v1}"
+VIKUNJA_URL="${VIKUNJA_URL:-http://ats.local/vikunja/api/v1}"
 VIKUNJA_TOKEN="${VIKUNJA_TOKEN:-}"
 VIKUNJA_CONFIG="${HOME}/.config/vikunja-cli/config"
 

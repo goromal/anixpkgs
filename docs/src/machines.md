@@ -232,11 +232,9 @@ ATS machines automatically include [Vikunja](https://vikunja.io/), an open-sourc
 
 Once your ATS machine is running, Vikunja is accessible at:
 - **Web UI**: `http://ats.local:3457/`
-- **API**: `http://ats.local:3457/api/v1/`
+- **API**: `http://ats.local/vikunja/api/v1/`
 
-The web UI is mobile-friendly and served through nginx on a dedicated port, so you can manage tasks from your phone while on your home LAN.
-
-**Note**: Vikunja is served on a separate port (3457) rather than a subpath (like `/vikunja/`) because it doesn't properly support subpath deployment.
+The web UI is mobile-friendly and served through nginx on port 3457. The API is accessible at `/vikunja/` on the default HTTP port (80) due to how the frontend is built in nixpkgs.
 
 ### Initial Setup
 
@@ -335,7 +333,7 @@ Add to your Claude Code MCP settings (typically `~/.config/claude-code/mcp.json`
     "vikunja": {
       "command": "vikunja-mcp-server",
       "env": {
-        "VIKUNJA_URL": "http://ats.local:3457/api/v1",
+        "VIKUNJA_URL": "http://ats.local/vikunja/api/v1",
         "VIKUNJA_TOKEN": "your-token-here"
       }
     }
@@ -414,11 +412,12 @@ sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
 
 Vikunja is served through nginx as a reverse proxy:
 - Vikunja serves both the web UI and API from a single service
-- Accessible at `ats.local:3457` (frontend at `/`, API at `/api/v1/`)
+- Frontend accessible at `ats.local:3457`
+- API accessible at `ats.local/vikunja/api/v1/` (port 80)
 - Internal port: 3456 (centrally managed in `service-ports.nix`)
-- External port: 3457 (nginx proxy)
+- External ports: 3457 (frontend), 80 (API via `/vikunja/`)
 
-The service runs on a localhost-only port (3456) and is proxied through nginx on port 3457. Unlike Grafana which supports subpath deployment, Vikunja requires serving from the root path.
+The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on port 80 for API access.
 
 ## Miscellaneous
 
