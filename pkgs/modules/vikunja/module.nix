@@ -44,7 +44,6 @@ in
     environment.etc."vikunja/config.yml".text = ''
       service:
         interface: :${toString service-ports.vikunja}
-        frontendurl: http://${cfg.domain}:3457
         enableregistration: false
         enablecaldav: true
         enablelinksharing: true
@@ -79,8 +78,8 @@ in
       cors:
         enable: true
         origins:
-          - http://${cfg.domain}
-          - https://${cfg.domain}
+          - http://${cfg.domain}:3457
+          - https://${cfg.domain}:3457
         maxage: 0
 
       ratelimit:
