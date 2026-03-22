@@ -44,6 +44,14 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    machines.base.webServices = [
+      {
+        name = "LA Quiz Game";
+        path = "/la-quiz/";
+        description = "LA geography challenge game";
+      }
+    ];
+
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0755 andrew dev -"
       "d ${cfg.mapsDir} 0755 andrew dev -"
