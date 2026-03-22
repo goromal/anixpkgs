@@ -243,6 +243,7 @@ let
               stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
               authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
+              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -342,6 +343,7 @@ rec {
   stampserver = final.python313.pkgs.stampserver;
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
+  la_quiz_web = final.python313.pkgs.la_quiz_web;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;

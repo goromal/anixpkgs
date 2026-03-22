@@ -241,6 +241,11 @@
                 "docs": true
             },
             {
+                "attr": "la_quiz_web",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "easy-google-auth",
                 "ci": true,
                 "docs": true

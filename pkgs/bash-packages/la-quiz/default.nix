@@ -6,8 +6,6 @@
   pkgData,
 }:
 let
-  # ^^^^ TODO rename package to la-quiz-cli but keep the help name the same
-  # ^^^^ TODO move the python code and make a flask specialization that's read-only
   pkgname = "la-quiz";
   quiz =
     with python.pkgs;
