@@ -163,6 +163,17 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-la-quiz-backup";
+          jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
+            rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-la-quiz-backup "LA Quiz backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }

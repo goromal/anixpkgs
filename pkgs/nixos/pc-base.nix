@@ -186,6 +186,7 @@ in
     ../python-packages/flasks/budget_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
+    ../python-packages/flasks/la-quiz-web/module.nix
     (
       let
         jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
@@ -431,6 +432,11 @@ in
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.stampserver;
       rootDir = "${cfg.homeDir}/fileservers";
+    };
+
+    services.la-quiz-web = {
+      enable = cfg.isATS;
+      dataDir = "${cfg.homeDir}/data/la-quiz-web";
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {

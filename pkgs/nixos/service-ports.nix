@@ -23,4 +23,5 @@
     internal = 3456;
     public = 3457;
   };
+  la-quiz-web = 5656;
 }

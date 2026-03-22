@@ -25,6 +25,7 @@ Packages written (or bound) in Python.
 - [flask-oatbox](./flask-oatbox.md)
 - [rankserver](./rankserver.md)
 - [stampserver](./stampserver.md)
+- [la_quiz_web](./la_quiz_web.md)
 - [easy-google-auth](./easy-google-auth.md)
 - [rcdo](./rcdo.md)
 - [task-tools](./task-tools.md)

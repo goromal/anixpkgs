@@ -46,6 +46,7 @@
   - [flask-oatbox](./python/flask-oatbox.md)
   - [rankserver](./python/rankserver.md)
   - [stampserver](./python/stampserver.md)
+  - [la_quiz_web](./python/la_quiz_web.md)
   - [easy-google-auth](./python/easy-google-auth.md)
   - [rcdo](./python/rcdo.md)
   - [task-tools](./python/task-tools.md)
