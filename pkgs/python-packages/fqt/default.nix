@@ -1,4 +1,9 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, click }:
+{
+  callPackage,
+  pytestCheckHook,
+  buildPythonPackage,
+  click,
+}:
 callPackage ../pythonPkgFromScript.nix {
   pname = "fqt";
   version = "1.0.0";

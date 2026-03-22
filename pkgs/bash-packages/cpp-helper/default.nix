@@ -1,5 +1,12 @@
-{ writeArgparseScriptBin, writeShellScript, color-prints, redirects, git-cc
-, anixpkgs-version, python3 }:
+{
+  writeArgparseScriptBin,
+  writeShellScript,
+  color-prints,
+  redirects,
+  git-cc,
+  anixpkgs-version,
+  python3,
+}:
 let
   pkgname = "cpp-helper";
   usage_str = ''
@@ -33,9 +40,9 @@ let
         exit 1
       fi
       if [[ -f shell.nix ]]; then
-        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+        nix-shell --command 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
       elif [[ -f flake.nix ]]; then
-        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$maketarget
       else
         ${printErr} "shell.nix not found."
         exit 1
@@ -53,11 +60,11 @@ let
         exit 1
       fi
       if [[ -f shell.nix ]]; then
-        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
-        nix-shell --command 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+        nix-shell --command 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix-shell --command 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
       elif [[ -f flake.nix ]]; then
-        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
-        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget && \
+        nix develop --command bash -c 'NIX_CFLAGS_COMPILE= rm -rf build && mkdir -p build && cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSECONDARY_SANITIZERS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_FLAGS="$NIX_CFLAGS_COMPILE" -DCMAKE_CXX_FLAGS="$NIX_CFLAGS_COMPILE" && make -C build -j$(nproc) '$challengetarget
       else
         ${printErr} "shell.nix not found."
         exit 1
@@ -143,61 +150,66 @@ let
         mv "$makeexl/cmake/example-cppConfig.cmake.in" "$makeexl/cmake/''${makeexl}Config.cmake.in"
     fi
   '';
-in (writeArgparseScriptBin pkgname usage_str [
-  {
-    var = "makeff";
-    isBool = true;
-    default = "0";
-    flags = "format-file";
-  }
-  {
-    var = "makehot";
-    isBool = false;
-    default = "";
-    flags = "header-lib";
-  }
-  {
-    var = "makeexl";
-    isBool = false;
-    default = "";
-    flags = "exec-lib";
-  }
-  {
-    var = "makenix";
-    isBool = true;
-    default = "0";
-    flags = "nix";
-  }
-  {
-    var = "makevscode";
-    isBool = true;
-    default = "0";
-    flags = "vscode";
-  }
-  {
-    var = "maketarget";
-    isBool = false;
-    default = "";
-    flags = "make";
-  }
-  {
-    var = "challengetarget";
-    isBool = false;
-    default = "";
-    flags = "challenge";
-  }
-] ''
-  set -e
-  tmpdir=$(mktemp -d)
-  ${makeffRule}
-  ${makehotRule}
-  ${makeexlRule}
-  ${makenixRule}
-  ${makevscodeRule}
-  ${makeRule}
-  ${challengeRule}
-  rm -rf "$tmpdir"
-'') // {
+in
+(writeArgparseScriptBin pkgname usage_str
+  [
+    {
+      var = "makeff";
+      isBool = true;
+      default = "0";
+      flags = "format-file";
+    }
+    {
+      var = "makehot";
+      isBool = false;
+      default = "";
+      flags = "header-lib";
+    }
+    {
+      var = "makeexl";
+      isBool = false;
+      default = "";
+      flags = "exec-lib";
+    }
+    {
+      var = "makenix";
+      isBool = true;
+      default = "0";
+      flags = "nix";
+    }
+    {
+      var = "makevscode";
+      isBool = true;
+      default = "0";
+      flags = "vscode";
+    }
+    {
+      var = "maketarget";
+      isBool = false;
+      default = "";
+      flags = "make";
+    }
+    {
+      var = "challengetarget";
+      isBool = false;
+      default = "";
+      flags = "challenge";
+    }
+  ]
+  ''
+    set -e
+    tmpdir=$(mktemp -d)
+    ${makeffRule}
+    ${makehotRule}
+    ${makeexlRule}
+    ${makenixRule}
+    ${makevscodeRule}
+    ${makeRule}
+    ${challengeRule}
+    rm -rf "$tmpdir"
+  ''
+)
+// {
   meta = {
     description = "Convenience tools for setting up C++ projects.";
     longDescription = "";

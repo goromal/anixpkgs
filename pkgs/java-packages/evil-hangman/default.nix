@@ -1,10 +1,21 @@
-{ stdenv, jdk, jre, ant, makeWrapper, pkg-src }:
+{
+  stdenv,
+  jdk,
+  jre,
+  ant,
+  makeWrapper,
+  pkg-src,
+}:
 stdenv.mkDerivation {
   name = "evil-hangman";
   version = "1.0.0";
   src = pkg-src;
 
-  nativeBuildInputs = [ jdk ant makeWrapper ];
+  nativeBuildInputs = [
+    jdk
+    ant
+    makeWrapper
+  ];
 
   patches = [ ./patches/args.patch ];
 
@@ -20,8 +31,7 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    description =
-      "Interactive hangman game where you'll probably lose (because the computer is cheating).";
+    description = "Interactive hangman game where you'll probably lose (because the computer is cheating).";
     longDescription = ''
       Written in Java. [Repository](https://github.com/goromal/evil-hangman)
 

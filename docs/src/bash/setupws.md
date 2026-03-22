@@ -2,9 +2,11 @@
 
 Create standalone development workspaces.
 
-Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI:
+Unlike with [devshell](./devshell.md)'s `setupcurrentws` command, this tool takes all of its setup info from the CLI.
 
-```
+## Usage
+
+```bash
 usage: setupws [OPTIONS] workspace_name srcname:git_url [srcname:git_url ...] [scriptname=scriptpath ...]
 
 Create a development workspace with specified git sources and scripts.

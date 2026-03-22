@@ -1,4 +1,9 @@
-{ clangStdenv, cmake, boost, pkg-src }:
+{
+  clangStdenv,
+  cmake,
+  boost,
+  pkg-src,
+}:
 clangStdenv.mkDerivation {
   name = "sorting";
   version = "1.0.0";
@@ -9,8 +14,7 @@ clangStdenv.mkDerivation {
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
-    description =
-      "A C++ library for sporadic, incremental sorting with client-side comparators.";
+    description = "A C++ library for sporadic, incremental sorting with client-side comparators.";
     longDescription = ''
       [Repository](https://github.com/goromal/sorting)
 

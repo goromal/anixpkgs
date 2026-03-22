@@ -1,9 +1,21 @@
-{ buildPythonPackage, flask, writeTextFile, callPackage, writeShellScript
-, python }:
+{
+  buildPythonPackage,
+  flask,
+  writeTextFile,
+  callPackage,
+  writeShellScript,
+  python,
+}:
 callPackage ../builders/mkSimpleFlaskApp.nix {
   pname = "flask_hello_world";
   version = "0.0.0";
-  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  inherit
+    buildPythonPackage
+    flask
+    writeTextFile
+    writeShellScript
+    python
+    ;
   scriptPropagatedBuildInputs = [ ];
   flaskScript = ''
     @app.route('/')

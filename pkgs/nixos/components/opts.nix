@@ -1,16 +1,20 @@
-{ pkgs, config, lib, ... }:
-with import ../dependencies.nix; {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+with import ../dependencies.nix;
+{
   options.mods.opts = {
     standalone = lib.mkOption {
       type = lib.types.bool;
-      description =
-        "Whether this is a standalone Nix installation (default: false)";
+      description = "Whether this is a standalone Nix installation (default: false)";
       default = false;
     };
     homeDir = lib.mkOption {
       type = lib.types.str;
-      description =
-        "Home directory to put the wallpaper in (default: /data/andrew)";
+      description = "Home directory to put the wallpaper in (default: /data/andrew)";
       default = "/data/andrew";
     };
     homeState = lib.mkOption {
@@ -19,23 +23,26 @@ with import ../dependencies.nix; {
     };
     userOrchestrator = lib.mkOption {
       type = lib.types.bool;
-      description =
-        "Whether to run a user-domain instance of orchestratord (default: true)";
+      description = "Whether to run a user-domain instance of orchestratord (default: true)";
       default = true;
     };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
-      description =
-        "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
+      description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
     };
     editor = lib.mkOption {
       type = lib.types.str;
       description = "Code editor (executable) of choice";
-      default = "codium";
+      default = "code";
     };
     browserExec = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       description = "Executable name to open your browser of choice";
+      default = null;
+    };
+    wallpaperImage = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      description = "Path to desired wallpaper (for graphical distributions)";
       default = null;
     };
     screenResolution = lib.mkOption {
@@ -47,6 +54,21 @@ with import ../dependencies.nix; {
       type = lib.types.bool;
       default = false;
       description = "Whether to export OS metrics";
+    };
+    claudeMarketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of extra plugin marketplaces to install";
+    };
+    claudePlugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of claude plugins to install";
+    };
+    extraClaudeSettings = lib.mkOption {
+      type = lib.types.attrs;
+      default = { };
+      description = "Attrs describing the Claude JSON settings";
     };
   };
 }

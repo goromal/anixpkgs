@@ -14,7 +14,7 @@ Fun:10
 Family:30
 ```
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: fqt [OPTIONS] COMMAND [ARGS]...
@@ -29,6 +29,5 @@ Options:
 Commands:
   analyze  Analyze past task performance.
   task     Propose a task for the day.
-
 ```
 

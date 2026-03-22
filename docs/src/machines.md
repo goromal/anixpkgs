@@ -19,8 +19,8 @@ experimental-features = nix-command flakes auto-allocate-uids
 4. Add these Nix channels via `nix-channel --add URL NAME`:
 ```bash
 $ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
-nixpkgs https://nixos.org/channels/nixos-24.05
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixpkgs https://nixos.org/channels/nixos-25.11
 ```
 5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
@@ -69,153 +69,53 @@ export NIXPKGS_ALLOW_UNFREE=1
 # eval "$(direnv hook bash)"
 ```
 
-## Build and Deploy a Raspberry Pi NixOS SD Configuration
-
-Since the hardware configuration for the Raspberry Pi is well understood, it makes sense to skip the installer step and deploy a fully-fledged clusure instead.
-
-```bash
-nixos-generate -f sd-aarch64 --system aarch64-linux -c /path/to/anixpkgs/pkgs/nixos/configurations/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
-```
-
-```bash
-nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
-```
-
-```bash
-sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
-```
-
-On the Pi, connect to the internet, copy over SSH keys (maybe no need for `/root/.ssh/`) and then set up the Nix channel(s):
-
-```bash
-sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
-sudo nix-channel --update
-```
-
-Note that the `nixos-generate` step may not have "aarch-ified" the `anixpkgs` packages (that's something for me to look into) so the `anix-upgrade` setup steps are especially important:
-
-- Make a `~/sources` directory
-- Symlink the configuration file even if it doesn't exist yet
-- Run `anix-upgrade` to aarch-ify everything
-
-## Build a Raspberry Pi NixOS SD Installer Image
-
-```bash
-nixos-generate -f sd-aarch64-installer --system aarch64-linux -c /path/to/rpi/config.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
-```
-
-```bash
-nix-shell -p zstd --run "unzstd -d /nix/store/path/to/image.img.zst"
-```
-
-```bash
-sudo dd if=/path/to/image.img of=/dev/sdX bs=4096 conv=fsync status=progress
-```
-
-On the Pi, copy over SSH keys (including to `/root/.ssh/`!) and then set up the Nix channel:
-
-```bash
-sudo nix-channel --add https://nixos.org/channels/nixos-[NIXOS-VERSION] nixos
-sudo nix-channel --update
-```
-
-## Installation Instructions on a New Machine
+## Personal Machine Installation Instructions
 
 *Sources*
 
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
-***Note***: You can replace steps 1-8 with a `kexec` kernel load and disk formatting with `disko`:
-- [kexec directions](https://github.com/nix-community/nixos-images#kexec-tarballs)
-- [disko directions](https://github.com/nix-community/disko)
-
-1. Download a [NixOS ISO](https://nixos.org/nixos/download.html) image.
+1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
-4. Burn ISO to USB stick with 
-```bash
-cp nixos-xxx.iso /dev/sdX
-# OR
-dd if=nixos.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
-```
+4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
 5. On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)
-6. Wipe the file system:
-```bash
-wipefs [--all -a] /dev/sda
-```
-7. `gparted`
-   1. Create a GUID table: *Device* > *Create Partition Table* > *GPT*
-      1. Select `/dev/sda`
-      2. *Entire disk*
-   2. Create the boot partition: *Partition* > *New*
-      1. Free space preceding (MiB): 1
-      2. New size (MiB): 512
-      3. Free space following (MiB): Rest
-      4. Align to: MiB
-      5. Create as: Primary Partition
-      6. Partition name: EFI
-      7. File system: `fat32`
-      8. Label: EFI
-   3. Add the `boot` flag
-      1. Right-click on `/dev/sda1` to manage flags
-      2. Add the `boot` flag and enable `esp` (should be automatic with GPT)
-   4. Create the root partition: *Partition* > *New*
-      1. Free space preceding (MiB): 0
-      2. New size (MiB): Rest
-      3. Free space following (MiB): 0
-      4. Align to: MiB
-      5. Create as: Primary Partition
-      6. Partition name: NixOS
-      7. File system: `ext4`
-      8. Label: NixOS
-   5. Apply modifications
-8. Mount root and boot partitions:
-```bash
-mkdir /mnt/nixos
-mount /dev/disk/by-label/NixOS /mnt/nixos
-mkdir /mnt/nixos/boot
-mount /dev/disk/by-label/EFI /mnt/nixos/boot
-```
-9. Generate an initial configuration (you'll want it to enable WiFi connectivity and a web browser at least):
-```bash
-nixos-generate-config --root /mnt/nixos
-# /etc/nixos/configuration.nix
-# /etc/nixos/hardware-configuration.nix
-```
-10.  Do the installation:
-```bash
-nixos-install --root /mnt/nixos
-```
-11.  If everything went well:
-```bash
-reboot
-```
-12.  Log into Github and generate an SSH key for authentication.
-13.  Clone and link an editable version of the configuration:
-```bash
-mkdir -p /data/andrew/sources # or in an alternate location, for now
-git clone git@github.com:goromal/anixpkgs.git /data/andrew/sources/anixpkgs
-cat /etc/nixos/hardware-configuration.nix > /data/andrew/sources/anixpkgs/pkgs/nixos/hardware/[hardware-configuration.nix] # update link/headings in configuration.nix
-sudo mv /etc/nixos/configuration.nix /etc/nixos/old.configuration.nix
-sudo mv /etc/nixos/hardware-configuration.nix /etc/nixos/old.hardware-configuration.nix
-sudo ln -s /data/andrew/sources/anixpkgs/pkgs/nixos/configurations/[your-configuration.nix] /etc/nixos/configuration.nix
-```
-14.  Make other needed updates to the configuration, then apply:
-```bash
-sudo nixos-rebuild boot
-sudo reboot
-```
+6. Login as the user `andrew`
+7. Connect to the internet
+8. Within the installer, run `sudo anix-install`
+9. If everything went well, reboot
+10. On the next reboot, login as user `andrew` again
+11. Connect to the internet
+12. Run `anix-init` 
+13. Enjoy!
+
+## JetPack Machine Installation Instructions
+
+1. Ensure that the device has UEFI firmware installed. See https://github.com/anduril/jetpack-nixos.
+2. Build the installation ISO with `nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage`
+3. Plug in a USB stick large enough to accommodate the image.
+4. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
+5. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
+6. Insert the USB drive into the Jetson device. On the AGX devkits, I've had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.
+7. Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the "Boot Manager", select the correct USB device and boot directly into it.
+8. Connect to the internet
+9. Within the installer, run `sudo anix-install`
+10. If everything went well, reboot
+11. On the next reboot, login as user `andrew` again
+12. Connect to the internet
+13. Run `anix-init` 
+14. Enjoy!
 
 ## Upgrading NixOS versions with `anixpkgs`
 
 Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
 
 ```bash
-# e.g., upgrading to 24.05:
-home-manager https://github.com/nix-community/home-manager/archive/release-24.05.tar.gz
-nixos https://nixos.org/channels/nixos-24.05
-nixpkgs https://nixos.org/channels/nixos-24.05
+# e.g., upgrading to 25.11:
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixos https://nixos.org/channels/nixos-25.11
+nixpkgs https://nixos.org/channels/nixos-25.11
 ```
 
 `sudo nix-channel --update`. Then upgrade with
@@ -224,16 +124,17 @@ nixpkgs https://nixos.org/channels/nixos-24.05
 anix-upgrade [source specification] --local --boot
 ```
 
-### Cloud Syncing
+## Build a JetPack Installer ISO
 
-The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
+Cross-compiled from x86_64. Requires `binfmt` support for aarch64 (enabled by default on NixOS with `boot.binfmt.emulatedSystems`).
 
-- `dropbox:secrets` -> `rclone copy` -> `~/secrets`
-- `dropbox:configs`-> `rclone copy` -> `~/configs`
-- `dropbox:Games` -> `rclone copy` -> `~/games`
-- `box:data` -> `rclone copy` -> `~/data`
-- `box:.devrc` -> `rclone copy` -> `~/.devrc`
-- `drive:Documents` -> `rclone copy` -> `~/Documents`
+```bash
+nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
+```
+
+```bash
+dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
+```
 
 ## Build a NixOS ISO Image
 
@@ -247,3 +148,106 @@ nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/t
 sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
+## Local SSL Setup for HTTPS Access
+
+For machines configured with `runWebServer = true` (like ATS), you can enable HTTPS access from devices on your local network (especially phones) to avoid browser security warnings.
+
+### Quick Start
+
+1. **Generate SSL certificates** on the server:
+   ```bash
+   generate-local-ssl-certs
+   ```
+
+   The script will auto-detect your LAN IP address and create certificates in `~/secrets/vpn/`.
+
+   If you need to specify a different IP address:
+   ```bash
+   generate-local-ssl-certs 192.168.1.100
+   ```
+
+2. **Install the CA certificate on your client devices**:
+
+   Transfer `~/secrets/vpn/rootCA.pem` to your phone and install it:
+
+   **Android:**
+   - Settings → Security → Encryption & credentials → Install a certificate
+   - Choose "CA certificate" and select `rootCA.pem`
+   - Give it a name like "ATS Local CA"
+
+   **iPhone/iPad:**
+   - Email or AirDrop `rootCA.pem` to your device
+   - Open the file to install the profile
+   - Settings → General → VPN & Device Management → Install the profile
+   - Settings → General → About → Certificate Trust Settings → Enable full trust
+
+3. **Access your server via HTTPS**:
+   ```
+   https://ats.local:443
+   ```
+
+   Or use HTTP if you prefer (no automatic redirect):
+   ```
+   http://ats.local:80
+   ```
+
+### How It Works
+
+- The nginx server listens on **both** HTTP (port 80) and HTTPS (port 443)
+- There is **no automatic redirect** from HTTP to HTTPS - both protocols are supported
+- The certificates are valid for:
+  - `[hostname].local` (e.g., `ats.local`)
+  - `*.[hostname].local` (wildcard for subdomains)
+  - `localhost`, `127.0.0.1`, and your LAN IP address
+- Certificates are stored in `~/secrets/vpn/` and backed up by `rcrsync`
+- Certificates expire after ~825 days and can be regenerated anytime
+
+### Regenerating Certificates
+
+If your server IP changes or certificates expire:
+```bash
+generate-local-ssl-certs [new-ip-address]
+```
+
+The script will backup old certificates and create new ones. You won't need to reinstall the CA on your devices if you're replacing server certificates signed by the same CA.
+
+### Troubleshooting
+
+**SSL warnings still appear:**
+- Verify you installed `rootCA.pem` (the CA certificate), not `chain.pem`
+- On iOS, ensure you enabled full trust in Certificate Trust Settings
+- Try clearing browser cache or restarting the browser
+
+**Connection refused:**
+- Check firewall allows ports 80 and 443: `sudo iptables -L -n | grep -E '80|443'`
+- Verify nginx is running: `systemctl status nginx`
+
+See [Local SSL Setup](./local-ssl-setup.md) for complete documentation.
+
+## Miscellaneous
+
+### Cloud Syncing
+
+The following mount points are recommended (using [rclone](https://rclone.org/) to set up):
+
+- `dropbox:secrets` -> `rclone copy` -> `~/secrets`
+- `dropbox:configs`-> `rclone copy` -> `~/configs`
+- `dropbox:Games` -> `rclone copy` -> `~/games`
+- `box:data` -> `rclone copy` -> `~/data`
+- `box:.devrc` -> `rclone copy` -> `~/.devrc`
+- `drive:Documents` -> `rclone copy` -> `~/Documents`
+
+### Music with Tidal
+
+If you haven't already, run:
+
+```bash
+install-superdirt
+```
+
+Open VSCode, run `sclang` in the terminal (close with `0.exit`), and open up a `.tidal` file and get to work.
+
+Useful commands:
+
+- Install samples with e.g., `tidal-download-samples eddyflux/crate crate`
+- When `sclang` is running, associate with the correct audio device with `sc-route-audio`

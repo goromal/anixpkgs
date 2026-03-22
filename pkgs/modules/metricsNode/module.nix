@@ -1,35 +1,42 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.metricsNode;
-in {
+  textfileDir = "/var/lib/node_exporter/textfile_collector";
+  fileMonitorScript = pkgs.writeShellScriptBin "home-dir-file-counts" ''
+    #!/usr/bin/env bash
+    mkdir -p ${textfileDir}
+    out="${textfileDir}/home_file_counts.prom"
+    tmp="$(mktemp)"
+
+    for dir in "$HOME"/*/; do
+      count=$(find "$dir" -type f | wc -l)
+      name=$(basename "$dir")
+      echo "home_dir_file_count{dir=\"$name\"} $count" >> "$tmp"
+    done
+
+    mv "$tmp" "$out"
+    chmod 644 "$out"
+  '';
+in
+{
   options.services.metricsNode = {
     enable = lib.mkEnableOption "enable metrics node services";
     openFirewall = lib.mkOption {
       type = lib.types.bool;
-      description =
-        "Whether to open the specific firewall port for inter-computer usage";
+      description = "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
   };
 
   config = lib.mkIf cfg.enable {
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [
-      service-ports.grafana.internal
-      service-ports.netdata
-    ];
-
-    services.netdata = {
-      enable = true;
-      config = {
-        global = { "memory mode" = "ram"; };
-        plugins = { "cgroup plugin" = "yes"; };
-        web = {
-          "bind to" = "tcp:0.0.0.0:${builtins.toString service-ports.netdata}";
-        };
-      };
-    };
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
 
     services.vector = {
       enable = true;
@@ -42,7 +49,9 @@ in {
             address = "0.0.0.0:${builtins.toString service-ports.statsd}";
             mode = "udp";
           };
-          service_logs = { type = "journald"; };
+          service_logs = {
+            type = "journald";
+          };
         };
         transforms = {
           tagged_service_logs = {
@@ -58,14 +67,12 @@ in {
             # https://vector.dev/docs/reference/configuration/sinks/prometheus_exporter/
             type = "prometheus_exporter";
             inputs = [ "statsd_metrics" ];
-            address =
-              "[::]:${builtins.toString service-ports.prometheus.input}";
+            address = "[::]:${builtins.toString service-ports.prometheus.input}";
           };
           loki = {
             type = "loki";
             inputs = [ "tagged_service_logs" ];
-            endpoint =
-              "http://localhost:${builtins.toString service-ports.loki}";
+            endpoint = "http://localhost:${builtins.toString service-ports.loki}";
             encoding.codec = "json"; # Recommended for structured logs
             labels = {
               job = "vector";
@@ -81,15 +88,22 @@ in {
       enable = true;
       configuration = {
         auth_enabled = false;
-        server = { http_listen_port = service-ports.loki; };
+        limits_config = {
+          ingestion_rate_mb = 16; # Increase limit (default is 4)
+          ingestion_burst_size_mb = 32; # Allow bursts above the rate
+        };
+        server = {
+          http_listen_port = service-ports.loki;
+        };
         common = {
-          path_prefix =
-            "/var/lib/loki"; # Ensures compactor has a working directory
+          path_prefix = "/var/lib/loki"; # Ensures compactor has a working directory
         };
         ingester = {
           lifecycler = {
             ring = {
-              kvstore = { store = "inmemory"; };
+              kvstore = {
+                store = "inmemory";
+              };
               replication_factor = 1;
             };
             final_sleep = "0s";
@@ -100,16 +114,18 @@ in {
           };
         };
         schema_config = {
-          configs = [{
-            from = "2020-10-24";
-            store = "boltdb-shipper";
-            object_store = "filesystem";
-            schema = "v11";
-            index = {
-              prefix = "index_";
-              period = "24h";
-            };
-          }];
+          configs = [
+            {
+              from = "2020-10-24";
+              store = "boltdb-shipper";
+              object_store = "filesystem";
+              schema = "v11";
+              index = {
+                prefix = "index_";
+                period = "24h";
+              };
+            }
+          ];
         };
         storage_config = {
           boltdb_shipper = {
@@ -117,7 +133,9 @@ in {
             cache_location = "/var/lib/loki/cache";
             # shared_store = "filesystem";
           };
-          filesystem = { directory = "/var/lib/loki/chunks"; };
+          filesystem = {
+            directory = "/var/lib/loki/chunks";
+          };
         };
         limits_config.allow_structured_metadata = false;
       };
@@ -127,20 +145,69 @@ in {
       RestartSec = lib.mkForce "5s";
     };
 
+    systemd.services.homeDirFileCounts = {
+      description = "Generate file counts per home subdirectory";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${fileMonitorScript}/bin/home-dir-file-counts";
+        Environment = "HOME=${globalCfg.homeDir}";
+      };
+    };
+    systemd.timers.homeDirFileCounts = {
+      description = "Run homeDirFileCounts every 60 minutes";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "1m";
+        OnUnitActiveSec = "60m";
+      };
+    };
+
     # Check health with
     # curl -s http://localhost:9001/api/v1/targets | jq '.data.activeTargets[] | {scrapeUrl, lastScrape, health, lastError}'
     services.prometheus = {
       enable = true;
       port = service-ports.prometheus.output;
       retentionTime = "15d";
-      scrapeConfigs = [{
-        job_name = "vector";
-        static_configs = [{
-          targets =
-            [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
-        }];
-      }];
+      scrapeConfigs = [
+        {
+          job_name = "vector";
+          static_configs = [
+            {
+              targets = [ "0.0.0.0:${builtins.toString service-ports.prometheus.input}" ];
+            }
+          ];
+        }
+        {
+          job_name = "node";
+          static_configs = [
+            {
+              targets = [ "127.0.0.1:${builtins.toString service-ports.node-exporter}" ];
+            }
+          ];
+        }
+      ];
+      exporters.node = {
+        enable = true;
+        port = service-ports.node-exporter;
+        extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
+      };
     };
+
+    systemd.tmpfiles.rules = [
+      "d /var/lib/grafana/dashboards 0750 grafana grafana -"
+      "d ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} 0750 andrew dev -"
+      "d ${textfileDir} 0755 node-exporter node-exporter -"
+    ];
+    users.users.grafana.extraGroups = [ "dev" ];
+    fileSystems."/var/lib/grafana/dashboards" = {
+      device = "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+    system.activationScripts.grafanaPerms.text = ''
+      chmod -R g+rx ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}
+      find ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} -type f -exec chmod g+r {} +
+    '';
 
     services.grafana = {
       enable = true;
@@ -153,21 +220,32 @@ in {
         };
       };
       provision = {
-        datasources.settings.datasources = [{
-          name = "Loki";
-          type = "loki";
-          access = "proxy";
-          url = "http://localhost:${builtins.toString service-ports.loki}";
-        }];
+        enable = true;
+        dashboards = {
+          settings = {
+            providers = [
+              {
+                name = config.networking.hostName;
+                options.path = "/var/lib/grafana/dashboards";
+              }
+            ];
+          };
+        };
+        datasources.settings.datasources = [
+          {
+            name = "Loki";
+            type = "loki";
+            access = "proxy";
+            url = "http://localhost:${builtins.toString service-ports.loki}";
+          }
+        ];
       };
     };
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/grafana/" = {
-        proxyPass = "http://127.0.0.1:${
-            builtins.toString service-ports.grafana.internal
-          }/grafana/";
+        proxyPass = "http://127.0.0.1:${builtins.toString service-ports.grafana.internal}/grafana/";
         proxyWebsockets = true;
         extraConfig = ''
           proxy_set_header Host $host;
@@ -176,10 +254,6 @@ in {
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_set_header X-Forwarded-Host $host;
         '';
-      };
-      locations."/netdata/" = {
-        proxyPass =
-          "http://127.0.0.1:${builtins.toString service-ports.netdata}/";
       };
     };
   };

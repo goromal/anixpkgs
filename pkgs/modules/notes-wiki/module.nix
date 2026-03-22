@@ -1,9 +1,15 @@
-{ pkgs, lib, config, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.notes-wiki;
-in {
+in
+{
   options.services.notes-wiki = {
     enable = lib.mkEnableOption "enable notes wiki server";
     dataWikiDirname = lib.mkOption {
@@ -13,14 +19,12 @@ in {
     };
     wikiDir = lib.mkOption {
       type = lib.types.str;
-      description =
-        "Root directory for notes wiki (default: ~/data/${cfg.dataWikiDirname}/public_html)";
+      description = "Root directory for notes wiki (default: ~/data/${cfg.dataWikiDirname}/public_html)";
       default = "${globalCfg.homeDir}/data/${cfg.dataWikiDirname}/public_html";
     };
     php = lib.mkOption {
       type = lib.types.package;
-      description =
-        "PHP build (default: 7.4 until DokuWiki version gets updated)";
+      description = "PHP build (default: 7.4 until DokuWiki version gets updated)";
       default = anixpkgs.php74;
     };
   };

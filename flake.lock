@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1734240005,
-        "narHash": "sha256-ydGzaszIULCfra4cMlSIDZCjKdn6b63C9TwgDOB25+E=",
+        "lastModified": 1768144916,
+        "narHash": "sha256-SlA5mbKsWjSnoGFw8HE44efy2BB6QeUmX6IHDMMrbxo=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "bbd81c2974dc591cd309f473cd3d32559b8c1f7e",
+        "rev": "e7cad057b29a7acbcf2409fb9e899f7864a4c08a",
         "type": "github"
       },
       "original": {
@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1707018004,
-        "narHash": "sha256-YOA4MvKJqJEJ6g5JzuHwW47zJNNXQWSUtrVcdFp7L4U=",
+        "lastModified": 1771825089,
+        "narHash": "sha256-AbyLbEfPdEcgYTnqv1/4hofSwmN+UBNLJ5B6cWAX+I0=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "77211cd6ab4ee5a9879aef94403c81daf2a11d58",
+        "rev": "467fef9fe1e9daf72de5eb6bf868ea29da590cb1",
         "type": "github"
       },
       "original": {
@@ -35,17 +35,17 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1717112455,
-        "narHash": "sha256-4sZlPIGYr9ivk1V5CHG1wsIxzqrHFxpb2inWT5IfDT4=",
-        "ref": "Copter-4.4",
-        "rev": "865cffa5f2a850f892ab43def2d4ad21b8a9adca",
-        "revCount": 57489,
+        "lastModified": 1770503432,
+        "narHash": "sha256-QrilSQb87TDkQBXC0x3saQgdC08z5YWW+VZsY9FOlRg=",
+        "ref": "master",
+        "rev": "4fb7f3bb865e6bc523c0f5bfb8609f4a9daf0ef2",
+        "revCount": 70888,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
-        "ref": "Copter-4.4",
+        "ref": "master",
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
@@ -54,11 +54,11 @@
     "book-notes-sync": {
       "flake": false,
       "locked": {
-        "lastModified": 1717871019,
-        "narHash": "sha256-0ic7jZirFebHbYtQDoFcdJmuVKAkwiKVq8lmE0byy9I=",
+        "lastModified": 1757796240,
+        "narHash": "sha256-Zzwg+0sIU2BlquPHTmowdCLoy2KX/p1D48mGIVgRNeg=",
         "owner": "goromal",
         "repo": "book-notes-sync",
-        "rev": "3f96818f223520e45dea7a98f7b3287ab23b5a5a",
+        "rev": "36ed429e6a81bb9e6e688b08c6f6df37309f29f1",
         "type": "github"
       },
       "original": {
@@ -99,6 +99,47 @@
         "type": "github"
       }
     },
+    "cuda-legacy": {
+      "inputs": {
+        "flake-parts": [
+          "jetpack-nixos",
+          "cuda-legacy"
+        ],
+        "nixpkgs": [
+          "jetpack-nixos",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768505959,
+        "narHash": "sha256-oFCx/ApQ+S1/apUKWsvT9vq+Eo1m2vINWEDkW7/nckA=",
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
+        "rev": "86ad7e2c2e314f0234539cbbc66b5cd7746bcd32",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos-cuda",
+        "repo": "cuda-legacy",
+        "type": "github"
+      }
+    },
+    "daily_tactical_server": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1766035688,
+        "narHash": "sha256-/lq485V/warVmf38ICCN2tK44xKzlxHMyQuriq+RGto=",
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "rev": "9ff6f97ce5c193f95996e8a886c5995ab5ff86dd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "daily_tactical_server",
+        "type": "github"
+      }
+    },
     "easy-google-auth": {
       "flake": false,
       "locked": {
@@ -118,11 +159,11 @@
     "evil-hangman": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693382,
-        "narHash": "sha256-uu1Fuvfh1Gq9Hl9MnG4Zy8V4Ad94FQACI/QAI5/S1FQ=",
+        "lastModified": 1757261291,
+        "narHash": "sha256-K5c2zp79c2ypC5cgy0fDpgFqpycNekeR7Eetu8O6lVA=",
         "owner": "goromal",
         "repo": "evil-hangman",
-        "rev": "fbd190eec9b5f0b28d316e2db4eabb4e35347dfd",
+        "rev": "d6f51fdc7ac3062dd28b1148f5df97740c3a93fb",
         "type": "github"
       },
       "original": {
@@ -200,11 +241,11 @@
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1742189535,
-        "narHash": "sha256-rMySYxi15Cp1Li8H38DZfHyrm0N5MAbfIDRgsCRG1iY=",
+        "lastModified": 1771609177,
+        "narHash": "sha256-tJgSBbC9lHSJdWy4HSW2POk5XZr2IIM+l0ABEaI+IDA=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "d67ec20d64a8e9d04798306febe49b5aafa76c0e",
+        "rev": "27564549b423069373d8e2324bc87d8c36d2b4bf",
         "type": "github"
       },
       "original": {
@@ -229,14 +270,49 @@
         "type": "github"
       }
     },
+    "gnc": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769404494,
+        "narHash": "sha256-rSVQkLqNaQjG5ELajLpZiL7QBVd+KQBk3KntqeNybR4=",
+        "owner": "goromal",
+        "repo": "gnc",
+        "rev": "82fe050acea9c1524168b1ec85d046d3d31ed1b0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "gnc",
+        "type": "github"
+      }
+    },
+    "jetpack-nixos": {
+      "inputs": {
+        "cuda-legacy": "cuda-legacy",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1770229245,
+        "narHash": "sha256-dMC/OzvG+y5OaF0zTR/Onx6EcVcLt/DX/cucOC4MqCk=",
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "rev": "0910e7d6e219e8dab0e30cee03f71d1b3553d1e1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
-        "lastModified": 1690955602,
-        "narHash": "sha256-Q3Mlqmiklk77ezqb3wvjcQq9iB3ovAggFm15i4KrL3U=",
+        "lastModified": 1754799137,
+        "narHash": "sha256-W9dUALrxhQ9uS2AuRi8moFsj77PZ0ZECczuo/Ry9G30=",
         "ref": "refs/heads/main",
-        "rev": "f9205485cc2f073cb3caa35e2fffeb2cc1ed6c1d",
-        "revCount": 4,
+        "rev": "2423b7bcffb4d7f1b6af517e0a598d5d18fc0f6c",
+        "revCount": 5,
         "type": "git",
         "url": "https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31"
       },
@@ -248,15 +324,16 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1746337994,
-        "narHash": "sha256-4MEQqEmZs7D2asF5c/rc3NzDDui/0uAlZWlasGUdlRo=",
+        "lastModified": 1742189520,
+        "narHash": "sha256-0xF03b3GfZrJpjspc7MsJYiTl/mBrbVjVNl4c4iYrxQ=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "f7013ab24f5ac59a220d960994d627beb2ffdd6c",
+        "rev": "9bbb6c47c8d0b2d90a53e868cfea855354106bad",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "manif-geom-cpp",
         "type": "github"
       }
@@ -264,11 +341,11 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1710476829,
-        "narHash": "sha256-m5XNqp5aypoJlpQ/baxb0EQiTJ9ItI1CzBhE1KC76qQ=",
+        "lastModified": 1769379491,
+        "narHash": "sha256-3MpS9AReLB2M7Lxz+qAI2UBWJvhm7PmAG6bulQ/O0S4=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "c1fcc55181ae78752b8ac487645f0a3c78548679",
+        "rev": "0175d43b0ed22d99cd82649eda98a99501bca63e",
         "type": "github"
       },
       "original": {
@@ -290,17 +367,18 @@
       "original": {
         "owner": "mavlink",
         "repo": "c_library_v2",
+        "rev": "f9cec4814082af27c2fd27259aed302f52ce9cf7",
         "type": "github"
       }
     },
     "mavlink-router": {
       "flake": false,
       "locked": {
-        "lastModified": 1724248737,
-        "narHash": "sha256-/RkuEb/N/jtik+H9Q+9xZ/VkDX8pGNcf/t13hTRrcfo=",
+        "lastModified": 1735840064,
+        "narHash": "sha256-jCqguWNaXN1rH4i8uG9htQQRF3V9LKNjAE4F5z6WZlU=",
         "owner": "mavlink-router",
         "repo": "mavlink-router",
-        "rev": "c20337bbc61abda21463e7482172d58b654e66b6",
+        "rev": "51983a46cd1f632a5934a29da2dbe5fd7d5c38d4",
         "type": "github"
       },
       "original": {
@@ -312,11 +390,11 @@
     "mavlog-utils": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694240,
-        "narHash": "sha256-0Jn0QdvBhC8Qh0PQmEkhIedslSmeGGfv/UJzvowZsS0=",
+        "lastModified": 1758083814,
+        "narHash": "sha256-MJckvugf68LBnYeUXCqg6A6qy6QJg/On8pQeiztSxBM=",
         "owner": "goromal",
         "repo": "mavlog-utils",
-        "rev": "516bc15b3cf5bbdcc82ea84548202d1f72fe56ef",
+        "rev": "810fc49ae42d4235c70ab92dd4977e97536bff7c",
         "type": "github"
       },
       "original": {
@@ -360,11 +438,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1728191989,
-        "narHash": "sha256-9UN2ok+PI0AozZ/eUIX4j6wy5eZi7oOSgl/PICRvxN0=",
+        "lastModified": 1766897832,
+        "narHash": "sha256-oMdbVcbk3pBegoKD6BQOYhTzQUXHvaxeGSbIPi4uqqE=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "1451f74e1fa9e4e0408011d38a58ec177e986a14",
+        "rev": "62878869d06545ee6a28fc5a757159b4f8664abd",
         "type": "github"
       },
       "original": {
@@ -375,21 +453,37 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1717179513,
-        "narHash": "sha256-vboIEwIQojofItm2xGCdZCzW96U85l9nDW3ifMuAIdM=",
-        "owner": "NixOS",
+        "lastModified": 1768773494,
+        "narHash": "sha256-XsM7GP3jHlephymxhDE+/TKKO1Q16phz/vQiLBGhpF4=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "63dacb46bf939521bdc93981b4cbb7ecb58427a0",
+        "rev": "77ef7a29d276c6d8303aece3444d61118ef71ac2",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
-        "ref": "refs/tags/24.05",
+        "owner": "nixos",
+        "ref": "nixos-25.11",
         "repo": "nixpkgs",
         "type": "github"
       }
     },
     "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1764521362,
+        "narHash": "sha256-M101xMtWdF1eSD0xhiR8nG8CXRlHmv6V+VoY65Smwf4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "871b9fd269ff6246794583ce4ee1031e1da71895",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "refs/tags/25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1718276985,
         "narHash": "sha256-u1fA0DYQYdeG+5kDm1bOoGcHtX0rtC7qs2YA2N1X++I=",
@@ -408,11 +502,11 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1741671470,
-        "narHash": "sha256-vua/eYmBxQKMb742YY3kN8AQPquC2LHUWRZjHB9Cowo=",
+        "lastModified": 1768144730,
+        "narHash": "sha256-XXVUr4wjiEptVKD8pGVXnE3zlR1feqrDmNcxSeK3io4=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "695bc2ecf271713a41f102eee09536c8c582ad10",
+        "rev": "1289cdf8a530468419c7a3339b61f1cb49ce13cc",
         "type": "github"
       },
       "original": {
@@ -456,7 +550,7 @@
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "utils": "utils"
       },
       "locked": {
@@ -493,11 +587,11 @@
     "pyceres_factors": {
       "flake": false,
       "locked": {
-        "lastModified": 1700917664,
-        "narHash": "sha256-72lOVW6SGFCHjG/BRPqA6Xh1eV+3tYwm+T3h060knqM=",
+        "lastModified": 1771609357,
+        "narHash": "sha256-KUJQJVmtCzzoY02mIVvYyvcQLVOf7WlGFNfTKhLfndw=",
         "owner": "goromal",
         "repo": "pyceres_factors",
-        "rev": "5fee04d810bb954b90238a01f3bb1aea3edfc632",
+        "rev": "2c3917b4ffce0e8deb26afa10650417e76006cfc",
         "type": "github"
       },
       "original": {
@@ -509,11 +603,11 @@
     "pysignals": {
       "flake": false,
       "locked": {
-        "lastModified": 1735182553,
-        "narHash": "sha256-qOV2F0Jw5KuUICKv65uMW3aRGTWqj6Eudg3NFjEb6ts=",
+        "lastModified": 1771610243,
+        "narHash": "sha256-0vlzNBkQUgQCxz8Ei5uZiKw9jMx1jrzHLwY7hh07/NI=",
         "owner": "goromal",
         "repo": "pysignals",
-        "rev": "11d6532e27122b12238af99554535f9cfb138df6",
+        "rev": "bf58a5baeba2e43abf937f11e52a08789048ef59",
         "type": "github"
       },
       "original": {
@@ -525,11 +619,11 @@
     "pysorting": {
       "flake": false,
       "locked": {
-        "lastModified": 1683694136,
-        "narHash": "sha256-nP9sUskrz3v69gFrBVJzLp5yoeZyZR0z2Bn6cchLBGI=",
+        "lastModified": 1771610446,
+        "narHash": "sha256-VtmSU+uQFerZ7cO82iuhLEdzTRKa4NNATuvQpBa9bq0=",
         "owner": "goromal",
         "repo": "pysorting",
-        "rev": "09b008e7073e944c67f523d75e606a32c1ca7ae5",
+        "rev": "89fb8a730567cc176cb2f6f3a28e65ae2708cdc6",
         "type": "github"
       },
       "original": {
@@ -611,6 +705,7 @@
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
         "crowcpp": "crowcpp",
+        "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",
         "evil-hangman": "evil-hangman",
         "find_rotational_conventions": "find_rotational_conventions",
@@ -618,6 +713,8 @@
         "flake-utils": "flake-utils",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
+        "gnc": "gnc",
+        "jetpack-nixos": "jetpack-nixos",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -627,7 +724,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
         "photos-tools": "photos-tools",
@@ -651,6 +748,7 @@
         "task-tools": "task-tools",
         "trafficsim": "trafficsim",
         "wiki-tools": "wiki-tools",
+        "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
       }
     },
@@ -689,15 +787,16 @@
     "signals-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1735182528,
-        "narHash": "sha256-Gj6E/vaW/xQC3pIYm1A+Zj5Rza7m2iuhA2faM1Fm1Tc=",
+        "lastModified": 1769400792,
+        "narHash": "sha256-DqqqR7OBHEiNhuYkdKs9OR9mPhsAJtqFXMgTTwAJnSA=",
         "owner": "goromal",
         "repo": "signals-cpp",
-        "rev": "3b1cdfe2ce66f96095b762673d7ffc2ef1f666ea",
+        "rev": "5a29ba71d2eb7f903bdca76249a23c098a2d5dbe",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/tags/release/1.0",
         "repo": "signals-cpp",
         "type": "github"
       }
@@ -705,11 +804,11 @@
     "simple-image-editor": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693423,
-        "narHash": "sha256-y9vqK+ItS0bUWMWIEPoUb3LFpXNdlFx6yCJIwT0KNyg=",
+        "lastModified": 1757261329,
+        "narHash": "sha256-wsocjQy95Kv1OYyivBBpi7lWkCt18LaI2nCxGjlWDlM=",
         "owner": "goromal",
         "repo": "simple-image-editor",
-        "rev": "64160a1901a91ae941dabcff069d00057d318e06",
+        "rev": "7ad93d4b527055eb9d84092c9aa421c22352c610",
         "type": "github"
       },
       "original": {
@@ -737,11 +836,11 @@
     "spelling-corrector": {
       "flake": false,
       "locked": {
-        "lastModified": 1683693401,
-        "narHash": "sha256-mwncICz15GKpR/Cxe4w8koG9bHBsUdKH0ps32dxiFnw=",
+        "lastModified": 1757261311,
+        "narHash": "sha256-iTmqoloY9ql9t/2Sum/qdnFeOigM+G3cM4b8y4OGaAk=",
         "owner": "goromal",
         "repo": "spelling-corrector",
-        "rev": "8a4a1bf61aa8bb08fae09dd403ebfdf9980684fc",
+        "rev": "5bb421ff190c051e899c84ac7fbae985abe58a01",
         "type": "github"
       },
       "original": {
@@ -816,11 +915,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1740958593,
-        "narHash": "sha256-z2S7DmCIvwHfQ7iYVUe1+Ee30yMRnhG8HXrc1r7jH9Y=",
+        "lastModified": 1767334634,
+        "narHash": "sha256-zYvvI2k/rDuF+9uvQFCsQQzMPmhnXLZO6nLPlgeUYFc=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "f63509631abb6934eb98bf265127414b86a31337",
+        "rev": "0c08127eb7111da929ce5514b4b8411bc46f250b",
         "type": "github"
       },
       "original": {
@@ -866,16 +965,32 @@
     "wiki-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1717870970,
-        "narHash": "sha256-mMB/Vj6jA7nJqsJPPX8FX1EwaJDJuxP/gzXT3cyOZkg=",
+        "lastModified": 1757796195,
+        "narHash": "sha256-dA92/r7qPZfDgAjgX5s625YA6FqoGC7p/MZDFTjuuPI=",
         "owner": "goromal",
         "repo": "wiki-tools",
-        "rev": "60619a5e7f0c0005903153074c6963782984b479",
+        "rev": "43c9aeac48c26a678daf0a8913549b6e4478f608",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
         "repo": "wiki-tools",
+        "type": "github"
+      }
+    },
+    "workout-planner": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772261839,
+        "narHash": "sha256-eKJSMzsKBv74F80rxfBnDfdm9Bs9/0rBCjgAngKh4eU=",
+        "owner": "goromal",
+        "repo": "workout-planner",
+        "rev": "ab4d3263ea70b70085a9170580c11d12dd2585e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "workout-planner",
         "type": "github"
       }
     },

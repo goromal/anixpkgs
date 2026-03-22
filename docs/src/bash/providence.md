@@ -4,7 +4,7 @@ Be randomly dictated to from passages of importance.
 
 Requires a wiki secrets file at `~/secrets/wiki/secrets.json`.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: providence [options] domain
@@ -16,7 +16,6 @@ Pick randomly from a specified domain:
 
 Options:
 --wiki-url URL   URL of wiki to get data from (default: https://notes.andrewtorgesen.com)
-
 
 ```
 

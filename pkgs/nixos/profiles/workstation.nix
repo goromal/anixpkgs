@@ -1,5 +1,11 @@
-{ config, pkgs, lib, ... }:
-with import ../dependencies.nix; {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with import ../dependencies.nix;
+{
   imports = [ ../pc-base.nix ];
 
   config = mkProfileConfig {
@@ -9,8 +15,8 @@ with import ../dependencies.nix; {
     developer = true;
     isATS = false;
     serveNotesWiki = false;
-    isInstaller = false;
     enableMetrics = false;
+    enableFileServers = false;
     cloudDirs = [
       {
         name = "configs";

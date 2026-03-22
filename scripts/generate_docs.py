@@ -36,7 +36,7 @@ rfcsfile = open(os.path.join(ANIXDIR, "docs", "src", "rfcs", "rfcs.md"), "w")
 summaryfile.write("# Summary\n\n")
 summaryfile.write("- [Andrew's Software](./intro.md)\n")
 summaryfile.write("- [Machine Management](./machines.md)\n")
-
+summaryfile.write("  - [Local SSL Setup](./local-ssl-setup.md)\n")
 summaryfile.write("- [RFCs](./rfcs/rfcs.md)\n")
 rfcsfile.write("# RFCs\n\n")
 rfcsfile.write(

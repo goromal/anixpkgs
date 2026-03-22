@@ -1,6 +1,13 @@
-{ pkgs, config, lib, ... }:
-let cfg = config.services.url2mp4server;
-in {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+let
+  cfg = config.services.url2mp4server;
+in
+{
   options.services.url2mp4server = {
     enable = lib.mkEnableOption "enable smf server";
     package = lib.mkOption {
@@ -21,17 +28,19 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.tmpfiles.rules =
-      [ "d  ${cfg.rootDir} - andrew dev" "Z  ${cfg.rootDir} - andrew dev" ];
+    systemd.tmpfiles.rules = [
+      "d  ${cfg.rootDir} - andrew dev"
+      "Z  ${cfg.rootDir} - andrew dev"
+    ];
     systemd.services.url2mp4server = {
       enable = true;
       description = "SMF server";
-      unitConfig = { StartLimitIntervalSec = 0; };
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/flask_url2mp4 --port ${
-            builtins.toString cfg.port
-          }";
+        ExecStart = "${cfg.package}/bin/flask_url2mp4 --port ${builtins.toString cfg.port}";
         ReadWritePaths = [ "${cfg.rootDir}" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";

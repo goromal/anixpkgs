@@ -1,7 +1,13 @@
-let pkgs = import ../default.nix { };
-in with pkgs;
+let
+  pkgs = import ../default.nix { };
+in
+with pkgs;
 mkShell {
-  nativeBuildInputs = [ git direnv lorri ];
+  nativeBuildInputs = [
+    git
+    direnv
+    lorri
+  ];
   buildInputs = [
     make-title
     devshell
@@ -17,8 +23,12 @@ mkShell {
     cpp-helper
     pkgshell
     sunnyside
+    sread
+    swrite
     secure-delete
     time
+    png
+    ckfile
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."

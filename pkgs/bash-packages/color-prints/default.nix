@@ -1,7 +1,8 @@
 { stdenv, writeShellScriptBin }:
 let
   # https://en.wikipedia.org/wiki/ANSI_escape_code
-  echo-color = colorname: colorcode:
+  echo-color =
+    colorname: colorcode:
     writeShellScriptBin "echo_${colorname}" ''
       FLAGS='-e'
       POSITIONAL=()
@@ -38,7 +39,8 @@ let
   echo-magenta = echo-color "magenta" 35;
   echo-cyan = echo-color "cyan" 36;
   echo-white = echo-color "white" 37;
-in stdenv.mkDerivation {
+in
+stdenv.mkDerivation {
   name = "color-prints";
   version = "1.0.0";
   unpackPhase = "true";

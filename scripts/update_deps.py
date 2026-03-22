@@ -14,7 +14,7 @@ for src in lock["nodes"]:
         if ("owner" in original and original["owner"] == "goromal") or ("url" in original and "gist" in original["url"]):
             print(f"  {src}")
             try:
-                output = check_output(["nix", "flake", "lock", "--update-input", src], stderr=DEVNULL)
+                output = check_output(["nix", "flake", "update", src], stderr=DEVNULL)
             except CalledProcessError:
                 print(f"  ERROR updating flake input {src}")
                 exit(1)

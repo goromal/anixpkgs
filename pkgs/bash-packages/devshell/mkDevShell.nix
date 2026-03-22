@@ -1,6 +1,18 @@
-{ pkgs ? import <nixpkgs> { }, printErr, setupws, wsname, devDir, dataDir
-, pkgsVar, devrcFile, devScript, parseScript, editorName, shellSetupScript
-, devHistFile }:
+{
+  pkgs ? import <nixpkgs> { },
+  printErr,
+  setupws,
+  wsname,
+  devDir,
+  dataDir,
+  pkgsVar,
+  devrcFile,
+  devScript,
+  parseScript,
+  editorName,
+  shellSetupScript,
+  devHistFile,
+}:
 let
   setupcurrentws = pkgs.writeShellScriptBin "setupcurrentws" ''
     mkdir -p ${devDir}/${wsname}
@@ -51,8 +63,14 @@ let
     fi
     ${pkgs.python3}/bin/python ${parseScript} ADDSCR ${wsname} ${devrcFile} "$1" "$2" && setupcurrentws
   '';
-in pkgs.mkShell {
-  nativeBuildInputs = [ setupcurrentws dev addsrc addscr ];
+in
+pkgs.mkShell {
+  nativeBuildInputs = [
+    setupcurrentws
+    dev
+    addsrc
+    addscr
+  ];
   shellHook = ''
     export PS1='\n\[\033[1;36m\][devshell=${wsname}:\w]\$\[\033[0m\] '
     alias godev='cd ${devDir}/${wsname}'

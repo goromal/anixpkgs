@@ -32,6 +32,11 @@
                 "docs": true
             },
             {
+                "attr": "gnc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -58,8 +63,8 @@
             },
             {
                 "attr": "orchestrator-cpp",
-                "ci": true,
-                "docs": true
+                "ci": false,
+                "docs": false
             },
             {
                 "attr": "ardurouter",
@@ -102,6 +107,11 @@
             },
             {
                 "attr": "find_rotational_conventions",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "daily_tactical_server",
                 "ci": true,
                 "docs": true
             },
@@ -251,6 +261,11 @@
                 "docs": true
             },
             {
+                "attr": "workout-planner",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "photos-tools",
                 "ci": true,
                 "docs": true
@@ -272,7 +287,7 @@
             },
             {
                 "attr": "symforce",
-                "ci": true,
+                "ci": false,
                 "docs": false
             }
         ],
@@ -353,6 +368,11 @@
                 "docs": false
             },
             {
+                "attr": "ckfile",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "color-prints",
                 "ci": true,
                 "docs": true
@@ -368,12 +388,22 @@
                 "docs": true
             },
             {
+                "attr": "playabc",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "manage-gmail",
                 "ci": true,
                 "docs": true
             },
             {
                 "attr": "gantter",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "local-ssh-proxy",
                 "ci": true,
                 "docs": true
             },
@@ -393,6 +423,11 @@
                 "docs": true
             },
             {
+                "attr": "surveys_report",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "md2pdf",
                 "ci": true,
                 "docs": true
@@ -406,6 +441,16 @@
                 "attr": "fix-perms",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "sread",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "swrite",
+                "ci": true,
+                "docs": false
             },
             {
                 "attr": "make-title",
