@@ -124,9 +124,12 @@ class StampServer:
     def replace_stamp(self, stamp, new_stamp):
         dirname = RES_DIR
         basename = os.path.basename(self.filedeck)
-        split_basename = basename.split(".")
-        split_basename[1] = new_stamp
-        new_basename = ".".join(split_basename)
+        # Validate that the file has the expected stamp prefix format
+        if not basename.startswith(f"stamped.{stamp}."):
+            raise ValueError(f"File {basename} does not have expected stamp prefix 'stamped.{stamp}.'")
+        # Remove the old stamp prefix and add the new one
+        remainder = basename[len(f"stamped.{stamp}."):]
+        new_basename = f"stamped.{new_stamp}.{remainder}"
         os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
         self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
