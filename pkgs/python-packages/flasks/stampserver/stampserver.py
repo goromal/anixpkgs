@@ -89,7 +89,7 @@ class StampServer:
             self.task_type = stamp
         if len(self.filelist) == 0:
             for file in os.listdir(RES_DIR):
-                if file.startswith(f"stamped.{stamp}"):
+                if file.startswith(f"stamped.{stamp}."):
                     if file.lower().endswith(".png"):
                         self.filelist.append((file.strip(), "PNG"))
                     elif file.lower().endswith(".mp4"):
