@@ -13,7 +13,7 @@ with import ../dependencies.nix;
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
-      developer = true;
+      developer = false; # ^^^^ true;
       isATS = true;
       serveNotesWiki = true;
       notesWikiPort = 8080;
