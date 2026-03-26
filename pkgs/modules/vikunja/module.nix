@@ -53,8 +53,8 @@ in
 
       configFile = mkOption {
         type = types.str;
-        default = "${globalCfg.homeDir}/.claude/settings.json";
-        description = "Path to Claude Code settings file";
+        default = "${globalCfg.homeDir}/.claude.json";
+        description = "Path to Claude Code MCP configuration file";
       };
     };
   };
@@ -219,54 +219,25 @@ in
       vikunja-mcp-server
     ];
 
-    # Automatically configure MCP server for Claude Code
+    # Automatically configure MCP server for Claude Code using 'claude mcp add'
     system.activationScripts.vikunja-mcp-config = mkIf cfg.mcp.enable (
       lib.stringAfter [ "users" ] ''
-        # Run as the user, not root
+        # Run as the user andrew, not root
         if [ -f "${cfg.mcp.secretsFile}" ]; then
           VIKUNJA_TOKEN=$(${pkgs.jq}/bin/jq -r '.${cfg.mcp.tokenKey} // empty' "${cfg.mcp.secretsFile}" 2>/dev/null || echo "")
 
           if [ -n "$VIKUNJA_TOKEN" ]; then
-            # Create config directory
-            mkdir -p "$(dirname "${cfg.mcp.configFile}")"
+            # Use claude mcp CLI to register the server (as user andrew)
+            # First, remove existing vikunja server if present
+            su - andrew -c "claude mcp remove vikunja 2>/dev/null || true"
 
-            # Create or update Claude settings with MCP server config
-            if [ -f "${cfg.mcp.configFile}" ]; then
-              # Merge with existing config, ensuring mcpServers object exists
-              ${pkgs.jq}/bin/jq \
-                --arg token "$VIKUNJA_TOKEN" \
-                '. + {mcpServers: (.mcpServers // {})} |
-                 .mcpServers.vikunja = {
-                  "command": "vikunja-mcp-server",
-                  "env": {
-                    "VIKUNJA_URL": "https://${cfg.domain}:${toString service-ports.vikunja.public}",
-                    "VIKUNJA_API_TOKEN": $token
-                  }
-                }' \
-                "${cfg.mcp.configFile}" > "${cfg.mcp.configFile}.tmp"
-              mv "${cfg.mcp.configFile}.tmp" "${cfg.mcp.configFile}"
-            else
-              # Create new config with mcpServers
-              cat > "${cfg.mcp.configFile}" <<EOF
-        {
-          "mcpServers": {
-            "vikunja": {
-              "command": "vikunja-mcp-server",
-              "env": {
-                "VIKUNJA_URL": "https://${cfg.domain}:${toString service-ports.vikunja.public}",
-                "VIKUNJA_API_TOKEN": "$VIKUNJA_TOKEN"
-              }
-            }
-          }
-        }
-        EOF
-            fi
-
-            # Set proper ownership
-            chown andrew:dev "${cfg.mcp.configFile}"
-            chmod 600 "${cfg.mcp.configFile}"
-
-            echo "Vikunja MCP configuration updated in ${cfg.mcp.configFile}"
+            # Add the Vikunja MCP server with absolute path and environment variables
+            su - andrew -c "claude mcp add -s user \
+              -e VIKUNJA_URL=https://${cfg.domain}:${toString service-ports.vikunja.public} \
+              -e VIKUNJA_API_TOKEN=$VIKUNJA_TOKEN \
+              -- vikunja /run/current-system/sw/bin/vikunja-mcp-server" && \
+            echo "Vikunja MCP server registered successfully" || \
+            echo "Warning: Failed to register Vikunja MCP server"
           else
             echo "Warning: '${cfg.mcp.tokenKey}' not found in ${cfg.mcp.secretsFile}"
           fi

@@ -316,24 +316,22 @@ After adding the token, rebuild your system configuration:
 sudo nixos-rebuild switch
 ```
 
-The MCP configuration will be automatically merged into `~/.claude/settings.json` with the correct settings.
+The MCP server will be automatically registered using `claude mcp add` and stored in `~/.claude.json`.
 
 **Option 2: Manual Configuration**
 
-If you prefer manual configuration, add to your `~/.claude/settings.json`:
+If you prefer manual configuration, use the Claude Code MCP CLI:
 
-```json
-{
-  "mcpServers": {
-    "vikunja": {
-      "command": "vikunja-mcp-server",
-      "env": {
-        "VIKUNJA_URL": "https://ats.local:3457",
-        "VIKUNJA_API_TOKEN": "your-token-here"
-      }
-    }
-  }
-}
+```bash
+claude mcp add -s user \
+  -e VIKUNJA_URL=https://ats.local:3457 \
+  -e VIKUNJA_API_TOKEN=your-token-here \
+  -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
+```
+
+To verify it's registered:
+```bash
+claude mcp list
 ```
 
 **Configuration Options**
@@ -345,7 +343,7 @@ services.vikunja-ats.mcp = {
   enable = true;  # Default: true
   secretsFile = "/custom/path/secrets.json";  # Default: ~/secrets/vikunja/secrets.json
   tokenKey = "custom_key";  # Default: "token"
-  configFile = "/custom/path/settings.json";  # Default: ~/.claude/settings.json
+  configFile = "/custom/path/.claude.json";  # Default: ~/.claude.json (not used directly, but tracked)
 };
 ```
 
