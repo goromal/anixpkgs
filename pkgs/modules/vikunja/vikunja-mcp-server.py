@@ -305,11 +305,22 @@ def handle_tool_call(
 
 def handle_request(
     client: VikunjaClient, request: dict[str, Any]
-) -> dict[str, Any]:
+) -> dict[str, Any] | None:
     """Handle an MCP request"""
     method = request.get("method")
 
-    if method == "tools/list":
+    if method == "initialize":
+        return {
+            "protocolVersion": "2024-11-05",
+            "capabilities": {"tools": {}},
+            "serverInfo": {"name": "vikunja-mcp-server", "version": "1.0.0"},
+        }
+
+    elif method == "notifications/initialized":
+        # Notification - no response needed
+        return None
+
+    elif method == "tools/list":
         return {"tools": TOOLS}
 
     elif method == "tools/call":
@@ -350,16 +361,34 @@ def main():
     for line in sys.stdin:
         try:
             request = json.loads(line)
-            response = handle_request(client, request)
+            result = handle_request(client, request)
 
-            # Write response to stdout
-            print(json.dumps(response))
-            sys.stdout.flush()
+            # Write response to stdout (JSON-RPC format)
+            if result is not None:
+                response = {
+                    "jsonrpc": "2.0",
+                    "id": request.get("id"),
+                    "result": result,
+                }
+                print(json.dumps(response))
+                sys.stdout.flush()
 
         except json.JSONDecodeError:
-            print(json.dumps({"error": "Invalid JSON"}), file=sys.stderr)
+            error_response = {
+                "jsonrpc": "2.0",
+                "id": request.get("id") if "request" in locals() else None,
+                "error": {"code": -32700, "message": "Parse error"},
+            }
+            print(json.dumps(error_response))
+            sys.stdout.flush()
         except Exception as e:
-            print(json.dumps({"error": str(e)}), file=sys.stderr)
+            error_response = {
+                "jsonrpc": "2.0",
+                "id": request.get("id") if "request" in locals() else None,
+                "error": {"code": -32603, "message": str(e)},
+            }
+            print(json.dumps(error_response))
+            sys.stdout.flush()
 
 
 if __name__ == "__main__":
