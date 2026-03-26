@@ -9,6 +9,12 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.vikunja-ats;
+
+  # Package the Vikunja MCP server
+  vikunja-mcp-server = pkgs.writeScriptBin "vikunja-mcp-server" ''
+    #!${pkgs.python3}/bin/python3
+    ${builtins.readFile ./vikunja-mcp-server.py}
+  '';
 in
 {
   options.services.vikunja-ats = {
@@ -24,6 +30,32 @@ in
       type = types.str;
       default = "localhost";
       description = "Domain name for Vikunja";
+    };
+
+    mcp = {
+      enable = mkOption {
+        type = types.bool;
+        default = true;
+        description = "Enable MCP server integration for Claude Code";
+      };
+
+      secretsFile = mkOption {
+        type = types.str;
+        default = "${globalCfg.homeDir}/secrets/vikunja/secrets.json";
+        description = "Path to secrets.json file containing token";
+      };
+
+      tokenKey = mkOption {
+        type = types.str;
+        default = "token";
+        description = "JSON key name for the API token in secretsFile";
+      };
+
+      configFile = mkOption {
+        type = types.str;
+        default = "${globalCfg.homeDir}/.config/claude-code/mcp-servers.json";
+        description = "Path to Claude Code MCP servers configuration file";
+      };
     };
   };
 
@@ -181,13 +213,66 @@ in
       };
     };
 
-    # Add vikunja-cli and vikunja-mcp-server to system packages
+    # Add vikunja and vikunja-mcp-server to system packages
     environment.systemPackages = [
       pkgs.vikunja
-      (pkgs.writeScriptBin "vikunja-cli" (builtins.readFile ./vikunja-cli.sh))
-      (pkgs.writers.writePython3Bin "vikunja-mcp-server" {
-        libraries = [ pkgs.python3Packages.requests ];
-      } (builtins.readFile ./vikunja-mcp-server.py))
+      vikunja-mcp-server
     ];
+
+    # Automatically configure MCP server for Claude Code
+    system.activationScripts.vikunja-mcp-config = mkIf cfg.mcp.enable (
+      lib.stringAfter [ "users" ] ''
+        # Run as the user, not root
+        if [ -f "${cfg.mcp.secretsFile}" ]; then
+          VIKUNJA_TOKEN=$(${pkgs.jq}/bin/jq -r '.${cfg.mcp.tokenKey} // empty' "${cfg.mcp.secretsFile}" 2>/dev/null || echo "")
+
+          if [ -n "$VIKUNJA_TOKEN" ]; then
+            # Create config directory
+            mkdir -p "$(dirname "${cfg.mcp.configFile}")"
+
+            # Create or update MCP servers config
+            if [ -f "${cfg.mcp.configFile}" ]; then
+              # Merge with existing config
+              ${pkgs.jq}/bin/jq \
+                --arg token "$VIKUNJA_TOKEN" \
+                '.mcpServers.vikunja = {
+                  "command": "vikunja-mcp-server",
+                  "env": {
+                    "VIKUNJA_URL": "https://${cfg.domain}:${toString service-ports.vikunja.public}",
+                    "VIKUNJA_API_TOKEN": $token
+                  }
+                }' \
+                "${cfg.mcp.configFile}" > "${cfg.mcp.configFile}.tmp"
+              mv "${cfg.mcp.configFile}.tmp" "${cfg.mcp.configFile}"
+            else
+              # Create new config
+              cat > "${cfg.mcp.configFile}" <<EOF
+        {
+          "mcpServers": {
+            "vikunja": {
+              "command": "vikunja-mcp-server",
+              "env": {
+                "VIKUNJA_URL": "https://${cfg.domain}:${toString service-ports.vikunja.public}",
+                "VIKUNJA_API_TOKEN": "$VIKUNJA_TOKEN"
+              }
+            }
+          }
+        }
+        EOF
+            fi
+
+            # Set proper ownership
+            chown ${globalCfg.user}:${globalCfg.group} "${cfg.mcp.configFile}"
+            chmod 600 "${cfg.mcp.configFile}"
+
+            echo "Vikunja MCP configuration updated at ${cfg.mcp.configFile}"
+          else
+            echo "Warning: '${cfg.mcp.tokenKey}' not found in ${cfg.mcp.secretsFile}"
+          fi
+        else
+          echo "Warning: Secrets file ${cfg.mcp.secretsFile} not found. Skipping MCP configuration."
+        fi
+      ''
+    );
   };
 }

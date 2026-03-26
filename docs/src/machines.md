@@ -231,101 +231,96 @@ ATS machines automatically include [Vikunja](https://vikunja.io/), an open-sourc
 ### Accessing Vikunja
 
 Once your ATS machine is running, Vikunja is accessible at:
-- **Web UI**: `http://ats.local:3457/`
-- **API**: `http://ats.local/vikunja/api/v1/`
+- **Web UI (HTTPS)**: `https://ats.local:3457/`
+- **Web UI (HTTP)**: `http://ats.local:3457/`
+- **API**: `https://ats.local/vikunja/api/v1/` or `http://ats.local/vikunja/api/v1/`
 
-The web UI is mobile-friendly and served through nginx on port 3457. The API is accessible at `/vikunja/` on the default HTTP port (80) due to how the frontend is built in nixpkgs.
+The web UI is mobile-friendly and served through nginx on port 3457 with both HTTP and HTTPS support. The API is accessible at `/vikunja/` on the default ports (80/443) due to how the frontend is built in nixpkgs.
+
+**Note**: For HTTPS access to work without certificate warnings, you need to install the SSL certificate on your client devices. See the [Local SSL Setup](#local-ssl-setup-for-https-access) section above.
 
 ### Initial Setup
 
 1. **Create your first user** (registration is disabled after first use for security):
    ```bash
-   ssh andrew@ats.local
-   # Open http://ats.local:3457/ in a browser and register
+   # Open https://ats.local:3457/ in a browser and register
    # After registration, the service will reject new registrations
    ```
 
-2. **Configure CLI access** (on the machine running Claude Code):
-   ```bash
-   vikunja-cli login <username> <password>
-   # Token is saved to ~/.config/vikunja-cli/config
-   ```
+2. **Get your API token** for MCP integration:
+   - Log in to Vikunja
+   - Go to Settings → API Tokens
+   - Create a new token and save it securely
 
-3. **Verify connection**:
-   ```bash
-   vikunja-cli list-projects
-   ```
+3. **Configure Claude Code MCP** (see [MCP Integration](#mcp-integration) section below)
 
 ### Using Vikunja with Claude Code
 
-#### Setting Up a Project with Standing Instructions
+Once you've configured the MCP integration (see below), Claude Code can directly interact with your Vikunja tasks during conversations.
 
-Standing instructions are special tasks that Claude Code reads at the start of every session to understand your preferences and requirements.
+#### Typical Workflow
 
-```bash
-# Create a new project
-PROJECT_ID=$(vikunja-cli create-project "AI Development" "Projects for Claude Code" | jq -r '.id')
+**You (via Web/Phone)**:
+1. Open `https://ats.local:3457/` on your device
+2. Create projects for different areas (e.g., "Development", "Personal", "Research")
+3. Create tasks with descriptions, priorities, and due dates
+4. Review and comment on tasks Claude has worked on
 
-# Add standing instructions
-vikunja-cli create-standing-instruction $PROJECT_ID \
-  "Code Style" \
-  "Always use functional programming patterns. Prefer immutability. Use descriptive variable names."
+**Claude Code (via MCP)**:
+1. Lists your tasks when you start a conversation: "What should I work on?"
+2. Creates subtasks as it breaks down complex work
+3. Updates task status and adds progress comments
+4. Marks tasks complete when finished
+5. Creates new tasks for follow-up work or issues discovered
 
-vikunja-cli create-standing-instruction $PROJECT_ID \
-  "Testing" \
-  "Write tests for all new functions. Use property-based testing where applicable."
+#### Example Interactions
 
-vikunja-cli create-standing-instruction $PROJECT_ID \
-  "Documentation" \
-  "Add docstrings to all public functions. Keep comments up to date with code changes."
+- **You**: "What tasks do I have in the Development project?"
+  - Claude lists all tasks with their status, priority, and descriptions
+
+- **You**: "Work on task 42"
+  - Claude reads the task details and gets to work
+  - Creates subtasks for each step
+  - Adds comments with progress updates
+  - Marks task complete when done
+
+- **You**: "Create a task to implement user authentication with JWT"
+  - Claude creates the task with a detailed description
+  - Can immediately start working on it if requested
+
+### MCP Integration
+
+The Vikunja MCP server (`vikunja-mcp-server`) is automatically installed on ATS machines and provides direct integration between Claude Code and Vikunja.
+
+#### Getting Your API Token
+
+1. Log in to Vikunja at `https://ats.local:3457/`
+2. Go to Settings → API Tokens
+3. Click "Create new token"
+4. Copy the generated token (you won't be able to see it again!)
+
+#### Configuring Claude Code
+
+**Option 1: Automatic Configuration (Recommended)**
+
+The easiest way is to store your API token in `~/secrets/vikunja/secrets.json` on the ATS machine:
+
+```json
+{
+  "token": "your-api-token-here"
+}
 ```
 
-#### Claude Code Workflow
+After adding the token, rebuild your system configuration:
+```bash
+sudo nixos-rebuild switch
+```
 
-When Claude Code works on your project, it can:
+The MCP configuration will be automatically created at `~/.config/claude-code/mcp-servers.json` with the correct settings.
 
-1. **Read standing instructions** to understand your preferences:
-   ```bash
-   vikunja-cli get-standing-instructions
-   ```
+**Option 2: Manual Configuration**
 
-2. **List and work on tasks**:
-   ```bash
-   vikunja-cli list-tasks $PROJECT_ID
-   vikunja-cli get-task $TASK_ID
-   ```
-
-3. **Create subtasks** as it breaks down work:
-   ```bash
-   vikunja-cli create-task $PROJECT_ID "Implement user authentication" \
-     "Create login/logout endpoints with JWT tokens"
-   ```
-
-4. **Update progress** with comments:
-   ```bash
-   vikunja-cli add-comment $TASK_ID "Implemented JWT authentication. Tests passing."
-   vikunja-cli complete-task $TASK_ID
-   ```
-
-5. **Assign tasks to you** when input is needed:
-   ```bash
-   vikunja-cli assign-to-user $TASK_ID
-   ```
-
-#### Your Workflow (from Phone/Web)
-
-1. Open `http://ats.local:3457/` on your phone
-2. Create projects and tasks
-3. Add standing instructions with the "claude-standing-instructions" label
-4. Review tasks Claude has completed
-5. Check tasks assigned to you (labeled "user-assigned")
-6. Add comments with feedback or clarification
-
-### MCP Integration (Optional)
-
-For tighter integration, you can configure Claude Code to use the Vikunja MCP server.
-
-Add to your Claude Code MCP settings (typically `~/.config/claude-code/mcp.json`):
+If you prefer manual configuration, create `~/.config/claude-code/mcp-servers.json`:
 
 ```json
 {
@@ -333,53 +328,48 @@ Add to your Claude Code MCP settings (typically `~/.config/claude-code/mcp.json`
     "vikunja": {
       "command": "vikunja-mcp-server",
       "env": {
-        "VIKUNJA_URL": "http://ats.local/vikunja/api/v1",
-        "VIKUNJA_TOKEN": "your-token-here"
+        "VIKUNJA_URL": "https://ats.local:3457",
+        "VIKUNJA_API_TOKEN": "your-token-here"
       }
     }
   }
 }
 ```
 
-This gives Claude Code native access to Vikunja tools like:
-- `vikunja_list_projects`, `vikunja_get_project`
-- `vikunja_list_tasks`, `vikunja_get_task`, `vikunja_create_task`, `vikunja_complete_task`
-- `vikunja_add_comment`, `vikunja_get_comments`
-- `vikunja_get_standing_instructions`, `vikunja_create_standing_instruction`
-- `vikunja_list_user_tasks`, `vikunja_assign_to_user`
+**Configuration Options**
 
-### CLI Reference
+You can customize the MCP integration in your NixOS configuration:
 
-```bash
-# Authentication
-vikunja-cli login <username> <password>
-
-# Projects
-vikunja-cli list-projects
-vikunja-cli get-project <id>
-
-# Tasks
-vikunja-cli list-tasks [project_id]
-vikunja-cli get-task <id>
-vikunja-cli create-task <project_id> <title> [description]
-vikunja-cli update-task <id> <key=value>...
-vikunja-cli complete-task <id>
-
-# Comments
-vikunja-cli add-comment <task_id> <text>
-vikunja-cli get-comments <task_id>
-
-# Labels
-vikunja-cli list-labels
-vikunja-cli create-label <title> [color]
-vikunja-cli add-label <task_id> <label_id>
-
-# Claude Code Integration
-vikunja-cli get-standing-instructions
-vikunja-cli create-standing-instruction <project_id> <title> <instruction>
-vikunja-cli list-user-tasks
-vikunja-cli assign-to-user <task_id>
+```nix
+services.vikunja-ats.mcp = {
+  enable = true;  # Default: true
+  secretsFile = "/custom/path/secrets.json";  # Default: ~/secrets/vikunja/secrets.json
+  tokenKey = "custom_key";  # Default: "token"
+  configFile = "/custom/path/mcp-servers.json";  # Default: ~/.config/claude-code/mcp-servers.json
+};
 ```
+
+**Note**: Use HTTPS (`https://ats.local:3457`) for the URL to ensure secure API access.
+
+#### Available MCP Tools
+
+Once configured, Claude Code has native access to these Vikunja tools:
+- `vikunja_list_projects`, `vikunja_get_project` - Browse and view projects
+- `vikunja_list_tasks`, `vikunja_get_task` - View tasks
+- `vikunja_create_task` - Create new tasks
+- `vikunja_update_task` - Update task fields (title, description, priority, etc.)
+- `vikunja_complete_task` - Mark tasks as done
+- `vikunja_add_comment`, `vikunja_get_comments` - Add and view task comments
+
+#### Usage Examples
+
+With the MCP server configured, you can interact with Vikunja directly in Claude Code:
+
+- "What tasks do I have in the Development project?"
+- "Create a task in project 5 to implement user authentication"
+- "Add a comment to task 42 with the latest progress"
+- "Mark task 15 as complete"
+- "Update task 23's priority to high"
 
 ### Data Location
 
@@ -410,14 +400,15 @@ sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
 
 ### Architecture
 
-Vikunja is served through nginx as a reverse proxy:
-- Vikunja serves both the web UI and API from a single service
-- Frontend accessible at `ats.local:3457`
-- API accessible at `ats.local/vikunja/api/v1/` (port 80)
+Vikunja is served through nginx as a reverse proxy with HTTPS support:
+- Vikunja serves both the web UI and API from a single service on internal port 3456
+- Frontend accessible at `https://ats.local:3457` (HTTPS) or `http://ats.local:3457` (HTTP)
+- API accessible at `https://ats.local/vikunja/api/v1/` (HTTPS) or `http://ats.local/vikunja/api/v1/` (HTTP)
 - Internal port: 3456 (centrally managed in `service-ports.nix`)
-- External ports: 3457 (frontend), 80 (API via `/vikunja/`)
+- External ports: 3457 (frontend with HTTPS/HTTP), 80/443 (API via `/vikunja/`)
+- SSL certificates: Same self-signed certificates as main web server (`~/secrets/vpn/`)
 
-The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on port 80 for API access.
+The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
 ## Miscellaneous
 
