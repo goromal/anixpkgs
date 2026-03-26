@@ -311,40 +311,35 @@ The easiest way is to store your API token in `~/secrets/vikunja/secrets.json` o
 }
 ```
 
-After adding the token, rebuild your system configuration:
+After adding the token, rebuild your system configuration to install the MCP server:
 ```bash
 sudo nixos-rebuild switch
 ```
 
-The MCP server will be automatically registered using `claude mcp add` and stored in `~/.claude.json`.
+Then run the `claude-setup` script to register the MCP server:
+```bash
+claude-setup
+```
 
-**Option 2: Manual Configuration**
+The setup script will automatically:
+- Install Claude Code plugins
+- Register the Vikunja MCP server using your token from `~/secrets/vikunja/secrets.json`
+- Configure other development tools (gh CLI, etc.)
 
-If you prefer manual configuration, use the Claude Code MCP CLI:
+To verify the MCP server is registered:
+```bash
+claude mcp list
+```
+
+**Manual MCP Configuration**
+
+If you need to manually configure the Vikunja MCP server (without using `claude-setup`), you can use:
 
 ```bash
 claude mcp add -s user \
   -e VIKUNJA_URL=https://ats.local:3457 \
   -e VIKUNJA_API_TOKEN=your-token-here \
   -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
-```
-
-To verify it's registered:
-```bash
-claude mcp list
-```
-
-**Configuration Options**
-
-You can customize the MCP integration in your NixOS configuration:
-
-```nix
-services.vikunja-ats.mcp = {
-  enable = true;  # Default: true
-  secretsFile = "/custom/path/secrets.json";  # Default: ~/secrets/vikunja/secrets.json
-  tokenKey = "custom_key";  # Default: "token"
-  configFile = "/custom/path/.claude.json";  # Default: ~/.claude.json (not used directly, but tracked)
-};
 ```
 
 **Note**: Use HTTPS (`https://ats.local:3457`) for the URL to ensure secure API access.

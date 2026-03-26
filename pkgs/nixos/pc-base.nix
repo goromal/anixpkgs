@@ -790,6 +790,7 @@ in
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
         extraClaudeSettings = cfg.extraClaudeSettings;
+        vikunjaEnabled = cfg.isATS;
       };
     };
   };

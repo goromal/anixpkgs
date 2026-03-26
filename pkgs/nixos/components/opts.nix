@@ -70,5 +70,10 @@ with import ../dependencies.nix;
       default = { };
       description = "Attrs describing the Claude JSON settings";
     };
+    vikunjaEnabled = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether Vikunja is enabled on this machine (enables MCP setup in claude-setup)";
+    };
   };
 }

@@ -31,32 +31,6 @@ in
       default = "localhost";
       description = "Domain name for Vikunja";
     };
-
-    mcp = {
-      enable = mkOption {
-        type = types.bool;
-        default = true;
-        description = "Enable MCP server integration for Claude Code";
-      };
-
-      secretsFile = mkOption {
-        type = types.str;
-        default = "${globalCfg.homeDir}/secrets/vikunja/secrets.json";
-        description = "Path to secrets.json file containing token";
-      };
-
-      tokenKey = mkOption {
-        type = types.str;
-        default = "token";
-        description = "JSON key name for the API token in secretsFile";
-      };
-
-      configFile = mkOption {
-        type = types.str;
-        default = "${globalCfg.homeDir}/.claude.json";
-        description = "Path to Claude Code MCP configuration file";
-      };
-    };
   };
 
   config = mkIf cfg.enable {
@@ -218,36 +192,5 @@ in
       pkgs.vikunja
       vikunja-mcp-server
     ];
-
-    # Automatically configure MCP server for Claude Code using 'claude mcp add'
-    system.activationScripts.vikunja-mcp-config = mkIf cfg.mcp.enable (
-      lib.stringAfter [ "users" ] ''
-        # Run as the user andrew, not root
-        if [ -f "${cfg.mcp.secretsFile}" ]; then
-          VIKUNJA_TOKEN=$(${pkgs.jq}/bin/jq -r '.${cfg.mcp.tokenKey} // empty' "${cfg.mcp.secretsFile}" 2>/dev/null || echo "")
-
-          if [ -n "$VIKUNJA_TOKEN" ]; then
-            # Use claude mcp CLI to register the server (as user andrew)
-            # Set up environment for running as user
-            export HOME="${globalCfg.homeDir}"
-
-            # First, remove existing vikunja server if present
-            ${pkgs.sudo}/bin/sudo -u andrew -H bash -c "claude mcp remove vikunja 2>/dev/null || true"
-
-            # Add the Vikunja MCP server with absolute path and environment variables
-            ${pkgs.sudo}/bin/sudo -u andrew -H bash -c "claude mcp add -s user \
-              -e VIKUNJA_URL=https://${cfg.domain}:${toString service-ports.vikunja.public} \
-              -e VIKUNJA_API_TOKEN=$VIKUNJA_TOKEN \
-              -- vikunja /run/current-system/sw/bin/vikunja-mcp-server" && \
-            echo "Vikunja MCP server registered successfully" || \
-            echo "Warning: Failed to register Vikunja MCP server"
-          else
-            echo "Warning: '${cfg.mcp.tokenKey}' not found in ${cfg.mcp.secretsFile}"
-          fi
-        else
-          echo "Warning: Secrets file ${cfg.mcp.secretsFile} not found. Skipping MCP configuration."
-        fi
-      ''
-    );
   };
 }
