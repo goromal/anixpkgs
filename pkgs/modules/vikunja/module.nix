@@ -262,7 +262,7 @@ in
             fi
 
             # Set proper ownership
-            chown ${globalCfg.user}:${globalCfg.group} "${cfg.mcp.configFile}"
+            chown andrew:dev "${cfg.mcp.configFile}"
             chmod 600 "${cfg.mcp.configFile}"
 
             echo "Vikunja MCP configuration updated at ${cfg.mcp.configFile}"
