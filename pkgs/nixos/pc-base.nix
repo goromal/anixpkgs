@@ -598,6 +598,7 @@ in
         gcc
         gdb
         tig
+        git
         scc
         most
         gnumake
