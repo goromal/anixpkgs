@@ -53,8 +53,8 @@ in
 
       configFile = mkOption {
         type = types.str;
-        default = "${globalCfg.homeDir}/.config/claude-code/mcp-servers.json";
-        description = "Path to Claude Code MCP servers configuration file";
+        default = "${globalCfg.homeDir}/.claude/settings.json";
+        description = "Path to Claude Code settings file";
       };
     };
   };
@@ -230,12 +230,13 @@ in
             # Create config directory
             mkdir -p "$(dirname "${cfg.mcp.configFile}")"
 
-            # Create or update MCP servers config
+            # Create or update Claude settings with MCP server config
             if [ -f "${cfg.mcp.configFile}" ]; then
-              # Merge with existing config
+              # Merge with existing config, ensuring mcpServers object exists
               ${pkgs.jq}/bin/jq \
                 --arg token "$VIKUNJA_TOKEN" \
-                '.mcpServers.vikunja = {
+                '. + {mcpServers: (.mcpServers // {})} |
+                 .mcpServers.vikunja = {
                   "command": "vikunja-mcp-server",
                   "env": {
                     "VIKUNJA_URL": "https://${cfg.domain}:${toString service-ports.vikunja.public}",
@@ -245,7 +246,7 @@ in
                 "${cfg.mcp.configFile}" > "${cfg.mcp.configFile}.tmp"
               mv "${cfg.mcp.configFile}.tmp" "${cfg.mcp.configFile}"
             else
-              # Create new config
+              # Create new config with mcpServers
               cat > "${cfg.mcp.configFile}" <<EOF
         {
           "mcpServers": {
@@ -265,7 +266,7 @@ in
             chown andrew:dev "${cfg.mcp.configFile}"
             chmod 600 "${cfg.mcp.configFile}"
 
-            echo "Vikunja MCP configuration updated at ${cfg.mcp.configFile}"
+            echo "Vikunja MCP configuration updated in ${cfg.mcp.configFile}"
           else
             echo "Warning: '${cfg.mcp.tokenKey}' not found in ${cfg.mcp.secretsFile}"
           fi

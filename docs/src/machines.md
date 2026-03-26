@@ -316,11 +316,11 @@ After adding the token, rebuild your system configuration:
 sudo nixos-rebuild switch
 ```
 
-The MCP configuration will be automatically created at `~/.config/claude-code/mcp-servers.json` with the correct settings.
+The MCP configuration will be automatically merged into `~/.claude/settings.json` with the correct settings.
 
 **Option 2: Manual Configuration**
 
-If you prefer manual configuration, create `~/.config/claude-code/mcp-servers.json`:
+If you prefer manual configuration, add to your `~/.claude/settings.json`:
 
 ```json
 {
@@ -345,7 +345,7 @@ services.vikunja-ats.mcp = {
   enable = true;  # Default: true
   secretsFile = "/custom/path/secrets.json";  # Default: ~/secrets/vikunja/secrets.json
   tokenKey = "custom_key";  # Default: "token"
-  configFile = "/custom/path/mcp-servers.json";  # Default: ~/.config/claude-code/mcp-servers.json
+  configFile = "/custom/path/settings.json";  # Default: ~/.claude/settings.json
 };
 ```
 
