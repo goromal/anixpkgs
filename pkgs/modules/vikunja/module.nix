@@ -228,11 +228,14 @@ in
 
           if [ -n "$VIKUNJA_TOKEN" ]; then
             # Use claude mcp CLI to register the server (as user andrew)
+            # Set up environment for running as user
+            export HOME="${globalCfg.homeDir}"
+
             # First, remove existing vikunja server if present
-            su - andrew -c "claude mcp remove vikunja 2>/dev/null || true"
+            ${pkgs.sudo}/bin/sudo -u andrew -H bash -c "claude mcp remove vikunja 2>/dev/null || true"
 
             # Add the Vikunja MCP server with absolute path and environment variables
-            su - andrew -c "claude mcp add -s user \
+            ${pkgs.sudo}/bin/sudo -u andrew -H bash -c "claude mcp add -s user \
               -e VIKUNJA_URL=https://${cfg.domain}:${toString service-ports.vikunja.public} \
               -e VIKUNJA_API_TOKEN=$VIKUNJA_TOKEN \
               -- vikunja /run/current-system/sw/bin/vikunja-mcp-server" && \
