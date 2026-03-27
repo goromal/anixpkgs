@@ -5,6 +5,7 @@ tests=(
     "test_ws_tools.sh"
     "test_sunnyside.sh"
     "test_orchestrator.sh"
+    "test_orchestrator-cpp.sh"
     "test_png.sh"
     "test_mp4.sh"
     "test_fix-perms.sh"
