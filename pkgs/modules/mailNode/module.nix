@@ -62,6 +62,9 @@ in
         done
         if [ ! -z "$( ls -A '/var/mail/goromail/new' )" ]; then
           systemctl start ats-mailman.service
+          if grep -qi "Task entry" ${globalCfg.homeDir}/goromail/postfix.log 2>/dev/null; then
+            systemctl start ats-task-migrator.service
+          fi
         fi
       '';
     };
