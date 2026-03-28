@@ -23,6 +23,7 @@ Packages written (or bound) in Python.
 - [flask-mp3server](./flask-mp3server.md)
 - [flask-smfserver](./flask-smfserver.md)
 - [flask-oatbox](./flask-oatbox.md)
+- [self-tester-app](./self-tester-app.md)
 - [rankserver](./rankserver.md)
 - [stampserver](./stampserver.md)
 - [la_quiz_web](./la_quiz_web.md)

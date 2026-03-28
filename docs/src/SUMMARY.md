@@ -44,6 +44,7 @@
   - [flask-mp3server](./python/flask-mp3server.md)
   - [flask-smfserver](./python/flask-smfserver.md)
   - [flask-oatbox](./python/flask-oatbox.md)
+  - [self-tester-app](./python/self-tester-app.md)
   - [rankserver](./python/rankserver.md)
   - [stampserver](./python/stampserver.md)
   - [la_quiz_web](./python/la_quiz_web.md)
