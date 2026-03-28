@@ -220,25 +220,39 @@ def _create_ai_exam(title, exam_type):
     if pasted:
         source_texts.append(f"[Pasted text]\n{pasted[:20000]}")
 
-    if not source_texts:
-        flask.flash("No source material provided (URLs, files, or pasted text required).")
+    topics = [t.strip() for t in flask.request.form.get("topics", "").splitlines() if t.strip()]
+
+    if not source_texts and not topics:
+        flask.flash("No source material provided (URLs, files, pasted text, or topics required).")
         return flask.redirect(flask.url_for(url_for_prefix + "create"))
 
     combined = "\n\n".join(source_texts)[:40000]
     emphasis_block = f"\n\nPoints of emphasis:\n{emphasis}" if emphasis else ""
 
+    if topics:
+        topics_block = "Topics to draw on from your own knowledge:\n" + "\n".join(f"- {t}" for t in topics)
+    else:
+        topics_block = ""
+
+    if source_texts and topics:
+        material_section = f"Source material:\n{combined}\n\n{topics_block}"
+    elif source_texts:
+        material_section = f"Source material:\n{combined}"
+    else:
+        material_section = topics_block
+
     if exam_type == "multiple_choice":
         prompt = (
-            f"You are a quiz master. Based on the following source material, create exactly {num_q} "
-            f"multiple choice questions.\n\nSource material:\n{combined}{emphasis_block}\n\n"
+            f"You are a quiz master. Create exactly {num_q} multiple choice questions based on the following. "
+            f"For topic-based questions, draw on your own knowledge.\n\n{material_section}{emphasis_block}\n\n"
             f"Return ONLY a valid JSON array, no other text:\n"
             f'[{{"question":"...","options":["a","b","c","d"],"correct":0}}]\n\n'
             f'"correct" is the 0-based index of the correct option.'
         )
     else:  # short_answer
         prompt = (
-            f"You are a quiz master. Based on the following source material, create exactly {num_q} "
-            f"short answer questions.\n\nSource material:\n{combined}{emphasis_block}\n\n"
+            f"You are a quiz master. Create exactly {num_q} short answer questions based on the following. "
+            f"For topic-based questions, draw on your own knowledge.\n\n{material_section}{emphasis_block}\n\n"
             f'Return ONLY a valid JSON array of question strings, no other text:\n["question 1","question 2",...]'
         )
 
