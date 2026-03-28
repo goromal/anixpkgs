@@ -326,9 +326,9 @@ in
                     portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
                     port = if portMatch != null then builtins.head portMatch else "";
                   in
-                  "    <li><a href=\"#\" onclick=\"window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;\">${s.name}</a> - ${s.description}</li>"
+                  "    <li><a href=\"#\" class=\"service-card\" onclick=\"window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
                 else
-                  "    <li><a href=\"${s.path}\">${s.name}</a> - ${s.description}</li>"
+                  "    <li><a href=\"${s.path}\" class=\"service-card\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
               ) services;
             in
             ''
@@ -361,23 +361,32 @@ in
                     padding: 0;
                   }
                   li {
-                    margin: 15px 0;
-                    padding: 10px;
+                    margin: 12px 0;
+                  }
+                  .service-card {
+                    display: block;
+                    padding: 14px 16px;
                     background: #f9f9f9;
-                    border-radius: 4px;
-                    border-left: 4px solid #007bff;
-                  }
-                  a {
-                    color: #007bff;
+                    border-radius: 8px;
+                    border: 2px solid #007bff;
                     text-decoration: none;
-                    font-weight: 600;
+                    transition: background 0.15s, border-color 0.15s;
                   }
-                  a:hover {
-                    text-decoration: underline;
+                  .service-card:hover {
+                    background: #e8f0fe;
+                    border-color: #0056b3;
+                  }
+                  .service-name {
+                    display: block;
+                    color: #007bff;
+                    font-weight: 600;
+                    font-size: 1em;
                   }
                   .description {
+                    display: block;
                     color: #666;
                     font-size: 0.9em;
+                    margin-top: 4px;
                   }
                 </style>
               </head>
