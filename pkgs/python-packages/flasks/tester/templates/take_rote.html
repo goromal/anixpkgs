@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Tester — {{ exam.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .passage { line-height: 2.0; font-size: 1.05em; }
+    .blank-input {
+        border: none;
+        border-bottom: 2px solid #2c3e50;
+        background: #f0f4ff;
+        padding: 2px 6px;
+        font-size: 1em;
+        font-family: inherit;
+        border-radius: 4px 4px 0 0;
+        min-width: 100px;
+        margin: 0 3px;
+        outline: none;
+    }
+    .blank-input:focus { border-bottom-color: #3498db; background: #e8f0ff; }
+    .progress { color: #777; font-size: 0.88em; margin-bottom: 16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ exam.title }}</h1>
+<p class="progress">
+    Fill in the <strong>{{ blank_indices | length }}</strong> blanked chunks.
+    Use the surrounding text as context.
+</p>
+
+<div class="card">
+    <form method="post" action="{{ urlroot }}exam/{{ exam.id }}/submit">
+        <input type="hidden" name="blank_indices" value="{{ blank_indices_json }}">
+
+        <div class="passage">
+        {# Build a set of blank positions mapped to answer indices #}
+        {% set blank_pos = {} %}
+        {% for idx in blank_indices %}
+            {% set _ = blank_pos.update({idx: loop.index0}) %}
+        {% endfor %}
+
+        {% for chunk in chunks %}
+            {% set ci = loop.index0 %}
+            {% if ci in blank_pos %}
+                <input class="blank-input"
+                       type="text"
+                       name="answer_{{ blank_pos[ci] }}"
+                       placeholder="..."
+                       autocomplete="off"
+                       size="{{ [chunk | length // 2, 8] | max }}">
+            {% else %}
+                {{ chunk }}
+            {% endif %}
+            {% if not loop.last %} {% endif %}
+        {% endfor %}
+        </div>
+
+        <div style="margin-top:28px; display:flex; gap:12px;">
+            <button type="submit" class="btn btn-success">Submit Answers</button>
+            <a href="{{ urlroot }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

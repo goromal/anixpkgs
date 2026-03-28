@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Tester — Create Exam{% endblock %}
+
+{% block extra_head %}
+<style>
+    .type-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .type-tab {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 2px solid #ddd;
+        background: white;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9em;
+        color: #555;
+        transition: all 0.15s;
+    }
+    .type-tab.active { border-color: #2c3e50; background: #2c3e50; color: white; }
+    .type-section { display: none; }
+    .type-section.active { display: block; }
+    .hint { font-size: 0.82em; color: #888; margin-top: -10px; margin-bottom: 14px; }
+    .form-row { display: flex; gap: 16px; }
+    .form-row > div { flex: 1; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Create New Exam</h1>
+
+<div class="card">
+    <div class="type-tabs">
+        <button type="button" class="type-tab active" onclick="selectType('rote')">Rote Memorization</button>
+        <button type="button" class="type-tab" onclick="selectType('multiple_choice')">Multiple Choice</button>
+        <button type="button" class="type-tab" onclick="selectType('short_answer')">Short Answer</button>
+    </div>
+
+    <form method="post" action="{{ urlroot }}create" enctype="multipart/form-data">
+        <input type="hidden" name="exam_type" id="exam_type_field" value="rote">
+
+        <label for="title">Exam Title</label>
+        <input type="text" id="title" name="title" placeholder="e.g. Gettysburg Address, Chapter 3 Key Concepts" required>
+
+        <!-- Rote section -->
+        <div class="type-section active" id="section-rote">
+            <label for="text">Text to Memorize</label>
+            <textarea id="text" name="text" rows="8" placeholder="Paste the text you want to memorize..."></textarea>
+
+            <label for="delimiter">Chunk Delimiter</label>
+            <select id="delimiter" name="delimiter">
+                <option value="sentence">Sentence (split on . ! ?)</option>
+                <option value="paragraph">Paragraph (split on blank lines)</option>
+                <option value="line">Line (split on newlines)</option>
+            </select>
+            <p class="hint">The text will be split into chunks. During the exam, ~half the chunks will be blanked out for you to fill in.</p>
+        </div>
+
+        <!-- Multiple Choice / Short Answer shared section -->
+        <div class="type-section" id="section-ai">
+            <div class="form-row">
+                <div>
+                    <label for="num_questions">Number of Questions</label>
+                    <input type="number" id="num_questions" name="num_questions" value="10" min="1" max="30">
+                </div>
+            </div>
+
+            <label for="urls">Source URLs (one per line)</label>
+            <textarea id="urls" name="urls" rows="3" placeholder="https://example.com/article&#10;https://example.com/wiki-page"></textarea>
+            <p class="hint">Pages will be fetched and their text content extracted.</p>
+
+            <label for="files">Upload Files</label>
+            <input type="file" id="files" name="files" multiple style="margin-bottom:14px; padding:4px;">
+            <p class="hint" style="margin-top:-10px;">Plain text files (.txt, .md, etc.).</p>
+
+            <label for="pasted_text">Pasted Text</label>
+            <textarea id="pasted_text" name="pasted_text" rows="5" placeholder="Or paste source material directly here..."></textarea>
+
+            <label for="emphasis">Points of Emphasis (optional)</label>
+            <textarea id="emphasis" name="emphasis" rows="3" placeholder="e.g. Focus on dates, causes, and key figures. Ignore minor details."></textarea>
+            <p class="hint">Tell the AI what aspects of the material to emphasize in the exam.</p>
+        </div>
+
+        <button type="submit" class="btn btn-success" style="margin-top:8px;">Create Exam</button>
+        <a href="{{ urlroot }}" class="btn btn-secondary" style="margin-left:8px;">Cancel</a>
+    </form>
+</div>
+
+<script>
+    function selectType(type) {
+        document.getElementById('exam_type_field').value = type;
+        document.querySelectorAll('.type-tab').forEach(function(btn, i) {
+            btn.classList.toggle('active', ['rote','multiple_choice','short_answer'][i] === type);
+        });
+        document.getElementById('section-rote').classList.toggle('active', type === 'rote');
+        document.getElementById('section-ai').classList.toggle('active', type !== 'rote');
+    }
+</script>
+{% endblock %}

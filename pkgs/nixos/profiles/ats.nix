@@ -174,6 +174,17 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-tester-backup";
+          jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
+            rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-tester-backup "Tester backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }

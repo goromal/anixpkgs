@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Tester — Dashboard{% endblock %}
+
+{% block content %}
+<h1>Exam Dashboard</h1>
+
+{% if not exams %}
+<div class="card" style="text-align:center; color:#666; padding:40px;">
+    <p style="font-size:1.1em;">No exams yet.</p>
+    <a href="{{ urlroot }}create" class="btn btn-primary" style="margin-top:16px;">Create your first exam</a>
+</div>
+{% else %}
+
+{% set types = [('rote','Rote'),('multiple_choice','Multiple Choice'),('short_answer','Short Answer')] %}
+{% for type_key, type_label in types %}
+{% set group = exams | selectattr('exam_type','eq',type_key) | list %}
+{% if group %}
+<div class="card">
+    <h2>
+        <span class="badge badge-{{ type_key }}">{{ type_label }}</span>
+    </h2>
+    <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
+        <thead>
+            <tr style="border-bottom:2px solid #eee; text-align:left; color:#666; font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">
+                <th style="padding:8px 4px;">Title</th>
+                <th style="padding:8px 4px;">Created</th>
+                <th style="padding:8px 4px;">Last Score</th>
+                <th style="padding:8px 4px; text-align:right;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for exam in group %}
+        <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:10px 4px; font-weight:600;">{{ exam.title }}</td>
+            <td style="padding:10px 4px; color:#777; font-size:0.85em;">{{ exam.created_at }}</td>
+            <td style="padding:10px 4px;">
+                {% if exam.last_score is not none %}
+                <span class="score-badge {% if exam.last_score >= 80 %}score-high{% elif exam.last_score >= 50 %}score-mid{% else %}score-low{% endif %}" style="font-size:0.9em; padding:3px 8px;">
+                    {{ exam.last_score }}%
+                </span>
+                {% else %}
+                <span style="color:#aaa; font-size:0.85em;">not taken</span>
+                {% endif %}
+            </td>
+            <td style="padding:10px 4px; text-align:right;">
+                <a href="{{ urlroot }}exam/{{ exam.id }}/take" class="btn btn-primary" style="padding:6px 12px; font-size:0.82em;">Take</a>
+                <a href="{{ urlroot }}exam/{{ exam.id }}/results" class="btn btn-secondary" style="padding:6px 12px; font-size:0.82em; margin-left:4px;">History</a>
+                <form method="post" action="{{ urlroot }}exam/{{ exam.id }}/delete" style="display:inline; margin-left:4px;" onsubmit="return confirm('Delete this exam and all its results?')">
+                    <button type="submit" class="btn btn-danger" style="padding:6px 12px; font-size:0.82em;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock %}

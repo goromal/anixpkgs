@@ -244,6 +244,7 @@ let
               authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
               la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              tester = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -344,6 +345,7 @@ rec {
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  tester = final.python313.pkgs.tester;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;

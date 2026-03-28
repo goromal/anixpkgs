@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Tester — Result{% endblock %}
+
+{% block extra_head %}
+<style>
+    .score-header {
+        text-align: center;
+        padding: 32px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .score-number { font-size: 3em; font-weight: 700; }
+    .score-label { font-size: 1em; color: #555; margin-top: 4px; }
+    .detail-card {
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 12px;
+        border-left: 4px solid #ddd;
+    }
+    .detail-correct { border-left-color: #27ae60; background: #f0fff4; }
+    .detail-wrong   { border-left-color: #e74c3c; background: #fff5f5; }
+    .detail-partial { border-left-color: #f39c12; background: #fffaf0; }
+    .detail-label { font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .detail-label-correct { color: #27ae60; }
+    .detail-label-wrong   { color: #e74c3c; }
+    .detail-label-partial { color: #f39c12; }
+    .detail-question { font-weight: 600; margin-bottom: 8px; font-size: 0.95em; color: #2c3e50; }
+    .detail-row { font-size: 0.88em; color: #555; margin-bottom: 3px; }
+    .detail-row strong { color: #333; }
+    .justification { font-size: 0.85em; color: #555; margin-top: 6px; padding: 8px 10px; background: rgba(0,0,0,0.04); border-radius: 4px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Result: {{ exam.title }}</h1>
+
+{% if score_pct >= 80 %}
+<div class="score-header score-high">
+    <div class="score-number">{{ score_pct }}%</div>
+    <div class="score-label">Great work!</div>
+</div>
+{% elif score_pct >= 50 %}
+<div class="score-header score-mid">
+    <div class="score-number">{{ score_pct }}%</div>
+    <div class="score-label">Keep studying!</div>
+</div>
+{% else %}
+<div class="score-header score-low">
+    <div class="score-number">{{ score_pct }}%</div>
+    <div class="score-label">More practice needed.</div>
+</div>
+{% endif %}
+
+<div style="margin-bottom:20px;">
+    <a href="{{ urlroot }}exam/{{ exam.id }}/take" class="btn btn-primary">Take Again</a>
+    <a href="{{ urlroot }}exam/{{ exam.id }}/results" class="btn btn-secondary" style="margin-left:8px;">All Results</a>
+    <a href="{{ urlroot }}" class="btn btn-outline" style="margin-left:8px;">Dashboard</a>
+</div>
+
+{% if exam.exam_type == 'rote' %}
+<h2>Per-Blank Breakdown</h2>
+{% for d in details %}
+<div class="detail-card {{ 'detail-correct' if d.correct else 'detail-wrong' }}">
+    <div class="detail-label {{ 'detail-label-correct' if d.correct else 'detail-label-wrong' }}">
+        {{ 'Correct' if d.correct else 'Incorrect' }} — {{ (d.score * 100) | round | int }}% match
+    </div>
+    <div class="detail-question">Chunk #{{ d.chunk_index + 1 }}</div>
+    <div class="detail-row"><strong>Expected:</strong> {{ d.chunk }}</div>
+    {% if not d.correct %}
+    <div class="detail-row"><strong>Your answer:</strong> {{ d.user_answer if d.user_answer else '(blank)' }}</div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% elif exam.exam_type == 'multiple_choice' %}
+<h2>Per-Question Breakdown</h2>
+{% for d in details %}
+<div class="detail-card {{ 'detail-correct' if d.is_correct else 'detail-wrong' }}">
+    <div class="detail-label {{ 'detail-label-correct' if d.is_correct else 'detail-label-wrong' }}">
+        {{ 'Correct' if d.is_correct else 'Incorrect' }}
+    </div>
+    <div class="detail-question">Q{{ loop.index }}. {{ d.question }}</div>
+    {% set letters = ['A','B','C','D','E'] %}
+    {% if not d.is_correct %}
+    <div class="detail-row"><strong>Your answer:</strong>
+        {% if d.user_answer >= 0 %}{{ letters[d.user_answer] }}. {{ d.options[d.user_answer] }}{% else %}(no answer){% endif %}
+    </div>
+    <div class="detail-row"><strong>Correct answer:</strong> {{ letters[d.correct] }}. {{ d.options[d.correct] }}</div>
+    {% else %}
+    <div class="detail-row"><strong>Your answer:</strong> {{ letters[d.user_answer] }}. {{ d.options[d.user_answer] }}</div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% else %}
+<h2>Per-Question Breakdown</h2>
+{% for d in details %}
+{% set pct = (d.score * 100) | round | int %}
+<div class="detail-card {{ 'detail-correct' if pct >= 80 else ('detail-partial' if pct >= 50 else 'detail-wrong') }}">
+    <div class="detail-label {{ 'detail-label-correct' if pct >= 80 else ('detail-label-partial' if pct >= 50 else 'detail-label-wrong') }}">
+        Score: {{ pct }}%
+    </div>
+    <div class="detail-question">Q{{ loop.index }}. {{ d.question }}</div>
+    <div class="detail-row"><strong>Your answer:</strong> {{ d.user_answer if d.user_answer else '(blank)' }}</div>
+    {% if d.justification %}
+    <div class="justification">{{ d.justification }}</div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
