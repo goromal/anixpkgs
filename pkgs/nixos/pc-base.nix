@@ -190,7 +190,12 @@ in
     ../python-packages/flasks/tester/module.nix
     (
       let
-        jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
+        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
+        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
+        jetpackSrc = builtins.fetchTarball {
+          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
+          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
+        };
       in
       import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
     )
