@@ -287,7 +287,7 @@ def take_exam(exam_id):
     content = json.loads(exam["content"])
 
     if exam["exam_type"] == "rote":
-        atoms = content["atoms"]
+        atoms = content.get("atoms") or content.get("chunks", [])
         return flask.render_template(
             "take_rote.html",
             urlroot=urlroot,
@@ -337,7 +337,7 @@ def submit_exam(exam_id):
 
 
 def _grade_rote(exam_id, content):
-    atoms = content["atoms"]
+    atoms = content.get("atoms") or content.get("chunks", [])
     chunk_size = max(1, int(flask.request.form.get("chunk_size", "1")))
     # Re-derive chunks the same way the client did
     chunks = [" ".join(atoms[i:i + chunk_size]) for i in range(0, len(atoms), chunk_size)]
