@@ -87,14 +87,28 @@ function groupAtoms(chunkSize) {
 function chooseBlanks(numChunks, chunkSize) {
     // Re-seed based on (exam, chunkSize) so blanks are stable for a given size.
     seedState = ({{ exam.id }} * 2654435761 + chunkSize * 40503) | 1;
+    const count = Math.max(1, Math.floor(numChunks / 2));
+
+    // Shuffle all indices.
     const indices = Array.from({length: numChunks}, (_, i) => i);
-    // Fisher-Yates with seeded random
     for (let i = indices.length - 1; i > 0; i--) {
         const j = Math.floor(seededRand() * (i + 1));
         [indices[i], indices[j]] = [indices[j], indices[i]];
     }
-    const count = Math.max(1, Math.floor(numChunks / 2));
-    return indices.slice(0, count).sort((a, b) => a - b);
+
+    // First pass: greedily pick non-adjacent indices.
+    const chosen = new Set();
+    for (const idx of indices) {
+        if (chosen.size >= count) break;
+        if (!chosen.has(idx - 1) && !chosen.has(idx + 1)) chosen.add(idx);
+    }
+    // Second pass: fill remaining with any unchosen index (adjacency unavoidable).
+    for (const idx of indices) {
+        if (chosen.size >= count) break;
+        if (!chosen.has(idx)) chosen.add(idx);
+    }
+
+    return Array.from(chosen).sort((a, b) => a - b);
 }
 
 function escHtml(s) {
