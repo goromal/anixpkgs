@@ -231,6 +231,11 @@
                 "docs": true
             },
             {
+                "attr": "self-tester-app",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "rankserver",
                 "ci": true,
                 "docs": true

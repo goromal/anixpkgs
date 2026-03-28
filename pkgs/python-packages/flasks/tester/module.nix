@@ -15,7 +15,7 @@ in
     package = lib.mkOption {
       type = lib.types.package;
       description = "The tester package to use";
-      default = anixpkgs.tester;
+      default = anixpkgs.self-tester-app;
     };
     dataDir = lib.mkOption {
       type = lib.types.str;

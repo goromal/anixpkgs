@@ -11,7 +11,7 @@ let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
 in
 buildPythonPackage rec {
-  pname = "tester";
+  pname = "self-tester-app";
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];

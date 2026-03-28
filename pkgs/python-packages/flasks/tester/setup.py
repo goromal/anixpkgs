@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(
-    name='tester',
+    name='self-tester-app',
     version='0.0.1',
     py_modules=['tester'],
     entry_points={
