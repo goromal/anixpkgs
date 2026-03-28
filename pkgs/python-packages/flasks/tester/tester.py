@@ -106,6 +106,7 @@ def fetch_url_content(url):
     import requests
     from bs4 import BeautifulSoup
     resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
     soup = BeautifulSoup(resp.text, "html.parser")
     for tag in soup(["script", "style", "nav", "footer", "header"]):
         tag.decompose()
@@ -114,8 +115,11 @@ def fetch_url_content(url):
 
 def get_api_key():
     key_path = os.path.expanduser("~/secrets/claude/api_key.txt")
-    with open(key_path) as f:
-        return f.read().strip()
+    try:
+        with open(key_path) as f:
+            return f.read().strip()
+    except OSError:
+        raise RuntimeError(f"Claude API key not found at {key_path} — ensure the key file exists before using AI exam features")
 
 
 def call_claude(prompt):

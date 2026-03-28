@@ -30,7 +30,7 @@ api_call() {
     exit 1
   fi
 
-  local curl_args=(-X "$method" -H "Authorization: Bearer $VIKUNJA_TOKEN" -H "Content-Type: application/json" -s)
+  local curl_args=(-X "$method" -H "Authorization: Bearer $VIKUNJA_TOKEN" -H "Content-Type: application/json" -s --fail-with-body)
 
   if [[ -n "$data" ]]; then
     curl_args+=(-d "$data")
@@ -206,9 +206,19 @@ cmd_create_standing_instruction() {
     label_id=$(cmd_create_label "$STANDING_INSTRUCTIONS_LABEL" "#ff9800" | jq -r '.id')
   fi
 
+  if [[ -z "$label_id" ]] || [[ "$label_id" == "null" ]]; then
+    echo "Error: failed to create or find standing instructions label" >&2
+    exit 1
+  fi
+
   # Create the task
   local task=$(cmd_create_task "$project_id" "$title" "$instruction")
   local task_id=$(echo "$task" | jq -r '.id')
+
+  if [[ -z "$task_id" ]] || [[ "$task_id" == "null" ]]; then
+    echo "Error: failed to create task" >&2
+    exit 1
+  fi
 
   # Add the standing instructions label
   cmd_add_label_to_task "$task_id" "$label_id"
@@ -239,6 +249,11 @@ cmd_assign_to_user() {
 
   if [[ -z "$label_id" ]]; then
     label_id=$(cmd_create_label "$USER_ASSIGNED_LABEL" "#f44336" | jq -r '.id')
+  fi
+
+  if [[ -z "$label_id" ]] || [[ "$label_id" == "null" ]]; then
+    echo "Error: failed to create or find user-assigned label" >&2
+    exit 1
   fi
 
   cmd_add_label_to_task "$task_id" "$label_id"

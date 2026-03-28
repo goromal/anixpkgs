@@ -55,6 +55,8 @@ class VikunjaClient:
                 )
             except json.JSONDecodeError:
                 raise Exception(f"API Error {e.code}: {error_body}")
+        except urllib.error.URLError as e:
+            raise Exception(f"Network error connecting to {url}: {e.reason}")
 
     def list_projects(self) -> list[dict]:
         """List all projects"""
@@ -303,6 +305,7 @@ def handle_tool_call(
             return {"success": False, "error": f"Unknown tool: {tool_name}"}
 
     except Exception as e:
+        print(f"Error in {tool_name}: {type(e).__name__}: {e}", file=sys.stderr)
         return {"success": False, "error": str(e)}
 
 
