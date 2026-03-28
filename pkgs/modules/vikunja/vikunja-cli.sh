@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Configuration
-VIKUNJA_URL="${VIKUNJA_URL:-http://ats.local/vikunja/api/v1}"
+VIKUNJA_URL="${VIKUNJA_URL:-http://ats.local/vikunja}"
 VIKUNJA_TOKEN="${VIKUNJA_TOKEN:-}"
 VIKUNJA_CONFIG="${HOME}/.config/vikunja-cli/config"
 
@@ -44,8 +44,10 @@ cmd_login() {
   local username="$1"
   local password="$2"
 
+  local payload
+  payload=$(jq -n --arg u "$username" --arg p "$password" '{"username":$u,"password":$p}')
   local response=$(curl -X POST -H "Content-Type: application/json" \
-    -d "{\"username\":\"$username\",\"password\":\"$password\"}" \
+    -d "$payload" \
     -s "${VIKUNJA_URL}/api/v1/login")
 
   local token=$(echo "$response" | jq -r '.token // empty')
@@ -95,7 +97,9 @@ cmd_create_task() {
   local title="$2"
   local description="${3:-}"
 
-  local data="{\"title\":\"$title\""
+  local escaped_title
+  escaped_title=$(echo "$title" | jq -Rs .)
+  local data="{\"title\":$escaped_title"
   if [[ -n "$description" ]]; then
     # Escape newlines and quotes in description
     description=$(echo "$description" | jq -Rs .)
@@ -280,7 +284,7 @@ Claude Code Integration:
   assign-to-user <task_id>        Assign task to user for review
 
 Environment Variables:
-  VIKUNJA_URL                     Vikunja API URL (default: http://localhost:3456)
+  VIKUNJA_URL                     Vikunja base URL (default: http://ats.local/vikunja)
   VIKUNJA_TOKEN                   API authentication token
 
 Configuration:

@@ -29,7 +29,21 @@ DATA_DIR = args.data_dir if (args.data_dir and args.data_dir.startswith("/")) el
 DB_PATH = args.db_path if (args.db_path and args.db_path.startswith("/")) else os.path.join(DATA_DIR, "tester.db")
 
 app = flask.Flask(__name__)
-app.secret_key = b"tester_secret_key_change_in_production"
+
+
+def _load_secret_key():
+    key_file = os.path.join(DATA_DIR, ".secret_key")
+    if os.path.exists(key_file):
+        with open(key_file, "rb") as f:
+            return f.read()
+    os.makedirs(DATA_DIR, exist_ok=True)
+    key = os.urandom(32)
+    with open(key_file, "wb") as f:
+        f.write(key)
+    return key
+
+
+app.secret_key = _load_secret_key()
 
 
 # ── Database ──────────────────────────────────────────────────────────────────
@@ -371,10 +385,17 @@ def submit_exam(exam_id):
 
 def _grade_rote(exam_id, content):
     atoms = content.get("atoms") or content.get("chunks", [])
-    chunk_size = max(1, int(flask.request.form.get("chunk_size", "1")))
+    try:
+        chunk_size = max(1, int(flask.request.form.get("chunk_size", "1")))
+    except ValueError:
+        chunk_size = 1
     # Re-derive chunks the same way the client did
     chunks = [" ".join(atoms[i:i + chunk_size]) for i in range(0, len(atoms), chunk_size)]
-    blank_indices = json.loads(flask.request.form.get("blank_indices", "[]"))
+    try:
+        blank_indices = json.loads(flask.request.form.get("blank_indices", "[]"))
+    except (json.JSONDecodeError, ValueError):
+        blank_indices = []
+    blank_indices = [idx for idx in blank_indices if isinstance(idx, int) and 0 <= idx < len(chunks)]
     THRESHOLD = 0.80
 
     details = []

@@ -6,6 +6,7 @@
 }:
 with import ../../../nixos/dependencies.nix;
 let
+  globalCfg = config.machines.base;
   cfg = config.services.tester;
 in
 {

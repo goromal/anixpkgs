@@ -18,10 +18,13 @@ class VikunjaClient:
     def __init__(self, base_url: str, api_token: str):
         self.base_url = base_url.rstrip("/")
         self.api_token = api_token
-        # Create SSL context that doesn't verify certificates (for self-signed)
-        self.ssl_context = ssl.create_default_context()
-        self.ssl_context.check_hostname = False
-        self.ssl_context.verify_mode = ssl.CERT_NONE
+        insecure = os.environ.get("VIKUNJA_INSECURE", "").lower() in ("1", "true", "yes")
+        if insecure:
+            self.ssl_context = ssl.create_default_context()
+            self.ssl_context.check_hostname = False
+            self.ssl_context.verify_mode = ssl.CERT_NONE
+        else:
+            self.ssl_context = None
 
     def _request(
         self, method: str, endpoint: str, data: dict = None
