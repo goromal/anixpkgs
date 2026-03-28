@@ -25,7 +25,8 @@ buildPythonPackage rec {
     cp ${./templates/take_mc.html}   $out/${pythonLibDir}/templates/take_mc.html
     cp ${./templates/take_sa.html}   $out/${pythonLibDir}/templates/take_sa.html
     cp ${./templates/result.html}    $out/${pythonLibDir}/templates/result.html
-    cp ${./templates/results.html}   $out/${pythonLibDir}/templates/results.html
+    cp ${./templates/results.html}    $out/${pythonLibDir}/templates/results.html
+    cp ${./templates/passage.html}   $out/${pythonLibDir}/templates/passage.html
   '';
   propagatedBuildInputs = [
     flask

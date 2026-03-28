@@ -311,6 +311,25 @@ def take_exam(exam_id):
         )
 
 
+@bp.route("/exam/<int:exam_id>/passage")
+def view_passage(exam_id):
+    db = get_db()
+    exam = db.execute("SELECT * FROM exams WHERE id = ?", (exam_id,)).fetchone()
+    db.close()
+    if not exam:
+        flask.flash("Exam not found.")
+        return flask.redirect(flask.url_for(url_for_prefix + "index"))
+    exam = dict(exam)
+    content = json.loads(exam["content"])
+    atoms = content.get("atoms") or content.get("chunks", [])
+    return flask.render_template(
+        "passage.html",
+        urlroot=urlroot,
+        exam=exam,
+        atoms=atoms,
+    )
+
+
 @bp.route("/exam/<int:exam_id>/submit", methods=["POST"])
 def submit_exam(exam_id):
     db = get_db()
