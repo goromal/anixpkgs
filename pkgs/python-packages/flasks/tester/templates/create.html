@@ -21,10 +21,37 @@
     .hint { font-size: 0.82em; color: #888; margin-top: -10px; margin-bottom: 14px; }
     .form-row { display: flex; gap: 16px; }
     .form-row > div { flex: 1; }
+    #loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255,255,255,0.85);
+        z-index: 1000;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+    }
+    #loading-overlay.active { display: flex; }
+    .spinner {
+        width: 48px;
+        height: 48px;
+        border: 5px solid #ddd;
+        border-top-color: #2c3e50;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { font-size: 1.05em; color: #444; font-weight: 600; }
 </style>
 {% endblock %}
 
 {% block content %}
+<div id="loading-overlay">
+    <div class="spinner"></div>
+    <p id="loading-msg">Generating exam&hellip;</p>
+</div>
+
 <h1>Create New Exam</h1>
 
 <div class="card">
@@ -76,7 +103,7 @@
             <p class="hint">Tell the AI what aspects of the material to emphasize in the exam.</p>
         </div>
 
-        <button type="submit" class="btn btn-success" style="margin-top:8px;">Create Exam</button>
+        <button type="submit" class="btn btn-success" style="margin-top:8px;" id="submit-btn">Create Exam</button>
         <a href="{{ urlroot }}" class="btn btn-secondary" style="margin-left:8px;">Cancel</a>
     </form>
 </div>
@@ -90,5 +117,18 @@
         document.getElementById('section-rote').classList.toggle('active', type === 'rote');
         document.getElementById('section-ai').classList.toggle('active', type !== 'rote');
     }
+
+    document.querySelector('form').addEventListener('submit', function() {
+        const type = document.getElementById('exam_type_field').value;
+        if (type === 'rote') return; // rote is instant, no spinner needed
+        const urls = document.getElementById('urls').value.trim();
+        const hasUrls = urls.length > 0;
+        const msg = hasUrls
+            ? 'Fetching sources and generating exam\u2026'
+            : 'Generating exam\u2026';
+        document.getElementById('loading-msg').textContent = msg;
+        document.getElementById('loading-overlay').classList.add('active');
+        document.getElementById('submit-btn').disabled = true;
+    });
 </script>
 {% endblock %}
