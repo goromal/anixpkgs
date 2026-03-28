@@ -177,8 +177,23 @@ def _create_rote(title):
 
     chunks = chunk_text(text, delimiter)
     if len(chunks) < 2:
-        flask.flash("Need at least 2 chunks. Try a different delimiter or add more text.")
-        return flask.redirect(flask.url_for(url_for_prefix + "create"))
+        # Common cause: text copied from a web page loses newlines. Try sentence as fallback.
+        sentence_chunks = chunk_text(text, "sentence")
+        if len(sentence_chunks) >= 2:
+            flask.flash(
+                f"The '{delimiter}' delimiter only produced {len(chunks)} chunk(s) — your text "
+                f"may not have preserved newlines when copied. Falling back to sentence splitting "
+                f"({len(sentence_chunks)} chunks)."
+            )
+            chunks = sentence_chunks
+            delimiter = "sentence"
+        else:
+            flask.flash(
+                f"Could not split into at least 2 chunks (got {len(chunks)} with '{delimiter}', "
+                f"{len(sentence_chunks)} with sentence). "
+                f"Try manually adding blank lines between sections."
+            )
+            return flask.redirect(flask.url_for(url_for_prefix + "create"))
 
     content = json.dumps({"full_text": text, "chunks": chunks, "delimiter": delimiter})
     db = get_db()

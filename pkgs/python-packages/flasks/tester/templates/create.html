@@ -47,11 +47,11 @@
 
             <label for="delimiter">Chunk Delimiter</label>
             <select id="delimiter" name="delimiter">
-                <option value="sentence">Sentence (split on . ! ?)</option>
+                <option value="sentence">Sentence (split on . ! ?) — works even if newlines were lost</option>
                 <option value="paragraph">Paragraph (split on blank lines)</option>
                 <option value="line">Line (split on newlines)</option>
             </select>
-            <p class="hint">The text will be split into chunks. During the exam, ~half the chunks will be blanked out for you to fill in.</p>
+            <p class="hint">During the exam, ~half the chunks will be blanked out for you to fill in. <strong>Tip:</strong> if you copied from a website, use <em>Sentence</em> — copied text often loses its line breaks.</p>
         </div>
 
         <!-- Multiple Choice / Short Answer shared section -->
