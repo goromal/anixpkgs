@@ -169,33 +169,20 @@ def create():
 
 def _create_rote(title):
     text = flask.request.form.get("text", "").strip()
-    delimiter = flask.request.form.get("delimiter", "sentence")
 
     if not text:
         flask.flash("Text is required for rote memorization exams.")
         return flask.redirect(flask.url_for(url_for_prefix + "create"))
 
-    chunks = chunk_text(text, delimiter)
-    if len(chunks) < 2:
-        # Common cause: text copied from a web page loses newlines. Try sentence as fallback.
-        sentence_chunks = chunk_text(text, "sentence")
-        if len(sentence_chunks) >= 2:
-            flask.flash(
-                f"The '{delimiter}' delimiter only produced {len(chunks)} chunk(s) — your text "
-                f"may not have preserved newlines when copied. Falling back to sentence splitting "
-                f"({len(sentence_chunks)} chunks)."
-            )
-            chunks = sentence_chunks
-            delimiter = "sentence"
-        else:
-            flask.flash(
-                f"Could not split into at least 2 chunks (got {len(chunks)} with '{delimiter}', "
-                f"{len(sentence_chunks)} with sentence). "
-                f"Try manually adding blank lines between sections."
-            )
-            return flask.redirect(flask.url_for(url_for_prefix + "create"))
+    # Split into atomic units: prefer lines, fall back to sentences if newlines were lost.
+    atoms = chunk_text(text, "line")
+    if len(atoms) < 2:
+        atoms = chunk_text(text, "sentence")
+    if len(atoms) < 2:
+        flask.flash("Could not split text into at least 2 units. Try adding newlines between sections.")
+        return flask.redirect(flask.url_for(url_for_prefix + "create"))
 
-    content = json.dumps({"full_text": text, "chunks": chunks, "delimiter": delimiter})
+    content = json.dumps({"full_text": text, "atoms": atoms})
     db = get_db()
     db.execute(
         "INSERT INTO exams (title, exam_type, created_at, source_material, content) VALUES (?,?,?,?,?)",
@@ -203,7 +190,7 @@ def _create_rote(title):
     )
     db.commit()
     db.close()
-    flask.flash(f"Rote exam created with {len(chunks)} chunks.")
+    flask.flash(f"Rote exam created with {len(atoms)} units.")
     return flask.redirect(flask.url_for(url_for_prefix + "index"))
 
 
@@ -300,16 +287,13 @@ def take_exam(exam_id):
     content = json.loads(exam["content"])
 
     if exam["exam_type"] == "rote":
-        chunks = content["chunks"]
-        n_blank = max(1, len(chunks) // 2)
-        blank_indices = sorted(random.sample(range(len(chunks)), n_blank))
+        atoms = content["atoms"]
         return flask.render_template(
             "take_rote.html",
             urlroot=urlroot,
             exam=exam,
-            chunks=chunks,
-            blank_indices=blank_indices,
-            blank_indices_json=json.dumps(blank_indices),
+            atoms_json=json.dumps(atoms),
+            atom_count=len(atoms),
         )
     elif exam["exam_type"] == "multiple_choice":
         return flask.render_template(
@@ -353,7 +337,10 @@ def submit_exam(exam_id):
 
 
 def _grade_rote(exam_id, content):
-    chunks = content["chunks"]
+    atoms = content["atoms"]
+    chunk_size = max(1, int(flask.request.form.get("chunk_size", "1")))
+    # Re-derive chunks the same way the client did
+    chunks = [" ".join(atoms[i:i + chunk_size]) for i in range(0, len(atoms), chunk_size)]
     blank_indices = json.loads(flask.request.form.get("blank_indices", "[]"))
     THRESHOLD = 0.80
 

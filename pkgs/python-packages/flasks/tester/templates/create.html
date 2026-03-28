@@ -44,14 +44,7 @@
         <div class="type-section active" id="section-rote">
             <label for="text">Text to Memorize</label>
             <textarea id="text" name="text" rows="8" placeholder="Paste the text you want to memorize..."></textarea>
-
-            <label for="delimiter">Chunk Delimiter</label>
-            <select id="delimiter" name="delimiter">
-                <option value="sentence">Sentence (split on . ! ?) — works even if newlines were lost</option>
-                <option value="paragraph">Paragraph (split on blank lines)</option>
-                <option value="line">Line (split on newlines)</option>
-            </select>
-            <p class="hint">During the exam, ~half the chunks will be blanked out for you to fill in. <strong>Tip:</strong> if you copied from a website, use <em>Sentence</em> — copied text often loses its line breaks.</p>
+            <p class="hint">The text is split into atomic units (lines if newlines are present, sentences otherwise). When you take the exam you'll choose how large each chunk is — from one unit at a time up to half the content per chunk.</p>
         </div>
 
         <!-- Multiple Choice / Short Answer shared section -->
