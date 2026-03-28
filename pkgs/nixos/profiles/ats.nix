@@ -13,7 +13,7 @@ with import ../dependencies.nix;
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
-      developer = false;
+      developer = true;
       isATS = true;
       serveNotesWiki = true;
       notesWikiPort = 8080;
@@ -149,10 +149,35 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-vikunja-backup";
+          jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
+            mkdir -p $HOME/data/vikunja
+            sudo cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            sudo chown andrew:dev $HOME/data/vikunja/vikunja.db
+            rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-vikunja-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-la-quiz-backup";
           jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
             rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-la-quiz-backup "LA Quiz backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-tester-backup";
+          jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
+            rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-tester-backup "Tester backup successful!"
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 00:00:00" ];

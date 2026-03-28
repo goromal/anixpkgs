@@ -6,66 +6,61 @@
 }:
 with import ../../../nixos/dependencies.nix;
 let
-  cfg = config.services.la-quiz-web;
+  globalCfg = config.machines.base;
+  cfg = config.services.tester;
 in
 {
-  options.services.la-quiz-web = {
-    enable = lib.mkEnableOption "enable LA quiz web server";
+  options.services.tester = {
+    enable = lib.mkEnableOption "enable self-test exam tool";
     package = lib.mkOption {
       type = lib.types.package;
-      description = "The la-quiz-web package to use";
-      default = anixpkgs.la_quiz_web;
+      description = "The tester package to use";
+      default = anixpkgs.self-tester-app;
     };
     dataDir = lib.mkOption {
       type = lib.types.str;
-      description = "Data directory for database and maps";
-      default = "/data/andrew/la-quiz-web";
+      description = "Data directory for database and uploads";
+      default = "${globalCfg.homeDir}/data/tester";
     };
     dbPath = lib.mkOption {
       type = lib.types.str;
       description = "Path to SQLite database";
-      default = "${cfg.dataDir}/la_quiz.db";
-    };
-    mapsDir = lib.mkOption {
-      type = lib.types.str;
-      description = "Directory containing map images";
-      default = "${cfg.dataDir}/maps";
+      default = "${cfg.dataDir}/tester.db";
     };
     port = lib.mkOption {
       type = lib.types.port;
       description = "Port to run the server on";
-      default = service-ports.la-quiz-web;
+      default = service-ports.tester;
     };
     subdomain = lib.mkOption {
       type = lib.types.str;
       description = "Subdomain path for reverse proxy";
-      default = "/la-quiz";
+      default = "/tester";
     };
   };
 
   config = lib.mkIf cfg.enable {
     machines.base.webServices = [
       {
-        name = "LA Quiz Game";
-        path = "/la-quiz/";
-        description = "LA geography challenge game";
+        name = "Tester";
+        path = "/tester/";
+        description = "Self-testing and exam tool";
       }
     ];
 
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0755 andrew dev -"
-      "d ${cfg.mapsDir} 0755 andrew dev -"
     ];
 
-    systemd.services.la-quiz-web = {
+    systemd.services.tester = {
       enable = true;
-      description = "LA Geography Quiz Web Server";
+      description = "Self-Test Exam Web Server";
       unitConfig = {
         StartLimitIntervalSec = 0;
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/la-quiz-web --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --db-path ${cfg.dbPath} --maps-dir ${cfg.mapsDir}";
+        ExecStart = "${cfg.package}/bin/tester --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --db-path ${cfg.dbPath} --data-dir ${cfg.dataDir}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.dataDir;
         Restart = "always";

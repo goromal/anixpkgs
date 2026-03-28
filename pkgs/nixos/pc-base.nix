@@ -73,6 +73,28 @@ in
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
+    webServices = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Display name of the service";
+            };
+            path = lib.mkOption {
+              type = lib.types.str;
+              description = "URL path or full URL to the service";
+            };
+            description = lib.mkOption {
+              type = lib.types.str;
+              description = "Brief description of the service";
+            };
+          };
+        }
+      );
+      description = "List of web services to display on landing page";
+      default = [ ];
+    };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
       description = "Network interface name for the WiFi.";
@@ -157,6 +179,7 @@ in
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
+    ../modules/vikunja/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -164,9 +187,15 @@ in
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
+    ../python-packages/flasks/tester/module.nix
     (
       let
-        jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
+        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
+        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
+        jetpackSrc = builtins.fetchTarball {
+          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
+          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
+        };
       in
       import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
     )
@@ -281,6 +310,101 @@ in
             ssl = true;
           }
         ];
+
+        # Landing page listing all available services
+        locations."= /" = {
+          return = "200 '${
+            let
+              hostname = config.networking.hostName;
+              services = cfg.webServices;
+              # Generate service links with special handling for port-based services
+              serviceLinks = lib.concatMapStringsSep "\n" (
+                s:
+                if s.path == "#" then
+                  # Extract port from description (e.g., "Task management system (port 3457)")
+                  let
+                    portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+                    port = if portMatch != null then builtins.head portMatch else "";
+                  in
+                  "    <li><a href=\"#\" class=\"service-card\" onclick=\"window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
+                else
+                  "    <li><a href=\"${s.path}\" class=\"service-card\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
+              ) services;
+            in
+            ''
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset=\"UTF-8\">
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                <title>${hostname} Services</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    background: #f5f5f5;
+                  }
+                  .container {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                  }
+                  h1 {
+                    color: #333;
+                    margin-top: 0;
+                  }
+                  ul {
+                    list-style: none;
+                    padding: 0;
+                  }
+                  li {
+                    margin: 12px 0;
+                  }
+                  .service-card {
+                    display: block;
+                    padding: 14px 16px;
+                    background: #f9f9f9;
+                    border-radius: 8px;
+                    border: 2px solid #007bff;
+                    text-decoration: none;
+                    transition: background 0.15s, border-color 0.15s;
+                  }
+                  .service-card:hover {
+                    background: #e8f0fe;
+                    border-color: #0056b3;
+                  }
+                  .service-name {
+                    display: block;
+                    color: #007bff;
+                    font-weight: 600;
+                    font-size: 1em;
+                  }
+                  .description {
+                    display: block;
+                    color: #666;
+                    font-size: 0.9em;
+                    margin-top: 4px;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class=\"container\">
+                  <h1>${hostname} Services</h1>
+                  <ul>
+              ${serviceLinks}
+                  </ul>
+                </div>
+              </body>
+              </html>
+            ''
+          }'";
+          extraConfig = ''
+            default_type text/html;
+          '';
+        };
       };
     };
 
@@ -328,6 +452,11 @@ in
     services.la-quiz-web = {
       enable = cfg.isATS;
       dataDir = "${cfg.homeDir}/data/la-quiz-web";
+    };
+
+    services.tester = {
+      enable = cfg.isATS;
+      dataDir = "${cfg.homeDir}/data/tester";
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -469,6 +598,12 @@ in
     # Mail
     services.mailNode.enable = cfg.isATS;
 
+    # Vikunja Task Management
+    services.vikunja-ats = lib.mkIf cfg.isATS {
+      enable = true;
+      domain = "${config.networking.hostName}.local";
+    };
+
     # Global packages
     environment.systemPackages =
       with pkgs;
@@ -483,6 +618,7 @@ in
         gcc
         gdb
         tig
+        git
         scc
         most
         gnumake
@@ -674,6 +810,7 @@ in
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
         extraClaudeSettings = cfg.extraClaudeSettings;
+        vikunjaEnabled = cfg.isATS;
       };
     };
   };

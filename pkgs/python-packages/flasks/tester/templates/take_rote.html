@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Tester — {{ exam.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .controls {
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .controls label { margin: 0; font-size: 0.9em; font-weight: 600; color: #444; white-space: nowrap; }
+    input[type="range"] { width: 220px; cursor: pointer; }
+    .ctrl-info { font-size: 0.82em; color: #666; }
+
+    .passage {
+        line-height: 2.1;
+        font-size: 1.05em;
+        word-spacing: 1px;
+    }
+    .chunk-shown { color: #333; }
+    .blank-input {
+        border: none;
+        border-bottom: 2px solid #2c3e50;
+        background: #f0f4ff;
+        padding: 2px 6px;
+        font-size: 1em;
+        font-family: inherit;
+        border-radius: 4px 4px 0 0;
+        min-width: 80px;
+        outline: none;
+        margin: 0 2px;
+        transition: background 0.1s, border-color 0.1s;
+    }
+    .blank-input:focus { border-bottom-color: #3498db; background: #e8f0ff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ exam.title }}</h1>
+
+<div class="controls">
+    <label for="chunk-slider">Chunk size:</label>
+    <input type="range" id="chunk-slider" min="1" max="{{ atom_count }}" value="1" oninput="rebuild()">
+    <span class="ctrl-info" id="ctrl-info">…</span>
+</div>
+
+<div class="card">
+    <form method="post" action="{{ urlroot }}exam/{{ exam.id }}/submit" id="exam-form">
+        <input type="hidden" name="chunk_size" id="chunk_size_field">
+        <input type="hidden" name="blank_indices" id="blank_indices_field">
+        <div id="passage" class="passage"></div>
+        <div style="margin-top:28px; display:flex; gap:12px;">
+            <button type="submit" class="btn btn-success">Submit Answers</button>
+            <a href="{{ urlroot }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+const atoms = {{ atoms_json | safe }};
+const N = atoms.length;
+
+// Seeded random so blanks don't jump around when the slider value hasn't changed.
+// We re-seed only when chunkSize changes.
+let seedState = 0;
+function seededRand() {
+    seedState ^= seedState << 13;
+    seedState ^= seedState >> 17;
+    seedState ^= seedState << 5;
+    return (seedState >>> 0) / 4294967296;
+}
+
+function groupAtoms(chunkSize) {
+    const chunks = [];
+    for (let i = 0; i < N; i += chunkSize) {
+        chunks.push(atoms.slice(i, i + chunkSize).join(' '));
+    }
+    return chunks;
+}
+
+function chooseBlanks(numChunks, chunkSize) {
+    // Re-seed based on (exam, chunkSize) so blanks are stable for a given size.
+    seedState = ({{ exam.id }} * 2654435761 + chunkSize * 40503) | 1;
+    const count = Math.max(1, Math.floor(numChunks / 2));
+
+    // Shuffle all indices.
+    const indices = Array.from({length: numChunks}, (_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(seededRand() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    // First pass: greedily pick non-adjacent indices.
+    const chosen = new Set();
+    for (const idx of indices) {
+        if (chosen.size >= count) break;
+        if (!chosen.has(idx - 1) && !chosen.has(idx + 1)) chosen.add(idx);
+    }
+    // Second pass: fill remaining with any unchosen index (adjacency unavoidable).
+    for (const idx of indices) {
+        if (chosen.size >= count) break;
+        if (!chosen.has(idx)) chosen.add(idx);
+    }
+
+    return Array.from(chosen).sort((a, b) => a - b);
+}
+
+function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+let lastChunkSize = -1;
+
+function rebuild() {
+    const chunkSize = parseInt(document.getElementById('chunk-slider').value);
+    const chunks = groupAtoms(chunkSize);
+    const numChunks = chunks.length;
+    const blankIndices = chooseBlanks(numChunks, chunkSize);
+
+    // Update hidden fields
+    document.getElementById('chunk_size_field').value = chunkSize;
+    document.getElementById('blank_indices_field').value = JSON.stringify(blankIndices);
+
+    // Update info label
+    const pct = Math.round(chunkSize / N * 100);
+    document.getElementById('ctrl-info').textContent =
+        `${chunkSize} unit${chunkSize !== 1 ? 's' : ''} per chunk  (~${pct}% of content)  —  ${blankIndices.length} of ${numChunks} chunks blanked`;
+
+    // Re-render passage only when chunkSize changed (preserve typed answers otherwise)
+    if (chunkSize === lastChunkSize) return;
+    lastChunkSize = chunkSize;
+
+    const blankSet = new Set(blankIndices);
+    let html = '';
+    let answerIdx = 0;
+    for (let i = 0; i < numChunks; i++) {
+        if (blankSet.has(i)) {
+            const sz = Math.max(8, Math.floor(chunks[i].length / 2));
+            html += `<span><input class="blank-input" type="text" name="answer_${answerIdx}" placeholder="…" autocomplete="off" size="${sz}"></span> `;
+            answerIdx++;
+        } else {
+            html += `<span class="chunk-shown">${escHtml(chunks[i])}</span> `;
+        }
+    }
+    document.getElementById('passage').innerHTML = html;
+}
+
+// Set slider max so there are always at least 2 chunks (max chunkSize = floor(N/2))
+document.getElementById('chunk-slider').max = Math.max(1, Math.floor(N / 2));
+
+rebuild();
+</script>
+{% endblock %}

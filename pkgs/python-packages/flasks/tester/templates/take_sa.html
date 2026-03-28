@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Tester — {{ exam.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .question-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        margin-bottom: 16px;
+    }
+    .question-num { color: #aaa; font-size: 0.8em; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .question-text { font-weight: 600; margin-bottom: 12px; font-size: 1em; color: #2c3e50; }
+    .sa-textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95em;
+        font-family: inherit;
+        resize: vertical;
+        min-height: 80px;
+        background: #fafafa;
+        margin-bottom: 0;
+    }
+    .sa-textarea:focus { outline: none; border-color: #3498db; background: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ exam.title }}</h1>
+<p style="color:#777; margin-bottom:20px; font-size:0.9em;">
+    {{ questions | length }} questions — write a short answer for each. Your responses will be AI-graded on submission.
+</p>
+
+<form method="post" action="{{ urlroot }}exam/{{ exam.id }}/submit">
+    {% for q in questions %}
+    <div class="question-card">
+        <div class="question-num">Question {{ loop.index }} of {{ questions | length }}</div>
+        <div class="question-text">{{ q }}</div>
+        <textarea class="sa-textarea" name="answer_{{ loop.index0 }}" placeholder="Your answer..."></textarea>
+    </div>
+    {% endfor %}
+
+    <div style="margin-top:8px; display:flex; gap:12px; align-items:center;">
+        <button type="submit" class="btn btn-success">Submit for AI Grading</button>
+        <a href="{{ urlroot }}" class="btn btn-secondary">Cancel</a>
+        <span style="color:#888; font-size:0.82em; margin-left:4px;">This will make one API call to Claude.</span>
+    </div>
+</form>
+{% endblock %}

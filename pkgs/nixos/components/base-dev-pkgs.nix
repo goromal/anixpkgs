@@ -41,6 +41,32 @@ in
       ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.claudePlugins}
       echo_green "Done! Verify installed plugins with \"claude plugin list\""
 
+      ${lib.optionalString cfg.vikunjaEnabled ''
+        echo_yellow "Setting up Vikunja MCP server..."
+        SECRETS_FILE="$HOME/secrets/vikunja/secrets.json"
+        if [ -f "$SECRETS_FILE" ]; then
+          VIKUNJA_TOKEN=$(${pkgs.jq}/bin/jq -r '.token // empty' "$SECRETS_FILE" 2>/dev/null || echo "")
+
+          if [ -n "$VIKUNJA_TOKEN" ]; then
+            # Remove existing vikunja server if present
+            claude mcp remove vikunja 2>/dev/null || true
+
+            # Add the Vikunja MCP server
+            claude mcp add -s user \
+              -e VIKUNJA_URL=https://ats.local:3457 \
+              -e VIKUNJA_API_TOKEN="$VIKUNJA_TOKEN" \
+              -e VIKUNJA_INSECURE=1 \
+              -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
+
+            echo_green "Vikunja MCP server registered successfully"
+          else
+            echo_yellow "Warning: 'token' not found in $SECRETS_FILE. Skipping Vikunja MCP setup."
+          fi
+        else
+          echo_yellow "Warning: Secrets file $SECRETS_FILE not found. Skipping Vikunja MCP setup."
+        fi
+      ''}
+
       echo_yellow "Other setup..."
       read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
       echo
