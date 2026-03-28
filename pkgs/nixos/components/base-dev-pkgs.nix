@@ -55,6 +55,7 @@ in
             claude mcp add -s user \
               -e VIKUNJA_URL=https://ats.local:3457 \
               -e VIKUNJA_API_TOKEN="$VIKUNJA_TOKEN" \
+              -e VIKUNJA_INSECURE=1 \
               -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
 
             echo_green "Vikunja MCP server registered successfully"
