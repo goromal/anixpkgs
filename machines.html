@@ -1,0 +1,616 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Machine Management - anixpkgs</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-2459343d.css">
+        <link rel="stylesheet" href="css/chrome-ae938929.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+        <!-- MathJax -->
+        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-c8de688b.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-ad58d109.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">anixpkgs</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="machine-management"><a class="header" href="#machine-management">Machine Management</a></h1>
+<p><em><strong>These notes are still a work-in-progress and are currently largely for my personal use only.</strong></em></p>
+<h2 id="home-manager-example"><a class="header" href="#home-manager-example">Home-Manager Example</a></h2>
+<ol>
+<li>Install Nix standalone:</li>
+</ol>
+<pre><code class="language-bash">curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+</code></pre>
+<ol start="3">
+<li>Set proper Nix settings in <code>/etc/nix/nix.conf</code>:</li>
+</ol>
+<pre><code>substituters = https://cache.nixos.org/ https://github-public.cachix.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+narinfo-cache-positive-ttl = 0
+narinfo-cache-negative-ttl = 0
+experimental-features = nix-command flakes auto-allocate-uids
+</code></pre>
+<ol start="4">
+<li>Add these Nix channels via <code>nix-channel --add URL NAME</code>:</li>
+</ol>
+<pre><code class="language-bash">$ nix-channel --list
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixpkgs https://nixos.org/channels/nixos-25.11
+</code></pre>
+<ol start="5">
+<li>Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone</li>
+</ol>
+<p>Example <code>home.nix</code> file for personal use:</p>
+<pre><code class="language-nix">{ config, pkgs, lib, ... }:
+let
+  user = "andrew";
+  homedir = "/home/${user}";
+  anixsrc = ./path/to/sources/anixpkgs/.;
+in with import ../dependencies.nix; {
+  home.username = user;
+  home.homeDirectory = homedir;
+  programs.home-manager.enable = true;
+
+  imports = [
+    "${anixsrc}/pkgs/nixos/components/opts.nix"
+    "${anixsrc}/pkgs/nixos/components/base-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/base-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-rec-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/x86-graphical-rec-pkgs.nix"
+  ];
+
+  mods.opts.standalone = true;
+  mods.opts.homeDir = homedir;
+  mods.opts.homeState = "23.05";
+  mods.opts.browserExec = "google-chrome-stable";
+}
+
+</code></pre>
+<p><code>*-rec-*</code> packages can be removed for non-recreational use.</p>
+<p>Symlink to <code>~/.config/home-manager/home.nix</code>.</p>
+<p>Corresponding <code>~/.bashrc</code>:</p>
+<pre><code class="language-bash">export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
+. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+export NIXPKGS_ALLOW_UNFREE=1
+# alias code='codium'
+# eval "$(direnv hook bash)"
+</code></pre>
+<h2 id="personal-machine-installation-instructions"><a class="header" href="#personal-machine-installation-instructions">Personal Machine Installation Instructions</a></h2>
+<p><em>Sources</em></p>
+<ul>
+<li>https://nixos.wiki/wiki/NixOS_Installation_Guide</li>
+<li>https://alexherbo2.github.io/wiki/nixos/install-guide/</li>
+</ul>
+<ol>
+<li>Build the installation ISO with <code>NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage</code></li>
+<li>Plug in a USB stick large enough to accommodate the image.</li>
+<li>Find the right device with <code>lsblk</code> or <code>fdisk -l</code>. Replace <code>/dev/sdX</code> with the proper device (do not use <code>/dev/sdX1</code> or partitions of the disk; use the whole disk <code>/dev/sdX</code>).</li>
+<li>Burn ISO to USB stick with <code>dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync</code></li>
+<li>On the new machine, one-time boot UEFI into the USB stick on the computer (will need to disable Secure Boot from BIOS first)</li>
+<li>Login as the user <code>andrew</code></li>
+<li>Connect to the internet</li>
+<li>Within the installer, run <code>sudo anix-install</code></li>
+<li>If everything went well, reboot</li>
+<li>On the next reboot, login as user <code>andrew</code> again</li>
+<li>Connect to the internet</li>
+<li>Run <code>anix-init</code></li>
+<li>Enjoy!</li>
+</ol>
+<h2 id="jetpack-machine-installation-instructions"><a class="header" href="#jetpack-machine-installation-instructions">JetPack Machine Installation Instructions</a></h2>
+<ol>
+<li>Ensure that the device has UEFI firmware installed. See https://github.com/anduril/jetpack-nixos.</li>
+<li>Build the installation ISO with <code>nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage</code></li>
+<li>Plug in a USB stick large enough to accommodate the image.</li>
+<li>Find the right device with <code>lsblk</code> or <code>fdisk -l</code>. Replace <code>/dev/sdX</code> with the proper device (do not use <code>/dev/sdX1</code> or partitions of the disk; use the whole disk <code>/dev/sdX</code>).</li>
+<li>Burn ISO to USB stick with <code>dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync</code></li>
+<li>Insert the USB drive into the Jetson device. On the AGX devkits, I’ve had the best luck plugging into the USB-C slot above the power barrel jack. You may need to try a few USB options until you find one that works with both the UEFI firmware and the Linux kernel.</li>
+<li>Press power / reset as needed. When prompted, press ESC to enter the UEFI firmware menu. In the “Boot Manager”, select the correct USB device and boot directly into it.</li>
+<li>Connect to the internet</li>
+<li>Within the installer, run <code>sudo anix-install</code></li>
+<li>If everything went well, reboot</li>
+<li>On the next reboot, login as user <code>andrew</code> again</li>
+<li>Connect to the internet</li>
+<li>Run <code>anix-init</code></li>
+<li>Enjoy!</li>
+</ol>
+<h2 id="upgrading-nixos-versions-with-anixpkgs"><a class="header" href="#upgrading-nixos-versions-with-anixpkgs">Upgrading NixOS versions with <code>anixpkgs</code></a></h2>
+<p>Aside from the source code changes in <code>anixpkgs</code>, ensure that your channels have been updated <strong>for the root user</strong>:</p>
+<pre><code class="language-bash"># e.g., upgrading to 25.11:
+home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
+nixos https://nixos.org/channels/nixos-25.11
+nixpkgs https://nixos.org/channels/nixos-25.11
+</code></pre>
+<p><code>sudo nix-channel --update</code>. Then upgrade with</p>
+<pre><code class="language-bash">anix-upgrade [source specification] --local --boot
+</code></pre>
+<h2 id="build-a-jetpack-installer-iso"><a class="header" href="#build-a-jetpack-installer-iso">Build a JetPack Installer ISO</a></h2>
+<p>Cross-compiled from x86_64. Requires <code>binfmt</code> support for aarch64 (enabled by default on NixOS with <code>boot.binfmt.emulatedSystems</code>).</p>
+<pre><code class="language-bash">nix build .#nixosConfigurations.installer-jetpack.config.system.build.isoImage
+</code></pre>
+<pre><code class="language-bash">dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
+</code></pre>
+<h2 id="build-a-nixos-iso-image"><a class="header" href="#build-a-nixos-iso-image">Build a NixOS ISO Image</a></h2>
+<p><em><strong>TODO (untested)</strong></em>; work out hardware configuration portion.</p>
+<pre><code class="language-bash">nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+</code></pre>
+<pre><code class="language-bash">sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
+</code></pre>
+<h2 id="local-ssl-setup-for-https-access"><a class="header" href="#local-ssl-setup-for-https-access">Local SSL Setup for HTTPS Access</a></h2>
+<p>For machines configured with <code>runWebServer = true</code> (like ATS), you can enable HTTPS access from devices on your local network (especially phones) to avoid browser security warnings.</p>
+<h3 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h3>
+<ol>
+<li>
+<p><strong>Generate SSL certificates</strong> on the server:</p>
+<pre><code class="language-bash">generate-local-ssl-certs
+</code></pre>
+<p>The script will auto-detect your LAN IP address and create certificates in <code>~/secrets/vpn/</code>.</p>
+<p>If you need to specify a different IP address:</p>
+<pre><code class="language-bash">generate-local-ssl-certs 192.168.1.100
+</code></pre>
+</li>
+<li>
+<p><strong>Install the CA certificate on your client devices</strong>:</p>
+<p>Transfer <code>~/secrets/vpn/rootCA.pem</code> to your phone and install it:</p>
+<p><strong>Android:</strong></p>
+<ul>
+<li>Settings → Security → Encryption &amp; credentials → Install a certificate</li>
+<li>Choose “CA certificate” and select <code>rootCA.pem</code></li>
+<li>Give it a name like “ATS Local CA”</li>
+</ul>
+<p><strong>iPhone/iPad:</strong></p>
+<ul>
+<li>Email or AirDrop <code>rootCA.pem</code> to your device</li>
+<li>Open the file to install the profile</li>
+<li>Settings → General → VPN &amp; Device Management → Install the profile</li>
+<li>Settings → General → About → Certificate Trust Settings → Enable full trust</li>
+</ul>
+</li>
+<li>
+<p><strong>Access your server via HTTPS</strong>:</p>
+<pre><code>https://ats.local:443
+</code></pre>
+<p>Or use HTTP if you prefer (no automatic redirect):</p>
+<pre><code>http://ats.local:80
+</code></pre>
+</li>
+</ol>
+<h3 id="how-it-works"><a class="header" href="#how-it-works">How It Works</a></h3>
+<ul>
+<li>The nginx server listens on <strong>both</strong> HTTP (port 80) and HTTPS (port 443)</li>
+<li>There is <strong>no automatic redirect</strong> from HTTP to HTTPS - both protocols are supported</li>
+<li>The certificates are valid for:
+<ul>
+<li><code>[hostname].local</code> (e.g., <code>ats.local</code>)</li>
+<li><code>*.[hostname].local</code> (wildcard for subdomains)</li>
+<li><code>localhost</code>, <code>127.0.0.1</code>, and your LAN IP address</li>
+</ul>
+</li>
+<li>Certificates are stored in <code>~/secrets/vpn/</code> and backed up by <code>rcrsync</code></li>
+<li>Certificates expire after ~825 days and can be regenerated anytime</li>
+</ul>
+<h3 id="regenerating-certificates"><a class="header" href="#regenerating-certificates">Regenerating Certificates</a></h3>
+<p>If your server IP changes or certificates expire:</p>
+<pre><code class="language-bash">generate-local-ssl-certs [new-ip-address]
+</code></pre>
+<p>The script will backup old certificates and create new ones. You won’t need to reinstall the CA on your devices if you’re replacing server certificates signed by the same CA.</p>
+<h3 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h3>
+<p><strong>SSL warnings still appear:</strong></p>
+<ul>
+<li>Verify you installed <code>rootCA.pem</code> (the CA certificate), not <code>chain.pem</code></li>
+<li>On iOS, ensure you enabled full trust in Certificate Trust Settings</li>
+<li>Try clearing browser cache or restarting the browser</li>
+</ul>
+<p><strong>Connection refused:</strong></p>
+<ul>
+<li>Check firewall allows ports 80 and 443: <code>sudo iptables -L -n | grep -E '80|443'</code></li>
+<li>Verify nginx is running: <code>systemctl status nginx</code></li>
+</ul>
+<p>See <a href="./local-ssl-setup.html">Local SSL Setup</a> for complete documentation.</p>
+<h2 id="vikunja-task-management-ats-only"><a class="header" href="#vikunja-task-management-ats-only">Vikunja Task Management (ATS Only)</a></h2>
+<p>ATS machines automatically include <a href="https://vikunja.io/">Vikunja</a>, an open-source task management system designed for collaboration between you and Claude Code.</p>
+<h3 id="accessing-vikunja"><a class="header" href="#accessing-vikunja">Accessing Vikunja</a></h3>
+<p>Once your ATS machine is running, Vikunja is accessible at:</p>
+<ul>
+<li><strong>Web UI (HTTPS)</strong>: <code>https://ats.local:3457/</code></li>
+<li><strong>Web UI (HTTP)</strong>: <code>http://ats.local:3457/</code></li>
+<li><strong>API</strong>: <code>https://ats.local/vikunja/api/v1/</code> or <code>http://ats.local/vikunja/api/v1/</code></li>
+</ul>
+<p>The web UI is mobile-friendly and served through nginx on port 3457 with both HTTP and HTTPS support. The API is accessible at <code>/vikunja/</code> on the default ports (80/443) due to how the frontend is built in nixpkgs.</p>
+<p><strong>Note</strong>: For HTTPS access to work without certificate warnings, you need to install the SSL certificate on your client devices. See the <a href="#local-ssl-setup-for-https-access">Local SSL Setup</a> section above.</p>
+<h3 id="initial-setup"><a class="header" href="#initial-setup">Initial Setup</a></h3>
+<ol>
+<li>
+<p><strong>Create your first user</strong> (registration is disabled after first use for security):</p>
+<pre><code class="language-bash"># Open https://ats.local:3457/ in a browser and register
+# After registration, the service will reject new registrations
+</code></pre>
+</li>
+<li>
+<p><strong>Get your API token</strong> for MCP integration:</p>
+<ul>
+<li>Log in to Vikunja</li>
+<li>Go to Settings → API Tokens</li>
+<li>Create a new token and save it securely</li>
+</ul>
+</li>
+<li>
+<p><strong>Configure Claude Code MCP</strong> (see <a href="#mcp-integration">MCP Integration</a> section below)</p>
+</li>
+</ol>
+<h3 id="using-vikunja-with-claude-code"><a class="header" href="#using-vikunja-with-claude-code">Using Vikunja with Claude Code</a></h3>
+<p>Once you’ve configured the MCP integration (see below), Claude Code can directly interact with your Vikunja tasks during conversations.</p>
+<h4 id="typical-workflow"><a class="header" href="#typical-workflow">Typical Workflow</a></h4>
+<p><strong>You (via Web/Phone)</strong>:</p>
+<ol>
+<li>Open <code>https://ats.local:3457/</code> on your device</li>
+<li>Create projects for different areas (e.g., “Development”, “Personal”, “Research”)</li>
+<li>Create tasks with descriptions, priorities, and due dates</li>
+<li>Review and comment on tasks Claude has worked on</li>
+</ol>
+<p><strong>Claude Code (via MCP)</strong>:</p>
+<ol>
+<li>Lists your tasks when you start a conversation: “What should I work on?”</li>
+<li>Creates subtasks as it breaks down complex work</li>
+<li>Updates task status and adds progress comments</li>
+<li>Marks tasks complete when finished</li>
+<li>Creates new tasks for follow-up work or issues discovered</li>
+</ol>
+<h4 id="example-interactions"><a class="header" href="#example-interactions">Example Interactions</a></h4>
+<ul>
+<li>
+<p><strong>You</strong>: “What tasks do I have in the Development project?”</p>
+<ul>
+<li>Claude lists all tasks with their status, priority, and descriptions</li>
+</ul>
+</li>
+<li>
+<p><strong>You</strong>: “Work on task 42”</p>
+<ul>
+<li>Claude reads the task details and gets to work</li>
+<li>Creates subtasks for each step</li>
+<li>Adds comments with progress updates</li>
+<li>Marks task complete when done</li>
+</ul>
+</li>
+<li>
+<p><strong>You</strong>: “Create a task to implement user authentication with JWT”</p>
+<ul>
+<li>Claude creates the task with a detailed description</li>
+<li>Can immediately start working on it if requested</li>
+</ul>
+</li>
+</ul>
+<h3 id="mcp-integration"><a class="header" href="#mcp-integration">MCP Integration</a></h3>
+<p>The Vikunja MCP server (<code>vikunja-mcp-server</code>) is automatically installed on ATS machines and provides direct integration between Claude Code and Vikunja.</p>
+<h4 id="getting-your-api-token"><a class="header" href="#getting-your-api-token">Getting Your API Token</a></h4>
+<ol>
+<li>Log in to Vikunja at <code>https://ats.local:3457/</code></li>
+<li>Go to Settings → API Tokens</li>
+<li>Click “Create new token”</li>
+<li>Copy the generated token (you won’t be able to see it again!)</li>
+</ol>
+<h4 id="configuring-claude-code"><a class="header" href="#configuring-claude-code">Configuring Claude Code</a></h4>
+<p><strong>Option 1: Automatic Configuration (Recommended)</strong></p>
+<p>The easiest way is to store your API token in <code>~/secrets/vikunja/secrets.json</code> on the ATS machine:</p>
+<pre><code class="language-json">{
+  "token": "your-api-token-here"
+}
+</code></pre>
+<p>After adding the token, rebuild your system configuration to install the MCP server:</p>
+<pre><code class="language-bash">sudo nixos-rebuild switch
+</code></pre>
+<p>Then run the <code>claude-setup</code> script to register the MCP server:</p>
+<pre><code class="language-bash">claude-setup
+</code></pre>
+<p>The setup script will automatically:</p>
+<ul>
+<li>Install Claude Code plugins</li>
+<li>Register the Vikunja MCP server using your token from <code>~/secrets/vikunja/secrets.json</code></li>
+<li>Configure other development tools (gh CLI, etc.)</li>
+</ul>
+<p>To verify the MCP server is registered:</p>
+<pre><code class="language-bash">claude mcp list
+</code></pre>
+<p><strong>Manual MCP Configuration</strong></p>
+<p>If you need to manually configure the Vikunja MCP server (without using <code>claude-setup</code>), you can use:</p>
+<pre><code class="language-bash">claude mcp add -s user \
+  -e VIKUNJA_URL=https://ats.local:3457 \
+  -e VIKUNJA_API_TOKEN=your-token-here \
+  -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
+</code></pre>
+<p><strong>Note</strong>: Use HTTPS (<code>https://ats.local:3457</code>) for the URL to ensure secure API access.</p>
+<h4 id="available-mcp-tools"><a class="header" href="#available-mcp-tools">Available MCP Tools</a></h4>
+<p>Once configured, Claude Code has native access to these Vikunja tools:</p>
+<ul>
+<li><code>vikunja_list_projects</code>, <code>vikunja_get_project</code> - Browse and view projects</li>
+<li><code>vikunja_list_tasks</code>, <code>vikunja_get_task</code> - View tasks</li>
+<li><code>vikunja_create_task</code> - Create new tasks</li>
+<li><code>vikunja_update_task</code> - Update task fields (title, description, priority, etc.)</li>
+<li><code>vikunja_complete_task</code> - Mark tasks as done</li>
+<li><code>vikunja_add_comment</code>, <code>vikunja_get_comments</code> - Add and view task comments</li>
+</ul>
+<h4 id="usage-examples"><a class="header" href="#usage-examples">Usage Examples</a></h4>
+<p>With the MCP server configured, you can interact with Vikunja directly in Claude Code:</p>
+<ul>
+<li>“What tasks do I have in the Development project?”</li>
+<li>“Create a task in project 5 to implement user authentication”</li>
+<li>“Add a comment to task 42 with the latest progress”</li>
+<li>“Mark task 15 as complete”</li>
+<li>“Update task 23’s priority to high”</li>
+</ul>
+<h3 id="data-location"><a class="header" href="#data-location">Data Location</a></h3>
+<ul>
+<li><strong>Database</strong>: <code>/var/lib/vikunja/vikunja.db</code> (SQLite)</li>
+<li><strong>Files</strong>: <code>/var/lib/vikunja/files/</code></li>
+<li><strong>Logs</strong>: <code>/var/lib/vikunja/logs/</code></li>
+<li><strong>Configuration</strong>: <code>/etc/vikunja/config.yml</code></li>
+</ul>
+<h3 id="backup"><a class="header" href="#backup">Backup</a></h3>
+<p>The Vikunja database is automatically backed up daily at midnight by the <code>ats-vikunja-backup</code> orchestrator job:</p>
+<ul>
+<li>Copies <code>/var/lib/vikunja/vikunja.db</code> to <code>~/data/vikunja/vikunja.db</code></li>
+<li>Syncs to cloud storage via <code>rcrsync override data vikunja</code></li>
+</ul>
+<p>You can manually trigger a backup with:</p>
+<pre><code class="language-bash">ssh andrew@ats.local
+sudo systemctl start ats-vikunja-backup.service
+</code></pre>
+<p>Or manually copy the database:</p>
+<pre><code class="language-bash">ssh andrew@ats.local
+sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
+</code></pre>
+<h3 id="architecture"><a class="header" href="#architecture">Architecture</a></h3>
+<p>Vikunja is served through nginx as a reverse proxy with HTTPS support:</p>
+<ul>
+<li>Vikunja serves both the web UI and API from a single service on internal port 3456</li>
+<li>Frontend accessible at <code>https://ats.local:3457</code> (HTTPS) or <code>http://ats.local:3457</code> (HTTP)</li>
+<li>API accessible at <code>https://ats.local/vikunja/api/v1/</code> (HTTPS) or <code>http://ats.local/vikunja/api/v1/</code> (HTTP)</li>
+<li>Internal port: 3456 (centrally managed in <code>service-ports.nix</code>)</li>
+<li>External ports: 3457 (frontend with HTTPS/HTTP), 80/443 (API via <code>/vikunja/</code>)</li>
+<li>SSL certificates: Same self-signed certificates as main web server (<code>~/secrets/vpn/</code>)</li>
+</ul>
+<p>The nixpkgs Vikunja frontend is built with <code>/vikunja/</code> as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying <code>/vikunja/</code> on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.</p>
+<h2 id="miscellaneous"><a class="header" href="#miscellaneous">Miscellaneous</a></h2>
+<h3 id="cloud-syncing"><a class="header" href="#cloud-syncing">Cloud Syncing</a></h3>
+<p>The following mount points are recommended (using <a href="https://rclone.org/">rclone</a> to set up):</p>
+<ul>
+<li><code>dropbox:secrets</code> -&gt; <code>rclone copy</code> -&gt; <code>~/secrets</code></li>
+<li><code>dropbox:configs</code>-&gt; <code>rclone copy</code> -&gt; <code>~/configs</code></li>
+<li><code>dropbox:Games</code> -&gt; <code>rclone copy</code> -&gt; <code>~/games</code></li>
+<li><code>box:data</code> -&gt; <code>rclone copy</code> -&gt; <code>~/data</code></li>
+<li><code>box:.devrc</code> -&gt; <code>rclone copy</code> -&gt; <code>~/.devrc</code></li>
+<li><code>drive:Documents</code> -&gt; <code>rclone copy</code> -&gt; <code>~/Documents</code></li>
+</ul>
+<h3 id="music-with-tidal"><a class="header" href="#music-with-tidal">Music with Tidal</a></h3>
+<p>If you haven’t already, run:</p>
+<pre><code class="language-bash">install-superdirt
+</code></pre>
+<p>Open VSCode, run <code>sclang</code> in the terminal (close with <code>0.exit</code>), and open up a <code>.tidal</code> file and get to work.</p>
+<p>Useful commands:</p>
+<ul>
+<li>Install samples with e.g., <code>tidal-download-samples eddyflux/crate crate</code></li>
+<li>When <code>sclang</code> is running, associate with the correct audio device with <code>sc-route-audio</code></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="local-ssl-setup.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="local-ssl-setup.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-c2a407aa.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-a0b12cfe.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+
+    </div>
+    </body>
+</html>
