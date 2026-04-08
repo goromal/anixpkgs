@@ -288,7 +288,7 @@
             {
                 "attr": "notion-tools",
                 "ci": true,
-                "docs": false
+                "docs": true
             },
             {
                 "attr": "book-notes-sync",
