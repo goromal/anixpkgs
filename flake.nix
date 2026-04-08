@@ -147,6 +147,9 @@
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
 
+    notion-tools.url = "github:goromal/notion-tools";
+    notion-tools.flake = false;
+
     workout-planner.url = "github:goromal/workout-planner";
     workout-planner.flake = false;
 
