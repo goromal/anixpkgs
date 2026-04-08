@@ -2,6 +2,7 @@
   buildPythonPackage,
   setuptools,
   requests,
+  click,
   pkg-src,
 }:
 buildPythonPackage rec {
@@ -12,6 +13,7 @@ buildPythonPackage rec {
   src = pkg-src;
   propagatedBuildInputs = [
     requests
+    click
   ];
   doCheck = false;
   meta = {
@@ -19,5 +21,12 @@ buildPythonPackage rec {
     longDescription = ''
       [Repository](https://github.com/goromal/notion-tools)
     '';
+    autoGenUsageCmd = "--help";
+    subCmds = [
+      "append"
+      "annotate"
+      "get-blocks"
+      "set-title"
+    ];
   };
 }
