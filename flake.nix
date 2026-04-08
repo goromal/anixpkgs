@@ -81,6 +81,9 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
+    notion-tools.url = "github:goromal/notion-tools";
+    notion-tools.flake = false;
+
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
@@ -146,9 +149,6 @@
 
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
-
-    notion-tools.url = "github:goromal/notion-tools";
-    notion-tools.flake = false;
 
     workout-planner.url = "github:goromal/workout-planner";
     workout-planner.flake = false;

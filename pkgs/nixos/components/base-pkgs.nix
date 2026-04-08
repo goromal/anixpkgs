@@ -57,6 +57,7 @@ in
         anixpkgs.local-ssh-proxy
         anixpkgs.wiki-tools
         anixpkgs.task-tools
+        anixpkgs.notion-tools
         anixpkgs.photos-tools
         anixpkgs.book-notes-sync
         anixpkgs.budget_report
