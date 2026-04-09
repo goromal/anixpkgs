@@ -2,9 +2,6 @@ import click
 import re
 import os
 import sys
-import json
-import requests
-import time
 from email import policy
 from email.parser import BytesParser
 from colorama import Fore, Style
@@ -16,6 +13,7 @@ from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
 from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.defaults import TaskToolsDefaults as TTD
+from notion_tools.manage import NotionTools
 from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
@@ -48,125 +46,11 @@ class PostfixMessage:
         self.maildir.remove(self.key)
 
 
-def create_notion_bulleted_list(data, level=0):
-    if not isinstance(data, list):
-        raise ValueError("Input data must be a list.")
-    notion_blocks = []
-    for item in data:
-        if isinstance(item, list):
-            nested_blocks = create_notion_bulleted_list(item, level + 1)
-            if notion_blocks:
-                notion_blocks[-1]["bulleted_list_item"]["children"] = nested_blocks
-            else:
-                raise ValueError("Nested list structure is invalid.")
-        else:
-            block = {
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": str(item)}}]
-                },
-            }
-            notion_blocks.append(block)
-    return notion_blocks
-
-
-def append_text_to_notion_page(token, id, msg, text):
-    ps = [p for p in text.split("\n") if p.strip()]
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    data = {
-        "children": create_notion_bulleted_list(
-            [ps[0], ps[1:]] if len(ps) > 1 else [ps[0]]
-        )
-    }
-    url = f"https://api.notion.com/v1/blocks/{id}/children"
-    response = requests.patch(url, json=data, headers=headers)
-    if response.status_code == 200:
-        if msg is not None:
-            msg.moveToTrash()
-    else:
-        sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
-        exit(1)
-
-
-def get_page_blocks(headers, page_id):
-    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
-    has_more = True
-    next_cursor = None
-    all_blocks = []
-
-    while has_more:
-        params = {}
-        if next_cursor:
-            time.sleep(0.3)
-            params["start_cursor"] = next_cursor
-
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            raise Exception(
-                f"Error fetching page content: {response.status_code}, {response.text}"
-            )
-
-        data = response.json()
-        all_blocks.append(data)
-        next_cursor = data.get("next_cursor")
-        has_more = data.get("has_more", False)
-
-    return all_blocks
-
-
-def count_bullet_points_and_keywords(all_content, keywords):
-    bullet_count = 0
-    keyword_count = 0
-
-    for content in all_content:
-        for block in content["results"]:
-            if block["type"] == "bulleted_list_item":
-                bullet_count += 1
-
-        for keyword in keywords:
-            keyword_count += json.dumps(content).lower().count(keyword)
-
-    return int(bullet_count), int(keyword_count / 2)
-
-
-def update_page_title(headers, page_id, new_title):
-    url = f"https://api.notion.com/v1/pages/{page_id}"
-
-    data = {"properties": {"title": [{"text": {"content": new_title}}]}}
-
-    response = requests.patch(url, json=data, headers=headers)
-    if response.status_code != 200:
-        raise Exception(
-            f"Error updating page title: {response.status_code}, {response.text}"
-        )
-
-
-def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
-    headers = {
-        "Authorization": f"Bearer {notion_api_token}",
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    content = get_page_blocks(headers, notion_page_id)
-    bullet_count, keyword_count = count_bullet_points_and_keywords(
-        content, ["\\u23f0"]
-    )  # ⏰
-    new_title = f"{keyword_count} - {bullet_count} - {keyword}"
-    if not dry_run:
-        update_page_title(headers, notion_page_id, new_title)
-    return True, bullet_count, keyword_count
-
-
 def process_keyword(
     text,
     datestr,
     keyword,
-    notion_api_token,
+    notion,
     notion_page_id,
     msg=None,
     dry_run=False,
@@ -186,7 +70,9 @@ def process_keyword(
         if logfile is not None:
             logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
+            notion.append_blocks(notion_page_id, item)
+            if msg is not None:
+                msg.moveToTrash()
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -200,7 +86,9 @@ def process_keyword(
         if logfile is not None:
             logfile.write(f"Notion:{keyword} entry\n")
         if not dry_run:
-            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
+            notion.append_blocks(notion_page_id, item)
+            if msg is not None:
+                msg.moveToTrash()
         return True
     return False
 
@@ -473,9 +361,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             logfile.close()
         return
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
@@ -539,7 +425,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                             text,
                             date.strftime("%m/%d/%Y"),
                             keyword,
-                            notion_api_token,
+                            notion,
                             notion_page_id,
                             msg,
                             dry_run,
@@ -582,9 +468,8 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                 if logfile is not None:
                     logfile.write("Notion:ITNS entry\n")
                 if not dry_run:
-                    append_text_to_notion_page(
-                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
-                    )
+                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", text)
+                    msg.moveToTrash()
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
         if logfile is not None:
@@ -641,9 +526,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             logfile.close()
         return
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
@@ -688,7 +571,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                             text,
                             date.strftime("%m/%d/%Y"),
                             keyword,
-                            notion_api_token,
+                            notion,
                             notion_page_id,
                             msg,
                             dry_run,
@@ -731,9 +614,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                 if logfile is not None:
                     logfile.write("Notion:ITNS entry\n")
                 if not dry_run:
-                    append_text_to_notion_page(
-                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
-                    )
+                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", text)
+                    msg.moveToTrash()
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
         if logfile is not None:
@@ -765,9 +647,7 @@ def itns_nudge(ctx: click.Context, categories_csv, dry_run):
     import random
 
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         exit(1)
@@ -785,7 +665,7 @@ def itns_nudge(ctx: click.Context, categories_csv, dry_run):
         text=f"{chosen_keyword}: action: Notice me!",
         datestr=datetime.today().strftime("%m/%d/%Y"),
         keyword=chosen_keyword,
-        notion_api_token=notion_api_token,
+        notion=notion,
         notion_page_id=chosen_page_id,
         dry_run=dry_run,
     ):
@@ -887,9 +767,7 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
     else:
         logfile = None
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
@@ -913,10 +791,9 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
             + Style.RESET_ALL
         )
         for notion_page_id, keyword in categories.items():
-            success, bullet_count, action_count = do_notion_counts(
+            success, bullet_count, action_count = notion.do_counts(
                 keyword,
                 notion_page_id,
-                notion_api_token,
                 dry_run,
             )
             if success:

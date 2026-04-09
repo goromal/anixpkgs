@@ -67,6 +67,20 @@ in
         fi
       ''}
 
+      ${lib.optionalString cfg.notionMcpEnabled ''
+        echo_yellow "Setting up Notion MCP server..."
+        NOTION_SECRETS="$HOME/secrets/notion/secret.json"
+        if [ -f "$NOTION_SECRETS" ]; then
+          claude mcp remove notion 2>/dev/null || true
+          claude mcp add -s user \
+            -e NOTION_TOKEN_FILE="$NOTION_SECRETS" \
+            -- notion /run/current-system/sw/bin/notion-mcp-server
+          echo_green "Notion MCP server registered successfully"
+        else
+          echo_yellow "Warning: $NOTION_SECRETS not found. Skipping Notion MCP setup."
+        fi
+      ''}
+
       echo_yellow "Other setup..."
       read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
       echo

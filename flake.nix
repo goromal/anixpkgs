@@ -81,6 +81,9 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
+    notion-tools.url = "github:goromal/notion-tools";
+    notion-tools.flake = false;
+
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 

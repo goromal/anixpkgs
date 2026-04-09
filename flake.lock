@@ -499,6 +499,22 @@
         "type": "github"
       }
     },
+    "notion-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775695868,
+        "narHash": "sha256-+WHhd2CYJSKsC+J10pjz2JzBXlhaM4jVPYGVn5JBfFU=",
+        "owner": "goromal",
+        "repo": "notion-tools",
+        "rev": "1e4652a0daec17ef801d0228a25be92a0bfaa59f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "notion-tools",
+        "type": "github"
+      }
+    },
     "orchestrator": {
       "flake": false,
       "locked": {
@@ -725,6 +741,7 @@
         "mfn": "mfn",
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs_2",
+        "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
         "photos-tools": "photos-tools",

@@ -33,5 +33,4 @@ Packages written (or bound) in Python.
 - [workout-planner](./workout-planner.md)
 - [photos-tools](./photos-tools.md)
 - [wiki-tools](./wiki-tools.md)
-- [book-notes-sync](./book-notes-sync.md)
-- [goromail](./goromail.md)
+- [notion-tools](./notion-tools.md)

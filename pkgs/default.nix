@@ -184,6 +184,11 @@ let
                   pkg-src = flakeInputs.wiki-tools;
                 }
               );
+              notion-tools = addDoc (
+                pySelf.callPackage ./python-packages/notion-tools {
+                  pkg-src = flakeInputs.notion-tools;
+                }
+              );
               mavlog-utils = addDoc (
                 pySelf.callPackage ./python-packages/mavlog-utils {
                   pkg-src = flakeInputs.mavlog-utils;
@@ -352,6 +357,7 @@ rec {
   photos-tools = final.python313.pkgs.photos-tools;
   python-dokuwiki = final.python313.pkgs.python-dokuwiki;
   wiki-tools = final.python313.pkgs.wiki-tools;
+  notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   goromail = final.python313.pkgs.goromail;

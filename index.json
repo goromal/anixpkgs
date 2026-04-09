@@ -286,6 +286,11 @@
                 "docs": true
             },
             {
+                "attr": "notion-tools",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "book-notes-sync",
                 "ci": true,
                 "docs": true
