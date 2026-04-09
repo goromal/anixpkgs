@@ -34,3 +34,5 @@ Packages written (or bound) in Python.
 - [photos-tools](./photos-tools.md)
 - [wiki-tools](./wiki-tools.md)
 - [notion-tools](./notion-tools.md)
+- [book-notes-sync](./book-notes-sync.md)
+- [goromail](./goromail.md)
