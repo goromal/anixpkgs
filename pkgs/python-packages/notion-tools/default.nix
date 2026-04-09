@@ -25,6 +25,7 @@ buildPythonPackage rec {
     subCmds = [
       "append"
       "annotate"
+      "create-subpage"
       "get-blocks"
       "list-blocks"
       "list-subpages"
