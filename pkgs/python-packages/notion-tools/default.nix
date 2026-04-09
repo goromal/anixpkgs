@@ -26,6 +26,9 @@ buildPythonPackage rec {
       "append"
       "annotate"
       "get-blocks"
+      "list-blocks"
+      "list-subpages"
+      "move-block"
       "set-title"
     ];
   };
