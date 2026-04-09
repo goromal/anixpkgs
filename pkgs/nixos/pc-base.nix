@@ -180,6 +180,7 @@ in
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
     ../modules/vikunja/module.nix
+    ../modules/notion-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -604,6 +605,9 @@ in
       domain = "${config.networking.hostName}.local";
     };
 
+    # Notion MCP Server
+    services.notion-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
+
     # Global packages
     environment.systemPackages =
       with pkgs;
@@ -811,6 +815,7 @@ in
         claudePlugins = cfg.claudePlugins;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
+        notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
       };
     };
   };
