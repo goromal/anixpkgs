@@ -117,6 +117,9 @@
     rcdo.url = "github:goromal/rcdo";
     rcdo.flake = false;
 
+    rtk.url = "github:rtk-ai/rtk";
+    rtk.flake = false;
+
     scrape.url = "github:goromal/scrape";
     scrape.flake = false;
 
