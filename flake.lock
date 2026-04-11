@@ -754,6 +754,7 @@
         "quad-sim-cpp": "quad-sim-cpp",
         "rankserver-cpp": "rankserver-cpp",
         "rcdo": "rcdo",
+        "rtk": "rtk",
         "scrape": "scrape",
         "secure-delete": "secure-delete",
         "signals-cpp": "signals-cpp",
@@ -767,6 +768,22 @@
         "wiki-tools": "wiki-tools",
         "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
+      }
+    },
+    "rtk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775476424,
+        "narHash": "sha256-7DAL4dsnq2ZWmkyoI+BeN21ouK0VyLvSxOCt5hPWCl4=",
+        "owner": "rtk-ai",
+        "repo": "rtk",
+        "rev": "8a7106c8f2996ebc75b38a71c5f342f17811ce39",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rtk-ai",
+        "repo": "rtk",
+        "type": "github"
       }
     },
     "scrape": {
