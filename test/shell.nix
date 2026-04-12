@@ -28,7 +28,10 @@ mkShell {
     secure-delete
     time
     png
+    mp3
+    mp4
     ckfile
+    ffmpeg
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."

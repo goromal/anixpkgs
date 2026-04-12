@@ -6,6 +6,7 @@ tests=(
     "test_sunnyside.sh"
     "test_orchestrator.sh"
     "test_png.sh"
+    "test_mp3.sh"
     "test_mp4.sh"
     "test_fix-perms.sh"
     "test_src_fetch.sh"
