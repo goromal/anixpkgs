@@ -29,6 +29,7 @@ in
     pkgs.gh
     pkgs.universal-ctags
     unstable.claude-code
+    anixpkgs.rtk
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then
         echo_red "Error: claude not found in PATH"
@@ -80,6 +81,10 @@ in
           echo_yellow "Warning: $NOTION_SECRETS not found. Skipping Notion MCP setup."
         fi
       ''}
+
+      echo_yellow "Installing rtk Claude Code hook..."
+      rtk init -g
+      echo_green "rtk hook installed"
 
       echo_yellow "Other setup..."
       read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r

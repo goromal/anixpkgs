@@ -92,6 +92,11 @@
                 "attr": "sunnyside",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "rtk",
+                "ci": true,
+                "docs": false
             }
         ],
         "python": [
