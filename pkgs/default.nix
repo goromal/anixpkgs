@@ -535,6 +535,11 @@ rec {
       pkg-src = flakeInputs.sunnyside;
     }
   );
+  rtk = addDoc (
+    prev.callPackage ./rust-packages/rtk {
+      pkg-src = flakeInputs.rtk;
+    }
+  );
 
   nixos-machines = rec {
     personal = makeMachines "personal";
