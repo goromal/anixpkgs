@@ -4,6 +4,7 @@ let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   service-ports = import ./nixos/service-ports.nix;
+  unstable = import flakeInputs.nixpkgs-unstable { inherit (prev.stdenv.hostPlatform) system; };
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
     nativeBuildInputs = [ prev.protobuf ];
@@ -518,6 +519,14 @@ rec {
     prev.callPackage ./java-packages/simple-image-editor (
       baseJavaArgs // { pkg-src = flakeInputs.simple-image-editor; }
     )
+  );
+
+  ladder = addDoc (
+    prev.callPackage ./modules/ladder/default.nix {
+      pkg-src = flakeInputs.ladder;
+      buildGoModule = unstable.buildGoModule;
+      go_1_26 = unstable.go_1_26;
+    }
   );
 
   manif-geom-rs = addDoc (

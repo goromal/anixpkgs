@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
 
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
     phps.url = "github:fossar/nix-phps";
@@ -116,6 +118,9 @@
 
     rcdo.url = "github:goromal/rcdo";
     rcdo.flake = false;
+
+    ladder.url = "github:everywall/ladder?ref=refs/tags/v0.0.22";
+    ladder.flake = false;
 
     rtk.url = "github:rtk-ai/rtk";
     rtk.flake = false;
