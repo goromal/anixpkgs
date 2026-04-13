@@ -111,28 +111,29 @@ in
     };
 
     # Dedicated nginx virtual host on the public port
-    services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.ladder.public}" = {
-      onlySSL = true;
-      extraConfig = "merge_slashes off;";
-      sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
-      sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
-      listen = [
-        {
-          addr = "0.0.0.0";
-          port = service-ports.ladder.public;
-          ssl = true;
-        }
-      ];
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:${toString service-ports.ladder.internal}/";
-        proxyWebsockets = true;
-        extraConfig = ''
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
+    services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.ladder.public}" =
+      {
+        onlySSL = true;
+        extraConfig = "merge_slashes off;";
+        sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
+        sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = service-ports.ladder.public;
+            ssl = true;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString service-ports.ladder.internal}/";
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
       };
-    };
   };
 }
