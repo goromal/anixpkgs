@@ -502,11 +502,11 @@
     "notion-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1775695868,
-        "narHash": "sha256-+WHhd2CYJSKsC+J10pjz2JzBXlhaM4jVPYGVn5JBfFU=",
+        "lastModified": 1776107009,
+        "narHash": "sha256-PxWbxt9LxMzsQrwK9j/r7JFInZvDpBPBzu9Pj+XgX6Y=",
         "owner": "goromal",
         "repo": "notion-tools",
-        "rev": "1e4652a0daec17ef801d0228a25be92a0bfaa59f",
+        "rev": "46b8e8eca2fca2703b6d34c8443e77e42b64f093",
         "type": "github"
       },
       "original": {
