@@ -6,6 +6,8 @@
   pyyaml,
   anthropic,
   easy-google-auth,
+  aapis-py,
+  grpcio,
   pkg-src,
 }:
 buildPythonPackage rec {
@@ -19,6 +21,8 @@ buildPythonPackage rec {
     pyyaml
     anthropic
     easy-google-auth
+    aapis-py
+    grpcio
   ];
   doCheck = false; # No tests yet
   meta = {
