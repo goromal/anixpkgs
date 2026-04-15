@@ -153,7 +153,7 @@
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
 
-    workout-planner.url = "github:goromal/workout-planner/2c3b61e404abc5cd02177fc115c1facd779ebfc7";
+    workout-planner.url = "github:goromal/workout-planner";
     workout-planner.flake = false;
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
