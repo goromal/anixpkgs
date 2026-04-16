@@ -1015,11 +1015,11 @@
     "workout-planner": {
       "flake": false,
       "locked": {
-        "lastModified": 1776231910,
-        "narHash": "sha256-s8h/8c/xwxTUAXQzhtvyK/PDqjDev0cGS7xpwJFAi5I=",
+        "lastModified": 1776261810,
+        "narHash": "sha256-jgvqwgivLP3N4BsineF3PdWqMd5xRs4+FmADSwV/yG8=",
         "owner": "goromal",
         "repo": "workout-planner",
-        "rev": "2c3b61e404abc5cd02177fc115c1facd779ebfc7",
+        "rev": "7807db2368b5c094b64a4ab6f17b3d6274cd453e",
         "type": "github"
       },
       "original": {
