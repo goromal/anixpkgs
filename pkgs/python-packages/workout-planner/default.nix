@@ -67,7 +67,7 @@ buildPythonPackage rec {
 
       ### Configuration
 
-      **Location**: `~/configs/workout-config.yaml`
+      **(Default) Location**: `~/configs/workout-config.yaml`
 
       **Structure**:
 
