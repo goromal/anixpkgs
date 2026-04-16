@@ -25,7 +25,7 @@ in
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
   programs.vscode = {
     enable = true;
-    package = unstable.vscode;
+    package = pkgs.vscode;
     profiles.default = {
       userSettings = {
         "editor.minimap.enabled" = false;
