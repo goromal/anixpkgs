@@ -305,6 +305,23 @@
         "type": "github"
       }
     },
+    "ladder": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775934819,
+        "narHash": "sha256-groo1WyGDIa01MpEDkA2gHENdKnLWAaBewuJn887Lho=",
+        "owner": "everywall",
+        "repo": "ladder",
+        "rev": "0d3ffaef16ac2fdd57dc5baf486b2cd660375f49",
+        "type": "github"
+      },
+      "original": {
+        "owner": "everywall",
+        "ref": "refs/tags/v0.0.22",
+        "repo": "ladder",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -463,6 +480,22 @@
       "original": {
         "owner": "nixos",
         "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1775710090,
+        "narHash": "sha256-ar3rofg+awPB8QXDaFJhJ2jJhu+KqN/PRCXeyuXR76E=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "4c1018dae018162ec878d42fec712642d214fdfa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -731,6 +764,7 @@
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
         "jetpack-nixos": "jetpack-nixos",
+        "ladder": "ladder",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -741,6 +775,7 @@
         "mfn": "mfn",
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs_2",
+        "nixpkgs-unstable": "nixpkgs-unstable",
         "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
