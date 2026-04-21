@@ -10,14 +10,16 @@ let
   claudeCodeVersion = "2.1.116";
   claudeCodeExt =
     let
-      base = builtins.head (unstable.vscode-utils.extensionsFromVscodeMarketplace [
-        {
-          name = "claude-code";
-          publisher = "anthropic";
-          version = claudeCodeVersion;
-          sha256 = "sha256-47LEeYQGaeZiU+W+KGDi1g5OcTqDl/H4hW3TjeBMBbY=";
-        }
-      ]);
+      base = builtins.head (
+        unstable.vscode-utils.extensionsFromVscodeMarketplace [
+          {
+            name = "claude-code";
+            publisher = "anthropic";
+            version = claudeCodeVersion;
+            sha256 = "sha256-47LEeYQGaeZiU+W+KGDi1g5OcTqDl/H4hW3TjeBMBbY=";
+          }
+        ]
+      );
     in
     pkgs.stdenvNoCC.mkDerivation {
       name = "vscode-extension-anthropic-claude-code-${claudeCodeVersion}-nixos";
