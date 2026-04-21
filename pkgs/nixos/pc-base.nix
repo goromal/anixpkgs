@@ -734,6 +734,14 @@ in
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+      tmux() {
+        command tmux "$@"
+        local _tmux_exit=$?
+        tput rmcup 2>/dev/null
+        tput cnorm 2>/dev/null
+        stty sane 2>/dev/null
+        return $_tmux_exit
+      }
        mkcd() {
           if [[ "$1" == "-h" || "$1" == "--help" ]]; then
               echo "usage: mkcd [-t|DIRNAME]"
