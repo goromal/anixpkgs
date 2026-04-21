@@ -28,7 +28,7 @@ in
     anixpkgs.makepyshell
     pkgs.gh
     pkgs.universal-ctags
-    unstable.claude-code
+    anixpkgs.claude-code-bin
     anixpkgs.rtk
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then

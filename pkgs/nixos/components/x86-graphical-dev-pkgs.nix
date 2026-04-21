@@ -7,6 +7,38 @@
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
+  claudeCodeVersion = "2.1.116";
+  claudeCodeExt =
+    let
+      base = builtins.head (
+        unstable.vscode-utils.extensionsFromVscodeMarketplace [
+          {
+            name = "claude-code";
+            publisher = "anthropic";
+            version = claudeCodeVersion;
+            sha256 = "sha256-47LEeYQGaeZiU+W+KGDi1g5OcTqDl/H4hW3TjeBMBbY=";
+          }
+        ]
+      );
+    in
+    pkgs.stdenvNoCC.mkDerivation {
+      name = "vscode-extension-anthropic-claude-code-${claudeCodeVersion}-nixos";
+      version = claudeCodeVersion;
+      dontUnpack = true;
+      dontBuild = true;
+      installPhase = ''
+        cp -r ${base} $out
+        chmod -R u+w $out
+        mkdir -p $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64
+        ln -s ${anixpkgs.claude-code-bin}/bin/claude \
+          $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64/claude
+      '';
+      passthru = {
+        vscodeExtUniqueId = base.vscodeExtUniqueId;
+        vscodeExtPublisher = base.vscodeExtPublisher;
+        vscodeExtName = base.vscodeExtName;
+      };
+    };
 in
 {
   home.packages = [
@@ -52,6 +84,7 @@ in
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
           ms-vscode.cpptools
+          claudeCodeExt
         ]
         ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
           {
@@ -65,12 +98,6 @@ in
             publisher = "statiolake";
             version = "0.1.2";
             sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
-          }
-          {
-            name = "claude-code";
-            publisher = "anthropic";
-            version = "2.0.34";
-            sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
           }
           {
             name = "protobuf-vsc";
