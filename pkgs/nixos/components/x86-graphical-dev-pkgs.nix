@@ -70,6 +70,7 @@ in
         "terminal.integrated.env.linux" = {
           "TMPDIR" = "/tmp";
         };
+        "claudeCode.preferredLocation" = "panel";
       };
       extensions =
         with unstable.vscode-extensions;
