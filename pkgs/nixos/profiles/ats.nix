@@ -65,6 +65,12 @@ with import ../dependencies.nix;
         }
         {
           name = "ats-mailman";
+          execStartPre = pkgs.writeShellScript "ats-mailman-fix-perms" ''
+            for f in /var/mail/goromail/new/*; do
+              [ -e "$f" ] || exit 0
+              chmod 660 "$f"
+            done
+          '';
           jobShellScript = pkgs.writeShellScript "ats-mailman" ''
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit

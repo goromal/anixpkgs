@@ -4,6 +4,7 @@ import os
 import sys
 from email import policy
 from email.parser import BytesParser
+from email.utils import parsedate_to_datetime
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -29,7 +30,10 @@ class PostfixMessage:
         self.sender = msg["From"]
         self.recipient = msg["To"]
         self.subject = msg["Subject"]
-        self.date = datetime.strptime(msg["Date"], "%a, %d %b %Y %H:%M:%S %z").astimezone()
+        try:
+            self.date = parsedate_to_datetime(msg["Date"]).astimezone()
+        except Exception:
+            self.date = datetime.now().astimezone()
         text_parts = []
         for part in msg.walk():
             if part.get_content_type() == "text/plain":

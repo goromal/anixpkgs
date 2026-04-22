@@ -52,6 +52,9 @@ in
 
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
       serviceConfig = {
         Type = "oneshot";
       };
