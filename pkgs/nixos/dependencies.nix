@@ -44,7 +44,8 @@ rec {
               Type = "oneshot";
               ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
               ReadWritePaths = readWritePaths;
-            } // (if execStartPre != null then { ExecStartPre = execStartPre; } else { });
+            }
+            // (if execStartPre != null then { ExecStartPre = execStartPre; } else { });
           };
         };
     in
