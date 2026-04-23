@@ -181,6 +181,7 @@ in
     ../modules/mailNode/module.nix
     ../modules/vikunja/module.nix
     ../modules/notion-mcp/module.nix
+    ../modules/ladder/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix

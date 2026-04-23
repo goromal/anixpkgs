@@ -25,4 +25,9 @@
   };
   la-quiz-web = 5656;
   tester = 5757;
+  ladder = {
+    internal = 8181;
+    public = 8282;
+  };
+  flaresolverr = 8191;
 }
