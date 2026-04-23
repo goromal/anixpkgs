@@ -8,6 +8,7 @@
   werkzeug,
   pillow,
   opencv4,
+  ffmpeg-headless,
   writeShellScript,
   python,
 }:
@@ -25,6 +26,12 @@ buildPythonPackage rec {
     cp ${./index.html} $out/${pythonLibDir}/templates/index.html
     cp ${./login.html} $out/${pythonLibDir}/templates/login.html
   '';
+  makeWrapperArgs = [
+    "--prefix"
+    "PATH"
+    ":"
+    "${ffmpeg-headless}/bin"
+  ];
   propagatedBuildInputs = [
     flask
     flask-login
