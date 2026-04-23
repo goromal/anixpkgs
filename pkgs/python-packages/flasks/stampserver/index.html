@@ -38,9 +38,7 @@
             justify-content: flex-end;
         }
 
-        nav li {
-            margin: 0;
-        }
+        nav li { margin: 0; }
 
         nav a {
             color: #fff;
@@ -52,9 +50,7 @@
             font-weight: 500;
         }
 
-        nav a:hover {
-            background-color: #1e3a8a;
-        }
+        nav a:hover { background-color: #1e3a8a; }
 
         h1 {
             color: #212529;
@@ -64,30 +60,55 @@
         }
 
         @media (min-width: 768px) {
-            h1 {
-                font-size: 2rem;
-            }
+            h1 { font-size: 2rem; }
         }
-        .controls-section {
+
+        /* Collapsible controls */
+        details.controls-section {
             margin: 20px 0;
-            padding: 20px;
+            padding: 16px 20px;
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .controls-section h3 {
-            margin: 0 0 20px 0;
+        details.controls-section > summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             color: #495057;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 10px;
+            user-select: none;
+            padding: 4px 0;
         }
 
-        .control-group {
-            margin: 15px 0;
+        details.controls-section > summary::-webkit-details-marker { display: none; }
+
+        details.controls-section > summary::before {
+            content: '▶';
+            font-size: 0.7rem;
+            color: #6c757d;
+            display: inline-block;
+            transition: transform 0.18s ease;
+            flex-shrink: 0;
         }
+
+        details[open].controls-section > summary::before {
+            transform: rotate(90deg);
+        }
+
+        details[open].controls-section > summary {
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .control-group { margin: 15px 0; }
+
+        .control-group:first-of-type { margin-top: 0; }
 
         .control-group label {
             display: block;
@@ -126,28 +147,16 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .btn:active {
-            transform: translateY(0);
-        }
+        .btn:active { transform: translateY(0); }
 
-        .btn-danger {
-            background-color: #e74a3b;
-        }
-
-        .btn-danger:hover {
-            background-color: #d32f2f;
-        }
+        .btn-danger { background-color: #e74a3b; }
+        .btn-danger:hover { background-color: #d32f2f; }
 
         @media (max-width: 767px) {
-            .control-group .btn-group {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                flex: none;
-            }
+            .control-group .btn-group { flex-direction: column; }
+            .btn { width: 100%; flex: none; }
         }
+
         .status-message {
             padding: 16px 20px;
             margin: 20px 0;
@@ -169,6 +178,7 @@
             color: #721c24;
             border: 2px solid #f5c6cb;
         }
+
         .image-container {
             position: relative;
             display: block;
@@ -199,30 +209,13 @@
         }
 
         .crop-info {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+            font-family: monospace;
             font-size: 0.9rem;
             color: #495057;
             margin: 10px 0;
             padding: 10px;
             background-color: #e9ecef;
             border-radius: 6px;
-        }
-        .crop-handle {
-            position: absolute;
-            background: white;
-            border: 2px solid #00ff00;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            touch-action: none;
-            z-index: 10;
-        }
-
-        .crop-edge {
-            position: absolute;
-            touch-action: none;
-            z-index: 5;
         }
 
         /* Edit points list */
@@ -259,9 +252,7 @@
             font-size: 0.95rem;
         }
 
-        .edit-points-list li:last-child {
-            border-bottom: none;
-        }
+        .edit-points-list li:last-child { border-bottom: none; }
 
         .edit-point-type {
             font-weight: 700;
@@ -301,10 +292,7 @@
         .loading-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.72);
             z-index: 9999;
             justify-content: center;
@@ -312,9 +300,7 @@
             flex-direction: column;
         }
 
-        .loading-overlay.active {
-            display: flex;
-        }
+        .loading-overlay.active { display: flex; }
 
         .loading-spinner {
             width: 64px;
@@ -325,9 +311,7 @@
             animation: spin 0.75s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .loading-message {
             color: #ffffff;
@@ -337,7 +321,6 @@
             letter-spacing: 0.02em;
         }
 
-        /* Form Styles */
         form {
             background-color: #ffffff;
             padding: 25px;
@@ -351,7 +334,7 @@
             min-height: 120px;
             padding: 15px;
             font-size: 1rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: inherit;
             border: 2px solid #ced4da;
             border-radius: 8px;
             resize: vertical;
@@ -386,11 +369,8 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        input[type="submit"]:active {
-            transform: translateY(0);
-        }
+        input[type="submit"]:active { transform: translateY(0); }
 
-        /* Stamp List Styles */
         .stamp-list {
             background-color: #ffffff;
             padding: 25px;
@@ -408,20 +388,14 @@
             padding-bottom: 10px;
         }
 
-        .stamp-list ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        .stamp-list ul { list-style: none; padding: 0; margin: 0; }
 
         .stamp-list li {
             margin: 0;
             border-bottom: 1px solid #e9ecef;
         }
 
-        .stamp-list li:last-child {
-            border-bottom: none;
-        }
+        .stamp-list li:last-child { border-bottom: none; }
 
         .stamp-list a {
             display: flex;
@@ -461,25 +435,14 @@
         }
 
         @media (max-width: 767px) {
-            .container {
-                padding: 10px;
-            }
-
-            .controls-section,
-            form,
-            .stamp-list {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 1.25rem;
-            }
+            .container { padding: 10px; }
+            details.controls-section, form, .stamp-list { padding: 15px; }
+            h1 { font-size: 1.25rem; }
         }
     </style>
 </head>
 
 <body>
-    <!-- Loading overlay for long-running video operations -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
         <div class="loading-message" id="loadingMessage">Processing...</div>
@@ -500,8 +463,8 @@
         <div class="error-message">{{ msg }}</div>
         {% else %}
         {% if ftype == "PNG" %}
-        <div class="controls-section">
-            <h3>Image Controls</h3>
+        <details class="controls-section">
+            <summary>Image Controls</summary>
 
             <div class="control-group">
                 <label>Rotate</label>
@@ -530,7 +493,7 @@
                     <button class="btn" onclick="duplicateImage()">Duplicate Image</button>
                 </div>
             </div>
-        </div>
+        </details>
 
         <div class="image-container">
             <img id="currentImage" src="{{ file }}" alt="" />
@@ -538,20 +501,15 @@
         </div>
 
         {% elif ftype == "MP4" %}
-        <div class="controls-section">
-            <h3>Video Controls</h3>
+        <details class="controls-section">
+            <summary>Video Controls</summary>
 
             <div class="control-group">
-                <label>Screenshot</label>
+                <label>Rotate</label>
                 <div class="btn-group">
-                    <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label>File Actions</label>
-                <div class="btn-group">
-                    <button class="btn" onclick="duplicateVideo()">Duplicate Video</button>
+                    <button class="btn" onclick="rotateVideo(90)">90° CW</button>
+                    <button class="btn" onclick="rotateVideo(-90)">90° CCW</button>
+                    <button class="btn" onclick="rotateVideo(180)">180°</button>
                 </div>
             </div>
 
@@ -574,7 +532,21 @@
                     <button class="btn" onclick="addEditPoint('end')">Mark End</button>
                 </div>
             </div>
-        </div>
+
+            <div class="control-group">
+                <label>Screenshot</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>File Actions</label>
+                <div class="btn-group">
+                    <button class="btn" onclick="duplicateVideo()">Duplicate Video</button>
+                </div>
+            </div>
+        </details>
 
         <div class="edit-points-section" id="editPointsSection">
             <h4>Edit Points (sorted by time)</h4>
@@ -591,15 +563,15 @@
         </div>
 
         {% elif ftype == "WEBM_EXT" %}
-        <div class="controls-section">
-            <h3>Video Controls</h3>
+        <details class="controls-section">
+            <summary>Video Controls</summary>
             <div class="control-group">
                 <label>Screenshot</label>
                 <div class="btn-group">
                     <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
                 </div>
             </div>
-        </div>
+        </details>
 
         <div class="image-container">
             <video id="currentVideo" controls loop>
@@ -608,15 +580,15 @@
         </div>
 
         {% elif ftype == "MP4_EXT" %}
-        <div class="controls-section">
-            <h3>Video Controls</h3>
+        <details class="controls-section">
+            <summary>Video Controls</summary>
             <div class="control-group">
                 <label>Screenshot</label>
                 <div class="btn-group">
                     <button class="btn" onclick="saveScreenshot()">Save Screenshot at Current Time</button>
                 </div>
             </div>
-        </div>
+        </details>
 
         <div class="image-container">
             <video id="currentVideo" controls loop>
@@ -668,31 +640,24 @@
         // ===== LOADING OVERLAY =====
 
         function showLoading(message) {
-            const overlay = document.getElementById('loadingOverlay');
             const msg = document.getElementById('loadingMessage');
             if (msg) msg.textContent = message || 'Processing...';
-            if (overlay) overlay.classList.add('active');
+            document.getElementById('loadingOverlay').classList.add('active');
         }
 
         function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.classList.remove('active');
+            document.getElementById('loadingOverlay').classList.remove('active');
         }
 
         // ===== FILENAME HELPER =====
 
         function getCurrentFilename() {
-            const imgElement = document.getElementById('currentImage');
-            const videoElement = document.getElementById('currentVideo');
-
-            if (imgElement) {
-                const src = imgElement.src;
-                const filename = src.substring(src.lastIndexOf('/') + 1);
-                return filename.split('?')[0];
-            } else if (videoElement) {
-                const src = videoElement.querySelector('source').src;
-                const filename = src.substring(src.lastIndexOf('/') + 1);
-                return filename.split('?')[0];
+            const img = document.getElementById('currentImage');
+            const video = document.getElementById('currentVideo');
+            if (img) return img.src.substring(img.src.lastIndexOf('/') + 1).split('?')[0];
+            if (video) {
+                const src = video.querySelector('source').src;
+                return src.substring(src.lastIndexOf('/') + 1).split('?')[0];
             }
             return null;
         }
@@ -702,9 +667,7 @@
         function rotateImage(degrees) {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
             const normalizedDegrees = ((degrees % 360) + 360) % 360;
-
             fetch('{{ urlroot }}api/rotate-image', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -727,11 +690,7 @@
 
         let cropMode = false;
         let cropRect = { left: 0, top: 0, right: 0, bottom: 0 };
-        let dragState = null;
-        let dragStartX = 0;
-        let dragStartY = 0;
-        let initialCropRect = null;
-        let resizeObserver = null;
+        let dragState = null, dragStartX = 0, dragStartY = 0, initialCropRect = null, resizeObserver = null;
 
         window.addEventListener('load', function() {
             const img = document.getElementById('currentImage');
@@ -745,39 +704,30 @@
         function updateCanvasSize() {
             const img = document.getElementById('currentImage');
             const canvas = document.getElementById('cropCanvas');
-            if (img && canvas) {
-                canvas.width = img.offsetWidth;
-                canvas.height = img.offsetHeight;
-            }
+            if (img && canvas) { canvas.width = img.offsetWidth; canvas.height = img.offsetHeight; }
         }
 
         function enableCropMode() {
             cropMode = true;
             const canvas = document.getElementById('cropCanvas');
+            canvas.style.display = 'block';
             document.getElementById('cropInfo').style.display = 'block';
             document.getElementById('enableCropBtn').style.display = 'none';
             document.getElementById('applyCropBtn').style.display = 'inline-block';
             document.getElementById('cancelCropBtn').style.display = 'inline-block';
-
-            canvas.style.display = 'block';
             updateCanvasSize();
-
             const margin = Math.min(canvas.width, canvas.height) * 0.1;
             cropRect = { left: margin, top: margin, right: canvas.width - margin, bottom: canvas.height - margin };
-
             setupCropHandlers();
             drawCropOverlay();
-
             const img = document.getElementById('currentImage');
             if (img && typeof ResizeObserver !== 'undefined') {
                 resizeObserver = new ResizeObserver(() => {
                     if (!cropMode) return;
-                    const oldW = canvas.width, oldH = canvas.height;
-                    const lr = cropRect.left / oldW, tr = cropRect.top / oldH;
-                    const rr = cropRect.right / oldW, br = cropRect.bottom / oldH;
+                    const ow = canvas.width, oh = canvas.height;
                     updateCanvasSize();
-                    cropRect = { left: lr * canvas.width, top: tr * canvas.height,
-                                 right: rr * canvas.width, bottom: br * canvas.height };
+                    cropRect = { left: cropRect.left/ow*canvas.width, top: cropRect.top/oh*canvas.height,
+                                 right: cropRect.right/ow*canvas.width, bottom: cropRect.bottom/oh*canvas.height };
                     drawCropOverlay();
                 });
                 resizeObserver.observe(img);
@@ -785,8 +735,7 @@
         }
 
         function cancelCrop() {
-            cropMode = false;
-            dragState = null;
+            cropMode = false; dragState = null;
             const canvas = document.getElementById('cropCanvas');
             canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
             canvas.style.display = 'none';
@@ -797,77 +746,50 @@
             if (resizeObserver) { resizeObserver.disconnect(); resizeObserver = null; }
         }
 
-        function setupCropHandlers() {
-            const canvas = document.getElementById('cropCanvas');
-
+        function makeCropHandlers(canvas, getRect, setRect) {
             function getCoords(e) {
-                const rect = canvas.getBoundingClientRect();
-                if (e.touches && e.touches.length > 0) {
-                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-                }
-                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+                const r = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0)
+                    return { x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top };
+                return { x: e.clientX - r.left, y: e.clientY - r.top };
             }
-
             function detectTarget(x, y) {
-                const h = 30, et = 15;
-                if (Math.abs(x - cropRect.left) < h && Math.abs(y - cropRect.top) < h) return 'nw';
-                if (Math.abs(x - cropRect.right) < h && Math.abs(y - cropRect.top) < h) return 'ne';
-                if (Math.abs(x - cropRect.left) < h && Math.abs(y - cropRect.bottom) < h) return 'sw';
-                if (Math.abs(x - cropRect.right) < h && Math.abs(y - cropRect.bottom) < h) return 'se';
-                if (Math.abs(y - cropRect.top) < et && x > cropRect.left && x < cropRect.right) return 'n';
-                if (Math.abs(y - cropRect.bottom) < et && x > cropRect.left && x < cropRect.right) return 's';
-                if (Math.abs(x - cropRect.left) < et && y > cropRect.top && y < cropRect.bottom) return 'w';
-                if (Math.abs(x - cropRect.right) < et && y > cropRect.top && y < cropRect.bottom) return 'e';
-                if (x > cropRect.left && x < cropRect.right && y > cropRect.top && y < cropRect.bottom) return 'move';
+                const rect = getRect(), h = 30, et = 15;
+                if (Math.abs(x-rect.left)<h && Math.abs(y-rect.top)<h) return 'nw';
+                if (Math.abs(x-rect.right)<h && Math.abs(y-rect.top)<h) return 'ne';
+                if (Math.abs(x-rect.left)<h && Math.abs(y-rect.bottom)<h) return 'sw';
+                if (Math.abs(x-rect.right)<h && Math.abs(y-rect.bottom)<h) return 'se';
+                if (Math.abs(y-rect.top)<et && x>rect.left && x<rect.right) return 'n';
+                if (Math.abs(y-rect.bottom)<et && x>rect.left && x<rect.right) return 's';
+                if (Math.abs(x-rect.left)<et && y>rect.top && y<rect.bottom) return 'w';
+                if (Math.abs(x-rect.right)<et && y>rect.top && y<rect.bottom) return 'e';
+                if (x>rect.left && x<rect.right && y>rect.top && y<rect.bottom) return 'move';
                 return null;
             }
-
+            let ds = null, sx = 0, sy = 0, ir = null;
             function startDrag(e) {
                 e.preventDefault();
-                const c = getCoords(e);
-                dragState = detectTarget(c.x, c.y);
-                if (dragState) { dragStartX = c.x; dragStartY = c.y; initialCropRect = { ...cropRect }; }
+                const c = getCoords(e); ds = detectTarget(c.x, c.y);
+                if (ds) { sx = c.x; sy = c.y; ir = { ...getRect() }; }
             }
-
             function doDrag(e) {
-                if (!dragState) return;
-                e.preventDefault();
-                const c = getCoords(e);
-                const dx = c.x - dragStartX, dy = c.y - dragStartY;
-                const min = 50;
-                if (dragState === 'move') {
-                    const w = initialCropRect.right - initialCropRect.left;
-                    const h2 = initialCropRect.bottom - initialCropRect.top;
-                    cropRect.left = Math.max(0, Math.min(canvas.width - w, initialCropRect.left + dx));
-                    cropRect.top = Math.max(0, Math.min(canvas.height - h2, initialCropRect.top + dy));
-                    cropRect.right = cropRect.left + w;
-                    cropRect.bottom = cropRect.top + h2;
-                } else if (dragState === 'nw') {
-                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - min, initialCropRect.left + dx));
-                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - min, initialCropRect.top + dy));
-                } else if (dragState === 'ne') {
-                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + min, initialCropRect.right + dx));
-                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - min, initialCropRect.top + dy));
-                } else if (dragState === 'sw') {
-                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - min, initialCropRect.left + dx));
-                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + min, initialCropRect.bottom + dy));
-                } else if (dragState === 'se') {
-                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + min, initialCropRect.right + dx));
-                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + min, initialCropRect.bottom + dy));
-                } else if (dragState === 'n') {
-                    cropRect.top = Math.max(0, Math.min(initialCropRect.bottom - min, initialCropRect.top + dy));
-                } else if (dragState === 's') {
-                    cropRect.bottom = Math.min(canvas.height, Math.max(initialCropRect.top + min, initialCropRect.bottom + dy));
-                } else if (dragState === 'w') {
-                    cropRect.left = Math.max(0, Math.min(initialCropRect.right - min, initialCropRect.left + dx));
-                } else if (dragState === 'e') {
-                    cropRect.right = Math.min(canvas.width, Math.max(initialCropRect.left + min, initialCropRect.right + dx));
+                if (!ds) return; e.preventDefault();
+                const c = getCoords(e), dx = c.x-sx, dy = c.y-sy, min = 50;
+                const rect = { ...ir };
+                if (ds==='move') {
+                    const w=ir.right-ir.left, h=ir.bottom-ir.top;
+                    rect.left=Math.max(0,Math.min(canvas.width-w,ir.left+dx));
+                    rect.top=Math.max(0,Math.min(canvas.height-h,ir.top+dy));
+                    rect.right=rect.left+w; rect.bottom=rect.top+h;
+                } else {
+                    if (ds==='nw'||ds==='sw'||ds==='w') rect.left=Math.max(0,Math.min(ir.right-min,ir.left+dx));
+                    if (ds==='ne'||ds==='se'||ds==='e') rect.right=Math.min(canvas.width,Math.max(ir.left+min,ir.right+dx));
+                    if (ds==='nw'||ds==='ne'||ds==='n') rect.top=Math.max(0,Math.min(ir.bottom-min,ir.top+dy));
+                    if (ds==='sw'||ds==='se'||ds==='s') rect.bottom=Math.min(canvas.height,Math.max(ir.top+min,ir.bottom+dy));
                 }
-                drawCropOverlay();
+                setRect(rect);
             }
-
-            function endDrag(e) { e.preventDefault(); dragState = null; }
-
+            function endDrag(e) { e.preventDefault(); ds = null; }
             canvas.addEventListener('mousedown', startDrag);
             canvas.addEventListener('mousemove', doDrag);
             canvas.addEventListener('mouseup', endDrag);
@@ -878,74 +800,58 @@
             canvas.addEventListener('touchcancel', endDrag, { passive: false });
         }
 
-        function drawCropOverlay() {
-            const canvas = document.getElementById('cropCanvas');
+        function drawOverlay(canvas, rect, infoEl) {
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const w = cropRect.right - cropRect.left, h = cropRect.bottom - cropRect.top;
-            ctx.clearRect(cropRect.left, cropRect.top, w, h);
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(cropRect.left, cropRect.top, w, h);
-
+            const w = rect.right-rect.left, h = rect.bottom-rect.top;
+            ctx.clearRect(rect.left, rect.top, w, h);
+            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2;
+            ctx.strokeRect(rect.left, rect.top, w, h);
             const hs = 20;
-            const corners = [
-                { x: cropRect.left, y: cropRect.top }, { x: cropRect.right, y: cropRect.top },
-                { x: cropRect.left, y: cropRect.bottom }, { x: cropRect.right, y: cropRect.bottom }
-            ];
-            ctx.fillStyle = 'white'; ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2;
-            corners.forEach(c => { ctx.beginPath(); ctx.arc(c.x, c.y, hs / 2, 0, 2 * Math.PI); ctx.fill(); ctx.stroke(); });
+            [[rect.left,rect.top],[rect.right,rect.top],[rect.left,rect.bottom],[rect.right,rect.bottom]].forEach(([cx,cy]) => {
+                ctx.fillStyle='white'; ctx.strokeStyle='#00ff00'; ctx.lineWidth=2;
+                ctx.beginPath(); ctx.arc(cx,cy,hs/2,0,2*Math.PI); ctx.fill(); ctx.stroke();
+            });
+            [[(rect.left+rect.right)/2,rect.top],[(rect.left+rect.right)/2,rect.bottom],
+             [rect.left,(rect.top+rect.bottom)/2],[rect.right,(rect.top+rect.bottom)/2]].forEach(([cx,cy]) => {
+                ctx.beginPath(); ctx.arc(cx,cy,hs/3,0,2*Math.PI); ctx.fill(); ctx.stroke();
+            });
+            if (infoEl) infoEl.textContent = `Selection: ${Math.round(w)}x${Math.round(h)} at (${Math.round(rect.left)}, ${Math.round(rect.top)})`;
+        }
 
-            const edges = [
-                { x: (cropRect.left + cropRect.right) / 2, y: cropRect.top },
-                { x: (cropRect.left + cropRect.right) / 2, y: cropRect.bottom },
-                { x: cropRect.left, y: (cropRect.top + cropRect.bottom) / 2 },
-                { x: cropRect.right, y: (cropRect.top + cropRect.bottom) / 2 }
-            ];
-            edges.forEach(e => { ctx.beginPath(); ctx.arc(e.x, e.y, hs / 3, 0, 2 * Math.PI); ctx.fill(); ctx.stroke(); });
+        function setupCropHandlers() {
+            const canvas = document.getElementById('cropCanvas');
+            makeCropHandlers(canvas, () => cropRect, r => { cropRect = r; drawCropOverlay(); });
+        }
 
-            document.getElementById('cropInfo').textContent =
-                `Selection: ${Math.round(w)}x${Math.round(h)} at (${Math.round(cropRect.left)}, ${Math.round(cropRect.top)})`;
+        function drawCropOverlay() {
+            drawOverlay(document.getElementById('cropCanvas'), cropRect, document.getElementById('cropInfo'));
         }
 
         function applyCrop() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
             const img = document.getElementById('currentImage');
-            const scaleX = img.naturalWidth / img.offsetWidth;
-            const scaleY = img.naturalHeight / img.offsetHeight;
-            const w = cropRect.right - cropRect.left, h = cropRect.bottom - cropRect.top;
-            if (w <= 0 || h <= 0) { showStatus('Error: Invalid crop area', true); return; }
-
-            const ax = Math.floor(cropRect.left * scaleX);
-            const ay = Math.floor(cropRect.top * scaleY);
-            const aw = Math.floor(cropRect.right * scaleX) - ax;
-            const ah = Math.floor(cropRect.bottom * scaleY) - ay;
-            const sx = Math.max(0, Math.min(ax, img.naturalWidth - 1));
-            const sy = Math.max(0, Math.min(ay, img.naturalHeight - 1));
-            const sw = Math.max(1, Math.min(aw, img.naturalWidth - sx));
-            const sh = Math.max(1, Math.min(ah, img.naturalHeight - sy));
-
+            const scaleX = img.naturalWidth/img.offsetWidth, scaleY = img.naturalHeight/img.offsetHeight;
+            const w = cropRect.right-cropRect.left, h = cropRect.bottom-cropRect.top;
+            if (w<=0||h<=0) { showStatus('Error: Invalid crop area', true); return; }
+            const ax=Math.floor(cropRect.left*scaleX), ay=Math.floor(cropRect.top*scaleY);
+            const aw=Math.floor(cropRect.right*scaleX)-ax, ah=Math.floor(cropRect.bottom*scaleY)-ay;
+            const sx=Math.max(0,Math.min(ax,img.naturalWidth-1)), sy=Math.max(0,Math.min(ay,img.naturalHeight-1));
+            const sw=Math.max(1,Math.min(aw,img.naturalWidth-sx)), sh=Math.max(1,Math.min(ah,img.naturalHeight-sy));
             fetch('{{ urlroot }}api/crop-image', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filename, x: sx, y: sy, width: sw, height: sh })
             })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    showStatus('Image cropped successfully!');
-                    cancelCrop();
+                    showStatus('Image cropped successfully!'); cancelCrop();
                     const img = document.getElementById('currentImage');
                     img.src = img.src.split('?')[0] + '?t=' + Date.now();
-                } else {
-                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
-                }
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
             })
             .catch(err => showStatus('Error: ' + err.message, true));
         }
@@ -955,20 +861,14 @@
         function duplicateImage() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
             fetch('{{ urlroot }}api/duplicate-image', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filename })
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) {
-                    showStatus('Image duplicated as: ' + data.new_filename);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
-                }
+                if (data.success) { showStatus('Image duplicated as: ' + data.new_filename); setTimeout(() => location.reload(), 1500); }
+                else showStatus('Error: ' + (data.error || 'Unknown error'), true);
             })
             .catch(err => showStatus('Error: ' + err.message, true));
         }
@@ -978,14 +878,11 @@
         function saveScreenshot() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
-            const videoElement = document.getElementById('currentVideo');
-            if (!videoElement) { showStatus('Error: No video element found', true); return; }
-
+            const video = document.getElementById('currentVideo');
+            if (!video) { showStatus('Error: No video element found', true); return; }
             fetch('{{ urlroot }}api/save-screenshot', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename, timestamp: videoElement.currentTime })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename, timestamp: video.currentTime })
             })
             .then(r => r.json())
             .then(data => {
@@ -995,25 +892,43 @@
             .catch(err => showStatus('Error: ' + err.message, true));
         }
 
+        // ===== VIDEO ROTATE =====
+
+        function rotateVideo(degrees) {
+            const filename = getCurrentFilename();
+            if (!filename) { showStatus('Error: Could not determine filename', true); return; }
+            showLoading('Rotating video...');
+            fetch('{{ urlroot }}api/rotate-video', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename, degrees })
+            })
+            .then(r => r.json())
+            .then(data => {
+                hideLoading();
+                if (data.success) {
+                    showStatus('Video rotated successfully!');
+                    const v = document.getElementById('currentVideo');
+                    const source = v.querySelector('source');
+                    source.src = source.src.split('?')[0] + '?t=' + Date.now();
+                    v.load();
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(err => { hideLoading(); showStatus('Error: ' + err.message, true); });
+        }
+
         // ===== VIDEO DUPLICATE =====
 
         function duplicateVideo() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
             fetch('{{ urlroot }}api/duplicate-video', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filename })
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success) {
-                    showStatus('Video duplicated as: ' + data.new_filename);
-                    setTimeout(() => window.location.reload(), 1500);
-                } else {
-                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
-                }
+                if (data.success) { showStatus('Video duplicated as: ' + data.new_filename); setTimeout(() => location.reload(), 1500); }
+                else showStatus('Error: ' + (data.error || 'Unknown error'), true);
             })
             .catch(err => showStatus('Error: ' + err.message, true));
         }
@@ -1022,19 +937,12 @@
 
         let videoCropMode = false;
         let videoCropRect = { left: 0, top: 0, right: 0, bottom: 0 };
-        let videoDragState = null;
-        let videoDragStartX = 0;
-        let videoDragStartY = 0;
-        let videoInitialCropRect = null;
         let videoResizeObserver = null;
 
         function updateVideoCropCanvasSize() {
             const video = document.getElementById('currentVideo');
             const canvas = document.getElementById('videoCropCanvas');
-            if (video && canvas) {
-                canvas.width = video.offsetWidth;
-                canvas.height = video.offsetHeight;
-            }
+            if (video && canvas) { canvas.width = video.offsetWidth; canvas.height = video.offsetHeight; }
         }
 
         function enableVideoCropMode() {
@@ -1045,25 +953,19 @@
             document.getElementById('enableVideoCropBtn').style.display = 'none';
             document.getElementById('applyVideoCropBtn').style.display = 'inline-block';
             document.getElementById('cancelVideoCropBtn').style.display = 'inline-block';
-
             updateVideoCropCanvasSize();
-
             const margin = Math.min(canvas.width, canvas.height) * 0.1;
-            videoCropRect = { left: margin, top: margin, right: canvas.width - margin, bottom: canvas.height - margin };
-
-            setupVideoCropHandlers();
+            videoCropRect = { left: margin, top: margin, right: canvas.width-margin, bottom: canvas.height-margin };
+            makeCropHandlers(canvas, () => videoCropRect, r => { videoCropRect = r; drawVideoCropOverlay(); });
             drawVideoCropOverlay();
-
             const video = document.getElementById('currentVideo');
             if (video && typeof ResizeObserver !== 'undefined') {
                 videoResizeObserver = new ResizeObserver(() => {
                     if (!videoCropMode) return;
-                    const oldW = canvas.width, oldH = canvas.height;
-                    const lr = videoCropRect.left / oldW, tr = videoCropRect.top / oldH;
-                    const rr = videoCropRect.right / oldW, br = videoCropRect.bottom / oldH;
+                    const ow=canvas.width, oh=canvas.height;
                     updateVideoCropCanvasSize();
-                    videoCropRect = { left: lr * canvas.width, top: tr * canvas.height,
-                                      right: rr * canvas.width, bottom: br * canvas.height };
+                    videoCropRect = { left: videoCropRect.left/ow*canvas.width, top: videoCropRect.top/oh*canvas.height,
+                                      right: videoCropRect.right/ow*canvas.width, bottom: videoCropRect.bottom/oh*canvas.height };
                     drawVideoCropOverlay();
                 });
                 videoResizeObserver.observe(video);
@@ -1072,7 +974,6 @@
 
         function cancelVideoCrop() {
             videoCropMode = false;
-            videoDragState = null;
             const canvas = document.getElementById('videoCropCanvas');
             if (!canvas) return;
             canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
@@ -1085,152 +986,26 @@
         }
 
         function drawVideoCropOverlay() {
-            const canvas = document.getElementById('videoCropCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            const w = videoCropRect.right - videoCropRect.left, h = videoCropRect.bottom - videoCropRect.top;
-            ctx.clearRect(videoCropRect.left, videoCropRect.top, w, h);
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(videoCropRect.left, videoCropRect.top, w, h);
-
-            const hs = 20;
-            const corners = [
-                { x: videoCropRect.left, y: videoCropRect.top }, { x: videoCropRect.right, y: videoCropRect.top },
-                { x: videoCropRect.left, y: videoCropRect.bottom }, { x: videoCropRect.right, y: videoCropRect.bottom }
-            ];
-            ctx.fillStyle = 'white'; ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2;
-            corners.forEach(c => { ctx.beginPath(); ctx.arc(c.x, c.y, hs / 2, 0, 2 * Math.PI); ctx.fill(); ctx.stroke(); });
-
-            const edges = [
-                { x: (videoCropRect.left + videoCropRect.right) / 2, y: videoCropRect.top },
-                { x: (videoCropRect.left + videoCropRect.right) / 2, y: videoCropRect.bottom },
-                { x: videoCropRect.left, y: (videoCropRect.top + videoCropRect.bottom) / 2 },
-                { x: videoCropRect.right, y: (videoCropRect.top + videoCropRect.bottom) / 2 }
-            ];
-            edges.forEach(e => { ctx.beginPath(); ctx.arc(e.x, e.y, hs / 3, 0, 2 * Math.PI); ctx.fill(); ctx.stroke(); });
-
-            document.getElementById('videoCropInfo').textContent =
-                `Selection: ${Math.round(w)}x${Math.round(h)} at (${Math.round(videoCropRect.left)}, ${Math.round(videoCropRect.top)})`;
-        }
-
-        function setupVideoCropHandlers() {
-            const canvas = document.getElementById('videoCropCanvas');
-
-            function getCoords(e) {
-                const rect = canvas.getBoundingClientRect();
-                if (e.touches && e.touches.length > 0) {
-                    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
-                }
-                return { x: e.clientX - rect.left, y: e.clientY - rect.top };
-            }
-
-            function detectTarget(x, y) {
-                const h = 30, et = 15;
-                if (Math.abs(x - videoCropRect.left) < h && Math.abs(y - videoCropRect.top) < h) return 'nw';
-                if (Math.abs(x - videoCropRect.right) < h && Math.abs(y - videoCropRect.top) < h) return 'ne';
-                if (Math.abs(x - videoCropRect.left) < h && Math.abs(y - videoCropRect.bottom) < h) return 'sw';
-                if (Math.abs(x - videoCropRect.right) < h && Math.abs(y - videoCropRect.bottom) < h) return 'se';
-                if (Math.abs(y - videoCropRect.top) < et && x > videoCropRect.left && x < videoCropRect.right) return 'n';
-                if (Math.abs(y - videoCropRect.bottom) < et && x > videoCropRect.left && x < videoCropRect.right) return 's';
-                if (Math.abs(x - videoCropRect.left) < et && y > videoCropRect.top && y < videoCropRect.bottom) return 'w';
-                if (Math.abs(x - videoCropRect.right) < et && y > videoCropRect.top && y < videoCropRect.bottom) return 'e';
-                if (x > videoCropRect.left && x < videoCropRect.right && y > videoCropRect.top && y < videoCropRect.bottom) return 'move';
-                return null;
-            }
-
-            function startDrag(e) {
-                e.preventDefault();
-                const c = getCoords(e);
-                videoDragState = detectTarget(c.x, c.y);
-                if (videoDragState) { videoDragStartX = c.x; videoDragStartY = c.y; videoInitialCropRect = { ...videoCropRect }; }
-            }
-
-            function doDrag(e) {
-                if (!videoDragState) return;
-                e.preventDefault();
-                const c = getCoords(e);
-                const dx = c.x - videoDragStartX, dy = c.y - videoDragStartY;
-                const min = 50;
-                if (videoDragState === 'move') {
-                    const w = videoInitialCropRect.right - videoInitialCropRect.left;
-                    const h2 = videoInitialCropRect.bottom - videoInitialCropRect.top;
-                    videoCropRect.left = Math.max(0, Math.min(canvas.width - w, videoInitialCropRect.left + dx));
-                    videoCropRect.top = Math.max(0, Math.min(canvas.height - h2, videoInitialCropRect.top + dy));
-                    videoCropRect.right = videoCropRect.left + w;
-                    videoCropRect.bottom = videoCropRect.top + h2;
-                } else if (videoDragState === 'nw') {
-                    videoCropRect.left = Math.max(0, Math.min(videoInitialCropRect.right - min, videoInitialCropRect.left + dx));
-                    videoCropRect.top = Math.max(0, Math.min(videoInitialCropRect.bottom - min, videoInitialCropRect.top + dy));
-                } else if (videoDragState === 'ne') {
-                    videoCropRect.right = Math.min(canvas.width, Math.max(videoInitialCropRect.left + min, videoInitialCropRect.right + dx));
-                    videoCropRect.top = Math.max(0, Math.min(videoInitialCropRect.bottom - min, videoInitialCropRect.top + dy));
-                } else if (videoDragState === 'sw') {
-                    videoCropRect.left = Math.max(0, Math.min(videoInitialCropRect.right - min, videoInitialCropRect.left + dx));
-                    videoCropRect.bottom = Math.min(canvas.height, Math.max(videoInitialCropRect.top + min, videoInitialCropRect.bottom + dy));
-                } else if (videoDragState === 'se') {
-                    videoCropRect.right = Math.min(canvas.width, Math.max(videoInitialCropRect.left + min, videoInitialCropRect.right + dx));
-                    videoCropRect.bottom = Math.min(canvas.height, Math.max(videoInitialCropRect.top + min, videoInitialCropRect.bottom + dy));
-                } else if (videoDragState === 'n') {
-                    videoCropRect.top = Math.max(0, Math.min(videoInitialCropRect.bottom - min, videoInitialCropRect.top + dy));
-                } else if (videoDragState === 's') {
-                    videoCropRect.bottom = Math.min(canvas.height, Math.max(videoInitialCropRect.top + min, videoInitialCropRect.bottom + dy));
-                } else if (videoDragState === 'w') {
-                    videoCropRect.left = Math.max(0, Math.min(videoInitialCropRect.right - min, videoInitialCropRect.left + dx));
-                } else if (videoDragState === 'e') {
-                    videoCropRect.right = Math.min(canvas.width, Math.max(videoInitialCropRect.left + min, videoInitialCropRect.right + dx));
-                }
-                drawVideoCropOverlay();
-            }
-
-            function endDrag(e) { e.preventDefault(); videoDragState = null; }
-
-            canvas.addEventListener('mousedown', startDrag);
-            canvas.addEventListener('mousemove', doDrag);
-            canvas.addEventListener('mouseup', endDrag);
-            canvas.addEventListener('mouseleave', endDrag);
-            canvas.addEventListener('touchstart', startDrag, { passive: false });
-            canvas.addEventListener('touchmove', doDrag, { passive: false });
-            canvas.addEventListener('touchend', endDrag, { passive: false });
-            canvas.addEventListener('touchcancel', endDrag, { passive: false });
+            drawOverlay(document.getElementById('videoCropCanvas'), videoCropRect, document.getElementById('videoCropInfo'));
         }
 
         function applyVideoCrop() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-
             const video = document.getElementById('currentVideo');
-            if (!video.videoWidth || !video.videoHeight) {
-                showStatus('Error: Video dimensions not available yet', true);
-                return;
-            }
-
-            const scaleX = video.videoWidth / video.offsetWidth;
-            const scaleY = video.videoHeight / video.offsetHeight;
-            const w = videoCropRect.right - videoCropRect.left, h = videoCropRect.bottom - videoCropRect.top;
-            if (w <= 0 || h <= 0) { showStatus('Error: Invalid crop area', true); return; }
-
-            const ax = Math.floor(videoCropRect.left * scaleX);
-            const ay = Math.floor(videoCropRect.top * scaleY);
-            // Round to even numbers for codec compatibility
-            const aw = (Math.floor((videoCropRect.right - videoCropRect.left) * scaleX)) & ~1;
-            const ah = (Math.floor((videoCropRect.bottom - videoCropRect.top) * scaleY)) & ~1;
-            const sx = Math.max(0, Math.min(ax, video.videoWidth - 1));
-            const sy = Math.max(0, Math.min(ay, video.videoHeight - 1));
-            const sw = Math.max(2, Math.min(aw, video.videoWidth - sx));
-            const sh = Math.max(2, Math.min(ah, video.videoHeight - sy));
-
+            if (!video.videoWidth || !video.videoHeight) { showStatus('Error: Video dimensions not available yet', true); return; }
+            const scaleX = video.videoWidth/video.offsetWidth, scaleY = video.videoHeight/video.offsetHeight;
+            const w = videoCropRect.right-videoCropRect.left, h = videoCropRect.bottom-videoCropRect.top;
+            if (w<=0||h<=0) { showStatus('Error: Invalid crop area', true); return; }
+            const ax=Math.floor(videoCropRect.left*scaleX), ay=Math.floor(videoCropRect.top*scaleY);
+            const aw=(Math.floor((videoCropRect.right-videoCropRect.left)*scaleX))&~1;
+            const ah=(Math.floor((videoCropRect.bottom-videoCropRect.top)*scaleY))&~1;
+            const sx=Math.max(0,Math.min(ax,video.videoWidth-1)), sy=Math.max(0,Math.min(ay,video.videoHeight-1));
+            const sw=Math.max(2,Math.min(aw,video.videoWidth-sx)), sh=Math.max(2,Math.min(ah,video.videoHeight-sy));
             cancelVideoCrop();
             showLoading('Cropping video...');
-
             fetch('{{ urlroot }}api/crop-video', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ filename, x: sx, y: sy, width: sw, height: sh })
             })
             .then(r => r.json())
@@ -1242,17 +1017,14 @@
                     const source = v.querySelector('source');
                     source.src = source.src.split('?')[0] + '?t=' + Date.now();
                     v.load();
-                } else {
-                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
-                }
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
             })
             .catch(err => { hideLoading(); showStatus('Error: ' + err.message, true); });
         }
 
         // ===== EDIT POINTS =====
 
-        let editPoints = [];
-        let editPointIdCounter = 0;
+        let editPoints = [], editPointIdCounter = 0;
 
         function addEditPoint(type) {
             const video = document.getElementById('currentVideo');
@@ -1271,66 +1043,49 @@
             const list = document.getElementById('editPointsList');
             const applyBtn = document.getElementById('applyEditsBtn');
             if (!section || !list || !applyBtn) return;
-
             const sorted = [...editPoints].sort((a, b) => a.time - b.time);
-
             list.innerHTML = '';
             sorted.forEach(pt => {
                 const li = document.createElement('li');
-
                 const typeEl = document.createElement('span');
                 typeEl.className = 'edit-point-type ' + pt.type;
                 typeEl.textContent = pt.type.toUpperCase();
-
                 const timeEl = document.createElement('span');
                 timeEl.className = 'edit-point-time';
                 timeEl.textContent = pt.time.toFixed(2) + 's';
-
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'edit-point-remove';
                 removeBtn.textContent = '✕';
-                const capturedId = pt.id;
-                removeBtn.onclick = () => removeEditPoint(capturedId);
-
-                li.appendChild(typeEl);
-                li.appendChild(timeEl);
-                li.appendChild(removeBtn);
+                const id = pt.id;
+                removeBtn.onclick = () => removeEditPoint(id);
+                li.appendChild(typeEl); li.appendChild(timeEl); li.appendChild(removeBtn);
                 list.appendChild(li);
             });
-
-            const hasPoints = editPoints.length > 0;
-            section.style.display = hasPoints ? 'block' : 'none';
-            applyBtn.style.display = hasPoints ? 'inline-block' : 'none';
+            const has = editPoints.length > 0;
+            section.style.display = has ? 'block' : 'none';
+            applyBtn.style.display = has ? 'inline-block' : 'none';
         }
 
         function applyEdits() {
             const filename = getCurrentFilename();
             if (!filename) { showStatus('Error: Could not determine filename', true); return; }
-            if (editPoints.length === 0) { showStatus('Error: No edit points defined', true); return; }
-
-            const pointsForServer = editPoints.map(p => ({ type: p.type, time: p.time }));
-
+            if (!editPoints.length) { showStatus('Error: No edit points defined', true); return; }
             showLoading('Applying edits...');
-
             fetch('{{ urlroot }}api/trim-video', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filename, edit_points: pointsForServer })
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename, edit_points: editPoints.map(p => ({ type: p.type, time: p.time })) })
             })
             .then(r => r.json())
             .then(data => {
                 hideLoading();
                 if (data.success) {
-                    editPoints = [];
-                    renderEditPoints();
+                    editPoints = []; renderEditPoints();
                     showStatus('Edits applied successfully!');
                     const v = document.getElementById('currentVideo');
                     const source = v.querySelector('source');
                     source.src = source.src.split('?')[0] + '?t=' + Date.now();
                     v.load();
-                } else {
-                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
-                }
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
             })
             .catch(err => { hideLoading(); showStatus('Error: ' + err.message, true); });
         }

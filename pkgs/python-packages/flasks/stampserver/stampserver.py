@@ -502,6 +502,52 @@ def duplicate_video_api():
     except Exception as e:
         return flask.jsonify({'success': False, 'error': str(e)}), 500
 
+@bp.route("/api/rotate-video", methods=["POST"])
+@flask_login.login_required
+def rotate_video_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        degrees = data.get('degrees')
+
+        if not filename or degrees is None:
+            return flask.jsonify({'success': False, 'error': 'Missing filename or degrees parameter'}), 400
+
+        file_path = os.path.join(RES_DIR, filename)
+
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.mp4'):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 files can be rotated'}), 400
+
+        normalized = ((int(degrees) % 360) + 360) % 360
+        if normalized == 90:
+            vf = 'transpose=1'
+        elif normalized == 270:
+            vf = 'transpose=2'
+        elif normalized == 180:
+            vf = 'vflip,hflip'
+        else:
+            return flask.jsonify({'success': False, 'error': f'Unsupported rotation: {degrees}°'}), 400
+
+        temp_path = file_path + '.tmp.mp4'
+        result = subprocess.run(
+            ['ffmpeg', '-i', file_path, '-vf', vf, '-c:a', 'copy', temp_path, '-y'],
+            capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return flask.jsonify({'success': False, 'error': f'ffmpeg error: {result.stderr[-500:]}'}), 500
+
+        os.replace(temp_path, file_path)
+        return flask.jsonify({'success': True})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
 @bp.route("/api/crop-video", methods=["POST"])
 @flask_login.login_required
 def crop_video_api():
