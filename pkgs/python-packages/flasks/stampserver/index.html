@@ -134,20 +134,24 @@
             border-radius: 8px;
             font-size: 1rem;
             font-weight: 500;
-            transition: all 0.2s ease;
+            /* Enumerate only changing properties — 'all' forces the browser to
+               track every property every frame, which is expensive on mobile. */
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             min-height: 48px;
             flex: 1;
             min-width: 120px;
+            /* Removes the 300 ms tap delay on iOS Safari without breaking
+               double-tap zoom on the rest of the page. */
+            touch-action: manipulation;
         }
 
         .btn:hover {
             background-color: #2e59d9;
-            transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        .btn:active { transform: translateY(0); }
+        .btn:active { opacity: 0.85; }
 
         .btn-danger { background-color: #e74a3b; }
         .btn-danger:hover { background-color: #d32f2f; }
@@ -434,6 +438,22 @@
             font-size: 1rem;
         }
 
+        .stamp-search {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 1rem;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+            touch-action: manipulation;
+        }
+
+        .stamp-search:focus {
+            outline: none;
+            border-color: #4e73df;
+        }
+
         @media (max-width: 767px) {
             .container { padding: 10px; }
             details.controls-section, form, .stamp-list { padding: 15px; }
@@ -605,11 +625,16 @@
 
         <div class="stamp-list">
             <h2>Stamp Categories</h2>
-            <ul>
+            {% if stamps %}
+            <input type="search" id="stampSearch" class="stamp-search"
+                   placeholder="Filter labels (use * as wildcard)…"
+                   oninput="filterStamps(this.value)">
+            {% endif %}
+            <ul id="stampListUl">
                 {% for stamp, nstamps in stamps.items() %}
-                <li>
+                <li data-stamp="{{ stamp }}">
                     <a href="{{ urlroot }}restamp/{{ stamp }}">
-                        <span>{{ stamp }}</span>
+                        <span>{% if stamp %}{{ stamp }}{% else %}<em style="color:#adb5bd;">(empty)</em>{% endif %}</span>
                         <span class="stamp-count">{{ nstamps }}</span>
                     </a>
                 </li>
@@ -746,7 +771,13 @@
             if (resizeObserver) { resizeObserver.disconnect(); resizeObserver = null; }
         }
 
+        // Guard against accumulating duplicate listeners when crop mode is toggled
+        // multiple times on the same canvas element.
+        const _cropHandlerCanvases = new WeakSet();
+
         function makeCropHandlers(canvas, getRect, setRect) {
+            if (_cropHandlerCanvases.has(canvas)) return;
+            _cropHandlerCanvases.add(canvas);
             function getCoords(e) {
                 const r = canvas.getBoundingClientRect();
                 if (e.touches && e.touches.length > 0)
@@ -798,6 +829,25 @@
             canvas.addEventListener('touchmove', doDrag, { passive: false });
             canvas.addEventListener('touchend', endDrag, { passive: false });
             canvas.addEventListener('touchcancel', endDrag, { passive: false });
+        }
+
+        // ===== STAMP SEARCH =====
+
+        function filterStamps(query) {
+            const items = document.querySelectorAll('#stampListUl li[data-stamp]');
+            if (!query.trim()) {
+                items.forEach(li => li.style.display = '');
+                return;
+            }
+            // Escape regex metacharacters then restore * as .*
+            const pattern = query.trim()
+                .split('*')
+                .map(s => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&'))
+                .join('.*');
+            const re = new RegExp('^' + pattern + '$', 'i');
+            items.forEach(li => {
+                li.style.display = re.test(li.dataset.stamp) ? '' : 'none';
+            });
         }
 
         function drawOverlay(canvas, rect, infoEl) {
