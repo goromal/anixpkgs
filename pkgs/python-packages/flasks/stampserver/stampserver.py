@@ -198,9 +198,10 @@ def index():
     file = urlroot + file
     return flask.render_template("index.html", urlroot=urlroot, err=False, msg="", file=file, ftype=ftype, root="", nleft=str(numleft), datadir=SHORT_RESDIR, stamps=stamps)
 
+@bp.route("/restamp/", methods=["GET","POST"])
 @bp.route("/restamp/<stamp>", methods=["GET","POST"])
 @flask_login.login_required
-def stamped(stamp):
+def stamped(stamp=""):
     global args
     global stampserver
     global urlroot

@@ -634,7 +634,7 @@
                 {% for stamp, nstamps in stamps.items() %}
                 <li data-stamp="{{ stamp }}">
                     <a href="{{ urlroot }}restamp/{{ stamp }}">
-                        <span>{{ stamp }}</span>
+                        <span>{% if stamp %}{{ stamp }}{% else %}<em style="color:#adb5bd;">(empty)</em>{% endif %}</span>
                         <span class="stamp-count">{{ nstamps }}</span>
                     </a>
                 </li>
