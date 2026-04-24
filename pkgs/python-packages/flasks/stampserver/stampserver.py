@@ -13,6 +13,8 @@ from datetime import timedelta
 from PIL import Image
 import cv2
 
+STAMP_RE = re.compile(r"stamped\.(.*?)\.")
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
 parser.add_argument("--subdomain", action="store", type=str, default="/", help="Subdomain for a reverse proxy")
@@ -109,13 +111,11 @@ class StampServer:
     def getstamps(self):
         stamps = {}
         for file in os.listdir(RES_DIR):
-            stampmatch = re.search(r"stamped\.(.*?)\.", file)
-            if stampmatch:
-                if stampmatch.group(1) in stamps:
-                    stamps[stampmatch.group(1)] += 1
-                else:
-                    stamps[stampmatch.group(1)] = 1
-        return stamps
+            m = STAMP_RE.search(file)
+            if m:
+                key = m.group(1)
+                stamps[key] = stamps.get(key, 0) + 1
+        return dict(sorted(stamps.items(), key=lambda x: x[1], reverse=True))
 
     def stamp(self, stamp):
         dirname = RES_DIR
