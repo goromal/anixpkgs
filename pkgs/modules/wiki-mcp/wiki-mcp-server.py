@@ -6,31 +6,40 @@ import sys
 import json
 import os
 import re
-import base64
+import socket
 import subprocess
+import http.cookiejar
+import urllib.request
 import xmlrpc.client
 from typing import Any
 
 
-class BasicAuthTransport(xmlrpc.client.SafeTransport):
-    def __init__(self, username: str, password: str):
-        super().__init__()
-        token = base64.b64encode(f"{username}:{password}".encode()).decode()
-        self._auth = f"Basic {token}"
+class CookieTransport(xmlrpc.client.Transport):
+    """XMLRPC transport using cookie-based session auth (DokuWiki cookieAuth mode)."""
 
-    def send_host(self, connection, host):
-        super().send_host(connection, host)
-        connection.putheader("Authorization", self._auth)
+    def __init__(self):
+        super().__init__()
+        jar = http.cookiejar.CookieJar()
+        self._opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+
+    def request(self, host, handler, request_body, verbose=False):
+        self.verbose = verbose
+        url = f"http://{host}{handler}"
+        req = urllib.request.Request(url, request_body, {"Content-Type": "text/xml"})
+        resp = self._opener.open(req)
+        return self.parse_response(resp)
 
 
 class WikiClient:
-    """Client for DokuWiki XMLRPC API"""
+    """Client for DokuWiki XMLRPC API using cookie-based auth."""
 
     def __init__(self, wiki_url: str, wiki_user: str, wiki_pass: str):
         self.wiki_url = wiki_url
         xmlrpc_url = f"{wiki_url}/lib/exe/xmlrpc.php"
-        transport = BasicAuthTransport(wiki_user, wiki_pass)
+        transport = CookieTransport()
         self.server = xmlrpc.client.ServerProxy(xmlrpc_url, transport=transport)
+        if not self.server.dokuwiki.login(wiki_user, wiki_pass):
+            raise Exception(f"DokuWiki login failed for user {wiki_user!r}")
 
     def get_page(self, page_id: str) -> str:
         return self.server.wiki.getPage(page_id)
@@ -214,7 +223,7 @@ def handle_request(client: WikiClient, request: dict[str, Any]) -> dict[str, Any
 
 
 def main():
-    wiki_url = os.environ.get("WIKI_URL", "https://notes.andrewtorgesen.com")
+    wiki_url = os.environ.get("WIKI_URL", f"http://{socket.gethostname()}.local")
     secrets_dir = os.path.expanduser(
         os.environ.get("WIKI_SECRETS_DIR", "~/secrets/wiki")
     )
