@@ -41,6 +41,14 @@ class WikiClient:
         if not self.server.dokuwiki.login(wiki_user, wiki_pass):
             raise Exception(f"DokuWiki login failed for user {wiki_user!r}")
 
+    def list_pages(self, namespace: str = "") -> list[str]:
+        pages = self.server.wiki.getAllPages()
+        ids = [p["id"] for p in pages]
+        if namespace:
+            prefix = namespace.rstrip(":") + ":"
+            ids = [i for i in ids if i.startswith(prefix)]
+        return sorted(ids)
+
     def get_page(self, page_id: str) -> str:
         return self.server.wiki.getPage(page_id)
 
@@ -87,6 +95,24 @@ def markdown_to_doku(markdown: str) -> str:
 # ---------------------------------------------------------------------------
 
 TOOLS = [
+    {
+        "name": "wiki_list_pages",
+        "description": (
+            "List all page IDs in the wiki. Optionally filter by namespace "
+            "(e.g. 'notes' returns all pages under 'notes:'). "
+            "Returns a sorted list of page ID strings."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "description": "Optional namespace prefix to filter by (e.g. 'notes', 'journals')",
+                }
+            },
+            "required": [],
+        },
+    },
     {
         "name": "wiki_get_page",
         "description": (
@@ -172,7 +198,11 @@ TOOLS = [
 
 def handle_tool_call(client: WikiClient, tool_name: str, arguments: dict[str, Any]):
     try:
-        if tool_name == "wiki_get_page":
+        if tool_name == "wiki_list_pages":
+            pages = client.list_pages(arguments.get("namespace", ""))
+            return {"success": True, "pages": pages}
+
+        elif tool_name == "wiki_get_page":
             content = client.get_page(arguments["page_id"])
             return {"success": True, "content": content}
 
