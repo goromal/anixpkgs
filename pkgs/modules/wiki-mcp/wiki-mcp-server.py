@@ -41,6 +41,15 @@ class WikiClient:
         if not self.server.dokuwiki.login(wiki_user, wiki_pass):
             raise Exception(f"DokuWiki login failed for user {wiki_user!r}")
 
+    def search(self, query: str) -> list[dict]:
+        results = self.server.dokuwiki.search(query)
+        clean = []
+        for r in results:
+            snippet = re.sub(r"<[^>]+>", "", r.get("snippet", ""))
+            snippet = snippet.replace("&quot;", '"').replace("&#039;", "'").replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+            clean.append({"id": r["id"], "title": r.get("title", ""), "score": r["score"], "snippet": snippet.strip()})
+        return clean
+
     def list_pages(self, namespace: str = "") -> list[str]:
         pages = self.server.wiki.getAllPages()
         ids = [p["id"] for p in pages]
@@ -95,6 +104,25 @@ def markdown_to_doku(markdown: str) -> str:
 # ---------------------------------------------------------------------------
 
 TOOLS = [
+    {
+        "name": "wiki_search",
+        "description": (
+            "Full-text search across all wiki pages. Returns matching pages with "
+            "their IDs, titles, relevance scores, and text snippets showing the "
+            "context around each match. Much more efficient than fetching full pages "
+            "when looking for mentions of a specific term."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Search query string",
+                }
+            },
+            "required": ["query"],
+        },
+    },
     {
         "name": "wiki_list_pages",
         "description": (
@@ -198,7 +226,11 @@ TOOLS = [
 
 def handle_tool_call(client: WikiClient, tool_name: str, arguments: dict[str, Any]):
     try:
-        if tool_name == "wiki_list_pages":
+        if tool_name == "wiki_search":
+            results = client.search(arguments["query"])
+            return {"success": True, "results": results}
+
+        elif tool_name == "wiki_list_pages":
             pages = client.list_pages(arguments.get("namespace", ""))
             return {"success": True, "pages": pages}
 
