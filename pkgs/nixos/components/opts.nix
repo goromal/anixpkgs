@@ -80,5 +80,10 @@ with import ../dependencies.nix;
       default = false;
       description = "Whether the Notion MCP server is installed on this machine (enables MCP setup in claude-setup)";
     };
+    wikiMcpEnabled = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether the Wiki MCP server is installed on this machine (enables MCP setup in claude-setup)";
+    };
   };
 }

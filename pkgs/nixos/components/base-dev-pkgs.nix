@@ -82,6 +82,20 @@ in
         fi
       ''}
 
+      ${lib.optionalString cfg.wikiMcpEnabled ''
+        echo_yellow "Setting up Wiki MCP server..."
+        WIKI_SECRETS="$HOME/secrets/wiki/secret.json"
+        if [ -f "$WIKI_SECRETS" ]; then
+          claude mcp remove wiki 2>/dev/null || true
+          claude mcp add -s user \
+            -e WIKI_SECRET_FILE="$WIKI_SECRETS" \
+            -- wiki /run/current-system/sw/bin/wiki-mcp-server
+          echo_green "Wiki MCP server registered successfully"
+        else
+          echo_yellow "Warning: $WIKI_SECRETS not found. Skipping Wiki MCP setup."
+        fi
+      ''}
+
       echo_yellow "Installing rtk Claude Code hook..."
       rtk init -g
       echo_green "rtk hook installed"
