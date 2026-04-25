@@ -7,6 +7,7 @@ import json
 import os
 import re
 import base64
+import subprocess
 import xmlrpc.client
 from typing import Any
 
@@ -213,19 +214,23 @@ def handle_request(client: WikiClient, request: dict[str, Any]) -> dict[str, Any
 
 
 def main():
-    secret_file = os.environ.get(
-        "WIKI_SECRET_FILE", os.path.expanduser("~/secrets/wiki/secret.json")
-    )
     wiki_url = os.environ.get("WIKI_URL", "https://notes.andrewtorgesen.com")
+    secrets_dir = os.path.expanduser(
+        os.environ.get("WIKI_SECRETS_DIR", "~/secrets/wiki")
+    )
 
     try:
-        with open(secret_file) as f:
-            secret = json.load(f)
-            wiki_user = secret["user"]
-            wiki_pass = secret["pass"]
+        user_file = os.path.join(secrets_dir, "u.txt")
+        pass_file = os.path.join(secrets_dir, "p.txt.tyz")
+        with open(user_file) as f:
+            wiki_user = f.read().strip()
+        result = subprocess.run(
+            ["sread", pass_file], capture_output=True, text=True, check=True
+        )
+        wiki_pass = result.stdout.strip()
     except Exception as e:
         print(
-            json.dumps({"error": f"Failed to read credentials from {secret_file}: {e}"}),
+            json.dumps({"error": f"Failed to read wiki credentials from {secrets_dir}: {e}"}),
             file=sys.stderr,
         )
         sys.exit(1)
