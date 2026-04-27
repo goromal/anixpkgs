@@ -418,6 +418,7 @@ rec {
     }
   );
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
+  backup = addDoc (prev.callPackage ./bash-packages/backup { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });
   setupws = addDoc (prev.callPackage ./bash-packages/setupws { });
   listsources = addDoc (prev.callPackage ./bash-packages/listsources { });
