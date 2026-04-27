@@ -40,6 +40,11 @@ in
       >&2 ${color-prints}/bin/echo_red "Must specify --to."
       exit 1
     fi
+    from_dir="''${from_dir%/}"
+    if [[ ! -d "$from_dir" ]]; then
+      >&2 ${color-prints}/bin/echo_red "--from must be a directory."
+      exit 1
+    fi
     ${rsync}/bin/rsync -a --delete --checksum --info=progress2 "$from_dir/" "$to_dir/"
   ''
 )
