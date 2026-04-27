@@ -186,6 +186,7 @@ in
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
     ../python-packages/flasks/budget_ui/module.nix
+    ../python-packages/flasks/orchestrator_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
@@ -437,6 +438,10 @@ in
         anixpkgs.budget_report
         anixpkgs.fixfname
       ];
+    };
+
+    services.orchestrator_ui = {
+      enable = cfg.enableOrchestrator;
     };
 
     services.rankserver = {
