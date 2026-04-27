@@ -158,8 +158,7 @@ with import ../dependencies.nix;
           name = "ats-vikunja-backup";
           jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
             mkdir -p $HOME/data/vikunja
-            sudo cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
-            sudo chown andrew:dev $HOME/data/vikunja/vikunja.db
+            cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-vikunja-backup "Backup successful!"
           '';
@@ -263,5 +262,6 @@ with import ../dependencies.nix;
     })
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+      users.users.andrew.extraGroups = [ "vikunja" ];
     };
 }
