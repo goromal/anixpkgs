@@ -64,7 +64,10 @@ with import ../dependencies.nix;
           };
         }
       ];
-      extraOrchestratorPackages = [ anixpkgs.mp4 anixpkgs.png ];
+      extraOrchestratorPackages = [
+        anixpkgs.mp4
+        anixpkgs.png
+      ];
     })
     // {
       environment.systemPackages = [
