@@ -44,6 +44,9 @@ in
     users.users.plex.extraGroups = [ "media" ];
 
     # Ensure the drive has appropriate permissions
-    systemd.tmpfiles.rules = [ "d /mnt/media-empire 0755 plex media -" ];
+    systemd.tmpfiles.rules = [
+      "d /mnt/media-empire 0755 plex media -"
+      "d /data/andrew/media-empire 0755 plex media -"
+    ];
   };
 }
