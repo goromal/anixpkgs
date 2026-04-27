@@ -8,9 +8,7 @@ with import ../../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.orchestrator_ui;
-  serviceList = builtins.concatStringsSep "/" (
-    map (x: "${x.name}.service") globalCfg.timedOrchJobs
-  );
+  serviceList = builtins.concatStringsSep "/" (map (x: "${x.name}.service") globalCfg.timedOrchJobs);
 in
 {
   options.services.orchestrator_ui = {

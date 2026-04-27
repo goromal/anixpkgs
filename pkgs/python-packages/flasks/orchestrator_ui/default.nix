@@ -19,7 +19,11 @@ buildPythonPackage rec {
     mkdir -p $out/${pythonLibDir}/templates
     cp ${./templates/main.html} $out/${pythonLibDir}/templates/main.html
   '';
-  propagatedBuildInputs = [ flask grpcio aapis-py ];
+  propagatedBuildInputs = [
+    flask
+    grpcio
+    aapis-py
+  ];
   meta = {
     description = "Web UI for managing orchestrator jobs";
     longDescription = "Provides a browser-based interface equivalent to the otrigger CLI.";
