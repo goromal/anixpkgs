@@ -15,6 +15,7 @@
   };
   authui = 4242;
   budget_ui = 4343;
+  orchestrator_ui = 4545;
   tactical = {
     insecure = 60060;
     web = 60070;
