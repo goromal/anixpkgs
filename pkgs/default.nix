@@ -401,6 +401,9 @@ rec {
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
+  mp3unite = addDoc (prev.callPackage ./bash-packages/mp3unite { });
+  mp3separate = addDoc (prev.callPackage ./bash-packages/mp3separate { });
+  mp4separate = addDoc (prev.callPackage ./bash-packages/mp4separate { });
   notabilify = addDoc (prev.callPackage ./bash-packages/converters/notabilify.nix { });
   make-title = addDoc (prev.callPackage ./bash-packages/make-title { });
   pb = addDoc (prev.callPackage ./bash-packages/pb { });

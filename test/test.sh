@@ -8,6 +8,8 @@ tests=(
     "test_png.sh"
     "test_mp3.sh"
     "test_mp4.sh"
+    "test_mp3unite_separate.sh"
+    "test_mp4separate.sh"
     "test_fix-perms.sh"
     "test_src_fetch.sh"
     "test_secure-delete.sh"
