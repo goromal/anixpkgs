@@ -503,7 +503,27 @@
                 "docs": true
             },
             {
+                "attr": "backup",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "mp4unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3separate",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp4separate",
                 "ci": true,
                 "docs": true
             },

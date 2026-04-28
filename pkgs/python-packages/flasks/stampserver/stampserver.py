@@ -78,6 +78,8 @@ class StampServer:
                     continue
                 if file.lower().endswith(".png"):
                     self.filelist.append((file.strip(), "PNG"))
+                elif file.lower().endswith((".jpg", ".jpeg")):
+                    self.filelist.append((file.strip(), "JPG"))
                 elif file.lower().endswith(".mp4"):
                     self.filelist.append((file.strip(), "MP4"))
             shuffle(self.filelist)
@@ -96,6 +98,8 @@ class StampServer:
                 if file.startswith(f"stamped.{stamp}."):
                     if file.lower().endswith(".png"):
                         self.filelist.append((file.strip(), "PNG"))
+                    elif file.lower().endswith((".jpg", ".jpeg")):
+                        self.filelist.append((file.strip(), "JPG"))
                     elif file.lower().endswith(".mp4"):
                         self.filelist.append((file.strip(), "MP4"))
             shuffle(self.filelist)
@@ -126,13 +130,12 @@ class StampServer:
     def replace_stamp(self, stamp, new_stamp):
         dirname = RES_DIR
         basename = os.path.basename(self.filedeck)
-        # Validate that the file has the expected stamp prefix format
         if not basename.startswith(f"stamped.{stamp}."):
             raise ValueError(f"File {basename} does not have expected stamp prefix 'stamped.{stamp}.'")
-        # Remove the old stamp prefix and add the new one
-        remainder = basename[len(f"stamped.{stamp}."):]
-        new_basename = f"stamped.{new_stamp}.{remainder}"
-        os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
+        if new_stamp != stamp:
+            remainder = basename[len(f"stamped.{stamp}."):]
+            new_basename = f"stamped.{new_stamp}.{remainder}"
+            os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
         self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
 stampserver = StampServer()
@@ -253,8 +256,10 @@ def rotate_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be rotated'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be rotated'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Open image with Pillow
         img = Image.open(file_path)
@@ -272,7 +277,7 @@ def rotate_image_api():
 
         # Save to temporary file first, then rename (atomic operation)
         temp_path = file_path + '.tmp'
-        rotated_img.save(temp_path, format='PNG')
+        rotated_img.save(temp_path, format=img_format)
         os.replace(temp_path, file_path)
 
         return flask.jsonify({'success': True})
@@ -301,8 +306,10 @@ def crop_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be cropped'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be cropped'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Validate crop parameters
         if width <= 0 or height <= 0:
@@ -321,7 +328,7 @@ def crop_image_api():
 
         # Save to temporary file first, then rename (atomic operation)
         temp_path = file_path + '.tmp'
-        cropped_img.save(temp_path, format='PNG')
+        cropped_img.save(temp_path, format=img_format)
         os.replace(temp_path, file_path)
 
         return flask.jsonify({'success': True})
@@ -346,11 +353,13 @@ def duplicate_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be duplicated'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be duplicated'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Parse filename to preserve stamp metadata
-        # Format: [stamped.{stamp}.]basename.png
+        # Format: [stamped.{stamp}.]basename.ext
         base_name = os.path.splitext(filename)[0]
         extension = os.path.splitext(filename)[1]
 
@@ -381,9 +390,9 @@ def duplicate_image_api():
                 break
             counter += 1
 
-        # Copy the file using Pillow to ensure proper PNG handling
+        # Copy the file using Pillow to ensure proper image handling
         img = Image.open(file_path)
-        img.save(new_file_path, format='PNG')
+        img.save(new_file_path, format=img_format)
 
         return flask.jsonify({'success': True, 'new_filename': new_filename})
 

@@ -15,6 +15,9 @@ mkShell {
     listsources
     color-prints
     mp4unite
+    mp3unite
+    mp3separate
+    mp4separate
     scrape
     orchestrator
     fix-perms
