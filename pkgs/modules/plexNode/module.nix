@@ -29,10 +29,9 @@ in
     # Make sure the Plex user can read media
     users.users.plex.extraGroups = [ "media" ];
 
-    # Ensure the media directory has appropriate permissions
+    # Ensure the media directory exists with correct ownership
     systemd.tmpfiles.rules = [
       "d /data/andrew/media-empire 0755 plex media -"
-      "z /data/andrew 0701 andrew dev -"
     ];
 
     # Register Plex in the web services landing page
@@ -44,9 +43,11 @@ in
       }
     ];
 
-    # Grant plex access to media despite ProtectHome sandboxing
+    # Bind-mount media into a path plex can traverse without needing access to
+    # /data/andrew (which stays 0700 as home-manager sets it). Systemd resolves
+    # the source as root; plex only ever sees /var/lib/plex-media.
     systemd.services.plex.serviceConfig.BindReadOnlyPaths = [
-      "/data/andrew/media-empire"
+      "/data/andrew/media-empire:/var/lib/plex-media"
     ];
   };
 }
