@@ -345,6 +345,18 @@
                     (pkgs.writeShellScriptBin "anix-install" ''
                       set -euo pipefail
 
+                      # --- NVIDIA VARIANT SELECTION ---
+                      echo "Enter NVIDIA Jetpack variant (e.g., orin-nx, orin-agx):"
+                      read -rp "Variant: " VARIANT
+
+                      if [ -z "$VARIANT" ]; then
+                        echo "Error: Variant cannot be empty."
+                        exit 1
+                      fi
+
+                      echo "Selected variant: $VARIANT"
+                      echo
+
                       # --- CONFIGURATION ---
                       BOOT_LABEL="EFI"
                       ROOT_LABEL="NixOS"
@@ -424,21 +436,24 @@
                       nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
                       nix-channel --update
                       nixos-generate-config --root /mnt/nixos
-                      sudo -u andrew bash <<'EOF'
+                      sudo -u andrew bash <<'INNEREOF'
                       cd /data/andrew
                       # ^^^^
                       git clone --branch dev/jetpack https://github.com/goromal/anixpkgs.git
-                      cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
-                      cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/temp/orin-nx/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                      cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/$VARIANT.nix
+                      cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      sed -i "s/orin-nx/$VARIANT/g" anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      sed -i 's/machines\.base\.nixosState *= *[^;]*/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      cd anixpkgs
+                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      cd /data/andrew
                       mkdir -p ~/.config/nixpkgs
                       echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
-                      EOF
+                      INNEREOF
                       mkdir -p /root/.config/nixpkgs
                       cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                       rm /mnt/nixos/etc/nixos/*
-                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-''${VARIANT}.nix /mnt/nixos/etc/nixos/configuration.nix
                       nixos-install --root /mnt/nixos
                       echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                     '')
