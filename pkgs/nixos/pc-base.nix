@@ -191,17 +191,17 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/tester/module.nix
-    #(
-    #  let
-    #    # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
-    #    # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
-    #    jetpackSrc = builtins.fetchTarball {
-    #      url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
-    #      sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
-    #    };
-    #  in
-    #  import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    #)
+    (
+      let
+        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
+        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
+        jetpackSrc = builtins.fetchTarball {
+          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
+          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
+        };
+      in
+      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
+    )
   ];
 
   config = {
@@ -225,7 +225,7 @@ in
         # Use the systemd-boot EFI boot loader for x86_linux and Jetson
         # Grub is used on Raspberry Pi
         systemd-boot.enable = (cfg.machineType == "x86_linux");
-        grub.enable = (cfg.machineType == "pi4");
+        grub.enable = lib.mkForce (cfg.machineType == "pi4");
         efi = {
           canTouchEfiVariables = (cfg.machineType == "x86_linux" || cfg.machineType == "pi4");
           efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
