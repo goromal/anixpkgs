@@ -29,7 +29,7 @@ for configuration in ${configurations[@]}; do
     echo "Checking nix instantiation for configuration: $configuration..."
     nix-instantiate '<nixpkgs/nixos>' \
       -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix \
-      -A config.boot.loader.grub.enable --eval --strict
+      -A system --dry-run --show-trace
     echo
     echo
     echo "Checking derivation for configuration: $configuration..."
