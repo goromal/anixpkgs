@@ -222,12 +222,18 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
       };
       loader = {
-        # Use the systemd-boot EFI boot loader.
-        # Grub is used on Raspberry Pi
+        # Use the systemd-boot EFI boot loader for x86_linux
+        # Grub is used on Raspberry Pi and Jetson
         systemd-boot.enable = (if cfg.machineType == "x86_linux" then true else false);
+        grub = lib.mkIf (cfg.machineType == "pi4" || cfg.machineType == "jetson") {
+          enable = true;
+          efiSupport = true;
+          device = "nodev";
+          efiInstallAsRemovable = true;
+        };
         efi = {
           canTouchEfiVariables = true;
-          efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
+          efiSysMountPoint = cfg.bootMntPt;
         };
       };
       supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
