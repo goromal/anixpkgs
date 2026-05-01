@@ -43,6 +43,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register Tactical in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Tactical";
+        path = "/tactical/";
+        description = "Daily tactical planning";
+      }
+    ];
+
     systemd.tmpfiles.rules = [ "L ${cfg.rootDir} - - - - ${cfg.rootDirSource}" ];
     systemd.services.tacticald = {
       enable = true;

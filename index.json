@@ -92,6 +92,11 @@
                 "attr": "sunnyside",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "rtk",
+                "ci": true,
+                "docs": false
             }
         ],
         "python": [
@@ -231,12 +236,22 @@
                 "docs": true
             },
             {
+                "attr": "self-tester-app",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "rankserver",
                 "ci": true,
                 "docs": true
             },
             {
                 "attr": "stampserver",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "la_quiz_web",
                 "ci": true,
                 "docs": true
             },
@@ -261,12 +276,22 @@
                 "docs": true
             },
             {
+                "attr": "workout-planner",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "photos-tools",
                 "ci": true,
                 "docs": true
             },
             {
                 "attr": "wiki-tools",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "notion-tools",
                 "ci": true,
                 "docs": true
             },
@@ -478,7 +503,27 @@
                 "docs": true
             },
             {
+                "attr": "backup",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "mp4unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3separate",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp4separate",
                 "ci": true,
                 "docs": true
             },

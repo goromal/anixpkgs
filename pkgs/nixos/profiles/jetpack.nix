@@ -40,6 +40,7 @@ with import ../dependencies.nix;
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
+        anixpkgs.notion-tools
         anixpkgs.mp4
         anixpkgs.mp4unite
         anixpkgs.goromail

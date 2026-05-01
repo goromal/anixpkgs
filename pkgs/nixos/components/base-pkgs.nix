@@ -57,10 +57,12 @@ in
         anixpkgs.local-ssh-proxy
         anixpkgs.wiki-tools
         anixpkgs.task-tools
+        anixpkgs.notion-tools
         anixpkgs.photos-tools
         anixpkgs.book-notes-sync
         anixpkgs.budget_report
         anixpkgs.surveys_report
+        anixpkgs.backup
         anixpkgs.ckfile
         anixpkgs.color-prints
         anixpkgs.fix-perms
@@ -93,6 +95,9 @@ in
         anixpkgs.mp3
         anixpkgs.mp4
         anixpkgs.mp4unite
+        anixpkgs.mp3unite
+        anixpkgs.mp3separate
+        anixpkgs.mp4separate
         anixpkgs.pdf
         anixpkgs.png
         anixpkgs.svg

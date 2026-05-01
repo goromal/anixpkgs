@@ -148,6 +148,261 @@ nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/t
 sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
+## Local SSL Setup for HTTPS Access
+
+For machines configured with `runWebServer = true` (like ATS), you can enable HTTPS access from devices on your local network (especially phones) to avoid browser security warnings.
+
+### Quick Start
+
+1. **Generate SSL certificates** on the server:
+   ```bash
+   generate-local-ssl-certs
+   ```
+
+   The script will auto-detect your LAN IP address and create certificates in `~/secrets/vpn/`.
+
+   If you need to specify a different IP address:
+   ```bash
+   generate-local-ssl-certs 192.168.1.100
+   ```
+
+2. **Install the CA certificate on your client devices**:
+
+   Transfer `~/secrets/vpn/rootCA.pem` to your phone and install it:
+
+   **Android:**
+   - Settings → Security → Encryption & credentials → Install a certificate
+   - Choose "CA certificate" and select `rootCA.pem`
+   - Give it a name like "ATS Local CA"
+
+   **iPhone/iPad:**
+   - Email or AirDrop `rootCA.pem` to your device
+   - Open the file to install the profile
+   - Settings → General → VPN & Device Management → Install the profile
+   - Settings → General → About → Certificate Trust Settings → Enable full trust
+
+3. **Access your server via HTTPS**:
+   ```
+   https://ats.local:443
+   ```
+
+   Or use HTTP if you prefer (no automatic redirect):
+   ```
+   http://ats.local:80
+   ```
+
+### How It Works
+
+- The nginx server listens on **both** HTTP (port 80) and HTTPS (port 443)
+- There is **no automatic redirect** from HTTP to HTTPS - both protocols are supported
+- The certificates are valid for:
+  - `[hostname].local` (e.g., `ats.local`)
+  - `*.[hostname].local` (wildcard for subdomains)
+  - `localhost`, `127.0.0.1`, and your LAN IP address
+- Certificates are stored in `~/secrets/vpn/` and backed up by `rcrsync`
+- Certificates expire after ~825 days and can be regenerated anytime
+
+### Regenerating Certificates
+
+If your server IP changes or certificates expire:
+```bash
+generate-local-ssl-certs [new-ip-address]
+```
+
+The script will backup old certificates and create new ones. You won't need to reinstall the CA on your devices if you're replacing server certificates signed by the same CA.
+
+### Troubleshooting
+
+**SSL warnings still appear:**
+- Verify you installed `rootCA.pem` (the CA certificate), not `chain.pem`
+- On iOS, ensure you enabled full trust in Certificate Trust Settings
+- Try clearing browser cache or restarting the browser
+
+**Connection refused:**
+- Check firewall allows ports 80 and 443: `sudo iptables -L -n | grep -E '80|443'`
+- Verify nginx is running: `systemctl status nginx`
+
+See [Local SSL Setup](./local-ssl-setup.md) for complete documentation.
+
+## Vikunja Task Management (ATS Only)
+
+ATS machines automatically include [Vikunja](https://vikunja.io/), an open-source task management system designed for collaboration between you and Claude Code.
+
+### Accessing Vikunja
+
+Once your ATS machine is running, Vikunja is accessible at:
+- **Web UI (HTTPS)**: `https://ats.local:3457/`
+- **Web UI (HTTP)**: `http://ats.local:3457/`
+- **API**: `https://ats.local/vikunja/api/v1/` or `http://ats.local/vikunja/api/v1/`
+
+The web UI is mobile-friendly and served through nginx on port 3457 with both HTTP and HTTPS support. The API is accessible at `/vikunja/` on the default ports (80/443) due to how the frontend is built in nixpkgs.
+
+**Note**: For HTTPS access to work without certificate warnings, you need to install the SSL certificate on your client devices. See the [Local SSL Setup](#local-ssl-setup-for-https-access) section above.
+
+### Initial Setup
+
+1. **Create your first user** (registration is disabled after first use for security):
+   ```bash
+   # Open https://ats.local:3457/ in a browser and register
+   # After registration, the service will reject new registrations
+   ```
+
+2. **Get your API token** for MCP integration:
+   - Log in to Vikunja
+   - Go to Settings → API Tokens
+   - Create a new token and save it securely
+
+3. **Configure Claude Code MCP** (see [MCP Integration](#mcp-integration) section below)
+
+### Using Vikunja with Claude Code
+
+Once you've configured the MCP integration (see below), Claude Code can directly interact with your Vikunja tasks during conversations.
+
+#### Typical Workflow
+
+**You (via Web/Phone)**:
+1. Open `https://ats.local:3457/` on your device
+2. Create projects for different areas (e.g., "Development", "Personal", "Research")
+3. Create tasks with descriptions, priorities, and due dates
+4. Review and comment on tasks Claude has worked on
+
+**Claude Code (via MCP)**:
+1. Lists your tasks when you start a conversation: "What should I work on?"
+2. Creates subtasks as it breaks down complex work
+3. Updates task status and adds progress comments
+4. Marks tasks complete when finished
+5. Creates new tasks for follow-up work or issues discovered
+
+#### Example Interactions
+
+- **You**: "What tasks do I have in the Development project?"
+  - Claude lists all tasks with their status, priority, and descriptions
+
+- **You**: "Work on task 42"
+  - Claude reads the task details and gets to work
+  - Creates subtasks for each step
+  - Adds comments with progress updates
+  - Marks task complete when done
+
+- **You**: "Create a task to implement user authentication with JWT"
+  - Claude creates the task with a detailed description
+  - Can immediately start working on it if requested
+
+### MCP Integration
+
+The Vikunja MCP server (`vikunja-mcp-server`) is automatically installed on ATS machines and provides direct integration between Claude Code and Vikunja.
+
+#### Getting Your API Token
+
+1. Log in to Vikunja at `https://ats.local:3457/`
+2. Go to Settings → API Tokens
+3. Click "Create new token"
+4. Copy the generated token (you won't be able to see it again!)
+
+#### Configuring Claude Code
+
+**Option 1: Automatic Configuration (Recommended)**
+
+The easiest way is to store your API token in `~/secrets/vikunja/secrets.json` on the ATS machine:
+
+```json
+{
+  "token": "your-api-token-here"
+}
+```
+
+After adding the token, rebuild your system configuration to install the MCP server:
+```bash
+sudo nixos-rebuild switch
+```
+
+Then run the `claude-setup` script to register the MCP server:
+```bash
+claude-setup
+```
+
+The setup script will automatically:
+- Install Claude Code plugins
+- Register the Vikunja MCP server using your token from `~/secrets/vikunja/secrets.json`
+- Configure other development tools (gh CLI, etc.)
+
+To verify the MCP server is registered:
+```bash
+claude mcp list
+```
+
+**Manual MCP Configuration**
+
+If you need to manually configure the Vikunja MCP server (without using `claude-setup`), you can use:
+
+```bash
+claude mcp add -s user \
+  -e VIKUNJA_URL=https://ats.local:3457 \
+  -e VIKUNJA_API_TOKEN=your-token-here \
+  -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
+```
+
+**Note**: Use HTTPS (`https://ats.local:3457`) for the URL to ensure secure API access.
+
+#### Available MCP Tools
+
+Once configured, Claude Code has native access to these Vikunja tools:
+- `vikunja_list_projects`, `vikunja_get_project` - Browse and view projects
+- `vikunja_list_tasks`, `vikunja_get_task` - View tasks
+- `vikunja_create_task` - Create new tasks
+- `vikunja_update_task` - Update task fields (title, description, priority, etc.)
+- `vikunja_complete_task` - Mark tasks as done
+- `vikunja_add_comment`, `vikunja_get_comments` - Add and view task comments
+
+#### Usage Examples
+
+With the MCP server configured, you can interact with Vikunja directly in Claude Code:
+
+- "What tasks do I have in the Development project?"
+- "Create a task in project 5 to implement user authentication"
+- "Add a comment to task 42 with the latest progress"
+- "Mark task 15 as complete"
+- "Update task 23's priority to high"
+
+### Data Location
+
+- **Database**: `/var/lib/vikunja/vikunja.db` (SQLite)
+- **Files**: `/var/lib/vikunja/files/`
+- **Logs**: `/var/lib/vikunja/logs/`
+- **Configuration**: `/etc/vikunja/config.yml`
+
+### Backup
+
+The Vikunja database is automatically backed up daily at midnight by the `ats-vikunja-backup` orchestrator job:
+- Copies `/var/lib/vikunja/vikunja.db` to `~/data/vikunja/vikunja.db`
+- Syncs to cloud storage via `rcrsync override data vikunja`
+
+You can manually trigger a backup with:
+
+```bash
+ssh andrew@ats.local
+sudo systemctl start ats-vikunja-backup.service
+```
+
+Or manually copy the database:
+
+```bash
+ssh andrew@ats.local
+sudo cp /var/lib/vikunja/vikunja.db ~/backups/vikunja-$(date +%Y%m%d).db
+```
+
+### Architecture
+
+Vikunja is served through nginx as a reverse proxy with HTTPS support:
+- Vikunja serves both the web UI and API from a single service on internal port 3456
+- Frontend accessible at `https://ats.local:3457` (HTTPS) or `http://ats.local:3457` (HTTP)
+- API accessible at `https://ats.local/vikunja/api/v1/` (HTTPS) or `http://ats.local/vikunja/api/v1/` (HTTP)
+- Internal port: 3456 (centrally managed in `service-ports.nix`)
+- External ports: 3457 (frontend with HTTPS/HTTP), 80/443 (API via `/vikunja/`)
+- SSL certificates: Same self-signed certificates as main web server (`~/secrets/vpn/`)
+
+The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
+
 ## Miscellaneous
 
 ### Cloud Syncing

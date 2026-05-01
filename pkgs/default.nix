@@ -169,6 +169,11 @@ let
                   pkg-src = flakeInputs.task-tools;
                 }
               );
+              workout-planner = addDoc (
+                pySelf.callPackage ./python-packages/workout-planner {
+                  pkg-src = flakeInputs.workout-planner;
+                }
+              );
               photos-tools = addDoc (
                 pySelf.callPackage ./python-packages/photos-tools {
                   pkg-src = flakeInputs.photos-tools;
@@ -177,6 +182,11 @@ let
               wiki-tools = addDoc (
                 pySelf.callPackage ./python-packages/wiki-tools {
                   pkg-src = flakeInputs.wiki-tools;
+                }
+              );
+              notion-tools = addDoc (
+                pySelf.callPackage ./python-packages/notion-tools {
+                  pkg-src = flakeInputs.notion-tools;
                 }
               );
               mavlog-utils = addDoc (
@@ -238,6 +248,9 @@ let
               stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
               authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
+              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
+              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -337,11 +350,16 @@ rec {
   stampserver = final.python313.pkgs.stampserver;
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
+  orchestrator_ui = final.python313.pkgs.orchestrator_ui;
+  la_quiz_web = final.python313.pkgs.la_quiz_web;
+  self-tester-app = final.python313.pkgs.self-tester-app;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
+  workout-planner = final.python313.pkgs.workout-planner;
   photos-tools = final.python313.pkgs.photos-tools;
   python-dokuwiki = final.python313.pkgs.python-dokuwiki;
   wiki-tools = final.python313.pkgs.wiki-tools;
+  notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   goromail = final.python313.pkgs.goromail;
@@ -383,6 +401,9 @@ rec {
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
+  mp3unite = addDoc (prev.callPackage ./bash-packages/mp3unite { });
+  mp3separate = addDoc (prev.callPackage ./bash-packages/mp3separate { });
+  mp4separate = addDoc (prev.callPackage ./bash-packages/mp4separate { });
   notabilify = addDoc (prev.callPackage ./bash-packages/converters/notabilify.nix { });
   make-title = addDoc (prev.callPackage ./bash-packages/make-title { });
   pb = addDoc (prev.callPackage ./bash-packages/pb { });
@@ -402,6 +423,7 @@ rec {
     }
   );
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
+  backup = addDoc (prev.callPackage ./bash-packages/backup { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });
   setupws = addDoc (prev.callPackage ./bash-packages/setupws { });
   listsources = addDoc (prev.callPackage ./bash-packages/listsources { });
@@ -417,6 +439,7 @@ rec {
   anix-changelog-compare = addDoc (prev.callPackage ./bash-packages/anix-changelog-compare { });
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
+  generate-local-ssl-certs = prev.callPackage ./bash-packages/generate-local-ssl-certs { };
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
@@ -518,6 +541,11 @@ rec {
       pkg-src = flakeInputs.sunnyside;
     }
   );
+  rtk = addDoc (
+    prev.callPackage ./rust-packages/rtk {
+      pkg-src = flakeInputs.rtk;
+    }
+  );
 
   nixos-machines = rec {
     personal = makeMachines "personal";
@@ -535,4 +563,7 @@ rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  # Override claude-code-bin to use version 2.1.113
+  claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

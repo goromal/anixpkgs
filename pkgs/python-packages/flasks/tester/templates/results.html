@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Tester — Results for {{ exam.title }}{% endblock %}
+
+{% block content %}
+<h1>Results: {{ exam.title }}</h1>
+<p style="color:#777; margin-bottom:20px; font-size:0.9em;">
+    <span class="badge badge-{{ exam.exam_type }}">{{ exam.exam_type | replace('_',' ') | title }}</span>
+    &nbsp; Created {{ exam.created_at }}
+</p>
+
+<div style="margin-bottom:20px;">
+    <a href="{{ urlroot }}exam/{{ exam.id }}/take" class="btn btn-primary">Take Exam</a>
+    <a href="{{ urlroot }}" class="btn btn-secondary" style="margin-left:8px;">Dashboard</a>
+</div>
+
+{% if not results %}
+<div class="card" style="text-align:center; color:#888; padding:32px;">
+    No results yet. Take the exam to record your first attempt.
+</div>
+{% else %}
+<div class="card">
+    <table style="width:100%; border-collapse:collapse; font-size:0.9em;">
+        <thead>
+            <tr style="border-bottom:2px solid #eee; text-align:left; color:#666; font-size:0.82em; text-transform:uppercase; letter-spacing:0.5px;">
+                <th style="padding:8px 4px;">#</th>
+                <th style="padding:8px 4px;">Taken</th>
+                <th style="padding:8px 4px;">Score</th>
+                <th style="padding:8px 4px; text-align:right;">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in results %}
+        {% set pct = (r.score * 100) | round | int %}
+        <tr style="border-bottom:1px solid #f0f0f0;">
+            <td style="padding:10px 4px; color:#aaa; font-size:0.85em;">{{ loop.index }}</td>
+            <td style="padding:10px 4px; color:#555;">{{ r.taken_at }}</td>
+            <td style="padding:10px 4px;">
+                <span class="score-badge {% if pct >= 80 %}score-high{% elif pct >= 50 %}score-mid{% else %}score-low{% endif %}" style="font-size:0.9em; padding:4px 10px;">
+                    {{ pct }}%
+                </span>
+            </td>
+            <td style="padding:10px 4px; text-align:right;">
+                <a href="{{ urlroot }}result/{{ r.id }}" class="btn btn-outline" style="padding:5px 12px; font-size:0.82em;">View</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

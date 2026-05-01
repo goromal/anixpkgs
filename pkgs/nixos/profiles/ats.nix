@@ -13,7 +13,7 @@ with import ../dependencies.nix;
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
-      developer = false;
+      developer = true;
       isATS = true;
       serveNotesWiki = true;
       notesWikiPort = 8080;
@@ -65,6 +65,12 @@ with import ../dependencies.nix;
         }
         {
           name = "ats-mailman";
+          execStartPre = pkgs.writeShellScript "ats-mailman-fix-perms" ''
+            for f in /var/mail/goromail/new/*; do
+              [ -e "$f" ] || exit 0
+              chmod 660 "$f"
+            done
+          '';
           jobShellScript = pkgs.writeShellScript "ats-mailman" ''
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit
@@ -82,6 +88,19 @@ with import ../dependencies.nix;
           timerCfg = {
             OnBootSec = "5m";
             OnUnitActiveSec = "60m";
+          };
+        }
+        {
+          name = "ats-workout-planner";
+          jobShellScript = pkgs.writeShellScript "ats-workout-planner" ''
+            authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
+            rcrsync sync configs || { logger -t authm "Configs sync UNSUCCESSFUL"; >&2 echo "configs sync error!"; exit 1; }
+            workout-planner --enable-logging generate
+            logger -t ats-workout-planner "💪 Daily workout plan generated and published"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 05:30:00" ];
+            Persistent = true;
           };
         }
         {
@@ -129,6 +148,41 @@ with import ../dependencies.nix;
           jobShellScript = pkgs.writeShellScript "ats-tactical-backup" ''
             rcrsync override data tacticald || { logger -t authm "Tacticald Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-tactical-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-vikunja-backup";
+          jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
+            mkdir -p $HOME/data/vikunja
+            cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-vikunja-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-la-quiz-backup";
+          jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
+            rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-la-quiz-backup "LA Quiz backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-tester-backup";
+          jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
+            rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-tester-backup "Tester backup successful!"
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 00:00:00" ];
@@ -194,6 +248,7 @@ with import ../dependencies.nix;
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
+        anixpkgs.workout-planner
         anixpkgs.mp4
         anixpkgs.mp4unite
         anixpkgs.goromail
@@ -207,5 +262,6 @@ with import ../dependencies.nix;
     })
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+      users.users.andrew.extraGroups = [ "vikunja" ];
     };
 }
