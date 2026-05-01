@@ -436,7 +436,7 @@
                       nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
                       nix-channel --update
                       nixos-generate-config --root /mnt/nixos
-                      sudo -u andrew bash <<'INNEREOF'
+                      sudo -u andrew VARIANT="$VARIANT" bash <<'INNEREOF'
                       cd /data/andrew
                       # ^^^^
                       git clone --branch dev/jetpack https://github.com/goromal/anixpkgs.git
