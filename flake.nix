@@ -209,6 +209,18 @@
                   (pkgs.writeShellScriptBin "anix-install" ''
                     set -euo pipefail
 
+                    # --- HARDWARE NAME SELECTION ---
+                    echo "Enter hardware name for this PC (e.g., inspiron, alderlake, thinkpad):"
+                    read -rp "Hardware name: " HARDWARE_NAME
+
+                    if [ -z "$HARDWARE_NAME" ]; then
+                      echo "Error: Hardware name cannot be empty."
+                      exit 1
+                    fi
+
+                    echo "Selected hardware name: $HARDWARE_NAME"
+                    echo
+
                     # --- CONFIGURATION ---
                     BOOT_LABEL="EFI"
                     ROOT_LABEL="NixOS"
@@ -288,21 +300,24 @@
                     nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
                     nix-channel --update
                     nixos-generate-config --root /mnt/nixos
-                    sudo -u andrew bash <<'EOF'
+                    sudo -u andrew HARDWARE_NAME="$HARDWARE_NAME" bash <<'EOF'
                     cd /data/andrew
                     git clone https://github.com/goromal/anixpkgs.git
-                    cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
-                    cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                    cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/$HARDWARE_NAME.nix
+                    cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i "s/inspiron/$HARDWARE_NAME/g" anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    cd anixpkgs
+                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    cd /data/andrew
                     mkdir -p ~/.config/nixpkgs
                     echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
                     EOF
                     mkdir -p /root/.config/nixpkgs
                     cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                     rm /mnt/nixos/etc/nixos/*
-                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-''${HARDWARE_NAME}.nix /mnt/nixos/etc/nixos/configuration.nix
                     nixos-install --root /mnt/nixos
                     echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                   '')
