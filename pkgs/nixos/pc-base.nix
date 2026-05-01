@@ -232,7 +232,7 @@ in
           efiInstallAsRemovable = true;
         };
         efi = {
-          canTouchEfiVariables = true;
+          canTouchEfiVariables = lib.mkIf (cfg.machineType == "x86_linux") true;
           efiSysMountPoint = cfg.bootMntPt;
         };
       };
