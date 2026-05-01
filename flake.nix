@@ -426,10 +426,11 @@
                       nixos-generate-config --root /mnt/nixos
                       sudo -u andrew bash <<'EOF'
                       cd /data/andrew
-                      git clone https://github.com/goromal/anixpkgs.git
+                      # ^^^^
+                      git clone --branch dev/jetpack https://github.com/goromal/anixpkgs.git
                       cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
                       cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/orin-nx/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                      sed -i 's/temp/orin-nx/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
                       mkdir -p ~/.config/nixpkgs
                       echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
