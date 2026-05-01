@@ -207,11 +207,11 @@ in
   config = {
     system.stateVersion = cfg.nixosState;
 
-    boot = lib.mkIf (cfg.machineType != "jetson") {
-      kernelPackages = (
+    boot = {
+      kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
       );
-      kernel.sysctl = {
+      kernel.sysctl = lib.mkIf (cfg.machineType != "jetson") {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
         "net.ipv4.tcp_notsent_lowat" = "16384";
