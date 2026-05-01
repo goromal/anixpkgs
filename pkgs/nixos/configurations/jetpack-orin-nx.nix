@@ -1,4 +1,3 @@
-# TODO: UNTESTED
 {
   config,
   pkgs,
@@ -8,7 +7,7 @@
 {
   imports = [
     ../profiles/jetpack.nix
-    # ^^^^ ^^^^ ^^^^ ^^^^ ../hardware/orin-nx.nix
+    ../hardware/orin-nx.nix
   ];
   machines.base.nixosState = "25.11";
   machines.base.wifiInterfaceName = "wlp1s0";
