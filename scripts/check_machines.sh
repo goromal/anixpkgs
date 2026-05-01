@@ -24,6 +24,14 @@ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 configurations=(jetpack-orin-nx personal-inspiron personal-panasonic ats-alderlake ats-pi)
 for configuration in ${configurations[@]}; do
+    echo
+    echo
+    echo "Checking nix instantiation for configuration: $configuration..."
+    nix-instantiate '<nixpkgs/nixos>' \
+      -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix \
+      -A config.boot.loader.grub.enable --eval --strict
+    echo
+    echo
     echo "Checking derivation for configuration: $configuration..."
     nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run --show-trace
     echo "Checks out!"
