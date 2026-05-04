@@ -24,12 +24,7 @@ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 configurations=(jetpack-orin-nx personal-inspiron personal-panasonic ats-alderlake ats-pi)
 for configuration in ${configurations[@]}; do
-    #echo ^^^^ TODO why does jetpack fail in CI but not on my local machine?
-    #echo
-    #echo "Checking nix instantiation for configuration: $configuration..."
-    #nix-instantiate '<nixpkgs/nixos>' \
-    #  -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix \
-    #  -A system --dry-run --show-trace
+    # ^^^^ TODO why does jetpack fail in CI but not on my local machine?
     echo
     echo
     echo "Checking derivation for configuration: $configuration..."
