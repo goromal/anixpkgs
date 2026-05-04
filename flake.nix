@@ -318,6 +318,8 @@
                     cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                     rm /mnt/nixos/etc/nixos/*
                     ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-''${HARDWARE_NAME}.nix /mnt/nixos/etc/nixos/configuration.nix
+                    export NIXPKGS_ALLOW_UNFREE=1
+                    export NIXPKGS_ALLOW_INSECURE=1
                     nixos-install --root /mnt/nixos
                     echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                   '')
@@ -469,6 +471,8 @@
                       cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                       rm /mnt/nixos/etc/nixos/*
                       ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-''${VARIANT}.nix /mnt/nixos/etc/nixos/configuration.nix
+                      export NIXPKGS_ALLOW_UNFREE=1
+                      export NIXPKGS_ALLOW_INSECURE=1
                       nixos-install --root /mnt/nixos
                       echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                     '')
