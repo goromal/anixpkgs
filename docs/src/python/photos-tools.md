@@ -10,7 +10,7 @@ For your photos management, follow these steps:
 2. On a computer with space, run the clean method
 3. Move the whole Favorites directory to the trash
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 Usage: photos-tools [OPTIONS] COMMAND [ARGS]...
@@ -27,9 +27,12 @@ Options:
 
 Commands:
   clean  Download favorited photos so that you can later delete them from...
+```
+
+### clean
 
 
-
+```bash
 Usage: photos-tools clean [OPTIONS]
 
   Download favorited photos so that you can later delete them from the cloud.
@@ -38,6 +41,5 @@ Options:
   --output-dir PATH  Directory to download the media to.
   --dry-run          Dry run only.
   --help             Show this message and exit.
-
 ```
 

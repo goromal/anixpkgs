@@ -1,9 +1,25 @@
-{ buildPythonPackage, flask, abc, mp3, strings, redirects, writeTextFile
-, callPackage, writeShellScript, python }:
+{
+  buildPythonPackage,
+  flask,
+  abc,
+  mp3,
+  strings,
+  redirects,
+  writeTextFile,
+  callPackage,
+  writeShellScript,
+  python,
+}:
 callPackage ../builders/mkSimpleFlaskApp.nix {
   pname = "flask_smfserver";
   version = "0.0.1";
-  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  inherit
+    buildPythonPackage
+    flask
+    writeTextFile
+    writeShellScript
+    python
+    ;
   scriptPropagatedBuildInputs = [ ];
   flaskScript = ''
     from subprocess import Popen, PIPE
@@ -85,8 +101,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     ${mp3}/bin/mp3 _midfile.abc out.mp3 ${redirects.suppress_all}
     echo "$PWD/out.mp3"
   '';
-  description = ''
-    Spawn an SMF "simple music file" conversion server, powered by Python's flask library.'';
+  description = ''Spawn an SMF "simple music file" conversion server, powered by Python's flask library.'';
   longDescription = ''
     The server page presents a text input area where you can type a song as specified by the simplified SMF music specification language:
 

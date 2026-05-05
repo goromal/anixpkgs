@@ -1,9 +1,13 @@
-{ lib, rustPlatform, pkg-src }:
+{
+  lib,
+  rustPlatform,
+  pkg-src,
+}:
 rustPlatform.buildRustPackage rec {
   pname = "sunnyside";
   version = "0.1.0";
   src = pkg-src;
-  cargoHash = "sha256-Aq2PPn1n4/AgMY51TyB460nXcd4SjFx00QqCSwq1eiU=";
+  cargoHash = "sha256-iKjsrQ/u9SwQZNlSMPjJOxLRSbBuE21Ae0jnJ60fKoE=";
   meta = {
     description = "File scrambler.";
     longDescription = ''

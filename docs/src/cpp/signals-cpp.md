@@ -4,5 +4,7 @@ Header-only templated C++ library implementing rigid-body dynamics, derivatives,
 
 [Repository](https://github.com/goromal/signals-cpp)
 
-Examples documented in the [unit tests](https://github.com/goromal/signals-cpp/tree/master/tests).
+[Documentation](https://andrewtorgesen.com/signals-cpp)
+
+Examples also documented in the [unit tests](https://github.com/goromal/signals-cpp/tree/master/tests).
 

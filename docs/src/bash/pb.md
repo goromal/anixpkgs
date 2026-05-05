@@ -2,7 +2,23 @@
 
 Print out a progress bar.
 
+Example usage:
+
 ```
+N=0
+T=20
+while [ \$N -le \$T ]; do
+    pb \$N \$T
+    N=\$[\$N+1]
+    sleep 1
+done
+echo
+
+```
+
+## Usage
+
+```bash
 usage: pb [options] iternum itertot
 
 Prints a progress bar.
@@ -16,19 +32,18 @@ Arguments:
 iternum: current iteration number
 itertot: number of total iterations
 
-```
 
-Example usage:
+Example Usage:
 
-```
 N=0
 T=20
-while [ \$N -le \$T ]; do
-    pb \$N \$T
-    N=\$[\$N+1]
+while [ $N -le $T ]; do
+    pb $N $T
+    N=$[$N+1]
     sleep 1
 done
 echo
+
 
 ```
 

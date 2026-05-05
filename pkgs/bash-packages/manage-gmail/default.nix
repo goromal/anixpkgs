@@ -1,6 +1,18 @@
-{ writeArgparseScriptBin, mkShell, python, color-prints }:
+{
+  writeArgparseScriptBin,
+  mkShell,
+  python,
+  color-prints,
+}:
 let
-  pythonEnv = (python.withPackages (p: with p; [ ipython gmail-parser ]));
+  pythonEnv = (
+    python.withPackages (
+      p: with p; [
+        ipython
+        gmail-parser
+      ]
+    )
+  );
   pkgname = "manage-gmail";
   usage_str = ''
     usage: ${pkgname}
@@ -31,19 +43,19 @@ let
         >> subInbox.markAllAsRead()
   '';
   shellFile = ../bash-utils/customShell.nix;
-  hookCmd =
-    "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus'";
-in (writeArgparseScriptBin pkgname usage_str [ ] ''
+  hookCmd = "${color-prints}/bin/echo_yellow 'from gmail_parser.corpus import GMailCorpus'";
+in
+(writeArgparseScriptBin pkgname usage_str [ ] ''
   nix-shell ${shellFile} \
     --arg pkgList "[ ${pythonEnv} ]" \
     --argstr shellName "${pkgname}" \
     --argstr hookCmd "${hookCmd}" \
     --arg colorCode 31 \
     --run "ipython"
-'') // {
+'')
+// {
   meta = {
-    description =
-      "Interactively manage your GMail inbox from the command line.";
+    description = "Interactively manage your GMail inbox from the command line.";
     longDescription = ''
       Powered by [gmail-parser](../python/gmail-parser.md).
     '';

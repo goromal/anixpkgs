@@ -36,6 +36,14 @@ if [[ -z $(cat $tmpdir/dev/test_env/shell.nix | grep "inherit ceres-factors;") ]
     echo_red "setupcurrentws missed shell pkg intra-workspace dependency"
     exit 1
 fi
+if [[ ! -f $tmpdir/dev/test_env/.claude/CLAUDE.md ]]; then
+    echo_red "Failed to create root claude boilerplate"
+    exit 1
+fi
+if [[ ! -f $tmpdir/dev/test_env/sources/.claude/CLAUDE.md ]]; then
+    echo_red "Failed to create source claude boilerplate"
+    exit 1
+fi
 [[ -d "$tmpdir/data2" ]] || { echo_red "Failed data dir override"; exit 1; }
 echo "<scr> = scripts/test" >> data/devrc
 echo "scr_env = geometry" >> data/devrc

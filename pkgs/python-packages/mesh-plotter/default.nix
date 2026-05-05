@@ -1,11 +1,27 @@
-{ buildPythonPackage, fetchPypi, pythonOlder, numpy, matplotlib, geometry
-, pysignals, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  fetchPypi,
+  pythonOlder,
+  numpy,
+  matplotlib,
+  geometry,
+  pysignals,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "mesh_plotter";
   version = "0.0.1";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.6";
   doCheck = false;
-  propagatedBuildInputs = [ numpy matplotlib geometry pysignals ];
+  propagatedBuildInputs = [
+    numpy
+    matplotlib
+    geometry
+    pysignals
+  ];
   src = pkg-src;
   meta = {
     description = "Tools for plotting transforms and line meshes in Python.";

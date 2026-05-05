@@ -3,7 +3,7 @@
 Play a game using the Dolphin Emulator.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: play GAME
@@ -14,7 +14,6 @@ Play a game. Your options:
       twilight	Twilight Princess.
       melee	Super Smash Bros. Melee.
       sunshine	Super Mario Sunshine.
-
 
 ```
 

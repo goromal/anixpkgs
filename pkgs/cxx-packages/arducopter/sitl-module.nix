@@ -1,4 +1,9 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   cfg = config.services.ardupilot-sim;
   defaults = {
@@ -36,7 +41,8 @@ let
       -S -I 0 \
       --defaults ${cfg.paramfile}
   '';
-in {
+in
+{
   options.services.ardupilot-sim = with types; {
     enable = mkEnableOption "Enable Arducopter SITL";
     package = lib.mkOption {

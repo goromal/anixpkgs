@@ -3,7 +3,7 @@
 Convenience tools for setting up C++ projects.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: cpp-helper [options]
@@ -18,7 +18,6 @@ Options:
     make       TARGET|all   Full CMake build command (run from repo root)
     challenge  TARGET|all   Full CMake build command WITH SANITIZERS
                             (run from repo root)
-
 
 ```
 

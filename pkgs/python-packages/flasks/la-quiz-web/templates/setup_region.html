@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Setup {{ region.name }} - LA Geography Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link {
+            color: #11998e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .region-title {
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .map-container {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #mapCanvas {
+            cursor: crosshair;
+            touch-action: none;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .setup-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .setup-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .setup-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            color: #0066cc;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #11998e;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin-top: 10px;
+        }
+
+        .coords-display {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="{{ urlroot }}" class="back-link">← Back to Regions</a>
+        <div class="region-title">Setup: {{ region.name }}</div>
+    </div>
+
+    <div class="map-container">
+        <div class="canvas-wrapper">
+            <canvas id="mapCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="setup-panel">
+        <h3>Add Cities to {{ region.name }}</h3>
+        <div class="setup-info">
+            This region has no cities yet. Use the form below to add cities by clicking on the map.
+        </div>
+
+        <div class="form-group">
+            <label for="cityName">City Name:</label>
+            <input type="text" id="cityName" placeholder="Enter city name">
+        </div>
+
+        <div class="form-group">
+            <label>Click on the map to set coordinates:</label>
+            <div class="coords-display">
+                X: <span id="coordX">-</span>, Y: <span id="coordY">-</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="saveCity()">Add City</button>
+        <button class="btn btn-secondary" onclick="window.location.href='{{ urlroot }}'">Cancel</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mapCanvas');
+        const ctx = canvas.getContext('2d');
+        const regionId = {{ region.id }};
+        const urlroot = "{{ urlroot }}";
+
+        let mapImage = new Image();
+        let scaleFactor = 1;
+        let selectedCoords = { x: null, y: null };
+
+        mapImage.onload = function() {
+            // Scale to fit screen width while maintaining aspect ratio
+            const maxWidth = Math.min(1000, window.innerWidth - 40);
+            scaleFactor = maxWidth / mapImage.width;
+
+            canvas.width = mapImage.width * scaleFactor;
+            canvas.height = mapImage.height * scaleFactor;
+
+            drawMap();
+        };
+
+        mapImage.src = "{{ urlroot }}static/" + "{{ region.map_image }}";
+
+        function drawMap() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(mapImage, 0, 0, canvas.width, canvas.height);
+
+            // Draw selected point if set
+            if (selectedCoords.x !== null && selectedCoords.y !== null) {
+                ctx.beginPath();
+                ctx.arc(selectedCoords.x * scaleFactor, selectedCoords.y * scaleFactor, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = 'blue';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function getCanvasCoordinates(event) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (event.touches) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+
+            const x = (clientX - rect.left) / scaleFactor;
+            const y = (clientY - rect.top) / scaleFactor;
+            return { x, y };
+        }
+
+        function handleClick(event) {
+            event.preventDefault();
+            const coords = getCanvasCoordinates(event);
+            selectedCoords.x = Math.round(coords.x);
+            selectedCoords.y = Math.round(coords.y);
+
+            document.getElementById('coordX').textContent = selectedCoords.x;
+            document.getElementById('coordY').textContent = selectedCoords.y;
+
+            drawMap();
+        }
+
+        function saveCity() {
+            const name = document.getElementById('cityName').value.trim();
+
+            if (!name) {
+                alert('Please enter a city name.');
+                return;
+            }
+
+            if (selectedCoords.x === null || selectedCoords.y === null) {
+                alert('Please click on the map to set coordinates.');
+                return;
+            }
+
+            fetch(urlroot + 'add-city/' + regionId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    x: selectedCoords.x,
+                    y: selectedCoords.y
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    alert(`City "${data.name}" added successfully!`);
+                    // Reset form
+                    document.getElementById('cityName').value = '';
+                    selectedCoords = { x: null, y: null };
+                    document.getElementById('coordX').textContent = '-';
+                    document.getElementById('coordY').textContent = '-';
+                    drawMap();
+                } else {
+                    alert('Error adding city: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding city.');
+            });
+        }
+
+        // Handle both click and touch events
+        canvas.addEventListener('click', handleClick);
+        canvas.addEventListener('touchstart', handleClick);
+
+        // Prevent scrolling when touching the canvas
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // Redraw on window resize
+        window.addEventListener('resize', function() {
+            if (mapImage.complete) {
+                const maxWidth = Math.min(1000, window.innerWidth - 40);
+                const newScaleFactor = maxWidth / mapImage.width;
+
+                if (Math.abs(newScaleFactor - scaleFactor) > 0.01) {
+                    scaleFactor = newScaleFactor;
+                    canvas.width = mapImage.width * scaleFactor;
+                    canvas.height = mapImage.height * scaleFactor;
+                    drawMap();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

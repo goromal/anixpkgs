@@ -3,13 +3,12 @@
 Compare the changelogs of two instances of anixpkgs.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: anix-changelog-compare anixpkgs_FROM anixpkgs_TO
 
 Compare the changelogs of two instances of anixpkgs.
-
 
 ```
 

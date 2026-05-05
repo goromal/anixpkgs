@@ -1,10 +1,21 @@
-{ stdenv, jdk, jre, ant, makeWrapper, pkg-src }:
+{
+  stdenv,
+  jdk,
+  jre,
+  ant,
+  makeWrapper,
+  pkg-src,
+}:
 stdenv.mkDerivation {
   name = "simple-image-editor";
   version = "1.0.0";
   src = pkg-src;
 
-  nativeBuildInputs = [ jdk ant makeWrapper ];
+  nativeBuildInputs = [
+    jdk
+    ant
+    makeWrapper
+  ];
 
   buildPhase = "ant";
 
@@ -18,8 +29,7 @@ stdenv.mkDerivation {
   '';
 
   meta = {
-    description =
-      "Perform some simple image transformations from the command line.";
+    description = "Perform some simple image transformations from the command line.";
     longDescription = ''
       Written in Java. [Repository](https://github.com/goromal/simple-image-editor)
 

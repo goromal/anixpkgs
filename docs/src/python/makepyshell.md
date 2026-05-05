@@ -4,7 +4,7 @@ Generate a nix-shell file for Python development.
 
 [Gist](https://gist.github.com/goromal/e64b6bdc8a176c38092e9bde4c434d31)
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: makepyshell [-h] [--nix-path NIX_PATH]
@@ -17,6 +17,5 @@ options:
   --nix-path NIX_PATH   Nix source path. (default: nixpkgs)
   --modules MODULES [MODULES ...]
                         Python modules for development. (default: [])
-
 ```
 

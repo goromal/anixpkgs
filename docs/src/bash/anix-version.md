@@ -3,13 +3,12 @@
 Get the current anixpkgs version of the operating system.
 
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: anix-version
 
 Get the current anixpkgs version of the operating system.
-
 
 ```
 

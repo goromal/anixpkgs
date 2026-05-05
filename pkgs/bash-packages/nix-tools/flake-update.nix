@@ -1,8 +1,7 @@
 { writeArgparseScriptBin, color-prints }:
 let
   pkgname = "flake-update";
-  description =
-    "Automatically update the flake lock of every changed ref (according to Git diff).";
+  description = "Automatically update the flake lock of every changed ref (according to Git diff).";
   long-description = ''
     usage: ${pkgname} [path/to/flake.nix]
   '';
@@ -13,7 +12,8 @@ let
   printErr = "${color-prints}/bin/echo_red";
   printYlw = "${color-prints}/bin/echo_yellow";
   printGrn = "${color-prints}/bin/echo_green";
-in (writeArgparseScriptBin pkgname usage_str [ ] ''
+in
+(writeArgparseScriptBin pkgname usage_str [ ] ''
   flakefile="flake.nix"
   if [[ ! -z "$1" ]]; then
       flakefile="$1"
@@ -27,10 +27,11 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
   readarray -t sources < <(git diff flake.nix | grep -oP '^\+\s+\K\S+(?=\.url)')
   for source in "''${sources[@]}"; do
       ${printYlw} "Detected changed source $source"
-      nix flake lock --update-input "$source"
+      nix flake update "$source" || nix flake lock --update-input "$source"
   done
   ${printGrn} Done.
-'') // {
+'')
+// {
   meta = {
     inherit description;
     longDescription = "";

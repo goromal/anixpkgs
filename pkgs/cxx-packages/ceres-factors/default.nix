@@ -1,16 +1,28 @@
-{ clangStdenv, cmake, eigen, ceres-solver, manif-geom-cpp, boost, pkg-src }:
+{
+  clangStdenv,
+  cmake,
+  eigen,
+  ceres-solver,
+  manif-geom-cpp,
+  boost,
+  pkg-src,
+}:
 clangStdenv.mkDerivation {
   name = "ceres-factors";
   version = "1.0.0";
   src = pkg-src;
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ eigen ceres-solver manif-geom-cpp boost ];
+  buildInputs = [
+    eigen
+    ceres-solver
+    manif-geom-cpp
+    boost
+  ];
   preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"
   '';
   meta = {
-    description =
-      "C++ library with custom parameterizations and cost functions for the Ceres Solver.";
+    description = "C++ library with custom parameterizations and cost functions for the Ceres Solver.";
     longDescription = ''
       [Repository](https://github.com/goromal/ceres-factors)
 

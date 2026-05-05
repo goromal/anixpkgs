@@ -1,6 +1,13 @@
-{ pkgs, config, lib, ... }:
-let cfg = config.services.ardurouter;
-in {
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
+let
+  cfg = config.services.ardurouter;
+in
+{
   options.services.ardurouter = {
     enable = lib.mkEnableOption "enable ardurouter service";
     package = lib.mkOption {
@@ -51,8 +58,8 @@ in {
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/mavlink-routerd ${cfg.interfaceArgs} ${
-            if cfg.log then "--log ${cfg.rootDir}" else ""
-          } ${if cfg.tlog then "--tlog ${cfg.rootDir}" else ""}";
+          if cfg.log then "--log ${cfg.rootDir}" else ""
+        } ${if cfg.tlog then "--tlog ${cfg.rootDir}" else ""}";
         CPUQuota = "300%";
         Restart = "always";
         RestartSec = 1;
@@ -60,7 +67,10 @@ in {
         Group = cfg.group;
         WorkingDirectory = cfg.rootDir;
       };
-      requires = [ "network.target" "sysinit.target" ];
+      requires = [
+        "network.target"
+        "sysinit.target"
+      ];
       wantedBy = [ "multi-user.target" ];
       # TODO after [ (udev.device) ];
     };

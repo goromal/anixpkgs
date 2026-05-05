@@ -19,7 +19,7 @@ Once in the shell, the following commands are provided:
 - `listsources`: See the [listsources](./listsources.md) tool documentation.
 - `dev`: Enter an interactive menu for workspace source manipulation.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: devshell [-n|--new] [-d DEVRC] [-s DEVHIST] [--override-data-dir DIR] [--run CMD] workspace_name
@@ -49,7 +49,6 @@ pkgs_var = <anixpkgs>
 # workspaces
 signals = manif-geom-cpp geometry pyvitools script_ref
 =================================================================
-
 
 ```
 

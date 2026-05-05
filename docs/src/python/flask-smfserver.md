@@ -20,7 +20,7 @@ The server page presents a text input area where you can type a song as specifie
 
 Under the hood, conversions to MP3 are done using the [abc](../bash/abc.md) and [mp3](../bash/mp3.md) tools.
 
-## Usage (Auto-Generated)
+## Usage
 
 ```bash
 usage: flask_smfserver [-h] [--port PORT]
@@ -28,6 +28,5 @@ usage: flask_smfserver [-h] [--port PORT]
 options:
   -h, --help   show this help message and exit
   --port PORT  Port to run the server on
-
 ```
 

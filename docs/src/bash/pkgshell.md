@@ -2,7 +2,10 @@
 
 Flexible Nix shell.
 
-```
+
+## Usage
+
+```bash
 usage: pkgshell [options] pkgs attr [--run CMD]
 
 Make a nix shell with package [attr] from [pkgs] (e.g., '<nixpkgs>').

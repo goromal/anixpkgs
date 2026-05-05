@@ -1,10 +1,24 @@
-{ buildPythonPackage, flask, mp4, strings, redirects, writeTextFile, callPackage
-, writeShellScript, python
+{
+  buildPythonPackage,
+  flask,
+  mp4,
+  strings,
+  redirects,
+  writeTextFile,
+  callPackage,
+  writeShellScript,
+  python,
 }: # TODO change to flask_mp4server (just serves the API of mp4)
 callPackage ../builders/mkSimpleFlaskApp.nix {
   pname = "flask_mp4server";
   version = "0.0.0";
-  inherit buildPythonPackage flask writeTextFile writeShellScript python;
+  inherit
+    buildPythonPackage
+    flask
+    writeTextFile
+    writeShellScript
+    python
+    ;
   scriptPropagatedBuildInputs = [ ];
   flaskScript = ''
     from subprocess import Popen, PIPE
@@ -50,8 +64,7 @@ callPackage ../builders/mkSimpleFlaskApp.nix {
     ${mp4} "$vidfile" "$vidname" ${redirects.suppress_all}
     echo "$PWD/$vidname.mp4"
   '';
-  description =
-    "Spawn an MP4 conversion server, powered by Python's flask library.";
+  description = "Spawn an MP4 conversion server, powered by Python's flask library.";
   longDescription = ''
     The server page takes an input video file and converts it to an MP4 using the [mp4](../bash/mp4.md) tool.
   '';

@@ -2,7 +2,10 @@
 
 Developer tools for creating Python packages.
 
-```
+
+## Usage
+
+```bash
 usage: py-helper [options]
 
 Options:

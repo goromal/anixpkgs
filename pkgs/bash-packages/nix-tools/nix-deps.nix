@@ -1,4 +1,8 @@
-{ writeArgparseScriptBin, color-prints, nix-tree }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  nix-tree,
+}:
 let
   pkgname = "nix-deps";
   description = "Recurse the dependencies of a Nix package.";
@@ -12,7 +16,8 @@ let
     ${description}
   '';
   printErr = "${color-prints}/bin/echo_red";
-in (writeArgparseScriptBin pkgname usage_str [ ] ''
+in
+(writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ $# -ge 2 ]]; then
       nix-build $@ --no-out-link | xargs -o ${nix-tree}/bin/nix-tree
   elif [[ $# -eq 1 ]]; then
@@ -20,7 +25,8 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
   else
       ${printErr} "Must specify either a store path or nix-build rules."
   fi
-'') // {
+'')
+// {
   meta = {
     inherit description;
     longDescription = "";
