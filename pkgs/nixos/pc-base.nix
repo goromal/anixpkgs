@@ -225,7 +225,9 @@ in
         # Use the systemd-boot EFI boot loader for x86_linux and Jetson
         # Grub is used on Raspberry Pi
         systemd-boot.enable = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
-        grub.enable = lib.mkForce false;
+        grub.enable = lib.mkForce (cfg.machineType == "pi4");
+        grub.efiSupport = lib.mkIf (cfg.machineType == "pi4") true;
+        grub.device = lib.mkIf (cfg.machineType == "pi4") "nodev";
         efi = {
           canTouchEfiVariables = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
           efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
