@@ -207,11 +207,11 @@ in
   config = {
     system.stateVersion = cfg.nixosState;
 
-    boot = lib.mkIf (cfg.machineType != "jetson") {
-      kernelPackages = (
+    boot = {
+      kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
       );
-      kernel.sysctl = {
+      kernel.sysctl = lib.mkIf (cfg.machineType != "jetson") {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
         "net.ipv4.tcp_notsent_lowat" = "16384";
@@ -222,13 +222,17 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
       };
       loader = {
-        # Use the systemd-boot EFI boot loader.
+        # Use the systemd-boot EFI boot loader for x86_linux and Jetson
         # Grub is used on Raspberry Pi
-        systemd-boot.enable = (if cfg.machineType == "x86_linux" then true else false);
+        systemd-boot.enable = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
+        grub.enable = lib.mkForce (cfg.machineType == "pi4");
+        grub.efiSupport = lib.mkIf (cfg.machineType == "pi4") true;
+        grub.device = lib.mkIf (cfg.machineType == "pi4") "nodev";
         efi = {
-          canTouchEfiVariables = true;
+          canTouchEfiVariables = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
           efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
+        generic-extlinux-compatible.enable = lib.mkForce false;
       };
       supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
       binfmt.emulatedSystems = lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
