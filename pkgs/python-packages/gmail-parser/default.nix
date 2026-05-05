@@ -10,7 +10,7 @@
 }:
 buildPythonPackage rec {
   pname = "gmail_parser";
-  version = "0.0.0";
+  version = "1.0.0";
   pyproject = true;
   build-system = [ setuptools ];
   disabled = pythonOlder "3.8";
