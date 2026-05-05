@@ -459,6 +459,123 @@
             details.controls-section, form, .stamp-list { padding: 15px; }
             h1 { font-size: 1.25rem; }
         }
+
+        .stampables-config {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stampables-config h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 0 0 14px 0;
+        }
+
+        .stampables-realpath {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .realpath-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .realpath-value {
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #212529;
+            background: #f1f3f5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .dir-picker {
+            margin-top: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dir-picker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+
+        .dir-picker-path {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .dir-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .dir-list li + li {
+            border-top: 1px solid #f1f3f5;
+        }
+
+        .dir-btn {
+            width: 100%;
+            padding: 10px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #212529;
+            transition: background-color 0.15s;
+            touch-action: manipulation;
+        }
+
+        .dir-btn:hover { background-color: #e9f0ff; }
+        .dir-btn:active { background-color: #d0e0ff; }
+
+        .dir-btn::before {
+            content: '📁 ';
+            font-size: 0.9rem;
+        }
+
+        .dir-picker-actions {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+
+        .dir-picker-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            min-height: 36px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 
@@ -649,6 +766,28 @@
             <p style="margin: 15px 12px 0; color: #495057; font-size: 0.95rem; font-weight: 600; border-top: 2px solid #e9ecef; padding-top: 12px;">Total stamped: {{ stamps.values() | sum }}</p>
             {% endif %}
         </div>
+
+        {% if root == "zzz" %}
+        <div class="stampables-config">
+            <h2>Stampables Directory</h2>
+            <div class="stampables-realpath">
+                <span class="realpath-label">Current real path:</span>
+                <span class="realpath-value" id="stampablesRealPath">Loading...</span>
+                <button class="btn btn-sm" onclick="openDirPicker()">Change&hellip;</button>
+            </div>
+            <div class="dir-picker" id="dirPicker" style="display: none;">
+                <div class="dir-picker-header">
+                    <span class="dir-picker-path" id="pickerCurrentPath"></span>
+                    <button class="btn btn-sm" onclick="pickerNavigateUp()">&#8593; Up</button>
+                </div>
+                <ul class="dir-list" id="dirList"></ul>
+                <div class="dir-picker-actions">
+                    <button class="btn btn-sm btn-danger" onclick="closeDirPicker()">Cancel</button>
+                    <button class="btn btn-sm" onclick="selectPickerDir()">Select This Directory</button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <script>
@@ -1139,6 +1278,91 @@
             })
             .catch(err => { hideLoading(); showStatus('Error: ' + err.message, true); });
         }
+        // ===== STAMPABLES DIR PICKER =====
+
+        {% if root == "zzz" %}
+        let _pickerPath = '/';
+
+        function loadStampablesInfo() {
+            fetch('{{ urlroot }}api/stampables-info')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('stampablesRealPath').textContent = data.real_path;
+                    _pickerPath = data.real_path;
+                })
+                .catch(() => {
+                    document.getElementById('stampablesRealPath').textContent = '(error loading)';
+                });
+        }
+
+        function openDirPicker() {
+            document.getElementById('dirPicker').style.display = 'block';
+            loadPickerDirs(_pickerPath);
+        }
+
+        function closeDirPicker() {
+            document.getElementById('dirPicker').style.display = 'none';
+        }
+
+        function loadPickerDirs(path) {
+            fetch('{{ urlroot }}api/list-dirs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: path})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { showStatus('Error: ' + data.error, true); return; }
+                _pickerPath = data.path;
+                document.getElementById('pickerCurrentPath').textContent = data.path;
+                const list = document.getElementById('dirList');
+                list.innerHTML = '';
+                data.dirs.forEach(dir => {
+                    const li = document.createElement('li');
+                    const btn = document.createElement('button');
+                    btn.className = 'dir-btn';
+                    btn.textContent = dir;
+                    const fullPath = data.path === '/' ? '/' + dir : data.path + '/' + dir;
+                    btn.onclick = () => loadPickerDirs(fullPath);
+                    li.appendChild(btn);
+                    list.appendChild(li);
+                });
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function pickerNavigateUp() {
+            fetch('{{ urlroot }}api/list-dirs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath})
+            })
+            .then(r => r.json())
+            .then(data => { if (data.parent) loadPickerDirs(data.parent); });
+        }
+
+        function selectPickerDir() {
+            if (!confirm('Set stampables directory to:\n' + _pickerPath)) return;
+            fetch('{{ urlroot }}api/set-stampables-dir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    closeDirPicker();
+                    document.getElementById('stampablesRealPath').textContent = data.real_path;
+                    showStatus('Stampables directory updated to: ' + data.real_path);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        loadStampablesInfo();
+        {% endif %}
     </script>
 </body>
 

@@ -238,6 +238,54 @@ def zzz():
         stamps={}
     )
 
+@bp.route("/api/stampables-info", methods=["GET"])
+@flask_login.login_required
+def stampables_info():
+    is_link = os.path.islink(RES_DIR)
+    realpath = os.path.realpath(RES_DIR)
+    return flask.jsonify({
+        'is_symlink': is_link,
+        'symlink_path': RES_DIR,
+        'real_path': realpath
+    })
+
+@bp.route("/api/list-dirs", methods=["POST"])
+@flask_login.login_required
+def list_dirs():
+    data = flask.request.get_json()
+    path = os.path.normpath(data.get('path', '/'))
+    try:
+        entries = os.listdir(path)
+        dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and not e.startswith('.')])
+        hidden_dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and e.startswith('.')])
+        parent = os.path.dirname(path) if path != '/' else None
+        return flask.jsonify({'path': path, 'parent': parent, 'dirs': dirs + hidden_dirs})
+    except PermissionError:
+        return flask.jsonify({'error': 'Permission denied'}), 403
+    except FileNotFoundError:
+        return flask.jsonify({'error': 'Path not found'}), 404
+
+@bp.route("/api/set-stampables-dir", methods=["POST"])
+@flask_login.login_required
+def set_stampables_dir():
+    global SHORT_RESDIR
+    data = flask.request.get_json()
+    new_target = data.get('path')
+    if not new_target:
+        return flask.jsonify({'success': False, 'error': 'Missing path parameter'}), 400
+    new_target = os.path.normpath(new_target)
+    if not os.path.isdir(new_target):
+        return flask.jsonify({'success': False, 'error': 'Path is not a directory'}), 400
+    if not os.path.islink(RES_DIR):
+        return flask.jsonify({'success': False, 'error': 'Stampables path is not a symlink; cannot reroute'}), 400
+    try:
+        os.unlink(RES_DIR)
+        os.symlink(new_target, RES_DIR)
+        SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
+        return flask.jsonify({'success': True, 'real_path': new_target})
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
 @bp.route("/api/rotate-image", methods=["POST"])
 @flask_login.login_required
 def rotate_image_api():
