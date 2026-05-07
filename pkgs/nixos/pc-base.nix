@@ -216,7 +216,9 @@ in
     hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
 
     services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
-    services.launchpad.pythonPackages = lib.mkIf (cfg.machineType == "jetson") cfg.launchpadPythonPackages;
+    services.launchpad.pythonPackages = lib.mkIf (
+      cfg.machineType == "jetson"
+    ) cfg.launchpadPythonPackages;
 
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (

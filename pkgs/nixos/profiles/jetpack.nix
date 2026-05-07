@@ -63,18 +63,19 @@ with import ../dependencies.nix;
           };
         }
       ];
-      launchpadPythonPackages = ps: with ps; [
-        numpy
-        scipy
-        torch
-        opencv4
-        geometry
-        pysignals
-        pyceres
-        pyceres_factors
-        mesh-plotter
-        find_rotational_conventions
-      ];
+      launchpadPythonPackages =
+        ps: with ps; [
+          numpy
+          scipy
+          torch
+          opencv4
+          geometry
+          pysignals
+          pyceres
+          pyceres_factors
+          mesh-plotter
+          find_rotational_conventions
+        ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
