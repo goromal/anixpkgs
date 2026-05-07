@@ -148,6 +148,11 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    launchpadPythonPackages = lib.mkOption {
+      type = lib.types.functionTo (lib.types.listOf lib.types.package);
+      description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
+      default = _ps: [ ];
+    };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ "DevonMorris/claude-ctags" ];
@@ -211,6 +216,7 @@ in
     hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
 
     services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
+    services.launchpad.pythonPackages = lib.mkIf (cfg.machineType == "jetson") cfg.launchpadPythonPackages;
 
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
