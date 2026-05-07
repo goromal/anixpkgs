@@ -13,6 +13,5 @@
   machines.base.wifiInterfaceName = "wlp1s0";
   hardware.nvidia-jetpack.som = "orin-nx";
   hardware.nvidia-jetpack.carrierBoard = "devkit";
-  hardware.nvidia-jetpack.configureCuda = true;
   networking.hostName = "jetson-orin-nx";
 }

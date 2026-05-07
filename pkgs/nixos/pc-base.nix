@@ -207,6 +207,8 @@ in
   config = {
     system.stateVersion = cfg.nixosState;
 
+    hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
+
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
