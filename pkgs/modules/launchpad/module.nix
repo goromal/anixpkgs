@@ -28,6 +28,11 @@ in
       description = "Directory to serve notebooks from";
       default = "/data/andrew/launchpad";
     };
+    scratchpadRepo = lib.mkOption {
+      type = lib.types.str;
+      description = "Git URL of the scratchpad repo to clone if notebookDir is not yet a repo";
+      default = "git@github.com:goromal/scratchpad.git";
+    };
     pythonPackages = lib.mkOption {
       type = lib.types.functionTo (lib.types.listOf lib.types.package);
       description = "Additional Python packages (function from python313 package set to list)";
@@ -48,6 +53,11 @@ in
       };
       serviceConfig = {
         Type = "simple";
+        ExecStartPre = pkgs.writeShellScript "launchpad-pre" ''
+          if [[ ! -d "${cfg.notebookDir}/.git" ]]; then
+            ${pkgs.git}/bin/git clone ${cfg.scratchpadRepo} ${cfg.notebookDir}
+          fi
+        '';
         ExecStart = "${pythonEnv}/bin/jupyter lab --no-browser --ip=0.0.0.0 --port=${builtins.toString cfg.port} --notebook-dir=${cfg.notebookDir}";
         ReadWritePaths = [
           cfg.notebookDir
