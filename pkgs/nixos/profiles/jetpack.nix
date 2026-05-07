@@ -6,10 +6,7 @@
 }:
 with import ../dependencies.nix;
 {
-  imports = [
-    ../pc-base.nix
-    ../modules/launchpad/module.nix
-  ];
+  imports = [ ../pc-base.nix ];
 
   config =
     (mkProfileConfig {
@@ -82,22 +79,18 @@ with import ../dependencies.nix;
       ];
     })
     // {
-      services.launchpad = {
-        enable = true;
-        pythonPackages =
-          ps: with ps; [
-            numpy
-            scipy
-            torch
-            opencv4
-            geometry
-            pysignals
-            pyceres
-            pyceres_factors
-            mesh-plotter
-            find_rotational_conventions
-          ];
-      };
+      services.launchpad.pythonPackages = ps: with ps; [
+        numpy
+        scipy
+        torch
+        opencv4
+        geometry
+        pysignals
+        pyceres
+        pyceres_factors
+        mesh-plotter
+        find_rotational_conventions
+      ];
 
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [

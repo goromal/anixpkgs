@@ -191,6 +191,7 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../modules/launchpad/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -208,6 +209,8 @@ in
     system.stateVersion = cfg.nixosState;
 
     hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
+
+    services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
 
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
