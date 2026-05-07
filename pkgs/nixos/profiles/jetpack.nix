@@ -49,9 +49,12 @@ with import ../dependencies.nix;
               if [[ -n "$(git status --porcelain)" ]]; then
                 git add -A
                 git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
-                git push origin master && logger -t launchpad-sync "Changes pushed to master" || logger -t launchpad-sync "Push to master failed"
+              fi
+              if git pull --rebase origin master; then
+                git push origin master && logger -t launchpad-sync "Sync complete" || logger -t launchpad-sync "Push to master failed"
               else
-                logger -t launchpad-sync "No changes to commit"
+                git rebase --abort
+                logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
               fi
             else
               logger -t launchpad-sync "No git repository found at $REPO, skipping"
