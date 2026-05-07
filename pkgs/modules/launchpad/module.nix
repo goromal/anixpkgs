@@ -11,9 +11,7 @@ let
   # overlay so withPackages sees both CUDA-enabled stdlib packages and the
   # custom anixpkgs Python packages (geometry, pysignals, etc.) in one set.
   extendedPkgs = pkgs.extend (import ../../../overlay.nix);
-  pythonEnv = extendedPkgs.python313.withPackages (
-    ps: [ ps.jupyterlab ] ++ (cfg.pythonPackages ps)
-  );
+  pythonEnv = extendedPkgs.python313.withPackages (ps: [ ps.jupyterlab ] ++ (cfg.pythonPackages ps));
 in
 {
   options.services.launchpad = {
