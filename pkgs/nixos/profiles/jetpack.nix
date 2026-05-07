@@ -6,7 +6,10 @@
 }:
 with import ../dependencies.nix;
 {
-  imports = [ ../pc-base.nix ];
+  imports = [
+    ../pc-base.nix
+    ../modules/launchpad/module.nix
+  ];
 
   config =
     (mkProfileConfig {
@@ -36,7 +39,30 @@ with import ../dependencies.nix;
         }
       ];
       enableOrchestrator = true;
-      timedOrchJobs = [ ];
+      timedOrchJobs = [
+        {
+          name = "launchpad-sync";
+          jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
+            REPO=$HOME/launchpad
+            if [[ -d "$REPO/.git" ]]; then
+              cd "$REPO"
+              if [[ -n "$(git status --porcelain)" ]]; then
+                git add -A
+                git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
+                git push origin master && logger -t launchpad-sync "Changes pushed to master" || logger -t launchpad-sync "Push to master failed"
+              else
+                logger -t launchpad-sync "No changes to commit"
+              fi
+            else
+              logger -t launchpad-sync "No git repository found at $REPO, skipping"
+            fi
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 02:00:00" ];
+            Persistent = true;
+          };
+        }
+      ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
@@ -53,6 +79,22 @@ with import ../dependencies.nix;
       ];
     })
     // {
+      services.launchpad = {
+        enable = true;
+        pythonPackages = ps: with ps; [
+          numpy
+          scipy
+          torch
+          opencv4
+          geometry
+          pysignals
+          pyceres
+          pyceres_factors
+          mesh-plotter
+          find_rotational_conventions
+        ];
+      };
+
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
         (pkgs.writeShellScriptBin "anix-init" ''
