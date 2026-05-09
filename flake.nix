@@ -49,6 +49,9 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    jetson-stats.url = "github:rbonghi/jetson_stats";
+    jetson-stats.flake = false;
+
     gnc.url = "github:goromal/gnc";
     gnc.flake = false;
 

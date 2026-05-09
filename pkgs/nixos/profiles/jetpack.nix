@@ -94,6 +94,7 @@ with import ../dependencies.nix;
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
+        anixpkgs.jetson-stats
         (pkgs.writeShellScriptBin "anix-init" ''
           make-title -c yellow "Setting up rcrsync"
 

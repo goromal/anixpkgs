@@ -115,6 +115,11 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              jetson-stats = addDoc (
+                pySelf.callPackage ./python-packages/jetson-stats {
+                  pkg-src = flakeInputs.jetson-stats;
+                }
+              );
               goromail = addDoc (pySelf.callPackage ./python-packages/goromail { });
               symforce = addDoc (pySelf.callPackage ./python-packages/symforce { });
               fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -362,6 +367,7 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  jetson-stats = final.python313.pkgs.jetson-stats;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
 
