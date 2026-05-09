@@ -37,7 +37,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator} --services ${serviceList}";
+        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator}${lib.optionalString (serviceList != "") " --services ${serviceList}"}";
         Restart = "always";
         RestartSec = 5;
         User = "root";
