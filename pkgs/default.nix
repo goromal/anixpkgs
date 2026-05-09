@@ -120,6 +120,13 @@ let
                   pkg-src = flakeInputs.jetson-stats;
                 }
               );
+              jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
+              jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
+              jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
+              jupyter-nbmodel-client = pySelf.callPackage ./python-packages/jupyter-nbmodel-client { };
+              jupyter-mcp-tools = pySelf.callPackage ./python-packages/jupyter-mcp-tools { };
+              jupyter-server-nbmodel = pySelf.callPackage ./python-packages/jupyter-server-nbmodel { };
+              jupyter-mcp-server = addDoc (pySelf.callPackage ./python-packages/jupyter-mcp-server { });
               goromail = addDoc (pySelf.callPackage ./python-packages/goromail { });
               symforce = addDoc (pySelf.callPackage ./python-packages/symforce { });
               fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -368,6 +375,7 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
+  jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
 

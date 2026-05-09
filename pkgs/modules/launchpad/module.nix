@@ -56,7 +56,7 @@ in
             ${pkgs.git}/bin/git clone ${cfg.scratchpadRepo} ${cfg.notebookDir}
           fi
         '';
-        ExecStart = "${pythonEnv}/bin/jupyter lab --no-browser --ip=0.0.0.0 --port=${builtins.toString cfg.port} --notebook-dir=${cfg.notebookDir}";
+        ExecStart = "${pythonEnv}/bin/jupyter lab --no-browser --ip=0.0.0.0 --port=${builtins.toString cfg.port} --notebook-dir=${cfg.notebookDir} --ServerApp.token=''";
         ReadWritePaths = [
           cfg.notebookDir
           "/tmp"
