@@ -82,7 +82,9 @@
         <!-- Branch -->
         <div class="mb-3 source-field" id="field-branch" style="display:none">
           <label class="form-label small fw-semibold">Branch</label>
-          <input type="text" class="form-control form-control-sm" name="branch" placeholder="e.g. dev/my-feature">
+          <input type="text" class="form-control form-control-sm" name="branch" id="branch-input"
+                 placeholder="e.g. dev/my-feature"
+                 oninput="localStorage.setItem('anix-branch', this.value)">
         </div>
 
         <!-- Commit -->
@@ -165,6 +167,12 @@ function resetRunButton() {
   const btn = $('run-btn');
   btn.disabled = false;
   btn.textContent = 'Run upgrade';
+}
+
+function waitForServiceThenReload() {
+  fetch(subdomain + '/status')
+    .then(r => { if (r.ok) location.reload(); else setTimeout(waitForServiceThenReload, 1500); })
+    .catch(() => setTimeout(waitForServiceThenReload, 1500));
 }
 
 // ── Source type dropdown ────────────────────────────────────────────────────
@@ -278,10 +286,9 @@ $('upgrade-form').addEventListener('submit', function(e) {
       function read() {
         reader.read().then(({ done, value }) => {
           if (done) {
-            // Connection dropped without [DONE] — service was restarted by the upgrade itself.
             resetRunButton();
-            appendLog('[Connection lost — the service was restarted by the upgrade. Reloading in 5s...]');
-            setTimeout(() => location.reload(), 5000);
+            appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
+            waitForServiceThenReload();
             return;
           }
           buffer += decoder.decode(value, { stream: true });
@@ -294,10 +301,10 @@ $('upgrade-form').addEventListener('submit', function(e) {
             appendLog(msg);
           }
           read();
-        }).catch(err => {
+        }).catch(() => {
           resetRunButton();
-          appendLog('[Connection lost — the service was restarted by the upgrade. Reloading in 5s...]');
-          setTimeout(() => location.reload(), 5000);
+          appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
+          waitForServiceThenReload();
         });
       }
       read();
@@ -309,8 +316,10 @@ $('upgrade-form').addEventListener('submit', function(e) {
     });
 });
 
-// Restore saved source path on load
+// Restore saved fields on load
 const _savedPath = localStorage.getItem('anix-source-path');
+const _savedBranch = localStorage.getItem('anix-branch');
+if (_savedBranch) $('branch-input').value = _savedBranch;
 if (_savedPath) {
   $('source-path-input').value = _savedPath;
   $('source-type').value = 'source';
