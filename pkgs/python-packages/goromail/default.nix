@@ -1,5 +1,17 @@
-{ callPackage, pytestCheckHook, buildPythonPackage, easy-google-auth, click
-, colorama, gmail-parser, task-tools, wiki-tools, aapis-py, grpcio }:
+{
+  callPackage,
+  pytestCheckHook,
+  buildPythonPackage,
+  easy-google-auth,
+  click,
+  colorama,
+  gmail-parser,
+  task-tools,
+  wiki-tools,
+  notion-tools,
+  aapis-py,
+  grpcio,
+}:
 callPackage ../pythonPkgFromScript.nix {
   pname = "goromail";
   version = "1.0.0";
@@ -13,6 +25,7 @@ callPackage ../pythonPkgFromScript.nix {
     gmail-parser
     task-tools
     wiki-tools
+    notion-tools
     aapis-py
     grpcio
   ];
@@ -38,5 +51,10 @@ callPackage ../pythonPkgFromScript.nix {
     - Any pattern will be added to the journal according to the date *in which the message was sent* **unless** prepended by the string `mm/dd/yyyy:`.
   '';
   autoGenUsageCmd = "--help";
-  subCmds = [ "bot" "journal" "annotate-triage-pages" "itns-nudge" ];
+  subCmds = [
+    "bot"
+    "journal"
+    "annotate-triage-pages"
+    "itns-nudge"
+  ];
 }

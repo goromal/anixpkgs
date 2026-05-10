@@ -1,10 +1,21 @@
-{ stdenv, jdk, jre, ant, makeWrapper, pkg-src }:
+{
+  stdenv,
+  jdk,
+  jre,
+  ant,
+  makeWrapper,
+  pkg-src,
+}:
 stdenv.mkDerivation {
   name = "spelling-corrector";
   version = "1.0.0";
   src = pkg-src;
 
-  nativeBuildInputs = [ jdk ant makeWrapper ];
+  nativeBuildInputs = [
+    jdk
+    ant
+    makeWrapper
+  ];
 
   patches = [ ./patches/args.patch ];
 

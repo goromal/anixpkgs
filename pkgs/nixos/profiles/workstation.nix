@@ -1,5 +1,11 @@
-{ config, pkgs, lib, ... }:
-with import ../dependencies.nix; {
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with import ../dependencies.nix;
+{
   imports = [ ../pc-base.nix ];
 
   config = mkProfileConfig {

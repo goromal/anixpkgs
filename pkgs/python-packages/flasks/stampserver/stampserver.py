@@ -1,5 +1,7 @@
 import os
 import re
+import shutil
+import subprocess
 import argparse
 import flask
 import flask_login
@@ -10,6 +12,8 @@ from random import shuffle
 from datetime import timedelta
 from PIL import Image
 import cv2
+
+STAMP_RE = re.compile(r"stamped\.(.*?)\.")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
@@ -74,6 +78,8 @@ class StampServer:
                     continue
                 if file.lower().endswith(".png"):
                     self.filelist.append((file.strip(), "PNG"))
+                elif file.lower().endswith((".jpg", ".jpeg")):
+                    self.filelist.append((file.strip(), "JPG"))
                 elif file.lower().endswith(".mp4"):
                     self.filelist.append((file.strip(), "MP4"))
             shuffle(self.filelist)
@@ -89,9 +95,11 @@ class StampServer:
             self.task_type = stamp
         if len(self.filelist) == 0:
             for file in os.listdir(RES_DIR):
-                if file.startswith(f"stamped.{stamp}"):
+                if file.startswith(f"stamped.{stamp}."):
                     if file.lower().endswith(".png"):
                         self.filelist.append((file.strip(), "PNG"))
+                    elif file.lower().endswith((".jpg", ".jpeg")):
+                        self.filelist.append((file.strip(), "JPG"))
                     elif file.lower().endswith(".mp4"):
                         self.filelist.append((file.strip(), "MP4"))
             shuffle(self.filelist)
@@ -107,13 +115,11 @@ class StampServer:
     def getstamps(self):
         stamps = {}
         for file in os.listdir(RES_DIR):
-            stampmatch = re.search(r"stamped\.(.*?)\.", file)
-            if stampmatch:
-                if stampmatch.group(1) in stamps:
-                    stamps[stampmatch.group(1)] += 1
-                else:
-                    stamps[stampmatch.group(1)] = 1
-        return stamps
+            m = STAMP_RE.search(file)
+            if m:
+                key = m.group(1)
+                stamps[key] = stamps.get(key, 0) + 1
+        return dict(sorted(stamps.items(), key=lambda x: x[1], reverse=True))
 
     def stamp(self, stamp):
         dirname = RES_DIR
@@ -124,10 +130,12 @@ class StampServer:
     def replace_stamp(self, stamp, new_stamp):
         dirname = RES_DIR
         basename = os.path.basename(self.filedeck)
-        split_basename = basename.split(".")
-        split_basename[1] = new_stamp
-        new_basename = ".".join(split_basename)
-        os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
+        if not basename.startswith(f"stamped.{stamp}."):
+            raise ValueError(f"File {basename} does not have expected stamp prefix 'stamped.{stamp}.'")
+        if new_stamp != stamp:
+            remainder = basename[len(f"stamped.{stamp}."):]
+            new_basename = f"stamped.{new_stamp}.{remainder}"
+            os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
         self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
 stampserver = StampServer()
@@ -193,9 +201,10 @@ def index():
     file = urlroot + file
     return flask.render_template("index.html", urlroot=urlroot, err=False, msg="", file=file, ftype=ftype, root="", nleft=str(numleft), datadir=SHORT_RESDIR, stamps=stamps)
 
+@bp.route("/restamp/", methods=["GET","POST"])
 @bp.route("/restamp/<stamp>", methods=["GET","POST"])
 @flask_login.login_required
-def stamped(stamp):
+def stamped(stamp=""):
     global args
     global stampserver
     global urlroot
@@ -229,6 +238,54 @@ def zzz():
         stamps={}
     )
 
+@bp.route("/api/stampables-info", methods=["GET"])
+@flask_login.login_required
+def stampables_info():
+    is_link = os.path.islink(RES_DIR)
+    realpath = os.path.realpath(RES_DIR)
+    return flask.jsonify({
+        'is_symlink': is_link,
+        'symlink_path': RES_DIR,
+        'real_path': realpath
+    })
+
+@bp.route("/api/list-dirs", methods=["POST"])
+@flask_login.login_required
+def list_dirs():
+    data = flask.request.get_json()
+    path = os.path.normpath(data.get('path', '/'))
+    try:
+        entries = os.listdir(path)
+        dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and not e.startswith('.')])
+        hidden_dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and e.startswith('.')])
+        parent = os.path.dirname(path) if path != '/' else None
+        return flask.jsonify({'path': path, 'parent': parent, 'dirs': dirs + hidden_dirs})
+    except PermissionError:
+        return flask.jsonify({'error': 'Permission denied'}), 403
+    except FileNotFoundError:
+        return flask.jsonify({'error': 'Path not found'}), 404
+
+@bp.route("/api/set-stampables-dir", methods=["POST"])
+@flask_login.login_required
+def set_stampables_dir():
+    global SHORT_RESDIR
+    data = flask.request.get_json()
+    new_target = data.get('path')
+    if not new_target:
+        return flask.jsonify({'success': False, 'error': 'Missing path parameter'}), 400
+    new_target = os.path.normpath(new_target)
+    if not os.path.isdir(new_target):
+        return flask.jsonify({'success': False, 'error': 'Path is not a directory'}), 400
+    if not os.path.islink(RES_DIR):
+        return flask.jsonify({'success': False, 'error': 'Stampables path is not a symlink; cannot reroute'}), 400
+    try:
+        os.unlink(RES_DIR)
+        os.symlink(new_target, RES_DIR)
+        SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
+        return flask.jsonify({'success': True, 'real_path': new_target})
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
 @bp.route("/api/rotate-image", methods=["POST"])
 @flask_login.login_required
 def rotate_image_api():
@@ -247,8 +304,10 @@ def rotate_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be rotated'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be rotated'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Open image with Pillow
         img = Image.open(file_path)
@@ -266,7 +325,7 @@ def rotate_image_api():
 
         # Save to temporary file first, then rename (atomic operation)
         temp_path = file_path + '.tmp'
-        rotated_img.save(temp_path, format='PNG')
+        rotated_img.save(temp_path, format=img_format)
         os.replace(temp_path, file_path)
 
         return flask.jsonify({'success': True})
@@ -295,8 +354,10 @@ def crop_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be cropped'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be cropped'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Validate crop parameters
         if width <= 0 or height <= 0:
@@ -315,7 +376,7 @@ def crop_image_api():
 
         # Save to temporary file first, then rename (atomic operation)
         temp_path = file_path + '.tmp'
-        cropped_img.save(temp_path, format='PNG')
+        cropped_img.save(temp_path, format=img_format)
         os.replace(temp_path, file_path)
 
         return flask.jsonify({'success': True})
@@ -340,11 +401,13 @@ def duplicate_image_api():
         if not os.path.exists(file_path):
             return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
 
-        if not filename.lower().endswith('.png'):
-            return flask.jsonify({'success': False, 'error': 'Only PNG files can be duplicated'}), 400
+        if not filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            return flask.jsonify({'success': False, 'error': 'Only image files (PNG, JPEG) can be duplicated'}), 400
+
+        img_format = 'JPEG' if filename.lower().endswith(('.jpg', '.jpeg')) else 'PNG'
 
         # Parse filename to preserve stamp metadata
-        # Format: [stamped.{stamp}.]basename.png
+        # Format: [stamped.{stamp}.]basename.ext
         base_name = os.path.splitext(filename)[0]
         extension = os.path.splitext(filename)[1]
 
@@ -375,9 +438,9 @@ def duplicate_image_api():
                 break
             counter += 1
 
-        # Copy the file using Pillow to ensure proper PNG handling
+        # Copy the file using Pillow to ensure proper image handling
         img = Image.open(file_path)
-        img.save(new_file_path, format='PNG')
+        img.save(new_file_path, format=img_format)
 
         return flask.jsonify({'success': True, 'new_filename': new_filename})
 
@@ -446,6 +509,240 @@ def save_screenshot_api():
         cv2.imwrite(new_file_path, frame)
 
         return flask.jsonify({'success': True, 'new_filename': new_filename})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/duplicate-video", methods=["POST"])
+@flask_login.login_required
+def duplicate_video_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+
+        if not filename:
+            return flask.jsonify({'success': False, 'error': 'Missing filename parameter'}), 400
+
+        file_path = os.path.join(RES_DIR, filename)
+
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.mp4'):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 files can be duplicated'}), 400
+
+        base_name = os.path.splitext(filename)[0]
+        extension = os.path.splitext(filename)[1]
+
+        stamp_prefix = ""
+        actual_base = base_name
+        if base_name.startswith("stamped."):
+            parts = base_name.split(".", 2)
+            if len(parts) >= 3:
+                stamp_prefix = f"stamped.{parts[1]}."
+                actual_base = parts[2]
+            elif len(parts) == 2:
+                stamp_prefix = f"stamped.{parts[1]}."
+                actual_base = ""
+
+        counter = 1
+        while True:
+            new_basename = f"{actual_base}_copy" if counter == 1 else f"{actual_base}_copy{counter}"
+            new_filename = f"{stamp_prefix}{new_basename}{extension}"
+            new_file_path = os.path.join(RES_DIR, new_filename)
+            if not os.path.exists(new_file_path):
+                break
+            counter += 1
+
+        shutil.copy2(file_path, new_file_path)
+        return flask.jsonify({'success': True, 'new_filename': new_filename})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/rotate-video", methods=["POST"])
+@flask_login.login_required
+def rotate_video_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        degrees = data.get('degrees')
+
+        if not filename or degrees is None:
+            return flask.jsonify({'success': False, 'error': 'Missing filename or degrees parameter'}), 400
+
+        file_path = os.path.join(RES_DIR, filename)
+
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.mp4'):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 files can be rotated'}), 400
+
+        normalized = ((int(degrees) % 360) + 360) % 360
+        if normalized == 90:
+            vf = 'transpose=1'
+        elif normalized == 270:
+            vf = 'transpose=2'
+        elif normalized == 180:
+            vf = 'vflip,hflip'
+        else:
+            return flask.jsonify({'success': False, 'error': f'Unsupported rotation: {degrees}°'}), 400
+
+        temp_path = file_path + '.tmp.mp4'
+        result = subprocess.run(
+            ['ffmpeg', '-i', file_path, '-vf', vf, '-c:a', 'copy', temp_path, '-y'],
+            capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return flask.jsonify({'success': False, 'error': f'ffmpeg error: {result.stderr[-500:]}'}), 500
+
+        os.replace(temp_path, file_path)
+        return flask.jsonify({'success': True})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/crop-video", methods=["POST"])
+@flask_login.login_required
+def crop_video_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        x = data.get('x')
+        y = data.get('y')
+        width = data.get('width')
+        height = data.get('height')
+
+        if not filename or x is None or y is None or width is None or height is None:
+            return flask.jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+        file_path = os.path.join(RES_DIR, filename)
+
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.mp4'):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 files can be cropped'}), 400
+
+        if width <= 0 or height <= 0:
+            return flask.jsonify({'success': False, 'error': 'Width and height must be positive'}), 400
+
+        temp_path = file_path + '.tmp.mp4'
+        result = subprocess.run(
+            ['ffmpeg', '-i', file_path, '-vf', f'crop={width}:{height}:{x}:{y}',
+             '-c:a', 'copy', temp_path, '-y'],
+            capture_output=True, text=True
+        )
+
+        if result.returncode != 0:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return flask.jsonify({'success': False, 'error': f'ffmpeg error: {result.stderr[-500:]}'}), 500
+
+        os.replace(temp_path, file_path)
+        return flask.jsonify({'success': True})
+
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/api/trim-video", methods=["POST"])
+@flask_login.login_required
+def trim_video_api():
+    try:
+        data = flask.request.get_json()
+        filename = data.get('filename')
+        edit_points = data.get('edit_points', [])
+
+        if not filename:
+            return flask.jsonify({'success': False, 'error': 'Missing filename parameter'}), 400
+
+        if not edit_points:
+            return flask.jsonify({'success': False, 'error': 'No edit points provided'}), 400
+
+        file_path = os.path.join(RES_DIR, filename)
+
+        if not os.path.exists(file_path):
+            return flask.jsonify({'success': False, 'error': f'File not found: {filename}'}), 404
+
+        if not filename.lower().endswith('.mp4'):
+            return flask.jsonify({'success': False, 'error': 'Only MP4 files can be trimmed'}), 400
+
+        cap = cv2.VideoCapture(file_path)
+        if not cap.isOpened():
+            return flask.jsonify({'success': False, 'error': 'Could not open video file'}), 500
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        duration = total_frames / fps if fps > 0 else 0
+        cap.release()
+
+        pts = sorted(edit_points, key=lambda p: p['time'])
+
+        if pts[0]['type'] == 'end':
+            pts.insert(0, {'type': 'start', 'time': 0.0})
+        if pts[-1]['type'] == 'start':
+            pts.append({'type': 'end', 'time': duration})
+
+        segments = []
+        i = 0
+        while i < len(pts) - 1:
+            if pts[i]['type'] == 'start' and pts[i + 1]['type'] == 'end':
+                segments.append((pts[i]['time'], pts[i + 1]['time']))
+                i += 2
+            else:
+                return flask.jsonify({'success': False, 'error': f'Invalid edit point sequence at index {i}: expected alternating start/end pairs'}), 400
+
+        if not segments:
+            return flask.jsonify({'success': False, 'error': 'No valid segments formed from edit points'}), 400
+
+        temp_path = file_path + '.tmp.mp4'
+
+        # Detect whether the video has an audio stream
+        probe = subprocess.run(
+            ['ffprobe', '-v', 'quiet', '-select_streams', 'a',
+             '-show_entries', 'stream=codec_type',
+             '-of', 'default=noprint_wrappers=1', file_path],
+            capture_output=True, text=True
+        )
+        has_audio = 'codec_type=audio' in probe.stdout
+
+        # Build a single-pass filter_complex trim+concat (avoids intermediate files
+        # and the stream-detection issues of the concat demuxer with stream copy).
+        n = len(segments)
+        filter_parts = []
+        for i, (start, end) in enumerate(segments):
+            filter_parts.append(f"[0:v]trim=start={start}:end={end},setpts=PTS-STARTPTS[v{i}]")
+            if has_audio:
+                filter_parts.append(f"[0:a]atrim=start={start}:end={end},asetpts=PTS-STARTPTS[a{i}]")
+
+        if has_audio:
+            stream_inputs = ''.join(f'[v{i}][a{i}]' for i in range(n))
+            filter_parts.append(f"{stream_inputs}concat=n={n}:v=1:a=1[vout][aout]")
+            filter_complex = ';'.join(filter_parts)
+            cmd = ['ffmpeg', '-i', file_path,
+                   '-filter_complex', filter_complex,
+                   '-map', '[vout]', '-map', '[aout]',
+                   temp_path, '-y']
+        else:
+            stream_inputs = ''.join(f'[v{i}]' for i in range(n))
+            filter_parts.append(f"{stream_inputs}concat=n={n}:v=1:a=0[vout]")
+            filter_complex = ';'.join(filter_parts)
+            cmd = ['ffmpeg', '-i', file_path,
+                   '-filter_complex', filter_complex,
+                   '-map', '[vout]',
+                   temp_path, '-y']
+
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            return flask.jsonify({'success': False, 'error': f'ffmpeg error: {result.stderr[-500:]}'}), 500
+
+        os.replace(temp_path, file_path)
+        return flask.jsonify({'success': True})
 
     except Exception as e:
         return flask.jsonify({'success': False, 'error': str(e)}), 500

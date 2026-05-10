@@ -1,5 +1,12 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects, python3
-, abcmidi }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  python3,
+  abcmidi,
+}:
 let
   name = "abc";
   extension = "abc";
@@ -29,9 +36,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
-  description =
-    "Generate [abc music files](https://abcnotation.com/) from similar formats.";
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
+  description = "Generate [abc music files](https://abcnotation.com/) from similar formats.";
 }

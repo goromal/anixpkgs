@@ -1,9 +1,27 @@
-{ buildPythonPackage, pkg-src, lib, makeWrapper, click, aapis-py, grpcio, flask
-, colorama, statsd, aiosqlite, aiofiles, wiki-tools, task-tools, service-ports
-, sqlalchemy }:
+{
+  buildPythonPackage,
+  setuptools,
+  pkg-src,
+  lib,
+  makeWrapper,
+  click,
+  aapis-py,
+  grpcio,
+  flask,
+  colorama,
+  statsd,
+  aiosqlite,
+  aiofiles,
+  wiki-tools,
+  task-tools,
+  service-ports,
+  sqlalchemy,
+}:
 buildPythonPackage rec {
   pname = "daily_tactical_server";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   src = pkg-src;
   buildInputs = [ makeWrapper ];
   propagatedBuildInputs = [
@@ -21,9 +39,7 @@ buildPythonPackage rec {
   ];
   postInstall = ''
     wrapProgram $out/bin/tacticald \
-      --add-flags "--server-port ${
-        builtins.toString service-ports.tactical.insecure
-      } --web-port ${builtins.toString service-ports.tactical.web}"
+      --add-flags "--server-port ${builtins.toString service-ports.tactical.insecure} --web-port ${builtins.toString service-ports.tactical.web}"
     wrapProgram $out/bin/tactical \
       --add-flags "--port ${builtins.toString service-ports.tactical.insecure}"
   '';

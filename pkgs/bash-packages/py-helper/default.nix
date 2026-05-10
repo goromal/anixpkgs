@@ -1,5 +1,11 @@
-{ writeArgparseScriptBin, color-prints, redirects, strings, git-cc
-, anixpkgs-version }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  redirects,
+  strings,
+  git-cc,
+  anixpkgs-version,
+}:
 let
   pkgname = "py-helper";
   usage_str = ''
@@ -82,33 +88,38 @@ let
         sed -i 's|example-cpp|'"$cppname"'|g' "$pblname/CMakeLists.txt"
     fi
   '';
-in (writeArgparseScriptBin pkgname usage_str [
-  {
-    var = "makepkg";
-    isBool = false;
-    default = "";
-    flags = "--make-pkg";
-  }
-  {
-    var = "makepbl";
-    isBool = false;
-    default = "";
-    flags = "--make-pybind-lib";
-  }
-  {
-    var = "makenix";
-    isBool = true;
-    default = "0";
-    flags = "--make-nix";
-  }
-] ''
-  set -e
-  tmpdir=$(mktemp -d)
-  ${makepkgRule}
-  ${makepblRule}
-  ${makenixRule}
-  rm -rf "$tmpdir"
-'') // {
+in
+(writeArgparseScriptBin pkgname usage_str
+  [
+    {
+      var = "makepkg";
+      isBool = false;
+      default = "";
+      flags = "--make-pkg";
+    }
+    {
+      var = "makepbl";
+      isBool = false;
+      default = "";
+      flags = "--make-pybind-lib";
+    }
+    {
+      var = "makenix";
+      isBool = true;
+      default = "0";
+      flags = "--make-nix";
+    }
+  ]
+  ''
+    set -e
+    tmpdir=$(mktemp -d)
+    ${makepkgRule}
+    ${makepblRule}
+    ${makenixRule}
+    rm -rf "$tmpdir"
+  ''
+)
+// {
   meta = {
     description = "Developer tools for creating Python packages.";
     longDescription = "";

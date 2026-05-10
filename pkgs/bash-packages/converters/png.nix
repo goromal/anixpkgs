@@ -1,5 +1,14 @@
-{ writeArgparseScriptBin, callPackage, color-prints, strings, redirects
-, imagemagick, openssl, libheif, exiftool }:
+{
+  writeArgparseScriptBin,
+  callPackage,
+  color-prints,
+  strings,
+  redirects,
+  imagemagick,
+  openssl,
+  libheif,
+  exiftool,
+}:
 let
   name = "png";
   extension = "png";
@@ -87,9 +96,43 @@ let
       '';
     }
     {
-      extension = "gif|GIF|svg|SVG";
+      extension = "gif|GIF";
       commands = ''
-        ${printWarn} "NOT IMPLEMENTED YET"
+        tmpdir=$(mktemp -d)
+        _stp1="$tmpdir/_stp1.png"
+        ${imagemagick}/bin/convert "$infile[0]" "$_stp1" ${redirects.suppress_all}
+        if [[ ! -z "$resize" ]]; then
+            ${apply_resize "$tmpdir" "$_stp1" "_stp2"}
+        else
+            _stp2="$_stp1"
+        fi
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
+        mv "$_stp3" "$outfile"
+        rm -rf $tmpdir
+      '';
+    }
+    {
+      extension = "svg|SVG";
+      commands = ''
+        tmpdir=$(mktemp -d)
+        _stp1="$tmpdir/_stp1.png"
+        ${imagemagick}/bin/convert -background none "$infile" "$_stp1" ${redirects.suppress_all}
+        if [[ ! -z "$resize" ]]; then
+            ${apply_resize "$tmpdir" "$_stp1" "_stp2"}
+        else
+            _stp2="$_stp1"
+        fi
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
+        mv "$_stp3" "$outfile"
+        rm -rf $tmpdir
       '';
     }
     {
@@ -117,8 +160,15 @@ let
       '';
     }
   ];
-in callPackage ./mkConverter.nix {
+in
+callPackage ./mkConverter.nix {
   inherit writeArgparseScriptBin color-prints strings;
-  inherit name extension usage_str optsWithVarsAndDefaults convOptCmds;
+  inherit
+    name
+    extension
+    usage_str
+    optsWithVarsAndDefaults
+    convOptCmds
+    ;
   description = "Generate PNG images from a variety of similar formats.";
 }

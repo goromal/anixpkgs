@@ -1,4 +1,9 @@
-{ stdenv, makeWrapper, grpcurl, apis-fds }:
+{
+  stdenv,
+  makeWrapper,
+  grpcurl,
+  apis-fds,
+}:
 stdenv.mkDerivation {
   name = "aapis-grpcurl";
   nativeBuildInputs = [ makeWrapper ];

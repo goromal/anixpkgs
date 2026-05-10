@@ -1,17 +1,63 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 with import ../dependencies.nix;
-let cfg = config.mods.opts;
-in {
-  home.packages = [ pkgs.black pkgs.clang-tools pkgs.nodejs anixpkgs.aptest ];
+let
+  cfg = config.mods.opts;
+  claudeCodeVersion = "2.1.116";
+  claudeCodeExt =
+    let
+      base = builtins.head (
+        unstable.vscode-utils.extensionsFromVscodeMarketplace [
+          {
+            name = "claude-code";
+            publisher = "anthropic";
+            version = claudeCodeVersion;
+            sha256 = "sha256-47LEeYQGaeZiU+W+KGDi1g5OcTqDl/H4hW3TjeBMBbY=";
+          }
+        ]
+      );
+    in
+    pkgs.stdenvNoCC.mkDerivation {
+      name = "vscode-extension-anthropic-claude-code-${claudeCodeVersion}-nixos";
+      version = claudeCodeVersion;
+      dontUnpack = true;
+      dontBuild = true;
+      installPhase = ''
+        cp -r ${base} $out
+        chmod -R u+w $out
+        mkdir -p $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64
+        ln -s ${anixpkgs.claude-code-bin}/bin/claude \
+          $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64/claude
+      '';
+      passthru = {
+        vscodeExtUniqueId = base.vscodeExtUniqueId;
+        vscodeExtPublisher = base.vscodeExtPublisher;
+        vscodeExtName = base.vscodeExtName;
+      };
+    };
+in
+{
+  home.packages = [
+    pkgs.black
+    pkgs.clang-tools
+    pkgs.nodejs
+    anixpkgs.aptest
+  ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
-    "org/gnome/shell" = { "favorite-apps" = [ "code.desktop" ]; };
+    "org/gnome/shell" = {
+      "favorite-apps" = [ "code.desktop" ];
+    };
   };
 
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
   programs.vscode = {
     enable = true;
-    package = unstable.vscode;
+    package = pkgs.vscode;
     profiles.default = {
       userSettings = {
         "editor.minimap.enabled" = false;
@@ -21,9 +67,13 @@ in {
         "editor.formatOnSave" = true;
         "files.hotExit" = "off";
         "C_Cpp.default.compilerPath" = "clang";
-        "terminal.integrated.env.linux" = { "TMPDIR" = "/tmp"; };
+        "terminal.integrated.env.linux" = {
+          "TMPDIR" = "/tmp";
+        };
+        "claudeCode.preferredLocation" = "panel";
       };
-      extensions = with unstable.vscode-extensions;
+      extensions =
+        with unstable.vscode-extensions;
         [
           eamodio.gitlens
           ms-python.vscode-pylance
@@ -34,9 +84,10 @@ in {
           ms-python.python
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
-          zxh404.vscode-proto3
           ms-vscode.cpptools
-        ] ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+          claudeCodeExt
+        ]
+        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "cmake";
             publisher = "twxs";
@@ -50,10 +101,10 @@ in {
             sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
           }
           {
-            name = "claude-code";
-            publisher = "anthropic";
-            version = "2.0.34";
-            sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
+            name = "protobuf-vsc";
+            publisher = "DrBlury";
+            version = "1.0.1";
+            sha256 = "sha256-DFLm0efm7krqcObblbgAlO9PsEGDtw9vrsIDeCtjd14=s";
           }
         ];
     };

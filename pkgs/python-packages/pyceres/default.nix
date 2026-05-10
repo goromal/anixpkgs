@@ -1,6 +1,19 @@
-{ callPackage, clangStdenv, cmake, ceres-solver, eigen, glog, gflags
-, suitesparse, pybind11, python, pythonOlder, pytestCheckHook
-, buildPythonPackage, pkg-src }:
+{
+  callPackage,
+  clangStdenv,
+  cmake,
+  ceres-solver,
+  eigen,
+  glog,
+  gflags,
+  suitesparse,
+  pybind11,
+  python,
+  pythonOlder,
+  pytestCheckHook,
+  buildPythonPackage,
+  pkg-src,
+}:
 callPackage ../pythonPkgFromPybind.nix {
   pname = "PyCeres";
   version = "2.0.0";
@@ -8,8 +21,15 @@ callPackage ../pythonPkgFromPybind.nix {
   inherit clangStdenv;
   inherit pkg-src;
   cppNativeBuildInputs = [ cmake ];
-  cppBuildInputs = [ ceres-solver eigen glog gflags suitesparse ];
+  cppBuildInputs = [
+    ceres-solver
+    eigen
+    glog
+    gflags
+    suitesparse
+  ];
   cppSetup = ''
+    sed -i 's|cmake_minimum_required(VERSION [0-9.]*)|cmake_minimum_required(VERSION 3.5)|g' CMakeLists.txt
     sed -i 's|set(CMAKE_MODULE_PATH "''${CMAKE_CURRENT_SOURCE_DIR}/cmake")|set(CMAKE_CXX_FLAGS "''${CMAKE_CXX_FLAGS} -std=c++17")|g' CMakeLists.txt
     sed -i 's|add_subdirectory(pybind11)|find_package(pybind11 REQUIRED)|g' CMakeLists.txt
     sed -i 's|include_directories(''${CERES_INCLUDE_DIR})||g' CMakeLists.txt

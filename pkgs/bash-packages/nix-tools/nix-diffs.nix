@@ -1,8 +1,11 @@
-{ writeArgparseScriptBin, color-prints, nix-diff }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  nix-diff,
+}:
 let
   pkgname = "nix-diffs";
-  description =
-    "Diff the Nix hashes of two closures or packages in nicely-formatted diffed text files (with ordering mostly preserved).";
+  description = "Diff the Nix hashes of two closures or packages in nicely-formatted diffed text files (with ordering mostly preserved).";
   long-description = ''
     usage: ${pkgname} derivation1 derivation2 out_dir
   '';
@@ -11,7 +14,8 @@ let
     ${description}
   '';
   printErr = "${color-prints}/bin/echo_red";
-in (writeArgparseScriptBin pkgname usage_str [ ] ''
+in
+(writeArgparseScriptBin pkgname usage_str [ ] ''
   if [[ -z "$1" ]]; then
       ${printErr} "derivation1 not specified."
       exit 1
@@ -32,7 +36,8 @@ in (writeArgparseScriptBin pkgname usage_str [ ] ''
       cat $RIGHT_DRV | sed 's/\\n/\n/g' | sed 's/),(/),\n(/g' | sed 's/\],\[/\],\n\[/g' | sed 's/},{/},\n{/g' | sort > $OUT_DIR/$RIGHT_OUT_FILE
       vim -d $OUT_DIR/$LEFT_OUT_FILE $OUT_DIR/$RIGHT_OUT_FILE
   done < /tmp/nix-diff.txt
-'') // {
+'')
+// {
   meta = {
     inherit description;
     longDescription = "";

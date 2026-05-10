@@ -1,4 +1,10 @@
-{ writeArgparseScriptBin, python3, color-prints, setupws, editorName ? "code" }:
+{
+  writeArgparseScriptBin,
+  python3,
+  color-prints,
+  setupws,
+  editorName ? "code",
+}:
 let
   pkgname = "devshell";
   usage_str = ''
@@ -35,102 +41,107 @@ let
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
   devScript = ./dev.py;
-in (writeArgparseScriptBin pkgname usage_str [
-  {
-    var = "devrc";
-    isBool = false;
-    default = "~/.devrc";
-    flags = "-d";
-  }
-  {
-    var = "devhist";
-    isBool = false;
-    default = "~/.devhist";
-    flags = "-s";
-  }
-  {
-    var = "overridedatadir";
-    isBool = false;
-    default = "";
-    flags = "--override-data-dir";
-  }
-  {
-    var = "runcmd";
-    isBool = false;
-    default = "";
-    flags = "--run";
-  }
-  {
-    var = "newws";
-    isBool = true;
-    default = "0";
-    flags = "-n|--new";
-  }
-] ''
-  wsname=$1
-  if [[ -z "$wsname" ]]; then
-      ${printErr} "ERROR: no workspace name provided."
-      exit 1
-  fi
+in
+(writeArgparseScriptBin pkgname usage_str
+  [
+    {
+      var = "devrc";
+      isBool = false;
+      default = "~/.devrc";
+      flags = "-d";
+    }
+    {
+      var = "devhist";
+      isBool = false;
+      default = "~/.devhist";
+      flags = "-s";
+    }
+    {
+      var = "overridedatadir";
+      isBool = false;
+      default = "";
+      flags = "--override-data-dir";
+    }
+    {
+      var = "runcmd";
+      isBool = false;
+      default = "";
+      flags = "--run";
+    }
+    {
+      var = "newws";
+      isBool = true;
+      default = "0";
+      flags = "-n|--new";
+    }
+  ]
+  ''
+    wsname=$1
+    if [[ -z "$wsname" ]]; then
+        ${printErr} "ERROR: no workspace name provided."
+        exit 1
+    fi
 
-  if [[ "$newws" == "1" ]]; then
-      ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
-  fi
+    if [[ "$newws" == "1" ]]; then
+        ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
+    fi
 
-  if [[ -z "$overridedatadir" ]]; then
-    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
-  else
-    rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
-  fi
-  if [[ "$rcinfo" == "_NODEVRC_" ]]; then
-      ${printErr} "ERROR: no $devrc file found"
-      exit 1
-  elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
-      ${printErr} "ERROR: no workspace name provided."
-      exit 1
-  elif [[ "$rcinfo" == ERROR* ]]; then
-      ${printErr} "''${rcinfo}"
-      exit 1
-  elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
-      ${printErr} "ERROR: workspace $wsname not found in $devrc"
-      exit 1
-  else
-      IFS='|' read -ra rcinfoarray <<< "$rcinfo"
-      dev_dir="''${rcinfoarray[0]}"
-      data_dir="''${rcinfoarray[1]}"
-      pkgs_var="''${rcinfoarray[2]}"
-      if [[ -z "$runcmd" ]]; then
-          nix-shell ${shellFile} \
-            --arg printErr ${printErr} \
-            --arg setupws ${setupws} \
-            --argstr wsname "$wsname" \
-            --argstr devDir "$dev_dir" \
-            --argstr dataDir "$data_dir" \
-            --argstr pkgsVar "$pkgs_var" \
-            --argstr devrcFile "$devrc" \
-            --argstr editorName ${editorName} \
-            --arg shellSetupScript ${shellSetupScript} \
-            --arg devScript ${devScript} \
-            --arg parseScript ${parseScript} \
-            --argstr devHistFile "$devhist"
-      else
-          nix-shell ${shellFile} \
-            --arg printErr ${printErr} \
-            --arg setupws ${setupws} \
-            --argstr wsname "$wsname" \
-            --argstr devDir "$dev_dir" \
-            --argstr dataDir "$data_dir" \
-            --argstr pkgsVar "$pkgs_var" \
-            --argstr devrcFile "$devrc" \
-            --argstr editorName ${editorName} \
-            --arg shellSetupScript ${shellSetupScript} \
-            --arg devScript ${devScript} \
-            --arg parseScript ${parseScript} \
-            --argstr devHistFile "$devhist" \
-            --command "$runcmd"
-      fi 
-  fi
-'') // {
+    if [[ -z "$overridedatadir" ]]; then
+      rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
+    else
+      rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
+    fi
+    if [[ "$rcinfo" == "_NODEVRC_" ]]; then
+        ${printErr} "ERROR: no $devrc file found"
+        exit 1
+    elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
+        ${printErr} "ERROR: no workspace name provided."
+        exit 1
+    elif [[ "$rcinfo" == ERROR* ]]; then
+        ${printErr} "''${rcinfo}"
+        exit 1
+    elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
+        ${printErr} "ERROR: workspace $wsname not found in $devrc"
+        exit 1
+    else
+        IFS='|' read -ra rcinfoarray <<< "$rcinfo"
+        dev_dir="''${rcinfoarray[0]}"
+        data_dir="''${rcinfoarray[1]}"
+        pkgs_var="''${rcinfoarray[2]}"
+        if [[ -z "$runcmd" ]]; then
+            nix-shell ${shellFile} \
+              --arg printErr ${printErr} \
+              --arg setupws ${setupws} \
+              --argstr wsname "$wsname" \
+              --argstr devDir "$dev_dir" \
+              --argstr dataDir "$data_dir" \
+              --argstr pkgsVar "$pkgs_var" \
+              --argstr devrcFile "$devrc" \
+              --argstr editorName ${editorName} \
+              --arg shellSetupScript ${shellSetupScript} \
+              --arg devScript ${devScript} \
+              --arg parseScript ${parseScript} \
+              --argstr devHistFile "$devhist"
+        else
+            nix-shell ${shellFile} \
+              --arg printErr ${printErr} \
+              --arg setupws ${setupws} \
+              --argstr wsname "$wsname" \
+              --argstr devDir "$dev_dir" \
+              --argstr dataDir "$data_dir" \
+              --argstr pkgsVar "$pkgs_var" \
+              --argstr devrcFile "$devrc" \
+              --argstr editorName ${editorName} \
+              --arg shellSetupScript ${shellSetupScript} \
+              --arg devScript ${devScript} \
+              --arg parseScript ${parseScript} \
+              --argstr devHistFile "$devhist" \
+              --command "$runcmd"
+        fi 
+    fi
+  ''
+)
+// {
   meta = {
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''

@@ -1,4 +1,10 @@
-{ writeShellScriptBin, imagemagick, pkgData, screenResolution, label }:
+{
+  writeShellScriptBin,
+  imagemagick,
+  pkgData,
+  screenResolution,
+  label,
+}:
 let
   minWpIdx = pkgData.img.wallpapers.minWallpaperIdx;
   maxWpIdx = pkgData.img.wallpapers.maxWallpaperIdx;
@@ -11,13 +17,15 @@ let
 
     # Determine source image based on random index
     case $RANDOM_IDX in
-      ${
-        builtins.concatStringsSep "\n" (builtins.genList (i:
-          let idx = i + 1;
-          in "  ${toString idx}) SOURCE_IMAGE=\"${
-              pkgData.img.wallpapers."wallpaper${toString idx}".data
-            }\" ;;") maxWpIdx)
-      }
+      ${builtins.concatStringsSep "\n" (
+        builtins.genList (
+          i:
+          let
+            idx = i + 1;
+          in
+          "  ${toString idx}) SOURCE_IMAGE=\"${pkgData.img.wallpapers."wallpaper${toString idx}".data}\" ;;"
+        ) maxWpIdx
+      )}
     esac
 
     # Parse screen resolution
@@ -58,4 +66,5 @@ let
 
     echo "Wallpaper regenerated (index: $RANDOM_IDX)"
   '';
-in script
+in
+script

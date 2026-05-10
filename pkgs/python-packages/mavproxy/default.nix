@@ -1,17 +1,29 @@
-{ stdenv, lib, buildPythonPackage, fetchFromGitHub, lxml, matplotlib, numpy
-, opencv-python, pymavlink, pyserial, setuptools, wxpython, billiard
-, gnureadline, }:
+{
+  stdenv,
+  lib,
+  buildPythonPackage,
+  fetchFromGitHub,
+  lxml,
+  matplotlib,
+  numpy,
+  opencv-python,
+  pymavlink,
+  pyserial,
+  setuptools,
+  wxpython,
+  billiard,
+  gnureadline,
+}:
 
 buildPythonPackage rec {
   pname = "MAVProxy";
-  version = "1.8.66";
+  version = "master";
   format = "setuptools";
 
-  src = fetchFromGitHub {
-    owner = "ArduPilot";
-    repo = "MAVProxy";
-    tag = "v${version}";
-    hash = "sha256-vEb5y4hvRjZSRJ6I4S8tC7yAqM2XTvBBQxdz1uOCalQ=";
+  src = builtins.fetchGit {
+    url = "https://github.com/ArduPilot/MAVProxy.git";
+    ref = "master";
+    rev = "4948a269a63288103633ae30c60b861656fbc16b";
   };
 
   propagatedBuildInputs = [
@@ -23,7 +35,11 @@ buildPythonPackage rec {
     pyserial
     setuptools
     wxpython
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [ billiard gnureadline ];
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isDarwin [
+    billiard
+    gnureadline
+  ];
 
   # No tests
   doCheck = false;

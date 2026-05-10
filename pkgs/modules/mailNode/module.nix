@@ -1,17 +1,23 @@
-{ pkgs, config, lib, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 let
   globalCfg = config.machines.base;
   cfg = config.services.mailNode;
-in {
+in
+{
   options.services.mailNode = {
     enable = lib.mkEnableOption "enable mail node services";
   };
   config = lib.mkIf cfg.enable {
     services.postfix = {
       enable = true;
-      hostname = "mail.andrewtorgesen.com";
-      domain = "andrewtorgesen.com";
-      config = {
+      settings.main = {
+        myhostname = "mail.andrewtorgesen.com";
+        mydomain = "andrewtorgesen.com";
         virtual_mailbox_base = "/var/mail/goromail/";
         virtual_mailbox_domains = "andrewtorgesen.com";
         virtual_uid_maps = "static:994";
@@ -32,7 +38,9 @@ in {
       uid = 994;
       group = "goromail";
     };
-    users.groups.goromail = { gid = 993; };
+    users.groups.goromail = {
+      gid = 993;
+    };
     users.users.andrew.extraGroups = [ "goromail" ];
 
     systemd.tmpfiles.rules = [
@@ -44,7 +52,12 @@ in {
 
     systemd.services.fix-mail-perms = {
       description = "Fix permissions of new Postfix mail files";
-      serviceConfig = { Type = "oneshot"; };
+      unitConfig = {
+        StartLimitIntervalSec = 0;
+      };
+      serviceConfig = {
+        Type = "oneshot";
+      };
       script = ''
         for f in /var/mail/goromail/new/*; do
           [ -e "$f" ] || exit 0
@@ -52,6 +65,10 @@ in {
         done
         if [ ! -z "$( ls -A '/var/mail/goromail/new' )" ]; then
           systemctl start ats-mailman.service
+          if grep -qi "Task entry" ${globalCfg.homeDir}/goromail/postfix.log 2>/dev/null; then
+            sleep 10
+            systemctl start ats-task-migrator.service
+          fi
         fi
       '';
     };

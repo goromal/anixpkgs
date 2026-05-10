@@ -1,14 +1,28 @@
-{ buildPythonPackage, pythonOlder, click, easy-google-auth, html2text
-, progressbar2, pkg-src }:
+{
+  buildPythonPackage,
+  setuptools,
+  pythonOlder,
+  click,
+  easy-google-auth,
+  html2text,
+  progressbar2,
+  pkg-src,
+}:
 buildPythonPackage rec {
   pname = "gmail_parser";
   version = "0.0.0";
+  pyproject = true;
+  build-system = [ setuptools ];
   disabled = pythonOlder "3.8";
-  propagatedBuildInputs = [ click easy-google-auth html2text progressbar2 ];
+  propagatedBuildInputs = [
+    click
+    easy-google-auth
+    html2text
+    progressbar2
+  ];
   src = pkg-src;
   meta = {
-    description =
-      "Assorted Python tools for semi-automated processing of GMail messages.";
+    description = "Assorted Python tools for semi-automated processing of GMail messages.";
     longDescription = ''
       [Repository](https://github.com/goromal/gmail_parser)
 
@@ -52,6 +66,11 @@ buildPythonPackage rec {
       ```
     '';
     autoGenUsageCmd = "--help";
-    subCmds = [ "clean" "send" "gbot-send" "journal-send" ];
+    subCmds = [
+      "clean"
+      "send"
+      "gbot-send"
+      "journal-send"
+    ];
   };
 }

@@ -1,7 +1,13 @@
-let pkgs = import ../default.nix { };
-in with pkgs;
+let
+  pkgs = import ../default.nix { };
+in
+with pkgs;
 mkShell {
-  nativeBuildInputs = [ git direnv lorri ];
+  nativeBuildInputs = [
+    git
+    direnv
+    lorri
+  ];
   buildInputs = [
     make-title
     devshell
@@ -9,6 +15,9 @@ mkShell {
     listsources
     color-prints
     mp4unite
+    mp3unite
+    mp3separate
+    mp4separate
     scrape
     orchestrator
     fix-perms
@@ -22,7 +31,10 @@ mkShell {
     secure-delete
     time
     png
+    mp3
+    mp4
     ckfile
+    ffmpeg
   ];
   shellHook = ''
     ${color-prints}/bin/echo_yellow "Entering anixpkgs test shell..."
