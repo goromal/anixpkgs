@@ -26,4 +26,5 @@
   };
   la-quiz-web = 5656;
   tester = 5757;
+  anix_upgrade_ui = 5858;
 }

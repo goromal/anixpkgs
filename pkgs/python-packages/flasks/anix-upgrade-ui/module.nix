@@ -7,6 +7,7 @@
 with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.anix-upgrade-ui;
+  globalCfg = config.machines.base;
 in
 {
   options.services.anix-upgrade-ui = {
@@ -43,11 +44,16 @@ in
     ];
 
     systemd.services.anix-upgrade-ui = {
-      enable = true;
       description = "anix-upgrade Web UI";
-      unitConfig = {
-        StartLimitIntervalSec = 0;
-      };
+      unitConfig.StartLimitIntervalSec = 0;
+      path = with pkgs; [
+        git
+        gawk
+        gnused
+        "/run/wrappers"
+        "/run/current-system/sw"
+      ];
+      environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}";

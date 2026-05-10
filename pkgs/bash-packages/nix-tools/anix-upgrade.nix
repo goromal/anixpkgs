@@ -63,10 +63,11 @@ in
   ]
   ''
     tmpdir=$(mktemp -d)
-    fromdir="$tmpdir"
+    fromdir=""
+    prev_symlink=""
     cd ~/sources
     vcurr=$(cat ~/.anix-version)
-    if [[ "$vcurr" != "Local Build" ]]; then
+    if [[ "$vcurr" != "Local Build"* ]]; then
       vcurr=''${vcurr:1}
     fi
     if [[ "$local" == "1" ]]; then
@@ -74,25 +75,38 @@ in
     else
       localVar=false
     fi
+    ${
+      if standalone == false then
+        ''
+          if ! atsudo true 2>/dev/null; then
+            ${printError} "atsudo is not configured for passwordless sudo on this machine."
+            ${printError} "Ensure ~/secrets/$(hostname)/p.txt.tyz exists and is readable."
+            exit 1
+          fi
+        ''
+      else
+        ""
+    }
     if [[ -d anixpkgs ]]; then
       if [[ -L anixpkgs ]]; then
         ${printYellow} "Removing existing symlink."
-        fromdir=$(readlink anixpkgs)
+        prev_symlink=$(readlink anixpkgs)
+        fromdir="$prev_symlink"
         rm anixpkgs
       else
         ${printYellow} "Removing existing directory."
-        cp -r anixpkgs $tmpdir
+        cp -r anixpkgs "$tmpdir"
         fromdir="$tmpdir/anixpkgs"
         rm -rf anixpkgs
       fi
     fi
-    if [[ ! -z "$version" ]]; then
+    if [[ -n "$version" ]]; then
       nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
-    elif [[ ! -z "$commit" ]]; then
+    elif [[ -n "$commit" ]]; then
       nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "'"$commit"'"; }' -o anixpkgs
-    elif [[ ! -z "$branch" ]]; then
-      nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
-    elif [[ ! -z "$source" ]]; then
+    elif [[ -n "$branch" ]]; then
+      nix-build --tarball-ttl 0 -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
+    elif [[ -n "$source" ]]; then
       if [[ "$source" != /* ]]; then
         ${printError} "Please provide an absolute path to the source tree."
         exit 1
@@ -101,36 +115,101 @@ in
       if [[ "$localVar" == "true" ]]; then
         sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/pkgs/nixos/dependencies.nix
       fi
+      _meta=$(git -C "$source" rev-parse --short HEAD 2>/dev/null || echo "local")
+      echo -n "$_meta" > anixpkgs/ANIX_META
     else
       nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/master"; }' -o anixpkgs
     fi
-    vdest=$(cat anixpkgs/ANIX_VERSION)
-    ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $(cat anixpkgs/NIXOS_VERSION))..."
+    if [[ ! -d anixpkgs ]]; then
+      ${printError} "Build failed: anixpkgs directory not created."
+      if [[ -n "$prev_symlink" ]]; then
+        ${printYellow} "Restoring previous anixpkgs symlink."
+        ln -s "$prev_symlink" anixpkgs
+      fi
+      rm -rf "$tmpdir"
+      exit 1
+    fi
+    if [[ -n "$source" ]]; then
+      vdest="Local Build ($(basename "$source"))"
+    elif [[ "$localVar" == "true" ]]; then
+      vdest="$(cat anixpkgs/ANIX_VERSION) (local)"
+    else
+      vdest=$(cat anixpkgs/ANIX_VERSION)
+    fi
+    nixos_dest=$(cat anixpkgs/NIXOS_VERSION)
+    nixos_curr=$(nixos-version 2>/dev/null | cut -d'.' -f1,2 || echo "")
+    ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $nixos_dest)..."
+    if [[ -n "$nixos_curr" ]] && [[ "$nixos_dest" != "$nixos_curr" ]]; then
+      ${printYellow} "NixOS version bump detected ($nixos_curr -> $nixos_dest). Updating nix channels..."
+      ${
+        if standalone == false then
+          ''
+            atsudo nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixpkgs
+            atsudo nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixos
+            atsudo nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$nixos_dest.tar.gz" home-manager
+            atsudo nix-channel --update
+          ''
+        else
+          ''
+            nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixpkgs
+            nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$nixos_dest.tar.gz" home-manager
+            nix-channel --update
+          ''
+      }
+    fi
+    build_success=0
     if [[ "$boot" == "1" ]]; then
       ${
         if standalone == false then
           ''
-            atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot && ${printYellow} "Reboot for changes to take effect."
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot; then
+              ${printYellow} "Reboot for changes to take effect."
+              build_success=1
+            fi
           ''
         else
           ''
-            ${printYellow} "Ignoring boot flag for home switch" && home-manager switch && ${printYellow} "Done."
+            ${printYellow} "Ignoring boot flag for home switch"
+            if home-manager switch; then
+              ${printYellow} "Done."
+              build_success=1
+            fi
           ''
       }
     else
       ${
         if standalone == false then
           ''
-            atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch && ${printYellow} "Done."
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch; then
+              ${printYellow} "Done."
+              build_success=1
+            fi
           ''
         else
           ''
-            home-manager switch && ${printYellow} "Done."
+            if home-manager switch; then
+              ${printYellow} "Done."
+              build_success=1
+            fi
           ''
       }
     fi
+    if [[ "$build_success" == "0" ]]; then
+      ${printError} "Build/switch failed."
+      if [[ -n "$prev_symlink" ]]; then
+        ${printYellow} "Rolling back anixpkgs symlink to previous state."
+        rm -rf anixpkgs
+        ln -s "$prev_symlink" anixpkgs
+      fi
+      rm -rf "$tmpdir"
+      exit 1
+    fi
     echo ""
-    ${anix-changelog-compare}/bin/anix-changelog-compare "$fromdir" anixpkgs
+    if [[ -n "$fromdir" ]]; then
+      ${anix-changelog-compare}/bin/anix-changelog-compare "$fromdir" anixpkgs
+    else
+      ${printYellow} "No prior anixpkgs tree found; skipping changelog compare."
+    fi
     rm -rf "$tmpdir"
   ''
 )

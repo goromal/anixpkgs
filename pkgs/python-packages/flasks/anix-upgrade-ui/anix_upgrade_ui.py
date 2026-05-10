@@ -1,16 +1,27 @@
 import argparse
+import os
 import subprocess
 import threading
-import time
-import os
 
-from flask import Flask, Blueprint, render_template, Response, stream_with_context, jsonify
+from flask import (
+    Blueprint,
+    Flask,
+    Response,
+    jsonify,
+    render_template,
+    request,
+    stream_with_context,
+)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", type=int, default=5000)
 parser.add_argument("--subdomain", type=str, default="")
-parser.add_argument("--anix-upgrade-bin", type=str, default="anix-upgrade",
-                    help="Path to the anix-upgrade binary")
+parser.add_argument(
+    "--anix-upgrade-bin",
+    type=str,
+    default="anix-upgrade",
+    help="Path to the anix-upgrade binary",
+)
 args = parser.parse_args()
 
 app = Flask(__name__)
@@ -21,20 +32,20 @@ _running = False
 _last_status = "idle"  # idle | running | success | failed
 
 
-def current_version():
+def _read_file(path):
     try:
-        with open(os.path.expanduser("~/.anix-version")) as f:
-            return f.read().strip()
-    except OSError:
-        return "unknown"
-
-
-def current_meta():
-    try:
-        with open(os.path.expanduser("~/.anix-meta")) as f:
+        with open(os.path.expanduser(path)) as f:
             return f.read().strip()
     except OSError:
         return ""
+
+
+def current_version():
+    return _read_file("~/.anix-version") or "unknown"
+
+
+def current_meta():
+    return _read_file("~/.anix-meta")
 
 
 @bp.route("/")
@@ -50,7 +61,6 @@ def index():
 
 @bp.route("/status")
 def status():
-    global _running, _last_status
     return jsonify({
         "running": _running,
         "status": _last_status,
@@ -59,10 +69,31 @@ def status():
     })
 
 
-@bp.route("/run", methods=["POST"])
-def run():
-    from flask import request
+@bp.route("/api/list-dirs", methods=["POST"])
+def list_dirs():
+    data = request.get_json() or {}
+    path = os.path.normpath(data.get("path", "/"))
+    try:
+        entries = os.listdir(path)
+    except PermissionError:
+        return jsonify({"error": "Permission denied"}), 403
+    except FileNotFoundError:
+        return jsonify({"error": "Path not found"}), 404
 
+    visible = sorted(
+        e for e in entries
+        if os.path.isdir(os.path.join(path, e)) and not e.startswith(".")
+    )
+    hidden = sorted(
+        e for e in entries
+        if os.path.isdir(os.path.join(path, e)) and e.startswith(".")
+    )
+    parent = os.path.dirname(path) if path != "/" else None
+    return jsonify({"path": path, "parent": parent, "dirs": visible + hidden})
+
+
+@bp.route("/run", methods=["POST"])
+def run_upgrade():
     global _running, _last_status
 
     with _lock:
@@ -123,9 +154,9 @@ def run():
 app.register_blueprint(bp)
 
 
-def run():
+def main():
     app.run(host="0.0.0.0", port=args.port, debug=False)
 
 
 if __name__ == "__main__":
-    run()
+    main()

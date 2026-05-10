@@ -6,7 +6,7 @@ setup(
     py_modules=["anix_upgrade_ui"],
     entry_points={
         "console_scripts": [
-            "anix-upgrade-ui=anix_upgrade_ui:run",
+            "anix-upgrade-ui=anix_upgrade_ui:main",
         ],
     },
 )
