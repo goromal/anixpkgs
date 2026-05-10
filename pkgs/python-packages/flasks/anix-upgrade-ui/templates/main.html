@@ -283,30 +283,47 @@ $('upgrade-form').addEventListener('submit', function(e) {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let watchdog = null;
+
+      function resetWatchdog() {
+        clearTimeout(watchdog);
+        watchdog = setTimeout(() => {
+          reader.cancel();
+          resetRunButton();
+          appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
+          waitForServiceThenReload();
+        }, 20000);
+      }
+
       function read() {
         reader.read().then(({ done, value }) => {
           if (done) {
+            clearTimeout(watchdog);
             resetRunButton();
             appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
             waitForServiceThenReload();
             return;
           }
+          resetWatchdog();
           buffer += decoder.decode(value, { stream: true });
           const lines = buffer.split('\n');
           buffer = lines.pop();
           for (const line of lines) {
             if (!line.startsWith('data: ')) continue;
             const msg = line.slice(6);
-            if (msg === '[DONE]') { resetRunButton(); pollStatus(); return; }
+            if (msg === '[DONE]') { clearTimeout(watchdog); resetRunButton(); pollStatus(); return; }
             appendLog(msg);
           }
           read();
         }).catch(() => {
+          clearTimeout(watchdog);
           resetRunButton();
           appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
           waitForServiceThenReload();
         });
       }
+
+      resetWatchdog();
       read();
     })
     .catch(err => {
