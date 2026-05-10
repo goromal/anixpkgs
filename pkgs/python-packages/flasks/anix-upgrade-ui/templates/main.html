@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>anix-upgrade</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f8f9fa; }
+    .log-box {
+      background: #1e1e1e; color: #d4d4d4; font-family: monospace;
+      font-size: 0.85rem; border-radius: 6px; padding: 12px;
+      height: 420px; overflow-y: auto; white-space: pre-wrap;
+    }
+    .spinner-border { width: 1rem; height: 1rem; border-width: 0.15em; }
+    #status-badge { font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+<div class="container py-4" style="max-width:800px">
+  <h1 class="mb-1">anix-upgrade</h1>
+  <p class="text-muted mb-4">Upgrade the NixOS / home-manager system configuration</p>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div><strong>Current version:</strong> <span id="curr-version">{{ version }}</span>
+          {% if meta %}<span class="text-muted small ms-1">({{ meta }})</span>{% endif %}
+        </div>
+        <span id="status-badge" class="badge
+          {% if status == 'success' %}bg-success
+          {% elif status == 'failed' %}bg-danger
+          {% elif status == 'running' %}bg-warning text-dark
+          {% else %}bg-secondary{% endif %}">
+          {{ status }}
+        </span>
+      </div>
+
+      <form id="upgrade-form">
+        <div class="row g-2 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold">Version tag</label>
+            <input type="text" class="form-control form-control-sm" name="version" placeholder="e.g. 8.12.2">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold">Commit</label>
+            <input type="text" class="form-control form-control-sm" name="commit" placeholder="git SHA">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold">Branch</label>
+            <input type="text" class="form-control form-control-sm" name="branch" placeholder="e.g. dev/my-feature">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold">Source tree path</label>
+            <input type="text" class="form-control form-control-sm" name="source" placeholder="absolute path">
+          </div>
+        </div>
+        <div class="d-flex gap-4 mb-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="local" value="1" id="chk-local">
+            <label class="form-check-label" for="chk-local">--local</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="boot" value="1" id="chk-boot">
+            <label class="form-check-label" for="chk-boot">--boot</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" id="run-btn">Run upgrade</button>
+      </form>
+    </div>
+  </div>
+
+  <h5>Output</h5>
+  <div id="log" class="log-box mb-2"></div>
+  <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('log').textContent=''">Clear</button>
+</div>
+
+<script>
+const subdomain = "{{ subdomain }}";
+
+function setStatus(s) {
+  const badge = document.getElementById('status-badge');
+  badge.textContent = s;
+  badge.className = 'badge';
+  if (s === 'success') badge.classList.add('bg-success');
+  else if (s === 'failed') badge.classList.add('bg-danger');
+  else if (s === 'running') badge.classList.add('bg-warning', 'text-dark');
+  else badge.classList.add('bg-secondary');
+}
+
+function pollStatus() {
+  fetch(subdomain + '/status')
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('curr-version').textContent = data.version || 'unknown';
+      setStatus(data.status || 'idle');
+    })
+    .catch(() => {});
+}
+
+document.getElementById('upgrade-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = this;
+  const btn = document.getElementById('run-btn');
+  const log = document.getElementById('log');
+
+  const fd = new FormData(form);
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border" role="status"></span> Running...';
+  setStatus('running');
+  log.textContent = '';
+
+  fetch(subdomain + '/run', { method: 'POST', body: fd })
+    .then(response => {
+      if (response.status === 409) {
+        log.textContent = '[Upgrade already in progress]\n';
+        btn.disabled = false;
+        btn.textContent = 'Run upgrade';
+        return;
+      }
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      function read() {
+        reader.read().then(({ done, value }) => {
+          if (done) {
+            btn.disabled = false;
+            btn.textContent = 'Run upgrade';
+            pollStatus();
+            return;
+          }
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const msg = line.slice(6);
+              if (msg === '[DONE]') {
+                btn.disabled = false;
+                btn.textContent = 'Run upgrade';
+                pollStatus();
+                return;
+              }
+              log.textContent += msg + '\n';
+              log.scrollTop = log.scrollHeight;
+            }
+          }
+          read();
+        });
+      }
+      read();
+    })
+    .catch(err => {
+      log.textContent += 'Error: ' + err + '\n';
+      btn.disabled = false;
+      btn.textContent = 'Run upgrade';
+      setStatus('failed');
+    });
+});
+
+setInterval(pollStatus, 30000);
+</script>
+</body>
+</html>
