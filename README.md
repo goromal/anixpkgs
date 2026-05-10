@@ -1,10 +1,10 @@
-# anixpkgs 
+# anixpkgs
 
 ![example workflow](https://github.com/goromal/anixpkgs/actions/workflows/test.yml/badge.svg) [![Deploy](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml/badge.svg?event=push)](https://github.com/goromal/anixpkgs/actions/workflows/deploy.yml) [![pages-build-deployment](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/goromal/anixpkgs/actions/workflows/pages/pages-build-deployment)
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v8.12.2](https://github.com/goromal/anixpkgs/tree/v8.12.2)**
+**LATEST RELEASE: [v8.13.0](https://github.com/goromal/anixpkgs/tree/v8.13.0)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
