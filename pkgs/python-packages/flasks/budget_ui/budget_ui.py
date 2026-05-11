@@ -87,7 +87,8 @@ def stream_command(command):
         stderr=subprocess.STDOUT,
         text=True,
         bufsize=1,
-        universal_newlines=True
+        universal_newlines=True,
+        env={**os.environ, 'PYTHONUNBUFFERED': '1'},
     )
     for line in process.stdout:
         yield line.rstrip('\n')

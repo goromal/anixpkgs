@@ -138,6 +138,11 @@ in
       default = false;
       description = "Whether to enable the orchestrator daemon";
     };
+    enableAnixUpgradeUI = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the anix-upgrade web UI";
+    };
     timedOrchJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description = "Orchestrator job definitions";
@@ -196,6 +201,7 @@ in
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
+    ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
     ../modules/launchpad/module.nix
     (
@@ -460,6 +466,10 @@ in
 
     services.orchestrator_ui = {
       enable = cfg.enableOrchestrator;
+    };
+
+    services.anix-upgrade-ui = {
+      enable = cfg.enableAnixUpgradeUI;
     };
 
     services.rankserver = {

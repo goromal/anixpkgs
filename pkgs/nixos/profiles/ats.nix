@@ -47,6 +47,7 @@ with import ../dependencies.nix;
         }
       ];
       enableOrchestrator = true;
+      enableAnixUpgradeUI = true;
       timedOrchJobs = [
         {
           name = "ats-triaging";

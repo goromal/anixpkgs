@@ -262,6 +262,7 @@ let
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
               orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
               la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
@@ -364,6 +365,7 @@ rec {
   budget_ui = final.python313.pkgs.budget_ui;
   orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
