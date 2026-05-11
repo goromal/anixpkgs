@@ -7,19 +7,33 @@
     sshUser = "andrew";
     sshKey = "/data/andrew/.ssh/id_rsa";
     # x86_64-linux natively; aarch64-linux via binfmt emulation (pc-base.nix)
-    systems = [ "x86_64-linux" "aarch64-linux" ];
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
     maxJobs = 4;
     speedFactor = 2;
-    supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" ];
+    supportedFeatures = [
+      "nixos-test"
+      "benchmark"
+      "big-parallel"
+    ];
   };
   personal-panasonic = {
     hostName = "atorgesen-panasonic.local";
     sshUser = "andrew";
     sshKey = "/data/andrew/.ssh/id_rsa";
     # x86_64-linux natively; aarch64-linux via binfmt emulation (pc-base.nix)
-    systems = [ "x86_64-linux" "aarch64-linux" ];
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
     maxJobs = 4;
     speedFactor = 2;
-    supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" ];
+    supportedFeatures = [
+      "nixos-test"
+      "benchmark"
+      "big-parallel"
+    ];
   };
 }
