@@ -26,5 +26,8 @@
   nix.settings.max-jobs = lib.mkForce 1;
   nix.settings.cores = lib.mkForce 4;
 
-  machines.base.remoteBuilders = [ "personal-inspiron" "personal-panasonic" ];
+  machines.base.remoteBuilders = [
+    "personal-inspiron"
+    "personal-panasonic"
+  ];
 }
