@@ -4,6 +4,7 @@
 <head>
     <title>Budget Tool</title>
     <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/ansi_up@5/ansi_up.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,13 +31,10 @@
             color: red;
         }
 
-        pre.log {
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
+        .log-box {
+            background: #1e1e1e; color: #d4d4d4; font-family: monospace;
+            font-size: 0.85rem; border-radius: 6px; padding: 12px;
+            height: 300px; overflow-y: auto; white-space: pre-wrap;
         }
 
         button {
@@ -75,38 +73,45 @@
         <button onclick='runCommand({{ url_for("budget.trigger_upload") | tojson }}, "upload-log")'>
             Upload transactions
         </button>
-        <pre id="upload-log" class="log"></pre>
+        <div id="upload-log" class="log-box"></div>
     </div>
 
     <div class="section">
         <button onclick='runCommand({{ url_for("budget.trigger_process") | tojson }}, "process-log")'>
             Process transactions
         </button>
-        <pre id="process-log" class="log"></pre>
+        <div id="process-log" class="log-box"></div>
     </div>
 
     <script>
+        const ansiUp = (typeof AnsiUp !== 'undefined') ? new AnsiUp() : null;
+        if (ansiUp) ansiUp.use_classes = false;
+
+        function escHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function appendLog(log, msg) {
+            const span = document.createElement('span');
+            span.innerHTML = (ansiUp ? ansiUp.ansi_to_html(msg) : escHtml(msg)) + '\n';
+            log.appendChild(span);
+            log.scrollTop = log.scrollHeight;
+        }
+
         function runCommand(endpoint, logId) {
-            console.log("Connecting to SSE endpoint:", endpoint);
             const log = document.getElementById(logId);
-            log.textContent = 'Starting...\n\n';
+            log.innerHTML = '';
+            appendLog(log, 'Starting...');
 
             const evtSource = new EventSource(endpoint);
 
             evtSource.onmessage = function (event) {
-                log.textContent += event.data + '\n';
-                log.scrollTop = log.scrollHeight;
+                appendLog(log, event.data);
             };
 
             evtSource.onerror = function () {
-                console.error("SSE connection failed or closed");
-                log.textContent += '\n[Connection failed or ended]\n';
+                appendLog(log, '[Connection failed or ended]');
                 evtSource.close();
-            };
-
-            evtSource.onopen = function () {
-                console.log("SSE connection opened");
-                log.textContent += '[Connected to server]\n';
             };
         }
     </script>
