@@ -25,6 +25,16 @@ in
     "Bash(git status:*)"
     "Bash(git diff:*)"
     "Bash(git show:*)"
+    # General git
+    "Bash(git add:*)"
+    "Bash(git commit:*)"
+    "Bash(git push:*)"
+    "Bash(git pull:*)"
+    "Bash(git stash:*)"
+    "Bash(git checkout:*)"
+    "Bash(git rebase:*)"
+    # GitHub CLI
+    "Bash(gh:*)"
     # Filesystem read
     "Bash(ls:*)"
     "Bash(find:*)"
@@ -34,13 +44,29 @@ in
     "Bash(echo:*)"
     "Bash(which:*)"
     "Bash(pwd:*)"
-    # Write ops (superpowers pre-commit hook guards commits)
-    "Bash(git add:*)"
-    "Bash(git commit:*)"
+    # Data processing
+    "Bash(python3:*)"
+    "Bash(jq:*)"
     # Build tools
     "Bash(npm run:*)"
     "Bash(cargo build:*)"
     "Bash(nix build:*)"
+    "Bash(nix-build:*)"
+    "Bash(nix eval:*)"
+    "Bash(nix flake:*)"
+    "Bash(nix search:*)"
+    # System management
+    "Bash(systemctl:*)"
+    "Bash(journalctl:*)"
+    # This-system tools
+    "Bash(anix-upgrade:*)"
+    "Bash(claude-setup)"
+    "Bash(rtk:*)"
+    # File access
+    "Read(/data/andrew/**)"
+    # Web fetch
+    "WebFetch(domain:github.com)"
+    "WebFetch(domain:raw.githubusercontent.com)"
     # MCP read tools
     "mcp__vikunja__vikunja_list_tasks"
     "mcp__vikunja__vikunja_list_projects"
