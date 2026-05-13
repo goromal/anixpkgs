@@ -184,7 +184,7 @@ in
         NIXOS_HOOKS='${hooksJson}'
 
         # Create directory if it doesn't exist
-        mkdir -p "$SETTINGS_DIR"
+        ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
 
         # If settings file doesn't exist, just write the NixOS settings
         if [ ! -f "$SETTINGS_FILE" ]; then
@@ -194,11 +194,11 @@ in
           # Merge existing settings with NixOS settings
           # NixOS settings take precedence for conflicts
           ${pkgs.jq}/bin/jq -n \
-            --argjson existing "$(cat "$SETTINGS_FILE")" \
+            --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
             --argjson nixos "$NIXOS_SETTINGS" \
             '$existing * $nixos' > "$SETTINGS_FILE.tmp"
 
-          mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
           echo "Updated Claude settings, preserving user modifications"
         fi
 
@@ -213,7 +213,7 @@ in
                 | unique_by(.hooks[0].command)
               )
             )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-          mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
           echo "Merged declarative hooks into Claude settings"
         fi
       '';
@@ -221,8 +221,6 @@ in
     {
       Unit = {
         Description = "Update Claude Code settings with NixOS configuration";
-        After = [ "graphical-session-pre.target" ];
-        PartOf = [ "graphical-session.target" ];
       };
       Service = {
         Type = "oneshot";
