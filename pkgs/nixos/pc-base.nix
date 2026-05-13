@@ -191,7 +191,7 @@ in
       });
       default =
         let
-          sp = "~/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
+          sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
         in
         [
           {
