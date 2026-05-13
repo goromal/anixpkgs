@@ -6,6 +6,7 @@
 }:
 with import ./dependencies.nix;
 let
+  claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
@@ -155,62 +156,17 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "DevonMorris/claude-ctags"
-        "pcvelz/superpowers"
-      ];
+      default = claudeDefaults.marketplaces;
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "claude-ctags@claude-ctags"
-        "code-review@claude-plugins-official"
-        "frontend-design@claude-plugins-official"
-        "github@claude-plugins-official"
-        "feature-dev@claude-plugins-official"
-        "pr-review-toolkit@claude-plugins-official"
-        "superpowers-extended-cc@superpowers-extended-cc-marketplace"
-      ];
+      default = claudeDefaults.plugins;
       description = "List of claude plugins to install";
     };
     claudePermissionsAllow = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        # Read-only git
-        "Bash(git log:*)"
-        "Bash(git status:*)"
-        "Bash(git diff:*)"
-        "Bash(git show:*)"
-        # Filesystem read
-        "Bash(ls:*)"
-        "Bash(find:*)"
-        "Bash(cat:*)"
-        "Bash(grep:*)"
-        "Bash(rg:*)"
-        "Bash(echo:*)"
-        "Bash(which:*)"
-        "Bash(pwd:*)"
-        # Write ops (superpowers pre-commit hook guards commits)
-        "Bash(git add:*)"
-        "Bash(git commit:*)"
-        # Build tools
-        "Bash(npm run:*)"
-        "Bash(cargo build:*)"
-        "Bash(nix build:*)"
-        # MCP read tools
-        "mcp__vikunja__vikunja_list_tasks"
-        "mcp__vikunja__vikunja_list_projects"
-        "mcp__vikunja__vikunja_get_task"
-        "mcp__vikunja__vikunja_get_project"
-        "mcp__vikunja__vikunja_get_comments"
-        "mcp__wiki__wiki_get_page"
-        "mcp__wiki__wiki_get_page_md"
-        "mcp__wiki__wiki_list_pages"
-        "mcp__wiki__wiki_search"
-        "mcp__notion__notion_list_blocks"
-        "mcp__notion__notion_list_subpages"
-      ];
+      default = claudeDefaults.permissionsAllow;
       description = "List of Claude Code permission patterns to add to the global allowlist";
     };
     claudeHooks = lib.mkOption {
@@ -230,38 +186,7 @@ in
           };
         }
       );
-      default =
-        let
-          sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
-        in
-        [
-          {
-            event = "SessionStart";
-            matcher = "startup|clear|compact";
-            command = "\"${sp}/hooks/run-hook.cmd\" session-start";
-            async = false;
-          }
-          {
-            event = "PreToolUse";
-            matcher = "Bash";
-            command = "bash \"${sp}/hooks/examples/pre-commit-check-tasks.sh\"";
-          }
-          {
-            event = "PostToolUse";
-            matcher = "TaskUpdate";
-            command = "bash \"${sp}/hooks/examples/post-task-complete-revalidate.sh\"";
-          }
-          {
-            event = "Stop";
-            matcher = "";
-            command = "bash \"${sp}/hooks/examples/stop-revalidate-user-gates.sh\"";
-          }
-          {
-            event = "PreToolUse";
-            matcher = "TaskUpdate";
-            command = "bash \"${sp}/hooks/examples/pre-task-blockedby-enforce.sh\"";
-          }
-        ];
+      default = claudeDefaults.hooks;
       description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
