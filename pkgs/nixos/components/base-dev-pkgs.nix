@@ -168,8 +168,13 @@ in
         map (h: {
           matcher = h.matcher;
           hooks = [
-            ({ type = "command"; command = h.command; }
-              // lib.optionalAttrs h.async { async = true; })
+            (
+              {
+                type = "command";
+                command = h.command;
+              }
+              // lib.optionalAttrs h.async { async = true; }
+            )
           ];
         }) entries
       ) hooksByEvent;

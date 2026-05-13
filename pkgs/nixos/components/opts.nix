@@ -71,20 +71,22 @@ with import ../dependencies.nix;
       description = "List of Claude Code permission patterns to add to the global allowlist";
     };
     claudeHooks = lib.mkOption {
-      type = lib.types.listOf (lib.types.submodule {
-        options = {
-          event = lib.mkOption { type = lib.types.str; };
-          matcher = lib.mkOption {
-            type = lib.types.str;
-            default = "";
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
           };
-          command = lib.mkOption { type = lib.types.str; };
-          async = lib.mkOption {
-            type = lib.types.bool;
-            default = false;
-          };
-        };
-      });
+        }
+      );
       default = [ ];
       description = "List of Claude Code hooks to merge into settings.json";
     };
