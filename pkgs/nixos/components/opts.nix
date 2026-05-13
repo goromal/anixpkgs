@@ -65,6 +65,24 @@ with import ../dependencies.nix;
       default = [ ];
       description = "List of claude plugins to install";
     };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          event = lib.mkOption { type = lib.types.str; };
+          matcher = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+          };
+          command = lib.mkOption { type = lib.types.str; };
+          async = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+          };
+        };
+      });
+      default = [ ];
+      description = "List of Claude Code hooks to merge into settings.json";
+    };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };

@@ -155,7 +155,10 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "DevonMorris/claude-ctags" ];
+      default = [
+        "DevonMorris/claude-ctags"
+        "pcvelz/superpowers"
+      ];
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
@@ -167,8 +170,58 @@ in
         "github@claude-plugins-official"
         "feature-dev@claude-plugins-official"
         "pr-review-toolkit@claude-plugins-official"
+        "superpowers-extended-cc@superpowers-extended-cc-marketplace"
       ];
       description = "List of claude plugins to install";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          event = lib.mkOption { type = lib.types.str; };
+          matcher = lib.mkOption {
+            type = lib.types.str;
+            default = "";
+          };
+          command = lib.mkOption { type = lib.types.str; };
+          async = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+          };
+        };
+      });
+      default =
+        let
+          sp = "~/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
+        in
+        [
+          {
+            event = "SessionStart";
+            matcher = "startup|clear|compact";
+            command = "\"${sp}/hooks/run-hook.cmd\" session-start";
+            async = false;
+          }
+          {
+            event = "PreToolUse";
+            matcher = "Bash";
+            command = "bash \"${sp}/hooks/examples/pre-commit-check-tasks.sh\"";
+          }
+          {
+            event = "PostToolUse";
+            matcher = "TaskUpdate";
+            command = "bash \"${sp}/hooks/examples/post-task-complete-revalidate.sh\"";
+          }
+          {
+            event = "Stop";
+            matcher = "";
+            command = "bash \"${sp}/hooks/examples/stop-revalidate-user-gates.sh\"";
+          }
+          {
+            event = "PreToolUse";
+            matcher = "TaskUpdate";
+            command = "bash \"${sp}/hooks/examples/pre-task-blockedby-enforce.sh\"";
+          }
+        ];
+      description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
@@ -844,6 +897,7 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudeHooks = cfg.claudeHooks;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
