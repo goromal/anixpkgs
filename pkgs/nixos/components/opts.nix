@@ -65,6 +65,11 @@ with import ../dependencies.nix;
       default = [ ];
       description = "List of claude plugins to install";
     };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
     claudeHooks = lib.mkOption {
       type = lib.types.listOf (lib.types.submodule {
         options = {

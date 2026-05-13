@@ -174,6 +174,7 @@ in
         }) entries
       ) hooksByEvent;
       hooksJson = builtins.toJSON hooksConfig;
+      permissionsAllowJson = builtins.toJSON cfg.claudePermissionsAllow;
 
       mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
         set -e
@@ -182,6 +183,7 @@ in
         SETTINGS_FILE="$SETTINGS_DIR/settings.json"
         NIXOS_SETTINGS='${nixosSettingsJson}'
         NIXOS_HOOKS='${hooksJson}'
+        NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
 
         # Create directory if it doesn't exist
         ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
@@ -215,6 +217,16 @@ in
             )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
           ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
           echo "Merged declarative hooks into Claude settings"
+        fi
+
+        # Append declarative permissions allowlist, deduplicating
+        if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
+          ${pkgs.jq}/bin/jq \
+            --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
+            '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
+            "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Merged declarative permissions into Claude settings"
         fi
       '';
     in

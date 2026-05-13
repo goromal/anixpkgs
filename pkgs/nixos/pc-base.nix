@@ -174,6 +174,45 @@ in
       ];
       description = "List of claude plugins to install";
     };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [
+        # Read-only git
+        "Bash(git log:*)"
+        "Bash(git status:*)"
+        "Bash(git diff:*)"
+        "Bash(git show:*)"
+        # Filesystem read
+        "Bash(ls:*)"
+        "Bash(find:*)"
+        "Bash(cat:*)"
+        "Bash(grep:*)"
+        "Bash(rg:*)"
+        "Bash(echo:*)"
+        "Bash(which:*)"
+        "Bash(pwd:*)"
+        # Write ops (superpowers pre-commit hook guards commits)
+        "Bash(git add:*)"
+        "Bash(git commit:*)"
+        # Build tools
+        "Bash(npm run:*)"
+        "Bash(cargo build:*)"
+        "Bash(nix build:*)"
+        # MCP read tools
+        "mcp__vikunja__vikunja_list_tasks"
+        "mcp__vikunja__vikunja_list_projects"
+        "mcp__vikunja__vikunja_get_task"
+        "mcp__vikunja__vikunja_get_project"
+        "mcp__vikunja__vikunja_get_comments"
+        "mcp__wiki__wiki_get_page"
+        "mcp__wiki__wiki_get_page_md"
+        "mcp__wiki__wiki_list_pages"
+        "mcp__wiki__wiki_search"
+        "mcp__notion__notion_list_blocks"
+        "mcp__notion__notion_list_subpages"
+      ];
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
     claudeHooks = lib.mkOption {
       type = lib.types.listOf (lib.types.submodule {
         options = {
@@ -897,6 +936,7 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudePermissionsAllow = cfg.claudePermissionsAllow;
         claudeHooks = cfg.claudeHooks;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
