@@ -8,6 +8,7 @@ with import ./dependencies.nix;
 let
   claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
+  remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
@@ -194,6 +195,16 @@ in
       default = { };
       description = "Attrs describing the Claude JSON settings";
     };
+    remoteBuilders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Keys into remote-builders.nix catalog of LAN build machines to use for distributed builds.";
+    };
+    acceptRemoteBuilds = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether this machine accepts build jobs from other LAN hosts via SSH.";
+    };
   };
 
   imports = [
@@ -296,6 +307,10 @@ in
       "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
       "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
     ];
+
+    nix.distributedBuilds = cfg.remoteBuilders != [ ];
+    nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+    nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
     services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
     services.displayManager.gdm.enable = lib.mkIf (
