@@ -161,39 +161,83 @@ in
       nixosSettings = baseConfig // cfg.extraClaudeSettings;
       nixosSettingsJson = builtins.toJSON nixosSettings;
 
+      # Group hooks by event and convert to Claude Code settings format
+      hooksByEvent = lib.groupBy (h: h.event) cfg.claudeHooks;
+      hooksConfig = lib.mapAttrs (
+        _event: entries:
+        map (h: {
+          matcher = h.matcher;
+          hooks = [
+            (
+              {
+                type = "command";
+                command = h.command;
+              }
+              // lib.optionalAttrs h.async { async = true; }
+            )
+          ];
+        }) entries
+      ) hooksByEvent;
+      hooksJson = builtins.toJSON hooksConfig;
+      permissionsAllowJson = builtins.toJSON cfg.claudePermissionsAllow;
+
       mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
         set -e
 
         SETTINGS_DIR="$HOME/.claude"
         SETTINGS_FILE="$SETTINGS_DIR/settings.json"
         NIXOS_SETTINGS='${nixosSettingsJson}'
+        NIXOS_HOOKS='${hooksJson}'
+        NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
 
         # Create directory if it doesn't exist
-        mkdir -p "$SETTINGS_DIR"
+        ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
 
         # If settings file doesn't exist, just write the NixOS settings
         if [ ! -f "$SETTINGS_FILE" ]; then
           echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
           echo "Created new Claude settings file with NixOS configuration"
-          exit 0
+        else
+          # Merge existing settings with NixOS settings
+          # NixOS settings take precedence for conflicts
+          ${pkgs.jq}/bin/jq -n \
+            --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
+            --argjson nixos "$NIXOS_SETTINGS" \
+            '$existing * $nixos' > "$SETTINGS_FILE.tmp"
+
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Updated Claude settings, preserving user modifications"
         fi
 
-        # Merge existing settings with NixOS settings
-        # NixOS settings take precedence for conflicts
-        ${pkgs.jq}/bin/jq -n \
-          --argjson existing "$(cat "$SETTINGS_FILE")" \
-          --argjson nixos "$NIXOS_SETTINGS" \
-          '$existing * $nixos' > "$SETTINGS_FILE.tmp"
+        # Append declarative hooks, deduplicating by command
+        if [ "$NIXOS_HOOKS" != "{}" ]; then
+          ${pkgs.jq}/bin/jq \
+            --argjson new_hooks "$NIXOS_HOOKS" \
+            'reduce ($new_hooks | to_entries[]) as $ev (
+              .;
+              .hooks[$ev.key] = (
+                (.hooks[$ev.key] // []) + $ev.value
+                | unique_by(.hooks[0].command)
+              )
+            )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Merged declarative hooks into Claude settings"
+        fi
 
-        mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-        echo "Updated Claude settings, preserving user modifications"
+        # Append declarative permissions allowlist, deduplicating
+        if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
+          ${pkgs.jq}/bin/jq \
+            --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
+            '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
+            "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Merged declarative permissions into Claude settings"
+        fi
       '';
     in
     {
       Unit = {
         Description = "Update Claude Code settings with NixOS configuration";
-        After = [ "graphical-session-pre.target" ];
-        PartOf = [ "graphical-session.target" ];
       };
       Service = {
         Type = "oneshot";

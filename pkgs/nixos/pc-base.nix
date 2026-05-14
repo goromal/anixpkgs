@@ -6,6 +6,7 @@
 }:
 with import ./dependencies.nix;
 let
+  claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
   remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
@@ -156,20 +157,38 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "DevonMorris/claude-ctags" ];
+      default = claudeDefaults.marketplaces;
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "claude-ctags@claude-ctags"
-        "code-review@claude-plugins-official"
-        "frontend-design@claude-plugins-official"
-        "github@claude-plugins-official"
-        "feature-dev@claude-plugins-official"
-        "pr-review-toolkit@claude-plugins-official"
-      ];
+      default = claudeDefaults.plugins;
       description = "List of claude plugins to install";
+    };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = claudeDefaults.permissionsAllow;
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
+      default = claudeDefaults.hooks;
+      description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
@@ -859,6 +878,8 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudePermissionsAllow = cfg.claudePermissionsAllow;
+        claudeHooks = cfg.claudeHooks;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
