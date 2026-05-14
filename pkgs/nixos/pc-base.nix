@@ -140,11 +140,6 @@ in
       default = false;
       description = "Whether to enable the orchestrator daemon";
     };
-    enableAnixUpgradeUI = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to enable the anix-upgrade web UI";
-    };
     timedOrchJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description = "Orchestrator job definitions";
@@ -490,7 +485,7 @@ in
     };
 
     services.anix-upgrade-ui = {
-      enable = cfg.enableAnixUpgradeUI;
+      enable = true;
     };
 
     services.rankserver = {
