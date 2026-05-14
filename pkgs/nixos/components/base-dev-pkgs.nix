@@ -102,7 +102,7 @@ in
         claude mcp add -s user \
           -- linkedin /run/current-system/sw/bin/linkedin-mcp-server
         echo_green "LinkedIn MCP server registered"
-        echo_purple "!!!! To authenticate, start a Claude Code session and ask Claude to call the linkedin_get_oauth_url tool, then follow the OAuth flow."
+        echo_magenta "!!!! To authenticate, start a Claude Code session and ask Claude to call the linkedin_get_oauth_url tool, then follow the OAuth flow."
       ''}
 
       echo_yellow "Installing rtk Claude Code hook..."
