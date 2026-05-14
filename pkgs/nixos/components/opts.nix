@@ -110,5 +110,10 @@ with import ../dependencies.nix;
       default = false;
       description = "Whether the Wiki MCP server is installed on this machine (enables MCP setup in claude-setup)";
     };
+    linkedinMcpEnabled = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether the LinkedIn MCP server is installed on this machine (enables MCP setup in claude-setup)";
+    };
   };
 }

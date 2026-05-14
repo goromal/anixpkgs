@@ -96,6 +96,17 @@ in
         fi
       ''}
 
+      ${lib.optionalString cfg.linkedinMcpEnabled ''
+        echo_yellow "Setting up LinkedIn MCP server..."
+        claude mcp remove linkedin 2>/dev/null || true
+        claude mcp add -s user \
+          -- linkedin /run/current-system/sw/bin/linkedin-mcp-server
+        echo_green "LinkedIn MCP server registered"
+        echo_yellow "Launching LinkedIn browser login..."
+        /run/current-system/sw/bin/linkedin-mcp-server --login
+        echo_green "LinkedIn authentication complete"
+      ''}
+
       echo_yellow "Installing rtk Claude Code hook..."
       rtk init -g
       echo_green "rtk hook installed"
