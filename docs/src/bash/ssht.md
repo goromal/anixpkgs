@@ -2,6 +2,9 @@
 
 SSH to a host and attach/create a remote tmux session.
 
+Wraps `ssh` with optional port-forwarding and an automatic `tmux new -As <session>`
+on the remote, with `HISTSIZE=999` exported so the session retains a useful command
+history.
 
 ## Usage
 
@@ -16,6 +19,5 @@ Flags:
   -u            Forward local 8080 to remote 443 (the Lattice UI).
   -L <spec>     Extra -L forward spec (repeatable). E.g. -L 9090:localhost:9090
   -s <session>  Remote tmux session name (default: "work").
-
 ```
 
