@@ -433,6 +433,11 @@
                 "docs": true
             },
             {
+                "attr": "ssht",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
                 "ci": true,
                 "docs": true
