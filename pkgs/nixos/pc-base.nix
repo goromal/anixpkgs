@@ -6,7 +6,9 @@
 }:
 with import ./dependencies.nix;
 let
+  claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
+  remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
@@ -138,11 +140,6 @@ in
       default = false;
       description = "Whether to enable the orchestrator daemon";
     };
-    enableAnixUpgradeUI = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to enable the anix-upgrade web UI";
-    };
     timedOrchJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description = "Orchestrator job definitions";
@@ -160,25 +157,53 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "DevonMorris/claude-ctags" ];
+      default = claudeDefaults.marketplaces;
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "claude-ctags@claude-ctags"
-        "code-review@claude-plugins-official"
-        "frontend-design@claude-plugins-official"
-        "github@claude-plugins-official"
-        "feature-dev@claude-plugins-official"
-        "pr-review-toolkit@claude-plugins-official"
-      ];
+      default = claudeDefaults.plugins;
       description = "List of claude plugins to install";
+    };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = claudeDefaults.permissionsAllow;
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
+      default = claudeDefaults.hooks;
+      description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
       description = "Attrs describing the Claude JSON settings";
+    };
+    remoteBuilders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Keys into remote-builders.nix catalog of LAN build machines to use for distributed builds.";
+    };
+    acceptRemoteBuilds = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether this machine accepts build jobs from other LAN hosts via SSH.";
     };
   };
 
@@ -291,6 +316,10 @@ in
       "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
       "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
     ];
+
+    nix.distributedBuilds = cfg.remoteBuilders != [ ];
+    nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+    nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
     services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
     services.displayManager.gdm.enable = lib.mkIf (
@@ -469,7 +498,7 @@ in
     };
 
     services.anix-upgrade-ui = {
-      enable = cfg.enableAnixUpgradeUI;
+      enable = true;
     };
 
     services.rankserver = {
@@ -861,6 +890,8 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudePermissionsAllow = cfg.claudePermissionsAllow;
+        claudeHooks = cfg.claudeHooks;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);

@@ -76,6 +76,7 @@
   - [manage-gmail](./bash/manage-gmail.md)
   - [gantter](./bash/gantter.md)
   - [local-ssh-proxy](./bash/local-ssh-proxy.md)
+  - [ssht](./bash/ssht.md)
   - [la-quiz](./bash/la-quiz.md)
   - [play](./bash/play.md)
   - [budget_report](./bash/budget_report.md)

@@ -388,6 +388,7 @@ rec {
     }
   );
   local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
+  ssht = addDoc (prev.callPackage ./bash-packages/ssht { });
   gantter = addDoc (
     prev.callPackage ./bash-packages/gantter {
       python = final.python313;
