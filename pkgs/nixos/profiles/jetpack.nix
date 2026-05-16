@@ -36,7 +36,6 @@ with import ../dependencies.nix;
         }
       ];
       enableOrchestrator = true;
-      enableAnixUpgradeUI = true;
       timedOrchJobs = [ ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
