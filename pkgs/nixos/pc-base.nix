@@ -212,7 +212,6 @@ in
     ../modules/vikunja/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
-    ../modules/linkedin-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -661,9 +660,6 @@ in
     # Wiki MCP Server
     services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
 
-    # LinkedIn MCP Server
-    services.linkedin-mcp.enable = cfg.developer && cfg.recreational && cfg.graphical && !cfg.isATS;
-
     # Global packages
     environment.systemPackages =
       with pkgs;
@@ -883,7 +879,6 @@ in
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
         wikiMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
-        linkedinMcpEnabled = cfg.developer && cfg.recreational && cfg.graphical && !cfg.isATS;
       };
     };
   };
