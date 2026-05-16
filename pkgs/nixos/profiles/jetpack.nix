@@ -76,7 +76,6 @@ with import ../dependencies.nix;
           mesh-plotter
           find_rotational_conventions
         ];
-      enableAnixUpgradeUI = true;
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
