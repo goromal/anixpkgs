@@ -1,1 +1,140 @@
-<html><body>stub</body></html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tasks</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; max-width: 600px; }
+    h1 { margin-bottom: 24px; }
+    label { display: block; margin: 12px 0 4px; font-weight: bold; }
+    input[type="text"], input[type="date"], textarea {
+      width: 100%; padding: 8px; box-sizing: border-box;
+      border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+    }
+    textarea { height: 80px; resize: vertical; }
+    #notes-section { margin-top: 4px; display: none; }
+    #notes-toggle {
+      cursor: pointer; color: #0066cc; font-size: 13px;
+      margin-top: 8px; display: inline-block; user-select: none;
+    }
+    button[type="submit"] {
+      margin-top: 20px; padding: 10px 24px; background: #0066cc;
+      color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer;
+    }
+    button[type="submit"]:disabled { background: #aaa; cursor: not-allowed; }
+    #results { list-style: none; padding: 0; margin-top: 20px; display: none; }
+    #results li { padding: 4px 0; font-family: monospace; font-size: 14px; }
+    #results li.ok { color: green; }
+    #results li.error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>Upload Tasks</h1>
+  <form id="task-form" onsubmit="submitTask(event)">
+    <label for="name">Task name</label>
+    <input type="text" id="name" name="name" required placeholder="e.g. P1: Weekly review">
+
+    <label for="date">Start date</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="until">End date <span style="font-weight:normal;font-size:12px">(optional — defaults to start date)</span></label>
+    <input type="date" id="until" name="until">
+
+    <a id="notes-toggle" onclick="toggleNotes()">+ Notes</a>
+    <div id="notes-section">
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes"></textarea>
+    </div>
+
+    <button type="submit" id="submit-btn">Upload</button>
+  </form>
+
+  <ul id="results"></ul>
+
+  <script>
+    document.getElementById('date').valueAsDate = new Date();
+
+    function toggleNotes() {
+      const section = document.getElementById('notes-section');
+      const toggle = document.getElementById('notes-toggle');
+      const hidden = section.style.display === 'none' || section.style.display === '';
+      section.style.display = hidden ? 'block' : 'none';
+      toggle.textContent = hidden ? '\u2212 Notes' : '+ Notes';
+    }
+
+    async function submitTask(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const date = document.getElementById('date').value;
+      const until = document.getElementById('until').value || null;
+      const notes = document.getElementById('notes').value;
+
+      const btn = document.getElementById('submit-btn');
+      const resultsList = document.getElementById('results');
+
+      btn.disabled = true;
+      resultsList.innerHTML = '';
+      resultsList.style.display = 'block';
+
+      let hasError = false;
+
+      const resp = await fetch('submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name, notes, date, until})
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({error: 'Unknown error'}));
+        const li = document.createElement('li');
+        li.textContent = 'Error: ' + err.error;
+        li.className = 'error';
+        resultsList.appendChild(li);
+        btn.disabled = false;
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, {stream: true});
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = JSON.parse(line.slice(6));
+          if (data.done) continue;
+          const li = document.createElement('li');
+          if (data.status === 'ok') {
+            li.textContent = data.date + ' \u2713';
+            li.className = 'ok';
+          } else {
+            li.textContent = data.date + ' \u2717 \u2014 ' + data.message;
+            li.className = 'error';
+            hasError = true;
+          }
+          resultsList.appendChild(li);
+        }
+      }
+
+      btn.disabled = false;
+
+      if (!hasError) {
+        document.getElementById('task-form').reset();
+        document.getElementById('date').valueAsDate = new Date();
+        document.getElementById('notes-section').style.display = 'none';
+        document.getElementById('notes-toggle').textContent = '+ Notes';
+        setTimeout(() => {
+          resultsList.innerHTML = '';
+          resultsList.style.display = 'none';
+        }, 2000);
+      }
+    }
+  </script>
+</body>
+</html>
