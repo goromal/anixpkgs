@@ -314,6 +314,16 @@
                 "attr": "symforce",
                 "ci": false,
                 "docs": false
+            },
+            {
+                "attr": "jetson-stats",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "jupyter-mcp-server",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [

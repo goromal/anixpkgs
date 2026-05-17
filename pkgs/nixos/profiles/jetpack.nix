@@ -36,7 +36,46 @@ with import ../dependencies.nix;
         }
       ];
       enableOrchestrator = true;
-      timedOrchJobs = [ ];
+      timedOrchJobs = [
+        {
+          name = "launchpad-sync";
+          jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
+            REPO=$HOME/launchpad
+            if [[ -d "$REPO/.git" ]]; then
+              cd "$REPO"
+              if [[ -n "$(git status --porcelain)" ]]; then
+                git add -A
+                git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
+              fi
+              if git pull --rebase origin master; then
+                git push origin master && logger -t launchpad-sync "Sync complete" || logger -t launchpad-sync "Push to master failed"
+              else
+                git rebase --abort
+                logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
+              fi
+            else
+              logger -t launchpad-sync "No git repository found at $REPO, skipping"
+            fi
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 02:00:00" ];
+            Persistent = true;
+          };
+        }
+      ];
+      launchpadPythonPackages =
+        ps: with ps; [
+          numpy
+          scipy
+          torch
+          opencv4
+          geometry
+          pysignals
+          pyceres
+          pyceres_factors
+          mesh-plotter
+          find_rotational_conventions
+        ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
@@ -52,6 +91,7 @@ with import ../dependencies.nix;
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
+        anixpkgs.jetson-stats
         (pkgs.writeShellScriptBin "anix-init" ''
           make-title -c yellow "Setting up rcrsync"
 

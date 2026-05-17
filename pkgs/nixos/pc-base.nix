@@ -150,6 +150,11 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    launchpadPythonPackages = lib.mkOption {
+      type = lib.types.functionTo (lib.types.listOf lib.types.package);
+      description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
+      default = _ps: [ ];
+    };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = claudeDefaults.marketplaces;
@@ -212,6 +217,7 @@ in
     ../modules/vikunja/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
+    ../modules/jupyter-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -222,6 +228,7 @@ in
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../modules/launchpad/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -237,6 +244,13 @@ in
 
   config = {
     system.stateVersion = cfg.nixosState;
+
+    hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
+
+    services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
+    services.launchpad.pythonPackages = lib.mkIf (
+      cfg.machineType == "jetson"
+    ) cfg.launchpadPythonPackages;
 
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
@@ -664,6 +678,9 @@ in
     # Wiki MCP Server
     services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
 
+    # Jupyter MCP Server
+    services.jupyter-mcp.enable = (cfg.machineType == "jetson");
+
     # Global packages
     environment.systemPackages =
       with pkgs;
@@ -883,6 +900,7 @@ in
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
         wikiMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
+        jupyterMcpEnabled = (cfg.machineType == "jetson");
       };
     };
   };
