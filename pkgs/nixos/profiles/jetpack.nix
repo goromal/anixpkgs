@@ -80,12 +80,9 @@ with import ../dependencies.nix;
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.notion-tools
-        anixpkgs.mp4
-        anixpkgs.mp4unite
         anixpkgs.goromail
         anixpkgs.sread
         anixpkgs.gmail-parser
-        anixpkgs.scrape
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report

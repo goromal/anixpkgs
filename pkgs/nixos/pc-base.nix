@@ -585,6 +585,10 @@ in
           rclone
           machine-rcrsync
           machine-authm
+          anixpkgs.mp4
+          anixpkgs.mp4unite
+          anixpkgs.png
+          anixpkgs.scrape
         ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
