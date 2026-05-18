@@ -52,7 +52,7 @@ def _read_spec_csv(path):
     daily, weekly, monthly, quarterly = [], [], [], []
     with open(path, 'r') as f:
         for line in f:
-            parts = line.split('|')
+            parts = line.split('|', 2)
             if len(parts) < 2:
                 continue
             rtype = parts[0].strip().lower()
@@ -146,6 +146,11 @@ def create_app(subdomain='', manager=None, spec_csv=None):
             return {'error': 'Invalid JSON'}, 400
         if 'items' not in data:
             return {'error': 'missing items key'}, 400
+        for item in data['items']:
+            title = str(item.get('title', '') or '').strip()
+            desc = str(item.get('desc', '') or '').strip()
+            if '|' in title or '|' in desc:
+                return {'error': 'title and desc may not contain | characters'}, 400
         try:
             parent = os.path.dirname(_spec_csv)
             if parent:

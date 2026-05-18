@@ -446,6 +446,7 @@
           sel.addEventListener('change', () => {
             csvItems[idx].interval = sel.value;
             csvOnChange();
+            csvRender();  // re-render to move item to new group
           });
 
           const titleInput = document.createElement('input');
@@ -455,7 +456,7 @@
           titleInput.value = item.title;
           titleInput.addEventListener('input', () => {
             csvItems[idx].title = titleInput.value;
-            csvOnChange();
+            csvOnChange();  // dirty check only, no re-render
           });
 
           const descInput = document.createElement('input');
@@ -465,7 +466,7 @@
           descInput.value = item.desc;
           descInput.addEventListener('input', () => {
             csvItems[idx].desc = descInput.value;
-            csvOnChange();
+            csvOnChange();  // dirty check only, no re-render
           });
 
           const delBtn = document.createElement('button');
@@ -474,6 +475,7 @@
           delBtn.addEventListener('click', () => {
             csvItems.splice(idx, 1);
             csvOnChange();
+            csvRender();  // re-render to remove the deleted row
           });
 
           row.appendChild(sel);
@@ -486,7 +488,6 @@
     }
 
     function csvOnChange() {
-      csvRender();
       const dirty = !csvItemsEqual(csvItems, csvDiskItems);
       document.getElementById('csv-dirty-banner').style.display = dirty ? 'block' : 'none';
       if (dirty) {
@@ -499,6 +500,7 @@
     function csvAddItem() {
       csvItems.push({interval: 'w', title: '', desc: ''});
       csvOnChange();
+      csvRender();
     }
 
     async function csvSave() {
@@ -519,6 +521,7 @@
           csvDiskItems = csvDeepCopy(csvItems);
           localStorage.removeItem(CSV_LS_KEY);
           document.getElementById('csv-dirty-banner').style.display = 'none';
+          csvRender();
           status.textContent = 'Saved.';
           setTimeout(() => { status.textContent = ''; }, 2000);
         }
@@ -532,9 +535,18 @@
       let diskItems = [];
       try {
         const resp = await fetch('spec-csv');
+        if (!resp.ok) {
+          document.getElementById('csv-save-status').textContent = 'Error loading CSV from server.';
+          document.getElementById('csv-save-btn').disabled = true;
+          return;
+        }
         const data = await resp.json();
         diskItems = data.items || [];
-      } catch (_) {}
+      } catch (_) {
+        document.getElementById('csv-save-status').textContent = 'Error loading CSV from server.';
+        document.getElementById('csv-save-btn').disabled = true;
+        return;
+      }
 
       csvDiskItems = csvDeepCopy(diskItems);
 
