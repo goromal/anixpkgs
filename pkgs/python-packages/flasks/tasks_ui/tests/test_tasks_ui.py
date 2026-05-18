@@ -226,6 +226,68 @@ def test_spec_submit_put_task_error_continues_stream(tmp_path):
         assert non_skip[1]['status'] == 'ok'
 
 
+# --- /spec-csv tests ---
+
+def test_spec_csv_get_returns_items(tmp_path):
+    csv = tmp_path / 'tasks.csv'
+    csv.write_text('w|P0: Weekly Task|some notes\n')
+    app = make_app(spec_csv=str(csv))
+    with app.test_client() as client:
+        resp = client.get('/spec-csv')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert 'items' in data
+        assert len(data['items']) == 1
+        assert data['items'][0] == {'interval': 'w', 'title': 'P0: Weekly Task', 'desc': 'some notes'}
+
+
+def test_spec_csv_get_missing_file_returns_empty(tmp_path):
+    nonexistent = str(tmp_path / 'no-such-file.csv')
+    app = make_app(spec_csv=nonexistent)
+    with app.test_client() as client:
+        resp = client.get('/spec-csv')
+        assert resp.status_code == 200
+        assert resp.get_json() == {'items': []}
+
+
+def test_spec_csv_post_writes_file(tmp_path):
+    csv_path = str(tmp_path / 'tasks.csv')
+    app = make_app(spec_csv=csv_path)
+    items = [
+        {'interval': 'd', 'title': 'Daily standup', 'desc': ''},
+        {'interval': 'w', 'title': 'Weekly review', 'desc': 'check metrics'},
+    ]
+    with app.test_client() as client:
+        resp = client.post('/spec-csv',
+                           data=json.dumps({'items': items}),
+                           content_type='application/json')
+        assert resp.status_code == 200
+        assert resp.get_json() == {'ok': True}
+    content = open(csv_path).read()
+    assert 'd|Daily standup|\n' in content
+    assert 'w|Weekly review|check metrics\n' in content
+
+
+def test_spec_csv_post_non_json_returns_400():
+    app = make_app()
+    with app.test_client() as client:
+        resp = client.post('/spec-csv',
+                           data='not json',
+                           content_type='application/json')
+        assert resp.status_code == 400
+        assert 'error' in resp.get_json()
+
+
+def test_spec_csv_post_missing_items_returns_400():
+    app = make_app()
+    with app.test_client() as client:
+        resp = client.post('/spec-csv',
+                           data=json.dumps({}),
+                           content_type='application/json')
+        assert resp.status_code == 400
+        assert 'error' in resp.get_json()
+
+
 def test_spec_submit_idempotent_skips_existing(tmp_path):
     csv = tmp_path / 'tasks.csv'
     csv.write_text('w|P0: Weekly Task|\n')

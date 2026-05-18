@@ -125,6 +125,41 @@ def create_app(subdomain='', manager=None, spec_csv=None):
 
         return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
+    @bp.route('/spec-csv', methods=['GET'])
+    def spec_csv_get():
+        try:
+            daily, weekly, monthly, quarterly = _read_spec_csv(_spec_csv)
+        except FileNotFoundError:
+            return {'items': []}
+        items = (
+            [{'interval': 'd', 'title': t, 'desc': d} for t, d in daily] +
+            [{'interval': 'w', 'title': t, 'desc': d} for t, d in weekly] +
+            [{'interval': 'm', 'title': t, 'desc': d} for t, d in monthly] +
+            [{'interval': 'q', 'title': t, 'desc': d} for t, d in quarterly]
+        )
+        return {'items': items}
+
+    @bp.route('/spec-csv', methods=['POST'])
+    def spec_csv_post():
+        data = request.get_json(silent=True)
+        if data is None:
+            return {'error': 'Invalid JSON'}, 400
+        if 'items' not in data:
+            return {'error': 'missing items key'}, 400
+        try:
+            parent = os.path.dirname(_spec_csv)
+            if parent:
+                os.makedirs(parent, exist_ok=True)
+            with open(_spec_csv, 'w') as f:
+                for item in data['items']:
+                    interval = item.get('interval', '')
+                    title = item.get('title', '')
+                    desc = item.get('desc', '')
+                    f.write(f'{interval}|{title}|{desc}\n')
+        except Exception as e:
+            return {'error': str(e)}, 500
+        return {'ok': True}
+
     @bp.route('/spec-submit', methods=['POST'])
     def spec_submit():
         if manager is None:
