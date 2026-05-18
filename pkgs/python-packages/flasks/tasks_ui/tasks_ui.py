@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import os
+import subprocess
 
 from flask import Flask, Blueprint, request, render_template, Response, stream_with_context
 
@@ -163,6 +164,10 @@ def create_app(subdomain='', manager=None, spec_csv=None):
                     f.write(f'{interval}|{title}|{desc}\n')
         except Exception as e:
             return {'error': str(e)}, 500
+        try:
+            subprocess.run(['rcrsync', 'override', 'configs'], check=True, capture_output=True)
+        except Exception as e:
+            return {'ok': True, 'warning': f'File saved but cloud sync failed: {e}'}
         return {'ok': True}
 
     @bp.route('/spec-submit', methods=['POST'])
