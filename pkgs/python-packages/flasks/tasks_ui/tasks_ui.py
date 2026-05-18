@@ -183,7 +183,7 @@ def create_app(subdomain='', manager=None, spec_csv=None):
                     continue
 
                 uploaded = []
-                error_msg = None
+                errors = []
                 for title, desc in due:
                     if title in existing_names:
                         continue
@@ -191,10 +191,10 @@ def create_app(subdomain='', manager=None, spec_csv=None):
                         manager.putTask(title, desc, current)
                         uploaded.append(title)
                     except Exception as exc:
-                        error_msg = str(exc)
+                        errors.append(str(exc))
 
-                if error_msg:
-                    event = json.dumps({'date': label, 'tasks': uploaded, 'status': 'error', 'message': error_msg})
+                if errors:
+                    event = json.dumps({'date': label, 'tasks': uploaded, 'status': 'error', 'message': '; '.join(errors)})
                 else:
                     event = json.dumps({'date': label, 'tasks': uploaded, 'status': 'ok'})
                 yield f'data: {event}\n\n'
