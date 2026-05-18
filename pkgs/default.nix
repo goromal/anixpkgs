@@ -252,6 +252,7 @@ let
               la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
+              tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -355,6 +356,7 @@ rec {
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  tasks_ui = final.python313.pkgs.tasks_ui;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
