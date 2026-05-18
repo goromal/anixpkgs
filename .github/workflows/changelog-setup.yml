@@ -1,0 +1,40 @@
+name: "Changelog Bot Setup"
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  comment-pr:
+    name: Generate PR Comment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v3
+      - name: Check for Existing Comment
+        id: check_comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if there's already a bot comment on this PR
+          EXISTING_COMMENT=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          --jq '.[] | select(.user.login=="github-actions[bot]")')
+          if [[ -z "$EXISTING_COMMENT" ]]; then
+            echo "no_comment=true" >> $GITHUB_ENV
+          else
+            echo "no_comment=false" >> $GITHUB_ENV
+          fi
+      - name: Post Changelog Form
+        if: env.no_comment == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "body": "## Change Description\n\n'"${PR_TITLE}"'\n\n- [ ] Add to global changelog"
+            }' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
