@@ -14,7 +14,63 @@ def _init_manager():
         return None, str(e)
 
 
-def create_app(subdomain='', manager=None):
+def _all_sundays(start, end):
+    result = []
+    current = start
+    while current.weekday() != 6:
+        current += datetime.timedelta(days=1)
+    while current <= end:
+        result.append(current)
+        current += datetime.timedelta(days=7)
+    return result
+
+
+def _first_sundays_of_month(start, end):
+    result = []
+    month = start.month
+    year = start.year
+    while datetime.datetime(year, month, 1) <= end:
+        first = datetime.datetime(year, month, 1)
+        while first.weekday() != 6:
+            first += datetime.timedelta(days=1)
+        if start <= first <= end:
+            result.append(first)
+        if month == 12:
+            month = 1
+            year += 1
+        else:
+            month += 1
+    return result
+
+
+def _first_sundays_of_quarter(start, end):
+    quarter_months = {1, 4, 7, 10}
+    return [d for d in _first_sundays_of_month(start, end) if d.month in quarter_months]
+
+
+def _read_spec_csv(path):
+    daily, weekly, monthly, quarterly = [], [], [], []
+    with open(path, 'r') as f:
+        for line in f:
+            parts = line.split('|')
+            if len(parts) < 2:
+                continue
+            rtype = parts[0].strip().lower()
+            title = parts[1].strip()
+            desc = parts[2].strip() if len(parts) > 2 else ''
+            if rtype == 'd':
+                daily.append((title, desc))
+            elif rtype == 'w':
+                weekly.append((title, desc))
+            elif rtype == 'm':
+                monthly.append((title, desc))
+            elif rtype == 'q':
+                quarterly.append((title, desc))
+    return daily, weekly, monthly, quarterly
+
+
+def create_app(subdomain='', manager=None, spec_csv=None):
+    _spec_csv = os.path.expanduser(spec_csv or '~/configs/intervaled-tasks.csv')
     app = Flask(__name__)
     bp = Blueprint('tasks', __name__, url_prefix=subdomain)
 
@@ -69,6 +125,84 @@ def create_app(subdomain='', manager=None):
 
         return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
+    @bp.route('/spec-submit', methods=['POST'])
+    def spec_submit():
+        if manager is None:
+            return {'error': 'TaskManager not initialized — check secrets'}, 500
+
+        data = request.get_json(silent=True)
+        if data is None:
+            return {'error': 'Invalid JSON'}, 400
+
+        start_str = data.get('start_date')
+        end_str = data.get('end_date')
+
+        if not start_str or not end_str:
+            return {'error': 'start_date and end_date are required'}, 400
+
+        try:
+            start = datetime.datetime.strptime(start_str, '%Y-%m-%d')
+            end = datetime.datetime.strptime(end_str, '%Y-%m-%d')
+        except ValueError:
+            return {'error': 'invalid date format'}, 400
+
+        if end < start:
+            end = start
+
+        try:
+            daily, weekly, monthly, quarterly = _read_spec_csv(_spec_csv)
+        except FileNotFoundError:
+            return {'error': f'CSV not found: {_spec_csv}'}, 500
+
+        sundays = set(_all_sundays(start, end))
+        month_sundays = set(_first_sundays_of_month(start, end))
+        quarter_sundays = set(_first_sundays_of_quarter(start, end))
+
+        def generate():
+            current = start
+            while current <= end:
+                label = current.strftime('%Y-%m-%d')
+                due = list(daily)
+                if current in sundays:
+                    due += weekly
+                if current in month_sundays:
+                    due += monthly
+                if current in quarter_sundays:
+                    due += quarterly
+
+                if not due:
+                    yield f'data: {json.dumps({"date": label, "tasks": [], "status": "skip"})}\n\n'
+                    current += datetime.timedelta(days=1)
+                    continue
+
+                try:
+                    existing_names = {t.name for t in manager.getTasks(date=current, start_date=current)}
+                except Exception as exc:
+                    yield f'data: {json.dumps({"date": label, "tasks": [], "status": "error", "message": str(exc)})}\n\n'
+                    current += datetime.timedelta(days=1)
+                    continue
+
+                uploaded = []
+                error_msg = None
+                for title, desc in due:
+                    if title in existing_names:
+                        continue
+                    try:
+                        manager.putTask(title, desc, current)
+                        uploaded.append(title)
+                    except Exception as exc:
+                        error_msg = str(exc)
+
+                if error_msg:
+                    event = json.dumps({'date': label, 'tasks': uploaded, 'status': 'error', 'message': error_msg})
+                else:
+                    event = json.dumps({'date': label, 'tasks': uploaded, 'status': 'ok'})
+                yield f'data: {event}\n\n'
+                current += datetime.timedelta(days=1)
+            yield 'data: {"done": true}\n\n'
+
+        return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
     app.register_blueprint(bp)
 
     @app.route(f'{subdomain}/static/<path:filename>')
@@ -82,13 +216,14 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=5959)
     parser.add_argument('--subdomain', type=str, default='/tasks')
+    parser.add_argument('--spec-csv', type=str, default='~/configs/intervaled-tasks.csv')
     args = parser.parse_args()
 
     manager, err = _init_manager()
     if manager is None:
         print(f'Warning: TaskManager init failed: {err}', flush=True)
 
-    app = create_app(subdomain=args.subdomain, manager=manager)
+    app = create_app(subdomain=args.subdomain, manager=manager, spec_csv=args.spec_csv)
     app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=args.port, debug=False)
 
