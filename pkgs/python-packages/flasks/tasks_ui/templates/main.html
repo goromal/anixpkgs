@@ -4,8 +4,9 @@
   <title>Tasks</title>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; max-width: 600px; }
+    body { font-family: Arial, sans-serif; margin: 40px; max-width: 620px; }
     h1 { margin-bottom: 24px; }
+    h2 { font-size: 20px; margin-bottom: 20px; }
     label { display: block; margin: 12px 0 4px; font-weight: bold; }
     input[type="text"], input[type="date"], textarea {
       width: 100%; padding: 8px; box-sizing: border-box;
@@ -26,6 +27,34 @@
     #results li { padding: 4px 0; font-family: monospace; font-size: 14px; }
     #results li.ok { color: green; }
     #results li.error { color: red; }
+
+    .section-divider { margin: 36px 0; border: none; border-top: 1px solid #ccc; }
+    #spec-error { color: red; margin-top: 8px; display: none; }
+    #spec-calendar { margin-top: 24px; display: none; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .cal-header {
+      text-align: center; font-size: 11px; font-weight: bold; color: #666; padding: 3px 0;
+    }
+    .cal-month-label {
+      grid-column: 1 / span 7; font-size: 12px; font-weight: bold;
+      color: #333; padding: 8px 2px 2px;
+    }
+    .cal-cell {
+      height: 44px; border: 1px dashed #ddd; border-radius: 3px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 11px; position: relative; background: #fafafa;
+    }
+    .cal-cell.out-of-range { background: transparent; border: none; visibility: hidden; }
+    .cal-cell.skip { background: #f0f0f0; border: 1px solid #e0e0e0; color: #aaa; }
+    .cal-cell.ok { background: #e8f5e9; border: 1px solid #81c784; color: #2e7d32; }
+    .cal-cell.error { background: #ffebee; border: 1px solid #e57373; color: #c62828; cursor: help; }
+    .cal-cell .day-num { font-weight: bold; font-size: 12px; }
+    .cal-cell .badge {
+      font-size: 9px; background: #43a047; color: white;
+      border-radius: 8px; padding: 0 5px; margin-top: 2px; line-height: 14px;
+    }
+    .cal-cell.error .badge { background: #e53935; }
   </style>
 </head>
 <body>
@@ -51,7 +80,24 @@
 
   <ul id="results"></ul>
 
+  <hr class="section-divider">
+
+  <h2>Upload Spec Tasks</h2>
+  <form id="spec-form" onsubmit="submitSpec(event)">
+    <label for="spec-start">Start date</label>
+    <input type="date" id="spec-start" name="spec-start" required>
+
+    <label for="spec-end">End date</label>
+    <input type="date" id="spec-end" name="spec-end" required>
+
+    <button type="submit" id="spec-submit-btn">Upload Spec</button>
+  </form>
+  <p id="spec-error"></p>
+
+  <div id="spec-calendar"></div>
+
   <script>
+    // --- Put Task form ---
     document.getElementById('date').valueAsDate = new Date();
 
     function toggleNotes() {
@@ -64,19 +110,16 @@
 
     async function submitTask(event) {
       event.preventDefault();
-
       const name = document.getElementById('name').value.trim();
       const date = document.getElementById('date').value;
       const until = document.getElementById('until').value || null;
       const notes = document.getElementById('notes').value;
-
       const btn = document.getElementById('submit-btn');
       const resultsList = document.getElementById('results');
 
       btn.disabled = true;
       resultsList.innerHTML = '';
       resultsList.style.display = 'block';
-
       let hasError = false;
 
       const resp = await fetch('submit', {
@@ -98,7 +141,6 @@
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
       let buf = '';
-
       while (true) {
         const {done, value} = await reader.read();
         if (done) break;
@@ -123,17 +165,179 @@
       }
 
       btn.disabled = false;
-
       if (!hasError) {
         document.getElementById('task-form').reset();
         document.getElementById('date').valueAsDate = new Date();
         document.getElementById('notes-section').style.display = 'none';
         document.getElementById('notes-toggle').textContent = '+ Notes';
-        setTimeout(() => {
-          resultsList.innerHTML = '';
-          resultsList.style.display = 'none';
-        }, 2000);
+        setTimeout(() => { resultsList.innerHTML = ''; resultsList.style.display = 'none'; }, 2000);
       }
+    }
+
+    // --- Spec date helpers (match task-tools CLI quarter logic) ---
+
+    function toISODate(d) {
+      return d.toISOString().slice(0, 10);
+    }
+
+    function firstSundayOnOrAfter(d) {
+      const result = new Date(d);
+      const day = result.getDay();
+      if (day !== 0) result.setDate(result.getDate() + (7 - day));
+      return result;
+    }
+
+    function firstSundayOfNthNextQuarter(n) {
+      const today = new Date();
+      const currentQuarter = Math.floor(today.getMonth() / 3);
+      const targetQuarter = currentQuarter + n;
+      const targetYear = today.getFullYear() + Math.floor(targetQuarter / 4);
+      const targetMonth = (targetQuarter % 4) * 3;
+      return firstSundayOnOrAfter(new Date(targetYear, targetMonth, 1));
+    }
+
+    document.getElementById('spec-start').value = toISODate(firstSundayOfNthNextQuarter(1));
+    document.getElementById('spec-end').value = toISODate(firstSundayOfNthNextQuarter(2));
+
+    // --- Calendar grid ---
+
+    let calCells = {};
+
+    function buildCalendar(startStr, endStr) {
+      const cal = document.getElementById('spec-calendar');
+      cal.innerHTML = '';
+      cal.style.display = 'block';
+      calCells = {};
+
+      const start = new Date(startStr + 'T00:00:00');
+      const end = new Date(endStr + 'T00:00:00');
+
+      const grid = document.createElement('div');
+      grid.className = 'cal-grid';
+
+      ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'cal-header';
+        h.textContent = d;
+        grid.appendChild(h);
+      });
+
+      // Pad to Monday before start, Sunday after end
+      const startDay = start.getDay();
+      const daysBackToMon = startDay === 0 ? 6 : startDay - 1;
+      const gridStart = new Date(start);
+      gridStart.setDate(start.getDate() - daysBackToMon);
+
+      const endDay = end.getDay();
+      const daysForwardToSun = endDay === 0 ? 0 : 7 - endDay;
+      const gridEnd = new Date(end);
+      gridEnd.setDate(end.getDate() + daysForwardToSun);
+
+      let lastMonthLabel = null;
+      let current = new Date(gridStart);
+
+      while (current <= gridEnd) {
+        if (current.getDay() === 1) {
+          const monthStr = current.toLocaleString('default', {month: 'long', year: 'numeric'});
+          if (monthStr !== lastMonthLabel) {
+            const label = document.createElement('div');
+            label.className = 'cal-month-label';
+            label.textContent = monthStr;
+            grid.appendChild(label);
+            lastMonthLabel = monthStr;
+          }
+        }
+
+        const dateStr = toISODate(current);
+        const inRange = current >= start && current <= end;
+        const cell = document.createElement('div');
+
+        if (inRange) {
+          cell.className = 'cal-cell';
+          const dayNum = document.createElement('span');
+          dayNum.className = 'day-num';
+          dayNum.textContent = current.getDate();
+          cell.appendChild(dayNum);
+          calCells[dateStr] = cell;
+        } else {
+          cell.className = 'cal-cell out-of-range';
+        }
+
+        grid.appendChild(cell);
+        current.setDate(current.getDate() + 1);
+      }
+
+      cal.appendChild(grid);
+    }
+
+    function updateCalendarCell(dateStr, status, tasks, message) {
+      const cell = calCells[dateStr];
+      if (!cell) return;
+      cell.className = 'cal-cell ' + status;
+      cell.innerHTML = '';
+      const dayNum = document.createElement('span');
+      dayNum.className = 'day-num';
+      dayNum.textContent = parseInt(dateStr.slice(8), 10);
+      cell.appendChild(dayNum);
+      if (status === 'ok' && tasks && tasks.length > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = tasks.length;
+        cell.appendChild(badge);
+      } else if (status === 'error') {
+        if (message) cell.title = message;
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = '!';
+        cell.appendChild(badge);
+      }
+    }
+
+    // --- Spec form submission ---
+
+    async function submitSpec(event) {
+      event.preventDefault();
+      const startDate = document.getElementById('spec-start').value;
+      const endDate = document.getElementById('spec-end').value;
+      const btn = document.getElementById('spec-submit-btn');
+      const errEl = document.getElementById('spec-error');
+
+      btn.disabled = true;
+      errEl.style.display = 'none';
+      buildCalendar(startDate, endDate);
+
+      const resp = await fetch('spec-submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({start_date: startDate, end_date: endDate})
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({error: 'Unknown error'}));
+        errEl.textContent = 'Error: ' + err.error;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        return;
+      }
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+      while (true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, {stream: true});
+        const lines = buf.split('\n');
+        buf = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = JSON.parse(line.slice(6));
+          if (data.done) continue;
+          updateCalendarCell(data.date, data.status, data.tasks, data.message);
+        }
+      }
+
+      btn.disabled = false;
     }
   </script>
 </body>
