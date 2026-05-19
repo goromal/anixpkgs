@@ -10,9 +10,10 @@ let
   cfg = config.machines.base;
   remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager-nixos-module =
-    if args ? hmModule
-    then args.hmModule
-    else (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
+    if args ? hmModule then
+      args.hmModule
+    else
+      (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
