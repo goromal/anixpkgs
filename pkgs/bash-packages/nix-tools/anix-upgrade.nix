@@ -143,7 +143,7 @@ in
       ${
         if standalone == false then
           ''
-            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot --flake ~/sources/anixpkgs#$(hostname); then
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot --flake ~/sources/anixpkgs#$(hostname) --impure; then
               ${printYellow} "Reboot for changes to take effect."
               build_success=1
             fi
@@ -161,7 +161,7 @@ in
       ${
         if standalone == false then
           ''
-            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake ~/sources/anixpkgs#$(hostname); then
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake ~/sources/anixpkgs#$(hostname) --impure; then
               ${printYellow} "Done."
               build_success=1
             fi
