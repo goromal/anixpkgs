@@ -4,6 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
 
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+
+    home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-25.11";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
     phps.url = "github:fossar/nix-phps";
@@ -166,6 +171,8 @@
       nixpkgs,
       flake-utils,
       jetpack-nixos,
+      determinate,
+      home-manager,
       ...
     }@inputs:
     let
@@ -175,6 +182,19 @@
       ];
       nixos-version = builtins.readFile ./NIXOS_VERSION;
       anixpkgsOverlay = import ./overlay.nix;
+      commonNixpkgsModule = {
+        nixpkgs.overlays = [ anixpkgsOverlay ];
+        nixpkgs.config.allowUnfree = true;
+        nixpkgs.config.flakeInputs = inputs;
+      };
+      commonSpecialArgs = {
+        inherit nixos-version;
+        hmModule = home-manager.nixosModules.home-manager;
+      };
+      commonModules = [
+        determinate.nixosModules.default
+        commonNixpkgsModule
+      ];
     in
     flake-utils.lib.eachSystem supported-systems (system: {
       legacyPackages = import nixpkgs {
@@ -188,6 +208,55 @@
     })
     // {
       nixosConfigurations = {
+        # Personal workstations
+        atorgesen-inspiron = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-inspiron.nix ];
+        };
+
+        atorgesen-panasonic = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-panasonic.nix ];
+        };
+
+        # ATS servers
+        ats = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/ats-alderlake.nix ];
+        };
+
+        ats-pi = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/ats-pi.nix ];
+        };
+
+        # NVIDIA Jetson
+        jetson-orin-nx =
+          let
+            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;
+          in
+          jetpackNixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            specialArgs = commonSpecialArgs;
+            modules = [
+              jetpack-nixos.nixosModules.default
+              determinate.nixosModules.default
+              commonNixpkgsModule
+              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
+            ];
+          };
+
+        # Drone simulation
+        drone-sitl = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/drone-sitl.nix ];
+        };
+
         # x86_64 personal installer ISO
         # Build: nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage
         installer-personal = nixpkgs.lib.nixosSystem {

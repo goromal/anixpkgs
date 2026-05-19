@@ -3,13 +3,17 @@
   pkgs,
   lib,
   ...
-}:
+}@args:
 with import ./dependencies.nix;
 let
   claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
   remoteBuildersCatalog = import ./remote-builders.nix;
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  home-manager-nixos-module =
+    if args ? hmModule then
+      args.hmModule
+    else
+      (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
@@ -204,7 +208,7 @@ in
 
   imports = [
     ./installation-base.nix
-    (import "${home-manager}/nixos")
+    home-manager-nixos-module
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
@@ -712,7 +716,7 @@ in
         sd
         clang
         clang-tools
-        neofetch
+        fastfetch
         onefetch
         man-pages
         black
