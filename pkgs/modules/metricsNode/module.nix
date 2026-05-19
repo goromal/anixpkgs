@@ -227,6 +227,7 @@ in
           http_port = service-ports.grafana.internal;
           http_addr = "127.0.0.1";
         };
+        security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
       };
       provision = {
         enable = true;
