@@ -6,7 +6,7 @@
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    home-manager.url = "github:nix-community/home-manager?ref=release-25.11";
+    home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";

@@ -1,8 +1,7 @@
-{
-  pkgs,
-  config,
-  lib,
-  ...
+{ pkgs
+, config
+, lib
+, ...
 }:
 with import ../dependencies.nix;
 let
@@ -11,7 +10,7 @@ let
   claudeCodeExt =
     let
       base = builtins.head (
-        unstable.vscode-utils.extensionsFromVscodeMarketplace [
+        pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "claude-code";
             publisher = "anthropic";
@@ -73,7 +72,7 @@ in
         "claudeCode.preferredLocation" = "panel";
       };
       extensions =
-        with unstable.vscode-extensions;
+        with pkgs.vscode-extensions;
         [
           eamodio.gitlens
           ms-python.vscode-pylance
@@ -87,7 +86,7 @@ in
           ms-vscode.cpptools
           claudeCodeExt
         ]
-        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+        ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "cmake";
             publisher = "twxs";

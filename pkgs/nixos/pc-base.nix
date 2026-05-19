@@ -716,7 +716,7 @@ in
         sd
         clang
         clang-tools
-        neofetch
+        fastfetch
         onefetch
         man-pages
         black
