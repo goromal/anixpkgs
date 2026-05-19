@@ -83,7 +83,6 @@ in
   nix.extraOptions = ''
     narinfo-cache-positive-ttl = 0
     narinfo-cache-negative-ttl = 0
-    experimental-features = nix-command flakes
   '';
 
   # Networking -------------------------------------------------------------------

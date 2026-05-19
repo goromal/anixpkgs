@@ -137,32 +137,13 @@ in
       vdest=$(cat anixpkgs/ANIX_VERSION)
     fi
     nixos_dest=$(cat anixpkgs/NIXOS_VERSION)
-    nixos_curr=$(nixos-version 2>/dev/null | cut -d'.' -f1,2 || echo "")
     ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $nixos_dest)..."
-    if [[ -n "$nixos_curr" ]] && [[ "$nixos_dest" != "$nixos_curr" ]]; then
-      ${printYellow} "NixOS version bump detected ($nixos_curr -> $nixos_dest). Updating nix channels..."
-      ${
-        if standalone == false then
-          ''
-            atsudo nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixpkgs
-            atsudo nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixos
-            atsudo nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$nixos_dest.tar.gz" home-manager
-            atsudo nix-channel --update
-          ''
-        else
-          ''
-            nix-channel --add "https://nixos.org/channels/nixos-$nixos_dest" nixpkgs
-            nix-channel --add "https://github.com/nix-community/home-manager/archive/release-$nixos_dest.tar.gz" home-manager
-            nix-channel --update
-          ''
-      }
-    fi
     build_success=0
     if [[ "$boot" == "1" ]]; then
       ${
         if standalone == false then
           ''
-            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot; then
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild boot --flake ~/sources/anixpkgs#$(hostname); then
               ${printYellow} "Reboot for changes to take effect."
               build_success=1
             fi
@@ -180,7 +161,7 @@ in
       ${
         if standalone == false then
           ''
-            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch; then
+            if atsudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --flake ~/sources/anixpkgs#$(hostname); then
               ${printYellow} "Done."
               build_success=1
             fi

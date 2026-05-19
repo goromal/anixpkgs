@@ -91,20 +91,16 @@ with import ../dependencies.nix;
             echo_yellow "Skipping SSH config setup"
           fi
 
-          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
-          sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-          sudo nix-channel --update
-          echo
           echo
           echo_green "DONE. Note the hardware-config.nix file below:"
           echo
           nixos-generate-config --show-hardware-config
           echo
-          echo_green  "Use the config above as you set up anix-upgrade:"
+          echo_green  "Next steps to finish configuring this machine:"
           echo_yellow "  - Use devshell to create a workspace with anixpkgs"
-          echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
-          echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
+          echo_yellow "  - Copy the hardware config above to anixpkgs/pkgs/nixos/hardware/<hostname>.nix"
+          echo_yellow "  - Create a new configuration in anixpkgs/pkgs/nixos/configurations/"
+          echo_yellow "  - Add the configuration to nixosConfigurations in anixpkgs/flake.nix (key must match hostname)"
           echo_yellow "  - Run anix-upgrade"
           echo_yellow "  - Create new secrets and configs entries"
           echo

@@ -4,25 +4,22 @@
 
 ## Home-Manager Example
 
-1. Install Nix standalone:
+This repo uses [Determinate Nix](https://determinate.systems/nix) for standalone (non-NixOS) machines. Determinate Nix automatically enables flakes, `nix-command`, and manages `/etc/nix/nix.conf` — no manual editing of that file is needed.
+
+1. Install Nix (Determinate):
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
-3. Set proper Nix settings in `/etc/nix/nix.conf`:
+
+2. Add cache settings for anixpkgs by appending to `~/.config/nix/nix.conf` (user-level config, respected by Determinate):
 ```
 substituters = https://cache.nixos.org/ https://github-public.cachix.org
 trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
 narinfo-cache-positive-ttl = 0
 narinfo-cache-negative-ttl = 0
-experimental-features = nix-command flakes auto-allocate-uids
 ```
-4. Add these Nix channels via `nix-channel --add URL NAME`:
-```bash
-$ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
-nixpkgs https://nixos.org/channels/nixos-25.11
-```
-5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
+
+3. Install home-manager (standalone): https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
 
 Example `home.nix` file for personal use:
 
@@ -62,12 +59,13 @@ Symlink to `~/.config/home-manager/home.nix`.
 Corresponding `~/.bashrc`:
 
 ```bash
-export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
 export NIXPKGS_ALLOW_UNFREE=1
 # alias code='codium'
 # eval "$(direnv hook bash)"
 ```
+
+Determinate Nix manages the shell environment setup automatically, so the manual `NIX_PATH` export is no longer needed.
 
 ## Personal Machine Installation Instructions
 
@@ -109,20 +107,15 @@ export NIXPKGS_ALLOW_UNFREE=1
 
 ## Upgrading NixOS versions with `anixpkgs`
 
-Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
+NixOS machines managed via the flake do not require channel updates. The flake's locked inputs (pinned nixpkgs, home-manager) handle all version management automatically.
 
-```bash
-# e.g., upgrading to 25.11:
-home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
-nixos https://nixos.org/channels/nixos-25.11
-nixpkgs https://nixos.org/channels/nixos-25.11
-```
-
-`sudo nix-channel --update`. Then upgrade with
+Simply run:
 
 ```bash
 anix-upgrade [source specification] --local --boot
 ```
+
+`anix-upgrade` will detect the target NixOS version from `NIXOS_VERSION` and rebuild the system via `nixos-rebuild --flake`.
 
 ## Build a JetPack Installer ISO
 
