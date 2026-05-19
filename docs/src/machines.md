@@ -117,6 +117,10 @@ anix-upgrade [source specification] --local --boot
 
 `anix-upgrade` will detect the target NixOS version from `NIXOS_VERSION` and rebuild the system via `nixos-rebuild --flake`.
 
+### One-time migration to Determinate Nix
+
+If your machine was set up before the Determinate Nix migration, the first `anix-upgrade` run uses the old script (channel-based rebuild) and installs the new `anix-upgrade` as part of the rebuilt system. **Run `anix-upgrade` a second time** to complete the migration — the new script uses `nixos-rebuild --flake` and applies the Determinate NixOS module.
+
 ## Build a JetPack Installer ISO
 
 Cross-compiled from x86_64. Requires `binfmt` support for aarch64 (enabled by default on NixOS with `boot.binfmt.emulatedSystems`).
