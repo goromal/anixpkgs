@@ -30,6 +30,8 @@ in
     pkgs.universal-ctags
     anixpkgs.claude-code-bin
     anixpkgs.rtk
+    # First-time bring-up on a new machine: registers marketplaces, installs plugins,
+    # configures MCP servers (Vikunja/Notion/Wiki), runs `rtk init`, and prompts for `gh auth login`.
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then
         echo_red "Error: claude not found in PATH"
@@ -106,6 +108,19 @@ in
       if [[ $REPLY =~ ^[Yy]$ ]]; then
         gh auth login
       fi
+    '')
+    # Run periodically to pull the latest plugin code from configured marketplaces.
+    # Refreshes marketplace metadata, then updates each configured plugin. Restart claude after.
+    (pkgs.writeShellScriptBin "claude-update" ''
+      if ! command -v claude &> /dev/null; then
+        echo_red "Error: claude not found in PATH"
+        exit 1
+      fi
+      echo_yellow "Updating claude marketplaces..."
+      claude plugin marketplace update
+      echo_yellow "Updating claude plugins..."
+      ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin update ${plugin} || true") cfg.claudePlugins}
+      echo_green "Done! Restart claude for updates to take effect."
     '')
   ];
 
