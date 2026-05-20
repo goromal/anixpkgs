@@ -39,6 +39,29 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    machines.base.runWebServer = true;
+
+    machines.base.webServices = [
+      {
+        name = "Launchpad";
+        path = "/lab/";
+        description = "Hardware-accelerated Jupyter notebook server";
+      }
+    ];
+
+    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      locations."/lab/" = {
+        proxyPass = "http://127.0.0.1:${builtins.toString cfg.port}/lab/";
+        proxyWebsockets = true;
+        extraConfig = ''
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+        '';
+      };
+    };
+
     systemd.tmpfiles.rules = [
       "d ${cfg.notebookDir} 0755 andrew dev -"
     ];
@@ -56,7 +79,7 @@ in
             ${pkgs.git}/bin/git clone ${cfg.scratchpadRepo} ${cfg.notebookDir}
           fi
         '';
-        ExecStart = "${pythonEnv}/bin/jupyter lab --no-browser --ip=0.0.0.0 --port=${builtins.toString cfg.port} --notebook-dir=${cfg.notebookDir} --ServerApp.token=''";
+        ExecStart = "${pythonEnv}/bin/jupyter lab --no-browser --ip=0.0.0.0 --port=${builtins.toString cfg.port} --notebook-dir=${cfg.notebookDir} --ServerApp.token='' --ServerApp.base_url=/lab/";
         ReadWritePaths = [
           cfg.notebookDir
           "/tmp"
@@ -66,7 +89,10 @@ in
         RestartSec = 5;
         User = "andrew";
         Group = "dev";
-        Environment = [ "HOME=/data/andrew" ];
+        Environment = [
+          "HOME=/data/andrew"
+          "PATH=${lib.makeBinPath [ pkgs.git pkgs.openssh ]}"
+        ];
       };
       wantedBy = [ "multi-user.target" ];
     };

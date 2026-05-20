@@ -40,6 +40,7 @@ with import ../dependencies.nix;
         {
           name = "launchpad-sync";
           jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
+            export PATH="${pkgs.lib.makeBinPath [ pkgs.git pkgs.openssh ]}:$PATH"
             REPO=$HOME/launchpad
             if [[ -d "$REPO/.git" ]]; then
               cd "$REPO"
@@ -47,10 +48,18 @@ with import ../dependencies.nix;
                 git add -A
                 git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
               fi
-              if git pull --rebase origin master; then
-                git push origin master && logger -t launchpad-sync "Sync complete" || logger -t launchpad-sync "Push to master failed"
+              pull_out=$(git pull --rebase origin master 2>&1)
+              if [[ $? -eq 0 ]]; then
+                push_out=$(git push origin master 2>&1)
+                if [[ $? -eq 0 ]]; then
+                  logger -t launchpad-sync "Sync complete"
+                else
+                  echo "$push_out" >&2
+                  logger -t launchpad-sync "Push to master failed"
+                fi
               else
-                git rebase --abort
+                echo "$pull_out" >&2
+                git rebase --abort 2>/dev/null
                 logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
               fi
             else
