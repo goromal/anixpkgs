@@ -129,7 +129,9 @@ in
   home.file = builtins.listToAttrs (
     map (skill: {
       name = ".claude/skills/${skill.name}/SKILL.md";
-      value = { source = skill.file; };
+      value = {
+        source = skill.file;
+      };
     }) cfg.claudeSkills
   );
 
