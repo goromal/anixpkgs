@@ -82,11 +82,26 @@ in
   ];
 
   skills = [
-    { name = "anixpkgs-deploy"; file = ./res/claude-skills/anixpkgs-deploy/SKILL.md; }
-    { name = "anixpkgs-packages"; file = ./res/claude-skills/anixpkgs-packages/SKILL.md; }
-    { name = "editing-skills"; file = ./res/claude-skills/editing-skills/SKILL.md; }
-    { name = "rtk-usage"; file = ./res/claude-skills/rtk-usage/SKILL.md; }
-    { name = "wiki-usage"; file = ./res/claude-skills/wiki-usage/SKILL.md; }
+    {
+      name = "anixpkgs-deploy";
+      file = ./res/claude-skills/anixpkgs-deploy/SKILL.md;
+    }
+    {
+      name = "anixpkgs-packages";
+      file = ./res/claude-skills/anixpkgs-packages/SKILL.md;
+    }
+    {
+      name = "editing-skills";
+      file = ./res/claude-skills/editing-skills/SKILL.md;
+    }
+    {
+      name = "rtk-usage";
+      file = ./res/claude-skills/rtk-usage/SKILL.md;
+    }
+    {
+      name = "wiki-usage";
+      file = ./res/claude-skills/wiki-usage/SKILL.md;
+    }
   ];
 
   hooks = [
