@@ -261,6 +261,11 @@
                 "docs": true
             },
             {
+                "attr": "tasks_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "easy-google-auth",
                 "ci": true,
                 "docs": true

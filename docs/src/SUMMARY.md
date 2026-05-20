@@ -49,6 +49,7 @@
   - [stampserver](./python/stampserver.md)
   - [la_quiz_web](./python/la_quiz_web.md)
   - [anix_upgrade_ui](./python/anix_upgrade_ui.md)
+  - [tasks_ui](./python/tasks_ui.md)
   - [easy-google-auth](./python/easy-google-auth.md)
   - [rcdo](./python/rcdo.md)
   - [task-tools](./python/task-tools.md)

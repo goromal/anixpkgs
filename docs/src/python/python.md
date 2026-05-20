@@ -28,6 +28,7 @@ Packages written (or bound) in Python.
 - [stampserver](./stampserver.md)
 - [la_quiz_web](./la_quiz_web.md)
 - [anix_upgrade_ui](./anix_upgrade_ui.md)
+- [tasks_ui](./tasks_ui.md)
 - [easy-google-auth](./easy-google-auth.md)
 - [rcdo](./rcdo.md)
 - [task-tools](./task-tools.md)
