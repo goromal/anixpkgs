@@ -91,7 +91,12 @@ in
         Group = "dev";
         Environment = [
           "HOME=/data/andrew"
-          "PATH=${lib.makeBinPath [ pkgs.git pkgs.openssh ]}"
+          "PATH=${
+            lib.makeBinPath [
+              pkgs.git
+              pkgs.openssh
+            ]
+          }"
         ];
       };
       wantedBy = [ "multi-user.target" ];

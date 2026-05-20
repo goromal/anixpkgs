@@ -40,7 +40,12 @@ with import ../dependencies.nix;
         {
           name = "launchpad-sync";
           jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
-            export PATH="${pkgs.lib.makeBinPath [ pkgs.git pkgs.openssh ]}:$PATH"
+            export PATH="${
+              pkgs.lib.makeBinPath [
+                pkgs.git
+                pkgs.openssh
+              ]
+            }:$PATH"
             REPO=$HOME/launchpad
             if [[ -d "$REPO/.git" ]]; then
               cd "$REPO"
