@@ -200,7 +200,7 @@ in
           };
         }
       );
-      default = [ ];
+      default = claudeDefaults.skills;
       description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
     };
     extraClaudeSettings = lib.mkOption {
