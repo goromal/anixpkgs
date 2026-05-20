@@ -139,13 +139,20 @@ class NotionClient:
         result = self._request("POST", "/pages", data)
         return result["id"]
 
-    def move_block(self, block_id: str, dest_page_id: str) -> None:
-        block = self._request("GET", f"/blocks/{block_id}")
+    def _build_block_with_children(self, block: dict) -> dict:
+        """Recursively build a block payload including any nested children."""
         btype = block["type"]
         bdata = dict(block[btype])
         if "rich_text" in bdata:
             bdata["rich_text"] = self._safe_rich_text(bdata["rich_text"])
-        new_block = {"object": "block", "type": btype, btype: bdata}
+        if block.get("has_children"):
+            children = self._get_block_children(block["id"])
+            bdata["children"] = [self._build_block_with_children(c) for c in children]
+        return {"object": "block", "type": btype, btype: bdata}
+
+    def move_block(self, block_id: str, dest_page_id: str) -> None:
+        block = self._request("GET", f"/blocks/{block_id}")
+        new_block = self._build_block_with_children(block)
         self._request("PATCH", f"/blocks/{dest_page_id}/children", {"children": [new_block]})
         self._request("DELETE", f"/blocks/{block_id}")
 

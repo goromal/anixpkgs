@@ -28,8 +28,10 @@ in
     anixpkgs.makepyshell
     pkgs.gh
     pkgs.universal-ctags
-    unstable.claude-code
+    anixpkgs.claude-code-bin
     anixpkgs.rtk
+    # First-time bring-up on a new machine: registers marketplaces, installs plugins,
+    # configures MCP servers (Vikunja/Notion/Wiki), runs `rtk init`, and prompts for `gh auth login`.
     (pkgs.writeShellScriptBin "claude-setup" ''
       if ! command -v claude &> /dev/null; then
         echo_red "Error: claude not found in PATH"
@@ -82,6 +84,20 @@ in
         fi
       ''}
 
+      ${lib.optionalString cfg.wikiMcpEnabled ''
+        echo_yellow "Setting up Wiki MCP server..."
+        WIKI_SECRETS_DIR="$HOME/secrets/wiki"
+        if [ -f "$WIKI_SECRETS_DIR/u.txt" ] && [ -f "$WIKI_SECRETS_DIR/p.txt.tyz" ]; then
+          claude mcp remove wiki 2>/dev/null || true
+          claude mcp add -s user \
+            -e WIKI_SECRETS_DIR="$WIKI_SECRETS_DIR" \
+            -- wiki /run/current-system/sw/bin/wiki-mcp-server
+          echo_green "Wiki MCP server registered successfully"
+        else
+          echo_yellow "Warning: $WIKI_SECRETS_DIR/u.txt or p.txt.tyz not found. Skipping Wiki MCP setup."
+        fi
+      ''}
+
       echo_yellow "Installing rtk Claude Code hook..."
       rtk init -g
       echo_green "rtk hook installed"
@@ -93,7 +109,31 @@ in
         gh auth login
       fi
     '')
+    # Run periodically to pull the latest plugin code from configured marketplaces.
+    # Refreshes marketplace metadata, then updates each configured plugin. Restart claude after.
+    (pkgs.writeShellScriptBin "claude-update" ''
+      if ! command -v claude &> /dev/null; then
+        echo_red "Error: claude not found in PATH"
+        exit 1
+      fi
+      echo_yellow "Updating claude marketplaces..."
+      claude plugin marketplace update
+      echo_yellow "Updating claude plugins..."
+      ${lib.concatMapStringsSep "\n      " (
+        plugin: "claude plugin update ${plugin} || true"
+      ) cfg.claudePlugins}
+      echo_green "Done! Restart claude for updates to take effect."
+    '')
   ];
+
+  home.file = builtins.listToAttrs (
+    map (skill: {
+      name = ".claude/skills/${skill.name}/SKILL.md";
+      value = {
+        source = skill.file;
+      };
+    }) cfg.claudeSkills
+  );
 
   programs.git = {
     package = pkgs.gitFull;
@@ -147,39 +187,83 @@ in
       nixosSettings = baseConfig // cfg.extraClaudeSettings;
       nixosSettingsJson = builtins.toJSON nixosSettings;
 
+      # Group hooks by event and convert to Claude Code settings format
+      hooksByEvent = lib.groupBy (h: h.event) cfg.claudeHooks;
+      hooksConfig = lib.mapAttrs (
+        _event: entries:
+        map (h: {
+          matcher = h.matcher;
+          hooks = [
+            (
+              {
+                type = "command";
+                command = h.command;
+              }
+              // lib.optionalAttrs h.async { async = true; }
+            )
+          ];
+        }) entries
+      ) hooksByEvent;
+      hooksJson = builtins.toJSON hooksConfig;
+      permissionsAllowJson = builtins.toJSON cfg.claudePermissionsAllow;
+
       mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
         set -e
 
         SETTINGS_DIR="$HOME/.claude"
         SETTINGS_FILE="$SETTINGS_DIR/settings.json"
         NIXOS_SETTINGS='${nixosSettingsJson}'
+        NIXOS_HOOKS='${hooksJson}'
+        NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
 
         # Create directory if it doesn't exist
-        mkdir -p "$SETTINGS_DIR"
+        ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
 
         # If settings file doesn't exist, just write the NixOS settings
         if [ ! -f "$SETTINGS_FILE" ]; then
           echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
           echo "Created new Claude settings file with NixOS configuration"
-          exit 0
+        else
+          # Merge existing settings with NixOS settings
+          # NixOS settings take precedence for conflicts
+          ${pkgs.jq}/bin/jq -n \
+            --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
+            --argjson nixos "$NIXOS_SETTINGS" \
+            '$existing * $nixos' > "$SETTINGS_FILE.tmp"
+
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Updated Claude settings, preserving user modifications"
         fi
 
-        # Merge existing settings with NixOS settings
-        # NixOS settings take precedence for conflicts
-        ${pkgs.jq}/bin/jq -n \
-          --argjson existing "$(cat "$SETTINGS_FILE")" \
-          --argjson nixos "$NIXOS_SETTINGS" \
-          '$existing * $nixos' > "$SETTINGS_FILE.tmp"
+        # Append declarative hooks, deduplicating by command
+        if [ "$NIXOS_HOOKS" != "{}" ]; then
+          ${pkgs.jq}/bin/jq \
+            --argjson new_hooks "$NIXOS_HOOKS" \
+            'reduce ($new_hooks | to_entries[]) as $ev (
+              .;
+              .hooks[$ev.key] = (
+                (.hooks[$ev.key] // []) + $ev.value
+                | unique_by(.hooks[0].command)
+              )
+            )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Merged declarative hooks into Claude settings"
+        fi
 
-        mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-        echo "Updated Claude settings, preserving user modifications"
+        # Append declarative permissions allowlist, deduplicating
+        if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
+          ${pkgs.jq}/bin/jq \
+            --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
+            '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
+            "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
+          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+          echo "Merged declarative permissions into Claude settings"
+        fi
       '';
     in
     {
       Unit = {
         Description = "Update Claude Code settings with NixOS configuration";
-        After = [ "graphical-session-pre.target" ];
-        PartOf = [ "graphical-session.target" ];
       };
       Service = {
         Type = "oneshot";

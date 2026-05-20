@@ -57,6 +57,11 @@ in
 
     users.groups.vikunja = { };
 
+    # Allow members of the vikunja group to read the data dir for backups
+    systemd.tmpfiles.rules = [
+      "z ${cfg.dataDir} 0750 vikunja vikunja -"
+    ];
+
     # Vikunja configuration file
     environment.etc."vikunja/config.yml".text = ''
       service:

@@ -228,9 +228,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    - uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-platforms = aarch64-linux
     - uses: cachix/cachix-action@v14
       with:
         name: github-public

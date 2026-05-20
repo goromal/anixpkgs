@@ -256,6 +256,16 @@
                 "docs": true
             },
             {
+                "attr": "anix_upgrade_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "tasks_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "easy-google-auth",
                 "ci": true,
                 "docs": true
@@ -428,6 +438,11 @@
                 "docs": true
             },
             {
+                "attr": "ssht",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
                 "ci": true,
                 "docs": true
@@ -503,7 +518,27 @@
                 "docs": true
             },
             {
+                "attr": "backup",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "mp4unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3separate",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp4separate",
                 "ci": true,
                 "docs": true
             },

@@ -15,6 +15,7 @@
   };
   authui = 4242;
   budget_ui = 4343;
+  orchestrator_ui = 4545;
   tactical = {
     insecure = 60060;
     web = 60070;
@@ -30,4 +31,6 @@
     public = 8282;
   };
   flaresolverr = 8191;
+  anix_upgrade_ui = 5858;
+  tasks_ui = 5959;
 }

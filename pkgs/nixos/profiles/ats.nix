@@ -65,6 +65,12 @@ with import ../dependencies.nix;
         }
         {
           name = "ats-mailman";
+          execStartPre = pkgs.writeShellScript "ats-mailman-fix-perms" ''
+            for f in /var/mail/goromail/new/*; do
+              [ -e "$f" ] || exit 0
+              chmod 660 "$f"
+            done
+          '';
           jobShellScript = pkgs.writeShellScript "ats-mailman" ''
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit
@@ -152,8 +158,7 @@ with import ../dependencies.nix;
           name = "ats-vikunja-backup";
           jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
             mkdir -p $HOME/data/vikunja
-            sudo cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
-            sudo chown andrew:dev $HOME/data/vikunja/vikunja.db
+            cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-vikunja-backup "Backup successful!"
           '';
@@ -244,12 +249,9 @@ with import ../dependencies.nix;
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.workout-planner
-        anixpkgs.mp4
-        anixpkgs.mp4unite
         anixpkgs.goromail
         anixpkgs.sread
         anixpkgs.gmail-parser
-        anixpkgs.scrape
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
@@ -257,6 +259,67 @@ with import ../dependencies.nix;
     })
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-      services.ladder-ats.enable = true;
+      services.ladder-ats.enable = true; # ^^^^ TODO shouldn't be here
+      users.users.andrew.extraGroups = [ "vikunja" ];
+      environment.systemPackages = [
+        (pkgs.writeShellScriptBin "anix-init" ''
+          make-title -c yellow "Setting up rcrsync"
+
+          DO_RCLONE=y
+          if [[ -f $HOME/.config/rclone/rclone.conf ]]; then
+            read -rp "rclone config already found, proceed anyway? (y|n): " DO_RCLONE
+          fi
+          if [[ "$DO_RCLONE" == "y" ]]; then
+            read -rp "Enter the char key to unlock the rclone config: " CFGKEY
+            rm -rf $HOME/.config/rclone
+            mkdir -p $HOME/.config/rclone && cd $HOME/.config/rclone
+            cp ${anixpkgs.pkgData.records.rcloneConf.data} ${anixpkgs.pkgData.records.rcloneConf.name}
+            sunnyside -s 0 -k $CFGKEY -t ${anixpkgs.pkgData.records.rcloneConf.name}
+            rm ${anixpkgs.pkgData.records.rcloneConf.name}
+          else
+            echo_yellow "Skipping rclone config step"
+          fi
+
+          cd $HOME
+          rcrsync -v init configs
+          rcrsync -v init secrets
+          rcrsync -v init data
+
+          make-title -c yellow "Setting up SSH and Nix"
+
+          DO_SSH=y
+          if [[ -d $HOME/.ssh ]]; then
+            read -rp ".ssh directory already present, proceed anyway? (y|n): " DO_SSH
+          fi
+          if [[ "$DO_SSH" == "y" ]]; then
+            rm -rf $HOME/.ssh
+            cp -r $HOME/data/.ssh $HOME/.ssh
+            cd $HOME/.ssh
+            fix-perms .
+            cd ..
+          else
+            echo_yellow "Skipping SSH config setup"
+          fi
+
+          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
+          sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
+          sudo nix-channel --update
+          echo
+          echo
+          echo_green "DONE. Note the hardware-config.nix file below:"
+          echo
+          nixos-generate-config --show-hardware-config
+          echo
+          echo_green  "Use the config above as you set up anix-upgrade:"
+          echo_yellow "  - Use devshell to create a workspace with anixpkgs"
+          echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
+          echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
+          echo_yellow "  - Run anix-upgrade"
+          echo_yellow "  - Create new secrets and configs entries"
+          echo
+          echo_green "Have fun!"
+        '')
+      ];
     };
 }

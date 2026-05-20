@@ -27,6 +27,7 @@ rec {
           jobShellScript,
           timerCfg,
           readWritePaths ? [ "/" ],
+          execStartPre ? null,
         }:
         {
           systemd.timers."${name}" = {
@@ -43,7 +44,8 @@ rec {
               Type = "oneshot";
               ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
               ReadWritePaths = readWritePaths;
-            };
+            }
+            // (if execStartPre != null then { ExecStartPre = execStartPre; } else { });
           };
         };
     in

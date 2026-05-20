@@ -7,6 +7,38 @@
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
+  claudeCodeVersion = "2.1.116";
+  claudeCodeExt =
+    let
+      base = builtins.head (
+        pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+          {
+            name = "claude-code";
+            publisher = "anthropic";
+            version = claudeCodeVersion;
+            sha256 = "sha256-myBC6iy7EsA1at4QKWjgiq3TRuC4VMqeH4jop9zo4BM=";
+          }
+        ]
+      );
+    in
+    pkgs.stdenvNoCC.mkDerivation {
+      name = "vscode-extension-anthropic-claude-code-${claudeCodeVersion}-nixos";
+      version = claudeCodeVersion;
+      dontUnpack = true;
+      dontBuild = true;
+      installPhase = ''
+        cp -r ${base} $out
+        chmod -R u+w $out
+        mkdir -p $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64
+        ln -s ${anixpkgs.claude-code-bin}/bin/claude \
+          $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64/claude
+      '';
+      passthru = {
+        vscodeExtUniqueId = base.vscodeExtUniqueId;
+        vscodeExtPublisher = base.vscodeExtPublisher;
+        vscodeExtName = base.vscodeExtName;
+      };
+    };
 in
 {
   home.packages = [
@@ -25,7 +57,7 @@ in
   # e.g., https://search.nixos.org/packages?channel=[NIXOS_VERSION]&from=0&size=50&sort=relevance&type=packages&query=vscode-extensions
   programs.vscode = {
     enable = true;
-    package = unstable.vscode;
+    package = pkgs.vscode;
     profiles.default = {
       userSettings = {
         "editor.minimap.enabled" = false;
@@ -38,9 +70,10 @@ in
         "terminal.integrated.env.linux" = {
           "TMPDIR" = "/tmp";
         };
+        "claudeCode.preferredLocation" = "panel";
       };
       extensions =
-        with unstable.vscode-extensions;
+        with pkgs.vscode-extensions;
         [
           eamodio.gitlens
           ms-python.vscode-pylance
@@ -52,8 +85,9 @@ in
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
           ms-vscode.cpptools
+          claudeCodeExt
         ]
-        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+        ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "cmake";
             publisher = "twxs";
@@ -65,12 +99,6 @@ in
             publisher = "statiolake";
             version = "0.1.2";
             sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
-          }
-          {
-            name = "claude-code";
-            publisher = "anthropic";
-            version = "2.0.34";
-            sha256 = "sha256-e+pjuGY0xrg43+pDDkQ4Svb1yBx2Fv+Z8WZoJv/k6D4=";
           }
           {
             name = "protobuf-vsc";

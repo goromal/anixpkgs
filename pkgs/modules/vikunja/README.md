@@ -158,7 +158,7 @@ ssh andrew@laptop.local
 
 # Start Claude Code on a specific project
 cd /path/to/project
-claude-code
+claude
 
 # Tell Claude to work on tasks
 # > "Please work on the pending tasks in Vikunja project ID 5"

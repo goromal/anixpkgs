@@ -535,11 +535,11 @@
     "notion-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1775695868,
-        "narHash": "sha256-+WHhd2CYJSKsC+J10pjz2JzBXlhaM4jVPYGVn5JBfFU=",
+        "lastModified": 1776107009,
+        "narHash": "sha256-PxWbxt9LxMzsQrwK9j/r7JFInZvDpBPBzu9Pj+XgX6Y=",
         "owner": "goromal",
         "repo": "notion-tools",
-        "rev": "1e4652a0daec17ef801d0228a25be92a0bfaa59f",
+        "rev": "46b8e8eca2fca2703b6d34c8443e77e42b64f093",
         "type": "github"
       },
       "original": {
@@ -1050,11 +1050,11 @@
     "workout-planner": {
       "flake": false,
       "locked": {
-        "lastModified": 1772261839,
-        "narHash": "sha256-eKJSMzsKBv74F80rxfBnDfdm9Bs9/0rBCjgAngKh4eU=",
+        "lastModified": 1776261810,
+        "narHash": "sha256-jgvqwgivLP3N4BsineF3PdWqMd5xRs4+FmADSwV/yG8=",
         "owner": "goromal",
         "repo": "workout-planner",
-        "rev": "ab4d3263ea70b70085a9170580c11d12dd2585e5",
+        "rev": "7807db2368b5c094b64a4ab6f17b3d6274cd453e",
         "type": "github"
       },
       "original": {

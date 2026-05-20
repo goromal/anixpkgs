@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   options.mods.opts = {
     standalone = lib.mkOption {
@@ -57,13 +60,56 @@ with import ../dependencies.nix;
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
+      default = claudeDefaults.marketplaces;
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
+      default = claudeDefaults.plugins;
       description = "List of claude plugins to install";
+    };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = claudeDefaults.permissionsAllow;
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
+    claudeSkills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.claude/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = claudeDefaults.skills;
+      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
+      default = claudeDefaults.hooks;
+      description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
@@ -79,6 +125,11 @@ with import ../dependencies.nix;
       type = lib.types.bool;
       default = false;
       description = "Whether the Notion MCP server is installed on this machine (enables MCP setup in claude-setup)";
+    };
+    wikiMcpEnabled = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether the Wiki MCP server is installed on this machine (enables MCP setup in claude-setup)";
     };
   };
 }

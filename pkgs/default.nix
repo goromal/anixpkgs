@@ -249,8 +249,11 @@ let
               stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
               authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
+              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
               la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
+              tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -350,8 +353,11 @@ rec {
   stampserver = final.python313.pkgs.stampserver;
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
+  orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  tasks_ui = final.python313.pkgs.tasks_ui;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
@@ -371,6 +377,7 @@ rec {
     }
   );
   local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
+  ssht = addDoc (prev.callPackage ./bash-packages/ssht { });
   gantter = addDoc (
     prev.callPackage ./bash-packages/gantter {
       python = final.python313;
@@ -400,6 +407,9 @@ rec {
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
+  mp3unite = addDoc (prev.callPackage ./bash-packages/mp3unite { });
+  mp3separate = addDoc (prev.callPackage ./bash-packages/mp3separate { });
+  mp4separate = addDoc (prev.callPackage ./bash-packages/mp4separate { });
   notabilify = addDoc (prev.callPackage ./bash-packages/converters/notabilify.nix { });
   make-title = addDoc (prev.callPackage ./bash-packages/make-title { });
   pb = addDoc (prev.callPackage ./bash-packages/pb { });
@@ -419,6 +429,7 @@ rec {
     }
   );
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
+  backup = addDoc (prev.callPackage ./bash-packages/backup { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });
   setupws = addDoc (prev.callPackage ./bash-packages/setupws { });
   listsources = addDoc (prev.callPackage ./bash-packages/listsources { });
@@ -566,4 +577,7 @@ rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  # Override claude-code-bin to use version 2.1.113
+  claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

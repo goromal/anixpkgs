@@ -6,7 +6,9 @@
 }:
 with import ./dependencies.nix;
 let
+  claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
+  remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
@@ -150,25 +152,71 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "DevonMorris/claude-ctags" ];
+      default = claudeDefaults.marketplaces;
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "claude-ctags@claude-ctags"
-        "code-review@claude-plugins-official"
-        "frontend-design@claude-plugins-official"
-        "github@claude-plugins-official"
-        "feature-dev@claude-plugins-official"
-        "pr-review-toolkit@claude-plugins-official"
-      ];
+      default = claudeDefaults.plugins;
       description = "List of claude plugins to install";
+    };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = claudeDefaults.permissionsAllow;
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
+      default = claudeDefaults.hooks;
+      description = "List of Claude Code hooks to merge into settings.json";
+    };
+    claudeSkills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.claude/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = claudeDefaults.skills;
+      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
       description = "Attrs describing the Claude JSON settings";
+    };
+    remoteBuilders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Keys into remote-builders.nix catalog of LAN build machines to use for distributed builds.";
+    };
+    acceptRemoteBuilds = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether this machine accepts build jobs from other LAN hosts via SSH.";
     };
   };
 
@@ -182,14 +230,18 @@ in
     ../modules/vikunja/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/ladder/module.nix
+    ../modules/wiki-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
     ../python-packages/flasks/budget_ui/module.nix
+    ../python-packages/flasks/orchestrator_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
+    ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../python-packages/flasks/tasks_ui/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -206,11 +258,11 @@ in
   config = {
     system.stateVersion = cfg.nixosState;
 
-    boot = lib.mkIf (cfg.machineType != "jetson") {
-      kernelPackages = (
+    boot = {
+      kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
       );
-      kernel.sysctl = {
+      kernel.sysctl = lib.mkIf (cfg.machineType != "jetson") {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
         "net.ipv4.tcp_notsent_lowat" = "16384";
@@ -221,13 +273,17 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
       };
       loader = {
-        # Use the systemd-boot EFI boot loader.
+        # Use the systemd-boot EFI boot loader for x86_linux and Jetson
         # Grub is used on Raspberry Pi
-        systemd-boot.enable = (if cfg.machineType == "x86_linux" then true else false);
+        systemd-boot.enable = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
+        grub.enable = lib.mkForce (cfg.machineType == "pi4");
+        grub.efiSupport = lib.mkIf (cfg.machineType == "pi4") true;
+        grub.device = lib.mkIf (cfg.machineType == "pi4") "nodev";
         efi = {
-          canTouchEfiVariables = true;
+          canTouchEfiVariables = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
           efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
+        generic-extlinux-compatible.enable = lib.mkForce false;
       };
       supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
       binfmt.emulatedSystems = lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
@@ -266,6 +322,10 @@ in
       "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
       "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
     ];
+
+    nix.distributedBuilds = cfg.remoteBuilders != [ ];
+    nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+    nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
     services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
     services.displayManager.gdm.enable = lib.mkIf (
@@ -439,6 +499,14 @@ in
       ];
     };
 
+    services.orchestrator_ui = {
+      enable = cfg.enableOrchestrator;
+    };
+
+    services.anix-upgrade-ui = {
+      enable = true;
+    };
+
     services.rankserver = {
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.rankserver;
@@ -459,6 +527,10 @@ in
     services.tester = {
       enable = cfg.isATS;
       dataDir = "${cfg.homeDir}/data/tester";
+    };
+
+    services.tasks_ui = {
+      enable = cfg.isATS;
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -523,6 +595,10 @@ in
           rclone
           machine-rcrsync
           machine-authm
+          anixpkgs.mp4
+          anixpkgs.mp4unite
+          anixpkgs.png
+          anixpkgs.scrape
         ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
@@ -608,6 +684,9 @@ in
 
     # Notion MCP Server
     services.notion-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
+
+    # Wiki MCP Server
+    services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
 
     # Global packages
     environment.systemPackages =
@@ -735,6 +814,14 @@ in
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+      tmux() {
+        command tmux "$@"
+        local _tmux_exit=$?
+        tput rmcup 2>/dev/null
+        tput cnorm 2>/dev/null
+        stty sane 2>/dev/null
+        return $_tmux_exit
+      }
        mkcd() {
           if [[ "$1" == "-h" || "$1" == "--help" ]]; then
               echo "usage: mkcd [-t|DIRNAME]"
@@ -814,9 +901,13 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudePermissionsAllow = cfg.claudePermissionsAllow;
+        claudeHooks = cfg.claudeHooks;
+        claudeSkills = cfg.claudeSkills;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
+        wikiMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
       };
     };
   };

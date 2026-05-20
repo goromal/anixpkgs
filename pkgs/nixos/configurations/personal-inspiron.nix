@@ -12,5 +12,6 @@
   machines.base.nixosState = "22.05";
   machines.base.wifiInterfaceName = "wlp1s0";
   machines.base.bootMntPt = "/boot/efi";
+  machines.base.acceptRemoteBuilds = true;
   networking.hostName = "atorgesen-inspiron";
 }
