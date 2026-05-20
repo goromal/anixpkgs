@@ -70,6 +70,24 @@ with import ../dependencies.nix;
       default = [ ];
       description = "List of Claude Code permission patterns to add to the global allowlist";
     };
+    claudeSkills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.claude/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
+    };
     claudeHooks = lib.mkOption {
       type = lib.types.listOf (
         lib.types.submodule {
