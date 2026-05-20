@@ -190,6 +190,24 @@ in
       default = claudeDefaults.hooks;
       description = "List of Claude Code hooks to merge into settings.json";
     };
+    claudeSkills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.claude/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = claudeDefaults.skills;
+      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
+    };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
@@ -901,6 +919,7 @@ in
         claudePlugins = cfg.claudePlugins;
         claudePermissionsAllow = cfg.claudePermissionsAllow;
         claudeHooks = cfg.claudeHooks;
+        claudeSkills = cfg.claudeSkills;
         extraClaudeSettings = cfg.extraClaudeSettings;
         vikunjaEnabled = cfg.isATS;
         notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
