@@ -5,9 +5,6 @@
   ...
 }:
 with import ../dependencies.nix;
-let
-  claudeDefaults = import ../claude-defaults.nix;
-in
 {
   options.mods.opts = {
     standalone = lib.mkOption {
@@ -60,17 +57,17 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.marketplaces;
+      default = [ ];
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.plugins;
+      default = [ ];
       description = "List of claude plugins to install";
     };
     claudePermissionsAllow = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.permissionsAllow;
+      default = [ ];
       description = "List of Claude Code permission patterns to add to the global allowlist";
     };
     claudeSkills = lib.mkOption {
@@ -88,7 +85,7 @@ in
           };
         }
       );
-      default = claudeDefaults.skills;
+      default = [ ];
       description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
     };
     claudeHooks = lib.mkOption {
@@ -108,7 +105,7 @@ in
           };
         }
       );
-      default = claudeDefaults.hooks;
+      default = [ ];
       description = "List of Claude Code hooks to merge into settings.json";
     };
     extraClaudeSettings = lib.mkOption {
@@ -116,20 +113,38 @@ in
       default = { };
       description = "Attrs describing the Claude JSON settings";
     };
-    vikunjaEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether Vikunja is enabled on this machine (enables MCP setup in claude-setup)";
-    };
-    notionMcpEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether the Notion MCP server is installed on this machine (enables MCP setup in claude-setup)";
-    };
-    wikiMcpEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether the Wiki MCP server is installed on this machine (enables MCP setup in claude-setup)";
+    claudeMcpServers = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "MCP server name (passed to `claude mcp add`)";
+            };
+            command = lib.mkOption {
+              type = lib.types.str;
+              description = "Absolute path to the MCP server executable";
+            };
+            env = lib.mkOption {
+              type = lib.types.attrsOf lib.types.str;
+              default = { };
+              description = "Plain (non-secret) environment variables for the server";
+            };
+            secretsPath = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Path checked for existence; if missing, server registration is skipped";
+            };
+            secretsEnvVar = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Name of env var that should receive secretsPath (the server reads + parses it)";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of MCP servers to register with claude during claude-setup";
     };
     jupyterMcpEnabled = lib.mkOption {
       type = lib.types.bool;

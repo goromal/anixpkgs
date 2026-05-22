@@ -6,7 +6,6 @@
 }:
 with import ./dependencies.nix;
 let
-  claudeDefaults = import ./claude-defaults.nix;
   cfg = config.machines.base;
   remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
@@ -157,17 +156,17 @@ in
     };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.marketplaces;
+      default = [ ];
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.plugins;
+      default = [ ];
       description = "List of claude plugins to install";
     };
     claudePermissionsAllow = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = claudeDefaults.permissionsAllow;
+      default = [ ];
       description = "List of Claude Code permission patterns to add to the global allowlist";
     };
     claudeHooks = lib.mkOption {
@@ -187,7 +186,7 @@ in
           };
         }
       );
-      default = claudeDefaults.hooks;
+      default = [ ];
       description = "List of Claude Code hooks to merge into settings.json";
     };
     claudeSkills = lib.mkOption {
@@ -205,13 +204,18 @@ in
           };
         }
       );
-      default = claudeDefaults.skills;
+      default = [ ];
       description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
       description = "Attrs describing the Claude JSON settings";
+    };
+    claudeMcpServers = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      default = [ ];
+      description = "List of MCP server attrsets (see mods.opts.claudeMcpServers) to register during claude-setup";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -922,10 +926,7 @@ in
         claudeHooks = cfg.claudeHooks;
         claudeSkills = cfg.claudeSkills;
         extraClaudeSettings = cfg.extraClaudeSettings;
-        vikunjaEnabled = cfg.isATS;
-        notionMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
-        wikiMcpEnabled = cfg.isATS || (cfg.recreational && cfg.developer);
-        jupyterMcpEnabled = (cfg.machineType == "jetson");
+        claudeMcpServers = cfg.claudeMcpServers;
       };
     };
   };

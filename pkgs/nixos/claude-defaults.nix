@@ -104,6 +104,31 @@ in
     }
   ];
 
+  mcpServers = {
+    vikunja = {
+      name = "vikunja";
+      command = "/run/current-system/sw/bin/vikunja-mcp-server";
+      env = {
+        VIKUNJA_URL = "https://ats.local:3457";
+        VIKUNJA_INSECURE = "1";
+      };
+      secretsPath = "$HOME/secrets/vikunja/secrets.json";
+      secretsEnvVar = "VIKUNJA_TOKEN_FILE";
+    };
+    notion = {
+      name = "notion";
+      command = "/run/current-system/sw/bin/notion-mcp-server";
+      secretsPath = "$HOME/secrets/notion/secret.json";
+      secretsEnvVar = "NOTION_TOKEN_FILE";
+    };
+    wiki = {
+      name = "wiki";
+      command = "/run/current-system/sw/bin/wiki-mcp-server";
+      secretsPath = "$HOME/secrets/wiki";
+      secretsEnvVar = "WIKI_SECRETS_DIR";
+    };
+  };
+
   hooks = [
     {
       event = "SessionStart";
