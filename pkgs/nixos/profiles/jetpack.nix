@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
@@ -15,6 +18,11 @@ with import ../dependencies.nix;
       recreational = false;
       developer = true;
       isATS = false;
+      claudeMarketplaces = claudeDefaults.marketplaces;
+      claudePlugins = claudeDefaults.plugins;
+      claudePermissionsAllow = claudeDefaults.permissionsAllow;
+      claudeHooks = claudeDefaults.hooks;
+      claudeSkills = claudeDefaults.skills;
       serveNotesWiki = false;
       enableMetrics = false; # TODO: perhaps enable in the future
       enableFileServers = true;
