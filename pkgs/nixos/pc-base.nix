@@ -544,6 +544,7 @@ in
 
     services.tasks_ui = {
       enable = cfg.isATS;
+      rcrsync = machine-rcrsync;
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
