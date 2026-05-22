@@ -52,7 +52,9 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/tasks_ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
-        Environment = lib.mkIf (cfg.rcrsync != null) "PATH=${cfg.rcrsync}/bin:/run/current-system/sw/bin:/usr/bin";
+        Environment = lib.mkIf (
+          cfg.rcrsync != null
+        ) "PATH=${cfg.rcrsync}/bin:/run/current-system/sw/bin:/usr/bin";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
