@@ -27,6 +27,11 @@ in
       description = "Subdomain path for reverse proxy";
       default = "/tasks";
     };
+    rcrsync = lib.mkOption {
+      type = lib.types.nullOr lib.types.package;
+      description = "The rcrsync package to add to the service PATH";
+      default = null;
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -47,6 +52,7 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/tasks_ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
+        Environment = lib.mkIf (cfg.rcrsync != null) "PATH=${cfg.rcrsync}/bin:/run/current-system/sw/bin:/usr/bin";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
