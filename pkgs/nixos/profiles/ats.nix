@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
@@ -15,6 +18,16 @@ with import ../dependencies.nix;
       recreational = false;
       developer = true;
       isATS = true;
+      claudeMarketplaces = claudeDefaults.marketplaces;
+      claudePlugins = claudeDefaults.plugins;
+      claudePermissionsAllow = claudeDefaults.permissionsAllow;
+      claudeHooks = claudeDefaults.hooks;
+      claudeSkills = claudeDefaults.skills;
+      claudeMcpServers = [
+        claudeDefaults.mcpServers.vikunja
+        claudeDefaults.mcpServers.notion
+        claudeDefaults.mcpServers.wiki
+      ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
