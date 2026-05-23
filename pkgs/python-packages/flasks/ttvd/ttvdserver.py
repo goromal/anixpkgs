@@ -18,6 +18,11 @@ SUBDOMAIN = args.subdomain.rstrip("/")
 TEMP_ROOT = Path("/tmp/ttvd")
 TEMP_ROOT.mkdir(parents=True, exist_ok=True)
 
+# Persistent directory for TikTokDownloader settings (including cookies).
+# Using a stable path means cookies survive across requests and restarts.
+SETTINGS_ROOT = Path.home() / ".local" / "share" / "TikTokDownloader"
+SETTINGS_ROOT.mkdir(parents=True, exist_ok=True)
+
 app = flask.Flask(__name__, static_url_path=SUBDOMAIN)
 bp = flask.Blueprint("ttvd", __name__)
 
@@ -42,7 +47,9 @@ def _build_parameter(root: Path):
 
     root.mkdir(parents=True, exist_ok=True)
     console = ColorfulConsole()
-    settings = Settings(root, console)
+    # Use persistent settings dir so cookies survive across requests/restarts.
+    # The download root is overridden below to the per-request temp dir.
+    settings = Settings(SETTINGS_ROOT, console)
     cfg = settings.read()
 
     # Override key settings for our use case

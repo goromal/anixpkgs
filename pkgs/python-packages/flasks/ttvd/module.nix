@@ -47,7 +47,7 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/ttvdserver --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
-        ReadWritePaths = [ "/tmp/ttvd" ];
+        ReadWritePaths = [ "/tmp/ttvd" "/data/andrew/.local/share/TikTokDownloader" ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
         RestartSec = 5;
