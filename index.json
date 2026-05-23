@@ -324,6 +324,11 @@
                 "attr": "ttvd",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "ttvdserver",
+                "ci": false,
+                "docs": false
             }
         ],
         "bash": [
