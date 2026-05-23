@@ -12,7 +12,7 @@ import flask
 parser = argparse.ArgumentParser(description="TTVD web server")
 parser.add_argument("--port", type=int, default=6060)
 parser.add_argument("--subdomain", type=str, default="/ttvd")
-args = parser.parse_args()
+args, _ = parser.parse_known_args()
 
 SUBDOMAIN = args.subdomain.rstrip("/")
 TEMP_ROOT = Path("/tmp/ttvd")
