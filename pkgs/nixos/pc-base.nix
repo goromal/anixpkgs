@@ -382,7 +382,7 @@ in
           return = "200 '${
             let
               hostname = config.networking.hostName;
-              services = cfg.webServices;
+              services = lib.sort (a: b: a.name < b.name) cfg.webServices;
               # Generate service links with special handling for port-based services
               serviceLinks = lib.concatMapStringsSep "\n" (
                 s:
