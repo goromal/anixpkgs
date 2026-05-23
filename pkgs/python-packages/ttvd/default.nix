@@ -16,11 +16,7 @@
   rich,
   uvicorn,
   ffmpeg-headless,
-  python,
 }:
-let
-  pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
-in
 buildPythonPackage rec {
   pname = "ttvd";
   version = "5.8";
