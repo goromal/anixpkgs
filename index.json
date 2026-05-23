@@ -319,6 +319,11 @@
                 "attr": "symforce",
                 "ci": false,
                 "docs": false
+            },
+            {
+                "attr": "ttvd",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [

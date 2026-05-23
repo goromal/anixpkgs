@@ -254,6 +254,12 @@ let
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
+              gmssl = addDoc (pySelf.callPackage ./python-packages/gmssl { });
+              ttvd = addDoc (
+                pySelf.callPackage ./python-packages/ttvd {
+                  pkg-src = flakeInputs.ttvd-src;
+                }
+              );
             }
           );
         }
@@ -368,6 +374,8 @@ rec {
   gmail-parser = final.python313.pkgs.gmail-parser;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
+  gmssl = final.python313.pkgs.gmssl;
+  ttvd = final.python313.pkgs.ttvd;
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (

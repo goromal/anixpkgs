@@ -765,6 +765,7 @@
         "symforce": "symforce",
         "task-tools": "task-tools",
         "trafficsim": "trafficsim",
+        "ttvd-src": "ttvd-src",
         "wiki-tools": "wiki-tools",
         "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
@@ -976,6 +977,22 @@
       "original": {
         "type": "git",
         "url": "https://gist.github.com/c37629235750b65b9d0ec0e17456ee96"
+      }
+    },
+    "ttvd-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779241456,
+        "narHash": "sha256-s+tL27K9AeatqsaW0v7h2+FxS1awu16a6AaMh4A6QqE=",
+        "owner": "JoeanAmier",
+        "repo": "TikTokDownloader",
+        "rev": "2d11673aa50ba193d83d3b1350e47b8afdf8e887",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JoeanAmier",
+        "repo": "TikTokDownloader",
+        "type": "github"
       }
     },
     "utils": {
