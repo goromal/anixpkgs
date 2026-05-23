@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1771825089,
-        "narHash": "sha256-AbyLbEfPdEcgYTnqv1/4hofSwmN+UBNLJ5B6cWAX+I0=",
+        "lastModified": 1779509151,
+        "narHash": "sha256-4fnplv8xfNHB8iIBc3f7Y4fIW21NqRCQSbQDjt1J29g=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "467fef9fe1e9daf72de5eb6bf868ea29da590cb1",
+        "rev": "34e7a7513020bd5661064e1ff4d4c35995cd7ff2",
         "type": "github"
       },
       "original": {
