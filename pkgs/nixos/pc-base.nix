@@ -245,6 +245,7 @@ in
     ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
+    ../python-packages/flasks/ttvd/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -535,6 +536,10 @@ in
     services.tasks_ui = {
       enable = cfg.isATS;
       rcrsync = machine-rcrsync;
+    };
+
+    services.ttvdserver = {
+      enable = cfg.isATS;
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
