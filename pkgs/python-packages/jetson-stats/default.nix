@@ -23,15 +23,15 @@ buildPythonPackage rec {
     nvidia-ml-py
   ];
   postPatch = ''
-    python3 -c "
-import pathlib
-p = pathlib.Path('jtop/core/config.py')
-t = p.read_text()
-p.write_text(t.replace(
-    'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    path = sys.prefix',
-    'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    if os.environ.get(\"JTOP_SERVICE\"):\n        return \"/var/lib/jtop\"\n    path = sys.prefix'
-))
-"
+        python3 -c "
+    import pathlib
+    p = pathlib.Path('jtop/core/config.py')
+    t = p.read_text()
+    p.write_text(t.replace(
+        'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    path = sys.prefix',
+        'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    if os.environ.get(\"JTOP_SERVICE\"):\n        return \"/var/lib/jtop\"\n    path = sys.prefix'
+    ))
+    "
   '';
   doCheck = false;
   meta = {
