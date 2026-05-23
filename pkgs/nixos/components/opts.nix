@@ -146,10 +146,5 @@ with import ../dependencies.nix;
       default = [ ];
       description = "List of MCP servers to register with claude during claude-setup";
     };
-    jupyterMcpEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether the Jupyter MCP server is installed on this machine (enables MCP setup in claude-setup)";
-    };
   };
 }

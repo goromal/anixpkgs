@@ -23,6 +23,7 @@ in
       claudePermissionsAllow = claudeDefaults.permissionsAllow;
       claudeHooks = claudeDefaults.hooks;
       claudeSkills = claudeDefaults.skills;
+      claudeMcpServers = [ claudeDefaults.mcpServers.jupyter ];
       serveNotesWiki = false;
       enableMetrics = false; # TODO: perhaps enable in the future
       enableFileServers = true;

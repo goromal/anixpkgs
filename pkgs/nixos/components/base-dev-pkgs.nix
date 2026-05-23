@@ -81,15 +81,6 @@ in
 
       ${lib.concatMapStringsSep "\n" mcpServerSetupScript cfg.claudeMcpServers}
 
-      ${lib.optionalString cfg.jupyterMcpEnabled ''
-        echo_yellow "Setting up Jupyter MCP server..."
-        claude mcp remove jupyter-mcp 2>/dev/null || true
-        claude mcp add -s user \
-          -e SERVER_URL=http://localhost:${toString service-ports.launchpad} \
-          -- jupyter-mcp /run/current-system/sw/bin/jupyter-mcp-server
-        echo_green "Jupyter MCP server registered successfully"
-      ''}
-
       echo_yellow "Installing rtk Claude Code hook..."
       rtk init -g
       echo_green "rtk hook installed"

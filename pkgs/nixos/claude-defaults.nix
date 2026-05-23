@@ -127,6 +127,13 @@ in
       secretsPath = "$HOME/secrets/wiki";
       secretsEnvVar = "WIKI_SECRETS_DIR";
     };
+    jupyter = {
+      name = "jupyter-mcp";
+      command = "/run/current-system/sw/bin/jupyter-mcp-server";
+      env = {
+        SERVER_URL = "http://localhost:8888";
+      };
+    };
   };
 
   hooks = [
