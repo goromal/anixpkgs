@@ -1,0 +1,61 @@
+{
+  "planPath": "docs/superpowers/plans/2026-05-22-ttvd-ui.md",
+  "tasks": [
+    {
+      "id": 7,
+      "subject": "Task 1: Add flake input and package ttvd CLI",
+      "status": "pending",
+      "description": "**Goal:** Pull TikTokDownloader from GitHub as a flake input and build it as an installable Python package (`ttvd`) with a `ttvd` CLI entry point.\n\n**Files:**\n- Modify: `flake.nix`\n- Create: `pkgs/python-packages/ttvd/default.nix`\n- Modify: `pkgs/default.nix`\n- Modify: `index.json`\n\n**Acceptance Criteria:**\n- [ ] `flake.nix` contains `ttvd-src` input pointing to `JoeanAmier/TikTokDownloader`\n- [ ] `nix-build . -A ttvd` succeeds\n- [ ] `result/bin/ttvd` exists\n- [ ] `from src.config import Settings, Parameter` works in the built env\n\n**Verify:** `nix-build . -A ttvd && result/bin/ttvd --help`\n\n```json:metadata\n{\"files\": [\"flake.nix\", \"pkgs/python-packages/ttvd/default.nix\", \"pkgs/default.nix\", \"index.json\"], \"verifyCommand\": \"nix-build . -A ttvd && result/bin/ttvd --help\", \"acceptanceCriteria\": [\"nix-build . -A ttvd succeeds\", \"result/bin/ttvd exists\", \"from src.config import Settings Parameter works in built env\"]}\n```"
+    },
+    {
+      "id": 8,
+      "subject": "Task 2: Add ttvd CLI to recreational machines",
+      "status": "pending",
+      "blockedBy": [7],
+      "description": "**Goal:** Make the `ttvd` CLI available on machines where `recreational = true`.\n\n**Files:**\n- Modify: `pkgs/nixos/components/x86-rec-pkgs.nix`\n\n**Acceptance Criteria:**\n- [ ] `anixpkgs.ttvd` appears in `home.packages` in `x86-rec-pkgs.nix`\n\n**Verify:** `grep -n \"ttvd\" pkgs/nixos/components/x86-rec-pkgs.nix`\n\n```json:metadata\n{\"files\": [\"pkgs/nixos/components/x86-rec-pkgs.nix\"], \"verifyCommand\": \"grep -n ttvd pkgs/nixos/components/x86-rec-pkgs.nix\", \"acceptanceCriteria\": [\"anixpkgs.ttvd appears in x86-rec-pkgs.nix home.packages\"]}\n```"
+    },
+    {
+      "id": 9,
+      "subject": "Task 3: Reserve port 6060 for ttvd service",
+      "status": "pending",
+      "blockedBy": [7],
+      "description": "**Goal:** Register port 6060 for the ttvd Flask service in the centralized port registry.\n\n**Files:**\n- Modify: `pkgs/nixos/service-ports.nix`\n\n**Acceptance Criteria:**\n- [ ] `service-ports.nix` contains `ttvd = 6060`\n\n**Verify:** `grep ttvd pkgs/nixos/service-ports.nix`\n\n```json:metadata\n{\"files\": [\"pkgs/nixos/service-ports.nix\"], \"verifyCommand\": \"grep ttvd pkgs/nixos/service-ports.nix\", \"acceptanceCriteria\": [\"ttvd = 6060 appears in service-ports.nix\"]}\n```"
+    },
+    {
+      "id": 10,
+      "subject": "Task 4: Implement Flask backend (ttvdserver.py)",
+      "status": "pending",
+      "blockedBy": [7],
+      "description": "**Goal:** Build the Flask server with all routes: fetch, stream, client-download, save-to-server, list-dirs.\n\n**Files:**\n- Create: `pkgs/python-packages/flasks/ttvd/ttvdserver.py`\n\n**Acceptance Criteria:**\n- [ ] `POST /ttvd/api/fetch` with real TikTok URL returns token+title+filename\n- [ ] `GET /ttvd/api/stream/<token>` returns 200 video/mp4\n- [ ] `GET /ttvd/api/client-download/<token>` returns file as attachment\n- [ ] `POST /ttvd/api/save-to-server` moves file to given path\n- [ ] `POST /ttvd/api/list-dirs` returns path/parent/dirs\n\n**Verify:** `python3 pkgs/python-packages/flasks/ttvd/ttvdserver.py --help`\n\n```json:metadata\n{\"files\": [\"pkgs/python-packages/flasks/ttvd/ttvdserver.py\"], \"verifyCommand\": \"python3 pkgs/python-packages/flasks/ttvd/ttvdserver.py --help\", \"acceptanceCriteria\": [\"POST /ttvd/api/fetch with real TikTok URL returns token+title+filename\", \"GET /ttvd/api/stream/<token> returns 200 video/mp4\", \"GET /ttvd/api/client-download/<token> returns file as attachment\", \"POST /ttvd/api/save-to-server moves file to path\", \"POST /ttvd/api/list-dirs returns path/parent/dirs\"]}\n```"
+    },
+    {
+      "id": 11,
+      "subject": "Task 5: Implement Flask UI (index.html)",
+      "status": "pending",
+      "blockedBy": [10],
+      "description": "**Goal:** Single-page UI with URL input, Fetch button, video player, client-download button, and folder-picker modal.\n\n**Files:**\n- Create: `pkgs/python-packages/flasks/ttvd/index.html`\n\n**Acceptance Criteria:**\n- [ ] Page renders without JS errors\n- [ ] All 5 API endpoints referenced in JS\n- [ ] Video player element present\n- [ ] Folder picker modal present\n\n**Verify:** `grep -c 'api/fetch\\|api/stream\\|api/client-download\\|api/save-to-server\\|api/list-dirs' pkgs/python-packages/flasks/ttvd/index.html`\n\n```json:metadata\n{\"files\": [\"pkgs/python-packages/flasks/ttvd/index.html\"], \"verifyCommand\": \"grep -c 'api/fetch\\\\|api/stream\\\\|api/client-download\\\\|api/save-to-server\\\\|api/list-dirs' pkgs/python-packages/flasks/ttvd/index.html\", \"acceptanceCriteria\": [\"Page contains all 5 API call sites\", \"Video player element present\", \"Folder picker modal present\"]}\n```"
+    },
+    {
+      "id": 12,
+      "subject": "Task 6: Create Flask Nix derivation (ttvdserver)",
+      "status": "pending",
+      "blockedBy": [10, 11],
+      "description": "**Goal:** Package ttvdserver.py + index.html as a buildPythonPackage derivation depending on ttvd and Flask.\n\n**Files:**\n- Create: `pkgs/python-packages/flasks/ttvd/setup.py`\n- Create: `pkgs/python-packages/flasks/ttvd/default.nix`\n- Modify: `pkgs/default.nix`\n\n**Acceptance Criteria:**\n- [ ] `nix-build . -A ttvdserver` succeeds\n- [ ] `result/bin/ttvdserver --help` exits cleanly\n- [ ] ttvd is a transitive dependency\n\n**Verify:** `nix-build . -A ttvdserver && result/bin/ttvdserver --help`\n\n```json:metadata\n{\"files\": [\"pkgs/python-packages/flasks/ttvd/setup.py\", \"pkgs/python-packages/flasks/ttvd/default.nix\", \"pkgs/default.nix\"], \"verifyCommand\": \"nix-build . -A ttvdserver && result/bin/ttvdserver --help\", \"acceptanceCriteria\": [\"nix-build . -A ttvdserver succeeds\", \"result/bin/ttvdserver --help exits with usage\", \"ttvd is a transitive dependency\"]}\n```"
+    },
+    {
+      "id": 13,
+      "subject": "Task 7: Create NixOS module and wire into pc-base.nix",
+      "status": "pending",
+      "blockedBy": [9, 12],
+      "description": "**Goal:** Define systemd service, nginx proxy, webServices registration for ttvdserver; enable on ATS machines.\n\n**Files:**\n- Create: `pkgs/python-packages/flasks/ttvd/module.nix`\n- Modify: `pkgs/nixos/pc-base.nix`\n\n**Acceptance Criteria:**\n- [ ] module.nix defines services.ttvdserver options\n- [ ] pc-base.nix imports module and enables for isATS\n- [ ] TTVD appears in machines.base.webServices config\n\n**Verify:** `grep -n \"ttvdserver\" pkgs/nixos/pc-base.nix`\n\n```json:metadata\n{\"files\": [\"pkgs/python-packages/flasks/ttvd/module.nix\", \"pkgs/nixos/pc-base.nix\"], \"verifyCommand\": \"grep -n ttvdserver pkgs/nixos/pc-base.nix\", \"acceptanceCriteria\": [\"module.nix defines services.ttvdserver options\", \"pc-base.nix imports module and enables for isATS\", \"TTVD appears in machines.base.webServices config\"]}\n```"
+    },
+    {
+      "id": 14,
+      "subject": "Task 8: Clean up design doc",
+      "status": "pending",
+      "blockedBy": [13],
+      "description": "**Goal:** Delete the design spec now that implementation is complete.\n\n**Files:**\n- Delete: `docs/superpowers/specs/2026-05-22-ttvd-ui-design.md`\n\n**Acceptance Criteria:**\n- [ ] File no longer exists in the repo\n\n**Verify:** `ls docs/superpowers/specs/ | grep ttvd` → no output\n\n```json:metadata\n{\"files\": [\"docs/superpowers/specs/2026-05-22-ttvd-ui-design.md\"], \"verifyCommand\": \"ls docs/superpowers/specs/ | grep ttvd\", \"acceptanceCriteria\": [\"2026-05-22-ttvd-ui-design.md no longer exists in the repo\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-05-22T00:00:00Z"
+}
