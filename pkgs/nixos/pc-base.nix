@@ -275,6 +275,23 @@ in
       cfg.machineType == "jetson"
     ) cfg.launchpadPythonPackages;
 
+    users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
+
+    systemd.services.jtop = lib.mkIf (cfg.machineType == "jetson") {
+      description = "jtop service";
+      after = [ "systemd-modules-load.service" ];
+      wantedBy = [ "multi-user.target" ];
+      environment.JTOP_SERVICE = "True";
+      serviceConfig = {
+        ExecStart = "${anixpkgs.jetson-stats}/bin/jtop --force";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        TimeoutStartSec = "30s";
+        TimeoutStopSec = "30s";
+        StateDirectory = "jtop";
+      };
+    };
+
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
