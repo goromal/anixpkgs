@@ -34,11 +34,14 @@ class PostfixMessage:
             self.date = parsedate_to_datetime(msg["Date"]).astimezone()
         except Exception:
             self.date = datetime.now().astimezone()
-        text_parts = []
+        plain_parts, html_parts = [], []
         for part in msg.walk():
             if part.get_content_type() == "text/plain":
-                text_parts.append(part.get_content())
-        self.text = "\n".join(text_parts)
+                plain_parts.append(part.get_content())
+            elif part.get_content_type() == "text/html":
+                html_parts.append(part.get_content())
+        self.raw_text = "\n".join(plain_parts) or "\n".join(html_parts)
+        self.text = re.sub(r"<[^>]+>", " ", self.raw_text).strip()
 
     def getText(self):
         return self.text
@@ -72,11 +75,15 @@ def process_keyword(
             item = f"[**{datestr}**] {matter.strip()}"
         item = re.sub(r"action:", "⏰", item, flags=re.IGNORECASE)
         if logfile is not None:
-            logfile.write(f"Notion:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry -> notion.append_blocks\n")
+            logfile.flush()
         if not dry_run:
             notion.append_blocks(notion_page_id, item)
             if msg is not None:
                 msg.moveToTrash()
+        if logfile is not None:
+            logfile.write(f"Notion:{keyword} entry done\n")
+            logfile.flush()
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -88,11 +95,15 @@ def process_keyword(
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Notion:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} sort entry -> notion.append_blocks\n")
+            logfile.flush()
         if not dry_run:
             notion.append_blocks(notion_page_id, item)
             if msg is not None:
                 msg.moveToTrash()
+        if logfile is not None:
+            logfile.write(f"Notion:{keyword} sort entry done\n")
+            logfile.flush()
         return True
     return False
 
@@ -167,6 +178,60 @@ def report_journal_entry_to_tactical(tactical_port, date):
                                 tactical_pb2.SurveyQuestionResult(
                                     question_name="Submitted entry",
                                     result=tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT,
+                                )
+                            ],
+                        )
+                    )
+                )
+            except:
+                pass
+
+    asyncio.run(cmd_impl(tactical_port, date.year, date.month, date.day))
+
+
+def parse_loseit_email(raw_text):
+    """Return (summary_date, consumed_cal, budget_cal) from a Lose It! HTML email, or None."""
+    if "Daily calorie budget" not in raw_text:
+        return None
+    budget_m = re.search(r"Daily calorie budget</td>\s*<td[^>]*>([\d,]+)</td>", raw_text)
+    consumed_m = re.search(r"Food calories consumed</td>\s*<td[^>]*>([\d,]+)</td>", raw_text)
+    date_m = re.search(r"Daily Summary for\s+\w+,\s+(\w+)\s+(\d+)", raw_text)
+    if not (budget_m and consumed_m and date_m):
+        return None
+    budget = int(budget_m.group(1).replace(",", ""))
+    consumed = int(consumed_m.group(1).replace(",", ""))
+    month_str, day_str = date_m.group(1), date_m.group(2)
+    try:
+        summary_date = datetime.strptime(f"{month_str} {day_str} 2000", "%B %d %Y")
+    except ValueError:
+        return None
+    return summary_date, consumed, budget
+
+
+def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
+    surplus = consumed - budget
+    if surplus <= 0:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
+    elif surplus <= 200:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
+    else:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+
+    async def cmd_impl(port, year, month, day):
+        async with aio.insecure_channel(f"localhost:{port}") as channel:
+            stub = tactical_pb2_grpc.TacticalServiceStub(channel)
+            try:
+                _ = await stub.SubmitSurveyResult(
+                    tactical_pb2.SubmitSurveyResultRequest(
+                        result=tactical_pb2.SurveyResult(
+                            year=year,
+                            month=month,
+                            day=day,
+                            survey_name="Heart Care",
+                            results=[
+                                tactical_pb2.SurveyQuestionResult(
+                                    question_name="Discipline in eating",
+                                    result=result_type,
                                 )
                             ],
                         )
@@ -348,10 +413,19 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "postfix.log"), "w")
     else:
         logfile = None
+
+    def log(msg):
+        if logfile is not None:
+            logfile.write(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}\n")
+            logfile.flush()
+
+    log("START")
+    log("Opening maildir")
     try:
         maildir = mailbox.Maildir(MAILDIR_PATH, factory=None)
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        log(f"ERROR opening maildir: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
@@ -361,22 +435,30 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             msgs.append(PostfixMessage(maildir, key, msg))
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
+        log("Queue empty")
         if logfile is not None:
             logfile.close()
         return
+    log(f"Found {len(msgs)} message(s)")
+    log("Connecting to Notion")
     try:
         notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
-    except:
+    except Exception as e:
         sys.stderr.write(f"Failed to load Notion API key")
+        log(f"ERROR connecting to Notion: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
+    log("Connected to Notion")
+    log("Connecting to Wiki")
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_user=ctx.obj["wiki_user"],
         wiki_pass=ctx.obj["wiki_pass"],
         enable_logging=ctx.obj["enable_logging"],
     )
+    log("Connected to Wiki")
+    log("Connecting to Tasks")
     try:
         task = TaskManager(
             task_secrets_file=ctx.obj["task_secrets_file"],
@@ -385,18 +467,34 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        log(f"ERROR connecting to Tasks: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
+    log("Connected to Tasks")
     print(
         Fore.YELLOW
         + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..."
         + Style.RESET_ALL
     )
     try:
-        for msg in reversed(msgs):
+        for i, msg in enumerate(reversed(msgs)):
             text = msg.getText().strip()
             date = msg.getDate()
+            log(f"Processing message {i + 1}/{len(msgs)} from {date}")
+
+            loseit = parse_loseit_email(msg.raw_text)
+            if loseit is not None:
+                summary_date, consumed, budget = loseit
+                summary_date = summary_date.replace(year=date.year)
+                surplus = consumed - budget
+                log(f"Lose It! email: consumed={consumed} budget={budget} surplus={surplus} -> Heart Care submission for {summary_date.strftime('%m/%d/%Y')}")
+                print(f"  Lose It! daily summary: {consumed} consumed / {budget} budget ({'+' if surplus >= 0 else ''}{surplus} cal)")
+                if not dry_run:
+                    report_eating_discipline_to_tactical(tactical_port, summary_date, consumed, budget)
+                    msg.moveToTrash()
+                log(f"Lose It! done")
+                continue
 
             if text[:8].lower() == f"journal:":
                 text = text[8:]
@@ -408,13 +506,14 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                     )
                     text = text.split(":", 1)[1].strip()
                 print(f"  Journal entry for {date}")
-                if logfile is not None:
-                    logfile.write(f"{date}\n")
+                log(f"Journal entry for {date} -> wiki.putPage")
                 if dry_run:
                     print(text)
                 if not dry_run:
                     add_journal_entry_to_wiki(wiki, msg, date, text)
+                    log(f"Journal entry written; reporting to tactical")
                     report_journal_entry_to_tactical(tactical_port, date)
+                    log(f"Journal entry done")
                 continue
 
             matched = False
@@ -438,19 +537,21 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                         if matched:
                             break
             if matched:
+                log(f"Message {i + 1} matched keyword -> notion done")
                 continue
             if text.lstrip("-+").isdigit():
                 print(f"  Calorie intake on {date}: {text}")
-                if logfile is not None:
-                    logfile.write("Calories entry\n")
+                log(f"Calories entry -> wiki.getPage(calorie-journal)")
                 if not dry_run:
                     caljo_doku = None
                     caljo_doku = wiki.getPage(id="calorie-journal")
                     new_caljo_doku = f"""{caljo_doku}
     * ({date}) {text}"""
+                    log(f"Calories entry -> wiki.putPage(calorie-journal)")
                     wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                     if caljo_doku is not None:
                         msg.moveToTrash()
+                log(f"Calories entry done")
             elif (
                 text[:3].lower() == "p0:"
                 or text[:3].lower() == "p1:"
@@ -458,8 +559,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                 or text[:3].lower() == "p3:"
             ):
                 print(f"  {text[:2]} task for {date}: {text[3:]}")
-                if logfile is not None:
-                    logfile.write("Task entry\n")
+                log(f"Task entry -> task.putTask")
                 if not dry_run:
                     task.putTask(
                         text,
@@ -467,18 +567,22 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                         datetime.today(),
                     )
                     msg.moveToTrash()
+                log(f"Task entry done")
             else:
-                print(f"  ITNS from {date}: {text}")
-                if logfile is not None:
-                    logfile.write("Notion:ITNS entry\n")
+                truncated = text[:2000] + ("…" if len(text) > 2000 else "")
+                print(f"  ITNS from {date}: {truncated}")
+                log(f"Notion:ITNS entry -> notion.append_blocks ({len(text)} chars)")
                 if not dry_run:
-                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", text)
+                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", truncated)
                     msg.moveToTrash()
+                log(f"Notion:ITNS entry done")
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
+        log(f"ERROR during processing: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
+    log("DONE")
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)
