@@ -15,6 +15,7 @@ in
     anixpkgs.providence
     anixpkgs.providence-tasker
     anixpkgs.playabc
+    anixpkgs.ttvd
     # TODO spleeter docker?
   ];
 
