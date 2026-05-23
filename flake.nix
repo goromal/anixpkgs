@@ -6,7 +6,7 @@
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
-    phps.url = "github:fossar/nix-phps";
+    phps.url = "github:fossar/nix-phps" ;
 
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
