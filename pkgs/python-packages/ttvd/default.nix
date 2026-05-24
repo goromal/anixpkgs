@@ -32,11 +32,11 @@ buildPythonPackage rec {
         # Add __init__.py to src so find_packages picks it up
         touch src/__init__.py
 
-        # Patch PROJECT_ROOT to use XDG_DATA_HOME instead of the read-only nix store
+        # Patch PROJECT_ROOT to use ~/configs/TikTokDownloader (syncs with cloud via rcrsync)
         substituteInPlace src/custom/internal.py \
           --replace-fail \
             'PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.joinpath("Volume")' \
-            'import os; PROJECT_ROOT = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share")) / "TikTokDownloader"'
+            'PROJECT_ROOT = Path.home() / "configs" / "TikTokDownloader"'
         substituteInPlace src/custom/internal.py \
           --replace-fail \
             'PROJECT_ROOT.mkdir(exist_ok=True)' \

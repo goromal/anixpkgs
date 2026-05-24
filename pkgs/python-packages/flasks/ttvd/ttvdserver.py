@@ -19,8 +19,8 @@ TEMP_ROOT = Path("/tmp/ttvd")
 TEMP_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Persistent directory for TikTokDownloader settings (including cookies).
-# Using a stable path means cookies survive across requests and restarts.
-SETTINGS_ROOT = Path.home() / ".local" / "share" / "TikTokDownloader"
+# Mirrors the CLI path so settings/cookies are shared and sync via rcrsync.
+SETTINGS_ROOT = Path.home() / "configs" / "TikTokDownloader"
 SETTINGS_ROOT.mkdir(parents=True, exist_ok=True)
 
 app = flask.Flask(__name__, static_url_path=SUBDOMAIN)

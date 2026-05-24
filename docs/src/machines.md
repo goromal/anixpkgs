@@ -425,10 +425,10 @@ Alternatively, use a browser extension like **EditThisCookie** or **Cookie-Edito
 
 The settings file lives at:
 ```
-~/.local/share/TikTokDownloader/settings.json
+~/configs/TikTokDownloader/settings.json
 ```
 
-It is created automatically the first time the TTVD service starts. Set the `"cookie_tiktok"` field to your cookie string:
+It is created automatically the first time the TTVD service starts (both the web UI and the `ttvd` CLI use this same path, so cookies are shared). Set the `"cookie_tiktok"` field to your cookie string:
 
 ```json
 {
@@ -451,7 +451,7 @@ TikTok cookies expire periodically (typically every few weeks). When downloads s
 
 - **Service**: `ttvdserver.service` (systemd), port 6060
 - **Nginx proxy**: `/ttvd/` → `http://127.0.0.1:6060/ttvd/`
-- **Settings**: `~/.local/share/TikTokDownloader/settings.json`
+- **Settings**: `~/configs/TikTokDownloader/settings.json` (shared with `ttvd` CLI, syncs via rcrsync)
 - **Temp downloads**: `/tmp/ttvd/<token>/` (cleaned up after each transfer)
 
 ## Miscellaneous

@@ -46,11 +46,9 @@ in
       };
       serviceConfig = {
         Type = "simple";
+        ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${globalCfg.homeDir}/configs/TikTokDownloader";
         ExecStart = "${cfg.package}/bin/ttvdserver --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
-        ReadWritePaths = [
-          "/tmp/ttvd"
-          "/data/andrew/.local/share/TikTokDownloader"
-        ];
+        ReadWritePaths = [ "/tmp/ttvd" "${globalCfg.homeDir}/configs/TikTokDownloader" ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
         RestartSec = 5;
