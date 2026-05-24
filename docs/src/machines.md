@@ -403,6 +403,57 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
+## TTVD — TikTok Video Downloader (ATS Only)
+
+ATS machines include a web UI for downloading TikTok videos, accessible at `https://ats.local/ttvd/`.
+
+### Cookie Setup (Required)
+
+TikTok requires authentication cookies even for public videos. Without cookies every download attempt will fail with a JSON error.
+
+#### 1. Get your TikTok cookies from a browser
+
+1. Log in to [TikTok](https://www.tiktok.com) in Chrome or Firefox
+2. Open DevTools (`F12`) → **Network** tab
+3. Reload the TikTok page, then click any request to `tiktok.com`
+4. In the **Headers** panel, find the `Cookie:` request header
+5. Copy the entire cookie string (it will be long)
+
+Alternatively, use a browser extension like **EditThisCookie** or **Cookie-Editor** to export cookies in Netscape/header format.
+
+#### 2. Paste the cookie into settings.json
+
+The settings file lives at:
+```
+~/.local/share/TikTokDownloader/settings.json
+```
+
+It is created automatically the first time the TTVD service starts. Set the `"cookie_tiktok"` field to your cookie string:
+
+```json
+{
+    "cookie_tiktok": "sessionid=abc123; tt_webid=...; msToken=...",
+    ...
+}
+```
+
+Leave all other fields as-is. The service reads this file on each download request, so no restart is needed after saving.
+
+#### 3. Verify it works
+
+Open `https://ats.local/ttvd/` in a browser, paste a TikTok video URL, and click **Fetch**. If the cookie is valid you will see the video player appear.
+
+### Cookie Expiry
+
+TikTok cookies expire periodically (typically every few weeks). When downloads start failing again, repeat the steps above to refresh `cookie_tiktok` in `settings.json`.
+
+### Architecture
+
+- **Service**: `ttvdserver.service` (systemd), port 6060
+- **Nginx proxy**: `/ttvd/` → `http://127.0.0.1:6060/ttvd/`
+- **Settings**: `~/.local/share/TikTokDownloader/settings.json`
+- **Temp downloads**: `/tmp/ttvd/<token>/` (cleaned up after each transfer)
+
 ## Miscellaneous
 
 ### Cloud Syncing
