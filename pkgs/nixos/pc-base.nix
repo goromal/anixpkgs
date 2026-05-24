@@ -222,6 +222,11 @@ in
       default = false;
       description = "Whether this machine accepts build jobs from other LAN hosts via SSH.";
     };
+    enableSunshine = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the Sunshine game streaming server for Moonlight clients.";
+    };
   };
 
   imports = [
@@ -584,6 +589,31 @@ in
     services.udev.packages = lib.mkIf (
       cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
     ) [ pkgs.dolphin-emu ];
+
+    services.sunshine = lib.mkIf (
+      cfg.enableSunshine && cfg.machineType == "x86_linux" && cfg.graphical
+    ) {
+      enable = true;
+      openFirewall = true;
+      capSysAdmin = true;
+      applications = {
+        # Ensure play and rcrsync are reachable from the sunshine user service,
+        # which runs with PATH=null per the NixOS sunshine module design.
+        env.PATH = "$(HOME)/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
+        apps = [
+          { name = "Zelda Collector's Edition"; cmd = "play zelda"; }
+          { name = "Wind Waker"; cmd = "play windwaker"; }
+          { name = "Twilight Princess"; cmd = "play twilight"; }
+          { name = "Super Smash Bros. Melee"; cmd = "play melee"; }
+          { name = "Super Mario Sunshine"; cmd = "play sunshine"; }
+        ];
+      };
+    };
+    services.udev.extraRules = lib.mkIf (
+      cfg.enableSunshine && cfg.machineType == "x86_linux"
+    ) ''
+      KERNEL=="uinput", GROUP="input", MODE="0660"
+    '';
 
     # Orchestrator jobs
     services.orchestratord = lib.mkIf cfg.enableOrchestrator {

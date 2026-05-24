@@ -403,6 +403,63 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
+## Sunshine Game Streaming (Personal Machines)
+
+Personal machines include [Sunshine](https://github.com/LizardByte/Sunshine), a self-hosted game stream host for [Moonlight](https://moonlight-stream.org/) clients. It exposes your `play` games as streamable apps, so you can play them remotely from a phone or tablet.
+
+Sunshine starts automatically with your GNOME graphical session. After a fresh deploy or first boot, a one-time setup is required.
+
+### First-Time Setup
+
+1. **Log out and back in** after the initial deploy. This activates the `input` group membership needed for virtual gamepad/mouse/keyboard input forwarding.
+
+2. **Open the Sunshine web UI** in a browser:
+   ```
+   https://localhost:47990
+   ```
+   Accept the self-signed certificate warning.
+
+3. **Create a username and password** when prompted (first launch only).
+
+4. **Pair Moonlight on your phone**:
+   - Open Moonlight and select your machine (advertised via Avahi as `atorgesen-panasonic` or `atorgesen-inspiron`)
+   - When prompted for a PIN, go to the Sunshine web UI → **PIN** tab and enter it there
+   - The pairing completes automatically
+
+5. **Launch a game** from Moonlight. The five games from `play` appear as individual apps.
+
+### How Memory Card Saving Works
+
+The `play` script handles saves transparently — Sunshine only streams the display, audio, and input. The full save cycle runs on the host as normal:
+
+- Before launch: syncs ROM and memory card from cloud (`rcrsync sync games`)
+- After you quit the emulator: copies the memory card back and syncs to cloud
+
+Quitting cleanly (not force-killing) is all that's needed to preserve saves.
+
+### Troubleshooting
+
+**Sunshine not running:**
+```bash
+systemctl --user status sunshine
+systemctl --user start sunshine
+journalctl --user -u sunshine -n 50
+```
+
+**Moonlight can't find the machine:** Verify Avahi is advertising:
+```bash
+journalctl --user -u sunshine | grep -i avahi
+```
+Both devices must be on the same local network.
+
+**Controller input not working:** The `input` group membership requires a fresh login session — log out and back in.
+
+**Display capture errors (`CAP_SYS_ADMIN`):** The NixOS config sets `capSysAdmin = true` which installs a security wrapper on the Sunshine binary. If errors recur after a rebuild, verify:
+```bash
+getcap $(which sunshine)
+# Should show: cap_sys_admin=p
+```
+
 ## Miscellaneous
 
 ### Cloud Syncing
