@@ -427,6 +427,22 @@ Sunshine starts automatically with your GNOME graphical session. After a fresh d
    - The pairing completes automatically
 
 5. **Launch a game** from Moonlight. The five games from `play` appear as individual apps.
+6. **Set up inputs** in Dolphin (by clicking to the controller setup menu). The "Device" to select for "GameCube Controller at Port 1" is *SDL/0/Xbox One S Controller*. You will need to relaunch the game for this to take effect.
+7. **Preferred Moonlight Settings**: Low latency is the most important thing:
+   1. Resolution: 360p
+   2. Frame Rate: 30 FPS
+   3. Bitrate: 1.0 Mbps
+   4. Touch Mode: Touchpad
+   5. On-Screen Controls: Auto
+   6. Optimize Game Settings: Yes
+   7. Multi-Controller Mode: Single
+   8. Swap A/B and X/Y Buttons: No
+   9. Play Audio on PC: No
+   10. Preferred Codec: Auto
+   11. HDR (Beta): No
+   12. Frame Pacing Preference: Lowest Latency
+   13. Citrix X1 Mouse Support: No
+   14. Statistics Overlay: No
 
 ### How Memory Card Saving Works
 

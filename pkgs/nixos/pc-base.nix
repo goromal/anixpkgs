@@ -590,6 +590,17 @@ in
       cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
     ) [ pkgs.dolphin-emu ];
 
+    # Sunshine's encoder test transiently binds port 48010, causing the RTSP
+    # server to fail on the same port immediately after. The service exits 0
+    # so on-failure won't retry — force always-restart so the second attempt
+    # (port now free) succeeds automatically.
+    systemd.user.services.sunshine = lib.mkIf (
+      cfg.enableSunshine && cfg.machineType == "x86_linux" && cfg.graphical
+    ) {
+      serviceConfig.Restart = lib.mkForce "always";
+      serviceConfig.RestartSec = lib.mkForce "3s";
+    };
+
     services.sunshine = lib.mkIf (
       cfg.enableSunshine && cfg.machineType == "x86_linux" && cfg.graphical
     ) {
