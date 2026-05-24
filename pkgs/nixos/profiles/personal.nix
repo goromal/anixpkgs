@@ -62,6 +62,7 @@ in
           dirname = "more-games";
         }
       ];
+      enableSunshine = true;
       enableOrchestrator = true;
       timedOrchJobs = [
         {
