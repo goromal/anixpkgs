@@ -7,48 +7,48 @@
 with import ../../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
-  cfg = config.services.ttvdserver;
+  cfg = config.services.vdlserver;
 in
 {
-  options.services.ttvdserver = {
-    enable = lib.mkEnableOption "enable TTVD server";
+  options.services.vdlserver = {
+    enable = lib.mkEnableOption "enable Video Downloader server";
     package = lib.mkOption {
       type = lib.types.package;
-      description = "The ttvdserver package to use";
-      default = anixpkgs.ttvdserver;
+      description = "The vdlserver package to use";
+      default = anixpkgs.vdlserver;
     };
     port = lib.mkOption {
       type = lib.types.port;
       description = "Port to run the server on";
-      default = service-ports.ttvd;
+      default = service-ports.videodl;
     };
     subdomain = lib.mkOption {
       type = lib.types.str;
       description = "Subdomain path for reverse proxy";
-      default = "/ttvd";
+      default = "/videodl";
     };
   };
 
   config = lib.mkIf cfg.enable {
     machines.base.webServices = [
       {
-        name = "TTVD";
-        path = "/ttvd/";
-        description = "TikTok video downloader";
+        name = "Video Downloader";
+        path = "/videodl/";
+        description = "Download videos from YouTube, TikTok, and more";
       }
     ];
 
-    systemd.services.ttvdserver = {
+    systemd.services.vdlserver = {
       enable = true;
-      description = "TTVD Web Server";
+      description = "Video Downloader Web Server";
       unitConfig = {
         StartLimitIntervalSec = 0;
       };
       serviceConfig = {
         Type = "simple";
-        ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${globalCfg.homeDir}/configs/TikTokDownloader";
-        ExecStart = "${cfg.package}/bin/ttvdserver --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
-        ReadWritePaths = [ "/tmp/ttvd" "${globalCfg.homeDir}/configs/TikTokDownloader" ];
+        ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${globalCfg.homeDir}/configs/VideoDownloader";
+        ExecStart = "${cfg.package}/bin/vdlserver --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
+        ReadWritePaths = [ "/tmp" "${globalCfg.homeDir}/configs" ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
         RestartSec = 5;

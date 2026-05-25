@@ -403,55 +403,46 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
-## TTVD — TikTok Video Downloader (ATS Only)
+## Video Downloader (ATS Only)
 
-ATS machines include a web UI for downloading TikTok videos, accessible at `https://ats.local/ttvd/`.
+ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
 
-### Cookie Setup (Required)
+### Cookie Setup (Optional but recommended)
 
-TikTok requires authentication cookies even for public videos. Without cookies every download attempt will fail with a JSON error.
+Some sites (including TikTok) require authentication cookies for downloading. YouTube works without cookies for public videos, but cookies may be needed for age-restricted content or to avoid bot-detection.
 
-#### 1. Get your TikTok cookies from a browser
+#### 1. Export cookies from your browser
 
-1. Log in to [TikTok](https://www.tiktok.com) in Chrome or Firefox
-2. Open DevTools (`F12`) → **Network** tab
-3. Reload the TikTok page, then click any request to `tiktok.com`
-4. In the **Headers** panel, find the `Cookie:` request header
-5. Copy the entire cookie string (it will be long)
+Use the **Get cookies.txt LOCALLY** browser extension (Chrome/Firefox) to export cookies in Netscape format:
 
-Alternatively, use a browser extension like **EditThisCookie** or **Cookie-Editor** to export cookies in Netscape/header format.
+1. Log in to the site (TikTok, YouTube, etc.) in your browser
+2. Click the extension icon while on that site
+3. Choose **Export** → **Current Site** (or **All Sites** to cover everything at once)
+4. Save the file
 
-#### 2. Paste the cookie into settings.json
+#### 2. Place cookies.txt on the server
 
-The settings file lives at:
+Copy or paste the file contents to:
 ```
-~/configs/TikTokDownloader/settings.json
-```
-
-It is created automatically the first time the TTVD service starts (both the web UI and the `ttvd` CLI use this same path, so cookies are shared). Set the `"cookie_tiktok"` field to your cookie string:
-
-```json
-{
-    "cookie_tiktok": "sessionid=abc123; tt_webid=...; msToken=...",
-    ...
-}
+~/configs/VideoDownloader/cookies.txt
 ```
 
-Leave all other fields as-is. The service reads this file on each download request, so no restart is needed after saving.
+The directory is created automatically when the service starts. The file is read on each download request, so no restart is needed after updating it.
 
 #### 3. Verify it works
 
-Open `https://ats.local/ttvd/` in a browser, paste a TikTok video URL, and click **Fetch**. If the cookie is valid you will see the video player appear.
+Open `https://ats.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
 
 ### Cookie Expiry
 
-TikTok cookies expire periodically (typically every few weeks). When downloads start failing again, repeat the steps above to refresh `cookie_tiktok` in `settings.json`.
+Browser cookies expire periodically. When downloads start failing with authentication errors, re-export `cookies.txt` from your browser.
 
 ### Architecture
 
-- **Service**: `ttvdserver.service` (systemd), port 6060
-- **Nginx proxy**: `/ttvd/` → `http://127.0.0.1:6060/ttvd/`
-- **Settings**: `~/configs/TikTokDownloader/settings.json` (shared with `ttvd` CLI, syncs via rcrsync)
+- **Service**: `vdlserver.service` (systemd), port 6060
+- **Backend**: `yt-dlp` subprocess, merges to mp4 via ffmpeg
+- **Nginx proxy**: `/videodl/` → `http://127.0.0.1:6060/videodl/`
+- **Settings**: `~/configs/VideoDownloader/cookies.txt` (syncs via rcrsync)
 - **Temp downloads**: `/tmp/ttvd/<token>/` (cleaned up after each transfer)
 
 ## Miscellaneous

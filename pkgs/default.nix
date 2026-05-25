@@ -253,7 +253,7 @@ let
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
-              ttvdserver = addDoc (pySelf.callPackage ./python-packages/flasks/ttvd { });
+              vdlserver = addDoc (pySelf.callPackage ./python-packages/flasks/videodl { });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
               gmssl = addDoc (pySelf.callPackage ./python-packages/gmssl { });
               ttvd = addDoc (
@@ -364,7 +364,7 @@ rec {
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
-  ttvdserver = final.python313.pkgs.ttvdserver;
+  vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;

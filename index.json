@@ -326,7 +326,7 @@
                 "docs": false
             },
             {
-                "attr": "ttvdserver",
+                "attr": "vdlserver",
                 "ci": false,
                 "docs": false
             }

@@ -3,14 +3,14 @@
   setuptools,
   flask,
   ffmpeg-headless,
-  ttvd,
+  yt-dlp,
   python,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
 in
 buildPythonPackage rec {
-  pname = "ttvdserver";
+  pname = "vdlserver";
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
@@ -20,17 +20,12 @@ buildPythonPackage rec {
     cp ${./templates/index.html} $out/${pythonLibDir}/templates/index.html
   '';
   makeWrapperArgs = [
-    "--prefix"
-    "PATH"
-    ":"
-    "${ffmpeg-headless}/bin"
+    "--prefix" "PATH" ":" "${yt-dlp}/bin"
+    "--prefix" "PATH" ":" "${ffmpeg-headless}/bin"
   ];
-  propagatedBuildInputs = [
-    flask
-    ttvd
-  ];
+  propagatedBuildInputs = [ flask ];
   meta = {
-    description = "Provides a web UI for downloading TikTok videos via ttvd.";
+    description = "Web UI for downloading videos from YouTube, TikTok, and more via yt-dlp.";
     longDescription = "";
     autoGenUsageCmd = "--help";
   };
