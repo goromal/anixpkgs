@@ -3,6 +3,7 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
+  unstable = (import ./nixos/dependencies.nix).unstable;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -253,6 +254,9 @@ let
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
+              vdlserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -357,6 +361,7 @@ rec {
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
+  vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;

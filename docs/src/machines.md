@@ -403,6 +403,48 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
+## Video Downloader (ATS Only)
+
+ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
+
+### Cookie Setup (Optional but recommended)
+
+Some sites (including TikTok) require authentication cookies for downloading. YouTube works without cookies for public videos, but cookies may be needed for age-restricted content or to avoid bot-detection.
+
+#### 1. Export cookies from your browser
+
+Use the **Get cookies.txt LOCALLY** browser extension (Chrome/Firefox) to export cookies in Netscape format:
+
+1. Log in to the site (TikTok, YouTube, etc.) in your browser
+2. Click the extension icon while on that site
+3. Choose **Export** → **Current Site** (or **All Sites** to cover everything at once)
+4. Save the file
+
+#### 2. Place cookies.txt on the server
+
+Copy or paste the file contents to:
+```
+~/configs/VideoDownloader/cookies.txt
+```
+
+The directory is created automatically when the service starts. The file is read on each download request, so no restart is needed after updating it.
+
+#### 3. Verify it works
+
+Open `https://ats.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
+
+### Cookie Expiry
+
+Browser cookies expire periodically. When downloads start failing with authentication errors, re-export `cookies.txt` from your browser.
+
+### Architecture
+
+- **Service**: `vdlserver.service` (systemd), port 6060
+- **Backend**: `yt-dlp` subprocess, merges to mp4 via ffmpeg
+- **Nginx proxy**: `/videodl/` → `http://127.0.0.1:6060/videodl/`
+- **Settings**: `~/configs/VideoDownloader/cookies.txt` (syncs via rcrsync)
+- **Temp downloads**: `/tmp/ttvd/<token>/` (cleaned up after each transfer)
+
 ## Sunshine Game Streaming (Personal Machines)
 
 Personal machines include [Sunshine](https://github.com/LizardByte/Sunshine), a self-hosted game stream host for [Moonlight](https://moonlight-stream.org/) clients. It exposes your `play` games as streamable apps, so you can play them remotely from a phone or tablet.

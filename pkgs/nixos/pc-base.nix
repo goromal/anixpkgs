@@ -250,6 +250,7 @@ in
     ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
+    ../python-packages/flasks/videodl/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -386,7 +387,7 @@ in
           return = "200 '${
             let
               hostname = config.networking.hostName;
-              services = cfg.webServices;
+              services = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) cfg.webServices;
               # Generate service links with special handling for port-based services
               serviceLinks = lib.concatMapStringsSep "\n" (
                 s:
@@ -540,6 +541,10 @@ in
     services.tasks_ui = {
       enable = cfg.isATS;
       rcrsync = machine-rcrsync;
+    };
+
+    services.vdlserver = {
+      enable = cfg.isATS;
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
