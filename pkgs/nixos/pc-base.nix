@@ -282,11 +282,46 @@ in
     ) cfg.launchpadPythonPackages;
 
     users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
+    users.users.andrew.extraGroups = lib.mkIf (cfg.machineType == "jetson") [ "jtop" ];
+
+    systemd.services.nvpmodel = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        mode3Conf = pkgs.runCommand "nvpmodel-p3767-mode3.conf" { } ''
+          sed 's/PM_CONFIG DEFAULT=2/PM_CONFIG DEFAULT=3/' \
+            ${pkgs.nvidia-jetpack.l4t-nvpmodel}/etc/nvpmodel/nvpmodel_p3767_0000.conf > $out
+        '';
+      in
+      {
+        serviceConfig.ExecStart = lib.mkForce
+          "${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -f ${mode3Conf}";
+      }
+    );
+
+    systemd.services.jetson-nvpmodel-maxn = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        script = pkgs.writeShellScript "jetson-nvpmodel-maxn" ''
+          current=$(${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -q | tail -1)
+          if [ "$current" = "3" ]; then exit 0; fi
+          exec ${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -m 3 --force
+        '';
+      in
+      {
+        description = "Force Jetson to 25W nvpmodel (all cores), rebooting once if needed";
+        after = [ "nvpmodel.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${script}";
+          RemainAfterExit = true;
+        };
+      }
+    );
 
     systemd.services.jtop = lib.mkIf (cfg.machineType == "jetson") {
       description = "jtop service";
       after = [ "systemd-modules-load.service" ];
       wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.util-linux ];
       environment.JTOP_SERVICE = "True";
       serviceConfig = {
         ExecStart = "${anixpkgs.jetson-stats}/bin/jtop --force";

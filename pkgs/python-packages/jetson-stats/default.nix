@@ -31,6 +31,12 @@ buildPythonPackage rec {
         'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    path = sys.prefix',
         'def get_config_service(data_folder=JTOP_DATA_FOLDER):\n    if os.environ.get(\"JTOP_SERVICE\"):\n        return \"/var/lib/jtop\"\n    path = sys.prefix'
     ))
+    p = pathlib.Path('jtop/core/jetson_libraries.py')
+    t = p.read_text()
+    p.write_text(t.replace(
+        'subprocess.call([\"which\", \"nvcc\"], stdout=subprocess.DEVNULL)',
+        'subprocess.call([\"which\", \"nvcc\"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)'
+    ))
     "
   '';
   doCheck = false;

@@ -49,7 +49,6 @@ let
     // rec {
       doc = prev.writeTextFile {
         name = "doc";
-        destination = "/doc.txt";
         text = (
           if builtins.hasAttr "description" pkg-attr.meta then
             (''
