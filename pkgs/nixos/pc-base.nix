@@ -292,8 +292,7 @@ in
         '';
       in
       {
-        serviceConfig.ExecStart = lib.mkForce
-          "${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -f ${mode3Conf}";
+        serviceConfig.ExecStart = lib.mkForce "${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -f ${mode3Conf}";
       }
     );
 
