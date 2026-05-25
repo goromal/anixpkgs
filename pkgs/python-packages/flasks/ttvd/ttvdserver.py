@@ -42,7 +42,6 @@ def _build_parameter(root: Path):
     from src.tools import ColorfulConsole
     from src.config import Settings, Parameter
     from src.manager import Database, DownloadRecorder
-    from src.module import Cookie
     from src.record import BaseLogger
 
     root.mkdir(parents=True, exist_ok=True)
@@ -59,13 +58,12 @@ def _build_parameter(root: Path):
     cfg["folder_mode"] = False
     cfg["storage_format"] = ""  # no data export (BaseTextLogger no-op)
 
-    db = Database()                                        # no args
-    recorder = DownloadRecorder(db, False, console)        # (database, switch, console)
-    cookie = Cookie(settings, console)                     # (settings, console)
+    db = Database()
+    recorder = DownloadRecorder(db, False, console)
 
     return Parameter(
         settings,
-        cookie,                                            # positional: cookie_object
+        cfg.get("cookie", ""),                             # Douyin cookie (str)
         logger=BaseLogger,
         console=console,
         **cfg,
@@ -89,6 +87,9 @@ async def _download_tiktok(url: str, dest: Path) -> dict:
     from src.storage import RecordManager
 
     params = _build_parameter(dest)
+    # Load cookies into HTTP headers (reads cookie_tiktok from settings and injects
+    # into headers_tiktok; without this call the requests are unauthenticated).
+    await params.update_params()
 
     # Step 1: extract video IDs from URL
     link_extractor = ExtractorTikTok(params)
