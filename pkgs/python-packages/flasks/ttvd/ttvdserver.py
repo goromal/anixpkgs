@@ -42,6 +42,7 @@ def _build_parameter(root: Path):
     from src.tools import ColorfulConsole
     from src.config import Settings, Parameter
     from src.manager import Database, DownloadRecorder
+    from src.module import Cookie
     from src.record import BaseLogger
 
     root.mkdir(parents=True, exist_ok=True)
@@ -60,10 +61,11 @@ def _build_parameter(root: Path):
 
     db = Database()
     recorder = DownloadRecorder(db, False, console)
+    cookie = Cookie(settings, console)
 
     return Parameter(
         settings,
-        cfg.get("cookie", ""),                             # Douyin cookie (str)
+        cookie,
         logger=BaseLogger,
         console=console,
         **cfg,
