@@ -90,19 +90,13 @@ in
             fi
             DIAG_LOG="$HOME/goromail/mailman-diag.log"
             mkdir -p "$HOME/goromail"
-            echo "[$(date '+%H:%M:%S')] START authm refresh" >> "$DIAG_LOG"
-            authm refresh --headless >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "authm refresh error!"; echo "[$(date '+%H:%M:%S')] FAILED authm refresh" >> "$DIAG_LOG"; exit 1; }
-            echo "[$(date '+%H:%M:%S')] START rcrsync configs" >> "$DIAG_LOG"
-            rcrsync sync configs >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "configs sync error!"; echo "[$(date '+%H:%M:%S')] FAILED rcrsync configs" >> "$DIAG_LOG"; exit 1; }
-            echo "[$(date '+%H:%M:%S')] START goromail postfix" >> "$DIAG_LOG"
+            authm refresh --headless >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "authm refresh error!"; exit 1; }
+            rcrsync sync configs >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "configs sync error!"; exit 1; }
             goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix >> "$DIAG_LOG" 2>&1
-            echo "[$(date '+%H:%M:%S')] END goromail postfix (exit $?)" >> "$DIAG_LOG"
             if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
               logger -t ats-mailman "Processed mail"
               if grep -qi "notion" $HOME/goromail/postfix.log; then
-                echo "[$(date '+%H:%M:%S')] START goromail annotate-triage-pages" >> "$DIAG_LOG"
                 goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages >> "$DIAG_LOG" 2>&1
-                echo "[$(date '+%H:%M:%S')] END goromail annotate-triage-pages (exit $?)" >> "$DIAG_LOG"
               fi
             fi
           '';

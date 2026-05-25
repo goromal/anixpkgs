@@ -419,13 +419,10 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             logfile.write(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}\n")
             logfile.flush()
 
-    log("START")
-    log("Opening maildir")
     try:
         maildir = mailbox.Maildir(MAILDIR_PATH, factory=None)
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        log(f"ERROR opening maildir: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
@@ -435,30 +432,22 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             msgs.append(PostfixMessage(maildir, key, msg))
     except KeyError:
         print(Fore.YELLOW + "Queue empty." + Style.RESET_ALL)
-        log("Queue empty")
         if logfile is not None:
             logfile.close()
         return
-    log(f"Found {len(msgs)} message(s)")
-    log("Connecting to Notion")
     try:
         notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except Exception as e:
         sys.stderr.write(f"Failed to load Notion API key")
-        log(f"ERROR connecting to Notion: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
-    log("Connected to Notion")
-    log("Connecting to Wiki")
     wiki = WikiTools(
         wiki_url=ctx.obj["wiki_url"],
         wiki_user=ctx.obj["wiki_user"],
         wiki_pass=ctx.obj["wiki_pass"],
         enable_logging=ctx.obj["enable_logging"],
     )
-    log("Connected to Wiki")
-    log("Connecting to Tasks")
     try:
         task = TaskManager(
             task_secrets_file=ctx.obj["task_secrets_file"],
@@ -467,11 +456,9 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         )
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        log(f"ERROR connecting to Tasks: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
-    log("Connected to Tasks")
     print(
         Fore.YELLOW
         + f"GBot is processing pending commands{' (DRY RUN)' if dry_run else ''}..."
@@ -481,19 +468,16 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         for i, msg in enumerate(reversed(msgs)):
             text = msg.getText().strip()
             date = msg.getDate()
-            log(f"Processing message {i + 1}/{len(msgs)} from {date}")
 
             loseit = parse_loseit_email(msg.raw_text)
             if loseit is not None:
                 summary_date, consumed, budget = loseit
                 summary_date = summary_date.replace(year=date.year)
                 surplus = consumed - budget
-                log(f"Lose It! email: consumed={consumed} budget={budget} surplus={surplus} -> Heart Care submission for {summary_date.strftime('%m/%d/%Y')}")
                 print(f"  Lose It! daily summary: {consumed} consumed / {budget} budget ({'+' if surplus >= 0 else ''}{surplus} cal)")
                 if not dry_run:
                     report_eating_discipline_to_tactical(tactical_port, summary_date, consumed, budget)
                     msg.moveToTrash()
-                log(f"Lose It! done")
                 continue
 
             if text[:8].lower() == f"journal:":
@@ -506,14 +490,12 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                     )
                     text = text.split(":", 1)[1].strip()
                 print(f"  Journal entry for {date}")
-                log(f"Journal entry for {date} -> wiki.putPage")
+                log(f"Journal entry for {date}")
                 if dry_run:
                     print(text)
                 if not dry_run:
                     add_journal_entry_to_wiki(wiki, msg, date, text)
-                    log(f"Journal entry written; reporting to tactical")
                     report_journal_entry_to_tactical(tactical_port, date)
-                    log(f"Journal entry done")
                 continue
 
             matched = False
@@ -537,21 +519,18 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                         if matched:
                             break
             if matched:
-                log(f"Message {i + 1} matched keyword -> notion done")
                 continue
             if text.lstrip("-+").isdigit():
                 print(f"  Calorie intake on {date}: {text}")
-                log(f"Calories entry -> wiki.getPage(calorie-journal)")
+                log(f"Calorie intake for {date}")
                 if not dry_run:
                     caljo_doku = None
                     caljo_doku = wiki.getPage(id="calorie-journal")
                     new_caljo_doku = f"""{caljo_doku}
     * ({date}) {text}"""
-                    log(f"Calories entry -> wiki.putPage(calorie-journal)")
                     wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                     if caljo_doku is not None:
                         msg.moveToTrash()
-                log(f"Calories entry done")
             elif (
                 text[:3].lower() == "p0:"
                 or text[:3].lower() == "p1:"
@@ -559,7 +538,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                 or text[:3].lower() == "p3:"
             ):
                 print(f"  {text[:2]} task for {date}: {text[3:]}")
-                log(f"Task entry -> task.putTask")
+                log(f"Task entry for {date}")
                 if not dry_run:
                     task.putTask(
                         text,
@@ -567,22 +546,18 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                         datetime.today(),
                     )
                     msg.moveToTrash()
-                log(f"Task entry done")
             else:
                 truncated = text[:2000] + ("…" if len(text) > 2000 else "")
                 print(f"  ITNS from {date}: {truncated}")
-                log(f"Notion:ITNS entry -> notion.append_blocks ({len(text)} chars)")
+                log(f"ITNS entry for {date}")
                 if not dry_run:
                     notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", truncated)
                     msg.moveToTrash()
-                log(f"Notion:ITNS entry done")
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
-        log(f"ERROR during processing: {e}")
         if logfile is not None:
             logfile.close()
         exit(1)
-    log("DONE")
     if logfile is not None:
         logfile.close()
     print(Fore.GREEN + f"Done." + Style.RESET_ALL)

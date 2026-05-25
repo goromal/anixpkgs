@@ -327,7 +327,7 @@
             },
             {
                 "attr": "vdlserver",
-                "ci": false,
+                "ci": true,
                 "docs": false
             }
         ],

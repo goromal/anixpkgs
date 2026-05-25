@@ -158,9 +158,6 @@
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";
     xv-lidar-rs.flake = false;
-
-    ttvd-src.url = "github:JoeanAmier/TikTokDownloader";
-    ttvd-src.flake = false;
   };
 
   outputs =

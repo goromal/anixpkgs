@@ -3,7 +3,7 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
-  unstablePkgs = import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { inherit (prev) system; };
+  unstable = (import ./nixos/dependencies.nix).unstable;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -254,14 +254,9 @@ let
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
-              vdlserver = addDoc (pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstablePkgs.yt-dlp; });
+              vdlserver = addDoc (pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
               gmssl = addDoc (pySelf.callPackage ./python-packages/gmssl { });
-              ttvd = addDoc (
-                pySelf.callPackage ./python-packages/ttvd {
-                  pkg-src = flakeInputs.ttvd-src;
-                }
-              );
             }
           );
         }
@@ -378,7 +373,6 @@ rec {
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
   gmssl = final.python313.pkgs.gmssl;
-  ttvd = final.python313.pkgs.ttvd;
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
