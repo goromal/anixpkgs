@@ -81,7 +81,7 @@ in
             fi
           '';
           timerCfg = {
-            OnCalendar = [ "*-*-* 02:00:00" ];
+            OnCalendar = [ "*-*-* 03:00:00" ];
             Persistent = true;
           };
         }
