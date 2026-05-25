@@ -321,6 +321,16 @@
                 "docs": false
             },
             {
+                "attr": "jetson-stats",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "jupyter-mcp-server",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "vdlserver",
                 "ci": true,
                 "docs": false

@@ -2,6 +2,7 @@
 # Kept in a separate file to avoid bloating the options declarations.
 let
   sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
+  ports = import ./service-ports.nix;
 in
 {
   marketplaces = [
@@ -109,7 +110,7 @@ in
       name = "vikunja";
       command = "/run/current-system/sw/bin/vikunja-mcp-server";
       env = {
-        VIKUNJA_URL = "https://ats.local:3457";
+        VIKUNJA_URL = "https://ats.local:${toString ports.vikunja.public}";
         VIKUNJA_INSECURE = "1";
       };
       secretsPath = "$HOME/secrets/vikunja/secrets.json";
@@ -126,6 +127,13 @@ in
       command = "/run/current-system/sw/bin/wiki-mcp-server";
       secretsPath = "$HOME/secrets/wiki";
       secretsEnvVar = "WIKI_SECRETS_DIR";
+    };
+    jupyter = {
+      name = "jupyter-mcp";
+      command = "/run/current-system/sw/bin/jupyter-mcp-server";
+      env = {
+        SERVER_URL = "http://localhost:${toString ports.launchpad}";
+      };
     };
   };
 

@@ -305,6 +305,22 @@
         "type": "github"
       }
     },
+    "jetson-stats": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777975381,
+        "narHash": "sha256-fmfuYZHRtMyvNC7fLfrUgl5CGtz6+MkqQ2YI6Ac//cc=",
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "rev": "365a8790c74771dcdc72fe9ebeb475168ea573bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -731,6 +747,7 @@
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
         "jetpack-nixos": "jetpack-nixos",
+        "jetson-stats": "jetson-stats",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",

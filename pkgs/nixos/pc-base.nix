@@ -149,6 +149,11 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    launchpadPythonPackages = lib.mkOption {
+      type = lib.types.functionTo (lib.types.listOf lib.types.package);
+      description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
+      default = _ps: [ ];
+    };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -239,6 +244,7 @@ in
     ../modules/vikunja/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
+    ../modules/jupyter-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -249,6 +255,7 @@ in
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
     (
@@ -266,6 +273,64 @@ in
 
   config = {
     system.stateVersion = cfg.nixosState;
+
+    hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
+
+    services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
+    services.launchpad.pythonPackages = lib.mkIf (
+      cfg.machineType == "jetson"
+    ) cfg.launchpadPythonPackages;
+
+    users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
+    users.users.andrew.extraGroups = lib.mkIf (cfg.machineType == "jetson") [ "jtop" ];
+
+    systemd.services.nvpmodel = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        mode3Conf = pkgs.runCommand "nvpmodel-p3767-mode3.conf" { } ''
+          sed 's/PM_CONFIG DEFAULT=2/PM_CONFIG DEFAULT=3/' \
+            ${pkgs.nvidia-jetpack.l4t-nvpmodel}/etc/nvpmodel/nvpmodel_p3767_0000.conf > $out
+        '';
+      in
+      {
+        serviceConfig.ExecStart = lib.mkForce "${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -f ${mode3Conf}";
+      }
+    );
+
+    systemd.services.jetson-nvpmodel-maxn = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        script = pkgs.writeShellScript "jetson-nvpmodel-maxn" ''
+          current=$(${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -q | tail -1)
+          if [ "$current" = "3" ]; then exit 0; fi
+          exec ${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -m 3 --force
+        '';
+      in
+      {
+        description = "Force Jetson to 25W nvpmodel (all cores), rebooting once if needed";
+        after = [ "nvpmodel.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${script}";
+          RemainAfterExit = true;
+        };
+      }
+    );
+
+    systemd.services.jtop = lib.mkIf (cfg.machineType == "jetson") {
+      description = "jtop service";
+      after = [ "systemd-modules-load.service" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.util-linux ];
+      environment.JTOP_SERVICE = "True";
+      serviceConfig = {
+        ExecStart = "${anixpkgs.jetson-stats}/bin/jtop --force";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        TimeoutStartSec = "30s";
+        TimeoutStopSec = "30s";
+        StateDirectory = "jtop";
+      };
+    };
 
     boot = {
       kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
@@ -750,6 +815,9 @@ in
 
     # Wiki MCP Server
     services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
+
+    # Jupyter MCP Server
+    services.jupyter-mcp.enable = (cfg.machineType == "jetson");
 
     # Global packages
     environment.systemPackages =
