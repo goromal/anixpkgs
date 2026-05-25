@@ -100,7 +100,9 @@ in
           tqdm
           pywavelets
           ipyparallel
-          (hmmlearn.overridePythonAttrs (_: { nativeCheckInputs = [ ]; }))
+          (hmmlearn.overridePythonAttrs (_: {
+            nativeCheckInputs = [ ];
+          }))
           imageio
           opencv4
           geometry
