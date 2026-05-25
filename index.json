@@ -321,11 +321,6 @@
                 "docs": false
             },
             {
-                "attr": "ttvd",
-                "ci": true,
-                "docs": false
-            },
-            {
                 "attr": "vdlserver",
                 "ci": true,
                 "docs": false

@@ -256,7 +256,6 @@ let
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               vdlserver = addDoc (pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; });
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
-              gmssl = addDoc (pySelf.callPackage ./python-packages/gmssl { });
             }
           );
         }
@@ -372,7 +371,6 @@ rec {
   gmail-parser = final.python313.pkgs.gmail-parser;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
-  gmssl = final.python313.pkgs.gmssl;
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
