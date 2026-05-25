@@ -329,6 +329,11 @@
                 "attr": "jupyter-mcp-server",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "vdlserver",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [

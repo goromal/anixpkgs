@@ -403,6 +403,121 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
+## Video Downloader (ATS Only)
+
+ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
+
+### Cookie Setup (Optional but recommended)
+
+Some sites (including TikTok) require authentication cookies for downloading. YouTube works without cookies for public videos, but cookies may be needed for age-restricted content or to avoid bot-detection.
+
+#### 1. Export cookies from your browser
+
+Use the **Get cookies.txt LOCALLY** browser extension (Chrome/Firefox) to export cookies in Netscape format:
+
+1. Log in to the site (TikTok, YouTube, etc.) in your browser
+2. Click the extension icon while on that site
+3. Choose **Export** → **Current Site** (or **All Sites** to cover everything at once)
+4. Save the file
+
+#### 2. Place cookies.txt on the server
+
+Copy or paste the file contents to:
+```
+~/configs/VideoDownloader/cookies.txt
+```
+
+The directory is created automatically when the service starts. The file is read on each download request, so no restart is needed after updating it.
+
+#### 3. Verify it works
+
+Open `https://ats.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
+
+### Cookie Expiry
+
+Browser cookies expire periodically. When downloads start failing with authentication errors, re-export `cookies.txt` from your browser.
+
+### Architecture
+
+- **Service**: `vdlserver.service` (systemd), port 6060
+- **Backend**: `yt-dlp` subprocess, merges to mp4 via ffmpeg
+- **Nginx proxy**: `/videodl/` → `http://127.0.0.1:6060/videodl/`
+- **Settings**: `~/configs/VideoDownloader/cookies.txt` (syncs via rcrsync)
+- **Temp downloads**: `/tmp/ttvd/<token>/` (cleaned up after each transfer)
+
+## Sunshine Game Streaming (Personal Machines)
+
+Personal machines include [Sunshine](https://github.com/LizardByte/Sunshine), a self-hosted game stream host for [Moonlight](https://moonlight-stream.org/) clients. It exposes your `play` games as streamable apps, so you can play them remotely from a phone or tablet.
+
+Sunshine starts automatically with your GNOME graphical session. After a fresh deploy or first boot, a one-time setup is required.
+
+### First-Time Setup
+
+1. **Log out and back in** after the initial deploy. This activates the `input` group membership needed for virtual gamepad/mouse/keyboard input forwarding.
+
+2. **Open the Sunshine web UI** in a browser:
+   ```
+   https://localhost:47990
+   ```
+   Accept the self-signed certificate warning.
+
+3. **Create a username and password** when prompted (first launch only).
+
+4. **Pair Moonlight on your phone**:
+   - Open Moonlight and select your machine (advertised via Avahi as `atorgesen-panasonic` or `atorgesen-inspiron`)
+   - When prompted for a PIN, go to the Sunshine web UI → **PIN** tab and enter it there
+   - The pairing completes automatically
+
+5. **Launch a game** from Moonlight. The five games from `play` appear as individual apps.
+6. **Set up inputs** in Dolphin (by clicking to the controller setup menu). The "Device" to select for "GameCube Controller at Port 1" is *SDL/0/Xbox One S Controller*. You will need to relaunch the game for this to take effect.
+7. **Preferred Moonlight Settings**: Low latency is the most important thing:
+   1. Resolution: 360p
+   2. Frame Rate: 30 FPS
+   3. Bitrate: 1.0 Mbps
+   4. Touch Mode: Touchpad
+   5. On-Screen Controls: Auto
+   6. Optimize Game Settings: Yes
+   7. Multi-Controller Mode: Single
+   8. Swap A/B and X/Y Buttons: No
+   9. Play Audio on PC: No
+   10. Preferred Codec: Auto
+   11. HDR (Beta): No
+   12. Frame Pacing Preference: Lowest Latency
+   13. Citrix X1 Mouse Support: No
+   14. Statistics Overlay: No
+
+### How Memory Card Saving Works
+
+The `play` script handles saves transparently — Sunshine only streams the display, audio, and input. The full save cycle runs on the host as normal:
+
+- Before launch: syncs ROM and memory card from cloud (`rcrsync sync games`)
+- After you quit the emulator: copies the memory card back and syncs to cloud
+
+Quitting cleanly (not force-killing) is all that's needed to preserve saves.
+
+### Troubleshooting
+
+**Sunshine not running:**
+```bash
+systemctl --user status sunshine
+systemctl --user start sunshine
+journalctl --user -u sunshine -n 50
+```
+
+**Moonlight can't find the machine:** Verify Avahi is advertising:
+```bash
+journalctl --user -u sunshine | grep -i avahi
+```
+Both devices must be on the same local network.
+
+**Controller input not working:** The `input` group membership requires a fresh login session — log out and back in.
+
+**Display capture errors (`CAP_SYS_ADMIN`):** The NixOS config sets `capSysAdmin = true` which installs a security wrapper on the Sunshine binary. If errors recur after a rebuild, verify:
+```bash
+getcap $(which sunshine)
+# Should show: cap_sys_admin=p
+```
+
 ## Miscellaneous
 
 ### Cloud Syncing

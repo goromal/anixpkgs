@@ -88,13 +88,15 @@ in
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit
             fi
-            authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-            rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
+            DIAG_LOG="$HOME/goromail/mailman-diag.log"
+            mkdir -p "$HOME/goromail"
+            authm refresh --headless >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "authm refresh error!"; exit 1; }
+            rcrsync sync configs >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "configs sync error!"; exit 1; }
+            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix >> "$DIAG_LOG" 2>&1
             if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
               logger -t ats-mailman "Processed mail"
               if grep -qi "notion" $HOME/goromail/postfix.log; then
-                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages >> "$DIAG_LOG" 2>&1
               fi
             fi
           '';
