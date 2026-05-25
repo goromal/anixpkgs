@@ -90,7 +90,18 @@ in
         ps: with ps; [
           numpy
           scipy
+          matplotlib
+          pandas
+          scikit-learn
+          sympy
+          cvxpy
+          statsmodels
           torch
+          tqdm
+          pywavelets
+          ipyparallel
+          (hmmlearn.overridePythonAttrs (_: { nativeCheckInputs = [ ]; }))
+          imageio
           opencv4
           geometry
           pysignals
