@@ -48,7 +48,10 @@ in
         Type = "simple";
         ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${globalCfg.homeDir}/configs/VideoDownloader";
         ExecStart = "${cfg.package}/bin/vdlserver --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";
-        ReadWritePaths = [ "/tmp" "${globalCfg.homeDir}/configs" ];
+        ReadWritePaths = [
+          "/tmp"
+          "${globalCfg.homeDir}/configs"
+        ];
         WorkingDirectory = globalCfg.homeDir;
         Restart = "always";
         RestartSec = 5;

@@ -254,7 +254,9 @@ let
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
-              vdlserver = addDoc (pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; });
+              vdlserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );

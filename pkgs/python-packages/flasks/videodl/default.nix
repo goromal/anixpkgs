@@ -20,8 +20,14 @@ buildPythonPackage rec {
     cp ${./templates/index.html} $out/${pythonLibDir}/templates/index.html
   '';
   makeWrapperArgs = [
-    "--prefix" "PATH" ":" "${yt-dlp}/bin"
-    "--prefix" "PATH" ":" "${ffmpeg-headless}/bin"
+    "--prefix"
+    "PATH"
+    ":"
+    "${yt-dlp}/bin"
+    "--prefix"
+    "PATH"
+    ":"
+    "${ffmpeg-headless}/bin"
   ];
   propagatedBuildInputs = [ flask ];
   meta = {
