@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
 
-    jetpack-nixos.url = "github:anduril/jetpack-nixos"; 
+    jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
     phps.url = "github:fossar/nix-phps";
 
