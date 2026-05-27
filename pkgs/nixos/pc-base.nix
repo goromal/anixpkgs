@@ -812,7 +812,9 @@ in
     };
 
     # Vikunja MCP client (ATS enables this via services.vikunja-ats; other machines enable it directly)
-    services.vikunja-mcp.enable = lib.mkDefault (builtins.any (s: s.name == "vikunja") cfg.claudeMcpServers);
+    services.vikunja-mcp.enable = lib.mkDefault (
+      builtins.any (s: s.name == "vikunja") cfg.claudeMcpServers
+    );
 
     # Notion MCP Server
     services.notion-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
