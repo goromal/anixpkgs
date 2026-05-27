@@ -16,7 +16,7 @@ let
       );
       secretsFlag =
         if server.secretsEnvVar != null then
-          "-e ${server.secretsEnvVar}=${lib.escapeShellArg server.secretsPath}"
+          "-e ${server.secretsEnvVar}=${server.secretsPath}"
         else
           "";
       hasSecretsCheck = server.secretsPath != null;
