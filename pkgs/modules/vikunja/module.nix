@@ -9,12 +9,6 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.vikunja-ats;
-
-  # Package the Vikunja MCP server
-  vikunja-mcp-server = pkgs.writeScriptBin "vikunja-mcp-server" ''
-    #!${pkgs.python3}/bin/python3
-    ${builtins.readFile ./vikunja-mcp-server.py}
-  '';
 in
 {
   options.services.vikunja-ats = {
@@ -192,10 +186,8 @@ in
       };
     };
 
-    # Add vikunja and vikunja-mcp-server to system packages
-    environment.systemPackages = [
-      pkgs.vikunja
-      vikunja-mcp-server
-    ];
+    services.vikunja-mcp.enable = true;
+
+    environment.systemPackages = [ pkgs.vikunja ];
   };
 }
