@@ -75,14 +75,21 @@ def create_app(subdomain='', manager=None, spec_csv=None):
     app = Flask(__name__)
     bp = Blueprint('tasks', __name__, url_prefix=subdomain)
 
+    def _get_manager():
+        if manager is not None:
+            return manager, None
+        # Re-initialize each request so credentials are always fresh from disk.
+        return _init_manager()
+
     @bp.route('/', methods=['GET'])
     def index():
         return render_template('main.html')
 
     @bp.route('/submit', methods=['POST'])
     def submit():
-        if manager is None:
-            return {'error': 'TaskManager not initialized — check secrets'}, 500
+        mgr, err = _get_manager()
+        if mgr is None:
+            return {'error': f'TaskManager not initialized — {err}'}, 500
 
         data = request.get_json(silent=True)
         if data is None:
@@ -116,7 +123,7 @@ def create_app(subdomain='', manager=None, spec_csv=None):
             while current <= end:
                 label = current.strftime('%Y-%m-%d')
                 try:
-                    manager.putTask(name, notes, current)
+                    mgr.putTask(name, notes, current)
                     event = json.dumps({'date': label, 'status': 'ok'})
                 except Exception as exc:
                     event = json.dumps({'date': label, 'status': 'error', 'message': str(exc)})
@@ -172,8 +179,9 @@ def create_app(subdomain='', manager=None, spec_csv=None):
 
     @bp.route('/spec-submit', methods=['POST'])
     def spec_submit():
-        if manager is None:
-            return {'error': 'TaskManager not initialized — check secrets'}, 500
+        mgr, err = _get_manager()
+        if mgr is None:
+            return {'error': f'TaskManager not initialized — {err}'}, 500
 
         data = request.get_json(silent=True)
         if data is None:
@@ -221,7 +229,7 @@ def create_app(subdomain='', manager=None, spec_csv=None):
                     continue
 
                 try:
-                    existing_names = {t.name for t in manager.getTasks(date=current, start_date=current)}
+                    existing_names = {t.name for t in mgr.getTasks(date=current, start_date=current)}
                 except Exception as exc:
                     yield f'data: {json.dumps({"date": label, "tasks": [], "status": "error", "message": str(exc)})}\n\n'
                     current += datetime.timedelta(days=1)
@@ -233,7 +241,7 @@ def create_app(subdomain='', manager=None, spec_csv=None):
                     if title in existing_names:
                         continue
                     try:
-                        manager.putTask(title, desc, current)
+                        mgr.putTask(title, desc, current)
                         uploaded.append(title)
                     except Exception as exc:
                         errors.append(str(exc))
@@ -264,11 +272,7 @@ def run():
     parser.add_argument('--spec-csv', type=str, default='~/configs/intervaled-tasks.csv')
     args = parser.parse_args()
 
-    manager, err = _init_manager()
-    if manager is None:
-        print(f'Warning: TaskManager init failed: {err}', flush=True)
-
-    app = create_app(subdomain=args.subdomain, manager=manager, spec_csv=args.spec_csv)
+    app = create_app(subdomain=args.subdomain, spec_csv=args.spec_csv)
     app.secret_key = os.urandom(24)
     app.run(host='0.0.0.0', port=args.port, debug=False)
 
