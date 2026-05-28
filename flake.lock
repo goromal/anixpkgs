@@ -127,16 +127,15 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1779948817,
+        "lastModified": 1779950628,
         "narHash": "sha256-xSY93NS0a7ul9humQxhGOsB6LEFfbvRk/zt6culkvPg=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "1052df0957fb033f4a4b6ea08ba79e68bed688d8",
+        "rev": "d6a97775412c5e2e45a897d26af5aa6e7f596a20",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/surveys",
         "repo": "daily_tactical_server",
         "type": "github"
       }
