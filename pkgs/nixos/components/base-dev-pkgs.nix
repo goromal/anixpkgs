@@ -15,10 +15,7 @@ let
         lib.mapAttrsToList (k: v: "-e ${k}=${lib.escapeShellArg v}") server.env
       );
       secretsFlag =
-        if server.secretsEnvVar != null then
-          "-e ${server.secretsEnvVar}=${lib.escapeShellArg server.secretsPath}"
-        else
-          "";
+        if server.secretsEnvVar != null then "-e ${server.secretsEnvVar}=${server.secretsPath}" else "";
       hasSecretsCheck = server.secretsPath != null;
       registerCmd = ''
         claude mcp remove ${server.name} 2>/dev/null || true
