@@ -103,6 +103,10 @@ in
       name = "wiki-usage";
       file = ./res/claude-skills/wiki-usage/SKILL.md;
     }
+    {
+      name = "karpathy-guidelines";
+      file = ./res/claude-skills/karpathy-guidelines/SKILL.md;
+    }
   ];
 
   mcpServers = {
