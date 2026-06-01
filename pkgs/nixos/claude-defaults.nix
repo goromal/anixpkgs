@@ -107,6 +107,10 @@ in
       name = "karpathy-guidelines";
       file = ./res/claude-skills/karpathy-guidelines/SKILL.md;
     }
+    {
+      name = "mscpp-services";
+      file = ./res/claude-skills/mscpp-services/SKILL.md;
+    }
   ];
 
   mcpServers = {
