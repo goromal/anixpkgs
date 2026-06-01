@@ -3,17 +3,17 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1772594786,
-        "narHash": "sha256-jY+ZN6I0ID+CpgP3a1iF+XEKQ+NKH5vm4XbQBm/N5RM=",
+        "lastModified": 1780289379,
+        "narHash": "sha256-FIcE4NO7mVTJKn2TDcWVu1Q9UZaO1MhU9qovVhwUrXU=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "84c9f4c4452024f753ca7635c95e423b8a384d26",
+        "rev": "9e8510b5e6cb36f00b26b53d998c6f2a893417fb",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/ov2",
         "repo": "aapis",
+        "rev": "9e8510b5e6cb36f00b26b53d998c6f2a893417fb",
         "type": "github"
       }
     },
@@ -448,8 +448,8 @@
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/reactor",
         "repo": "mscpp",
+        "rev": "027929453fb3535e1023409d905c45c2d8ad71e6",
         "type": "github"
       }
     },
@@ -520,17 +520,17 @@
     "orchestrator-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1773872762,
-        "narHash": "sha256-wzVj6bQCzQpxReIxXjdoTkE5x9Msv6OO/8tQrWAqrIM=",
+        "lastModified": 1780289378,
+        "narHash": "sha256-pN9ED2ZZgkV91dEvX1AIyV9wOxBG6RAyZ1v8QAEaGk0=",
         "owner": "goromal",
         "repo": "orchestrator-cpp",
-        "rev": "dbcad12aa286029564e81650c26beb8550d47799",
+        "rev": "3e5c6a8acb0b786630f53d62eab762dfab6e2f74",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/jq-test",
         "repo": "orchestrator-cpp",
+        "rev": "3e5c6a8acb0b786630f53d62eab762dfab6e2f74",
         "type": "github"
       }
     },
