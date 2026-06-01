@@ -30,6 +30,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register Budget UI in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Budget";
+        path = "/budget/";
+        description = "Budget tracking";
+      }
+    ];
+
     systemd.services.budget_ui = {
       enable = true;
       description = "Budget UI";

@@ -80,7 +80,16 @@ let
     {
       extension = "wav|WAV";
       commands = ''
-        ${color-prints}/bin/echo_yellow "NOT IMPLEMENTED YET"
+        tmpdir=$(mktemp -d)
+        _stp1="$tmpdir/_wav2mp3.mp3"
+        ${ffmpeg}/bin/ffmpeg -i "$infile" -q:a 0 "$_stp1" ${redirects.suppress_all}
+        if [[ "$transpose" != "NULL" ]]; then
+            ${apply_transpose "$tmpdir" "$_stp1" "_stp2"}
+        else
+            _stp2="$_stp1"
+        fi
+        mv "$_stp2" "$outfile"
+        rm -rf $tmpdir
       '';
     }
     {

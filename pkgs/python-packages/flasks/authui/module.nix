@@ -38,6 +38,15 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # Register Auth UI in the web services landing page
+    machines.base.webServices = [
+      {
+        name = "Auth UI";
+        path = "/auth/";
+        description = "Authentication management";
+      }
+    ];
+
     systemd.tmpfiles.rules = [
       "d ${cfg.rootDir} - andrew dev"
       "Z ${cfg.rootDir} - andrew dev"

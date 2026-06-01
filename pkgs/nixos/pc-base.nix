@@ -7,6 +7,7 @@
 with import ./dependencies.nix;
 let
   cfg = config.machines.base;
+  remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
@@ -73,6 +74,28 @@ in
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
+    webServices = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Display name of the service";
+            };
+            path = lib.mkOption {
+              type = lib.types.str;
+              description = "URL path or full URL to the service";
+            };
+            description = lib.mkOption {
+              type = lib.types.str;
+              description = "Brief description of the service";
+            };
+          };
+        }
+      );
+      description = "List of web services to display on landing page";
+      default = [ ];
+    };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
       description = "Network interface name for the WiFi.";
@@ -126,27 +149,88 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
+    launchpadPythonPackages = lib.mkOption {
+      type = lib.types.functionTo (lib.types.listOf lib.types.package);
+      description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
+      default = _ps: [ ];
+    };
     claudeMarketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "DevonMorris/claude-ctags" ];
+      default = [ ];
       description = "List of extra plugin marketplaces to install";
     };
     claudePlugins = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "claude-ctags@claude-ctags"
-        "code-review@claude-plugins-official"
-        "frontend-design@claude-plugins-official"
-        "github@claude-plugins-official"
-        "feature-dev@claude-plugins-official"
-        "pr-review-toolkit@claude-plugins-official"
-      ];
+      default = [ ];
       description = "List of claude plugins to install";
+    };
+    claudePermissionsAllow = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Claude Code permission patterns to add to the global allowlist";
+    };
+    claudeHooks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            event = lib.mkOption { type = lib.types.str; };
+            matcher = lib.mkOption {
+              type = lib.types.str;
+              default = "";
+            };
+            command = lib.mkOption { type = lib.types.str; };
+            async = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of Claude Code hooks to merge into settings.json";
+    };
+    claudeSkills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.claude/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
     };
     extraClaudeSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
       description = "Attrs describing the Claude JSON settings";
+    };
+    claudeMcpServers = lib.mkOption {
+      type = lib.types.listOf lib.types.attrs;
+      default = [ ];
+      description = "List of MCP server attrsets (see mods.opts.claudeMcpServers) to register during claude-setup";
+    };
+    remoteBuilders = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Keys into remote-builders.nix catalog of LAN build machines to use for distributed builds.";
+    };
+    acceptRemoteBuilds = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether this machine accepts build jobs from other LAN hosts via SSH.";
+    };
+    enableSunshine = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Whether to enable the Sunshine game streaming server for Moonlight clients.";
     };
   };
 
@@ -157,15 +241,32 @@ in
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
+    ../modules/vikunja/module.nix
+    ../modules/vikunja-mcp/module.nix
+    ../modules/notion-mcp/module.nix
+    ../modules/wiki-mcp/module.nix
+    ../modules/jupyter-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
     ../python-packages/flasks/budget_ui/module.nix
+    ../python-packages/flasks/orchestrator_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix
+    ../python-packages/flasks/la-quiz-web/module.nix
+    ../python-packages/flasks/anix-upgrade-ui/module.nix
+    ../python-packages/flasks/tester/module.nix
+    ../modules/launchpad/module.nix
+    ../python-packages/flasks/tasks_ui/module.nix
+    ../python-packages/flasks/videodl/module.nix
     (
       let
-        jetpackSrc = builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz";
+        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
+        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
+        jetpackSrc = builtins.fetchTarball {
+          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
+          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
+        };
       in
       import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
     )
@@ -174,11 +275,69 @@ in
   config = {
     system.stateVersion = cfg.nixosState;
 
-    boot = lib.mkIf (cfg.machineType != "jetson") {
-      kernelPackages = (
+    hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
+
+    services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
+    services.launchpad.pythonPackages = lib.mkIf (
+      cfg.machineType == "jetson"
+    ) cfg.launchpadPythonPackages;
+
+    users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
+    users.users.andrew.extraGroups = lib.mkIf (cfg.machineType == "jetson") [ "jtop" ];
+
+    systemd.services.nvpmodel = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        mode3Conf = pkgs.runCommand "nvpmodel-p3767-mode3.conf" { } ''
+          sed 's/PM_CONFIG DEFAULT=2/PM_CONFIG DEFAULT=3/' \
+            ${pkgs.nvidia-jetpack.l4t-nvpmodel}/etc/nvpmodel/nvpmodel_p3767_0000.conf > $out
+        '';
+      in
+      {
+        serviceConfig.ExecStart = lib.mkForce "${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -f ${mode3Conf}";
+      }
+    );
+
+    systemd.services.jetson-nvpmodel-maxn = lib.mkIf (cfg.machineType == "jetson") (
+      let
+        script = pkgs.writeShellScript "jetson-nvpmodel-maxn" ''
+          current=$(${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -q | tail -1)
+          if [ "$current" = "3" ]; then exit 0; fi
+          exec ${pkgs.nvidia-jetpack.l4t-nvpmodel}/bin/nvpmodel -m 3 --force
+        '';
+      in
+      {
+        description = "Force Jetson to 25W nvpmodel (all cores), rebooting once if needed";
+        after = [ "nvpmodel.service" ];
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${script}";
+          RemainAfterExit = true;
+        };
+      }
+    );
+
+    systemd.services.jtop = lib.mkIf (cfg.machineType == "jetson") {
+      description = "jtop service";
+      after = [ "systemd-modules-load.service" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.util-linux ];
+      environment.JTOP_SERVICE = "True";
+      serviceConfig = {
+        ExecStart = "${anixpkgs.jetson-stats}/bin/jtop --force";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        TimeoutStartSec = "30s";
+        TimeoutStopSec = "30s";
+        StateDirectory = "jtop";
+      };
+    };
+
+    boot = {
+      kernelPackages = lib.mkIf (cfg.machineType != "jetson") (
         if cfg.machineType == "pi4" then pkgs.linuxPackages_rpi4 else pkgs.linuxPackages_latest
       );
-      kernel.sysctl = {
+      kernel.sysctl = lib.mkIf (cfg.machineType != "jetson") {
         "net.core.default_qdisc" = "fq";
         "net.ipv4.tcp_congestion_control" = "bbr";
         "net.ipv4.tcp_notsent_lowat" = "16384";
@@ -189,13 +348,17 @@ in
         "net.ipv4.conf.default.forwarding" = "1";
       };
       loader = {
-        # Use the systemd-boot EFI boot loader.
+        # Use the systemd-boot EFI boot loader for x86_linux and Jetson
         # Grub is used on Raspberry Pi
-        systemd-boot.enable = (if cfg.machineType == "x86_linux" then true else false);
+        systemd-boot.enable = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
+        grub.enable = lib.mkForce (cfg.machineType == "pi4");
+        grub.efiSupport = lib.mkIf (cfg.machineType == "pi4") true;
+        grub.device = lib.mkIf (cfg.machineType == "pi4") "nodev";
         efi = {
-          canTouchEfiVariables = true;
+          canTouchEfiVariables = (cfg.machineType == "x86_linux" || cfg.machineType == "jetson");
           efiSysMountPoint = lib.mkIf (cfg.machineType == "x86_linux") cfg.bootMntPt;
         };
+        generic-extlinux-compatible.enable = lib.mkForce false;
       };
       supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
       binfmt.emulatedSystems = lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
@@ -234,6 +397,10 @@ in
       "nixpkgs=/nix/var/nix/profiles/per-user/root/channels/nixos"
       "anixpkgs=${cfg.homeDir}/sources/anixpkgs"
     ];
+
+    nix.distributedBuilds = cfg.remoteBuilders != [ ];
+    nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+    nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
     services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
     services.displayManager.gdm.enable = lib.mkIf (
@@ -280,6 +447,101 @@ in
             ssl = true;
           }
         ];
+
+        # Landing page listing all available services
+        locations."= /" = {
+          return = "200 '${
+            let
+              hostname = config.networking.hostName;
+              services = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) cfg.webServices;
+              # Generate service links with special handling for port-based services
+              serviceLinks = lib.concatMapStringsSep "\n" (
+                s:
+                if s.path == "#" then
+                  # Extract port from description (e.g., "Task management system (port 3457)")
+                  let
+                    portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+                    port = if portMatch != null then builtins.head portMatch else "";
+                  in
+                  "    <li><a href=\"#\" class=\"service-card\" onclick=\"window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
+                else
+                  "    <li><a href=\"${s.path}\" class=\"service-card\"><span class=\"service-name\">${s.name}</span><span class=\"description\">${s.description}</span></a></li>"
+              ) services;
+            in
+            ''
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <meta charset=\"UTF-8\">
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+                <title>${hostname} Services</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;
+                    max-width: 800px;
+                    margin: 50px auto;
+                    padding: 20px;
+                    background: #f5f5f5;
+                  }
+                  .container {
+                    background: white;
+                    padding: 30px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                  }
+                  h1 {
+                    color: #333;
+                    margin-top: 0;
+                  }
+                  ul {
+                    list-style: none;
+                    padding: 0;
+                  }
+                  li {
+                    margin: 12px 0;
+                  }
+                  .service-card {
+                    display: block;
+                    padding: 14px 16px;
+                    background: #f9f9f9;
+                    border-radius: 8px;
+                    border: 2px solid #007bff;
+                    text-decoration: none;
+                    transition: background 0.15s, border-color 0.15s;
+                  }
+                  .service-card:hover {
+                    background: #e8f0fe;
+                    border-color: #0056b3;
+                  }
+                  .service-name {
+                    display: block;
+                    color: #007bff;
+                    font-weight: 600;
+                    font-size: 1em;
+                  }
+                  .description {
+                    display: block;
+                    color: #666;
+                    font-size: 0.9em;
+                    margin-top: 4px;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class=\"container\">
+                  <h1>${hostname} Services</h1>
+                  <ul>
+              ${serviceLinks}
+                  </ul>
+                </div>
+              </body>
+              </html>
+            ''
+          }'";
+          extraConfig = ''
+            default_type text/html;
+          '';
+        };
       };
     };
 
@@ -312,6 +574,14 @@ in
       ];
     };
 
+    services.orchestrator_ui = {
+      enable = cfg.enableOrchestrator;
+    };
+
+    services.anix-upgrade-ui = {
+      enable = true;
+    };
+
     services.rankserver = {
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.rankserver;
@@ -322,6 +592,25 @@ in
       enable = cfg.isATS || cfg.enableFileServers;
       package = anixpkgs.stampserver;
       rootDir = "${cfg.homeDir}/fileservers";
+    };
+
+    services.la-quiz-web = {
+      enable = cfg.isATS;
+      dataDir = "${cfg.homeDir}/data/la-quiz-web";
+    };
+
+    services.tester = {
+      enable = cfg.isATS;
+      dataDir = "${cfg.homeDir}/data/tester";
+    };
+
+    services.tasks_ui = {
+      enable = cfg.isATS;
+      rcrsync = machine-rcrsync;
+    };
+
+    services.vdlserver = {
+      enable = cfg.isATS;
     };
 
     environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
@@ -372,6 +661,55 @@ in
       cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
     ) [ pkgs.dolphin-emu ];
 
+    # Sunshine's encoder test transiently binds port 48010, causing the RTSP
+    # server to fail on the same port immediately after. The service exits 0
+    # so on-failure won't retry — force always-restart so the second attempt
+    # (port now free) succeeds automatically.
+    systemd.user.services.sunshine =
+      lib.mkIf (cfg.enableSunshine && cfg.machineType == "x86_linux" && cfg.graphical)
+        {
+          serviceConfig.Restart = lib.mkForce "always";
+          serviceConfig.RestartSec = lib.mkForce "3s";
+        };
+
+    services.sunshine =
+      lib.mkIf (cfg.enableSunshine && cfg.machineType == "x86_linux" && cfg.graphical)
+        {
+          enable = true;
+          openFirewall = true;
+          capSysAdmin = true;
+          applications = {
+            # Ensure play and rcrsync are reachable from the sunshine user service,
+            # which runs with PATH=null per the NixOS sunshine module design.
+            env.PATH = "$(HOME)/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
+            apps = [
+              {
+                name = "Zelda Collector's Edition";
+                cmd = "play zelda";
+              }
+              {
+                name = "Wind Waker";
+                cmd = "play windwaker";
+              }
+              {
+                name = "Twilight Princess";
+                cmd = "play twilight";
+              }
+              {
+                name = "Super Smash Bros. Melee";
+                cmd = "play melee";
+              }
+              {
+                name = "Super Mario Sunshine";
+                cmd = "play sunshine";
+              }
+            ];
+          };
+        };
+    services.udev.extraRules = lib.mkIf (cfg.enableSunshine && cfg.machineType == "x86_linux") ''
+      KERNEL=="uinput", GROUP="input", MODE="0660"
+    '';
+
     # Orchestrator jobs
     services.orchestratord = lib.mkIf cfg.enableOrchestrator {
       enable = true;
@@ -386,6 +724,10 @@ in
           rclone
           machine-rcrsync
           machine-authm
+          anixpkgs.mp4
+          anixpkgs.mp4unite
+          anixpkgs.png
+          anixpkgs.scrape
         ]
         ++ cfg.extraOrchestratorPackages;
       statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
@@ -463,6 +805,26 @@ in
     # Mail
     services.mailNode.enable = cfg.isATS;
 
+    # Vikunja Task Management
+    services.vikunja-ats = lib.mkIf cfg.isATS {
+      enable = true;
+      domain = "${config.networking.hostName}.local";
+    };
+
+    # Vikunja MCP client (ATS enables this via services.vikunja-ats; other machines enable it directly)
+    services.vikunja-mcp.enable = lib.mkDefault (
+      builtins.any (s: s.name == "vikunja") cfg.claudeMcpServers
+    );
+
+    # Notion MCP Server
+    services.notion-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
+
+    # Wiki MCP Server
+    services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
+
+    # Jupyter MCP Server
+    services.jupyter-mcp.enable = (cfg.machineType == "jetson");
+
     # Global packages
     environment.systemPackages =
       with pkgs;
@@ -477,6 +839,7 @@ in
         gcc
         gdb
         tig
+        git
         scc
         most
         gnumake
@@ -588,6 +951,14 @@ in
 
     programs.bash.interactiveShellInit = ''
       ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+      tmux() {
+        command tmux "$@"
+        local _tmux_exit=$?
+        tput rmcup 2>/dev/null
+        tput cnorm 2>/dev/null
+        stty sane 2>/dev/null
+        return $_tmux_exit
+      }
        mkcd() {
           if [[ "$1" == "-h" || "$1" == "--help" ]]; then
               echo "usage: mkcd [-t|DIRNAME]"
@@ -667,7 +1038,11 @@ in
         enableMetrics = cfg.enableMetrics;
         claudeMarketplaces = cfg.claudeMarketplaces;
         claudePlugins = cfg.claudePlugins;
+        claudePermissionsAllow = cfg.claudePermissionsAllow;
+        claudeHooks = cfg.claudeHooks;
+        claudeSkills = cfg.claudeSkills;
         extraClaudeSettings = cfg.extraClaudeSettings;
+        claudeMcpServers = cfg.claudeMcpServers;
       };
     };
   };

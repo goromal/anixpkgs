@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LA Geography Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px 30px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .region-card {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .region-card:hover, .region-card:active {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .no-regions {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .flash-error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .flash-info {
+            background-color: #e7f3ff;
+            color: #0066cc;
+            border: 1px solid #b3d9ff;
+        }
+
+        .debug-toggle {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-debug {
+            background: linear-gradient(135deg, #ff9a56 0%, #ffdd59 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-debug.active {
+            background: linear-gradient(135deg, #0f9b0f 0%, #38ef7d 100%);
+        }
+
+        .btn-debug:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .region-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ LA Geography Quiz</h1>
+        <p class="subtitle">Test your knowledge of Los Angeles geography</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message flash-error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if regions %}
+            <div class="region-grid">
+                {% for region in regions %}
+                    <a href="{{ urlroot }}quiz/{{ region.id }}" class="region-card">
+                        {{ region.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-regions">
+                <p>No regions available. Please load region data into the database.</p>
+            </div>
+        {% endif %}
+
+        <div class="debug-toggle">
+            <button class="btn-debug{% if debug_mode %} active{% endif %}" id="debugToggle" onclick="toggleDebug()">
+                {% if debug_mode %}Debug Mode: ON{% else %}Debug Mode: OFF{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function toggleDebug() {
+            fetch("{{ urlroot }}toggle-debug", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error toggling debug mode.');
+            });
+        }
+    </script>
+</body>
+</html>

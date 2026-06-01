@@ -2,11 +2,9 @@ import click
 import re
 import os
 import sys
-import json
-import requests
-import time
 from email import policy
 from email.parser import BytesParser
+from email.utils import parsedate_to_datetime
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +14,7 @@ from gmail_parser.defaults import GmailParserDefaults as GPD
 from wiki_tools.wiki import WikiTools
 from wiki_tools.defaults import WikiToolsDefaults as WTD
 from task_tools.defaults import TaskToolsDefaults as TTD
+from notion_tools.manage import NotionTools
 from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
@@ -31,12 +30,18 @@ class PostfixMessage:
         self.sender = msg["From"]
         self.recipient = msg["To"]
         self.subject = msg["Subject"]
-        self.date = datetime.strptime(msg["Date"], "%a, %d %b %Y %H:%M:%S %z").astimezone()
-        text_parts = []
+        try:
+            self.date = parsedate_to_datetime(msg["Date"]).astimezone()
+        except Exception:
+            self.date = datetime.now().astimezone()
+        plain_parts, html_parts = [], []
         for part in msg.walk():
             if part.get_content_type() == "text/plain":
-                text_parts.append(part.get_content())
-        self.text = "\n".join(text_parts)
+                plain_parts.append(part.get_content())
+            elif part.get_content_type() == "text/html":
+                html_parts.append(part.get_content())
+        self.raw_text = "\n".join(plain_parts) or "\n".join(html_parts)
+        self.text = re.sub(r"<[^>]+>", " ", self.raw_text).strip()
 
     def getText(self):
         return self.text
@@ -48,125 +53,11 @@ class PostfixMessage:
         self.maildir.remove(self.key)
 
 
-def create_notion_bulleted_list(data, level=0):
-    if not isinstance(data, list):
-        raise ValueError("Input data must be a list.")
-    notion_blocks = []
-    for item in data:
-        if isinstance(item, list):
-            nested_blocks = create_notion_bulleted_list(item, level + 1)
-            if notion_blocks:
-                notion_blocks[-1]["bulleted_list_item"]["children"] = nested_blocks
-            else:
-                raise ValueError("Nested list structure is invalid.")
-        else:
-            block = {
-                "object": "block",
-                "type": "bulleted_list_item",
-                "bulleted_list_item": {
-                    "rich_text": [{"type": "text", "text": {"content": str(item)}}]
-                },
-            }
-            notion_blocks.append(block)
-    return notion_blocks
-
-
-def append_text_to_notion_page(token, id, msg, text):
-    ps = [p for p in text.split("\n") if p.strip()]
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    data = {
-        "children": create_notion_bulleted_list(
-            [ps[0], ps[1:]] if len(ps) > 1 else [ps[0]]
-        )
-    }
-    url = f"https://api.notion.com/v1/blocks/{id}/children"
-    response = requests.patch(url, json=data, headers=headers)
-    if response.status_code == 200:
-        if msg is not None:
-            msg.moveToTrash()
-    else:
-        sys.stderr.write(f"Program error: {response.status_code}, {response.text}")
-        exit(1)
-
-
-def get_page_blocks(headers, page_id):
-    url = f"https://api.notion.com/v1/blocks/{page_id}/children"
-    has_more = True
-    next_cursor = None
-    all_blocks = []
-
-    while has_more:
-        params = {}
-        if next_cursor:
-            time.sleep(0.3)
-            params["start_cursor"] = next_cursor
-
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            raise Exception(
-                f"Error fetching page content: {response.status_code}, {response.text}"
-            )
-
-        data = response.json()
-        all_blocks.append(data)
-        next_cursor = data.get("next_cursor")
-        has_more = data.get("has_more", False)
-
-    return all_blocks
-
-
-def count_bullet_points_and_keywords(all_content, keywords):
-    bullet_count = 0
-    keyword_count = 0
-
-    for content in all_content:
-        for block in content["results"]:
-            if block["type"] == "bulleted_list_item":
-                bullet_count += 1
-
-        for keyword in keywords:
-            keyword_count += json.dumps(content).lower().count(keyword)
-
-    return int(bullet_count), int(keyword_count / 2)
-
-
-def update_page_title(headers, page_id, new_title):
-    url = f"https://api.notion.com/v1/pages/{page_id}"
-
-    data = {"properties": {"title": [{"text": {"content": new_title}}]}}
-
-    response = requests.patch(url, json=data, headers=headers)
-    if response.status_code != 200:
-        raise Exception(
-            f"Error updating page title: {response.status_code}, {response.text}"
-        )
-
-
-def do_notion_counts(keyword, notion_page_id, notion_api_token, dry_run):
-    headers = {
-        "Authorization": f"Bearer {notion_api_token}",
-        "Content-Type": "application/json",
-        "Notion-Version": "2022-06-28",
-    }
-    content = get_page_blocks(headers, notion_page_id)
-    bullet_count, keyword_count = count_bullet_points_and_keywords(
-        content, ["\\u23f0"]
-    )  # ⏰
-    new_title = f"{keyword_count} - {bullet_count} - {keyword}"
-    if not dry_run:
-        update_page_title(headers, notion_page_id, new_title)
-    return True, bullet_count, keyword_count
-
-
 def process_keyword(
     text,
     datestr,
     keyword,
-    notion_api_token,
+    notion,
     notion_page_id,
     msg=None,
     dry_run=False,
@@ -184,9 +75,15 @@ def process_keyword(
             item = f"[**{datestr}**] {matter.strip()}"
         item = re.sub(r"action:", "⏰", item, flags=re.IGNORECASE)
         if logfile is not None:
-            logfile.write(f"Notion:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} entry -> notion.append_blocks\n")
+            logfile.flush()
         if not dry_run:
-            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
+            notion.append_blocks(notion_page_id, item)
+            if msg is not None:
+                msg.moveToTrash()
+        if logfile is not None:
+            logfile.write(f"Notion:{keyword} entry done\n")
+            logfile.flush()
         return True
     elif text[: (n + 6)].lower() == f"sort {keyword}.":
         matter = text[(n + 6) :].strip()
@@ -198,9 +95,15 @@ def process_keyword(
         else:
             item = f"[**{datestr}**] {matter.strip()}"
         if logfile is not None:
-            logfile.write(f"Notion:{keyword} entry\n")
+            logfile.write(f"Notion:{keyword} sort entry -> notion.append_blocks\n")
+            logfile.flush()
         if not dry_run:
-            append_text_to_notion_page(notion_api_token, notion_page_id, msg, item)
+            notion.append_blocks(notion_page_id, item)
+            if msg is not None:
+                msg.moveToTrash()
+        if logfile is not None:
+            logfile.write(f"Notion:{keyword} sort entry done\n")
+            logfile.flush()
         return True
     return False
 
@@ -275,6 +178,60 @@ def report_journal_entry_to_tactical(tactical_port, date):
                                 tactical_pb2.SurveyQuestionResult(
                                     question_name="Submitted entry",
                                     result=tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT,
+                                )
+                            ],
+                        )
+                    )
+                )
+            except:
+                pass
+
+    asyncio.run(cmd_impl(tactical_port, date.year, date.month, date.day))
+
+
+def parse_loseit_email(raw_text):
+    """Return (summary_date, consumed_cal, budget_cal) from a Lose It! HTML email, or None."""
+    if "Daily calorie budget" not in raw_text:
+        return None
+    budget_m = re.search(r"Daily calorie budget</td>\s*<td[^>]*>([\d,]+)</td>", raw_text)
+    consumed_m = re.search(r"Food calories consumed</td>\s*<td[^>]*>([\d,]+)</td>", raw_text)
+    date_m = re.search(r"Daily Summary for\s+\w+,\s+(\w+)\s+(\d+)", raw_text)
+    if not (budget_m and consumed_m and date_m):
+        return None
+    budget = int(budget_m.group(1).replace(",", ""))
+    consumed = int(consumed_m.group(1).replace(",", ""))
+    month_str, day_str = date_m.group(1), date_m.group(2)
+    try:
+        summary_date = datetime.strptime(f"{month_str} {day_str} 2000", "%B %d %Y")
+    except ValueError:
+        return None
+    return summary_date, consumed, budget
+
+
+def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
+    surplus = consumed - budget
+    if surplus <= 0:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
+    elif surplus <= 200:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
+    else:
+        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+
+    async def cmd_impl(port, year, month, day):
+        async with aio.insecure_channel(f"localhost:{port}") as channel:
+            stub = tactical_pb2_grpc.TacticalServiceStub(channel)
+            try:
+                _ = await stub.SubmitSurveyResult(
+                    tactical_pb2.SubmitSurveyResultRequest(
+                        result=tactical_pb2.SurveyResult(
+                            year=year,
+                            month=month,
+                            day=day,
+                            survey_name="Heart Care",
+                            results=[
+                                tactical_pb2.SurveyQuestionResult(
+                                    question_name="Discipline in eating",
+                                    result=result_type,
                                 )
                             ],
                         )
@@ -456,6 +413,12 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         logfile = open(os.path.join(ctx.obj["headless_logdir"], "postfix.log"), "w")
     else:
         logfile = None
+
+    def log(msg):
+        if logfile is not None:
+            logfile.write(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}\n")
+            logfile.flush()
+
     try:
         maildir = mailbox.Maildir(MAILDIR_PATH, factory=None)
     except Exception as e:
@@ -473,10 +436,8 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             logfile.close()
         return
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
-    except:
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
+    except Exception as e:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
             logfile.close()
@@ -504,9 +465,20 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
         + Style.RESET_ALL
     )
     try:
-        for msg in reversed(msgs):
+        for i, msg in enumerate(reversed(msgs)):
             text = msg.getText().strip()
             date = msg.getDate()
+
+            loseit = parse_loseit_email(msg.raw_text)
+            if loseit is not None:
+                summary_date, consumed, budget = loseit
+                summary_date = summary_date.replace(year=date.year)
+                surplus = consumed - budget
+                print(f"  Lose It! daily summary: {consumed} consumed / {budget} budget ({'+' if surplus >= 0 else ''}{surplus} cal)")
+                if not dry_run:
+                    report_eating_discipline_to_tactical(tactical_port, summary_date, consumed, budget)
+                    msg.moveToTrash()
+                continue
 
             if text[:8].lower() == f"journal:":
                 text = text[8:]
@@ -518,8 +490,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                     )
                     text = text.split(":", 1)[1].strip()
                 print(f"  Journal entry for {date}")
-                if logfile is not None:
-                    logfile.write(f"{date}\n")
+                log(f"Journal entry for {date}")
                 if dry_run:
                     print(text)
                 if not dry_run:
@@ -539,7 +510,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                             text,
                             date.strftime("%m/%d/%Y"),
                             keyword,
-                            notion_api_token,
+                            notion,
                             notion_page_id,
                             msg,
                             dry_run,
@@ -551,8 +522,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                 continue
             if text.lstrip("-+").isdigit():
                 print(f"  Calorie intake on {date}: {text}")
-                if logfile is not None:
-                    logfile.write("Calories entry\n")
+                log(f"Calorie intake for {date}")
                 if not dry_run:
                     caljo_doku = None
                     caljo_doku = wiki.getPage(id="calorie-journal")
@@ -568,8 +538,7 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                 or text[:3].lower() == "p3:"
             ):
                 print(f"  {text[:2]} task for {date}: {text[3:]}")
-                if logfile is not None:
-                    logfile.write("Task entry\n")
+                log(f"Task entry for {date}")
                 if not dry_run:
                     task.putTask(
                         text,
@@ -578,13 +547,12 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                     )
                     msg.moveToTrash()
             else:
-                print(f"  ITNS from {date}: {text}")
-                if logfile is not None:
-                    logfile.write("Notion:ITNS entry\n")
+                truncated = text[:2000] + ("…" if len(text) > 2000 else "")
+                print(f"  ITNS from {date}: {truncated}")
+                log(f"ITNS entry for {date}")
                 if not dry_run:
-                    append_text_to_notion_page(
-                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
-                    )
+                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", truncated)
+                    msg.moveToTrash()
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
         if logfile is not None:
@@ -641,9 +609,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
             logfile.close()
         return
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
@@ -688,7 +654,7 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                             text,
                             date.strftime("%m/%d/%Y"),
                             keyword,
-                            notion_api_token,
+                            notion,
                             notion_page_id,
                             msg,
                             dry_run,
@@ -731,9 +697,8 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                 if logfile is not None:
                     logfile.write("Notion:ITNS entry\n")
                 if not dry_run:
-                    append_text_to_notion_page(
-                        notion_api_token, "3ea6f1aa43564b0386bcaba6c7b79870", msg, text
-                    )
+                    notion.append_blocks("3ea6f1aa43564b0386bcaba6c7b79870", text)
+                    msg.moveToTrash()
     except Exception as e:
         sys.stderr.write(f"Program error: {e}")
         if logfile is not None:
@@ -765,9 +730,7 @@ def itns_nudge(ctx: click.Context, categories_csv, dry_run):
     import random
 
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         exit(1)
@@ -785,7 +748,7 @@ def itns_nudge(ctx: click.Context, categories_csv, dry_run):
         text=f"{chosen_keyword}: action: Notice me!",
         datestr=datetime.today().strftime("%m/%d/%Y"),
         keyword=chosen_keyword,
-        notion_api_token=notion_api_token,
+        notion=notion,
         notion_page_id=chosen_page_id,
         dry_run=dry_run,
     ):
@@ -887,9 +850,7 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
     else:
         logfile = None
     try:
-        with open(os.path.expanduser(ctx.obj["notion_secrets_file"]), "r") as nsf:
-            secrets = json.load(nsf)
-        notion_api_token = secrets["auth"]
+        notion = NotionTools.from_file(ctx.obj["notion_secrets_file"])
     except:
         sys.stderr.write(f"Failed to load Notion API key")
         if logfile is not None:
@@ -913,10 +874,9 @@ def annotate_triage_pages(ctx: click.Context, categories_csv, dry_run):
             + Style.RESET_ALL
         )
         for notion_page_id, keyword in categories.items():
-            success, bullet_count, action_count = do_notion_counts(
+            success, bullet_count, action_count = notion.do_counts(
                 keyword,
                 notion_page_id,
-                notion_api_token,
                 dry_run,
             )
             if success:

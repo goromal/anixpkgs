@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Tester — {{ exam.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .passage {
+        line-height: 2.1;
+        font-size: 1.05em;
+        word-spacing: 1px;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ exam.title }}</h1>
+
+<div class="card">
+    <div class="passage">
+        {% for atom in atoms %}
+        <span>{{ atom }}</span>{% if not loop.last %} {% endif %}
+        {% endfor %}
+    </div>
+    <div style="margin-top:28px; display:flex; gap:12px;">
+        <a href="{{ urlroot }}exam/{{ exam.id }}/take" class="btn btn-primary">Take Exam</a>
+        <a href="{{ urlroot }}" class="btn btn-secondary">Dashboard</a>
+    </div>
+</div>
+{% endblock %}

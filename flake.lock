@@ -20,11 +20,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1771825089,
-        "narHash": "sha256-AbyLbEfPdEcgYTnqv1/4hofSwmN+UBNLJ5B6cWAX+I0=",
+        "lastModified": 1779777629,
+        "narHash": "sha256-jr4ShdJgqQL2yq1Dn1Ur4abeHfuNwk0Uv3xjp1sIYpA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "467fef9fe1e9daf72de5eb6bf868ea29da590cb1",
+        "rev": "cec0d8a2f69cae580acc2599d673768ea9fe271a",
         "type": "github"
       },
       "original": {
@@ -128,11 +128,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1766035688,
-        "narHash": "sha256-/lq485V/warVmf38ICCN2tK44xKzlxHMyQuriq+RGto=",
+        "lastModified": 1779950628,
+        "narHash": "sha256-xSY93NS0a7ul9humQxhGOsB6LEFfbvRk/zt6culkvPg=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "9ff6f97ce5c193f95996e8a886c5995ab5ff86dd",
+        "rev": "d6a97775412c5e2e45a897d26af5aa6e7f596a20",
         "type": "github"
       },
       "original": {
@@ -303,6 +303,22 @@
       "original": {
         "owner": "anduril",
         "repo": "jetpack-nixos",
+        "type": "github"
+      }
+    },
+    "jetson-stats": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777975381,
+        "narHash": "sha256-fmfuYZHRtMyvNC7fLfrUgl5CGtz6+MkqQ2YI6Ac//cc=",
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "rev": "365a8790c74771dcdc72fe9ebeb475168ea573bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
         "type": "github"
       }
     },
@@ -498,6 +514,22 @@
         "owner": "NixOS",
         "ref": "nixpkgs-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "notion-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776107009,
+        "narHash": "sha256-PxWbxt9LxMzsQrwK9j/r7JFInZvDpBPBzu9Pj+XgX6Y=",
+        "owner": "goromal",
+        "repo": "notion-tools",
+        "rev": "46b8e8eca2fca2703b6d34c8443e77e42b64f093",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "notion-tools",
         "type": "github"
       }
     },
@@ -718,6 +750,7 @@
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
         "jetpack-nixos": "jetpack-nixos",
+        "jetson-stats": "jetson-stats",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -728,6 +761,7 @@
         "mfn": "mfn",
         "mscpp": "mscpp",
         "nixpkgs": "nixpkgs_2",
+        "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
         "photos-tools": "photos-tools",
@@ -740,6 +774,7 @@
         "quad-sim-cpp": "quad-sim-cpp",
         "rankserver-cpp": "rankserver-cpp",
         "rcdo": "rcdo",
+        "rtk": "rtk",
         "scrape": "scrape",
         "secure-delete": "secure-delete",
         "signals-cpp": "signals-cpp",
@@ -753,6 +788,22 @@
         "wiki-tools": "wiki-tools",
         "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
+      }
+    },
+    "rtk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775476424,
+        "narHash": "sha256-7DAL4dsnq2ZWmkyoI+BeN21ouK0VyLvSxOCt5hPWCl4=",
+        "owner": "rtk-ai",
+        "repo": "rtk",
+        "rev": "8a7106c8f2996ebc75b38a71c5f342f17811ce39",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rtk-ai",
+        "repo": "rtk",
+        "type": "github"
       }
     },
     "scrape": {
@@ -984,11 +1035,11 @@
     "workout-planner": {
       "flake": false,
       "locked": {
-        "lastModified": 1772261839,
-        "narHash": "sha256-eKJSMzsKBv74F80rxfBnDfdm9Bs9/0rBCjgAngKh4eU=",
+        "lastModified": 1776261810,
+        "narHash": "sha256-jgvqwgivLP3N4BsineF3PdWqMd5xRs4+FmADSwV/yG8=",
         "owner": "goromal",
         "repo": "workout-planner",
-        "rev": "ab4d3263ea70b70085a9170580c11d12dd2585e5",
+        "rev": "7807db2368b5c094b64a4ab6f17b3d6274cd453e",
         "type": "github"
       },
       "original": {

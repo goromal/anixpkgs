@@ -41,7 +41,7 @@ ats-workout-planner job
 
 ### Configuration
 
-**Location**: `~/configs/workout-config.yaml`
+**(Default) Location**: `~/configs/workout-config.yaml`
 
 **Structure**:
 
@@ -116,6 +116,8 @@ Options:
   --force-yesterday-completed BOOLEAN
                                   Override yesterday's completion status
                                   (True/False).
+  --tactical-port INTEGER         Tactical server port to report workout
+                                  result to.  [default: 60060]
   --help                          Show this message and exit.
 ```
 

@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
@@ -13,8 +16,18 @@ with import ../dependencies.nix;
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
-      developer = false;
+      developer = true;
       isATS = true;
+      claudeMarketplaces = claudeDefaults.marketplaces;
+      claudePlugins = claudeDefaults.plugins;
+      claudePermissionsAllow = claudeDefaults.permissionsAllow;
+      claudeHooks = claudeDefaults.hooks;
+      claudeSkills = claudeDefaults.skills;
+      claudeMcpServers = [
+        claudeDefaults.mcpServers.vikunja
+        claudeDefaults.mcpServers.notion
+        claudeDefaults.mcpServers.wiki
+      ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
@@ -65,17 +78,25 @@ with import ../dependencies.nix;
         }
         {
           name = "ats-mailman";
+          execStartPre = pkgs.writeShellScript "ats-mailman-fix-perms" ''
+            for f in /var/mail/goromail/new/*; do
+              [ -e "$f" ] || exit 0
+              chmod 660 "$f"
+            done
+          '';
           jobShellScript = pkgs.writeShellScript "ats-mailman" ''
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit
             fi
-            authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-            rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
+            DIAG_LOG="$HOME/goromail/mailman-diag.log"
+            mkdir -p "$HOME/goromail"
+            authm refresh --headless >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "authm refresh error!"; exit 1; }
+            rcrsync sync configs >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "configs sync error!"; exit 1; }
+            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix >> "$DIAG_LOG" 2>&1
             if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
               logger -t ats-mailman "Processed mail"
               if grep -qi "notion" $HOME/goromail/postfix.log; then
-                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages >> "$DIAG_LOG" 2>&1
               fi
             fi
           '';
@@ -149,6 +170,41 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-vikunja-backup";
+          jobShellScript = pkgs.writeShellScript "ats-vikunja-backup" ''
+            mkdir -p $HOME/data/vikunja
+            cp /var/lib/vikunja/vikunja.db $HOME/data/vikunja/vikunja.db || { logger -t ats-vikunja-backup "DB copy UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data vikunja || { logger -t ats-vikunja-backup "Vikunja Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-vikunja-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-la-quiz-backup";
+          jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
+            rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-la-quiz-backup "LA Quiz backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-tester-backup";
+          jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
+            rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-tester-backup "Tester backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
@@ -208,12 +264,9 @@ with import ../dependencies.nix;
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.workout-planner
-        anixpkgs.mp4
-        anixpkgs.mp4unite
         anixpkgs.goromail
         anixpkgs.sread
         anixpkgs.gmail-parser
-        anixpkgs.scrape
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
@@ -221,5 +274,66 @@ with import ../dependencies.nix;
     })
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+      users.users.andrew.extraGroups = [ "vikunja" ];
+      environment.systemPackages = [
+        (pkgs.writeShellScriptBin "anix-init" ''
+          make-title -c yellow "Setting up rcrsync"
+
+          DO_RCLONE=y
+          if [[ -f $HOME/.config/rclone/rclone.conf ]]; then
+            read -rp "rclone config already found, proceed anyway? (y|n): " DO_RCLONE
+          fi
+          if [[ "$DO_RCLONE" == "y" ]]; then
+            read -rp "Enter the char key to unlock the rclone config: " CFGKEY
+            rm -rf $HOME/.config/rclone
+            mkdir -p $HOME/.config/rclone && cd $HOME/.config/rclone
+            cp ${anixpkgs.pkgData.records.rcloneConf.data} ${anixpkgs.pkgData.records.rcloneConf.name}
+            sunnyside -s 0 -k $CFGKEY -t ${anixpkgs.pkgData.records.rcloneConf.name}
+            rm ${anixpkgs.pkgData.records.rcloneConf.name}
+          else
+            echo_yellow "Skipping rclone config step"
+          fi
+
+          cd $HOME
+          rcrsync -v init configs
+          rcrsync -v init secrets
+          rcrsync -v init data
+
+          make-title -c yellow "Setting up SSH and Nix"
+
+          DO_SSH=y
+          if [[ -d $HOME/.ssh ]]; then
+            read -rp ".ssh directory already present, proceed anyway? (y|n): " DO_SSH
+          fi
+          if [[ "$DO_SSH" == "y" ]]; then
+            rm -rf $HOME/.ssh
+            cp -r $HOME/data/.ssh $HOME/.ssh
+            cd $HOME/.ssh
+            fix-perms .
+            cd ..
+          else
+            echo_yellow "Skipping SSH config setup"
+          fi
+
+          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
+          sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
+          sudo nix-channel --update
+          echo
+          echo
+          echo_green "DONE. Note the hardware-config.nix file below:"
+          echo
+          nixos-generate-config --show-hardware-config
+          echo
+          echo_green  "Use the config above as you set up anix-upgrade:"
+          echo_yellow "  - Use devshell to create a workspace with anixpkgs"
+          echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
+          echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
+          echo_yellow "  - Run anix-upgrade"
+          echo_yellow "  - Create new secrets and configs entries"
+          echo
+          echo_green "Have fun!"
+        '')
+      ];
     };
 }

@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
@@ -15,6 +18,15 @@ with import ../dependencies.nix;
       recreational = false;
       developer = true;
       isATS = false;
+      claudeMarketplaces = claudeDefaults.marketplaces;
+      claudePlugins = claudeDefaults.plugins;
+      claudePermissionsAllow = claudeDefaults.permissionsAllow;
+      claudeHooks = claudeDefaults.hooks;
+      claudeSkills = claudeDefaults.skills;
+      claudeMcpServers = [
+        claudeDefaults.mcpServers.vikunja
+        claudeDefaults.mcpServers.jupyter
+      ];
       serveNotesWiki = false;
       enableMetrics = false; # TODO: perhaps enable in the future
       enableFileServers = true;
@@ -36,16 +48,80 @@ with import ../dependencies.nix;
         }
       ];
       enableOrchestrator = true;
-      timedOrchJobs = [ ];
+      timedOrchJobs = [
+        {
+          name = "launchpad-sync";
+          jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
+            export PATH="${
+              pkgs.lib.makeBinPath [
+                pkgs.git
+                pkgs.openssh
+              ]
+            }:$PATH"
+            REPO=$HOME/launchpad
+            if [[ -d "$REPO/.git" ]]; then
+              cd "$REPO"
+              if [[ -n "$(git status --porcelain)" ]]; then
+                git add -A
+                git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
+              fi
+              pull_out=$(git pull --rebase origin master 2>&1)
+              if [[ $? -eq 0 ]]; then
+                push_out=$(git push origin master 2>&1)
+                if [[ $? -eq 0 ]]; then
+                  logger -t launchpad-sync "Sync complete"
+                else
+                  echo "$push_out" >&2
+                  logger -t launchpad-sync "Push to master failed"
+                fi
+              else
+                echo "$pull_out" >&2
+                git rebase --abort 2>/dev/null
+                logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
+              fi
+            else
+              logger -t launchpad-sync "No git repository found at $REPO, skipping"
+            fi
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 03:00:00" ];
+            Persistent = true;
+          };
+        }
+      ];
+      launchpadPythonPackages =
+        ps: with ps; [
+          numpy
+          scipy
+          matplotlib
+          pandas
+          scikit-learn
+          sympy
+          cvxpy
+          statsmodels
+          torch
+          tqdm
+          pywavelets
+          ipyparallel
+          (hmmlearn.overridePythonAttrs (_: {
+            nativeCheckInputs = [ ];
+          }))
+          imageio
+          opencv4
+          geometry
+          pysignals
+          pyceres
+          pyceres_factors
+          mesh-plotter
+          find_rotational_conventions
+        ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
-        anixpkgs.mp4
-        anixpkgs.mp4unite
+        anixpkgs.notion-tools
         anixpkgs.goromail
         anixpkgs.sread
         anixpkgs.gmail-parser
-        anixpkgs.scrape
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
@@ -54,6 +130,7 @@ with import ../dependencies.nix;
     // {
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
+        anixpkgs.jetson-stats
         (pkgs.writeShellScriptBin "anix-init" ''
           make-title -c yellow "Setting up rcrsync"
 

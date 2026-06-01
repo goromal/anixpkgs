@@ -512,6 +512,8 @@ def main(stdscr):
                         [
                             "git",
                             "clone",
+                            "--filter=blob:none",
+                            "--no-single-branch",
                             "--recurse-submodules",
                             url,
                             repopath,

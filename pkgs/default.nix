@@ -3,6 +3,7 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
+  unstable = (import ./nixos/dependencies.nix).unstable;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -47,7 +48,8 @@ let
     pkg-attr
     // rec {
       doc = prev.writeTextFile {
-        name = "doc.txt";
+        name = "doc";
+        destination = "/doc.txt";
         text = (
           if builtins.hasAttr "description" pkg-attr.meta then
             (''
@@ -115,6 +117,18 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              jetson-stats = addDoc (
+                pySelf.callPackage ./python-packages/jetson-stats {
+                  pkg-src = flakeInputs.jetson-stats;
+                }
+              );
+              jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
+              jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
+              jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
+              jupyter-nbmodel-client = pySelf.callPackage ./python-packages/jupyter-nbmodel-client { };
+              jupyter-mcp-tools = pySelf.callPackage ./python-packages/jupyter-mcp-tools { };
+              jupyter-server-nbmodel = pySelf.callPackage ./python-packages/jupyter-server-nbmodel { };
+              jupyter-mcp-server = addDoc (pySelf.callPackage ./python-packages/jupyter-mcp-server { });
               goromail = addDoc (pySelf.callPackage ./python-packages/goromail { });
               symforce = addDoc (pySelf.callPackage ./python-packages/symforce { });
               fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -184,6 +198,11 @@ let
                   pkg-src = flakeInputs.wiki-tools;
                 }
               );
+              notion-tools = addDoc (
+                pySelf.callPackage ./python-packages/notion-tools {
+                  pkg-src = flakeInputs.notion-tools;
+                }
+              );
               mavlog-utils = addDoc (
                 pySelf.callPackage ./python-packages/mavlog-utils {
                   pkg-src = flakeInputs.mavlog-utils;
@@ -243,6 +262,14 @@ let
               stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
               authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
+              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
+              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
+              self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
+              tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
+              vdlserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -342,14 +369,23 @@ rec {
   stampserver = final.python313.pkgs.stampserver;
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
+  orchestrator_ui = final.python313.pkgs.orchestrator_ui;
+  la_quiz_web = final.python313.pkgs.la_quiz_web;
+  anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  self-tester-app = final.python313.pkgs.self-tester-app;
+  tasks_ui = final.python313.pkgs.tasks_ui;
+  vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
   photos-tools = final.python313.pkgs.photos-tools;
   python-dokuwiki = final.python313.pkgs.python-dokuwiki;
   wiki-tools = final.python313.pkgs.wiki-tools;
+  notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  jetson-stats = final.python313.pkgs.jetson-stats;
+  jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
 
@@ -360,6 +396,7 @@ rec {
     }
   );
   local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
+  ssht = addDoc (prev.callPackage ./bash-packages/ssht { });
   gantter = addDoc (
     prev.callPackage ./bash-packages/gantter {
       python = final.python313;
@@ -389,6 +426,9 @@ rec {
   git-shortcuts = addDoc (prev.callPackage ./bash-packages/git-shortcuts { });
   md2pdf = addDoc (prev.callPackage ./bash-packages/converters/md2pdf.nix { });
   mp4unite = addDoc (prev.callPackage ./bash-packages/mp4unite { });
+  mp3unite = addDoc (prev.callPackage ./bash-packages/mp3unite { });
+  mp3separate = addDoc (prev.callPackage ./bash-packages/mp3separate { });
+  mp4separate = addDoc (prev.callPackage ./bash-packages/mp4separate { });
   notabilify = addDoc (prev.callPackage ./bash-packages/converters/notabilify.nix { });
   make-title = addDoc (prev.callPackage ./bash-packages/make-title { });
   pb = addDoc (prev.callPackage ./bash-packages/pb { });
@@ -408,6 +448,7 @@ rec {
     }
   );
   zipper = addDoc (prev.callPackage ./bash-packages/converters/zipper.nix { });
+  backup = addDoc (prev.callPackage ./bash-packages/backup { });
   fix-perms = addDoc (prev.callPackage ./bash-packages/fix-perms { });
   setupws = addDoc (prev.callPackage ./bash-packages/setupws { });
   listsources = addDoc (prev.callPackage ./bash-packages/listsources { });
@@ -526,6 +567,11 @@ rec {
       pkg-src = flakeInputs.sunnyside;
     }
   );
+  rtk = addDoc (
+    prev.callPackage ./rust-packages/rtk {
+      pkg-src = flakeInputs.rtk;
+    }
+  );
 
   nixos-machines = rec {
     personal = makeMachines "personal";
@@ -543,4 +589,7 @@ rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
+
+  # Override claude-code-bin to use version 2.1.113
+  claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

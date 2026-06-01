@@ -92,6 +92,11 @@
                 "attr": "sunnyside",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "rtk",
+                "ci": true,
+                "docs": false
             }
         ],
         "python": [
@@ -231,12 +236,32 @@
                 "docs": true
             },
             {
+                "attr": "self-tester-app",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "rankserver",
                 "ci": true,
                 "docs": true
             },
             {
                 "attr": "stampserver",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "la_quiz_web",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "anix_upgrade_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "tasks_ui",
                 "ci": true,
                 "docs": true
             },
@@ -276,6 +301,11 @@
                 "docs": true
             },
             {
+                "attr": "notion-tools",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "book-notes-sync",
                 "ci": true,
                 "docs": true
@@ -288,6 +318,21 @@
             {
                 "attr": "symforce",
                 "ci": false,
+                "docs": false
+            },
+            {
+                "attr": "jetson-stats",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "jupyter-mcp-server",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "vdlserver",
+                "ci": true,
                 "docs": false
             }
         ],
@@ -408,6 +453,11 @@
                 "docs": true
             },
             {
+                "attr": "ssht",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "la-quiz",
                 "ci": true,
                 "docs": true
@@ -483,7 +533,27 @@
                 "docs": true
             },
             {
+                "attr": "backup",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "mp4unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3unite",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp3separate",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "mp4separate",
                 "ci": true,
                 "docs": true
             },

@@ -8,6 +8,7 @@
   gmail-parser,
   task-tools,
   wiki-tools,
+  notion-tools,
   aapis-py,
   grpcio,
 }:
@@ -24,6 +25,7 @@ callPackage ../pythonPkgFromScript.nix {
     gmail-parser
     task-tools
     wiki-tools
+    notion-tools
     aapis-py
     grpcio
   ];

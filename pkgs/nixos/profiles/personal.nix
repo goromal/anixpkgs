@@ -5,6 +5,9 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
@@ -15,6 +18,15 @@ with import ../dependencies.nix;
       recreational = true;
       developer = true;
       isATS = false;
+      claudeMarketplaces = claudeDefaults.marketplaces;
+      claudePlugins = claudeDefaults.plugins;
+      claudePermissionsAllow = claudeDefaults.permissionsAllow;
+      claudeHooks = claudeDefaults.hooks;
+      claudeSkills = claudeDefaults.skills;
+      claudeMcpServers = [
+        claudeDefaults.mcpServers.notion
+        claudeDefaults.mcpServers.wiki
+      ];
       serveNotesWiki = false;
       enableMetrics = true;
       enableFileServers = false;
@@ -50,6 +62,7 @@ with import ../dependencies.nix;
           dirname = "more-games";
         }
       ];
+      enableSunshine = true;
       enableOrchestrator = true;
       timedOrchJobs = [
         {
