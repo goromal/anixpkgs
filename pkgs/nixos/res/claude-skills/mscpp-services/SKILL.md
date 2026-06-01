@@ -20,13 +20,13 @@ Use this skill whenever you are working on a C++ service that uses the **mscpp**
 ┌─────────────────────────────────────────┐
 │  Layer 3: Reactor  (thin wrapper)       │  ← Constructor + optional doPeriodicMaintenance()
 ├─────────────────────────────────────────┤
-│  Layer 2: FSM States (coordination)     │  ← Reads ports → calls Store → writes ports
+│  Layer 2: FSM States (pure functions)   │  ← Port I/O + logic + Store calls, unit-testable
 ├─────────────────────────────────────────┤
-│  Layer 1: Store    (business logic)     │  ← Pure functions, const queries, minimal mutation
+│  Layer 1: Store    (pure functions)     │  ← Business logic, const queries, minimal mutation
 └─────────────────────────────────────────┘
 ```
 
-**The golden rule**: Store has business logic. States coordinate. Reactor enforces.
+**The golden rule**: All business logic in a reactor-derived class must live exclusively in FSM state pure functions and Store methods — both must be trivially unit-testable in isolation (i.e., you can pass mock Store structs/methods without spinning up a reactor). The Reactor layer itself contains no logic.
 
 ---
 
@@ -92,9 +92,9 @@ struct JobQueueStore {
 
 ---
 
-## Layer 2: FSM States (Coordination Logic)
+## Layer 2: FSM States (Pure Functions)
 
-States read inputs, delegate to Store, write outputs. They contain **no** business logic.
+FSM states read port inputs, perform logic (including business logic), call Store methods, and write port outputs. Both FSM state `step()` functions and Store methods can contain business logic — the key requirement is that **both must be unit-testable in isolation**, without needing a running reactor. You can pass mock Store structs directly to test state logic.
 
 ### State step() Signature
 
@@ -176,9 +176,8 @@ using MyStates = StateSet<IdleState, ProcessingState, PausedState>;
 ```
 
 **FSM State rules:**
-- States only coordinate: read ports → call Store → write ports → return next state
-- Business logic belongs in Store, not in `step()`
-- `step()` methods should be concise (< 50 lines is a good signal)
+- States can contain business logic, but it must be in pure functions that are unit-testable in isolation — pass mock Store structs/methods directly without a reactor
+- `step()` methods should be concise (< 50 lines is a good signal; if longer, extract logic into Store or helper functions)
 - State transitions return `SomeState::index()`, not raw integers
 - Check `port.is_present()` before calling `port.get()`
 - **Copy** port data immediately — never hold references across steps
@@ -408,20 +407,21 @@ TEST_CASE("JobQueueReactor: enqueue flow", "[Reactor][Integration]") {
 
 ## Anti-Patterns (Do Not Do These)
 
-### Business logic in FSM states
+### Untestable logic baked into step() inline
 
 ```cpp
-// ❌ Can't unit test this
+// ❌ Logic is not unit-testable in isolation — it's fused with port I/O
 size_t step(...) {
     if (request.amount < 0) { ports.error_out.set("Invalid"); return ...; }
     if (store.balance < request.amount) { ports.error_out.set("Insufficient"); return ...; }
-    store.balance -= request.amount;  // direct mutation
+    store.balance -= request.amount;  // direct mutation mixed with logic
     ...
 }
 
-// ✅ Delegate to Store
+// ✅ Extract logic into a pure function on Store (or a free function) — then it's testable
+// in isolation via mock Store, without a reactor
 size_t step(...) {
-    auto result = store.withdraw(request.amount);  // pure, testable
+    auto result = store.withdraw(request.amount);  // pure, easily unit-tested
     if (result.success) {
         store.updateBalance(result.new_balance);
         ports.success_out.set(true);
@@ -486,7 +486,8 @@ Before committing changes, verify:
 
 **Reactor Design**
 - [ ] All inter-reactor communication is port-based (no shared state, no direct calls)
-- [ ] States handle control flow; Store handles business logic
+- [ ] All business logic lives in FSM state pure functions or Store methods (not in the Reactor class itself)
+- [ ] Both FSM state functions and Store methods are unit-testable in isolation (mock Store structs work without a reactor)
 - [ ] `doPeriodicMaintenance()` only does housekeeping (logging, metrics, scheduling actions)
 - [ ] Physical time (`std::chrono::steady_clock`) used for real-world delays and timeouts
 - [ ] Logical time used for event ordering only
