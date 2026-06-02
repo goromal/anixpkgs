@@ -3,6 +3,8 @@
   cmake,
   catch2,
   spdlog,
+  grpc,
+  protobuf,
   pkg-src,
 }:
 clangStdenv.mkDerivation {
@@ -13,6 +15,10 @@ clangStdenv.mkDerivation {
   buildInputs = [
     catch2
     spdlog
+  ];
+  propagatedBuildInputs = [
+    grpc
+    protobuf
   ];
   preConfigure = ''
     cmakeFlags="$cmakeFlags --no-warn-unused-cli"

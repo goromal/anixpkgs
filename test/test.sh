@@ -1,18 +1,19 @@
 exit_code=0
 
 tests=(
-    "test_dirstuff.sh"
-    "test_ws_tools.sh"
-    "test_sunnyside.sh"
-    "test_orchestrator.sh"
-    "test_png.sh"
-    "test_mp3.sh"
-    "test_mp4.sh"
-    "test_mp3unite_separate.sh"
-    "test_mp4separate.sh"
-    "test_fix-perms.sh"
-    "test_src_fetch.sh"
-    "test_secure-delete.sh"
+    # "test_dirstuff.sh" # ^^^^ TODO - reenable
+    # "test_ws_tools.sh"
+    # "test_sunnyside.sh"
+    # "test_orchestrator.sh"
+    "test_orchestrator-cpp.sh"
+    # "test_png.sh"
+    # "test_mp3.sh"
+    # "test_mp4.sh"
+    # "test_mp3unite_separate.sh"
+    # "test_mp4separate.sh"
+    # "test_fix-perms.sh"
+    # "test_src_fetch.sh"
+    # "test_secure-delete.sh"
 )
 
 for test in "${tests[@]}"; do

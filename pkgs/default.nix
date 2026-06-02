@@ -475,7 +475,8 @@ rec {
 
   aapis-cpp = addDoc (
     prev.callPackage ./cxx-packages/aapis-cpp {
-      pkg-src = flakeInputs.aapis;
+      # Use local aapis source for development (includes proto changes)
+      pkg-src = ../../aapis;
     }
   );
   ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
