@@ -975,7 +975,8 @@ in
         userOrchestrator = false;
         enableMetrics = cfg.enableMetrics;
       };
-    } // lib.optionalAttrs (cfg.agentFramework == "claude") {
+    }
+    // lib.optionalAttrs (cfg.agentFramework == "claude") {
       mods.claude = {
         marketplaces = config.machines.claude.marketplaces;
         plugins = config.machines.claude.plugins;

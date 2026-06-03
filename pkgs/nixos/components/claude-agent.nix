@@ -210,9 +210,7 @@ in
         echo_yellow "Updating claude marketplaces..."
         claude plugin marketplace update
         echo_yellow "Updating claude plugins..."
-        ${lib.concatMapStringsSep "\n      " (
-          plugin: "claude plugin update ${plugin} || true"
-        ) cfg.plugins}
+        ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin update ${plugin} || true") cfg.plugins}
         echo_green "Done! Restart claude for updates to take effect."
       '')
     ];
