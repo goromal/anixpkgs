@@ -18,16 +18,7 @@ in
       recreational = false;
       developer = true;
       isATS = true;
-      claudeMarketplaces = claudeDefaults.marketplaces;
-      claudePlugins = claudeDefaults.plugins;
-      claudePermissionsAllow = claudeDefaults.permissionsAllow;
-      claudeHooks = claudeDefaults.hooks;
-      claudeSkills = claudeDefaults.skills;
-      claudeMcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
-      ];
+      agentFramework = "claude";
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
@@ -273,6 +264,18 @@ in
       ];
     })
     // {
+      machines.claude = {
+        marketplaces = claudeDefaults.marketplaces;
+        plugins = claudeDefaults.plugins;
+        permissionsAllow = claudeDefaults.permissionsAllow;
+        hooks = claudeDefaults.hooks;
+        skills = claudeDefaults.skills;
+        mcpServers = [
+          claudeDefaults.mcpServers.vikunja
+          claudeDefaults.mcpServers.notion
+          claudeDefaults.mcpServers.wiki
+        ];
+      };
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       users.users.andrew.extraGroups = [ "vikunja" ];
       environment.systemPackages = [

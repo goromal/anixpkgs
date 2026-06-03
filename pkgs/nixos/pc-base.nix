@@ -154,68 +154,10 @@ in
       description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
       default = _ps: [ ];
     };
-    claudeMarketplaces = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "List of extra plugin marketplaces to install";
-    };
-    claudePlugins = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "List of claude plugins to install";
-    };
-    claudePermissionsAllow = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "List of Claude Code permission patterns to add to the global allowlist";
-    };
-    claudeHooks = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            event = lib.mkOption { type = lib.types.str; };
-            matcher = lib.mkOption {
-              type = lib.types.str;
-              default = "";
-            };
-            command = lib.mkOption { type = lib.types.str; };
-            async = lib.mkOption {
-              type = lib.types.bool;
-              default = false;
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "List of Claude Code hooks to merge into settings.json";
-    };
-    claudeSkills = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            name = lib.mkOption {
-              type = lib.types.str;
-              description = "Skill directory name under ~/.claude/skills/";
-            };
-            file = lib.mkOption {
-              type = lib.types.path;
-              description = "Path to the SKILL.md file for this skill";
-            };
-          };
-        }
-      );
-      default = [ ];
-      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
-    };
-    extraClaudeSettings = lib.mkOption {
-      type = lib.types.attrs;
-      default = { };
-      description = "Attrs describing the Claude JSON settings";
-    };
-    claudeMcpServers = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
-      default = [ ];
-      description = "List of MCP server attrsets (see mods.opts.claudeMcpServers) to register during claude-setup";
+    agentFramework = lib.mkOption {
+      type = lib.types.nullOr (lib.types.enum [ "claude" ]);
+      default = null;
+      description = "AI agent framework to install and configure. Null means none.";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -237,6 +179,7 @@ in
   imports = [
     ./installation-base.nix
     (import "${home-manager}/nixos")
+    ../modules/claude-agent/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
@@ -816,17 +759,6 @@ in
       domain = "${config.networking.hostName}.local";
     };
 
-    # Vikunja MCP client (ATS enables this via services.vikunja-ats; other machines enable it directly)
-    services.vikunja-mcp.enable = lib.mkDefault (
-      builtins.any (s: s.name == "vikunja") cfg.claudeMcpServers
-    );
-
-    # Notion MCP Server
-    services.notion-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
-
-    # Wiki MCP Server
-    services.wiki-mcp.enable = cfg.isATS || (cfg.recreational && cfg.developer);
-
     # Jupyter MCP Server
     services.jupyter-mcp.enable = (cfg.machineType == "jetson");
 
@@ -1005,6 +937,7 @@ in
         ./components/base-pkgs.nix
       ]
       ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
+      ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
       ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
       ++ (
         if cfg.machineType == "x86_linux" then
@@ -1041,13 +974,17 @@ in
         cloudDirs = cfg.cloudDirs;
         userOrchestrator = false;
         enableMetrics = cfg.enableMetrics;
-        claudeMarketplaces = cfg.claudeMarketplaces;
-        claudePlugins = cfg.claudePlugins;
-        claudePermissionsAllow = cfg.claudePermissionsAllow;
-        claudeHooks = cfg.claudeHooks;
-        claudeSkills = cfg.claudeSkills;
-        extraClaudeSettings = cfg.extraClaudeSettings;
-        claudeMcpServers = cfg.claudeMcpServers;
+      };
+    } // lib.optionalAttrs (cfg.agentFramework == "claude") {
+      mods.claude = {
+        marketplaces = config.machines.claude.marketplaces;
+        plugins = config.machines.claude.plugins;
+        permissionsAllow = config.machines.claude.permissionsAllow;
+        hooks = config.machines.claude.hooks;
+        skills = config.machines.claude.skills;
+        extraSettings = config.machines.claude.extraSettings;
+        mcpServers = config.machines.claude.mcpServers;
+        graphical = cfg.graphical;
       };
     };
   };

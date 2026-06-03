@@ -18,15 +18,7 @@ in
       recreational = true;
       developer = true;
       isATS = false;
-      claudeMarketplaces = claudeDefaults.marketplaces;
-      claudePlugins = claudeDefaults.plugins;
-      claudePermissionsAllow = claudeDefaults.permissionsAllow;
-      claudeHooks = claudeDefaults.hooks;
-      claudeSkills = claudeDefaults.skills;
-      claudeMcpServers = [
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
-      ];
+      agentFramework = "claude";
       serveNotesWiki = false;
       enableMetrics = true;
       enableFileServers = false;
@@ -80,6 +72,17 @@ in
       extraOrchestratorPackages = [ ];
     })
     // {
+      machines.claude = {
+        marketplaces = claudeDefaults.marketplaces;
+        plugins = claudeDefaults.plugins;
+        permissionsAllow = claudeDefaults.permissionsAllow;
+        hooks = claudeDefaults.hooks;
+        skills = claudeDefaults.skills;
+        mcpServers = [
+          claudeDefaults.mcpServers.notion
+          claudeDefaults.mcpServers.wiki
+        ];
+      };
       environment.systemPackages = [
         (pkgs.writeShellScriptBin "anix-init" ''
           make-title -c yellow "Setting up rcrsync"
