@@ -223,6 +223,15 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         cd test && nix-shell --run "bash test.sh"
+  profile-smoke-test:
+    name: Profile Option Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: NIXOS_VERSION=${{ env.NIXOS_VERSION }} python3 scripts/smoke_test_profiles.py
   machines:
     name: Machine Checks
     runs-on: ubuntu-latest
