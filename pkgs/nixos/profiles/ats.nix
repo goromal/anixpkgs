@@ -12,7 +12,7 @@ in
   imports = [ ../pc-base.nix ];
 
   config =
-    (mkProfileConfig {
+    lib.recursiveUpdate (mkProfileConfig {
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
@@ -262,8 +262,7 @@ in
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
       ];
-    })
-    // {
+    }) {
       machines.claude = {
         marketplaces = claudeDefaults.marketplaces;
         plugins = claudeDefaults.plugins;

@@ -12,7 +12,7 @@ in
   imports = [ ../pc-base.nix ];
 
   config =
-    (mkProfileConfig {
+    lib.recursiveUpdate (mkProfileConfig {
       machineType = "x86_linux";
       graphical = true;
       recreational = false;
@@ -42,8 +42,7 @@ in
       enableOrchestrator = false;
       timedOrchJobs = [ ];
       extraOrchestratorPackages = [ ];
-    })
-    // {
+    }) {
       machines.claude = {
         marketplaces = claudeDefaults.marketplaces;
         plugins = claudeDefaults.plugins;

@@ -12,7 +12,7 @@ in
   imports = [ ../pc-base.nix ];
 
   config =
-    (mkProfileConfig {
+    lib.recursiveUpdate (mkProfileConfig {
       machineType = "x86_linux";
       graphical = true;
       recreational = true;
@@ -70,8 +70,7 @@ in
         }
       ];
       extraOrchestratorPackages = [ ];
-    })
-    // {
+    }) {
       machines.claude = {
         marketplaces = claudeDefaults.marketplaces;
         plugins = claudeDefaults.plugins;

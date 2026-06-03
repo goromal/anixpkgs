@@ -12,21 +12,13 @@ in
   imports = [ ../pc-base.nix ];
 
   config =
-    (mkProfileConfig {
+    lib.recursiveUpdate (mkProfileConfig {
       machineType = "jetson";
       graphical = false;
       recreational = false;
       developer = true;
       isATS = false;
-      claudeMarketplaces = claudeDefaults.marketplaces;
-      claudePlugins = claudeDefaults.plugins;
-      claudePermissionsAllow = claudeDefaults.permissionsAllow;
-      claudeHooks = claudeDefaults.hooks;
-      claudeSkills = claudeDefaults.skills;
-      claudeMcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.jupyter
-      ];
+      agentFramework = "claude";
       serveNotesWiki = false;
       enableMetrics = false; # TODO: perhaps enable in the future
       enableFileServers = true;
@@ -126,8 +118,18 @@ in
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
       ];
-    })
-    // {
+    }) {
+      machines.claude = {
+        marketplaces = claudeDefaults.marketplaces;
+        plugins = claudeDefaults.plugins;
+        permissionsAllow = claudeDefaults.permissionsAllow;
+        hooks = claudeDefaults.hooks;
+        skills = claudeDefaults.skills;
+        mcpServers = [
+          claudeDefaults.mcpServers.vikunja
+          claudeDefaults.mcpServers.jupyter
+        ];
+      };
       users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
       environment.systemPackages = [
         anixpkgs.jetson-stats

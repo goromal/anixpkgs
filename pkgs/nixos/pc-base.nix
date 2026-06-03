@@ -179,7 +179,7 @@ in
   imports = [
     ./installation-base.nix
     (import "${home-manager}/nixos")
-    ../modules/claude-agent/module.nix
+    ./modules/claude-agent/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
@@ -928,7 +928,7 @@ in
 
     programs.wireshark.enable = true;
 
-    home-manager.users.andrew = {
+    home-manager.users.andrew = lib.recursiveUpdate {
       programs.home-manager.enable = true;
       programs.command-not-found.enable = true;
 
@@ -975,8 +975,7 @@ in
         userOrchestrator = false;
         enableMetrics = cfg.enableMetrics;
       };
-    }
-    // lib.optionalAttrs (cfg.agentFramework == "claude") {
+    } (lib.optionalAttrs (cfg.agentFramework == "claude") {
       mods.claude = {
         marketplaces = config.machines.claude.marketplaces;
         plugins = config.machines.claude.plugins;
@@ -987,6 +986,6 @@ in
         mcpServers = config.machines.claude.mcpServers;
         graphical = cfg.graphical;
       };
-    };
+    });
   };
 }
