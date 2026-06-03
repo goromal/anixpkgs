@@ -1,0 +1,99 @@
+name: NixOS Profile Diff
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to post diff comment on (leave empty to only log)'
+        required: false
+        default: ''
+
+env:
+  NIXOS_VERSION: 25.11
+
+jobs:
+  diff:
+    name: Compare Profile Closures
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      # Checkout the triggered ref (PR branch) into ./pr
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          path: pr
+
+      # Find the merge-base of the PR branch against master
+      - name: Resolve base SHA
+        id: refs
+        run: |
+          cd pr
+          BASE_SHA=$(git merge-base HEAD origin/master)
+          echo "base_sha=$BASE_SHA"      >> $GITHUB_OUTPUT
+          echo "pr_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      # Checkout the merge-base into ./base
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.refs.outputs.base_sha }}
+          path: base
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+          extra_nix_config: |
+            extra-platforms = aarch64-linux
+
+      - name: Run profile diff
+        run: |
+          echo "Base: ${{ steps.refs.outputs.base_sha }}"
+          echo "PR:   ${{ steps.refs.outputs.pr_sha }}"
+          python pr/scripts/nixos_profile_diff.py ./base ./pr /tmp/diff-report.md
+
+      - name: Show report
+        run: cat /tmp/diff-report.md
+
+      - name: Append commit context to report
+        run: |
+          echo "" >> /tmp/diff-report.md
+          echo "---" >> /tmp/diff-report.md
+          echo "*PR \`${{ steps.refs.outputs.pr_sha }}\` vs base \`${{ steps.refs.outputs.base_sha }}\`*" >> /tmp/diff-report.md
+
+      - name: Post comment on PR
+        if: ${{ inputs.pr_number != '' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('/tmp/diff-report.md', 'utf8');
+            const prNumber = parseInt('${{ inputs.pr_number }}');
+
+            // Remove any previous diff comments from this workflow
+            const existing = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            for (const c of existing.data) {
+              if (c.body.startsWith('## NixOS Profile Diff')) {
+                await github.rest.issues.deleteComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: c.id,
+                });
+              }
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body,
+            });
