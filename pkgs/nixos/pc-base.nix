@@ -928,64 +928,69 @@ in
 
     programs.wireshark.enable = true;
 
-    home-manager.users.andrew = lib.recursiveUpdate {
-      programs.home-manager.enable = true;
-      programs.command-not-found.enable = true;
+    home-manager.users.andrew =
+      lib.recursiveUpdate
+        {
+          programs.home-manager.enable = true;
+          programs.command-not-found.enable = true;
 
-      imports = [
-        ./components/opts.nix
-        ./components/base-pkgs.nix
-      ]
-      ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
-      ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
-      ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
-      ++ (
-        if cfg.machineType == "x86_linux" then
-          (
-            [ ./components/x86-pkgs.nix ]
-            ++ (if cfg.recreational then [ ./components/x86-rec-pkgs.nix ] else [ ])
-            ++ (
-              if cfg.graphical then
-                (
-                  [ ./components/x86-graphical-pkgs.nix ]
-                  ++ (if cfg.developer then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
-                  ++ (if cfg.recreational then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
-                  ++ (
-                    if (cfg.developer && cfg.recreational) then [ ./components/x86-graphical-dev-rec-pkgs.nix ] else [ ]
-                  )
+          imports = [
+            ./components/opts.nix
+            ./components/base-pkgs.nix
+          ]
+          ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
+          ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
+          ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
+          ++ (
+            if cfg.machineType == "x86_linux" then
+              (
+                [ ./components/x86-pkgs.nix ]
+                ++ (if cfg.recreational then [ ./components/x86-rec-pkgs.nix ] else [ ])
+                ++ (
+                  if cfg.graphical then
+                    (
+                      [ ./components/x86-graphical-pkgs.nix ]
+                      ++ (if cfg.developer then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
+                      ++ (if cfg.recreational then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
+                      ++ (
+                        if (cfg.developer && cfg.recreational) then [ ./components/x86-graphical-dev-rec-pkgs.nix ] else [ ]
+                      )
+                    )
+                  else
+                    [ ]
                 )
-              else
-                [ ]
-            )
-          )
-        else
-          [ ]
-      );
+              )
+            else
+              [ ]
+          );
 
-      mods.opts = {
-        homeState = cfg.nixosState;
-        standalone = false;
-        homeDir = cfg.homeDir;
-        browserExec =
-          if cfg.graphical && cfg.machineType == "x86_linux" then
-            "${unstable.google-chrome}/bin/google-chrome-stable"
-          else
-            null;
-        cloudDirs = cfg.cloudDirs;
-        userOrchestrator = false;
-        enableMetrics = cfg.enableMetrics;
-      };
-    } (lib.optionalAttrs (cfg.agentFramework == "claude") {
-      mods.claude = {
-        marketplaces = config.machines.claude.marketplaces;
-        plugins = config.machines.claude.plugins;
-        permissionsAllow = config.machines.claude.permissionsAllow;
-        hooks = config.machines.claude.hooks;
-        skills = config.machines.claude.skills;
-        extraSettings = config.machines.claude.extraSettings;
-        mcpServers = config.machines.claude.mcpServers;
-        graphical = cfg.graphical;
-      };
-    });
+          mods.opts = {
+            homeState = cfg.nixosState;
+            standalone = false;
+            homeDir = cfg.homeDir;
+            browserExec =
+              if cfg.graphical && cfg.machineType == "x86_linux" then
+                "${unstable.google-chrome}/bin/google-chrome-stable"
+              else
+                null;
+            cloudDirs = cfg.cloudDirs;
+            userOrchestrator = false;
+            enableMetrics = cfg.enableMetrics;
+          };
+        }
+        (
+          lib.optionalAttrs (cfg.agentFramework == "claude") {
+            mods.claude = {
+              marketplaces = config.machines.claude.marketplaces;
+              plugins = config.machines.claude.plugins;
+              permissionsAllow = config.machines.claude.permissionsAllow;
+              hooks = config.machines.claude.hooks;
+              skills = config.machines.claude.skills;
+              extraSettings = config.machines.claude.extraSettings;
+              mcpServers = config.machines.claude.mcpServers;
+              graphical = cfg.graphical;
+            };
+          }
+        );
   };
 }
