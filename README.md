@@ -67,6 +67,16 @@ bash scripts/check_machines.sh
 
 *Automatically run as part of CI pipeline.*
 
+## NixOS Profile Diff
+
+To compare NixOS profile closures between a PR branch and its merge base, trigger the **NixOS Profile Diff** workflow manually from the GitHub Actions UI:
+
+1. Go to **Actions → NixOS Profile Diff → Run workflow**
+2. Select the PR branch from the branch dropdown
+3. Optionally enter the PR number in the `pr_number` field to have the diff posted as a comment (replacing any previous one); leave blank to only log the output
+
+The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
+
 ## SITL
 
 Some commands to spin up SITL environments:
