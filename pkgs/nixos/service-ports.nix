@@ -30,4 +30,5 @@
   anix_upgrade_ui = 5858;
   tasks_ui = 5959;
   videodl = 6060;
+  intake_ui = 6161;
 }
