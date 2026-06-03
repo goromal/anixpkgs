@@ -32,7 +32,8 @@ let
   user = "andrew";
   homedir = "/home/${user}";
   anixsrc = ./path/to/sources/anixpkgs/.;
-in with import ../dependencies.nix; {
+  claudeDefaults = import "${anixsrc}/pkgs/nixos/claude-defaults.nix";
+in with import "${anixsrc}/pkgs/nixos/dependencies.nix"; {
   home.username = user;
   home.homeDirectory = homedir;
   programs.home-manager.enable = true;
@@ -41,6 +42,7 @@ in with import ../dependencies.nix; {
     "${anixsrc}/pkgs/nixos/components/opts.nix"
     "${anixsrc}/pkgs/nixos/components/base-pkgs.nix"
     "${anixsrc}/pkgs/nixos/components/base-dev-pkgs.nix"
+    "${anixsrc}/pkgs/nixos/components/claude-agent.nix"  # omit if not using Claude Code
     "${anixsrc}/pkgs/nixos/components/x86-rec-pkgs.nix"
     "${anixsrc}/pkgs/nixos/components/x86-graphical-pkgs.nix"
     "${anixsrc}/pkgs/nixos/components/x86-graphical-dev-pkgs.nix"
@@ -51,6 +53,16 @@ in with import ../dependencies.nix; {
   mods.opts.homeDir = homedir;
   mods.opts.homeState = "23.05";
   mods.opts.browserExec = "google-chrome-stable";
+
+  mods.claude = {
+    marketplaces = claudeDefaults.marketplaces;
+    plugins = claudeDefaults.plugins;
+    permissionsAllow = claudeDefaults.permissionsAllow;
+    hooks = claudeDefaults.hooks;
+    skills = claudeDefaults.skills;
+    mcpServers = [ claudeDefaults.mcpServers.notion claudeDefaults.mcpServers.wiki ];
+    graphical = true;
+  };
 }
 
 ```

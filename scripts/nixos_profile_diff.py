@@ -149,6 +149,8 @@ def main() -> None:
                 badge = "🗑️ Deleted"
             elif status == "both_error":
                 badge = "❌ Eval error on both branches"
+            elif not added and not removed:
+                badge = "✅ No delta (hash only)"
             else:
                 badge = f"⚠️ +{len(added)} / -{len(removed)} packages"
             lines.append(f"| `{config}` | {badge} |")

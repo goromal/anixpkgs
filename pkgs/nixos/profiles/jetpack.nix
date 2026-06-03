@@ -12,183 +12,187 @@ in
   imports = [ ../pc-base.nix ];
 
   config =
-    (mkProfileConfig {
-      machineType = "jetson";
-      graphical = false;
-      recreational = false;
-      developer = true;
-      isATS = false;
-      claudeMarketplaces = claudeDefaults.marketplaces;
-      claudePlugins = claudeDefaults.plugins;
-      claudePermissionsAllow = claudeDefaults.permissionsAllow;
-      claudeHooks = claudeDefaults.hooks;
-      claudeSkills = claudeDefaults.skills;
-      claudeMcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.jupyter
-      ];
-      serveNotesWiki = false;
-      enableMetrics = false; # TODO: perhaps enable in the future
-      enableFileServers = true;
-      cloudDirs = [
-        {
-          name = "configs";
-          cloudname = "dropbox:configs";
-          dirname = "configs";
-        }
-        {
-          name = "secrets";
-          cloudname = "dropbox:secrets";
-          dirname = "secrets";
-        }
-        {
-          name = "data";
-          cloudname = "box:data";
-          dirname = "data";
-        }
-      ];
-      enableOrchestrator = true;
-      timedOrchJobs = [
-        {
-          name = "launchpad-sync";
-          jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
-            export PATH="${
-              pkgs.lib.makeBinPath [
-                pkgs.git
-                pkgs.openssh
-              ]
-            }:$PATH"
-            REPO=$HOME/launchpad
-            if [[ -d "$REPO/.git" ]]; then
-              cd "$REPO"
-              if [[ -n "$(git status --porcelain)" ]]; then
-                git add -A
-                git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
-              fi
-              pull_out=$(git pull --rebase origin master 2>&1)
-              if [[ $? -eq 0 ]]; then
-                push_out=$(git push origin master 2>&1)
+    lib.recursiveUpdate
+      (mkProfileConfig {
+        machineType = "jetson";
+        graphical = false;
+        recreational = false;
+        developer = true;
+        isATS = false;
+        agentFramework = "claude";
+        serveNotesWiki = false;
+        enableMetrics = false; # TODO: perhaps enable in the future
+        enableFileServers = true;
+        cloudDirs = [
+          {
+            name = "configs";
+            cloudname = "dropbox:configs";
+            dirname = "configs";
+          }
+          {
+            name = "secrets";
+            cloudname = "dropbox:secrets";
+            dirname = "secrets";
+          }
+          {
+            name = "data";
+            cloudname = "box:data";
+            dirname = "data";
+          }
+        ];
+        enableOrchestrator = true;
+        timedOrchJobs = [
+          {
+            name = "launchpad-sync";
+            jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
+              export PATH="${
+                pkgs.lib.makeBinPath [
+                  pkgs.git
+                  pkgs.openssh
+                ]
+              }:$PATH"
+              REPO=$HOME/launchpad
+              if [[ -d "$REPO/.git" ]]; then
+                cd "$REPO"
+                if [[ -n "$(git status --porcelain)" ]]; then
+                  git add -A
+                  git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
+                fi
+                pull_out=$(git pull --rebase origin master 2>&1)
                 if [[ $? -eq 0 ]]; then
-                  logger -t launchpad-sync "Sync complete"
+                  push_out=$(git push origin master 2>&1)
+                  if [[ $? -eq 0 ]]; then
+                    logger -t launchpad-sync "Sync complete"
+                  else
+                    echo "$push_out" >&2
+                    logger -t launchpad-sync "Push to master failed"
+                  fi
                 else
-                  echo "$push_out" >&2
-                  logger -t launchpad-sync "Push to master failed"
+                  echo "$pull_out" >&2
+                  git rebase --abort 2>/dev/null
+                  logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
                 fi
               else
-                echo "$pull_out" >&2
-                git rebase --abort 2>/dev/null
-                logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
+                logger -t launchpad-sync "No git repository found at $REPO, skipping"
               fi
-            else
-              logger -t launchpad-sync "No git repository found at $REPO, skipping"
-            fi
-          '';
-          timerCfg = {
-            OnCalendar = [ "*-*-* 03:00:00" ];
-            Persistent = true;
-          };
-        }
-      ];
-      launchpadPythonPackages =
-        ps: with ps; [
-          numpy
-          scipy
-          matplotlib
-          pandas
-          scikit-learn
-          sympy
-          cvxpy
-          statsmodels
-          torch
-          tqdm
-          pywavelets
-          ipyparallel
-          (hmmlearn.overridePythonAttrs (_: {
-            nativeCheckInputs = [ ];
-          }))
-          imageio
-          opencv4
-          geometry
-          pysignals
-          pyceres
-          pyceres_factors
-          mesh-plotter
-          find_rotational_conventions
+            '';
+            timerCfg = {
+              OnCalendar = [ "*-*-* 03:00:00" ];
+              Persistent = true;
+            };
+          }
         ];
-      extraOrchestratorPackages = [
-        anixpkgs.wiki-tools
-        anixpkgs.task-tools
-        anixpkgs.notion-tools
-        anixpkgs.goromail
-        anixpkgs.sread
-        anixpkgs.gmail-parser
-        anixpkgs.providence-tasker
-        anixpkgs.daily_tactical_server
-        anixpkgs.surveys_report
-      ];
-    })
-    // {
-      users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-      environment.systemPackages = [
-        anixpkgs.jetson-stats
-        (pkgs.writeShellScriptBin "anix-init" ''
-          make-title -c yellow "Setting up rcrsync"
+        launchpadPythonPackages =
+          ps: with ps; [
+            numpy
+            scipy
+            matplotlib
+            pandas
+            scikit-learn
+            sympy
+            cvxpy
+            statsmodels
+            torch
+            tqdm
+            pywavelets
+            ipyparallel
+            (hmmlearn.overridePythonAttrs (_: {
+              nativeCheckInputs = [ ];
+            }))
+            imageio
+            opencv4
+            geometry
+            pysignals
+            pyceres
+            pyceres_factors
+            mesh-plotter
+            find_rotational_conventions
+          ];
+        extraOrchestratorPackages = [
+          anixpkgs.wiki-tools
+          anixpkgs.task-tools
+          anixpkgs.notion-tools
+          anixpkgs.goromail
+          anixpkgs.sread
+          anixpkgs.gmail-parser
+          anixpkgs.providence-tasker
+          anixpkgs.daily_tactical_server
+          anixpkgs.surveys_report
+        ];
+      })
+      {
+        machines.claude = {
+          marketplaces = claudeDefaults.marketplaces;
+          plugins = claudeDefaults.plugins;
+          permissionsAllow = claudeDefaults.permissionsAllow;
+          hooks = claudeDefaults.hooks;
+          skills = claudeDefaults.skills;
+          mcpServers = [
+            claudeDefaults.mcpServers.vikunja
+            claudeDefaults.mcpServers.jupyter
+          ];
+        };
+        users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+        environment.systemPackages = [
+          anixpkgs.jetson-stats
+          (pkgs.writeShellScriptBin "anix-init" ''
+            make-title -c yellow "Setting up rcrsync"
 
-          DO_RCLONE=y
-          if [[ -f $HOME/.config/rclone/rclone.conf ]]; then
-            read -rp "rclone config already found, proceed anyway? (y|n): " DO_RCLONE
-          fi
-          if [[ "$DO_RCLONE" == "y" ]]; then
-            read -rp "Enter the char key to unlock the rclone config: " CFGKEY
-            rm -rf $HOME/.config/rclone
-            mkdir -p $HOME/.config/rclone && cd $HOME/.config/rclone
-            cp ${anixpkgs.pkgData.records.rcloneConf.data} ${anixpkgs.pkgData.records.rcloneConf.name}
-            sunnyside -s 0 -k $CFGKEY -t ${anixpkgs.pkgData.records.rcloneConf.name}
-            rm ${anixpkgs.pkgData.records.rcloneConf.name}
-          else
-            echo_yellow "Skipping rclone config step"
-          fi
+            DO_RCLONE=y
+            if [[ -f $HOME/.config/rclone/rclone.conf ]]; then
+              read -rp "rclone config already found, proceed anyway? (y|n): " DO_RCLONE
+            fi
+            if [[ "$DO_RCLONE" == "y" ]]; then
+              read -rp "Enter the char key to unlock the rclone config: " CFGKEY
+              rm -rf $HOME/.config/rclone
+              mkdir -p $HOME/.config/rclone && cd $HOME/.config/rclone
+              cp ${anixpkgs.pkgData.records.rcloneConf.data} ${anixpkgs.pkgData.records.rcloneConf.name}
+              sunnyside -s 0 -k $CFGKEY -t ${anixpkgs.pkgData.records.rcloneConf.name}
+              rm ${anixpkgs.pkgData.records.rcloneConf.name}
+            else
+              echo_yellow "Skipping rclone config step"
+            fi
 
-          cd $HOME
-          rcrsync -v init configs
-          rcrsync -v init secrets
-          rcrsync -v init data
+            cd $HOME
+            rcrsync -v init configs
+            rcrsync -v init secrets
+            rcrsync -v init data
 
-          make-title -c yellow "Setting up SSH and Nix"
+            make-title -c yellow "Setting up SSH and Nix"
 
-          DO_SSH=y
-          if [[ -d $HOME/.ssh ]]; then
-            read -rp ".ssh directory already present, proceed anyway? (y|n): " DO_SSH
-          fi
-          if [[ "$DO_SSH" == "y" ]]; then
-            rm -rf $HOME/.ssh
-            cp -r $HOME/data/.ssh $HOME/.ssh
-            cd $HOME/.ssh
-            fix-perms .
-            cd ..
-          else
-            echo_yellow "Skipping SSH config setup"
-          fi
+            DO_SSH=y
+            if [[ -d $HOME/.ssh ]]; then
+              read -rp ".ssh directory already present, proceed anyway? (y|n): " DO_SSH
+            fi
+            if [[ "$DO_SSH" == "y" ]]; then
+              rm -rf $HOME/.ssh
+              cp -r $HOME/data/.ssh $HOME/.ssh
+              cd $HOME/.ssh
+              fix-perms .
+              cd ..
+            else
+              echo_yellow "Skipping SSH config setup"
+            fi
 
-          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-          sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
-          sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-          sudo nix-channel --update
-          echo
-          echo
-          echo_green "DONE. Note the hardware-config.nix file below:"
-          echo
-          nixos-generate-config --show-hardware-config
-          echo
-          echo_green  "Use the config above as you set up anix-upgrade:"
-          echo_yellow "  - Use devshell to create a workspace with anixpkgs"
-          echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
-          echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
-          echo_yellow "  - Run anix-upgrade"
-          echo_yellow "  - Create new secrets and configs entries"
-          echo
-          echo_green "Have fun!"
-        '')
-      ];
-    };
+            sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
+            sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
+            sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
+            sudo nix-channel --update
+            echo
+            echo
+            echo_green "DONE. Note the hardware-config.nix file below:"
+            echo
+            nixos-generate-config --show-hardware-config
+            echo
+            echo_green  "Use the config above as you set up anix-upgrade:"
+            echo_yellow "  - Use devshell to create a workspace with anixpkgs"
+            echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
+            echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
+            echo_yellow "  - Run anix-upgrade"
+            echo_yellow "  - Create new secrets and configs entries"
+            echo
+            echo_green "Have fun!"
+          '')
+        ];
+      };
 }
