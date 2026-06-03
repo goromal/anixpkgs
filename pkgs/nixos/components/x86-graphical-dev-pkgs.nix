@@ -45,7 +45,6 @@ in
     pkgs.black
     pkgs.clang-tools
     pkgs.nodejs
-    anixpkgs.aptest
   ];
 
   dconf.settings = lib.mkIf (cfg.standalone == false) {
@@ -77,7 +76,6 @@ in
         [
           eamodio.gitlens
           ms-python.vscode-pylance
-          rust-lang.rust-analyzer
           jnoortheen.nix-ide
           yzhang.markdown-all-in-one
           xaver.clang-format
