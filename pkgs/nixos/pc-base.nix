@@ -259,6 +259,7 @@ in
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
+    ../python-packages/flasks/intake_ui/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -610,6 +611,10 @@ in
     };
 
     services.vdlserver = {
+      enable = cfg.isATS;
+    };
+
+    services.intake_ui = {
       enable = cfg.isATS;
     };
 
