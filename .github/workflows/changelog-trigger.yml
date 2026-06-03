@@ -11,7 +11,7 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
       - name: Get PR Details
@@ -23,7 +23,7 @@ jobs:
           PR_BRANCH=$(gh pr view $PR_NUMBER --json headRefName --jq '.headRefName')
           echo "branch_name=$PR_BRANCH" >> $GITHUB_ENV
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Check if comment has a valid changelog
