@@ -35,6 +35,8 @@ in
         name = "Video Downloader";
         path = "/videodl/";
         description = "Download videos from YouTube, TikTok, and more";
+        icon = "download";
+        faviconSvg = anixpkgs.pkgData.icons.favicons.download.data;
       }
     ];
 

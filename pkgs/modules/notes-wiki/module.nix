@@ -36,6 +36,7 @@ in
         name = "Wiki";
         path = "/wiki/";
         description = "DokuWiki notes and documentation";
+        icon = "book-open";
       }
     ];
 

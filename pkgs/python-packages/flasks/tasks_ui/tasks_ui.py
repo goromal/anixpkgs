@@ -83,7 +83,7 @@ def create_app(subdomain='', manager=None, spec_csv=None):
 
     @bp.route('/', methods=['GET'])
     def index():
-        return render_template('main.html')
+        return render_template('main.html', subdomain=subdomain)
 
     @bp.route('/submit', methods=['POST'])
     def submit():

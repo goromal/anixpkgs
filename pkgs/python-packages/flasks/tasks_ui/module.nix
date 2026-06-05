@@ -40,6 +40,8 @@ in
         name = "Tasks";
         path = "/tasks/";
         description = "Task management";
+        icon = "list-check";
+        faviconSvg = anixpkgs.pkgData.icons.favicons."list-check".data;
       }
     ];
 

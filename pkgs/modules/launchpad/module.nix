@@ -46,6 +46,7 @@ in
         name = "Launchpad";
         path = "/lab/";
         description = "Hardware-accelerated Jupyter notebook server";
+        icon = "rocket";
       }
     ];
 
