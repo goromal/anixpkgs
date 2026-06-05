@@ -151,9 +151,9 @@ in
               default = "";
             };
             faviconSvg = lib.mkOption {
-              type = lib.types.str;
-              description = "SVG content served at {path}favicon.svg; empty string disables";
-              default = "";
+              type = lib.types.nullOr lib.types.path;
+              description = "Path to SVG file served at {path}favicon.svg; null disables";
+              default = null;
             };
           };
         }
@@ -516,29 +516,24 @@ in
                 </body>
                 </html>
                 HTMLEOF
-              ''
-              +
-                # Copy per-service favicon SVGs
-                lib.concatMapStrings (
-                  s:
-                  lib.optionalString (s.faviconSvg != "" && s.path != "#") (
-                    let
-                      dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                      faviconFile = pkgs.writeText "favicon-${dir}.svg" s.faviconSvg;
-                    in
-                    "mkdir -p $out/${dir} && cp ${faviconFile} $out/${dir}/favicon.svg\n"
-                  )
-                ) cfg.webServices
-              +
-                # Copy root-page icon SVGs from anixdata (deduped by icon name)
-                (
-                  let
-                    iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
-                    fa6 = anixpkgs.pkgData.icons.fa6-solid;
-                  in
-                  "mkdir -p $out/icons\n"
-                  + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
+              '' +
+              # Copy per-service favicon SVGs
+              lib.concatMapStrings (
+                s:
+                lib.optionalString (s.faviconSvg != null && s.path != "#") (
+                  let dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                  in "mkdir -p $out/${dir} && cp ${s.faviconSvg} $out/${dir}/favicon.svg\n"
                 )
+              ) cfg.webServices +
+              # Copy root-page icon SVGs from anixdata (deduped by icon name)
+              (let
+                iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                fa6 = anixpkgs.pkgData.icons.fa6-solid;
+              in
+              "mkdir -p $out/icons\n" +
+              lib.concatMapStrings (name:
+                "cp ${fa6.${name}.data} $out/icons/${name}.svg\n"
+              ) iconNames)
             );
             rootPage = {
               root = "${staticRoot}";
@@ -555,11 +550,9 @@ in
             faviconLocations = lib.listToAttrs (
               lib.concatMap (
                 s:
-                lib.optional (s.faviconSvg != "" && s.path != "#") (
-                  let
-                    dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                  in
-                  {
+                lib.optional (s.faviconSvg != null && s.path != "#") (
+                  let dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                  in {
                     name = "${s.path}favicon.svg";
                     value = {
                       root = "${staticRoot}";

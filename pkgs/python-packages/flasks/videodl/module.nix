@@ -36,7 +36,7 @@ in
         path = "/videodl/";
         description = "Download videos from YouTube, TikTok, and more";
         icon = "download";
-        faviconSvg = faviconSvgs.download;
+        faviconSvg = anixpkgs.pkgData.icons.favicons.download.data;
       }
     ];
 

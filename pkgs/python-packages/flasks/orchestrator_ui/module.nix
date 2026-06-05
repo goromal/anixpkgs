@@ -27,7 +27,7 @@ in
         path = "/orchestrator/";
         description = "Orchestrator job management";
         icon = "gears";
-        faviconSvg = faviconSvgs.gears;
+        faviconSvg = anixpkgs.pkgData.icons.favicons.gears.data;
       }
     ];
 

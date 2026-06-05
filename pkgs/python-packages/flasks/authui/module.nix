@@ -45,7 +45,7 @@ in
         path = "/auth/";
         description = "Authentication management";
         icon = "key";
-        faviconSvg = faviconSvgs.key;
+        faviconSvg = anixpkgs.pkgData.icons.favicons.key.data;
       }
     ];
 

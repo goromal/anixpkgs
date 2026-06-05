@@ -41,7 +41,7 @@ in
         path = "/anix-upgrade/";
         description = "System upgrade management";
         icon = "arrows-rotate";
-        faviconSvg = faviconSvgs."arrows-rotate";
+        faviconSvg = anixpkgs.pkgData.icons.favicons."arrows-rotate".data;
       }
     ];
 

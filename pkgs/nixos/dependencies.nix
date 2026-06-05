@@ -18,7 +18,6 @@ rec {
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
       { };
   service-ports = import ./service-ports.nix;
-  faviconSvgs = import ./favicon-svgs.nix;
   mkProfileConfig =
     baseCfg:
     let

@@ -37,7 +37,7 @@ in
         path = "/budget/";
         description = "Budget tracking";
         icon = "piggy-bank";
-        faviconSvg = faviconSvgs."piggy-bank";
+        faviconSvg = anixpkgs.pkgData.icons.favicons."piggy-bank".data;
       }
     ];
 

@@ -46,7 +46,7 @@ in
         path = "/tester/";
         description = "Self-testing and exam tool";
         icon = "graduation-cap";
-        faviconSvg = faviconSvgs."graduation-cap";
+        faviconSvg = anixpkgs.pkgData.icons.favicons."graduation-cap".data;
       }
     ];
 
