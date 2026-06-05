@@ -516,24 +516,28 @@ in
                 </body>
                 </html>
                 HTMLEOF
-              '' +
-              # Copy per-service favicon SVGs
-              lib.concatMapStrings (
-                s:
-                lib.optionalString (s.faviconSvg != null && s.path != "#") (
-                  let dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                  in "mkdir -p $out/${dir} && cp ${s.faviconSvg} $out/${dir}/favicon.svg\n"
+              ''
+              +
+                # Copy per-service favicon SVGs
+                lib.concatMapStrings (
+                  s:
+                  lib.optionalString (s.faviconSvg != null && s.path != "#") (
+                    let
+                      dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                    in
+                    "mkdir -p $out/${dir} && cp ${s.faviconSvg} $out/${dir}/favicon.svg\n"
+                  )
+                ) cfg.webServices
+              +
+                # Copy root-page icon SVGs from anixdata (deduped by icon name)
+                (
+                  let
+                    iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                    fa6 = anixpkgs.pkgData.icons.fa6-solid;
+                  in
+                  "mkdir -p $out/icons\n"
+                  + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
                 )
-              ) cfg.webServices +
-              # Copy root-page icon SVGs from anixdata (deduped by icon name)
-              (let
-                iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
-                fa6 = anixpkgs.pkgData.icons.fa6-solid;
-              in
-              "mkdir -p $out/icons\n" +
-              lib.concatMapStrings (name:
-                "cp ${fa6.${name}.data} $out/icons/${name}.svg\n"
-              ) iconNames)
             );
             rootPage = {
               root = "${staticRoot}";
@@ -551,8 +555,10 @@ in
               lib.concatMap (
                 s:
                 lib.optional (s.faviconSvg != null && s.path != "#") (
-                  let dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                  in {
+                  let
+                    dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                  in
+                  {
                     name = "${s.path}favicon.svg";
                     value = {
                       root = "${staticRoot}";
