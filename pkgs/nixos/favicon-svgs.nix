@@ -4,12 +4,14 @@
 let
   # Wrap a FA icon path in a 512x512 blue rounded-square favicon
   # transform: CSS transform to center+scale the icon from its natural viewBox into 512x512
-  mkFav = transform: path: ''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="64" fill="#007bff"/><g transform="${transform}"><path fill="white" d="${path}"/></g></svg>'';
+  mkFav =
+    transform: path:
+    ''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="64" fill="#007bff"/><g transform="${transform}"><path fill="white" d="${path}"/></g></svg>'';
 
   # Pre-computed transforms for common FA viewBox sizes (with ~60px padding)
   t512 = "translate(60,60) scale(0.765625)"; # 512x512 viewBox
   t576 = "translate(60,82) scale(0.680556)"; # 576x512 viewBox
-  t640 = "translate(60,99) scale(0.6125)";   # 640x512 viewBox
+  t640 = "translate(60,99) scale(0.6125)"; # 640x512 viewBox
 in
 {
   # fa-arrows-rotate — used for anix-upgrade (system refresh/upgrade)

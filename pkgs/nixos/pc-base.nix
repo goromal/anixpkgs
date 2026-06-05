@@ -464,7 +464,12 @@ in
           let
             hostname = config.networking.hostName;
             services = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) cfg.webServices;
-            serviceIcon = s: if s.icon != "" then ''<img src="/icons/${s.icon}.svg" class="service-icon" alt="${s.icon}">'' else "";
+            serviceIcon =
+              s:
+              if s.icon != "" then
+                ''<img src="/icons/${s.icon}.svg" class="service-icon" alt="${s.icon}">''
+              else
+                "";
             serviceLinks = lib.concatMapStringsSep "\n" (
               s:
               if s.path == "#" then
@@ -472,9 +477,9 @@ in
                   portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
                   port = if portMatch != null then builtins.head portMatch else "";
                 in
-                ''    <li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
               else
-                ''    <li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
             ) services;
             # Build one directory containing index.html and per-service favicon.svg files
             staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
@@ -511,27 +516,29 @@ in
                 </body>
                 </html>
                 HTMLEOF
-              '' +
-              # Copy per-service favicon SVGs
-              lib.concatMapStrings (
-                s:
-                lib.optionalString (s.faviconSvg != "" && s.path != "#") (
+              ''
+              +
+                # Copy per-service favicon SVGs
+                lib.concatMapStrings (
+                  s:
+                  lib.optionalString (s.faviconSvg != "" && s.path != "#") (
+                    let
+                      dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                      faviconFile = pkgs.writeText "favicon-${dir}.svg" s.faviconSvg;
+                    in
+                    "mkdir -p $out/${dir} && cp ${faviconFile} $out/${dir}/favicon.svg\n"
+                  )
+                ) cfg.webServices
+              +
+                # Copy root-page icon SVGs from anixdata (deduped by icon name)
+                (
                   let
-                    dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                    faviconFile = pkgs.writeText "favicon-${dir}.svg" s.faviconSvg;
+                    iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                    fa6 = anixpkgs.pkgData.icons.fa6-solid;
                   in
-                  "mkdir -p $out/${dir} && cp ${faviconFile} $out/${dir}/favicon.svg\n"
+                  "mkdir -p $out/icons\n"
+                  + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
                 )
-              ) cfg.webServices +
-              # Copy root-page icon SVGs from anixdata (deduped by icon name)
-              (let
-                iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
-                fa6 = anixpkgs.pkgData.icons.fa6-solid;
-              in
-              "mkdir -p $out/icons\n" +
-              lib.concatMapStrings (name:
-                "cp ${fa6.${name}.data} $out/icons/${name}.svg\n"
-              ) iconNames)
             );
             rootPage = {
               root = "${staticRoot}";
@@ -549,8 +556,10 @@ in
               lib.concatMap (
                 s:
                 lib.optional (s.faviconSvg != "" && s.path != "#") (
-                  let dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
-                  in {
+                  let
+                    dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                  in
+                  {
                     name = "${s.path}favicon.svg";
                     value = {
                       root = "${staticRoot}";
