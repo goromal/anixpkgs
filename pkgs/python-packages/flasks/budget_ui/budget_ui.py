@@ -50,7 +50,8 @@ def index():
     if config is None:
         return render_template('upload_config.html',
                                has_default=config_path.exists(),
-                               config_path=str(config_path))
+                               config_path=str(config_path),
+                               subdomain=args.subdomain)
 
     sources = config.get('sources', [])
     statuses = {source['Account']: (DATA_DIR / f"{source['Account']}.csv").exists()
@@ -58,7 +59,8 @@ def index():
 
     return render_template('main.html',
                            sources=sources,
-                           statuses=statuses)
+                           statuses=statuses,
+                           subdomain=args.subdomain)
 
 @bp.route('/upload/<account>', methods=['POST'])
 def upload_csv(account):

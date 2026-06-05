@@ -40,6 +40,8 @@ in
         name = "Intake";
         path = "/intake/";
         description = "Send goromail messages";
+        icon = "inbox";
+        faviconSvg = faviconSvgs.inbox;
       }
     ];
 

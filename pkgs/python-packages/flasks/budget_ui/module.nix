@@ -36,6 +36,8 @@ in
         name = "Budget";
         path = "/budget/";
         description = "Budget tracking";
+        icon = "piggy-bank";
+        faviconSvg = faviconSvgs."piggy-bank";
       }
     ];
 

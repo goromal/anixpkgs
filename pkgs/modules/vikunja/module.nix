@@ -35,6 +35,7 @@ in
         name = "Vikunja";
         path = "#";
         description = "Task management system (port ${toString service-ports.vikunja.public})";
+        icon = "clipboard-check";
       }
     ];
 

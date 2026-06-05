@@ -45,6 +45,8 @@ in
         name = "Tester";
         path = "/tester/";
         description = "Self-testing and exam tool";
+        icon = "graduation-cap";
+        faviconSvg = faviconSvgs."graduation-cap";
       }
     ];
 

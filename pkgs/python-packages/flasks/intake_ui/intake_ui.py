@@ -48,7 +48,7 @@ def create_app(subdomain="", maildir=None, categories_csv=None):
     @bp.route("/", methods=["GET"])
     def index():
         categories = _load_categories(_categories_csv)
-        return render_template("main.html", categories=categories)
+        return render_template("main.html", categories=categories, subdomain=subdomain)
 
     @bp.route("/submit", methods=["POST"])
     def submit():

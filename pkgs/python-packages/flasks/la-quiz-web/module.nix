@@ -49,6 +49,8 @@ in
         name = "LA Quiz Game";
         path = "/la-quiz/";
         description = "LA geography challenge game";
+        icon = "map-location-dot";
+        faviconSvg = faviconSvgs."map-location-dot";
       }
     ];
 

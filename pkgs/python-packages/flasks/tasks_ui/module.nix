@@ -40,6 +40,8 @@ in
         name = "Tasks";
         path = "/tasks/";
         description = "Task management";
+        icon = "list-check";
+        faviconSvg = faviconSvgs."list-check";
       }
     ];
 

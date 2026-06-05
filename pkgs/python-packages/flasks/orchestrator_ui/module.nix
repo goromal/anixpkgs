@@ -26,6 +26,8 @@ in
         name = "Orchestrator";
         path = "/orchestrator/";
         description = "Orchestrator job management";
+        icon = "gears";
+        faviconSvg = faviconSvgs.gears;
       }
     ];
 

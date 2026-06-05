@@ -89,7 +89,8 @@ def index():
                        generators=generators,
                        generator_configs=GENERATOR_CONFIGS,
                        initialized=generators_initialized,
-                       refresh_times=refresh_times)
+                       refresh_times=refresh_times,
+                       subdomain=args.subdomain)
 
 
 @bp.route("/submit/<gen_key>", methods=["POST"])
