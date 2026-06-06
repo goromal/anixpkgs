@@ -442,7 +442,7 @@ in
       virtualHosts."${config.networking.hostName}.local" = let
         # Built entirely via JS DOM so element.style overrides any page stylesheet.
         # No single quotes (nginx wraps replacement in single quotes).
-        homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("width","20");s.setAttribute("height","20");s.setAttribute("viewBox","0 0 576 512");s.setAttribute("fill","white");s.style.display="block";var p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d","M575.8 255.5c0 18-15 32.1-32 32.1l-32 0 .7 160.2c0 2.7-.2 5.4-.5 8.1l0 16.2c0 22.1-17.9 40-40 40l-16 0c-1.1 0-2.1 0-3.2-.1c-1.4 .1-2.8 .1-4.2 .1L416 512l-24 0c-22.1 0-40-17.9-40-40l0-24 0-64c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32 14.3-32 32l0 64 0 24c0 22.1-17.9 40-40 40l-24 0-31.9 0c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2l-16 0c-22.1 0-40-17.9-40-40l0-112c0-.9 0-1.9 .1-2.8l0-69.7-32 0c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z");s.appendChild(p);a.appendChild(s);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+        homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src="/icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
       in {
         # Support both HTTP and HTTPS (no forced redirect)
         forceSSL = false;
@@ -548,6 +548,7 @@ in
                   in
                   "mkdir -p $out/icons\n"
                   + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
+                  + "cp ${fa6.house.data} $out/icons/house.svg\n"
                 )
             );
             rootPage = {
