@@ -736,6 +736,16 @@
 
         <form action="{{ urlroot }}{{ root }}" method="POST">
             <textarea id="text" name="text" placeholder="Enter stamp text here..."></textarea>
+            {% if root.startswith('restamp/') %}
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                <input type="checkbox" id="apply_all" name="apply_all" style="width:auto; margin:0; cursor:pointer;">
+                <label for="apply_all" style="margin:0; font-weight:500; color:#495057; cursor:pointer;">Apply to all remaining files with this stamp</label>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+                <input type="checkbox" id="preserve_originals" name="preserve_originals" style="width:auto; margin:0; cursor:pointer;">
+                <label for="preserve_originals" style="margin:0; font-weight:500; color:#495057; cursor:pointer;">Preserve originals (copy instead of rename)</label>
+            </div>
+            {% endif %}
             <input type="submit" value="Submit!">
         </form>
         {% endif %}

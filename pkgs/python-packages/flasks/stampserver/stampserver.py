@@ -127,7 +127,7 @@ class StampServer:
         os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, f"stamped.{stamp}." + basename))
         self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
 
-    def replace_stamp(self, stamp, new_stamp):
+    def replace_stamp(self, stamp, new_stamp, copy=False):
         dirname = RES_DIR
         basename = os.path.basename(self.filedeck)
         if not basename.startswith(f"stamped.{stamp}."):
@@ -135,8 +135,27 @@ class StampServer:
         if new_stamp != stamp:
             remainder = basename[len(f"stamped.{stamp}."):]
             new_basename = f"stamped.{new_stamp}.{remainder}"
-            os.rename(os.path.join(dirname, self.filedeck), os.path.join(dirname, new_basename))
+            src = os.path.join(dirname, self.filedeck)
+            dst = os.path.join(dirname, new_basename)
+            if copy:
+                shutil.copy2(src, dst)
+            else:
+                os.rename(src, dst)
         self.filelist = list(filter(lambda t: t[0] != self.filedeck, self.filelist))
+
+    def replace_stamp_all(self, stamp, new_stamp, copy=False):
+        dirname = RES_DIR
+        for file, _ in list(self.filelist):
+            basename = os.path.basename(file)
+            if basename.startswith(f"stamped.{stamp}."):
+                remainder = basename[len(f"stamped.{stamp}."):]
+                src = os.path.join(dirname, file)
+                dst = os.path.join(dirname, f"stamped.{new_stamp}.{remainder}")
+                if copy:
+                    shutil.copy2(src, dst)
+                else:
+                    os.rename(src, dst)
+        self.filelist = []
 
 stampserver = StampServer()
 
@@ -209,11 +228,17 @@ def stamped(stamp=""):
     global stampserver
     global urlroot
     if flask.request.method == "POST":
-        if flask.request.form["text"] == "":
+        new_stamp_text = flask.request.form["text"]
+        apply_all = flask.request.form.get("apply_all") == "on"
+        preserve = flask.request.form.get("preserve_originals") == "on"
+        if new_stamp_text == "":
             new_stamp = stamp
         else:
-            new_stamp = flask.request.form["text"]
-        stampserver.replace_stamp(stamp, new_stamp)
+            new_stamp = new_stamp_text
+        if apply_all and new_stamp_text != "":
+            stampserver.replace_stamp_all(stamp, new_stamp, copy=preserve)
+        else:
+            stampserver.replace_stamp(stamp, new_stamp, copy=preserve)
     res, msg = stampserver.load_stamped(stamp)
     if not res:
         return flask.render_template("index.html", urlroot=urlroot, err=True, msg=msg, file="", ftype="", root=f"restamp/{stamp}", nleft="?", datadir=SHORT_RESDIR, stamps={})
