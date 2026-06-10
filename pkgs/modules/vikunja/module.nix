@@ -55,7 +55,7 @@ in
     # Allow members of the vikunja group to read the data dir and db file for backups
     systemd.tmpfiles.rules = [
       "z ${cfg.dataDir} 0750 vikunja vikunja -"
-      "z ${cfg.dataDir}/vikunja.db 0640 vikunja vikunja -"
+      "z ${cfg.dataDir}/vikunja.db 0644 vikunja vikunja -"
     ];
 
     # Vikunja configuration file
