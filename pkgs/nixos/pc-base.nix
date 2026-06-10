@@ -435,7 +435,6 @@ in
       };
     };
 
-
     services.authui = {
       enable = cfg.isATS;
       initScript =
