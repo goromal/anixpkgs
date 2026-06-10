@@ -610,7 +610,13 @@ in
                 };
               };
             in
-            { "= /" = rootPage; } // iconsLocation // rootFaviconLocation // faviconLocations // homeButtonLocations;
+            {
+              "= /" = rootPage;
+            }
+            // iconsLocation
+            // rootFaviconLocation
+            // faviconLocations
+            // homeButtonLocations;
         };
     };
 
