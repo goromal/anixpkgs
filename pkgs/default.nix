@@ -78,27 +78,29 @@ let
   # crates.io returns 403 for requests without a User-Agent header. nixpkgs PR #512735 fixes this
   # in fetchCargoVendor but was not backported to nixos-25.11. Remove this once the flake.nix
   # nixpkgs input is updated to a branch/rev that includes that PR (nixos-26.05 or later).
-  patchedRustPlatform = prev.rustPlatform.overrideScope (rFinal: rPrev: {
-    fetchCargoVendor = rPrev.fetchCargoVendor.override {
-      writers = prev.writers // {
-        writePython3Bin =
-          name: args: content:
-          prev.writers.writePython3Bin name args (
-            if name != "fetch-cargo-vendor-util" then
-              content
-            else
-              builtins.replaceStrings
-                [
-                  "    session = requests.Session()\n    session.mount('http://"
-                ]
-                [
-                  "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
-                ]
+  patchedRustPlatform = prev.rustPlatform.overrideScope (
+    rFinal: rPrev: {
+      fetchCargoVendor = rPrev.fetchCargoVendor.override {
+        writers = prev.writers // {
+          writePython3Bin =
+            name: args: content:
+            prev.writers.writePython3Bin name args (
+              if name != "fetch-cargo-vendor-util" then
                 content
-          );
+              else
+                builtins.replaceStrings
+                  [
+                    "    session = requests.Session()\n    session.mount('http://"
+                  ]
+                  [
+                    "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
+                  ]
+                  content
+            );
+        };
       };
-    };
-  });
+    }
+  );
 
   baseModuleArgs = {
     pkgs = final;
