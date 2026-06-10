@@ -7,6 +7,7 @@
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
+  devshellPkg = anixpkgs.devshell.override { editorName = cfg.editor; };
 in
 {
   home.packages = [
@@ -18,9 +19,16 @@ in
     anixpkgs.setupws
     anixpkgs.listsources
     anixpkgs.pkgshell
-    (anixpkgs.devshell.override { editorName = cfg.editor; })
+    devshellPkg
     (pkgs.writeShellScriptBin "dsd" ''
-      devshell $@ --run dev
+      if [[ $# -eq 0 ]]; then
+        wsname=$(${pkgs.python3}/bin/python ${devshellPkg.selectWsScript} ~/.devrc)
+        if [[ -n "$wsname" ]]; then
+          devshell "$wsname" --run dev
+        fi
+      else
+        devshell "$@" --run dev
+      fi
     '')
     anixpkgs.cpp-helper
     anixpkgs.py-helper

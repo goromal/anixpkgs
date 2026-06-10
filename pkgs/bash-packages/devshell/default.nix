@@ -41,6 +41,7 @@ let
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
   devScript = ./dev.py;
+  selectWsScript = ./selectWorkspace.py;
 in
 (writeArgparseScriptBin pkgname usage_str
   [
@@ -142,6 +143,7 @@ in
   ''
 )
 // {
+  inherit selectWsScript;
   meta = {
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''
