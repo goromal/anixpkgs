@@ -505,6 +505,7 @@ in
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>${hostname} Services</title>
+                    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
                     <style>
                       body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
                       .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -553,6 +554,7 @@ in
                     + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
                     + "cp ${fa6.house.data} $out/icons/house.svg\n"
                     + "cp ${fa6.server.data} $out/icons/server.svg\n"
+                    + "cp ${fa6.server.data} $out/favicon.svg\n"
                   )
               );
               rootPage = {
@@ -600,8 +602,15 @@ in
                   }
                 ) services
               );
+              rootFaviconLocation = {
+                "= /favicon.svg" = {
+                  root = "${staticRoot}";
+                  tryFiles = "/favicon.svg =404";
+                  extraConfig = ''add_header Content-Type "image/svg+xml";'';
+                };
+              };
             in
-            { "= /" = rootPage; } // iconsLocation // faviconLocations // homeButtonLocations;
+            { "= /" = rootPage; } // iconsLocation // rootFaviconLocation // faviconLocations // homeButtonLocations;
         };
     };
 
