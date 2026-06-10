@@ -5,7 +5,7 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "rtk";
-  version = "0.1.0";
+  version = "0.1.1";
   src = pkg-src;
   cargoHash = "sha256-r/PCA15MsmERCq3z8nObxdbX3KijsrInxsgJ6aqRVc4=";
   doCheck = false;

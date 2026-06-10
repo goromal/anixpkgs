@@ -5,7 +5,7 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "sunnyside";
-  version = "0.1.0";
+  version = "0.1.1";
   src = pkg-src;
   cargoHash = "sha256-iKjsrQ/u9SwQZNlSMPjJOxLRSbBuE21Ae0jnJ60fKoE=";
   meta = {
