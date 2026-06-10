@@ -508,7 +508,8 @@ in
                     <style>
                       body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
                       .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-                      h1 { color: #333; margin-top: 0; }
+                      h1 { color: #333; margin-top: 0; display: flex; align-items: center; gap: 14px; }
+                      .title-icon { width: 28px; height: 28px; flex-shrink: 0; filter: invert(18%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%); }
                       ul { list-style: none; padding: 0; }
                       li { margin: 12px 0; }
                       .service-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #f9f9f9; border-radius: 8px; border: 2px solid #007bff; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
@@ -521,7 +522,7 @@ in
                   </head>
                   <body>
                     <div class="container">
-                      <h1>${hostname} Services</h1>
+                      <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
                       <ul>
                   ${serviceLinks}
                       </ul>
@@ -551,6 +552,7 @@ in
                     "mkdir -p $out/icons\n"
                     + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
                     + "cp ${fa6.house.data} $out/icons/house.svg\n"
+                    + "cp ${fa6.server.data} $out/icons/server.svg\n"
                   )
               );
               rootPage = {
