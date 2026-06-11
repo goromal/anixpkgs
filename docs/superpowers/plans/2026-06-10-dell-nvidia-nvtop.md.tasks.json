@@ -1,0 +1,19 @@
+{
+  "planPath": "docs/superpowers/plans/2026-06-10-dell-nvidia-nvtop.md",
+  "tasks": [
+    {
+      "id": 0,
+      "subject": "Task 1: Add NVIDIA driver + nvtop to dell hardware config and deploy",
+      "status": "pending",
+      "description": "**Goal:** dell.nix configures the open NVIDIA kernel module in PRIME offload mode with fine-grained power management, installs nvtop, and the system builds and switches.\n\n**Files:**\n- Modify: pkgs/nixos/hardware/dell.nix\n\n**Acceptance Criteria:**\n- anix-upgrade --local -s /data/andrew/dev/anix/sources/anixpkgs completes without error\n- nvtop binary on PATH in new generation\n\n**Verify:** anix-upgrade --local -s /data/andrew/dev/anix/sources/anixpkgs -> switch succeeds; which nvtop -> store path\n\n```json:metadata\n{\"files\": [\"pkgs/nixos/hardware/dell.nix\"], \"verifyCommand\": \"anix-upgrade --local -s /data/andrew/dev/anix/sources/anixpkgs && which nvtop\", \"acceptanceCriteria\": [\"build+switch succeeds\", \"nvtop on PATH\"]}\n```"
+    },
+    {
+      "id": 1,
+      "subject": "Task 2: Reboot and verify GPU monitoring",
+      "status": "pending",
+      "blockedBy": [0],
+      "description": "**Goal:** After reboot, the proprietary driver is loaded and nvtop shows both GPUs.\n\n**Files:** none (verification only)\n\n**Acceptance Criteria:**\n- lsmod shows nvidia modules, no nouveau\n- nvidia-smi lists NVIDIA RTX 500 Ada Generation Laptop GPU\n- nvtop runs and displays both GPUs\n- display still works on Intel iGPU\n\n**Verify:** nvidia-smi --query-gpu=name --format=csv,noheader -> NVIDIA RTX 500 Ada Generation Laptop GPU\n\n```json:metadata\n{\"files\": [], \"verifyCommand\": \"nvidia-smi --query-gpu=name --format=csv,noheader\", \"acceptanceCriteria\": [\"nvidia modules loaded\", \"nvidia-smi shows RTX 500 Ada\", \"nvtop displays GPUs\", \"display works\"]}\n```"
+    }
+  ],
+  "lastUpdated": "2026-06-10"
+}
