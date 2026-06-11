@@ -214,11 +214,6 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
-    launchpadPythonPackages = lib.mkOption {
-      type = lib.types.functionTo (lib.types.listOf lib.types.package);
-      description = "Additional Python packages for the launchpad Jupyter server (function from python313 package set to list)";
-      default = _ps: [ ];
-    };
     agentFramework = lib.mkOption {
       type = lib.types.nullOr (lib.types.enum [ "claude" ]);
       default = null;
@@ -246,6 +241,7 @@ in
     (import "${home-manager}/nixos")
     ./modules/claude-agent/module.nix
     ./modules/webserverNode/module.nix
+    ./modules/cudaNode/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
@@ -284,13 +280,6 @@ in
 
   config = {
     system.stateVersion = cfg.nixosState;
-
-    hardware.nvidia-jetpack.configureCuda = lib.mkIf (cfg.machineType == "jetson") true;
-
-    services.launchpad.enable = lib.mkIf (cfg.machineType == "jetson") true;
-    services.launchpad.pythonPackages = lib.mkIf (
-      cfg.machineType == "jetson"
-    ) cfg.launchpadPythonPackages;
 
     users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
     users.users.andrew.extraGroups = lib.mkIf (cfg.machineType == "jetson") [ "jtop" ];
