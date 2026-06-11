@@ -43,7 +43,6 @@
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
-  # NVIDIA RTX 500 Ada dGPU: PRIME offload (Intel iGPU drives displays)
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
     modesetting.enable = true;
