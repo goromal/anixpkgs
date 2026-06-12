@@ -29,6 +29,16 @@ in
       "d ${cfg.rootDir}/defaultStampables - andrew dev"
     ];
 
+    machines.base.webServices = [
+      {
+        name = "Files";
+        path = "/stamp/";
+        description = "Manage filesystem";
+        icon = "folder";
+        faviconSvg = anixpkgs.pkgData.icons.favicons.folder.data;
+      }
+    ];
+
     systemd.services.stampserver-setup = {
       description = "Reset stampables symlink to defaultStampables";
       wantedBy = [ "multi-user.target" ];
