@@ -170,10 +170,10 @@ function resetRunButton() {
   btn.textContent = 'Run upgrade';
 }
 
-function waitForServiceThenReload() {
-  fetch(subdomain + '/status')
-    .then(r => { if (r.ok) location.reload(); else setTimeout(waitForServiceThenReload, 1500); })
-    .catch(() => setTimeout(waitForServiceThenReload, 1500));
+function setRunButtonRunning() {
+  const btn = $('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border" role="status"></span> Running...';
 }
 
 // ── Source type dropdown ────────────────────────────────────────────────────
@@ -254,78 +254,53 @@ function pollStatus() {
     .then(data => {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
+      if (data.running) setRunButtonRunning();
+      else resetRunButton();
     })
     .catch(() => {});
+}
+
+// ── Output stream ───────────────────────────────────────────────────────────
+
+let es = null;
+
+function attachStream() {
+  if (es) es.close();
+  es = new EventSource(subdomain + '/stream');
+  // Also fires on auto-reconnect (e.g. the upgrade restarted this service):
+  // clear the log so the server-side replay isn't duplicated.
+  es.onopen = () => { $('log').innerHTML = ''; };
+  es.onmessage = (ev) => {
+    if (ev.data === '[DONE]') {
+      es.close();
+      es = null;
+      resetRunButton();
+      pollStatus();
+      return;
+    }
+    appendLog(ev.data);
+  };
+  // If the stream dies after the run already ended, recover the button state.
+  es.onerror = () => { pollStatus(); };
 }
 
 // ── Form submit ─────────────────────────────────────────────────────────────
 
 $('upgrade-form').addEventListener('submit', function(e) {
   e.preventDefault();
-  const btn = $('run-btn');
 
   // Only send the field matching the selected source type.
   const fd = new FormData(this);
   const type = $('source-type').value;
   SOURCE_FIELDS.forEach(k => { if (k !== type) fd.delete(k); });
 
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border" role="status"></span> Running...';
+  setRunButtonRunning();
   setStatus('running');
-  $('log').innerHTML = '';
 
   fetch(subdomain + '/run', { method: 'POST', body: fd })
-    .then(response => {
-      if (response.status === 409) {
-        appendLog('[Upgrade already in progress]');
-        resetRunButton();
-        return;
-      }
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let watchdog = null;
-
-      function resetWatchdog() {
-        clearTimeout(watchdog);
-        watchdog = setTimeout(() => {
-          reader.cancel();
-          resetRunButton();
-          appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
-          waitForServiceThenReload();
-        }, 20000);
-      }
-
-      function read() {
-        reader.read().then(({ done, value }) => {
-          if (done) {
-            clearTimeout(watchdog);
-            resetRunButton();
-            appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
-            waitForServiceThenReload();
-            return;
-          }
-          resetWatchdog();
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop();
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            const msg = line.slice(6);
-            if (msg === '[DONE]') { clearTimeout(watchdog); resetRunButton(); pollStatus(); return; }
-            appendLog(msg);
-          }
-          read();
-        }).catch(() => {
-          clearTimeout(watchdog);
-          resetRunButton();
-          appendLog('[Connection lost — the service was restarted by the upgrade. Reloading when ready...]');
-          waitForServiceThenReload();
-        });
-      }
-
-      resetWatchdog();
-      read();
+    .then(r => {
+      if (r.status === 409) appendLog('[Upgrade already in progress]');
+      attachStream();
     })
     .catch(err => {
       appendLog('Error: ' + err);
@@ -344,6 +319,8 @@ if (_savedPath) {
   onSourceTypeChange();
 }
 
+pollStatus();
+attachStream();
 setInterval(pollStatus, 30000);
 </script>
 </body>
