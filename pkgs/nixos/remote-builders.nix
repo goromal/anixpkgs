@@ -36,4 +36,21 @@
       "big-parallel"
     ];
   };
+  personal-dell = {
+    hostName = "atorgesen-dell.local";
+    sshUser = "andrew";
+    sshKey = "/data/andrew/.ssh/id_rsa";
+    # x86_64-linux natively; aarch64-linux via binfmt emulation (pc-base.nix)
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+    ];
+    maxJobs = 4;
+    speedFactor = 2;
+    supportedFeatures = [
+      "nixos-test"
+      "benchmark"
+      "big-parallel"
+    ];
+  };
 }

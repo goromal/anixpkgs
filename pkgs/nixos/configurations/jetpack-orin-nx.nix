@@ -21,5 +21,6 @@
   machines.base.remoteBuilders = [
     "personal-inspiron"
     "personal-panasonic"
+    "personal-dell"
   ];
 }
