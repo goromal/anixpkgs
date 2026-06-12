@@ -26,7 +26,6 @@ BOOL_OPTIONS = [
     "enableMetrics",
     "enableFileServers",
     "enableOrchestrator",
-    "enableSunshine",
 ]
 
 # x86 only in CI; pi4/jetson require cross-compilation setup
