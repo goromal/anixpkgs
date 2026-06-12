@@ -82,32 +82,6 @@ in
             };
           }
         ];
-        launchpadPythonPackages =
-          ps: with ps; [
-            numpy
-            scipy
-            matplotlib
-            pandas
-            scikit-learn
-            sympy
-            cvxpy
-            statsmodels
-            torch
-            tqdm
-            pywavelets
-            ipyparallel
-            (hmmlearn.overridePythonAttrs (_: {
-              nativeCheckInputs = [ ];
-            }))
-            imageio
-            opencv4
-            geometry
-            pysignals
-            pyceres
-            pyceres_factors
-            mesh-plotter
-            find_rotational_conventions
-          ];
         extraOrchestratorPackages = [
           anixpkgs.wiki-tools
           anixpkgs.task-tools
@@ -121,6 +95,7 @@ in
         ];
       })
       {
+        machines.cudaNode.enable = true;
         machines.claude = {
           marketplaces = claudeDefaults.marketplaces;
           plugins = claudeDefaults.plugins;
