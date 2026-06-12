@@ -29,7 +29,7 @@ class RunStore:
         os.makedirs(state_dir, exist_ok=True)
         self.log_path = os.path.join(state_dir, "current.log")
         self.state_path = os.path.join(state_dir, "state.json")
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._thread = None
 
     # -- state.json ----------------------------------------------------------
@@ -73,9 +73,13 @@ class RunStore:
             return state
         if self._pid_alive(state.get("pid")):
             return state
-        state.update(status="failed", returncode=None, finished_at=_now())
-        self._write_state(state)
-        return state
+        with self._lock:
+            state = self._read_raw()
+            if state.get("status") != "running":
+                return state
+            state.update(status="failed", returncode=None, finished_at=_now())
+            self._write_state(state)
+            return state
 
     # -- running -------------------------------------------------------------
 
@@ -112,13 +116,14 @@ class RunStore:
 
     def _wait(self, proc):
         rc = proc.wait()
-        state = self._read_raw()
-        state.update(
-            status="success" if rc == 0 else "failed",
-            returncode=rc,
-            finished_at=_now(),
-        )
-        self._write_state(state)
+        with self._lock:
+            state = self._read_raw()
+            state.update(
+                status="success" if rc == 0 else "failed",
+                returncode=rc,
+                finished_at=_now(),
+            )
+            self._write_state(state)
 
     # -- streaming -----------------------------------------------------------
 
