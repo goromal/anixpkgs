@@ -622,6 +622,6 @@ rec {
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
 
-  # Override claude-code-bin to use version 2.1.113
+  # Override claude-code-bin to use version 2.1.177
   claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }
