@@ -107,6 +107,52 @@ def restart(service):
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 
+@bp.route('/stop/<service>', methods=['POST'])
+def stop(service):
+    if service not in services:
+        return jsonify({'error': 'Invalid service'}), 400
+
+    def generate():
+        proc = subprocess.Popen(
+            ['systemctl', 'stop', service],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in proc.stdout:
+            yield f"data: {line.rstrip()}\n\n"
+        proc.wait()
+        if proc.returncode == 0:
+            yield "data: [Stop successful]\n\n"
+        else:
+            yield f"data: [Stop failed with exit code {proc.returncode}]\n\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
+
+@bp.route('/start/<service>', methods=['POST'])
+def start(service):
+    if service not in services:
+        return jsonify({'error': 'Invalid service'}), 400
+
+    def generate():
+        proc = subprocess.Popen(
+            ['systemctl', 'start', service],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in proc.stdout:
+            yield f"data: {line.rstrip()}\n\n"
+        proc.wait()
+        if proc.returncode == 0:
+            yield "data: [Start successful]\n\n"
+        else:
+            yield f"data: [Start failed with exit code {proc.returncode}]\n\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
+
 @bp.route('/jobs/summary')
 def jobs_summary():
     try:
