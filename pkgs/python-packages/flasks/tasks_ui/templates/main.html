@@ -77,6 +77,11 @@
       cursor: pointer; padding: 4px 8px; font-size: 14px; color: #888;
     }
     .csv-item-row .csv-delete:hover { background: #fee; color: #c00; }
+    .csv-item-row .csv-day {
+      width: 70px; flex-shrink: 0; padding: 6px 4px;
+      border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
+    }
+    .csv-item-row .csv-day:disabled { visibility: hidden; }
     #csv-dirty-banner {
       background: #fffbe6; border: 1px solid #f0c040; color: #7a5c00;
       padding: 8px 14px; border-radius: 4px; margin-bottom: 12px; font-size: 14px;
@@ -399,6 +404,8 @@
 
     const INTERVAL_LABELS = {d: 'Daily', w: 'Weekly', m: 'Monthly', q: 'Quarterly'};
     const INTERVAL_ORDER = ['d', 'w', 'm', 'q'];
+    const DAY_OPTIONS = ['sun','mon','tue','wed','thu','fri','sat'];
+    const DAY_LABELS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
     function csvDeepCopy(items) {
       return items.map(i => ({interval: i.interval, title: i.title, desc: i.desc}));
@@ -420,8 +427,8 @@
       const groups = {};
       INTERVAL_ORDER.forEach(k => { groups[k] = []; });
       csvItems.forEach((item, idx) => {
-        const key = INTERVAL_ORDER.includes(item.interval) ? item.interval : 'w';
-        groups[key].push({item, idx});
+        const key = item.interval.split(':')[0];
+        if (groups[key]) groups[key].push({item, idx});
       });
 
       INTERVAL_ORDER.forEach(key => {
@@ -436,12 +443,15 @@
           const row = document.createElement('div');
           row.className = 'csv-item-row';
 
+          const baseInterval = item.interval.split(':')[0];
+          const dayPart = item.interval.includes(':') ? item.interval.split(':')[1] : (baseInterval === 'w' ? 'sun' : null);
+
           const sel = document.createElement('select');
           INTERVAL_ORDER.forEach(k => {
             const opt = document.createElement('option');
             opt.value = k;
             opt.textContent = INTERVAL_LABELS[k];
-            if (k === item.interval) opt.selected = true;
+            if (k === baseInterval) opt.selected = true;
             sel.appendChild(opt);
           });
           sel.addEventListener('change', () => {
@@ -449,6 +459,25 @@
             csvOnChange();
             csvRender();  // re-render to move item to new group
           });
+
+          const daySel = document.createElement('select');
+          daySel.className = 'csv-day';
+          DAY_OPTIONS.forEach((d, i) => {
+            const opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = DAY_LABELS[i];
+            if (d === dayPart) opt.selected = true;
+            daySel.appendChild(opt);
+          });
+          if (baseInterval === 'w') {
+            daySel.addEventListener('change', () => {
+              const val = daySel.value;
+              csvItems[idx].interval = (val === 'sun') ? 'w' : 'w:' + val;
+              csvOnChange();
+            });
+          } else {
+            daySel.disabled = true;
+          }
 
           const titleInput = document.createElement('input');
           titleInput.type = 'text';
@@ -480,6 +509,7 @@
           });
 
           row.appendChild(sel);
+          row.appendChild(daySel);
           row.appendChild(titleInput);
           row.appendChild(descInput);
           row.appendChild(delBtn);

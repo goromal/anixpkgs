@@ -306,3 +306,64 @@ def test_spec_submit_idempotent_skips_existing(tmp_path):
         assert payloads[0]['status'] == 'ok'
         assert payloads[0]['tasks'] == []
         mock_mgr.putTask.assert_not_called()
+
+
+def test_spec_csv_get_returns_interval_with_day_suffix(tmp_path):
+    csv = tmp_path / 'tasks.csv'
+    csv.write_text('w:mon|Monday Task|notes\n')
+    app = make_app(spec_csv=str(csv))
+    with app.test_client() as client:
+        resp = client.get('/spec-csv')
+        assert resp.status_code == 200
+        data = resp.get_json()
+        assert data['items'][0] == {'interval': 'w:mon', 'title': 'Monday Task', 'desc': 'notes'}
+
+
+def test_spec_submit_w_mon_spawns_on_monday(tmp_path):
+    csv = tmp_path / 'tasks.csv'
+    csv.write_text('w:mon|Monday Task|\n')
+    mock_mgr = MagicMock()
+    mock_mgr.getTasks.return_value = []
+    app = make_app(mock_manager=mock_mgr, spec_csv=str(csv))
+    with app.test_client() as client:
+        # 2026-06-01 is Monday; range Mon–Sun contains exactly one Monday
+        resp = client.post('/spec-submit',
+                           data=json.dumps({'start_date': '2026-06-01', 'end_date': '2026-06-07'}),
+                           content_type='application/json')
+        body = resp.get_data(as_text=True)
+        payloads = [json.loads(line[6:]) for line in body.splitlines()
+                    if line.startswith('data: ') and '"done"' not in line]
+        ok_payloads = [p for p in payloads if p['status'] == 'ok']
+        assert len(ok_payloads) == 1
+        assert ok_payloads[0]['date'] == '2026-06-01'
+        mock_mgr.putTask.assert_called_once()
+
+
+def test_spec_submit_w_mon_does_not_spawn_on_sunday(tmp_path):
+    csv = tmp_path / 'tasks.csv'
+    csv.write_text('w:mon|Monday Task|\n')
+    mock_mgr = MagicMock()
+    mock_mgr.getTasks.return_value = []
+    app = make_app(mock_manager=mock_mgr, spec_csv=str(csv))
+    with app.test_client() as client:
+        # 2026-07-05 is Sunday; no Monday in this 1-day range
+        resp = client.post('/spec-submit',
+                           data=json.dumps({'start_date': '2026-07-05', 'end_date': '2026-07-05'}),
+                           content_type='application/json')
+        body = resp.get_data(as_text=True)
+        payloads = [json.loads(line[6:]) for line in body.splitlines()
+                    if line.startswith('data: ') and '"done"' not in line]
+        non_skip = [p for p in payloads if p['status'] != 'skip']
+        assert len(non_skip) == 0
+
+
+def test_spec_submit_invalid_day_token_returns_400(tmp_path):
+    csv = tmp_path / 'tasks.csv'
+    csv.write_text('w:xyz|Bad Task|\n')
+    app = make_app(spec_csv=str(csv))
+    with app.test_client() as client:
+        resp = client.post('/spec-submit',
+                           data=json.dumps({'start_date': '2026-06-01', 'end_date': '2026-06-07'}),
+                           content_type='application/json')
+        assert resp.status_code == 400
+        assert 'error' in resp.get_json()
