@@ -65,8 +65,9 @@ def get_service_info(service):
 @bp.route('/')
 def index():
     statuses = {svc: get_service_state(svc) for svc in services}
+    orch_state = get_service_state('orchestratord')
     return render_template('main.html', services=services, statuses=statuses,
-                           subdomain=args.subdomain)
+                           orch_state=orch_state, subdomain=args.subdomain)
 
 
 @bp.route('/status/<service>')
@@ -102,52 +103,6 @@ def restart(service):
             yield "data: [Restart successful]\n\n"
         else:
             yield f"data: [Restart failed with exit code {proc.returncode}]\n\n"
-        yield "data: [DONE]\n\n"
-
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
-
-
-@bp.route('/stop/<service>', methods=['POST'])
-def stop(service):
-    if service not in services:
-        return jsonify({'error': 'Invalid service'}), 400
-
-    def generate():
-        proc = subprocess.Popen(
-            ['systemctl', 'stop', service],
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True
-        )
-        for line in proc.stdout:
-            yield f"data: {line.rstrip()}\n\n"
-        proc.wait()
-        if proc.returncode == 0:
-            yield "data: [Stop successful]\n\n"
-        else:
-            yield f"data: [Stop failed with exit code {proc.returncode}]\n\n"
-        yield "data: [DONE]\n\n"
-
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
-
-
-@bp.route('/start/<service>', methods=['POST'])
-def start(service):
-    if service not in services:
-        return jsonify({'error': 'Invalid service'}), 400
-
-    def generate():
-        proc = subprocess.Popen(
-            ['systemctl', 'start', service],
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-            text=True
-        )
-        for line in proc.stdout:
-            yield f"data: {line.rstrip()}\n\n"
-        proc.wait()
-        if proc.returncode == 0:
-            yield "data: [Start successful]\n\n"
-        else:
-            yield f"data: [Start failed with exit code {proc.returncode}]\n\n"
         yield "data: [DONE]\n\n"
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
@@ -195,6 +150,51 @@ def job_detail(job_id):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 503
+
+
+@bp.route('/status-orchestratord')
+def status_orchestratord():
+    return jsonify({'state': get_service_state('orchestratord')})
+
+
+@bp.route('/stop-orchestratord', methods=['POST'])
+def stop_orchestratord():
+    def generate():
+        proc = subprocess.Popen(
+            ['systemctl', 'stop', 'orchestratord'],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in proc.stdout:
+            yield f"data: {line.rstrip()}\n\n"
+        proc.wait()
+        if proc.returncode == 0:
+            yield "data: [Stop successful]\n\n"
+        else:
+            yield f"data: [Stop failed with exit code {proc.returncode}]\n\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+
+
+@bp.route('/start-orchestratord', methods=['POST'])
+def start_orchestratord():
+    def generate():
+        proc = subprocess.Popen(
+            ['systemctl', 'start', 'orchestratord'],
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in proc.stdout:
+            yield f"data: {line.rstrip()}\n\n"
+        proc.wait()
+        if proc.returncode == 0:
+            yield "data: [Start successful]\n\n"
+        else:
+            yield f"data: [Start failed with exit code {proc.returncode}]\n\n"
+        yield "data: [DONE]\n\n"
+
+    return Response(stream_with_context(generate()), mimetype='text/event-stream')
 
 
 @bp.route('/restart-orchestratord', methods=['POST'])

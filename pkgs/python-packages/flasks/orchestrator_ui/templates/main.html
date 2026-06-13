@@ -77,9 +77,6 @@
               <button class="btn btn-sm btn-primary"
                 onclick="triggerRestart('{{ svc }}', {{ loop.index }})"
                 id="btn-{{ loop.index }}">Restart</button>
-              <button class="btn btn-sm {% if state == 'active' %}btn-outline-danger{% else %}btn-outline-success{% endif %}"
-                onclick="triggerToggle('{{ svc }}', {{ loop.index }})"
-                id="toggle-{{ loop.index }}">{% if state == 'active' %}Stop{% else %}Start{% endif %}</button>
               <button class="btn btn-sm btn-outline-secondary"
                 onclick="refreshStatus('{{ svc }}', {{ loop.index }})">Refresh</button>
             </div>
@@ -95,7 +92,9 @@
   <div class="section-header">
     <h5 class="mb-0">Job Monitor</h5>
     <button class="btn btn-sm btn-outline-secondary" onclick="refreshJobs()">Refresh</button>
-    <button class="btn btn-sm btn-danger ms-auto" id="orch-restart-btn"
+    <button class="btn btn-sm {% if orch_state == 'active' %}btn-outline-danger{% else %}btn-outline-success{% endif %} ms-auto"
+      id="orch-toggle-btn" onclick="toggleOrchestratord()">{% if orch_state == 'active' %}Stop{% else %}Start{% endif %} orchestratord</button>
+    <button class="btn btn-sm btn-danger" id="orch-restart-btn"
       onclick="restartOrchestratord()">Restart orchestratord</button>
   </div>
   <div id="orch-restart-log" class="orch-restart-log mb-3"></div>
@@ -137,43 +136,11 @@ function setBadge(idx, state) {
   else badge.classList.add('bg-warning', 'text-dark');
 }
 
-function setToggleBtn(idx, state) {
-  const btn = document.getElementById('toggle-' + idx);
-  if (!btn) return;
-  const isActive = state === 'active';
-  btn.textContent = isActive ? 'Stop' : 'Start';
-  btn.className = 'btn btn-sm ' + (isActive ? 'btn-outline-danger' : 'btn-outline-success');
-}
-
 function refreshStatus(service, idx) {
   fetch(subdomain + '/status/' + encodeURIComponent(service))
     .then(r => r.json())
-    .then(data => {
-      const state = data.state || 'unknown';
-      setBadge(idx, state);
-      setToggleBtn(idx, state);
-    })
-    .catch(() => {
-      setBadge(idx, 'unknown');
-      setToggleBtn(idx, 'unknown');
-    });
-}
-
-function triggerToggle(service, idx) {
-  const toggleBtn = document.getElementById('toggle-' + idx);
-  const log = document.getElementById('log-' + idx);
-  const currentText = toggleBtn.textContent.trim();
-  const isStopping = currentText === 'Stop';
-  const action = isStopping ? 'stop' : 'start';
-  const label = isStopping ? 'Stopping' : 'Starting';
-  toggleBtn.disabled = true;
-  toggleBtn.innerHTML = '<span class="spinner-border" role="status"></span> ' + label + '...';
-  log.textContent = '';
-  log.classList.add('visible');
-  streamPost(subdomain + '/' + action + '/' + encodeURIComponent(service), log, () => {
-    toggleBtn.disabled = false;
-    refreshStatus(service, idx);
-  });
+    .then(data => setBadge(idx, data.state || 'unknown'))
+    .catch(() => setBadge(idx, 'unknown'));
 }
 
 function triggerRestart(service, idx) {
@@ -223,7 +190,35 @@ function streamPost(url, logEl, onDone) {
     });
 }
 
-// ── orchestratord restart ───────────────────────────────────────────────────
+// ── orchestratord controls ──────────────────────────────────────────────────
+
+function refreshOrchState() {
+  fetch(subdomain + '/status-orchestratord')
+    .then(r => r.json())
+    .then(data => {
+      const btn = document.getElementById('orch-toggle-btn');
+      const isActive = (data.state || 'unknown') === 'active';
+      btn.textContent = (isActive ? 'Stop' : 'Start') + ' orchestratord';
+      btn.className = 'btn btn-sm ' + (isActive ? 'btn-outline-danger' : 'btn-outline-success') + ' ms-auto';
+    });
+}
+
+function toggleOrchestratord() {
+  const btn = document.getElementById('orch-toggle-btn');
+  const log = document.getElementById('orch-restart-log');
+  const isStopping = btn.textContent.trim().startsWith('Stop');
+  const endpoint = isStopping ? '/stop-orchestratord' : '/start-orchestratord';
+  const label = isStopping ? 'Stopping' : 'Starting';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border" role="status"></span> ' + label + '...';
+  log.textContent = '';
+  log.classList.add('visible');
+  streamPost(subdomain + endpoint, log, () => {
+    btn.disabled = false;
+    refreshOrchState();
+    setTimeout(refreshJobs, 2000);
+  });
+}
 
 function restartOrchestratord() {
   const btn = document.getElementById('orch-restart-btn');
