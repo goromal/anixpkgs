@@ -20,7 +20,8 @@
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  # For nano WiFi dongle
+  boot.extraModulePackages = [ config.boot.kernelPackages.rtl8821au ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/NixOS";
