@@ -5,6 +5,10 @@ import os
 import subprocess
 
 from flask import Flask, Blueprint, request, render_template, Response, stream_with_context
+# parse_interval and _all_weeks_on_day are module-level helpers in task_tools.cli.
+# They are imported directly rather than from a shared utils module — update this
+# import if those helpers are ever moved.
+from task_tools.cli import parse_interval, _all_weeks_on_day
 
 
 def _init_manager():
@@ -13,17 +17,6 @@ def _init_manager():
         return TaskManager(), None
     except Exception as e:
         return None, str(e)
-
-
-def _all_sundays(start, end):
-    result = []
-    current = start
-    while current.weekday() != 6:
-        current += datetime.timedelta(days=1)
-    while current <= end:
-        result.append(current)
-        current += datetime.timedelta(days=7)
-    return result
 
 
 def _first_sundays_of_month(start, end):
@@ -50,24 +43,17 @@ def _first_sundays_of_quarter(start, end):
 
 
 def _read_spec_csv(path):
-    daily, weekly, monthly, quarterly = [], [], [], []
+    items = []
     with open(path, 'r') as f:
         for line in f:
             parts = line.split('|', 2)
             if len(parts) < 2:
                 continue
-            rtype = parts[0].strip().lower()
+            rtype = parts[0].strip()
             title = parts[1].strip()
             desc = parts[2].strip() if len(parts) > 2 else ''
-            if rtype == 'd':
-                daily.append((title, desc))
-            elif rtype == 'w':
-                weekly.append((title, desc))
-            elif rtype == 'm':
-                monthly.append((title, desc))
-            elif rtype == 'q':
-                quarterly.append((title, desc))
-    return daily, weekly, monthly, quarterly
+            items.append((rtype, title, desc))
+    return items
 
 
 def create_app(subdomain='', manager=None, spec_csv=None):
@@ -136,16 +122,11 @@ def create_app(subdomain='', manager=None, spec_csv=None):
     @bp.route('/spec-csv', methods=['GET'])
     def spec_csv_get():
         try:
-            daily, weekly, monthly, quarterly = _read_spec_csv(_spec_csv)
+            items = _read_spec_csv(_spec_csv)
         except FileNotFoundError:
             return {'items': []}
-        items = (
-            [{'interval': 'd', 'title': t, 'desc': d} for t, d in daily] +
-            [{'interval': 'w', 'title': t, 'desc': d} for t, d in weekly] +
-            [{'interval': 'm', 'title': t, 'desc': d} for t, d in monthly] +
-            [{'interval': 'q', 'title': t, 'desc': d} for t, d in quarterly]
-        )
-        return {'items': items}
+        return {'items': [{'interval': rtype, 'title': title, 'desc': desc}
+                           for rtype, title, desc in items]}
 
     @bp.route('/spec-csv', methods=['POST'])
     def spec_csv_post():
@@ -203,11 +184,32 @@ def create_app(subdomain='', manager=None, spec_csv=None):
             end = start
 
         try:
-            daily, weekly, monthly, quarterly = _read_spec_csv(_spec_csv)
+            raw_items = _read_spec_csv(_spec_csv)
         except FileNotFoundError:
             return {'error': f'CSV not found: {_spec_csv}'}, 500
 
-        sundays = set(_all_sundays(start, end))
+        daily = []
+        weekly_by_day = {}
+        monthly = []
+        quarterly = []
+        for rtype, title, desc in raw_items:
+            try:
+                itype, weekday = parse_interval(rtype)
+            except ValueError as e:
+                return {'error': str(e)}, 400
+            if itype == 'd':
+                daily.append((title, desc))
+            elif itype == 'w':
+                weekly_by_day.setdefault(weekday, []).append((title, desc))
+            elif itype == 'm':
+                monthly.append((title, desc))
+            elif itype == 'q':
+                quarterly.append((title, desc))
+
+        week_dates_by_day = {
+            day: set(_all_weeks_on_day(start, end, day))
+            for day in weekly_by_day
+        }
         month_sundays = set(_first_sundays_of_month(start, end))
         quarter_sundays = set(_first_sundays_of_quarter(start, end))
 
@@ -216,8 +218,9 @@ def create_app(subdomain='', manager=None, spec_csv=None):
             while current <= end:
                 label = current.strftime('%Y-%m-%d')
                 due = list(daily)
-                if current in sundays:
-                    due += weekly
+                for day, specs in weekly_by_day.items():
+                    if current in week_dates_by_day[day]:
+                        due += specs
                 if current in month_sundays:
                     due += monthly
                 if current in quarter_sundays:
