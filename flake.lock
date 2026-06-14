@@ -966,16 +966,15 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1781323225,
+        "lastModified": 1781406286,
         "narHash": "sha256-Hshdgk7lR6X4FfNAeUJstdYStVQuxJfF9De8j0cz7cs=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "822b65ef3903bbcf5e169d0a29d9a19e6eed9f6c",
+        "rev": "0c7b7a9b632bd8f25b6a522022e7f1167f60aa73",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/days-tasks",
         "repo": "task-tools",
         "type": "github"
       }
