@@ -341,6 +341,26 @@
                 "docs": false
             },
             {
+                "attr": "comfyui-frontend-package",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-core",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-embedded-docs",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "comfyui",
                 "ci": true,
                 "docs": false

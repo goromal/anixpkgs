@@ -86,15 +86,16 @@
     "comfyui-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1781462523,
-        "narHash": "sha256-AmQWUnPQ67Yv7EaQqBIBmPP2r4PBZMXB5UVaWy1TWEQ=",
+        "lastModified": 1769486881,
+        "narHash": "sha256-CcA3xTVmBVLGMtM5F74R2LfwafFDxFHZ1uzx5MvrB/4=",
         "owner": "comfyanonymous",
         "repo": "ComfyUI",
-        "rev": "e1b9366898a4657bceea8737d74139406e4ea521",
+        "rev": "09725967cf76304371c390ca1d6483e04061da48",
         "type": "github"
       },
       "original": {
         "owner": "comfyanonymous",
+        "ref": "refs/tags/v0.11.0",
         "repo": "ComfyUI",
         "type": "github"
       }

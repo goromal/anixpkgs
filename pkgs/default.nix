@@ -152,6 +152,10 @@ let
               spandrel = pySelf.callPackage ./python-packages/spandrel {
                 pkg-src = flakeInputs.spandrel-src;
               };
+              comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
+              comfyui-workflow-templates-core = pySelf.callPackage ./python-packages/comfyui-workflow-templates-core { };
+              comfyui-workflow-templates = pySelf.callPackage ./python-packages/comfyui-workflow-templates { };
+              comfyui-embedded-docs = pySelf.callPackage ./python-packages/comfyui-embedded-docs { };
               jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
               jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
               jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
@@ -429,6 +433,7 @@ rec {
       torchsde = pyPkgs.torchsde;
       torchvision = pyPkgs.torchvision;
       torchaudio = pyPkgs.torchaudio;
+      numpy = pyPkgs.numpy;
       einops = pyPkgs.einops;
       transformers = pyPkgs.transformers;
       tokenizers = pyPkgs.tokenizers;
@@ -441,10 +446,16 @@ rec {
       scipy = pyPkgs.scipy;
       tqdm = pyPkgs.tqdm;
       psutil = pyPkgs.psutil;
+      alembic = pyPkgs.alembic;
+      sqlalchemy = pyPkgs.sqlalchemy;
+      requests = pyPkgs.requests;
+      pydantic = pyPkgs.pydantic;
       kornia = pyPkgs.kornia;
       spandrel = pyPkgs.spandrel;
-      soundfile = pyPkgs.soundfile;
       av = pyPkgs.av;
+      comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
+      comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
+      comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
       pkg-src = flakeInputs.comfyui-src;
     };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;

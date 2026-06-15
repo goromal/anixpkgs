@@ -6,6 +6,7 @@
   torchsde,
   torchvision,
   torchaudio,
+  numpy,
   einops,
   transformers,
   tokenizers,
@@ -18,10 +19,16 @@
   scipy,
   tqdm,
   psutil,
+  alembic,
+  sqlalchemy,
+  requests,
+  pydantic,
   kornia,
   spandrel,
-  soundfile,
   av,
+  comfyui-frontend-package,
+  comfyui-workflow-templates,
+  comfyui-embedded-docs,
   pkg-src,
 }:
 let
@@ -30,6 +37,7 @@ let
     torchsde
     torchvision
     torchaudio
+    numpy
     einops
     transformers
     tokenizers
@@ -42,15 +50,21 @@ let
     scipy
     tqdm
     psutil
+    alembic
+    sqlalchemy
+    requests
+    pydantic
     kornia
     spandrel
-    soundfile
     av
+    comfyui-frontend-package
+    comfyui-workflow-templates
+    comfyui-embedded-docs
   ]);
 in
 stdenvNoCC.mkDerivation {
   pname = "comfyui";
-  version = "0.0.0";
+  version = "0.11.0";
   src = pkg-src;
   nativeBuildInputs = [ makeWrapper ];
   dontConfigure = true;
