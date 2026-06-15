@@ -41,11 +41,16 @@ in
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/comfyui/" = {
         extraConfig = ''
-          set $comfyui_fwd $request_uri;
-          if ($comfyui_fwd ~ ^/comfyui(/.*)$) {
-            set $comfyui_fwd $1;
+          set $comfyui_path $request_uri;
+          set $comfyui_query "";
+          if ($comfyui_path ~ "^/comfyui(/[^?]*)\?(.*)$") {
+            set $comfyui_path $1;
+            set $comfyui_query $2;
           }
-          proxy_pass http://127.0.0.1:${builtins.toString cfg.port}$comfyui_fwd;
+          if ($comfyui_path ~ "^/comfyui(/[^?]*)$") {
+            set $comfyui_path $1;
+          }
+          proxy_pass http://127.0.0.1:${builtins.toString cfg.port}$comfyui_path?$comfyui_query;
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection $connection_upgrade;
