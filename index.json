@@ -334,6 +334,11 @@
                 "attr": "vdlserver",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "spandrel",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [

@@ -37,6 +37,9 @@
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
+    spandrel-src.url = "github:chaiNNer-org/spandrel";
+    spandrel-src.flake = false;
+
     evil-hangman.url = "github:goromal/evil-hangman";
     evil-hangman.flake = false;
 

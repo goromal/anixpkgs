@@ -149,6 +149,9 @@ let
                   pkg-src = flakeInputs.jetson-stats;
                 }
               );
+              spandrel = pySelf.callPackage ./python-packages/spandrel {
+                pkg-src = flakeInputs.spandrel-src;
+              };
               jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
               jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
               jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
@@ -414,6 +417,7 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
+  spandrel = final.python313.pkgs.spandrel;
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;

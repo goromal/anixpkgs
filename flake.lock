@@ -777,6 +777,7 @@
         "signals-cpp": "signals-cpp",
         "simple-image-editor": "simple-image-editor",
         "sorting": "sorting",
+        "spandrel-src": "spandrel-src",
         "spelling-corrector": "spelling-corrector",
         "sunnyside": "sunnyside",
         "symforce": "symforce",
@@ -881,6 +882,22 @@
       "original": {
         "owner": "goromal",
         "repo": "sorting",
+        "type": "github"
+      }
+    },
+    "spandrel-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776033370,
+        "narHash": "sha256-ohkI7giaAMvi9RatM11WoA2+Ww53TLmJsB+pRf+RWt0=",
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
+        "rev": "e1f2ea14b2eb9dc912bdf335803f8a3d481c45b8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
         "type": "github"
       }
     },
