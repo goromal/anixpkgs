@@ -156,10 +156,18 @@ let
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
                   { };
-              comfyui-workflow-templates-media-api = pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-api { };
-              comfyui-workflow-templates-media-video = pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-video { };
-              comfyui-workflow-templates-media-image = pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-image { };
-              comfyui-workflow-templates-media-other = pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-other { };
+              comfyui-workflow-templates-media-api =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-api
+                  { };
+              comfyui-workflow-templates-media-video =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-video
+                  { };
+              comfyui-workflow-templates-media-image =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-image
+                  { };
+              comfyui-workflow-templates-media-other =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-other
+                  { };
               comfyui-workflow-templates = pySelf.callPackage ./python-packages/comfyui-workflow-templates { };
               comfyui-embedded-docs = pySelf.callPackage ./python-packages/comfyui-embedded-docs { };
               jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
