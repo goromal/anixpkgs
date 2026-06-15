@@ -1,26 +1,33 @@
 import argparse
 import json
 import os
-import subprocess
 from pathlib import Path
 
 from flask import (
     Flask, Blueprint, request, render_template, redirect,
-    url_for, session, Response, stream_with_context
+    url_for, session, Response, jsonify
 )
 from werkzeug.utils import secure_filename
+
+from run_store import RunStore
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--port", type=int, default=5000, help="Port to run the server on")
 parser.add_argument("--subdomain", type=str, default="", help="URL prefix (e.g., '/budget')")
 parser.add_argument("--config-file", type=str, default="~/configs/budget-tool.json",
                     help="Path to default budget config JSON file")
+parser.add_argument("--state-dir", type=str, default="~/.local/state/budget-ui",
+                    help="Directory for run log and state persistence")
 args = parser.parse_args()
 
 # Expand paths
 config_path = Path(args.config_file).expanduser()
 DATA_DIR = Path.home() / 'data' / 'budgets'
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+state_dir = os.path.expanduser(args.state_dir)
+upload_store = RunStore(os.path.join(state_dir, "upload"), "UPLOAD")
+process_store = RunStore(os.path.join(state_dir, "process"), "PROCESS")
 
 # Create blueprint with proper url_prefix
 app = Flask(__name__)
@@ -82,41 +89,46 @@ def upload_csv(account):
     file.save(DATA_DIR / filename)
     return redirect(url_for('budget.index'))
 
-def stream_command(command):
-    process = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        bufsize=1,
-        universal_newlines=True,
-        env={**os.environ, 'PYTHONUNBUFFERED': '1'},
-    )
-    for line in process.stdout:
-        yield line.rstrip('\n')
-    process.wait()
-    if process.returncode != 0:
-        yield f"[Command failed with exit code {process.returncode}]"
+@bp.route('/status')
+def status():
+    return jsonify({
+        "upload": upload_store.read_state().get("status", "idle"),
+        "process": process_store.read_state().get("status", "idle"),
+    })
 
-@bp.route('/trigger_upload')
+@bp.route('/trigger_upload', methods=['POST'])
 def trigger_upload():
-    def generate():
-        upload_script = DATA_DIR / 'upload.sh'
-        if not upload_script.exists():
-            yield "data: Error: upload.sh not found at ~/data/budgets/upload.sh\n\n"
-            return
-        for line in stream_command(['bash', str(upload_script)]):
-            yield f"data: {line}\n\n"
-        yield "data: [Upload script finished]\n\n"
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+    upload_script = DATA_DIR / 'upload.sh'
+    if not upload_script.exists():
+        return jsonify({"error": "upload.sh not found at ~/data/budgets/upload.sh"}), 400
+    if not upload_store.start(['bash', str(upload_script)]):
+        return jsonify({"error": "Upload already in progress"}), 409
+    return jsonify({"started": True}), 202
 
-@bp.route('/trigger_process')
+@bp.route('/stream/upload')
+def stream_upload():
+    return Response(
+        upload_store.stream(),
+        mimetype='text/event-stream',
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+@bp.route('/trigger_process', methods=['POST'])
 def trigger_process():
-    def generate():
-        for line in stream_command(['budget_report', 'transactions-process']):
-            yield f"data: {line}\n\n"
-        yield "data: [Processing complete]\n\n"
-    return Response(stream_with_context(generate()), mimetype='text/event-stream')
+    if not process_store.start(
+        ['budget_report', 'transactions-process'],
+        env={**os.environ, 'PYTHONUNBUFFERED': '1'},
+    ):
+        return jsonify({"error": "Processing already in progress"}), 409
+    return jsonify({"started": True}), 202
+
+@bp.route('/stream/process')
+def stream_process():
+    return Response(
+        process_store.stream(),
+        mimetype='text/event-stream',
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 # Serve static files correctly under the subpath
 @app.route(f'{args.subdomain}/static/<path:filename>')
@@ -128,7 +140,7 @@ app.register_blueprint(bp)
 def run():
     global args, app
     app.secret_key = os.urandom(24)
-    app.run(host='0.0.0.0', port=args.port, debug=False)
+    app.run(host='0.0.0.0', port=args.port, debug=False, threaded=True)
 
 if __name__ == '__main__':
     run()
