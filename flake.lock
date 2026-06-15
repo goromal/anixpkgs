@@ -83,6 +83,22 @@
         "type": "github"
       }
     },
+    "comfyui-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781462523,
+        "narHash": "sha256-AmQWUnPQ67Yv7EaQqBIBmPP2r4PBZMXB5UVaWy1TWEQ=",
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "rev": "e1b9366898a4657bceea8737d74139406e4ea521",
+        "type": "github"
+      },
+      "original": {
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "type": "github"
+      }
+    },
     "crowcpp": {
       "flake": false,
       "locked": {
@@ -736,6 +752,7 @@
         "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
+        "comfyui-src": "comfyui-src",
         "crowcpp": "crowcpp",
         "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",

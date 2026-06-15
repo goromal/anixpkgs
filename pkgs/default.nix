@@ -418,6 +418,35 @@ rec {
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
+  comfyui =
+    let
+      py = final.python313;
+      pyPkgs = py.pkgs;
+    in
+    prev.callPackage ./python-packages/comfyui {
+      python313 = py;
+      torch = pyPkgs.torch;
+      torchsde = pyPkgs.torchsde;
+      torchvision = pyPkgs.torchvision;
+      torchaudio = pyPkgs.torchaudio;
+      einops = pyPkgs.einops;
+      transformers = pyPkgs.transformers;
+      tokenizers = pyPkgs.tokenizers;
+      sentencepiece = pyPkgs.sentencepiece;
+      safetensors = pyPkgs.safetensors;
+      aiohttp = pyPkgs.aiohttp;
+      yarl = pyPkgs.yarl;
+      pyyaml = pyPkgs.pyyaml;
+      pillow = pyPkgs.pillow;
+      scipy = pyPkgs.scipy;
+      tqdm = pyPkgs.tqdm;
+      psutil = pyPkgs.psutil;
+      kornia = pyPkgs.kornia;
+      spandrel = pyPkgs.spandrel;
+      soundfile = pyPkgs.soundfile;
+      av = pyPkgs.av;
+      pkg-src = flakeInputs.comfyui-src;
+    };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;

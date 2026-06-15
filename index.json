@@ -339,6 +339,11 @@
                 "attr": "spandrel",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "comfyui",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [
