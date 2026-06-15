@@ -351,6 +351,26 @@
                 "docs": false
             },
             {
+                "attr": "comfyui-workflow-templates-media-api",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-video",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-image",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-other",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "comfyui-workflow-templates",
                 "ci": true,
                 "docs": false
