@@ -41,6 +41,7 @@ in
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
       locations."/comfyui/" = {
         extraConfig = ''
+          client_max_body_size 100m;
           set $comfyui_path $request_uri;
           set $comfyui_query "";
           if ($comfyui_path ~ "^/comfyui(/[^?]*)\?(.*)$") {
