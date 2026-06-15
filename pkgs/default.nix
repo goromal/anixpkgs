@@ -450,6 +450,7 @@ rec {
       sqlalchemy = pyPkgs.sqlalchemy;
       requests = pyPkgs.requests;
       pydantic = pyPkgs.pydantic;
+      pydantic-settings = pyPkgs.pydantic-settings;
       kornia = pyPkgs.kornia;
       spandrel = pyPkgs.spandrel;
       av = pyPkgs.av;

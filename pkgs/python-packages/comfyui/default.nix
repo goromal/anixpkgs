@@ -23,6 +23,7 @@
   sqlalchemy,
   requests,
   pydantic,
+  pydantic-settings,
   kornia,
   spandrel,
   av,
@@ -54,6 +55,7 @@ let
     sqlalchemy
     requests
     pydantic
+    pydantic-settings
     kornia
     spandrel
     av

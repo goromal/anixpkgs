@@ -65,7 +65,7 @@ in
       unitConfig.StartLimitIntervalSec = 0;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --lowvram";
+        ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db --lowvram";
         ReadWritePaths = [
           cfg.dataDir
           "/tmp"
