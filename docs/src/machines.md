@@ -530,6 +530,54 @@ getcap $(which sunshine)
 # Should show: cap_sys_admin=p
 ```
 
+## ComfyUI Image Generation (personal-dell)
+
+`personal-dell` runs [ComfyUI](https://github.com/comfyanonymous/ComfyUI), a node-based Stable Diffusion (SDXL) web UI for creating and modifying digital paintings on the GPU. Enabled via `services.comfyui.enable = true` and accessible at:
+
+- **Web UI**: `https://atorgesen-dell.local/comfyui/` (also linked from the services landing page as "ComfyUI")
+
+The service runs in `--lowvram` mode because the RTX 500 Ada has only ~3.7 GB of usable VRAM. SDXL-Turbo / SDXL-Lightning checkpoints are recommended for usable speed; full SDXL base works but is slow.
+
+### Adding Models (manual step — required before first use)
+
+Model checkpoints are **not** packaged in Nix (they are large and user-managed). They live under the service's data directory and must be downloaded manually into the `checkpoints` subfolder:
+
+```bash
+mkdir -p /data/andrew/comfyui/models/checkpoints
+cd /data/andrew/comfyui/models/checkpoints
+
+# Example: SDXL-Turbo (~6.9 GB), a good fit for low-VRAM
+curl -fL -C - -o sd_xl_turbo_1.0_fp16.safetensors \
+  "https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors"
+```
+
+ComfyUI rescans the `checkpoints` folder automatically (no service restart needed) — the new model appears in the `Load Checkpoint` node after a page refresh. Other model types go in sibling folders (`models/loras/`, `models/vae/`, `models/controlnet/`, etc.).
+
+### Creating and Modifying Paintings
+
+- **Create**: in the web UI, build (or load) a text→image graph — `Load Checkpoint` → `CLIP Text Encode` (positive/negative) → `KSampler` → `VAE Decode` → `Save Image`. For SDXL-Turbo use `cfg ≈ 1.0`, `steps 1–4`, sampler `euler_ancestral`. Generated images are written to `/data/andrew/comfyui/output/`.
+- **Modify**: drop an existing painting into `/data/andrew/comfyui/input/`, then run an img2img or inpaint graph (`Load Image` → `VAE Encode` → `KSampler` with reduced `denoise`).
+
+### Architecture
+
+- **Service**: `comfyui.service` (systemd, user `andrew:dev`), internal port 8188 (centrally managed in `service-ports.nix`)
+- **Nginx proxy**: `/comfyui/` → `http://127.0.0.1:8188/` (ComfyUI uses relative asset paths, so the subpath works without a dedicated vhost)
+- **Data directory**: `/data/andrew/comfyui/` — `models/`, `input/`, `output/`, `custom_nodes/`, `user/` (created automatically via `systemd.tmpfiles`)
+- **Asset database**: `/data/andrew/comfyui/user/comfyui.db` (SQLite) — set explicitly with `--database-url` because ComfyUI's default DB path is relative to the read-only Nix store
+- **Version**: pinned to ComfyUI **v0.11.0**, the newest release predating the `comfy-aimdo` dependency (a compiled native wheel that does not package cleanly under Nix on Python 3.13). The three frontend asset packages (`comfyui-frontend-package`, `comfyui-workflow-templates`, `comfyui-embedded-docs`) and `spandrel` are packaged in `anixpkgs`.
+
+### Troubleshooting
+
+**Service not running / crash-looping:**
+```bash
+systemctl status comfyui
+journalctl -u comfyui -n 50
+```
+
+**Model not showing up:** Confirm the file is in `/data/andrew/comfyui/models/checkpoints/` and refresh the browser. A `comfy_kitchen` import warning in the logs is expected and harmless (fp8/fp4 quantization is disabled; not needed for SDXL).
+
+**Out-of-memory during generation:** Lower the resolution (SDXL-Turbo was trained at 512×512) or batch size; the service already runs `--lowvram`.
+
 ## Miscellaneous
 
 ### Cloud Syncing
