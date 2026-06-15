@@ -2,7 +2,7 @@ from setuptools import setup
 setup(
     name='budget_ui',
     version='0.0.0',
-    py_modules=['budget_ui'],
+    py_modules=['budget_ui', 'run_store'],
     entry_points={
         'console_scripts': ['budget_ui = budget_ui:run']
     },
