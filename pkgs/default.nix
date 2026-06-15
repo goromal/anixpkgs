@@ -153,7 +153,9 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
-              comfyui-workflow-templates-core = pySelf.callPackage ./python-packages/comfyui-workflow-templates-core { };
+              comfyui-workflow-templates-core =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
+                  { };
               comfyui-workflow-templates = pySelf.callPackage ./python-packages/comfyui-workflow-templates { };
               comfyui-embedded-docs = pySelf.callPackage ./python-packages/comfyui-embedded-docs { };
               jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
