@@ -34,7 +34,7 @@ in
         name = "ComfyUI";
         path = "/comfyui/";
         description = "Stable Diffusion (SDXL) image generation";
-        icon = "palette";
+        icon = "film";
       }
     ];
 
