@@ -561,7 +561,7 @@ ComfyUI rescans the `checkpoints` folder automatically (no service restart neede
 ### Architecture
 
 - **Service**: `comfyui.service` (systemd, user `andrew:dev`), internal port 8188 (centrally managed in `service-ports.nix`)
-- **Nginx proxy**: `/comfyui/` → `http://127.0.0.1:8188/` (ComfyUI uses relative asset paths, so the subpath works without a dedicated vhost)
+- **Nginx proxy**: `/comfyui/` → `http://127.0.0.1:8188` (ComfyUI uses relative asset paths, so the subpath works without a dedicated vhost). The location forwards the raw `$request_uri` (minus the `/comfyui` prefix) rather than a prefix-stripped path, so the `%2F`-encoded slashes in ComfyUI's `/userdata/{file}` API (e.g. saving `workflows/foo.json`) survive and don't break with HTTP 405.
 - **Data directory**: `/data/andrew/comfyui/` — `models/`, `input/`, `output/`, `custom_nodes/`, `user/` (created automatically via `systemd.tmpfiles`)
 - **Asset database**: `/data/andrew/comfyui/user/comfyui.db` (SQLite) — set explicitly with `--database-url` because ComfyUI's default DB path is relative to the read-only Nix store
 - **Version**: pinned to ComfyUI **v0.11.0**, the newest release predating the `comfy-aimdo` dependency (a compiled native wheel that does not package cleanly under Nix on Python 3.13). The three frontend asset packages (`comfyui-frontend-package`, `comfyui-workflow-templates`, `comfyui-embedded-docs`) and `spandrel` are packaged in `anixpkgs`.
