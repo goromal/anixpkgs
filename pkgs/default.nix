@@ -474,7 +474,7 @@ rec {
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
       ultralytics = pyPkgs.ultralytics;
-      opencv4 = pyPkgs.opencv4;
+      opencv4 = pyPkgs.opencv4.override { enableCuda = false; };
       dill = pyPkgs.dill;
       scikit-image = pyPkgs."scikit-image";
       piexif = pyPkgs.piexif;
