@@ -153,6 +153,9 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
+              onnxruntime = pySuper.onnxruntime.override {
+                onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
+              };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
