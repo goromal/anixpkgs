@@ -153,6 +153,7 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
+              opencv4 = pySuper.opencv4.override { enableCuda = false; };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
@@ -475,7 +476,7 @@ rec {
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
       ultralytics = pyPkgs.ultralytics;
-      opencv4 = pyPkgs.opencv4.override { enableCuda = false; };
+      opencv4 = pyPkgs.opencv4;
       dill = pyPkgs.dill;
       scikit-image = pyPkgs."scikit-image";
       piexif = pyPkgs.piexif;
