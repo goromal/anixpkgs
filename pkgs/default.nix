@@ -153,9 +153,6 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
-              onnxruntime = pySuper.onnxruntime.override {
-                onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
-              };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
@@ -440,6 +437,7 @@ rec {
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
+  onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
   segment-anything = final.python313.pkgs.segment-anything;
   comfyui =
     let
