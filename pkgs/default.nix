@@ -152,6 +152,7 @@ let
               spandrel = pySelf.callPackage ./python-packages/spandrel {
                 pkg-src = flakeInputs.spandrel-src;
               };
+              segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
@@ -436,6 +437,7 @@ rec {
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
+  segment-anything = final.python313.pkgs.segment-anything;
   comfyui =
     let
       py = final.python313;
@@ -471,6 +473,14 @@ rec {
       comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
+      ultralytics = pyPkgs.ultralytics;
+      opencv4 = pyPkgs.opencv4;
+      dill = pyPkgs.dill;
+      scikit-image = pyPkgs."scikit-image";
+      piexif = pyPkgs.piexif;
+      matplotlib = pyPkgs.matplotlib;
+      gitpython = pyPkgs.gitpython;
+      segment-anything = pyPkgs."segment-anything";
       pkg-src = flakeInputs.comfyui-src;
     };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;

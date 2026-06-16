@@ -30,6 +30,14 @@
   comfyui-frontend-package,
   comfyui-workflow-templates,
   comfyui-embedded-docs,
+  ultralytics,
+  opencv4,
+  dill,
+  scikit-image,
+  piexif,
+  matplotlib,
+  gitpython,
+  segment-anything,
   pkg-src,
 }:
 let
@@ -62,6 +70,14 @@ let
     comfyui-frontend-package
     comfyui-workflow-templates
     comfyui-embedded-docs
+    ultralytics
+    opencv4
+    dill
+    scikit-image
+    piexif
+    matplotlib
+    gitpython
+    segment-anything
   ]);
 in
 stdenvNoCC.mkDerivation {

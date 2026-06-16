@@ -341,6 +341,11 @@
                 "docs": false
             },
             {
+                "attr": "segment-anything",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "comfyui-frontend-package",
                 "ci": true,
                 "docs": false
