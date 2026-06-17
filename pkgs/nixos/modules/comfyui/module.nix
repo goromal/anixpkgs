@@ -24,9 +24,34 @@ in
       type = lib.types.package;
       default = extendedPkgs.comfyui;
     };
+    cozy = {
+      enable = lib.mkOption {
+        type = lib.types.bool;
+        default = true;
+        description = "Run the cozy image-generation UI alongside ComfyUI";
+      };
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = extendedPkgs.cozy;
+      };
+      stateDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/data/andrew/cozy";
+      };
+      workflowDir = lib.mkOption {
+        type = lib.types.str;
+        default = cfg.dataDir;
+        description = "Directory holding <name>.api.json workflow files";
+      };
+      workflows = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "imggen" "imggen2" ];
+      };
+    };
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.enable (lib.mkMerge [
+    {
     machines.base.runWebServer = true;
 
     machines.base.webServices = [
@@ -95,5 +120,51 @@ in
     };
 
     networking.firewall.allowedTCPPorts = [ cfg.port ];
-  };
+    }
+    (lib.mkIf cfg.cozy.enable {
+      machines.base.webServices = [
+        {
+          name = "cozy";
+          path = "/cozy/";
+          description = "ComfyUI image generation";
+          icon = "tv";
+          faviconSvg = ../../../python-packages/flasks/cozy/tv.svg;
+        }
+      ];
+      systemd.tmpfiles.rules = [
+        "d ${cfg.cozy.stateDir} 0755 andrew dev -"
+      ];
+      systemd.services.cozy = {
+        enable = true;
+        description = "cozy ComfyUI image-generation UI";
+        after = [ "comfyui.service" ];
+        unitConfig.StartLimitIntervalSec = 0;
+        serviceConfig = {
+          Type = "simple";
+          ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
+          ReadWritePaths = [ cfg.cozy.stateDir ];
+          WorkingDirectory = cfg.cozy.stateDir;
+          Restart = "always";
+          RestartSec = 5;
+          User = "andrew";
+          Group = "dev";
+        };
+        wantedBy = [ "multi-user.target" ];
+      };
+      services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+        locations."/cozy/" = {
+          proxyPass = "http://127.0.0.1:${builtins.toString service-ports.cozy}/cozy/";
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 600;
+            proxy_send_timeout 600;
+          '';
+        };
+      };
+    })
+  ]);
 }
