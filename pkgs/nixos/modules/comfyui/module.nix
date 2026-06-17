@@ -45,126 +45,131 @@ in
       };
       workflows = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [ "imggen" "imggen2" ];
+        default = [
+          "imggen"
+          "imggen2"
+        ];
       };
     };
   };
 
-  config = lib.mkIf cfg.enable (lib.mkMerge [
-    {
-    machines.base.runWebServer = true;
-
-    machines.base.webServices = [
+  config = lib.mkIf cfg.enable (
+    lib.mkMerge [
       {
-        name = "ComfyUI";
-        path = "/comfyui/";
-        description = "Stable Diffusion (SDXL) image generation";
-        icon = "film";
+        machines.base.runWebServer = true;
+
+        machines.base.webServices = [
+          {
+            name = "ComfyUI";
+            path = "/comfyui/";
+            description = "Stable Diffusion (SDXL) image generation";
+            icon = "film";
+          }
+        ];
+
+        services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+          locations."/comfyui/" = {
+            extraConfig = ''
+              client_max_body_size 100m;
+              set $comfyui_path $request_uri;
+              set $comfyui_query "";
+              if ($comfyui_path ~ "^/comfyui(/[^?]*)\?(.*)$") {
+                set $comfyui_path $1;
+                set $comfyui_query $2;
+              }
+              if ($comfyui_path ~ "^/comfyui(/[^?]*)$") {
+                set $comfyui_path $1;
+              }
+              proxy_pass http://127.0.0.1:${builtins.toString cfg.port}$comfyui_path?$comfyui_query;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection $connection_upgrade;
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+            '';
+          };
+        };
+
+        systemd.tmpfiles.rules = [
+          "d ${cfg.dataDir} 0755 andrew dev -"
+          "d ${cfg.dataDir}/models 0755 andrew dev -"
+          "d ${cfg.dataDir}/input 0755 andrew dev -"
+          "d ${cfg.dataDir}/output 0755 andrew dev -"
+          "d ${cfg.dataDir}/custom_nodes 0755 andrew dev -"
+        ];
+
+        systemd.services.comfyui = {
+          enable = true;
+          description = "ComfyUI Stable Diffusion Server";
+          unitConfig.StartLimitIntervalSec = 0;
+          serviceConfig = {
+            Type = "simple";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db --lowvram";
+            ReadWritePaths = [
+              cfg.dataDir
+              "/tmp"
+            ];
+            WorkingDirectory = cfg.dataDir;
+            Restart = "always";
+            RestartSec = 5;
+            User = "andrew";
+            Group = "dev";
+            Environment = [
+              "HOME=/data/andrew"
+            ];
+          };
+          wantedBy = [ "multi-user.target" ];
+        };
+
+        networking.firewall.allowedTCPPorts = [ cfg.port ];
       }
-    ];
-
-    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/comfyui/" = {
-        extraConfig = ''
-          client_max_body_size 100m;
-          set $comfyui_path $request_uri;
-          set $comfyui_query "";
-          if ($comfyui_path ~ "^/comfyui(/[^?]*)\?(.*)$") {
-            set $comfyui_path $1;
-            set $comfyui_query $2;
+      (lib.mkIf cfg.cozy.enable {
+        machines.base.webServices = [
+          {
+            name = "cozy";
+            path = "/cozy/";
+            description = "ComfyUI image generation";
+            icon = "tv";
+            faviconSvg = ../../../python-packages/flasks/cozy/tv.svg;
           }
-          if ($comfyui_path ~ "^/comfyui(/[^?]*)$") {
-            set $comfyui_path $1;
-          }
-          proxy_pass http://127.0.0.1:${builtins.toString cfg.port}$comfyui_path?$comfyui_query;
-          proxy_http_version 1.1;
-          proxy_set_header Upgrade $http_upgrade;
-          proxy_set_header Connection $connection_upgrade;
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-        '';
-      };
-    };
-
-    systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 0755 andrew dev -"
-      "d ${cfg.dataDir}/models 0755 andrew dev -"
-      "d ${cfg.dataDir}/input 0755 andrew dev -"
-      "d ${cfg.dataDir}/output 0755 andrew dev -"
-      "d ${cfg.dataDir}/custom_nodes 0755 andrew dev -"
-    ];
-
-    systemd.services.comfyui = {
-      enable = true;
-      description = "ComfyUI Stable Diffusion Server";
-      unitConfig.StartLimitIntervalSec = 0;
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db --lowvram";
-        ReadWritePaths = [
-          cfg.dataDir
-          "/tmp"
         ];
-        WorkingDirectory = cfg.dataDir;
-        Restart = "always";
-        RestartSec = 5;
-        User = "andrew";
-        Group = "dev";
-        Environment = [
-          "HOME=/data/andrew"
+        systemd.tmpfiles.rules = [
+          "d ${cfg.cozy.stateDir} 0755 andrew dev -"
         ];
-      };
-      wantedBy = [ "multi-user.target" ];
-    };
-
-    networking.firewall.allowedTCPPorts = [ cfg.port ];
-    }
-    (lib.mkIf cfg.cozy.enable {
-      machines.base.webServices = [
-        {
-          name = "cozy";
-          path = "/cozy/";
-          description = "ComfyUI image generation";
-          icon = "tv";
-          faviconSvg = ../../../python-packages/flasks/cozy/tv.svg;
-        }
-      ];
-      systemd.tmpfiles.rules = [
-        "d ${cfg.cozy.stateDir} 0755 andrew dev -"
-      ];
-      systemd.services.cozy = {
-        enable = true;
-        description = "cozy ComfyUI image-generation UI";
-        after = [ "comfyui.service" ];
-        unitConfig.StartLimitIntervalSec = 0;
-        serviceConfig = {
-          Type = "simple";
-          ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
-          ReadWritePaths = [ cfg.cozy.stateDir ];
-          WorkingDirectory = cfg.cozy.stateDir;
-          Restart = "always";
-          RestartSec = 5;
-          User = "andrew";
-          Group = "dev";
+        systemd.services.cozy = {
+          enable = true;
+          description = "cozy ComfyUI image-generation UI";
+          after = [ "comfyui.service" ];
+          unitConfig.StartLimitIntervalSec = 0;
+          serviceConfig = {
+            Type = "simple";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
+            ReadWritePaths = [ cfg.cozy.stateDir ];
+            WorkingDirectory = cfg.cozy.stateDir;
+            Restart = "always";
+            RestartSec = 5;
+            User = "andrew";
+            Group = "dev";
+          };
+          wantedBy = [ "multi-user.target" ];
         };
-        wantedBy = [ "multi-user.target" ];
-      };
-      services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-        locations."/cozy/" = {
-          proxyPass = "http://127.0.0.1:${builtins.toString service-ports.cozy}/cozy/";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_read_timeout 600;
-            proxy_send_timeout 600;
-          '';
+        services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+          locations."/cozy/" = {
+            proxyPass = "http://127.0.0.1:${builtins.toString service-ports.cozy}/cozy/";
+            proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_read_timeout 600;
+              proxy_send_timeout 600;
+            '';
+          };
         };
-      };
-    })
-  ]);
+      })
+    ]
+  );
 }
