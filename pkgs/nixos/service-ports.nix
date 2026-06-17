@@ -32,4 +32,5 @@
   tasks_ui = 5959;
   videodl = 6060;
   intake_ui = 6161;
+  cozy = 6262;
 }

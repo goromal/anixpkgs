@@ -394,6 +394,11 @@
                 "attr": "comfyui",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "cozy",
+                "ci": true,
+                "docs": true
             }
         ],
         "bash": [

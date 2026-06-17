@@ -319,6 +319,7 @@ let
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               intake_ui = addDoc (pySelf.callPackage ./python-packages/flasks/intake_ui { });
+              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { });
               vdlserver = addDoc (
                 pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
               );
@@ -427,6 +428,7 @@ rec {
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
+  cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
