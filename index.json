@@ -346,6 +346,11 @@
                 "docs": false
             },
             {
+                "attr": "comfy-kitchen",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "comfyui-frontend-package",
                 "ci": true,
                 "docs": false

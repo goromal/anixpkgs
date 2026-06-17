@@ -154,6 +154,7 @@ let
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
               opencv4 = pySuper.opencv4.override { enableCuda = false; };
+              comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
@@ -472,6 +473,7 @@ rec {
       kornia = pyPkgs.kornia;
       spandrel = pyPkgs.spandrel;
       av = pyPkgs.av;
+      comfy-kitchen = pyPkgs."comfy-kitchen";
       comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;

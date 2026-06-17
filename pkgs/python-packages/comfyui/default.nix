@@ -27,6 +27,7 @@
   kornia,
   spandrel,
   av,
+  comfy-kitchen,
   comfyui-frontend-package,
   comfyui-workflow-templates,
   comfyui-embedded-docs,
@@ -67,6 +68,7 @@ let
     kornia
     spandrel
     av
+    comfy-kitchen
     comfyui-frontend-package
     comfyui-workflow-templates
     comfyui-embedded-docs
