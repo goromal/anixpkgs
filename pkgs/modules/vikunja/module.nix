@@ -9,12 +9,6 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.vikunja-ats;
-
-  # Package the Vikunja MCP server
-  vikunja-mcp-server = pkgs.writeScriptBin "vikunja-mcp-server" ''
-    #!${pkgs.python3}/bin/python3
-    ${builtins.readFile ./vikunja-mcp-server.py}
-  '';
 in
 {
   options.services.vikunja-ats = {
@@ -41,6 +35,7 @@ in
         name = "Vikunja";
         path = "#";
         description = "Task management system (port ${toString service-ports.vikunja.public})";
+        icon = "clipboard-check";
       }
     ];
 
@@ -57,9 +52,10 @@ in
 
     users.groups.vikunja = { };
 
-    # Allow members of the vikunja group to read the data dir for backups
+    # Allow members of the vikunja group to read the data dir and db file for backups
     systemd.tmpfiles.rules = [
       "z ${cfg.dataDir} 0750 vikunja vikunja -"
+      "z ${cfg.dataDir}/vikunja.db 0644 vikunja vikunja -"
     ];
 
     # Vikunja configuration file
@@ -192,10 +188,8 @@ in
       };
     };
 
-    # Add vikunja and vikunja-mcp-server to system packages
-    environment.systemPackages = [
-      pkgs.vikunja
-      vikunja-mcp-server
-    ];
+    services.vikunja-mcp.enable = true;
+
+    environment.systemPackages = [ pkgs.vikunja ];
   };
 }

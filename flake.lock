@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1771825089,
-        "narHash": "sha256-AbyLbEfPdEcgYTnqv1/4hofSwmN+UBNLJ5B6cWAX+I0=",
+        "lastModified": 1781240032,
+        "narHash": "sha256-0/6LBHd1Qtraw9kU2RaK5tQHd4KetnRjYip1L/LSfyE=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "467fef9fe1e9daf72de5eb6bf868ea29da590cb1",
+        "rev": "c937a45fdb08d5b6f07f893be4697d5916bc5100",
         "type": "github"
       },
       "original": {
@@ -127,11 +127,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1766035688,
-        "narHash": "sha256-/lq485V/warVmf38ICCN2tK44xKzlxHMyQuriq+RGto=",
+        "lastModified": 1779950628,
+        "narHash": "sha256-xSY93NS0a7ul9humQxhGOsB6LEFfbvRk/zt6culkvPg=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "9ff6f97ce5c193f95996e8a886c5995ab5ff86dd",
+        "rev": "d6a97775412c5e2e45a897d26af5aa6e7f596a20",
         "type": "github"
       },
       "original": {
@@ -446,6 +446,22 @@
         "type": "github"
       }
     },
+    "jetson-stats": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777975381,
+        "narHash": "sha256-fmfuYZHRtMyvNC7fLfrUgl5CGtz6+MkqQ2YI6Ac//cc=",
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "rev": "365a8790c74771dcdc72fe9ebeb475168ea573bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "type": "github"
+      }
+    },
     "makepyshell": {
       "flake": false,
       "locked": {
@@ -482,11 +498,11 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1769379491,
-        "narHash": "sha256-3MpS9AReLB2M7Lxz+qAI2UBWJvhm7PmAG6bulQ/O0S4=",
+        "lastModified": 1781410162,
+        "narHash": "sha256-k3mBP7iY8PhXZHgKpaB/CCKWBjsVkwd05iQU9VSs1Ek=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "0175d43b0ed22d99cd82649eda98a99501bca63e",
+        "rev": "2d64e5a38641d302239e1bb9dd30b2271e1e4bd3",
         "type": "github"
       },
       "original": {
@@ -955,6 +971,7 @@
         "gnc": "gnc",
         "home-manager": "home-manager",
         "jetpack-nixos": "jetpack-nixos",
+        "jetson-stats": "jetson-stats",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -1173,11 +1190,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1767334634,
-        "narHash": "sha256-zYvvI2k/rDuF+9uvQFCsQQzMPmhnXLZO6nLPlgeUYFc=",
+        "lastModified": 1781406286,
+        "narHash": "sha256-Hshdgk7lR6X4FfNAeUJstdYStVQuxJfF9De8j0cz7cs=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "0c08127eb7111da929ce5514b4b8411bc46f250b",
+        "rev": "0c7b7a9b632bd8f25b6a522022e7f1167f60aa73",
         "type": "github"
       },
       "original": {

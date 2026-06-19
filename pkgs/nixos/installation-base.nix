@@ -26,6 +26,7 @@ in
       "networkmanager"
       "dialout"
       "video"
+      "input"
       "docker"
       "systemd-journal"
       "wireshark"

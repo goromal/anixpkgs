@@ -4,6 +4,7 @@
 <head>
     <title>Budget Tool</title>
     <meta charset="utf-8">
+    <link rel="icon" type="image/svg+xml" href="{{ subdomain }}/favicon.svg">
     <script src="https://cdn.jsdelivr.net/npm/ansi_up@5/ansi_up.min.js"></script>
     <style>
         body {
@@ -42,6 +43,11 @@
             font-size: 16px;
             margin-top: 10px;
         }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -70,14 +76,20 @@
     </div>
 
     <div class="section">
-        <button onclick='runCommand({{ url_for("budget.trigger_upload") | tojson }}, "upload-log")'>
+        <button id="upload-btn" onclick='runCommand(
+                {{ url_for("budget.trigger_upload") | tojson }},
+                {{ url_for("budget.stream_upload") | tojson }},
+                "upload-log", "upload-btn", "Upload transactions")'>
             Upload transactions
         </button>
         <div id="upload-log" class="log-box"></div>
     </div>
 
     <div class="section">
-        <button onclick='runCommand({{ url_for("budget.trigger_process") | tojson }}, "process-log")'>
+        <button id="process-btn" onclick='runCommand(
+                {{ url_for("budget.trigger_process") | tojson }},
+                {{ url_for("budget.stream_process") | tojson }},
+                "process-log", "process-btn", "Process transactions")'>
             Process transactions
         </button>
         <div id="process-log" class="log-box"></div>
@@ -98,22 +110,71 @@
             log.scrollTop = log.scrollHeight;
         }
 
-        function runCommand(endpoint, logId) {
-            const log = document.getElementById(logId);
-            log.innerHTML = '';
-            appendLog(log, 'Starting...');
-
-            const evtSource = new EventSource(endpoint);
-
-            evtSource.onmessage = function (event) {
+        function attachStream(streamEndpoint, log, btn, label) {
+            const es = new EventSource(streamEndpoint);
+            es.onmessage = function(event) {
+                if (event.data === '[DONE]') {
+                    es.close();
+                    btn.disabled = false;
+                    btn.textContent = label;
+                    return;
+                }
                 appendLog(log, event.data);
             };
-
-            evtSource.onerror = function () {
+            es.onerror = function() {
                 appendLog(log, '[Connection failed or ended]');
-                evtSource.close();
+                es.close();
+                btn.disabled = false;
+                btn.textContent = label;
             };
         }
+
+        function runCommand(triggerEndpoint, streamEndpoint, logId, btnId, label) {
+            const log = document.getElementById(logId);
+            const btn = document.getElementById(btnId);
+            log.innerHTML = '';
+            btn.disabled = true;
+            btn.textContent = 'Running...';
+
+            fetch(triggerEndpoint, { method: 'POST' })
+                .then(r => {
+                    if (r.status === 409) {
+                        appendLog(log, '[Already in progress, attaching to existing run...]');
+                        attachStream(streamEndpoint, log, btn, label);
+                        return;
+                    }
+                    if (!r.ok) {
+                        return r.json().then(d => { throw new Error(d.error || 'Failed to start'); });
+                    }
+                    attachStream(streamEndpoint, log, btn, label);
+                })
+                .catch(err => {
+                    appendLog(log, 'Error: ' + err.message);
+                    btn.disabled = false;
+                    btn.textContent = label;
+                });
+        }
+
+        // On load, reattach streams for any jobs that are already running
+        fetch({{ url_for("budget.status") | tojson }})
+            .then(r => r.json())
+            .then(data => {
+                if (data.upload === 'running') {
+                    const btn = document.getElementById('upload-btn');
+                    btn.disabled = true;
+                    btn.textContent = 'Running...';
+                    attachStream({{ url_for("budget.stream_upload") | tojson }},
+                        document.getElementById('upload-log'), btn, 'Upload transactions');
+                }
+                if (data.process === 'running') {
+                    const btn = document.getElementById('process-btn');
+                    btn.disabled = true;
+                    btn.textContent = 'Running...';
+                    attachStream({{ url_for("budget.stream_process") | tojson }},
+                        document.getElementById('process-log'), btn, 'Process transactions');
+                }
+            })
+            .catch(() => {});
     </script>
 </body>
 

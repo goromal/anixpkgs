@@ -7,6 +7,7 @@
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
+  devshellPkg = anixpkgs.devshell.override { editorName = cfg.editor; };
 in
 {
   home.packages = [
@@ -18,9 +19,16 @@ in
     anixpkgs.setupws
     anixpkgs.listsources
     anixpkgs.pkgshell
-    (anixpkgs.devshell.override { editorName = cfg.editor; })
+    devshellPkg
     (pkgs.writeShellScriptBin "dsd" ''
-      devshell $@ --run dev
+      if [[ $# -eq 0 ]]; then
+        wsname=$(${pkgs.python3}/bin/python ${devshellPkg.selectWsScript} ~/.devrc)
+        if [[ -n "$wsname" ]]; then
+          devshell "$wsname" --run dev
+        fi
+      else
+        devshell "$@" --run dev
+      fi
     '')
     anixpkgs.cpp-helper
     anixpkgs.py-helper
@@ -28,85 +36,6 @@ in
     anixpkgs.makepyshell
     pkgs.gh
     pkgs.universal-ctags
-    anixpkgs.claude-code-bin
-    anixpkgs.rtk
-    (pkgs.writeShellScriptBin "claude-setup" ''
-      if ! command -v claude &> /dev/null; then
-        echo_red "Error: claude not found in PATH"
-        exit 1
-      fi
-      echo_yellow "Installing claude plugins..."
-      ${lib.concatMapStringsSep "\n      " (
-        marketplace: "claude plugin marketplace add ${marketplace}"
-      ) cfg.claudeMarketplaces}
-      ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.claudePlugins}
-      echo_green "Done! Verify installed plugins with \"claude plugin list\""
-
-      ${lib.optionalString cfg.vikunjaEnabled ''
-        echo_yellow "Setting up Vikunja MCP server..."
-        SECRETS_FILE="$HOME/secrets/vikunja/secrets.json"
-        if [ -f "$SECRETS_FILE" ]; then
-          VIKUNJA_TOKEN=$(${pkgs.jq}/bin/jq -r '.token // empty' "$SECRETS_FILE" 2>/dev/null || echo "")
-
-          if [ -n "$VIKUNJA_TOKEN" ]; then
-            # Remove existing vikunja server if present
-            claude mcp remove vikunja 2>/dev/null || true
-
-            # Add the Vikunja MCP server
-            claude mcp add -s user \
-              -e VIKUNJA_URL=https://ats.local:3457 \
-              -e VIKUNJA_API_TOKEN="$VIKUNJA_TOKEN" \
-              -e VIKUNJA_INSECURE=1 \
-              -- vikunja /run/current-system/sw/bin/vikunja-mcp-server
-
-            echo_green "Vikunja MCP server registered successfully"
-          else
-            echo_yellow "Warning: 'token' not found in $SECRETS_FILE. Skipping Vikunja MCP setup."
-          fi
-        else
-          echo_yellow "Warning: Secrets file $SECRETS_FILE not found. Skipping Vikunja MCP setup."
-        fi
-      ''}
-
-      ${lib.optionalString cfg.notionMcpEnabled ''
-        echo_yellow "Setting up Notion MCP server..."
-        NOTION_SECRETS="$HOME/secrets/notion/secret.json"
-        if [ -f "$NOTION_SECRETS" ]; then
-          claude mcp remove notion 2>/dev/null || true
-          claude mcp add -s user \
-            -e NOTION_TOKEN_FILE="$NOTION_SECRETS" \
-            -- notion /run/current-system/sw/bin/notion-mcp-server
-          echo_green "Notion MCP server registered successfully"
-        else
-          echo_yellow "Warning: $NOTION_SECRETS not found. Skipping Notion MCP setup."
-        fi
-      ''}
-
-      ${lib.optionalString cfg.wikiMcpEnabled ''
-        echo_yellow "Setting up Wiki MCP server..."
-        WIKI_SECRETS_DIR="$HOME/secrets/wiki"
-        if [ -f "$WIKI_SECRETS_DIR/u.txt" ] && [ -f "$WIKI_SECRETS_DIR/p.txt.tyz" ]; then
-          claude mcp remove wiki 2>/dev/null || true
-          claude mcp add -s user \
-            -e WIKI_SECRETS_DIR="$WIKI_SECRETS_DIR" \
-            -- wiki /run/current-system/sw/bin/wiki-mcp-server
-          echo_green "Wiki MCP server registered successfully"
-        else
-          echo_yellow "Warning: $WIKI_SECRETS_DIR/u.txt or p.txt.tyz not found. Skipping Wiki MCP setup."
-        fi
-      ''}
-
-      echo_yellow "Installing rtk Claude Code hook..."
-      rtk init -g
-      echo_green "rtk hook installed"
-
-      echo_yellow "Other setup..."
-      read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
-      echo
-      if [[ $REPLY =~ ^[Yy]$ ]]; then
-        gh auth login
-      fi
-    '')
   ];
 
   programs.git = {
@@ -147,105 +76,4 @@ in
     ]
   );
 
-  systemd.user.services.claude-settings-update =
-    let
-      pluginsObj = builtins.listToAttrs (
-        map (plugin: {
-          name = plugin;
-          value = true;
-        }) cfg.claudePlugins
-      );
-      baseConfig = {
-        enabledPlugins = pluginsObj;
-      };
-      nixosSettings = baseConfig // cfg.extraClaudeSettings;
-      nixosSettingsJson = builtins.toJSON nixosSettings;
-
-      # Group hooks by event and convert to Claude Code settings format
-      hooksByEvent = lib.groupBy (h: h.event) cfg.claudeHooks;
-      hooksConfig = lib.mapAttrs (
-        _event: entries:
-        map (h: {
-          matcher = h.matcher;
-          hooks = [
-            (
-              {
-                type = "command";
-                command = h.command;
-              }
-              // lib.optionalAttrs h.async { async = true; }
-            )
-          ];
-        }) entries
-      ) hooksByEvent;
-      hooksJson = builtins.toJSON hooksConfig;
-      permissionsAllowJson = builtins.toJSON cfg.claudePermissionsAllow;
-
-      mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
-        set -e
-
-        SETTINGS_DIR="$HOME/.claude"
-        SETTINGS_FILE="$SETTINGS_DIR/settings.json"
-        NIXOS_SETTINGS='${nixosSettingsJson}'
-        NIXOS_HOOKS='${hooksJson}'
-        NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
-
-        # Create directory if it doesn't exist
-        ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
-
-        # If settings file doesn't exist, just write the NixOS settings
-        if [ ! -f "$SETTINGS_FILE" ]; then
-          echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
-          echo "Created new Claude settings file with NixOS configuration"
-        else
-          # Merge existing settings with NixOS settings
-          # NixOS settings take precedence for conflicts
-          ${pkgs.jq}/bin/jq -n \
-            --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
-            --argjson nixos "$NIXOS_SETTINGS" \
-            '$existing * $nixos' > "$SETTINGS_FILE.tmp"
-
-          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-          echo "Updated Claude settings, preserving user modifications"
-        fi
-
-        # Append declarative hooks, deduplicating by command
-        if [ "$NIXOS_HOOKS" != "{}" ]; then
-          ${pkgs.jq}/bin/jq \
-            --argjson new_hooks "$NIXOS_HOOKS" \
-            'reduce ($new_hooks | to_entries[]) as $ev (
-              .;
-              .hooks[$ev.key] = (
-                (.hooks[$ev.key] // []) + $ev.value
-                | unique_by(.hooks[0].command)
-              )
-            )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-          echo "Merged declarative hooks into Claude settings"
-        fi
-
-        # Append declarative permissions allowlist, deduplicating
-        if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
-          ${pkgs.jq}/bin/jq \
-            --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
-            '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
-            "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-          ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-          echo "Merged declarative permissions into Claude settings"
-        fi
-      '';
-    in
-    {
-      Unit = {
-        Description = "Update Claude Code settings with NixOS configuration";
-      };
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${mergeScript}";
-        RemainAfterExit = true;
-      };
-      Install = {
-        WantedBy = [ "default.target" ];
-      };
-    };
 }

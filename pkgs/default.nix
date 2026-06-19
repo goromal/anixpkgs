@@ -3,6 +3,7 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
+  unstable = (import ./nixos/dependencies.nix).unstable;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -47,7 +48,8 @@ let
     pkg-attr
     // rec {
       doc = prev.writeTextFile {
-        name = "doc.txt";
+        name = "doc";
+        destination = "/doc.txt";
         text = (
           if builtins.hasAttr "description" pkg-attr.meta then
             (''
@@ -72,6 +74,33 @@ let
   baseJavaArgs = {
     jre = minJRE;
   };
+
+  # crates.io returns 403 for requests without a User-Agent header. nixpkgs PR #512735 fixes this
+  # in fetchCargoVendor but was not backported to nixos-25.11. Remove this once the flake.nix
+  # nixpkgs input is updated to a branch/rev that includes that PR (nixos-26.05 or later).
+  patchedRustPlatform = prev.rustPlatform.overrideScope (
+    rFinal: rPrev: {
+      fetchCargoVendor = rPrev.fetchCargoVendor.override {
+        writers = prev.writers // {
+          writePython3Bin =
+            name: args: content:
+            prev.writers.writePython3Bin name args (
+              if name != "fetch-cargo-vendor-util" then
+                content
+              else
+                builtins.replaceStrings
+                  [
+                    "    session = requests.Session()\n    session.mount('http://"
+                  ]
+                  [
+                    "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
+                  ]
+                  content
+            );
+        };
+      };
+    }
+  );
 
   baseModuleArgs = {
     pkgs = final;
@@ -115,6 +144,18 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              jetson-stats = addDoc (
+                pySelf.callPackage ./python-packages/jetson-stats {
+                  pkg-src = flakeInputs.jetson-stats;
+                }
+              );
+              jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
+              jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
+              jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
+              jupyter-nbmodel-client = pySelf.callPackage ./python-packages/jupyter-nbmodel-client { };
+              jupyter-mcp-tools = pySelf.callPackage ./python-packages/jupyter-mcp-tools { };
+              jupyter-server-nbmodel = pySelf.callPackage ./python-packages/jupyter-server-nbmodel { };
+              jupyter-mcp-server = addDoc (pySelf.callPackage ./python-packages/jupyter-mcp-server { });
               goromail = addDoc (pySelf.callPackage ./python-packages/goromail { });
               symforce = addDoc (pySelf.callPackage ./python-packages/symforce { });
               fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -253,6 +294,10 @@ let
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
+              intake_ui = addDoc (pySelf.callPackage ./python-packages/flasks/intake_ui { });
+              vdlserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -357,6 +402,8 @@ rec {
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
+  intake_ui = final.python313.pkgs.intake_ui;
+  vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
@@ -366,6 +413,8 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  jetson-stats = final.python313.pkgs.jetson-stats;
+  jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
 
@@ -534,21 +583,25 @@ rec {
   manif-geom-rs = addDoc (
     prev.callPackage ./rust-packages/manif-geom-rs {
       pkg-src = flakeInputs.manif-geom-rs;
+      rustPlatform = patchedRustPlatform;
     }
   );
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
+      rustPlatform = patchedRustPlatform;
     }
   );
   sunnyside = addDoc (
     prev.callPackage ./rust-packages/sunnyside {
       pkg-src = flakeInputs.sunnyside;
+      rustPlatform = patchedRustPlatform;
     }
   );
   rtk = addDoc (
     prev.callPackage ./rust-packages/rtk {
       pkg-src = flakeInputs.rtk;
+      rustPlatform = patchedRustPlatform;
     }
   );
 
@@ -569,6 +622,6 @@ rec {
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
 
-  # Override claude-code-bin to use version 2.1.113
+  # Override claude-code-bin to use version 2.1.177
   claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

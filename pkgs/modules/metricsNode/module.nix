@@ -42,6 +42,7 @@ in
         name = "Grafana";
         path = "/grafana/";
         description = "Metrics and monitoring dashboards";
+        icon = "chart-line";
       }
     ];
 

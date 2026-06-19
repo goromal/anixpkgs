@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <link rel="icon" type="image/svg+xml" href="/videodl/favicon.svg">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+
+        h1 {
+            color: #212529;
+            margin: 0 0 24px 0;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        @media (max-width: 767px) {
+            h1 { font-size: 1.5rem; }
+            .container { padding: 15px 10px; }
+        }
+
+        /* Fetch card */
+        .fetch-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .fetch-card label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .url-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #urlInput {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 2px solid #ced4da;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+            min-height: 48px;
+        }
+
+        #urlInput:focus {
+            outline: none;
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78,115,223,0.15);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            cursor: pointer;
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 48px;
+            touch-action: manipulation;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: #2e59d9;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn:active { opacity: 0.85; }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .btn-green {
+            background-color: #1cc88a;
+        }
+        .btn-green:hover { background-color: #17a673; }
+
+        .btn-danger {
+            background-color: #e74a3b;
+        }
+        .btn-danger:hover { background-color: #d32f2f; }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover { background-color: #5a6268; }
+
+        /* Status message */
+        .status-message {
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: none;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        /* Video section */
+        #videoSection {
+            display: none;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #videoTitle {
+            padding: 16px 20px 0 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #495057;
+            word-break: break-word;
+        }
+
+        #videoPlayer {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 60vh;
+            background: #000;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            flex-wrap: wrap;
+        }
+
+        .video-actions .btn {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        @media (max-width: 480px) {
+            .video-actions { flex-direction: column; }
+            .video-actions .btn { width: 100%; flex: none; }
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.72);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active { display: flex; }
+
+        .loading-spinner {
+            width: 64px;
+            height: 64px;
+            border: 6px solid rgba(255, 255, 255, 0.25);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-message {
+            color: #ffffff;
+            margin-top: 22px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        /* Save modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 8000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px 14px 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #6c757d;
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: color 0.15s;
+        }
+
+        .modal-close:hover { color: #212529; }
+
+        .modal-body {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px;
+        }
+
+        /* Dir picker */
+        .dir-picker {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .dir-picker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .dir-picker-path {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            min-height: 36px;
+            font-size: 0.9rem;
+        }
+
+        .dir-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 120px;
+            max-height: 260px;
+        }
+
+        .dir-list li + li {
+            border-top: 1px solid #f1f3f5;
+        }
+
+        .dir-list-empty {
+            padding: 24px 16px;
+            color: #6c757d;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+
+        .dir-btn {
+            width: 100%;
+            padding: 10px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #212529;
+            transition: background-color 0.15s;
+            touch-action: manipulation;
+        }
+
+        .dir-btn:hover { background-color: #e9f0ff; }
+        .dir-btn:active { background-color: #d0e0ff; }
+
+        .dir-btn::before {
+            content: '📁 ';
+            font-size: 0.9rem;
+        }
+
+        .dir-picker-actions {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .dir-picker-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-message" id="loadingMessage">Downloading video...</div>
+    </div>
+
+    <!-- Save-to-server modal -->
+    <div class="modal-overlay" id="saveModal" onclick="handleModalOverlayClick(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2>Save to Server</h2>
+                <button class="modal-close" onclick="closeSavePicker()" title="Cancel">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="dir-picker">
+                    <div class="dir-picker-header">
+                        <span class="dir-picker-path" id="pickerCurrentPath">/</span>
+                        <button class="btn btn-secondary btn-sm" onclick="pickerNavigateUp()">&#8593; Up</button>
+                    </div>
+                    <ul class="dir-list" id="dirList">
+                        <li><span class="dir-list-empty">Loading...</span></li>
+                    </ul>
+                    <div class="dir-picker-actions">
+                        <button class="btn btn-danger btn-sm" onclick="closeSavePicker()">Cancel</button>
+                        <button class="btn btn-green btn-sm" onclick="selectPickerDir()">Save Here</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Video Downloader</h1>
+
+        <!-- Status message -->
+        <div class="status-message" id="statusMessage"></div>
+
+        <!-- URL fetch card -->
+        <div class="fetch-card">
+            <label for="urlInput">Video URL</label>
+            <div class="url-row">
+                <input
+                    type="url"
+                    id="urlInput"
+                    placeholder="https://www.youtube.com/watch?v=... or TikTok, etc."
+                    autocomplete="off"
+                    autocorrect="off"
+                    spellcheck="false"
+                />
+                <button class="btn" id="fetchBtn" onclick="doFetch()">Fetch</button>
+            </div>
+        </div>
+
+        <!-- Video section (hidden until fetch succeeds) -->
+        <div id="videoSection">
+            <div id="videoTitle"></div>
+            <video id="videoPlayer" controls></video>
+            <div class="video-actions">
+                <button class="btn btn-green" id="clientDownloadBtn" onclick="doClientDownload()">
+                    Download to this computer
+                </button>
+                <button class="btn" id="saveToServerBtn" onclick="openSavePicker()">
+                    Save to server
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== STATE =====
+
+        let _currentToken = null;
+
+        // ===== STATUS =====
+
+        function showStatus(message, isError) {
+            const el = document.getElementById('statusMessage');
+            el.textContent = message;
+            el.className = 'status-message ' + (isError ? 'status-error' : 'status-success');
+            el.style.display = 'block';
+            // Auto-hide success messages after 6 s; keep errors visible until next action
+            if (!isError) {
+                setTimeout(() => { el.style.display = 'none'; }, 6000);
+            }
+        }
+
+        function clearStatus() {
+            const el = document.getElementById('statusMessage');
+            el.style.display = 'none';
+        }
+
+        // ===== LOADING =====
+
+        function showLoading(message) {
+            document.getElementById('loadingMessage').textContent = message || 'Processing...';
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        // ===== UI HELPERS =====
+
+        function showVideoSection(token, title, filename) {
+            _currentToken = token;
+            document.getElementById('videoTitle').textContent = title || filename || '';
+            const player = document.getElementById('videoPlayer');
+            player.src = 'api/stream/' + token;
+            document.getElementById('videoSection').style.display = 'block';
+            document.getElementById('clientDownloadBtn').disabled = false;
+            document.getElementById('saveToServerBtn').disabled = false;
+        }
+
+        function resetUI() {
+            _currentToken = null;
+            document.getElementById('videoSection').style.display = 'none';
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.src = '';
+            document.getElementById('videoTitle').textContent = '';
+            document.getElementById('urlInput').value = '';
+        }
+
+        // ===== FETCH =====
+
+        function doFetch() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                showStatus('Please enter a video URL.', true);
+                return;
+            }
+            clearStatus();
+            document.getElementById('videoSection').style.display = 'none';
+            showLoading('Downloading video...');
+            document.getElementById('fetchBtn').disabled = true;
+
+            fetch('api/fetch', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({url: url})
+            })
+            .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+            .then(function(result) {
+                hideLoading();
+                document.getElementById('fetchBtn').disabled = false;
+                if (!result.ok || result.data.error) {
+                    showStatus('Error: ' + (result.data.error || 'Unknown error'), true);
+                    return;
+                }
+                showVideoSection(result.data.token, result.data.title, result.data.filename);
+            })
+            .catch(function(err) {
+                hideLoading();
+                document.getElementById('fetchBtn').disabled = false;
+                showStatus('Error: ' + err.message, true);
+            });
+        }
+
+        // Allow pressing Enter in the URL field to trigger Fetch
+        document.getElementById('urlInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') doFetch();
+        });
+
+        // ===== CLIENT DOWNLOAD =====
+
+        function doClientDownload() {
+            if (!_currentToken) return;
+            const token = _currentToken;
+            // Disable buttons — token is consumed server-side after this call
+            document.getElementById('clientDownloadBtn').disabled = true;
+            document.getElementById('saveToServerBtn').disabled = true;
+
+            // Trigger browser download via hidden link
+            const a = document.createElement('a');
+            a.href = 'api/client-download/' + token;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // Token is now consumed; reset UI after a brief delay
+            setTimeout(function() {
+                showStatus('Download triggered — check your browser downloads. If nothing arrived, re-fetch and try again.');
+                resetUI();
+            }, 800);
+        }
+
+        // ===== FOLDER PICKER =====
+
+        let _pickerPath = '/';
+        let _pendingToken = null;
+
+        function openSavePicker() {
+            _pendingToken = _currentToken;
+            if (!_pendingToken) return;
+            document.getElementById('saveModal').classList.add('active');
+            _pickerPath = '/';
+            loadPickerDirs(_pickerPath);
+        }
+
+        function closeSavePicker() {
+            document.getElementById('saveModal').classList.remove('active');
+        }
+
+        function handleModalOverlayClick(e) {
+            // Close if clicking on the dark backdrop (not the modal box itself)
+            if (e.target === document.getElementById('saveModal')) {
+                closeSavePicker();
+            }
+        }
+
+        function loadPickerDirs(path) {
+            const list = document.getElementById('dirList');
+            list.innerHTML = '<li><span class="dir-list-empty">Loading...</span></li>';
+
+            fetch('api/list-dirs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: path})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.error) {
+                    showStatus('Error: ' + data.error, true);
+                    return;
+                }
+                _pickerPath = data.path;
+                document.getElementById('pickerCurrentPath').textContent = data.path;
+                list.innerHTML = '';
+                if (data.dirs.length === 0) {
+                    list.innerHTML = '<li><span class="dir-list-empty">No subdirectories</span></li>';
+                    return;
+                }
+                data.dirs.forEach(function(dir) {
+                    const li = document.createElement('li');
+                    const btn = document.createElement('button');
+                    btn.className = 'dir-btn';
+                    btn.textContent = dir;
+                    const fullPath = data.path === '/' ? '/' + dir : data.path + '/' + dir;
+                    btn.onclick = function() { loadPickerDirs(fullPath); };
+                    li.appendChild(btn);
+                    list.appendChild(li);
+                });
+            })
+            .catch(function(err) {
+                var list = document.getElementById('dirList');
+                if (list) list.innerHTML = '<li><span style="padding:12px 16px;display:block;color:#721c24;">Failed to load: ' + err.message + '</span></li>';
+            });
+        }
+
+        function pickerNavigateUp() {
+            if (_pickerPath === '/') return;
+            var parent = _pickerPath.split('/').slice(0, -1).join('/') || '/';
+            loadPickerDirs(parent);
+        }
+
+        function selectPickerDir() {
+            if (!_pendingToken) return;
+            fetch('api/save-to-server', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token: _pendingToken, path: _pickerPath})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    closeSavePicker();
+                    showStatus('Saved to: ' + data.saved_to);
+                    resetUI();
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(function(err) {
+                showStatus('Error: ' + err.message, true);
+            });
+        }
+    </script>
+</body>
+
+</html>
