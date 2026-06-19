@@ -737,7 +737,6 @@ in
           sd
           clang
           clang-tools
-          neofetch
           onefetch
           man-pages
           black
