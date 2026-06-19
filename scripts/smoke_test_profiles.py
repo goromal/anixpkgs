@@ -15,7 +15,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 NIXOS_DIR = REPO_ROOT / "pkgs/nixos"
-NIXOS_STATE = os.environ.get("NIXOS_VERSION", "25.11")
+NIXOS_STATE = os.environ.get("NIXOS_VERSION", "26.05")
 
 BOOL_OPTIONS = [
     "graphical",

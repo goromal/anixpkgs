@@ -265,17 +265,6 @@ in
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
     ../python-packages/flasks/intake_ui/module.nix
-    (
-      let
-        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
-        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
-        jetpackSrc = builtins.fetchTarball {
-          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
-          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
-        };
-      in
-      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    )
   ];
 
   config = lib.mkMerge [
@@ -377,11 +366,6 @@ in
             echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
           ''
         );
-      };
-
-      hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
-      hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
-        enable = true;
       };
 
       # https://github.com/NixOS/nixpkgs/issues/154163

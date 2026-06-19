@@ -2,11 +2,11 @@
   description = "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/26.05";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
 
-    home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-25.11";
+    home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
@@ -251,9 +251,10 @@
           jetpackNixpkgs.lib.nixosSystem {
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
-            # jetpack-nixos.nixosModules.default is intentionally omitted: pc-base.nix
-            # imports a pinned older version to avoid a regression from PR #485.
-            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-nx.nix ];
+            modules = commonModules ++ [
+              jetpack-nixos.nixosModules.default
+              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
+            ];
           };
 
         # Drone simulation

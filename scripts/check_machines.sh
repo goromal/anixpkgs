@@ -24,9 +24,10 @@ export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 
 # Map from display name to flake nixosConfigurations key
-configurations=(jetpack-orin-nx personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi)
+# jetpack-orin-nx is excluded until jetpack-nixos supports nixpkgs 26.05
+# (modules/services-modular uses lib/services/lib.nix which was removed in 26.05)
+configurations=(personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi)
 declare -A flake_keys=(
-    [jetpack-orin-nx]="jetson-orin-nx"
     [personal-inspiron]="atorgesen-inspiron"
     [personal-panasonic]="atorgesen-panasonic"
     [personal-dell]="atorgesen-dell"

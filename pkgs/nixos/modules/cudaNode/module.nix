@@ -48,9 +48,6 @@ in
         services.launchpad.enable = true;
         services.launchpad.pythonPackages = cfg.pythonPackages;
       }
-      (lib.mkIf (config.machines.base.machineType == "jetson") {
-        hardware.nvidia-jetpack.configureCuda = true;
-      })
       (lib.mkIf (config.machines.base.machineType != "jetson") {
         nixpkgs.config.cudaSupport = true;
         nix.settings.substituters = [ "https://cuda-maintainers.cachix.org" ];
