@@ -21,13 +21,7 @@ export NIXPKGS_ALLOW_UNFREE=1
 export NIXPKGS_ALLOW_INSECURE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
-# In CI, the flake source is copied to the Nix store as a read-only snapshot, so
-# builtins.storePath (used by flake-compat inside default.nix) cannot resolve it.
-# local-build=true is only useful for local development where the source is already
-# a store path. The NixOS module code is always from the local flake source.
-if [ -z "${GITHUB_ACTIONS:-}" ]; then
-    sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
-fi
+sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
 
 # Map from display name to flake nixosConfigurations key
 # jetpack-orin-nx is excluded until jetpack-nixos supports nixpkgs 26.05
