@@ -9,7 +9,7 @@ on:
         default: ''
 
 env:
-  NIXOS_VERSION: 25.11
+  NIXOS_VERSION: 26.05
 
 jobs:
   diff:
@@ -44,10 +44,9 @@ jobs:
           ref: ${{ steps.refs.outputs.base_sha }}
           path: base
 
-      - uses: cachix/install-nix-action@v31
+      - uses: DeterminateSystems/nix-installer-action@v16
         with:
-          nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
-          extra_nix_config: |
+          extra-conf: |
             extra-platforms = aarch64-linux
 
       - name: Run profile diff
