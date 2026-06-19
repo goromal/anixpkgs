@@ -224,6 +224,12 @@
           modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-panasonic.nix ];
         };
 
+        atorgesen-dell = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-dell.nix ];
+        };
+
         # ATS servers
         ats = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -245,12 +251,9 @@
           jetpackNixpkgs.lib.nixosSystem {
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
-            modules = [
-              jetpack-nixos.nixosModules.default
-              determinate.nixosModules.default
-              commonNixpkgsModule
-              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
-            ];
+            # jetpack-nixos.nixosModules.default is intentionally omitted: pc-base.nix
+            # imports a pinned older version to avoid a regression from PR #485.
+            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-nx.nix ];
           };
 
         # Drone simulation
