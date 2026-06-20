@@ -596,11 +596,11 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1781968960,
-        "narHash": "sha256-8RuZ0Pw7Pc2ttR6vatVOKd9wXawzXfHW+9R9jnXAjD8=",
+        "lastModified": 1781993739,
+        "narHash": "sha256-yNNdvJWaF13jhothVLDyhNA76BhFvT8YO4NBWvdsB7g=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "7780ebde2e58abea8812164c8d9ec315af87f0bd",
+        "rev": "99c71c0fb736b968db0b72616b681715d1a95c08",
         "type": "github"
       },
       "original": {
