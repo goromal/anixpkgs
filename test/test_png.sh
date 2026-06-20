@@ -28,7 +28,7 @@ cat > test.svg << 'SVGEOF'
 SVGEOF
 png test.svg svg_out.png
 [[ -s svg_out.png ]] || { echo_red "SVG to PNG conversion produced no output"; exit 1; }
-SVG_DIMS=$(identify -format "%wx%h" svg_out.png 2>/dev/null)
+SVG_DIMS=$(python3 -c "import struct; f=open('svg_out.png','rb'); f.read(16); w,h=struct.unpack('>II',f.read(8)); print(f'{w}x{h}')" 2>/dev/null)
 [[ "$SVG_DIMS" == "20x20" ]] || { echo_red "SVG to PNG has wrong dimensions: expected 20x20, got $SVG_DIMS"; exit 1; }
 
 # Cleanup
