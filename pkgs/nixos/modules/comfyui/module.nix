@@ -11,7 +11,11 @@ let
 in
 {
   options.services.comfyui = {
-    enable = lib.mkEnableOption "ComfyUI Stable Diffusion server";
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = config.machines.cudaNode.enable;
+      description = "ComfyUI Stable Diffusion server (defaults on for GPU/cudaNode machines)";
+    };
     port = lib.mkOption {
       type = lib.types.port;
       default = service-ports.comfyui;

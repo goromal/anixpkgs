@@ -13,7 +13,6 @@
   machines.base.wifiInterfaceName = "wlp0s13f0u1u4";
   machines.base.acceptRemoteBuilds = true;
   machines.cudaNode.enable = true;
-  services.comfyui.enable = true;
   machines.base.timedOrchJobs = [
     {
       name = "launchpad-sync";
