@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from flask import Blueprint, Flask, Response, jsonify, render_template, request
+from flask import Blueprint, Flask, Response, jsonify, render_template, request, send_file
 
 from run_store import RunStore
 
@@ -97,6 +97,17 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
         if not store.start(cmd):
             return jsonify({"error": "Upgrade already in progress"}), 409
         return jsonify({"started": True}), 202
+
+    @bp.route("/log")
+    def download_log():
+        if not os.path.isfile(store.log_path):
+            return Response("No log available\n", mimetype="text/plain")
+        return send_file(
+            store.log_path,
+            mimetype="text/plain",
+            as_attachment=True,
+            download_name="anix-upgrade.log",
+        )
 
     @bp.route("/stream")
     def stream():
