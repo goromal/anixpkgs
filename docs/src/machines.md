@@ -72,7 +72,6 @@ Corresponding `~/.bashrc`:
 
 ```bash
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-export NIXPKGS_ALLOW_UNFREE=1
 # alias code='codium'
 # eval "$(direnv hook bash)"
 ```
@@ -86,7 +85,7 @@ Determinate Nix manages the shell environment setup automatically, so the manual
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
-1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
+1. Build the installation ISO with `nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
@@ -97,7 +96,7 @@ Determinate Nix manages the shell environment setup automatically, so the manual
 9. If everything went well, reboot
 10. On the next reboot, login as user `andrew` again
 11. Connect to the internet
-12. Run `anix-init` 
+12. Run `anix-init` to set up cloud sync and SSH keys, then follow the printed next steps
 13. Enjoy!
 
 ## JetPack Machine Installation Instructions
@@ -114,7 +113,7 @@ Determinate Nix manages the shell environment setup automatically, so the manual
 10. If everything went well, reboot
 11. On the next reboot, login as user `andrew` again
 12. Connect to the internet
-13. Run `anix-init` 
+13. Run `anix-init` to set up cloud sync and SSH keys, then follow the printed next steps
 14. Enjoy!
 
 ## Upgrading NixOS versions with `anixpkgs`
@@ -147,14 +146,14 @@ dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
 
 ## Build a NixOS ISO Image
 
-***TODO (untested)***; work out hardware configuration portion.
+Use the flake-based installer target (same as the personal installer above):
 
 ```bash
-nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage
 ```
 
 ```bash
-sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
+sudo dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
 ## Local SSL Setup for HTTPS Access
@@ -322,7 +321,7 @@ The easiest way is to store your API token in `~/secrets/vikunja/secrets.json` o
 
 After adding the token, rebuild your system configuration to install the MCP server:
 ```bash
-sudo nixos-rebuild switch
+anix-upgrade --local
 ```
 
 Then run the `claude-setup` script to register the MCP server:
