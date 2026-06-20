@@ -69,9 +69,9 @@ rec {
       cp -r ${flakeInputs.mavlink}/* modules/mavlink_c_library_v2/.
     '';
     postPatch = ''
-      substituteInPlace src/dedup.h \
-        --replace-fail '#include <memory>' '#include <memory>
-#include <cstdint>'
+            substituteInPlace src/dedup.h \
+              --replace-fail '#include <memory>' '#include <memory>
+      #include <cstdint>'
     '';
     mesonFlags = [
       "--buildtype=release"
