@@ -372,9 +372,6 @@
                     # --- INSTALL NIXOS ---
                     echo
                     echo "Installing NixOS profile..."
-                    nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-                    nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-                    nix-channel --update
                     nixos-generate-config --root /mnt/nixos
                     sudo -u andrew HARDWARE_NAME="$HARDWARE_NAME" bash <<'EOF'
                     cd /data/andrew
@@ -385,18 +382,16 @@
                     sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     cd anixpkgs
-                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
-                    cd /data/andrew
-                    mkdir -p ~/.config/nixpkgs
-                    echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                    python3 -c "
+                    hw='$HARDWARE_NAME'
+                    with open('flake.nix') as f: c=f.read()
+                    e='        atorgesen-'+hw+' = nixpkgs.lib.nixosSystem {\n          system = \"x86_64-linux\";\n          specialArgs = commonSpecialArgs;\n          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-'+hw+'.nix ];\n        };\n\n'
+                    c=c.replace('        # ATS servers',e+'        # ATS servers',1)
+                    open('flake.nix','w').write(c)
+                    "
+                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix flake.nix
                     EOF
-                    mkdir -p /root/.config/nixpkgs
-                    cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
-                    rm /mnt/nixos/etc/nixos/*
-                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-''${HARDWARE_NAME}.nix /mnt/nixos/etc/nixos/configuration.nix
-                    export NIXPKGS_ALLOW_UNFREE=1
-                    export NIXPKGS_ALLOW_INSECURE=1
-                    nixos-install --root /mnt/nixos
+                    nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#atorgesen-$HARDWARE_NAME
                     echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                   '')
                 ];
@@ -525,9 +520,6 @@
                       # --- INSTALL NIXOS ---
                       echo
                       echo "Installing NixOS profile..."
-                      nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-                      nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-                      nix-channel --update
                       nixos-generate-config --root /mnt/nixos
                       sudo -u andrew VARIANT="$VARIANT" bash <<'INNEREOF'
                       cd /data/andrew
@@ -537,18 +529,16 @@
                       sed -i "s/orin-nx/$VARIANT/g" anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       sed -i 's/machines\.base\.nixosState *= *[^;]*/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       cd anixpkgs
-                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix
-                      cd /data/andrew
-                      mkdir -p ~/.config/nixpkgs
-                      echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                      python3 -c "
+                      v='$VARIANT'
+                      with open('flake.nix') as f: c=f.read()
+                      e='        jetson-'+v+' =\n          let\n            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;\n          in\n          jetpackNixpkgs.lib.nixosSystem {\n            system = \"aarch64-linux\";\n            specialArgs = commonSpecialArgs;\n            modules = commonModules ++ [\n              jetpack-nixos.nixosModules.default\n              ./pkgs/nixos/configurations/jetpack-'+v+'.nix\n            ];\n          };\n\n'
+                      c=c.replace('        # Drone simulation',e+'        # Drone simulation',1)
+                      open('flake.nix','w').write(c)
+                      "
+                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix flake.nix
                       INNEREOF
-                      mkdir -p /root/.config/nixpkgs
-                      cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
-                      rm /mnt/nixos/etc/nixos/*
-                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-''${VARIANT}.nix /mnt/nixos/etc/nixos/configuration.nix
-                      export NIXPKGS_ALLOW_UNFREE=1
-                      export NIXPKGS_ALLOW_INSECURE=1
-                      nixos-install --root /mnt/nixos
+                      nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#jetson-$VARIANT
                       echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                     '')
                   ];
