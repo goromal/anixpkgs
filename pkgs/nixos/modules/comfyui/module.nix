@@ -8,6 +8,7 @@ let
   service-ports = import ../../service-ports.nix;
   cfg = config.services.comfyui;
   extendedPkgs = pkgs.extend (import ../../../../overlay.nix);
+  vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
 in
 {
   options.services.comfyui = {
@@ -27,6 +28,17 @@ in
     package = lib.mkOption {
       type = lib.types.package;
       default = extendedPkgs.comfyui;
+    };
+    vramMode = lib.mkOption {
+      type = lib.types.enum [
+        "lowvram"
+        "normalvram"
+        "highvram"
+        "novram"
+        "auto"
+      ];
+      default = if config.machines.base.machineType == "jetson" then "normalvram" else "lowvram";
+      description = "ComfyUI VRAM strategy; 'auto' lets ComfyUI decide (no flag).";
     };
     cozy = {
       enable = lib.mkOption {
@@ -110,7 +122,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db --lowvram";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag}";
             ReadWritePaths = [
               cfg.dataDir
               "/tmp"
