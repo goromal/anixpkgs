@@ -68,21 +68,9 @@ let
       echo_yellow "Skipping SSH config setup"
     fi
 
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
-    sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-    sudo nix-channel --update
     echo
-    echo
-    echo_green "DONE. Note the hardware-config.nix file below:"
-    echo
-    nixos-generate-config --show-hardware-config
-    echo
-    echo_green  "Use the config above as you set up anix-upgrade:"
-    echo_yellow "  - Use devshell to create a workspace with anixpkgs"
-    echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
-    echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
-    echo_yellow "  - Run anix-upgrade"
+    echo_green "DONE. Next steps:"
+    echo_yellow "  - Run: nixos-rebuild switch --flake $HOME/sources/anixpkgs#$(hostname)"
     echo_yellow "  - Create new secrets and configs entries"
     echo
     echo_green "Have fun!"

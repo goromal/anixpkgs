@@ -31,6 +31,49 @@ jobs:
           echo "No linting changes to commit"
         fi
         nix shell nixpkgs#nixfmt -c bash scripts/lint.sh check
+  verify-add-machine-script:
+    name: Verify add-machine-to-flake.py
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - run: |
+        set -euo pipefail
+        cp flake.nix flake.nix.bak
+
+        # personal: entry inserted correctly
+        python3 scripts/add-machine-to-flake.py personal testmachine
+        grep -q 'atorgesen-testmachine = nixpkgs.lib.nixosSystem' flake.nix \
+          || { echo "FAIL: personal entry not found"; exit 1; }
+
+        # personal: idempotent
+        python3 scripts/add-machine-to-flake.py personal testmachine
+        count=$(grep -c 'atorgesen-testmachine' flake.nix)
+        [ "$count" -eq 1 ] \
+          || { echo "FAIL: personal idempotency, found $count occurrences"; exit 1; }
+
+        cp flake.nix.bak flake.nix
+
+        # jetpack: entry inserted correctly
+        python3 scripts/add-machine-to-flake.py jetpack orin-agx
+        grep -q 'jetson-orin-agx =' flake.nix \
+          || { echo "FAIL: jetpack entry not found"; exit 1; }
+
+        # jetpack: idempotent
+        python3 scripts/add-machine-to-flake.py jetpack orin-agx
+        count=$(grep -c 'jetson-orin-agx' flake.nix)
+        [ "$count" -eq 1 ] \
+          || { echo "FAIL: jetpack idempotency, found $count occurrences"; exit 1; }
+
+        cp flake.nix.bak flake.nix
+
+        # missing anchor: must fail loudly
+        echo 'not a flake' > flake.nix
+        python3 scripts/add-machine-to-flake.py personal another 2>/dev/null \
+          && { echo "FAIL: should have exited non-zero on missing anchor"; exit 1; } || true
+
+        cp flake.nix.bak flake.nix
+        echo "All checks passed."
+
   check-flake-lock:
     name: Check Flake Lock Sync
     needs: lint
