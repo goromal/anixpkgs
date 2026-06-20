@@ -86,15 +86,16 @@
     "crowcpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1681531350,
-        "narHash": "sha256-IRlrNDLbYAOT4WlnX68FB4FBHKS1FC1uUTeVfIpfZDM=",
+        "lastModified": 1781969066,
+        "narHash": "sha256-gMoBewSqT5BLS/LmT3FtN5AIHFugoBCxpIINrB6J618=",
         "owner": "goromal",
         "repo": "Crow",
-        "rev": "8405788649538e5a45c791af5db5df5e171a8844",
+        "rev": "b702453a4dc9442d57aa4e7ca6c25af231d1a314",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/26.05",
         "repo": "Crow",
         "type": "github"
       }
@@ -595,15 +596,16 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1766897832,
-        "narHash": "sha256-oMdbVcbk3pBegoKD6BQOYhTzQUXHvaxeGSbIPi4uqqE=",
+        "lastModified": 1781968960,
+        "narHash": "sha256-8RuZ0Pw7Pc2ttR6vatVOKd9wXawzXfHW+9R9jnXAjD8=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "62878869d06545ee6a28fc5a757159b4f8664abd",
+        "rev": "7780ebde2e58abea8812164c8d9ec315af87f0bd",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/26.05",
         "repo": "mscpp",
         "type": "github"
       }

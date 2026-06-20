@@ -33,7 +33,7 @@
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
-    crowcpp.url = "github:goromal/Crow";
+    crowcpp.url = "github:goromal/Crow?ref=dev/26.05";
     crowcpp.flake = false;
 
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
@@ -86,7 +86,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp";
+    mscpp.url = "github:goromal/mscpp?ref=dev/26.05";
     mscpp.flake = false;
 
     notion-tools.url = "github:goromal/notion-tools";

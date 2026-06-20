@@ -9,7 +9,6 @@ clangStdenv.mkDerivation {
   name = "mscpp";
   version = "1.0.0";
   src = pkg-src;
-  patches = [ ./libc++21-compat.patch ];
   nativeBuildInputs = [ cmake ];
   buildInputs = [
     catch2
