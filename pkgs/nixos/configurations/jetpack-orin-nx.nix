@@ -9,13 +9,10 @@
     ../profiles/jetpack.nix
     ../hardware/orin-nx.nix
   ];
-  machines.base.nixosState = "26.05";
+  machines.base.nixosState = "25.11";
   machines.base.wifiInterfaceName = "wlp1s0";
-  hardware.nvidia-jetpack.enable = true;
   hardware.nvidia-jetpack.som = "orin-nx";
   hardware.nvidia-jetpack.carrierBoard = "devkit";
-  hardware.nvidia-jetpack.configureCuda = true;
-  hardware.graphics.enable = true;
   networking.hostName = "jetson-orin-nx";
 
   nix.settings.max-jobs = lib.mkForce 1;
