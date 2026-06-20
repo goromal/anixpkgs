@@ -133,7 +133,8 @@
 
   <h5>Output</h5>
   <div id="log" class="log-box mb-2"></div>
-  <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('log').innerHTML=''">Clear</button>
+  <button class="btn btn-sm btn-outline-secondary" onclick="_clearLog()">Clear</button>
+  <a id="dl-log-btn" class="btn btn-sm btn-outline-secondary ms-2" href="#">Download log</a>
 </div>
 
 <script>
@@ -156,12 +157,67 @@ function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function appendLog(msg) {
+// ── Log output (batched to avoid browser freeze on large replays) ────────────
+
+const MAX_LOG_LINES = 500;
+let _logLineCount = 0;
+let _logQueue = [];
+let _logFlushTimer = null;
+let _logTruncNotice = null;
+
+function _clearLog() {
+  clearTimeout(_logFlushTimer);
+  _logFlushTimer = null;
+  _logQueue = [];
+  _logLineCount = 0;
+  _logTruncNotice = null;
+  $('log').innerHTML = '';
+}
+
+function _flushLog() {
+  _logFlushTimer = null;
+  if (!_logQueue.length) return;
   const log = $('log');
-  const line = document.createElement('span');
-  line.innerHTML = (ansiUp ? ansiUp.ansi_to_html(msg) : escHtml(msg)) + '\n';
-  log.appendChild(line);
-  log.scrollTop = log.scrollHeight;
+  const atBottom = log.scrollHeight - log.clientHeight - log.scrollTop < 20;
+  const frag = document.createDocumentFragment();
+  for (const html of _logQueue) {
+    const line = document.createElement('span');
+    line.innerHTML = html;
+    frag.appendChild(line);
+    _logLineCount++;
+  }
+  _logQueue = [];
+  log.appendChild(frag);
+  // Trim lines that exceed the cap (keep notice pinned at top)
+  if (_logLineCount > MAX_LOG_LINES) {
+    const toRemove = _logLineCount - MAX_LOG_LINES;
+    let removed = 0;
+    while (removed < toRemove) {
+      const first = log.firstChild;
+      if (!first) break;
+      if (first === _logTruncNotice) {
+        if (first.nextSibling) { log.removeChild(first.nextSibling); removed++; }
+        else break;
+      } else {
+        log.removeChild(first); removed++;
+      }
+    }
+    _logLineCount = MAX_LOG_LINES;
+    if (!_logTruncNotice) {
+      _logTruncNotice = document.createElement('div');
+      _logTruncNotice.style.cssText = 'color:#999;font-style:italic;padding:2px 0 8px';
+      _logTruncNotice.textContent = '[ Earlier output truncated — use "Download log" for full output ]';
+    }
+    if (log.firstChild !== _logTruncNotice) {
+      log.insertBefore(_logTruncNotice, log.firstChild);
+    }
+  }
+  if (atBottom) log.scrollTop = log.scrollHeight;
+}
+
+function appendLog(msg) {
+  _logQueue.push((ansiUp ? ansiUp.ansi_to_html(msg) : escHtml(msg)) + '\n');
+  if (!_logFlushTimer) _logFlushTimer = setTimeout(_flushLog, 50);
 }
 
 function resetRunButton() {
@@ -269,7 +325,7 @@ function attachStream() {
   es = new EventSource(subdomain + '/stream');
   // Also fires on auto-reconnect (e.g. the upgrade restarted this service):
   // clear the log so the server-side replay isn't duplicated.
-  es.onopen = () => { $('log').innerHTML = ''; };
+  es.onopen = () => { _clearLog(); };
   es.onmessage = (ev) => {
     if (ev.data === '[DONE]') {
       es.close();
@@ -318,6 +374,8 @@ if (_savedPath) {
   $('source-type').value = 'source';
   onSourceTypeChange();
 }
+
+$('dl-log-btn').href = subdomain + '/log';
 
 pollStatus();
 attachStream();
