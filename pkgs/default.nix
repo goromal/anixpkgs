@@ -159,6 +159,7 @@ let
                   pySuper.kornia.overridePythonAttrs (old: {
                     dependencies = builtins.filter (p: (p.pname or "") != "kornia-rs") old.dependencies;
                     pythonImportsCheck = builtins.filter (m: m != "kornia.io") old.pythonImportsCheck;
+                    dontCheckRuntimeDeps = true;
                   })
                 else
                   pySuper.kornia;
