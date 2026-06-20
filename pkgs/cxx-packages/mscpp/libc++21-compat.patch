@@ -1,0 +1,23 @@
+--- a/include/mscpp/MicroService.h
++++ b/include/mscpp/MicroService.h
+@@ -5,7 +5,8 @@
+ #include <cstddef>
+ #include <cstdint>
+ #include <typeinfo>
+-#include <experimental/type_traits>
++#include <type_traits>
++#include <variant>
+ #include <mutex>
+ #include <pthread.h>
+ #include <thread>
+@@ -137,7 +138,9 @@
+         template<typename S, typename I>
+         static constexpr bool stepExists()
+         {
+-            return std::experimental::is_detected_exact_v<size_t, StepFuncSignature, S, I>;
++            return requires(S s, Store& store, const Container& container, I& input) {
++                { s.step(store, container, input) } -> std::same_as<size_t>;
++            };
+         }
+         template<typename S, typename I>
+         static constexpr void assertStepExists()
