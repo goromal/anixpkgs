@@ -96,6 +96,21 @@ def test_stream_serves_finished_run(tmp_path):
     assert body.rstrip().endswith("data: [DONE]")
 
 
+def test_log_download_no_run(tmp_path):
+    resp = make_client(tmp_path).get("/log")
+    assert resp.status_code == 200
+    assert b"No log available" in resp.data
+
+
+def test_log_download_after_run(tmp_path):
+    client = make_client(tmp_path, script="echo hello-from-run")
+    client.post("/run", data={})
+    wait_status(client, "success")
+    resp = client.get("/log")
+    assert resp.status_code == 200
+    assert b"hello-from-run" in resp.data
+
+
 def test_list_dirs_works(tmp_path):
     client = make_client(tmp_path)
     (tmp_path / "subdir").mkdir()
