@@ -154,6 +154,14 @@ let
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
               opencv4 = pySuper.opencv4.override { enableCuda = false; };
+              kornia =
+                if final.stdenv.hostPlatform.isAarch64 then
+                  pySuper.kornia.overridePythonAttrs (old: {
+                    dependencies = builtins.filter (p: (p.pname or "") != "kornia-rs") old.dependencies;
+                    pythonImportsCheck = builtins.filter (m: m != "kornia.io") old.pythonImportsCheck;
+                  })
+                else
+                  pySuper.kornia;
               comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
