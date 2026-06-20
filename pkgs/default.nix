@@ -455,9 +455,12 @@ rec {
   comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
   comfyui-workflow-templates-core = final.python313.pkgs.comfyui-workflow-templates-core;
   comfyui-workflow-templates-media-api = final.python313.pkgs.comfyui-workflow-templates-media-api;
-  comfyui-workflow-templates-media-video = final.python313.pkgs.comfyui-workflow-templates-media-video;
-  comfyui-workflow-templates-media-image = final.python313.pkgs.comfyui-workflow-templates-media-image;
-  comfyui-workflow-templates-media-other = final.python313.pkgs.comfyui-workflow-templates-media-other;
+  comfyui-workflow-templates-media-video =
+    final.python313.pkgs.comfyui-workflow-templates-media-video;
+  comfyui-workflow-templates-media-image =
+    final.python313.pkgs.comfyui-workflow-templates-media-image;
+  comfyui-workflow-templates-media-other =
+    final.python313.pkgs.comfyui-workflow-templates-media-other;
   comfyui-workflow-templates = final.python313.pkgs.comfyui-workflow-templates;
   comfyui-embedded-docs = final.python313.pkgs.comfyui-embedded-docs;
   comfyui =
