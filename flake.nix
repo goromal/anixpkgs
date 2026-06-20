@@ -382,13 +382,7 @@
                     sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     cd anixpkgs
-                    python3 -c "
-                    hw='$HARDWARE_NAME'
-                    with open('flake.nix') as f: c=f.read()
-                    e='        atorgesen-'+hw+' = nixpkgs.lib.nixosSystem {\n          system = \"x86_64-linux\";\n          specialArgs = commonSpecialArgs;\n          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-'+hw+'.nix ];\n        };\n\n'
-                    c=c.replace('        # ATS servers',e+'        # ATS servers',1)
-                    open('flake.nix','w').write(c)
-                    "
+                    python3 scripts/add-machine-to-flake.py personal $HARDWARE_NAME
                     git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix flake.nix
                     EOF
                     nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#atorgesen-$HARDWARE_NAME
@@ -529,13 +523,7 @@
                       sed -i "s/orin-nx/$VARIANT/g" anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       sed -i 's/machines\.base\.nixosState *= *[^;]*/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       cd anixpkgs
-                      python3 -c "
-                      v='$VARIANT'
-                      with open('flake.nix') as f: c=f.read()
-                      e='        jetson-'+v+' =\n          let\n            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;\n          in\n          jetpackNixpkgs.lib.nixosSystem {\n            system = \"aarch64-linux\";\n            specialArgs = commonSpecialArgs;\n            modules = commonModules ++ [\n              jetpack-nixos.nixosModules.default\n              ./pkgs/nixos/configurations/jetpack-'+v+'.nix\n            ];\n          };\n\n'
-                      c=c.replace('        # Drone simulation',e+'        # Drone simulation',1)
-                      open('flake.nix','w').write(c)
-                      "
+                      python3 scripts/add-machine-to-flake.py jetpack $VARIANT
                       git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix flake.nix
                       INNEREOF
                       nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#jetson-$VARIANT
