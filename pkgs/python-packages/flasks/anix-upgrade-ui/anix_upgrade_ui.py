@@ -64,6 +64,8 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
             "status": state.get("status", "idle"),
             "run_id": state.get("run_id"),
             "source": state.get("source", "ui"),
+            "started_at": state.get("started_at"),
+            "finished_at": state.get("finished_at"),
             "version": current_version(),
             "meta": current_meta(),
         })

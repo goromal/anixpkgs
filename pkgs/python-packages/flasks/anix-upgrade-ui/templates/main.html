@@ -62,6 +62,7 @@
         </span>
         <span id="api-badge" class="badge bg-info" style="display:none">via API</span>
       </div>
+      <div id="run-timing" class="text-muted small mb-2" style="display:none"></div>
 
       <form id="upgrade-form">
         <div class="mb-3">
@@ -305,6 +306,25 @@ function setStatus(s) {
   badge.classList.add(...(STATUS_CLASSES[s] || STATUS_CLASSES.idle));
 }
 
+function fmtDuration(seconds) {
+  if (seconds < 60) return seconds + 's';
+  return Math.floor(seconds / 60) + 'm ' + (seconds % 60) + 's';
+}
+
+function updateRunTiming(data) {
+  const el = $('run-timing');
+  if (!data.started_at) { el.style.display = 'none'; return; }
+  const start = new Date(data.started_at);
+  const startStr = start.toLocaleString(undefined, {dateStyle:'short', timeStyle:'short'});
+  if (data.finished_at) {
+    const secs = Math.round((new Date(data.finished_at) - start) / 1000);
+    el.textContent = 'Triggered ' + startStr + ' · completed in ' + fmtDuration(secs);
+  } else {
+    el.textContent = 'Triggered ' + startStr;
+  }
+  el.style.display = '';
+}
+
 function pollStatus() {
   fetch(subdomain + '/status')
     .then(r => r.json())
@@ -312,6 +332,7 @@ function pollStatus() {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
       $('api-badge').style.display = (data.source === 'api') ? '' : 'none';
+      updateRunTiming(data);
       if (data.running) setRunButtonRunning();
       else resetRunButton();
       const rid = data.run_id;
