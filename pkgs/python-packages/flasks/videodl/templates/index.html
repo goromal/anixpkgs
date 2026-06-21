@@ -123,6 +123,12 @@
         }
         .btn-secondary:hover { background-color: #5a6268; }
 
+        .btn-sm {
+            padding: 8px 16px;
+            min-height: 36px;
+            font-size: 0.9rem;
+        }
+
         /* Status message */
         .status-message {
             padding: 14px 18px;
@@ -157,11 +163,178 @@
         }
 
         #videoTitle {
-            padding: 16px 20px 0 20px;
+            padding: 16px 20px 12px 20px;
             font-size: 1rem;
             font-weight: 600;
             color: #495057;
             word-break: break-word;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Video controls collapsible */
+        #videoControls {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        #videoControls > summary {
+            padding: 12px 20px;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #495057;
+            font-size: 0.95rem;
+            font-weight: 600;
+            user-select: none;
+            background: #f8f9fa;
+        }
+
+        #videoControls > summary::-webkit-details-marker { display: none; }
+
+        #videoControls > summary::before {
+            content: '▶';
+            font-size: 0.65rem;
+            color: #6c757d;
+            display: inline-block;
+            transition: transform 0.18s ease;
+            flex-shrink: 0;
+        }
+
+        #videoControls[open] > summary::before {
+            transform: rotate(90deg);
+        }
+
+        #videoControls[open] > summary {
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        /* Control groups */
+        .control-group {
+            padding: 12px 20px 0 20px;
+        }
+
+        .control-group:last-child {
+            padding-bottom: 14px;
+        }
+
+        .control-group > label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #495057;
+            font-size: 0.88rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 14px;
+            min-height: 40px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .btn-group { flex-direction: column; }
+            .btn-group .btn { flex: none; width: 100%; }
+        }
+
+        .crop-info {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #495057;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+        }
+
+        /* Edit points section */
+        .edit-points-section {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .edit-points-section h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .edit-points-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+        }
+
+        .edit-points-list li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 4px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 0.9rem;
+        }
+
+        .edit-points-list li:last-child { border-bottom: none; }
+
+        .edit-point-type {
+            font-weight: 700;
+            min-width: 50px;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .edit-point-type.start { color: #1cc88a; }
+        .edit-point-type.end   { color: #e74a3b; }
+
+        .edit-point-time {
+            flex: 1;
+            color: #6c757d;
+            font-family: monospace;
+        }
+
+        .edit-point-remove {
+            background: none;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            color: #6c757d;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            transition: all 0.15s;
+        }
+
+        .edit-point-remove:hover {
+            background: #e74a3b;
+            border-color: #e74a3b;
+            color: white;
+        }
+
+        #applyEditsBtn {
+            flex: none !important;
+            min-width: 160px;
+            width: auto;
+            font-size: 0.9rem;
+            padding: 10px 16px;
+            min-height: 40px;
+        }
+
+        /* Video container with crop canvas overlay */
+        .video-container {
+            position: relative;
+            background: #000;
         }
 
         #videoPlayer {
@@ -172,16 +345,24 @@
             background: #000;
         }
 
+        #videoCropCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            touch-action: none;
+        }
+
         .video-actions {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             padding: 16px 20px;
             flex-wrap: wrap;
         }
 
         .video-actions .btn {
             flex: 1;
-            min-width: 180px;
+            min-width: 160px;
         }
 
         @media (max-width: 480px) {
@@ -317,12 +498,6 @@
             word-break: break-all;
         }
 
-        .btn-sm {
-            padding: 8px 16px;
-            min-height: 36px;
-            font-size: 0.9rem;
-        }
-
         .dir-list {
             list-style: none;
             margin: 0;
@@ -439,10 +614,63 @@
         <!-- Video section (hidden until fetch succeeds) -->
         <div id="videoSection">
             <div id="videoTitle"></div>
-            <video id="videoPlayer" controls></video>
+
+            <!-- Video Controls -->
+            <details id="videoControls">
+                <summary>Video Controls</summary>
+
+                <div class="control-group">
+                    <label>Rotate</label>
+                    <div class="btn-group">
+                        <button class="btn" onclick="rotateVideo(90)">90° CW</button>
+                        <button class="btn" onclick="rotateVideo(-90)">90° CCW</button>
+                        <button class="btn" onclick="rotateVideo(180)">180°</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Crop</label>
+                    <div class="btn-group">
+                        <button class="btn" id="enableVideoCropBtn" onclick="enableVideoCropMode()">Crop Video</button>
+                        <button class="btn btn-danger" id="applyVideoCropBtn" onclick="applyVideoCrop()" style="display: none;">Apply Crop</button>
+                        <button class="btn btn-secondary" id="cancelVideoCropBtn" onclick="cancelVideoCrop()" style="display: none;">Cancel</button>
+                    </div>
+                    <div id="videoCropInfo" class="crop-info" style="display: none;">
+                        Drag edges or corners to adjust crop area
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Edit Points</label>
+                    <div class="btn-group">
+                        <button class="btn" onclick="addEditPoint('start')">Mark Start</button>
+                        <button class="btn" onclick="addEditPoint('end')">Mark End</button>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Edit points list (shown when edit points exist) -->
+            <div class="edit-points-section" id="editPointsSection" style="display: none;">
+                <h4>Edit Points (sorted by time)</h4>
+                <ol class="edit-points-list" id="editPointsList"></ol>
+                <button class="btn btn-danger" id="applyEditsBtn" onclick="applyEdits()" style="display: none;">Apply Edits</button>
+            </div>
+
+            <!-- Video player with crop canvas overlay -->
+            <div class="video-container">
+                <video id="videoPlayer" controls></video>
+                <canvas id="videoCropCanvas"></canvas>
+            </div>
+
             <div class="video-actions">
                 <button class="btn btn-green" id="clientDownloadBtn" onclick="doClientDownload()">
-                    Download to this computer
+                    Download MP4
+                </button>
+                <button class="btn btn-secondary" id="downloadMp3Btn" onclick="doDownloadMp3()">
+                    Download MP3
+                </button>
+                <button class="btn btn-secondary" id="screenshotBtn" onclick="doScreenshot()">
+                    Save Screenshot
                 </button>
                 <button class="btn" id="saveToServerBtn" onclick="openSavePicker()">
                     Save to server
@@ -463,7 +691,6 @@
             el.textContent = message;
             el.className = 'status-message ' + (isError ? 'status-error' : 'status-success');
             el.style.display = 'block';
-            // Auto-hide success messages after 6 s; keep errors visible until next action
             if (!isError) {
                 setTimeout(() => { el.style.display = 'none'; }, 6000);
             }
@@ -494,10 +721,22 @@
             player.src = 'api/stream/' + token;
             document.getElementById('videoSection').style.display = 'block';
             document.getElementById('clientDownloadBtn').disabled = false;
+            document.getElementById('downloadMp3Btn').disabled = false;
+            document.getElementById('screenshotBtn').disabled = false;
             document.getElementById('saveToServerBtn').disabled = false;
+            // Reset editing state for the new video
+            cancelVideoCrop();
+            _editPoints = [];
+            _editPointIdCounter = 0;
+            renderEditPoints();
+            document.getElementById('videoControls').removeAttribute('open');
         }
 
         function resetUI() {
+            cancelVideoCrop();
+            _editPoints = [];
+            _editPointIdCounter = 0;
+            renderEditPoints();
             _currentToken = null;
             document.getElementById('videoSection').style.display = 'none';
             const player = document.getElementById('videoPlayer');
@@ -505,6 +744,13 @@
             player.src = '';
             document.getElementById('videoTitle').textContent = '';
             document.getElementById('urlInput').value = '';
+            document.getElementById('videoControls').removeAttribute('open');
+        }
+
+        function reloadVideoPlayer() {
+            const player = document.getElementById('videoPlayer');
+            player.src = 'api/stream/' + _currentToken + '?t=' + Date.now();
+            player.load();
         }
 
         // ===== FETCH =====
@@ -542,21 +788,20 @@
             });
         }
 
-        // Allow pressing Enter in the URL field to trigger Fetch
         document.getElementById('urlInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') doFetch();
         });
 
-        // ===== CLIENT DOWNLOAD =====
+        // ===== CLIENT DOWNLOAD (MP4) =====
 
         function doClientDownload() {
             if (!_currentToken) return;
             const token = _currentToken;
-            // Disable buttons — token is consumed server-side after this call
             document.getElementById('clientDownloadBtn').disabled = true;
+            document.getElementById('downloadMp3Btn').disabled = true;
+            document.getElementById('screenshotBtn').disabled = true;
             document.getElementById('saveToServerBtn').disabled = true;
 
-            // Trigger browser download via hidden link
             const a = document.createElement('a');
             a.href = 'api/client-download/' + token;
             a.style.display = 'none';
@@ -564,11 +809,338 @@
             a.click();
             document.body.removeChild(a);
 
-            // Token is now consumed; reset UI after a brief delay
             setTimeout(function() {
                 showStatus('Download triggered — check your browser downloads. If nothing arrived, re-fetch and try again.');
                 resetUI();
             }, 800);
+        }
+
+        // ===== MP3 DOWNLOAD =====
+
+        function doDownloadMp3() {
+            if (!_currentToken) return;
+            const token = _currentToken;
+            document.getElementById('downloadMp3Btn').disabled = true;
+            showLoading('Converting to MP3...');
+
+            fetch('api/convert-mp3', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token: token})
+            })
+            .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+            .then(function(result) {
+                hideLoading();
+                if (!result.ok || !result.data.success) {
+                    showStatus('Error: ' + (result.data.error || 'Conversion failed'), true);
+                    document.getElementById('downloadMp3Btn').disabled = false;
+                    return;
+                }
+                const a = document.createElement('a');
+                a.href = 'api/client-download-mp3/' + token;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showStatus('MP3 download triggered.');
+                // Re-enable so the user can download again if needed
+                setTimeout(function() {
+                    document.getElementById('downloadMp3Btn').disabled = false;
+                }, 1000);
+            })
+            .catch(function(err) {
+                hideLoading();
+                showStatus('Error: ' + err.message, true);
+                document.getElementById('downloadMp3Btn').disabled = false;
+            });
+        }
+
+        // ===== SCREENSHOT =====
+
+        function doScreenshot() {
+            if (!_currentToken) return;
+            const player = document.getElementById('videoPlayer');
+            const timestamp = player.currentTime;
+            const a = document.createElement('a');
+            a.href = 'api/screenshot/' + _currentToken + '?t=' + timestamp;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showStatus('Screenshot download triggered at ' + timestamp.toFixed(2) + 's.');
+        }
+
+        // ===== VIDEO ROTATE =====
+
+        function rotateVideo(degrees) {
+            if (!_currentToken) return;
+            showLoading('Rotating video...');
+            fetch('api/rotate-video', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token: _currentToken, degrees: degrees})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                hideLoading();
+                if (data.success) {
+                    showStatus('Video rotated successfully!');
+                    reloadVideoPlayer();
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(function(err) { hideLoading(); showStatus('Error: ' + err.message, true); });
+        }
+
+        // ===== VIDEO CROP =====
+
+        let _videoCropMode = false;
+        let _videoCropRect = {left: 0, top: 0, right: 0, bottom: 0};
+        let _videoResizeObserver = null;
+
+        // Guard against duplicate listeners when crop mode is toggled multiple times
+        const _cropHandlerCanvases = new WeakSet();
+
+        function makeCropHandlers(canvas, getRect, setRect) {
+            if (_cropHandlerCanvases.has(canvas)) return;
+            _cropHandlerCanvases.add(canvas);
+            function getCoords(e) {
+                const r = canvas.getBoundingClientRect();
+                if (e.touches && e.touches.length > 0)
+                    return {x: e.touches[0].clientX - r.left, y: e.touches[0].clientY - r.top};
+                return {x: e.clientX - r.left, y: e.clientY - r.top};
+            }
+            function detectTarget(x, y) {
+                const rect = getRect(), h = 30, et = 15;
+                if (Math.abs(x-rect.left)<h && Math.abs(y-rect.top)<h) return 'nw';
+                if (Math.abs(x-rect.right)<h && Math.abs(y-rect.top)<h) return 'ne';
+                if (Math.abs(x-rect.left)<h && Math.abs(y-rect.bottom)<h) return 'sw';
+                if (Math.abs(x-rect.right)<h && Math.abs(y-rect.bottom)<h) return 'se';
+                if (Math.abs(y-rect.top)<et && x>rect.left && x<rect.right) return 'n';
+                if (Math.abs(y-rect.bottom)<et && x>rect.left && x<rect.right) return 's';
+                if (Math.abs(x-rect.left)<et && y>rect.top && y<rect.bottom) return 'w';
+                if (Math.abs(x-rect.right)<et && y>rect.top && y<rect.bottom) return 'e';
+                if (x>rect.left && x<rect.right && y>rect.top && y<rect.bottom) return 'move';
+                return null;
+            }
+            let ds = null, sx = 0, sy = 0, ir = null;
+            function startDrag(e) {
+                e.preventDefault();
+                const c = getCoords(e); ds = detectTarget(c.x, c.y);
+                if (ds) { sx = c.x; sy = c.y; ir = {...getRect()}; }
+            }
+            function doDrag(e) {
+                if (!ds) return; e.preventDefault();
+                const c = getCoords(e), dx = c.x-sx, dy = c.y-sy, min = 50;
+                const rect = {...ir};
+                if (ds === 'move') {
+                    const w=ir.right-ir.left, h=ir.bottom-ir.top;
+                    rect.left=Math.max(0,Math.min(canvas.width-w,ir.left+dx));
+                    rect.top=Math.max(0,Math.min(canvas.height-h,ir.top+dy));
+                    rect.right=rect.left+w; rect.bottom=rect.top+h;
+                } else {
+                    if (ds==='nw'||ds==='sw'||ds==='w') rect.left=Math.max(0,Math.min(ir.right-min,ir.left+dx));
+                    if (ds==='ne'||ds==='se'||ds==='e') rect.right=Math.min(canvas.width,Math.max(ir.left+min,ir.right+dx));
+                    if (ds==='nw'||ds==='ne'||ds==='n') rect.top=Math.max(0,Math.min(ir.bottom-min,ir.top+dy));
+                    if (ds==='sw'||ds==='se'||ds==='s') rect.bottom=Math.min(canvas.height,Math.max(ir.top+min,ir.bottom+dy));
+                }
+                setRect(rect);
+            }
+            function endDrag(e) { e.preventDefault(); ds = null; }
+            canvas.addEventListener('mousedown', startDrag);
+            canvas.addEventListener('mousemove', doDrag);
+            canvas.addEventListener('mouseup', endDrag);
+            canvas.addEventListener('mouseleave', endDrag);
+            canvas.addEventListener('touchstart', startDrag, {passive: false});
+            canvas.addEventListener('touchmove', doDrag, {passive: false});
+            canvas.addEventListener('touchend', endDrag, {passive: false});
+            canvas.addEventListener('touchcancel', endDrag, {passive: false});
+        }
+
+        function drawCropOverlay(canvas, rect, infoEl) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const w = rect.right-rect.left, h = rect.bottom-rect.top;
+            ctx.clearRect(rect.left, rect.top, w, h);
+            ctx.strokeStyle = '#00ff00'; ctx.lineWidth = 2;
+            ctx.strokeRect(rect.left, rect.top, w, h);
+            const hs = 20;
+            [[rect.left,rect.top],[rect.right,rect.top],[rect.left,rect.bottom],[rect.right,rect.bottom]].forEach(function([cx,cy]) {
+                ctx.fillStyle='white'; ctx.strokeStyle='#00ff00'; ctx.lineWidth=2;
+                ctx.beginPath(); ctx.arc(cx,cy,hs/2,0,2*Math.PI); ctx.fill(); ctx.stroke();
+            });
+            [[(rect.left+rect.right)/2,rect.top],[(rect.left+rect.right)/2,rect.bottom],
+             [rect.left,(rect.top+rect.bottom)/2],[rect.right,(rect.top+rect.bottom)/2]].forEach(function([cx,cy]) {
+                ctx.beginPath(); ctx.arc(cx,cy,hs/3,0,2*Math.PI); ctx.fill(); ctx.stroke();
+            });
+            if (infoEl) infoEl.textContent = 'Selection: ' + Math.round(w) + 'x' + Math.round(h) + ' at (' + Math.round(rect.left) + ', ' + Math.round(rect.top) + ')';
+        }
+
+        function updateVideoCropCanvasSize() {
+            const video = document.getElementById('videoPlayer');
+            const canvas = document.getElementById('videoCropCanvas');
+            if (video && canvas) { canvas.width = video.offsetWidth; canvas.height = video.offsetHeight; }
+        }
+
+        function drawVideoCropOverlay() {
+            const canvas = document.getElementById('videoCropCanvas');
+            const infoEl = document.getElementById('videoCropInfo');
+            drawCropOverlay(canvas, _videoCropRect, infoEl);
+        }
+
+        function enableVideoCropMode() {
+            _videoCropMode = true;
+            const canvas = document.getElementById('videoCropCanvas');
+            canvas.style.display = 'block';
+            document.getElementById('videoCropInfo').style.display = 'block';
+            document.getElementById('enableVideoCropBtn').style.display = 'none';
+            document.getElementById('applyVideoCropBtn').style.display = 'inline-block';
+            document.getElementById('cancelVideoCropBtn').style.display = 'inline-block';
+            updateVideoCropCanvasSize();
+            const margin = Math.min(canvas.width, canvas.height) * 0.1;
+            _videoCropRect = {left: margin, top: margin, right: canvas.width-margin, bottom: canvas.height-margin};
+            makeCropHandlers(canvas, function() { return _videoCropRect; }, function(r) { _videoCropRect = r; drawVideoCropOverlay(); });
+            drawVideoCropOverlay();
+            const video = document.getElementById('videoPlayer');
+            if (video && typeof ResizeObserver !== 'undefined') {
+                _videoResizeObserver = new ResizeObserver(function() {
+                    if (!_videoCropMode) return;
+                    const ow = canvas.width, oh = canvas.height;
+                    updateVideoCropCanvasSize();
+                    _videoCropRect = {
+                        left: _videoCropRect.left/ow*canvas.width, top: _videoCropRect.top/oh*canvas.height,
+                        right: _videoCropRect.right/ow*canvas.width, bottom: _videoCropRect.bottom/oh*canvas.height
+                    };
+                    drawVideoCropOverlay();
+                });
+                _videoResizeObserver.observe(video);
+            }
+        }
+
+        function cancelVideoCrop() {
+            _videoCropMode = false;
+            const canvas = document.getElementById('videoCropCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.style.display = 'none';
+            const infoEl = document.getElementById('videoCropInfo');
+            if (infoEl) infoEl.style.display = 'none';
+            const enBtn = document.getElementById('enableVideoCropBtn');
+            const apBtn = document.getElementById('applyVideoCropBtn');
+            const caBtn = document.getElementById('cancelVideoCropBtn');
+            if (enBtn) enBtn.style.display = 'inline-block';
+            if (apBtn) apBtn.style.display = 'none';
+            if (caBtn) caBtn.style.display = 'none';
+            if (_videoResizeObserver) { _videoResizeObserver.disconnect(); _videoResizeObserver = null; }
+        }
+
+        function applyVideoCrop() {
+            if (!_currentToken) return;
+            const video = document.getElementById('videoPlayer');
+            if (!video.videoWidth || !video.videoHeight) {
+                showStatus('Error: Video dimensions not available yet', true); return;
+            }
+            const scaleX = video.videoWidth / video.offsetWidth;
+            const scaleY = video.videoHeight / video.offsetHeight;
+            const w = _videoCropRect.right - _videoCropRect.left;
+            const h = _videoCropRect.bottom - _videoCropRect.top;
+            if (w <= 0 || h <= 0) { showStatus('Error: Invalid crop area', true); return; }
+            const ax = Math.floor(_videoCropRect.left * scaleX);
+            const ay = Math.floor(_videoCropRect.top * scaleY);
+            const aw = (Math.floor(w * scaleX)) & ~1;
+            const ah = (Math.floor(h * scaleY)) & ~1;
+            const sx = Math.max(0, Math.min(ax, video.videoWidth - 1));
+            const sy = Math.max(0, Math.min(ay, video.videoHeight - 1));
+            const sw = Math.max(2, Math.min(aw, video.videoWidth - sx));
+            const sh = Math.max(2, Math.min(ah, video.videoHeight - sy));
+            cancelVideoCrop();
+            showLoading('Cropping video...');
+            fetch('api/crop-video', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({token: _currentToken, x: sx, y: sy, width: sw, height: sh})
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                hideLoading();
+                if (data.success) {
+                    showStatus('Video cropped successfully!');
+                    reloadVideoPlayer();
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(function(err) { hideLoading(); showStatus('Error: ' + err.message, true); });
+        }
+
+        // ===== EDIT POINTS =====
+
+        let _editPoints = [], _editPointIdCounter = 0;
+
+        function addEditPoint(type) {
+            const video = document.getElementById('videoPlayer');
+            if (!video) { showStatus('Error: No video element found', true); return; }
+            _editPoints.push({id: _editPointIdCounter++, type: type, time: video.currentTime});
+            renderEditPoints();
+        }
+
+        function removeEditPoint(id) {
+            _editPoints = _editPoints.filter(function(p) { return p.id !== id; });
+            renderEditPoints();
+        }
+
+        function renderEditPoints() {
+            const section = document.getElementById('editPointsSection');
+            const list = document.getElementById('editPointsList');
+            const applyBtn = document.getElementById('applyEditsBtn');
+            if (!section || !list || !applyBtn) return;
+            const sorted = [..._editPoints].sort(function(a, b) { return a.time - b.time; });
+            list.innerHTML = '';
+            sorted.forEach(function(pt) {
+                const li = document.createElement('li');
+                const typeEl = document.createElement('span');
+                typeEl.className = 'edit-point-type ' + pt.type;
+                typeEl.textContent = pt.type.toUpperCase();
+                const timeEl = document.createElement('span');
+                timeEl.className = 'edit-point-time';
+                timeEl.textContent = pt.time.toFixed(2) + 's';
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'edit-point-remove';
+                removeBtn.textContent = '✕';
+                const id = pt.id;
+                removeBtn.onclick = function() { removeEditPoint(id); };
+                li.appendChild(typeEl); li.appendChild(timeEl); li.appendChild(removeBtn);
+                list.appendChild(li);
+            });
+            const has = _editPoints.length > 0;
+            section.style.display = has ? 'block' : 'none';
+            applyBtn.style.display = has ? 'inline-block' : 'none';
+        }
+
+        function applyEdits() {
+            if (!_currentToken) return;
+            if (!_editPoints.length) { showStatus('Error: No edit points defined', true); return; }
+            showLoading('Applying edits...');
+            fetch('api/trim-video', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    token: _currentToken,
+                    edit_points: _editPoints.map(function(p) { return {type: p.type, time: p.time}; })
+                })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                hideLoading();
+                if (data.success) {
+                    _editPoints = []; renderEditPoints();
+                    showStatus('Edits applied successfully!');
+                    reloadVideoPlayer();
+                } else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(function(err) { hideLoading(); showStatus('Error: ' + err.message, true); });
         }
 
         // ===== FOLDER PICKER =====
@@ -589,7 +1161,6 @@
         }
 
         function handleModalOverlayClick(e) {
-            // Close if clicking on the dark backdrop (not the modal box itself)
             if (e.target === document.getElementById('saveModal')) {
                 closeSavePicker();
             }
