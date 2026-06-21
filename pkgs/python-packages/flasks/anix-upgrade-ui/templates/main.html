@@ -45,7 +45,7 @@
 <body>
 <div class="container py-4" style="max-width:800px">
   <h1 class="mb-1">anix-upgrade</h1>
-  <p class="text-muted mb-4">Upgrade the NixOS / home-manager system configuration</p>
+  <p class="text-muted mb-4">Upgrade the NixOS / home-manager system configuration on <strong id="hostname"></strong></p>
 
   <div class="card mb-4">
     <div class="card-body">
@@ -378,6 +378,8 @@ if (_savedPath) {
 }
 
 $('dl-log-btn').href = subdomain + '/log';
+
+document.getElementById('hostname').textContent = location.hostname;
 
 pollStatus();
 attachStream();
