@@ -101,7 +101,7 @@ def test_new_run_truncates_log(tmp_path):
 
 def test_stale_running_state_finalized_as_failed(tmp_path):
     store = make_store(tmp_path)
-    # A PID that existed but is now dead:
+    # A PID that existed but is now dead, with no exit.rc sentinel:
     proc = subprocess.Popen(["true"])
     proc.wait()
     with open(store.state_path, "w") as f:
@@ -112,6 +112,45 @@ def test_stale_running_state_finalized_as_failed(tmp_path):
     # ...and persisted:
     with open(store.state_path) as f:
         assert json.load(f)["status"] == "failed"
+
+
+def test_stale_running_state_recovers_success_via_rc_sentinel(tmp_path):
+    """Simulates nixos-rebuild switch killing the service after proc exits (rc=0)."""
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    # Simulate _wait() having written the sentinel before being killed:
+    with open(store._rc_path, "w") as f:
+        f.write("0")
+    state = store.read_state()
+    assert state["status"] == "success"
+    assert state["returncode"] == 0
+    assert not os.path.exists(store._rc_path)
+
+
+def test_stale_running_state_recovers_failure_via_rc_sentinel(tmp_path):
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    with open(store._rc_path, "w") as f:
+        f.write("2")
+    state = store.read_state()
+    assert state["status"] == "failed"
+    assert state["returncode"] == 2
+    assert not os.path.exists(store._rc_path)
+
+
+def test_start_clears_stale_rc_sentinel(tmp_path):
+    store = make_store(tmp_path)
+    with open(store._rc_path, "w") as f:
+        f.write("0")
+    store.start(["sh", "-c", "echo hi"])
+    wait_until_done(store)
+    assert not os.path.exists(store._rc_path)
 
 
 def test_spawn_failure_records_failed_and_logs_error(tmp_path):

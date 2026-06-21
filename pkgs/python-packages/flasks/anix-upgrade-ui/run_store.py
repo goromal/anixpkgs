@@ -30,6 +30,7 @@ class RunStore:
         os.makedirs(state_dir, exist_ok=True)
         self.log_path = os.path.join(state_dir, "current.log")
         self.state_path = os.path.join(state_dir, "state.json")
+        self._rc_path = os.path.join(state_dir, "exit.rc")
         self._lock = threading.RLock()
         self._thread = None
 
@@ -78,9 +79,27 @@ class RunStore:
             state = self._read_raw()
             if state.get("status") != "running":
                 return state
-            state.update(status="failed", returncode=None, finished_at=_now())
+            # Check if _wait() recorded an exit code before being killed
+            rc = self._read_rc()
+            if rc is not None:
+                state.update(
+                    status="success" if rc == 0 else "failed",
+                    returncode=rc,
+                    finished_at=_now(),
+                )
+            else:
+                state.update(status="failed", returncode=None, finished_at=_now())
             self._write_state(state)
             return state
+
+    def _read_rc(self):
+        """Read and remove the exit-code sentinel written by _wait(). None if absent."""
+        try:
+            rc = int(open(self._rc_path).read().strip())
+            os.unlink(self._rc_path)
+            return rc
+        except (OSError, ValueError):
+            return None
 
     # -- running -------------------------------------------------------------
 
@@ -89,6 +108,11 @@ class RunStore:
         with self._lock:
             if self.read_state().get("status") == "running":
                 return False
+            # Clear any sentinel left from a previous run
+            try:
+                os.unlink(self._rc_path)
+            except OSError:
+                pass
             state = {
                 "status": "running",
                 "run_id": str(uuid.uuid4()),
@@ -119,6 +143,16 @@ class RunStore:
 
     def _wait(self, proc):
         rc = proc.wait()
+        # Write exit code atomically before acquiring the lock. If the process
+        # is killed between here and _write_state() (e.g. nixos-rebuild switch
+        # restarts this service), orphan detection can recover the correct status.
+        tmp = self._rc_path + ".tmp"
+        try:
+            with open(tmp, "w") as f:
+                f.write(str(rc))
+            os.replace(tmp, self._rc_path)
+        except OSError:
+            pass
         with self._lock:
             state = self._read_raw()
             state.update(
@@ -127,6 +161,10 @@ class RunStore:
                 finished_at=_now(),
             )
             self._write_state(state)
+            try:
+                os.unlink(self._rc_path)
+            except OSError:
+                pass
 
     # -- streaming -----------------------------------------------------------
 
