@@ -61,7 +61,9 @@ in
       };
       workflows = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = [
+        default = if config.machines.base.machineType == "jetson" then [
+          "imggen-quantized"
+        ] else [
           "imggen"
           "imggen2"
         ];
