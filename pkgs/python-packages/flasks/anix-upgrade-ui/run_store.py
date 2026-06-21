@@ -3,6 +3,7 @@ import os
 import subprocess
 import threading
 import time
+import uuid
 from datetime import datetime, timezone
 
 REPLAY_CAP_BYTES = 512 * 1024
@@ -29,6 +30,7 @@ class RunStore:
         os.makedirs(state_dir, exist_ok=True)
         self.log_path = os.path.join(state_dir, "current.log")
         self.state_path = os.path.join(state_dir, "state.json")
+        self._rc_path = os.path.join(state_dir, "exit.rc")
         self._lock = threading.RLock()
         self._thread = None
 
@@ -77,19 +79,59 @@ class RunStore:
             state = self._read_raw()
             if state.get("status") != "running":
                 return state
-            state.update(status="failed", returncode=None, finished_at=_now())
+            # Check if _wait() recorded an exit code before being killed.
+            # If not (service was killed while subprocess was still running),
+            # fall back to log inference: anix-upgrade always prints
+            # "Build/switch failed." on failure, so absence of that string
+            # in a non-empty log means the upgrade succeeded.
+            rc = self._read_rc()
+            if rc is None:
+                rc = self._infer_rc_from_log()
+            status = "success" if rc == 0 else "failed"
+            state.update(status=status, returncode=rc, finished_at=_now())
             self._write_state(state)
             return state
 
+    def _read_rc(self):
+        """Read and remove the exit-code sentinel written by _wait(). None if absent."""
+        try:
+            rc = int(open(self._rc_path).read().strip())
+            os.unlink(self._rc_path)
+            return rc
+        except (OSError, ValueError):
+            return None
+
+    def _infer_rc_from_log(self):
+        """Infer exit code when _wait() was killed before the subprocess finished.
+
+        anix-upgrade prints "Build/switch failed." on failure. A non-empty log
+        without that string means the upgrade ran to completion successfully.
+        """
+        try:
+            with open(self.log_path, "rb") as f:
+                content = f.read()
+            if b"Build/switch failed" in content:
+                return 1
+            return 0 if content else None
+        except OSError:
+            return None
+
     # -- running -------------------------------------------------------------
 
-    def start(self, cmd):
-        """Begin a run in a background thread. False if one is already active."""
+    def start(self, cmd, source="ui"):
+        """Begin a run in a background thread. Returns run_id, or None if busy."""
         with self._lock:
             if self.read_state().get("status") == "running":
-                return False
+                return None
+            # Clear any sentinel left from a previous run
+            try:
+                os.unlink(self._rc_path)
+            except OSError:
+                pass
             state = {
                 "status": "running",
+                "run_id": str(uuid.uuid4()),
+                "source": source,
                 "pid": None,
                 "cmd": cmd,
                 "started_at": _now(),
@@ -105,17 +147,27 @@ class RunStore:
                     log_fd.write(f"[ERROR: {e}]\n".encode())
                     state.update(status="failed", finished_at=_now())
                     self._write_state(state)
-                    return True
+                    return state["run_id"]
             state["pid"] = proc.pid
             self._write_state(state)
             self._thread = threading.Thread(
                 target=self._wait, args=(proc,), daemon=True
             )
             self._thread.start()
-            return True
+            return state["run_id"]
 
     def _wait(self, proc):
         rc = proc.wait()
+        # Write exit code atomically before acquiring the lock. If the process
+        # is killed between here and _write_state() (e.g. nixos-rebuild switch
+        # restarts this service), orphan detection can recover the correct status.
+        tmp = self._rc_path + ".tmp"
+        try:
+            with open(tmp, "w") as f:
+                f.write(str(rc))
+            os.replace(tmp, self._rc_path)
+        except OSError:
+            pass
         with self._lock:
             state = self._read_raw()
             state.update(
@@ -124,6 +176,10 @@ class RunStore:
                 finished_at=_now(),
             )
             self._write_state(state)
+            try:
+                os.unlink(self._rc_path)
+            except OSError:
+                pass
 
     # -- streaming -----------------------------------------------------------
 

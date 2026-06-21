@@ -45,7 +45,7 @@
 <body>
 <div class="container py-4" style="max-width:800px">
   <h1 class="mb-1">anix-upgrade</h1>
-  <p class="text-muted mb-4">Upgrade the NixOS / home-manager system configuration</p>
+  <p class="text-muted mb-4">Upgrade the NixOS / home-manager system configuration on <strong id="hostname"></strong></p>
 
   <div class="card mb-4">
     <div class="card-body">
@@ -60,7 +60,9 @@
           {% else %}bg-secondary{% endif %}">
           {{ status }}
         </span>
+        <span id="api-badge" class="badge bg-info" style="display:none">via API</span>
       </div>
+      <div id="run-timing" class="text-muted small mb-2" style="display:none"></div>
 
       <form id="upgrade-form">
         <div class="mb-3">
@@ -304,21 +306,48 @@ function setStatus(s) {
   badge.classList.add(...(STATUS_CLASSES[s] || STATUS_CLASSES.idle));
 }
 
+let es = null;
+let _lastSeenRunId = null;
+
+function fmtDuration(seconds) {
+  if (seconds < 60) return seconds + 's';
+  return Math.floor(seconds / 60) + 'm ' + (seconds % 60) + 's';
+}
+
+function updateRunTiming(data) {
+  const el = $('run-timing');
+  if (!data.started_at) { el.style.display = 'none'; return; }
+  const start = new Date(data.started_at);
+  const startStr = start.toLocaleString(undefined, {dateStyle:'short', timeStyle:'short'});
+  if (data.finished_at) {
+    const secs = Math.round((new Date(data.finished_at) - start) / 1000);
+    el.textContent = 'Triggered ' + startStr + ' · completed in ' + fmtDuration(secs);
+  } else {
+    el.textContent = 'Triggered ' + startStr;
+  }
+  el.style.display = '';
+}
+
 function pollStatus() {
   fetch(subdomain + '/status')
     .then(r => r.json())
     .then(data => {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
+      $('api-badge').style.display = (data.source === 'api') ? '' : 'none';
+      updateRunTiming(data);
       if (data.running) setRunButtonRunning();
       else resetRunButton();
+      const rid = data.run_id;
+      if (rid && rid !== _lastSeenRunId && !es) {
+        _lastSeenRunId = rid;
+        attachStream();
+      }
     })
     .catch(() => {});
 }
 
 // ── Output stream ───────────────────────────────────────────────────────────
-
-let es = null;
 
 function attachStream() {
   if (es) es.close();
@@ -354,8 +383,13 @@ $('upgrade-form').addEventListener('submit', function(e) {
   setStatus('running');
 
   fetch(subdomain + '/run', { method: 'POST', body: fd })
-    .then(r => {
-      if (r.status === 409) appendLog('[Upgrade already in progress]');
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) {
+        appendLog('[Upgrade already in progress]');
+      } else {
+        _lastSeenRunId = data.run_id;
+      }
       attachStream();
     })
     .catch(err => {
@@ -376,6 +410,8 @@ if (_savedPath) {
 }
 
 $('dl-log-btn').href = subdomain + '/log';
+
+document.getElementById('hostname').textContent = location.hostname;
 
 pollStatus();
 attachStream();

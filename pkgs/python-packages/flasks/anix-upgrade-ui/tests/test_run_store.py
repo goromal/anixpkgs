@@ -51,7 +51,7 @@ def test_corrupt_state_file_reads_as_idle(tmp_path):
 
 def test_successful_run_records_success_and_log(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "echo hello; echo world"]) is True
+    assert store.start(["sh", "-c", "echo hello; echo world"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "success"
     assert state["returncode"] == 0
@@ -62,7 +62,7 @@ def test_successful_run_records_success_and_log(tmp_path):
 
 def test_failed_run_records_returncode(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "echo oops; exit 3"]) is True
+    assert store.start(["sh", "-c", "echo oops; exit 3"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "failed"
     assert state["returncode"] == 3
@@ -73,7 +73,7 @@ def test_run_completes_with_no_reader_attached(tmp_path):
 
     The old SSE-coupled design deadlocked here in pipe_write."""
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "yes x | head -c 200000"]) is True
+    assert store.start(["sh", "-c", "yes x | head -c 200000"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "success"
     assert os.path.getsize(store.log_path) == 200000
@@ -81,9 +81,9 @@ def test_run_completes_with_no_reader_attached(tmp_path):
 
 def test_start_rejects_concurrent_run(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sleep", "5"]) is True
+    assert store.start(["sleep", "5"]) is not None
     try:
-        assert store.start(["sh", "-c", "echo nope"]) is False
+        assert store.start(["sh", "-c", "echo nope"]) is None
     finally:
         os.kill(store.read_state()["pid"], 15)
         wait_until_done(store)
@@ -101,7 +101,7 @@ def test_new_run_truncates_log(tmp_path):
 
 def test_stale_running_state_finalized_as_failed(tmp_path):
     store = make_store(tmp_path)
-    # A PID that existed but is now dead:
+    # A PID that existed but is now dead, with no exit.rc sentinel:
     proc = subprocess.Popen(["true"])
     proc.wait()
     with open(store.state_path, "w") as f:
@@ -114,9 +114,82 @@ def test_stale_running_state_finalized_as_failed(tmp_path):
         assert json.load(f)["status"] == "failed"
 
 
+def test_stale_running_state_recovers_success_via_rc_sentinel(tmp_path):
+    """Simulates nixos-rebuild switch killing the service after proc exits (rc=0)."""
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    # Simulate _wait() having written the sentinel before being killed:
+    with open(store._rc_path, "w") as f:
+        f.write("0")
+    state = store.read_state()
+    assert state["status"] == "success"
+    assert state["returncode"] == 0
+    assert not os.path.exists(store._rc_path)
+
+
+def test_stale_running_state_recovers_failure_via_rc_sentinel(tmp_path):
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    with open(store._rc_path, "w") as f:
+        f.write("2")
+    state = store.read_state()
+    assert state["status"] == "failed"
+    assert state["returncode"] == 2
+    assert not os.path.exists(store._rc_path)
+
+
+def test_stale_running_state_recovers_success_via_log_inference(tmp_path):
+    """Simulates service killed while subprocess was still running (no exit.rc).
+
+    anix-upgrade writes to the log and exits 0; absence of the failure string
+    in a non-empty log should be inferred as success.
+    """
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    os.makedirs(os.path.dirname(store.log_path), exist_ok=True)
+    with open(store.log_path, "wb") as f:
+        f.write(b"building...\nDone.\n")
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    state = store.read_state()
+    assert state["status"] == "success"
+    assert state["returncode"] == 0
+
+
+def test_stale_running_state_recovers_failure_via_log_inference(tmp_path):
+    """Log containing 'Build/switch failed.' should be inferred as failure."""
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    os.makedirs(os.path.dirname(store.log_path), exist_ok=True)
+    with open(store.log_path, "wb") as f:
+        f.write(b"building...\nBuild/switch failed.\n")
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    state = store.read_state()
+    assert state["status"] == "failed"
+    assert state["returncode"] == 1
+
+
+def test_start_clears_stale_rc_sentinel(tmp_path):
+    store = make_store(tmp_path)
+    with open(store._rc_path, "w") as f:
+        f.write("0")
+    store.start(["sh", "-c", "echo hi"])
+    wait_until_done(store)
+    assert not os.path.exists(store._rc_path)
+
+
 def test_spawn_failure_records_failed_and_logs_error(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["/nonexistent/binary"]) is True
+    assert store.start(["/nonexistent/binary"]) is not None
     state = store.read_state()
     assert state["status"] == "failed"
     with open(store.log_path) as f:
