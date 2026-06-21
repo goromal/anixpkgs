@@ -22,3 +22,51 @@ This machine runs NixOS. All system configuration lives in the `anixpkgs` repo, 
 - NixOS modules must be **imported** in the right place (e.g. `pc-base.nix` imports list) to take effect — adding a file is not enough.
 - New options must be declared in `pkgs/nixos/components/opts.nix` and assigned in `pc-base.nix` before they can be used in components like `base-dev-pkgs.nix`.
 - MCP servers are registered per-user via `claude mcp add -s user ...`; the `claude-setup` script (in `base-dev-pkgs.nix`) handles this and must be re-run after a new server is added to propagate the registration.
+
+## Triggering and monitoring upgrades on remote machines
+
+Each machine running `anix-upgrade-ui` exposes a REST API reachable via mDNS at `http://<hostname>.local/anix-upgrade/api/v1/`. No auth is required (LAN-only).
+
+### Trigger an upgrade
+
+```bash
+curl -s -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
+  -H 'Content-Type: application/json' \
+  -d '{"branch": "dev/my-feature"}' | jq .
+# → {"run_id": "<uuid>", "started": true}
+# Returns 409 if an upgrade is already running.
+```
+
+JSON body fields (all optional): `version`, `commit`, `branch`, `source` (local path), `local` (bool), `boot` (bool). Same semantics as `anix-upgrade` flags.
+
+### Poll for completion
+
+```bash
+curl -s http://<hostname>.local/anix-upgrade/api/v1/status/<run_id> | jq .
+# → {"run_id": "...", "status": "running"|"success"|"failed", "running": bool,
+#    "returncode": int|null, "started_at": "...", "finished_at": "...", ...}
+# Returns 404 if the run_id has been superseded by a newer run.
+```
+
+Poll until `status` is `success` or `failed`. A `run_id` becomes stale (404) once a subsequent run starts on that machine, so download the log before triggering another upgrade.
+
+### Stream live output (SSE)
+
+```bash
+curl -N http://<hostname>.local/anix-upgrade/api/v1/stream/<run_id>
+# Replays the last 512 KB of log, then follows live output.
+# Final lines: [UPGRADE SUCCESSFUL] or [UPGRADE FAILED (exit N)], then [DONE].
+```
+
+### Download the full log
+
+```bash
+curl -o upgrade.log http://<hostname>.local/anix-upgrade/api/v1/log/<run_id>
+# Returns 404 if run_id is stale.
+```
+
+### Observability
+
+- API-triggered upgrades appear in the browser UI at `http://<hostname>.local/anix-upgrade/` with a **via API** badge.
+- They block manual UI upgrades (and vice versa) — only one run at a time per machine.
+- The UI streams the same log output whether the run was triggered locally or via API.

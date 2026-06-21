@@ -3,6 +3,7 @@ import os
 import subprocess
 import threading
 import time
+import uuid
 from datetime import datetime, timezone
 
 REPLAY_CAP_BYTES = 512 * 1024
@@ -83,13 +84,15 @@ class RunStore:
 
     # -- running -------------------------------------------------------------
 
-    def start(self, cmd):
+    def start(self, cmd, source="ui"):
         """Begin a run in a background thread. False if one is already active."""
         with self._lock:
             if self.read_state().get("status") == "running":
                 return False
             state = {
                 "status": "running",
+                "run_id": str(uuid.uuid4()),
+                "source": source,
                 "pid": None,
                 "cmd": cmd,
                 "started_at": _now(),

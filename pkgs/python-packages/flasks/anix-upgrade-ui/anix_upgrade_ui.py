@@ -24,6 +24,23 @@ def current_meta():
     return _read_file("~/.anix-meta")
 
 
+def _build_cmd(upgrade_bin, version, commit, branch, source, local, boot):
+    cmd = [upgrade_bin]
+    if version:
+        cmd += ["-v", version]
+    elif commit:
+        cmd += ["-c", commit]
+    elif branch:
+        cmd += ["-b", branch]
+    elif source:
+        cmd += ["-s", source]
+    if local:
+        cmd += ["--local"]
+    if boot:
+        cmd += ["--boot"]
+    return cmd
+
+
 def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE_DIR):
     store = RunStore(os.path.expanduser(state_dir))
     app = Flask(__name__)
@@ -45,6 +62,8 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
         return jsonify({
             "running": state.get("status") == "running",
             "status": state.get("status", "idle"),
+            "run_id": state.get("run_id"),
+            "source": state.get("source", "ui"),
             "version": current_version(),
             "meta": current_meta(),
         })
@@ -73,30 +92,77 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
 
     @bp.route("/run", methods=["POST"])
     def run_upgrade():
-        version = request.form.get("version", "").strip()
-        commit = request.form.get("commit", "").strip()
-        branch = request.form.get("branch", "").strip()
-        source = request.form.get("source", "").strip()
-        local = request.form.get("local") == "1"
-        boot = request.form.get("boot") == "1"
-
-        cmd = [upgrade_bin]
-        if version:
-            cmd += ["-v", version]
-        elif commit:
-            cmd += ["-c", commit]
-        elif branch:
-            cmd += ["-b", branch]
-        elif source:
-            cmd += ["-s", source]
-        if local:
-            cmd += ["--local"]
-        if boot:
-            cmd += ["--boot"]
-
+        cmd = _build_cmd(
+            upgrade_bin,
+            version=request.form.get("version", "").strip(),
+            commit=request.form.get("commit", "").strip(),
+            branch=request.form.get("branch", "").strip(),
+            source=request.form.get("source", "").strip(),
+            local=request.form.get("local") == "1",
+            boot=request.form.get("boot") == "1",
+        )
         if not store.start(cmd):
             return jsonify({"error": "Upgrade already in progress"}), 409
         return jsonify({"started": True}), 202
+
+    @bp.route("/api/v1/run", methods=["POST"])
+    def api_run():
+        data = request.get_json() or {}
+        cmd = _build_cmd(
+            upgrade_bin,
+            version=str(data.get("version", "") or "").strip(),
+            commit=str(data.get("commit", "") or "").strip(),
+            branch=str(data.get("branch", "") or "").strip(),
+            source=str(data.get("source", "") or "").strip(),
+            local=bool(data.get("local", False)),
+            boot=bool(data.get("boot", False)),
+        )
+        if not store.start(cmd, source="api"):
+            return jsonify({"error": "Upgrade already in progress"}), 409
+        run_id = store.read_state().get("run_id")
+        return jsonify({"started": True, "run_id": run_id}), 202
+
+    @bp.route("/api/v1/status/<run_id>")
+    def api_status(run_id):
+        state = store.read_state()
+        if state.get("run_id") != run_id:
+            return jsonify({"error": "Run not found"}), 404
+        return jsonify({
+            "run_id": run_id,
+            "status": state.get("status", "idle"),
+            "running": state.get("status") == "running",
+            "source": state.get("source", "ui"),
+            "returncode": state.get("returncode"),
+            "started_at": state.get("started_at"),
+            "finished_at": state.get("finished_at"),
+            "cmd": state.get("cmd"),
+            "version": current_version(),
+        })
+
+    @bp.route("/api/v1/stream/<run_id>")
+    def api_stream(run_id):
+        state = store.read_state()
+        if state.get("run_id") != run_id:
+            return jsonify({"error": "Run not found"}), 404
+        return Response(
+            store.stream(),
+            mimetype="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+        )
+
+    @bp.route("/api/v1/log/<run_id>")
+    def api_log(run_id):
+        state = store.read_state()
+        if state.get("run_id") != run_id:
+            return jsonify({"error": "Run not found"}), 404
+        if not os.path.isfile(store.log_path):
+            return Response("No log available\n", mimetype="text/plain")
+        return send_file(
+            store.log_path,
+            mimetype="text/plain",
+            as_attachment=True,
+            download_name="anix-upgrade.log",
+        )
 
     @bp.route("/log")
     def download_log():

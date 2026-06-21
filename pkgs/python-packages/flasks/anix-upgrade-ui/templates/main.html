@@ -60,6 +60,7 @@
           {% else %}bg-secondary{% endif %}">
           {{ status }}
         </span>
+        <span id="api-badge" class="badge bg-info" style="display:none">via API</span>
       </div>
 
       <form id="upgrade-form">
@@ -310,6 +311,7 @@ function pollStatus() {
     .then(data => {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
+      $('api-badge').style.display = (data.source === 'api') ? '' : 'none';
       if (data.running) setRunButtonRunning();
       else resetRunButton();
     })
