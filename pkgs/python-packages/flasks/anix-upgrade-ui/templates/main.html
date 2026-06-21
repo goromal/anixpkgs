@@ -312,11 +312,12 @@ function pollStatus() {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
       $('api-badge').style.display = (data.source === 'api') ? '' : 'none';
-      if (data.running) {
-        setRunButtonRunning();
-        if (!es) attachStream();
-      } else {
-        resetRunButton();
+      if (data.running) setRunButtonRunning();
+      else resetRunButton();
+      const rid = data.run_id;
+      if (rid && rid !== _lastSeenRunId && !es) {
+        _lastSeenRunId = rid;
+        attachStream();
       }
     })
     .catch(() => {});
@@ -325,6 +326,7 @@ function pollStatus() {
 // ── Output stream ───────────────────────────────────────────────────────────
 
 let es = null;
+let _lastSeenRunId = null;
 
 function attachStream() {
   if (es) es.close();
@@ -360,8 +362,13 @@ $('upgrade-form').addEventListener('submit', function(e) {
   setStatus('running');
 
   fetch(subdomain + '/run', { method: 'POST', body: fd })
-    .then(r => {
-      if (r.status === 409) appendLog('[Upgrade already in progress]');
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+      if (!ok) {
+        appendLog('[Upgrade already in progress]');
+      } else {
+        _lastSeenRunId = data.run_id;
+      }
       attachStream();
     })
     .catch(err => {

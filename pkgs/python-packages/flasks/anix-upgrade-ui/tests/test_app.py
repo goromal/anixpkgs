@@ -51,7 +51,9 @@ def test_run_returns_202_then_success(tmp_path):
     client = make_client(tmp_path)
     resp = client.post("/run", data={})
     assert resp.status_code == 202
-    assert resp.get_json() == {"started": True}
+    body = resp.get_json()
+    assert body["started"] is True
+    assert body["run_id"] is not None
     data = wait_status(client, "success")
     assert data["running"] is False
 

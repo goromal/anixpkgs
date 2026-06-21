@@ -103,7 +103,8 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
         )
         if not store.start(cmd):
             return jsonify({"error": "Upgrade already in progress"}), 409
-        return jsonify({"started": True}), 202
+        run_id = store.read_state().get("run_id")
+        return jsonify({"started": True, "run_id": run_id}), 202
 
     @bp.route("/api/v1/run", methods=["POST"])
     def api_run():
