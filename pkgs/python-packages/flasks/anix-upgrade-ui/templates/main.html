@@ -312,8 +312,12 @@ function pollStatus() {
       $('curr-version').textContent = data.version || 'unknown';
       setStatus(data.status || 'idle');
       $('api-badge').style.display = (data.source === 'api') ? '' : 'none';
-      if (data.running) setRunButtonRunning();
-      else resetRunButton();
+      if (data.running) {
+        setRunButtonRunning();
+        if (!es) attachStream();
+      } else {
+        resetRunButton();
+      }
     })
     .catch(() => {});
 }
