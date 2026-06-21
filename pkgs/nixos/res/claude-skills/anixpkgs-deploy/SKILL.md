@@ -29,12 +29,21 @@ Each machine running `anix-upgrade-ui` exposes a REST API reachable via mDNS at 
 
 ### Trigger an upgrade
 
-**The branch must be pushed to GitHub first.** `anix-upgrade` fetches it as a tarball from GitHub; local-only commits are invisible to the remote machine.
+**The commit must be pushed to GitHub first.** `anix-upgrade` fetches source from GitHub; local-only commits are invisible to the remote machine.
+
+**Prefer a full commit hash over a branch name.** Branch tarballs (`archive/refs/heads/…`) are served by GitHub's CDN, which has its own TTL and may return stale content for minutes after a push — even with `--tarball-ttl 0`. A commit hash uses `fetchGit` with a content-addressed `rev`, so GitHub must return that exact commit; no CDN caching can interfere.
 
 ```bash
+# Reliable — content-addressed, no CDN delay:
+curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
+  -H 'Content-Type: application/json' \
+  -d '{"commit": "$(git rev-parse HEAD)", "local": true}'
+
+# Convenient but may get stale CDN content for a few minutes after push:
 curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
   -H 'Content-Type: application/json' \
   -d '{"branch": "dev/my-feature", "local": true}'
+
 # HTTP 202 → {"run_id": "<uuid>", "started": true}
 # HTTP 409 → upgrade already in progress
 ```
@@ -43,9 +52,7 @@ Use `-si` (not `-s`) so the response headers are visible — some network proxie
 
 JSON body fields (all optional): `version`, `commit`, `branch`, `source` (local path), `local` (bool), `boot` (bool). Same semantics as `anix-upgrade` flags.
 
-> **`"local": true` is required when the branch modifies any service package or NixOS module.** Without it, `anix-upgrade` leaves `dependencies.nix` set to `local-build = false`, so all module package defaults (e.g. `cfg.package`) resolve to the **published tag** binary rather than the branch binary — service code changes silently don't take effect. `"local": true` causes `anix-upgrade` to patch `dependencies.nix` so modules use packages from the branch source tree.
-
-> **Note on tarball caching:** `anix-upgrade` passes `--tarball-ttl 0` for branch builds so GitHub tarballs are always fetched fresh. This requires `andrew` to be a Nix trusted user — guaranteed on any machine with `anix-upgrade-ui` enabled (the module sets it). Without this, the Nix daemon silently ignores `--tarball-ttl 0` and may build from a stale cached tarball.
+> **`"local": true` is required when the branch/commit modifies any service package or NixOS module.** Without it, `anix-upgrade` leaves `dependencies.nix` set to `local-build = false`, so module package defaults (e.g. `cfg.package`) resolve to the **published tag** binary rather than the branch binary — service code changes silently don't take effect. `"local": true` causes `anix-upgrade` to patch `dependencies.nix` so modules use packages from the fetched source tree.
 
 ### Poll for completion
 
