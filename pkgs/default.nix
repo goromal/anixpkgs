@@ -154,15 +154,15 @@ let
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
               opencv4 = pySuper.opencv4.override { enableCuda = false; };
-              kornia =
+              # aarch64 (Jetson): nixpkgs' from-source kornia-rs is
+              # badPlatforms=aarch64-linux (rustc SIGSEGV); use the prebuilt
+              # wheel so kornia (and thus comfyui) builds. See
+              # ./python-packages/kornia-rs/default.nix. x86 is untouched.
+              kornia-rs =
                 if final.stdenv.hostPlatform.isAarch64 then
-                  pySuper.kornia.overridePythonAttrs (old: {
-                    dependencies = builtins.filter (p: (p.pname or "") != "kornia-rs") old.dependencies;
-                    pythonImportsCheck = builtins.filter (m: m != "kornia.io") old.pythonImportsCheck;
-                    dontCheckRuntimeDeps = true;
-                  })
+                  pySelf.callPackage ./python-packages/kornia-rs { }
                 else
-                  pySuper.kornia;
+                  pySuper.kornia-rs;
               comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-core =
