@@ -61,12 +61,16 @@ in
       };
       workflows = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        default = if config.machines.base.machineType == "jetson" then [
-          "imggen-quantized"
-        ] else [
-          "imggen"
-          "imggen2"
-        ];
+        default =
+          if config.machines.base.machineType == "jetson" then
+            [
+              "imggen-quantized"
+            ]
+          else
+            [
+              "imggen"
+              "imggen2"
+            ];
       };
     };
   };
