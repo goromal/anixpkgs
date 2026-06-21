@@ -37,7 +37,7 @@ Each machine running `anix-upgrade-ui` exposes a REST API reachable via mDNS at 
 # Reliable — content-addressed, no CDN delay:
 curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
   -H 'Content-Type: application/json' \
-  -d '{"commit": "$(git rev-parse HEAD)", "local": true}'
+  -d "{\"commit\": \"$(git rev-parse HEAD)\", \"local\": true}"
 
 # Convenient but may get stale CDN content for a few minutes after push:
 curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
