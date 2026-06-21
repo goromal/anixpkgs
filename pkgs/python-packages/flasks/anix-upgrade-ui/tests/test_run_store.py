@@ -144,6 +144,40 @@ def test_stale_running_state_recovers_failure_via_rc_sentinel(tmp_path):
     assert not os.path.exists(store._rc_path)
 
 
+def test_stale_running_state_recovers_success_via_log_inference(tmp_path):
+    """Simulates service killed while subprocess was still running (no exit.rc).
+
+    anix-upgrade writes to the log and exits 0; absence of the failure string
+    in a non-empty log should be inferred as success.
+    """
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    os.makedirs(os.path.dirname(store.log_path), exist_ok=True)
+    with open(store.log_path, "wb") as f:
+        f.write(b"building...\nDone.\n")
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    state = store.read_state()
+    assert state["status"] == "success"
+    assert state["returncode"] == 0
+
+
+def test_stale_running_state_recovers_failure_via_log_inference(tmp_path):
+    """Log containing 'Build/switch failed.' should be inferred as failure."""
+    store = make_store(tmp_path)
+    proc = subprocess.Popen(["true"])
+    proc.wait()
+    os.makedirs(os.path.dirname(store.log_path), exist_ok=True)
+    with open(store.log_path, "wb") as f:
+        f.write(b"building...\nBuild/switch failed.\n")
+    with open(store.state_path, "w") as f:
+        json.dump({"status": "running", "pid": proc.pid}, f)
+    state = store.read_state()
+    assert state["status"] == "failed"
+    assert state["returncode"] == 1
+
+
 def test_start_clears_stale_rc_sentinel(tmp_path):
     store = make_store(tmp_path)
     with open(store._rc_path, "w") as f:

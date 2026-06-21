@@ -79,16 +79,16 @@ class RunStore:
             state = self._read_raw()
             if state.get("status") != "running":
                 return state
-            # Check if _wait() recorded an exit code before being killed
+            # Check if _wait() recorded an exit code before being killed.
+            # If not (service was killed while subprocess was still running),
+            # fall back to log inference: anix-upgrade always prints
+            # "Build/switch failed." on failure, so absence of that string
+            # in a non-empty log means the upgrade succeeded.
             rc = self._read_rc()
-            if rc is not None:
-                state.update(
-                    status="success" if rc == 0 else "failed",
-                    returncode=rc,
-                    finished_at=_now(),
-                )
-            else:
-                state.update(status="failed", returncode=None, finished_at=_now())
+            if rc is None:
+                rc = self._infer_rc_from_log()
+            status = "success" if rc == 0 else "failed"
+            state.update(status=status, returncode=rc, finished_at=_now())
             self._write_state(state)
             return state
 
@@ -99,6 +99,21 @@ class RunStore:
             os.unlink(self._rc_path)
             return rc
         except (OSError, ValueError):
+            return None
+
+    def _infer_rc_from_log(self):
+        """Infer exit code when _wait() was killed before the subprocess finished.
+
+        anix-upgrade prints "Build/switch failed." on failure. A non-empty log
+        without that string means the upgrade ran to completion successfully.
+        """
+        try:
+            with open(self.log_path, "rb") as f:
+                content = f.read()
+            if b"Build/switch failed" in content:
+                return 1
+            return 0 if content else None
+        except OSError:
             return None
 
     # -- running -------------------------------------------------------------
