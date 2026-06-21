@@ -33,6 +33,14 @@
         }
         button:disabled { opacity:0.5; cursor:not-allowed; }
         button.clear { background:#6c757d; box-shadow:none; }
+        .prompt-actions { display:flex; gap:8px; margin-top:6px; }
+        button.secondary {
+            margin-top:0; width:auto; padding:6px 14px; font-size:0.85rem; font-weight:600;
+            color:#4e73df; background:#fff; border:2px solid #4e73df; border-radius:6px;
+            cursor:pointer; box-shadow:none;
+        }
+        button.secondary:hover { background:#f0f4ff; }
+        button.secondary:disabled { opacity:0.5; cursor:not-allowed; }
         .progress { margin-top:20px; height:18px; background:#e9ecef; border-radius:9px; overflow:hidden; display:none; }
         .progress > div { height:100%; width:0%; background:linear-gradient(135deg,#4e73df,#224abe); transition:width 0.3s; }
         .error { color:#721c24; background:#f8d7da; border:2px solid #f5c6cb; padding:10px 14px; border-radius:6px; margin-top:16px; display:none; }
@@ -59,6 +67,10 @@
         <div id="inputs">
             <label for="prompt">Prompt</label>
             <textarea id="prompt">{{ state.prompt }}</textarea>
+            <div class="prompt-actions">
+                <button type="button" class="secondary" id="copy-btn" aria-label="Copy prompt to clipboard">&#128203; Copy</button>
+                <button type="button" class="secondary" id="paste-btn" aria-label="Paste clipboard text into prompt">&#128203; Paste</button>
+            </div>
             <div class="dims">
                 <div>
                     <label for="width">Width</label>
@@ -140,6 +152,48 @@
             await fetch(root + "api/clear", { method: "POST" });
             document.getElementById("prompt").value = "";
             output.innerHTML = ""; showError(""); bar.style.width = "0%";
+        });
+
+        // --- Copy / Paste prompt helpers ---
+        const copyBtn = document.getElementById("copy-btn");
+        const pasteBtn = document.getElementById("paste-btn");
+        const promptTA = document.getElementById("prompt");
+
+        copyBtn.addEventListener("click", async () => {
+            const text = promptTA.value;
+            let ok = false;
+            try {
+                await navigator.clipboard.writeText(text);
+                ok = true;
+            } catch (_) {
+                // Fallback: select + execCommand for older/restricted browsers.
+                try {
+                    promptTA.select();
+                    ok = document.execCommand("copy");
+                } catch (_) { ok = false; }
+            }
+            if (ok) {
+                const orig = copyBtn.innerHTML;
+                copyBtn.innerHTML = "&#10003; Copied!";
+                copyBtn.disabled = true;
+                setTimeout(() => { copyBtn.innerHTML = orig; copyBtn.disabled = false; }, 1200);
+            }
+        });
+
+        // Paste replaces the entire textarea value with clipboard content.
+        // Replacing is simpler and avoids cursor-position maths; consistent with
+        // how mobile "Select All → Paste" works when starting a new prompt.
+        pasteBtn.addEventListener("click", async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                promptTA.value = text;
+                promptTA.focus();
+            } catch (_) {
+                // readText() is unavailable (e.g. Firefox without permission, some
+                // mobile browsers). Guide the user to paste manually.
+                promptTA.focus();
+                showError("Clipboard read not supported — please use Ctrl/Cmd+V (desktop) or long-press → Paste (mobile) to paste into the prompt field.");
+            }
         });
 
         // Restore state on load: show image if present, resume polling if running.
