@@ -119,10 +119,10 @@ class RunStore:
     # -- running -------------------------------------------------------------
 
     def start(self, cmd, source="ui"):
-        """Begin a run in a background thread. False if one is already active."""
+        """Begin a run in a background thread. Returns run_id, or None if busy."""
         with self._lock:
             if self.read_state().get("status") == "running":
-                return False
+                return None
             # Clear any sentinel left from a previous run
             try:
                 os.unlink(self._rc_path)
@@ -147,14 +147,14 @@ class RunStore:
                     log_fd.write(f"[ERROR: {e}]\n".encode())
                     state.update(status="failed", finished_at=_now())
                     self._write_state(state)
-                    return True
+                    return state["run_id"]
             state["pid"] = proc.pid
             self._write_state(state)
             self._thread = threading.Thread(
                 target=self._wait, args=(proc,), daemon=True
             )
             self._thread.start()
-            return True
+            return state["run_id"]
 
     def _wait(self, proc):
         rc = proc.wait()

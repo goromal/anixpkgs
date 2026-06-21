@@ -103,9 +103,9 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
             local=request.form.get("local") == "1",
             boot=request.form.get("boot") == "1",
         )
-        if not store.start(cmd):
+        run_id = store.start(cmd)
+        if run_id is None:
             return jsonify({"error": "Upgrade already in progress"}), 409
-        run_id = store.read_state().get("run_id")
         return jsonify({"started": True, "run_id": run_id}), 202
 
     @bp.route("/api/v1/run", methods=["POST"])
@@ -120,9 +120,9 @@ def create_app(subdomain="", upgrade_bin="anix-upgrade", state_dir=DEFAULT_STATE
             local=bool(data.get("local", False)),
             boot=bool(data.get("boot", False)),
         )
-        if not store.start(cmd, source="api"):
+        run_id = store.start(cmd, source="api")
+        if run_id is None:
             return jsonify({"error": "Upgrade already in progress"}), 409
-        run_id = store.read_state().get("run_id")
         return jsonify({"started": True, "run_id": run_id}), 202
 
     @bp.route("/api/v1/status/<run_id>")

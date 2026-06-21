@@ -51,7 +51,7 @@ def test_corrupt_state_file_reads_as_idle(tmp_path):
 
 def test_successful_run_records_success_and_log(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "echo hello; echo world"]) is True
+    assert store.start(["sh", "-c", "echo hello; echo world"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "success"
     assert state["returncode"] == 0
@@ -62,7 +62,7 @@ def test_successful_run_records_success_and_log(tmp_path):
 
 def test_failed_run_records_returncode(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "echo oops; exit 3"]) is True
+    assert store.start(["sh", "-c", "echo oops; exit 3"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "failed"
     assert state["returncode"] == 3
@@ -73,7 +73,7 @@ def test_run_completes_with_no_reader_attached(tmp_path):
 
     The old SSE-coupled design deadlocked here in pipe_write."""
     store = make_store(tmp_path)
-    assert store.start(["sh", "-c", "yes x | head -c 200000"]) is True
+    assert store.start(["sh", "-c", "yes x | head -c 200000"]) is not None
     state = wait_until_done(store)
     assert state["status"] == "success"
     assert os.path.getsize(store.log_path) == 200000
@@ -81,9 +81,9 @@ def test_run_completes_with_no_reader_attached(tmp_path):
 
 def test_start_rejects_concurrent_run(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["sleep", "5"]) is True
+    assert store.start(["sleep", "5"]) is not None
     try:
-        assert store.start(["sh", "-c", "echo nope"]) is False
+        assert store.start(["sh", "-c", "echo nope"]) is None
     finally:
         os.kill(store.read_state()["pid"], 15)
         wait_until_done(store)
@@ -189,7 +189,7 @@ def test_start_clears_stale_rc_sentinel(tmp_path):
 
 def test_spawn_failure_records_failed_and_logs_error(tmp_path):
     store = make_store(tmp_path)
-    assert store.start(["/nonexistent/binary"]) is True
+    assert store.start(["/nonexistent/binary"]) is not None
     state = store.read_state()
     assert state["status"] == "failed"
     with open(store.log_path) as f:
