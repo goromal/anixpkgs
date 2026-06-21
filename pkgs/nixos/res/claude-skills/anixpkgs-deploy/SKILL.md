@@ -29,15 +29,21 @@ Each machine running `anix-upgrade-ui` exposes a REST API reachable via mDNS at 
 
 ### Trigger an upgrade
 
+**The branch must be pushed to GitHub first.** `anix-upgrade` fetches it as a tarball from GitHub; local-only commits are invisible to the remote machine.
+
 ```bash
-curl -s -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
+curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
   -H 'Content-Type: application/json' \
-  -d '{"branch": "dev/my-feature"}' | jq .
-# → {"run_id": "<uuid>", "started": true}
-# Returns 409 if an upgrade is already running.
+  -d '{"branch": "dev/my-feature"}'
+# HTTP 202 → {"run_id": "<uuid>", "started": true}
+# HTTP 409 → upgrade already in progress
 ```
 
+Use `-si` (not `-s`) so the response headers are visible — some network proxies strip JSON body values when using `-s` alone.
+
 JSON body fields (all optional): `version`, `commit`, `branch`, `source` (local path), `local` (bool), `boot` (bool). Same semantics as `anix-upgrade` flags.
+
+> **Note on tarball caching:** `anix-upgrade` passes `--tarball-ttl 0` for branch builds so GitHub tarballs are always fetched fresh. This requires `andrew` to be a Nix trusted user — guaranteed on any machine with `anix-upgrade-ui` enabled (the module sets it). Without this, the Nix daemon silently ignores `--tarball-ttl 0` and may build from a stale cached tarball.
 
 ### Poll for completion
 

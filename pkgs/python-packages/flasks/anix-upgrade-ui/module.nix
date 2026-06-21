@@ -35,6 +35,11 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # anix-upgrade passes --tarball-ttl 0 for branch builds, but the Nix daemon
+    # ignores that flag from untrusted users. Trust the service user so branch
+    # upgrades always fetch a fresh tarball rather than using a stale cache.
+    nix.settings.trusted-users = [ "andrew" ];
+
     machines.base.webServices = [
       {
         name = "anix-upgrade";
