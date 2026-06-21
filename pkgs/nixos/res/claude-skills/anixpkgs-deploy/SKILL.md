@@ -34,7 +34,7 @@ Each machine running `anix-upgrade-ui` exposes a REST API reachable via mDNS at 
 ```bash
 curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
   -H 'Content-Type: application/json' \
-  -d '{"branch": "dev/my-feature"}'
+  -d '{"branch": "dev/my-feature", "local": true}'
 # HTTP 202 → {"run_id": "<uuid>", "started": true}
 # HTTP 409 → upgrade already in progress
 ```
@@ -42,6 +42,8 @@ curl -si -X POST http://<hostname>.local/anix-upgrade/api/v1/run \
 Use `-si` (not `-s`) so the response headers are visible — some network proxies strip JSON body values when using `-s` alone.
 
 JSON body fields (all optional): `version`, `commit`, `branch`, `source` (local path), `local` (bool), `boot` (bool). Same semantics as `anix-upgrade` flags.
+
+> **`"local": true` is required when the branch modifies any service package or NixOS module.** Without it, `anix-upgrade` leaves `dependencies.nix` set to `local-build = false`, so all module package defaults (e.g. `cfg.package`) resolve to the **published tag** binary rather than the branch binary — service code changes silently don't take effect. `"local": true` causes `anix-upgrade` to patch `dependencies.nix` so modules use packages from the branch source tree.
 
 > **Note on tarball caching:** `anix-upgrade` passes `--tarball-ttl 0` for branch builds so GitHub tarballs are always fetched fresh. This requires `andrew` to be a Nix trusted user — guaranteed on any machine with `anix-upgrade-ui` enabled (the module sets it). Without this, the Nix daemon silently ignores `--tarball-ttl 0` and may build from a stale cached tarball.
 
