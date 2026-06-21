@@ -37,7 +37,7 @@ in
         "novram"
         "auto"
       ];
-      default = if config.machines.base.machineType == "jetson" then "normalvram" else "lowvram";
+      default = "lowvram";
       description = "ComfyUI VRAM strategy; 'auto' lets ComfyUI decide (no flag).";
     };
     cozy = {
