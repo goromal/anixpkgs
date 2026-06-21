@@ -4,7 +4,7 @@ let
   anixpkgs-meta = (builtins.readFile ../../ANIX_META);
 in
 rec {
-  local-build = false;
+  local-build = true;
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
   inherit anixpkgs-meta;
