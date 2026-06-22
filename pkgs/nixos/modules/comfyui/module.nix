@@ -9,12 +9,16 @@ let
   cfg = config.services.comfyui;
   extendedPkgs = pkgs.extend (import ../../../../overlay.nix);
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
-  # On Jetson (unified memory), pinned-memory registration via cudaHostRegister
-  # exhausts NvMap descriptor resources and causes CUDA OOM after the first run.
-  # Async weight offloading also has no benefit on unified memory (no actual DMA).
+  # On Jetson (unified memory), CPU and CUDA share one physical 15.6 GB pool, but
+  # ComfyUI accounts them as separate budgets — so it caches the 7.67 GB fp16 text
+  # encoder in "CPU" RAM and never evicts it, leaving no headroom for the next run
+  # (NvMap ENOMEM -> poisoned CUDA context -> every subsequent prompt fails).
+  # Loading the text encoder in fp8 (its source weights are already fp8) halves it
+  # to ~3.84 GB, keeping the full pipeline under budget with margin to spare.
+  # Async weight offloading has no benefit on unified memory (no actual DMA).
   jetsonFlags = lib.optionalString (
     config.machines.base.machineType == "jetson"
-  ) "--disable-pinned-memory --disable-async-offload";
+  ) "--fp8_e4m3fn-text-enc --disable-async-offload";
 in
 {
   options.services.comfyui = {
