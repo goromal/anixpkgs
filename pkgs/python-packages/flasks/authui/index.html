@@ -24,6 +24,16 @@
         {% endwith %}
 
         {% if not initialized %}
+        {% for gen_key, cfg in generator_configs.items() %}
+        {% if gen_key in elapsed_info %}
+        {% set info = elapsed_info[gen_key] %}
+        <p class="text-{{ info.color }}">
+            {{ cfg.name }}: last refreshed {{ info.days }}d {{ info.hours }}h {{ info.minutes }}m ago
+        </p>
+        {% else %}
+        <p class="text-secondary">{{ cfg.name }}: never refreshed</p>
+        {% endif %}
+        {% endfor %}
         <form method="post">
             <button class="btn btn-primary mb-3" type="submit">Start Setup</button>
         </form>
@@ -32,16 +42,6 @@
         <div class="card mb-4">
             <div class="card-body">
                 <h5 class="card-title">{{ generator_configs[gen_key].name }} Generator</h5>
-
-                {% if gen_key in refresh_times %}
-                <p class="text-success">
-                    ✅ Credentials refreshed on {{ refresh_times[gen_key] }}
-                </p>
-                {% else %}
-                <p class="text-warning">
-                    ⏳ Credentials not yet submitted.
-                </p>
-                {% endif %}
 
                 <p>
                     <a href="{{ gen.getAuthUrl() }}" target="_blank" class="btn btn-outline-success">
