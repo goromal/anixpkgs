@@ -5,7 +5,7 @@ import os
 import pwd
 import json
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 import subprocess
 
 parser = argparse.ArgumentParser()
@@ -65,6 +65,25 @@ def save_refresh_times():
 
 refresh_times = load_refresh_times()
 
+def compute_elapsed_info(refresh_times):
+    now = datetime.now()
+    result = {}
+    for key, ts in refresh_times.items():
+        last = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        delta = now - last
+        total_secs = int(delta.total_seconds())
+        days = delta.days
+        hours = (total_secs % 86400) // 3600
+        minutes = (total_secs % 3600) // 60
+        if days >= 7:
+            color = "danger"
+        elif days >= 6:
+            color = "warning"
+        else:
+            color = "success"
+        result[key] = {"days": days, "hours": hours, "minutes": minutes, "color": color}
+    return result
+
 @bp.route("/", methods=["GET", "POST"])
 def index():
     global generators_initialized
@@ -89,7 +108,7 @@ def index():
                        generators=generators,
                        generator_configs=GENERATOR_CONFIGS,
                        initialized=generators_initialized,
-                       refresh_times=refresh_times,
+                       elapsed_info=compute_elapsed_info(refresh_times),
                        subdomain=args.subdomain)
 
 
