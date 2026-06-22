@@ -44,6 +44,24 @@ class ComfyUIClient:
         with urllib.request.urlopen(req) as resp:
             return json.loads(resp.read())["prompt_id"]
 
+    def free(self):
+        """Unload models and free memory so the next job starts cold.
+
+        On unified-memory devices (Jetson) the model working set nearly
+        fills RAM and ComfyUI never evicts the CPU-resident text encoder
+        between runs, so back-to-back jobs OOM. Calling /free first gives
+        each job a clean pool. Best-effort: never raises."""
+        data = json.dumps({"unload_models": True, "free_memory": True}).encode()
+        req = urllib.request.Request(
+            self.base_url + "/free", data=data,
+            headers={"Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(req) as resp:
+                resp.read()
+        except Exception:
+            pass
+
     def history(self, prompt_id):
         with urllib.request.urlopen(self.base_url + "/history/" + prompt_id) as resp:
             return json.loads(resp.read())

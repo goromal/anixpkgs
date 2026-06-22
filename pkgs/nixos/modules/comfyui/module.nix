@@ -10,15 +10,20 @@ let
   extendedPkgs = pkgs.extend (import ../../../../overlay.nix);
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
   # On Jetson (unified memory), CPU and CUDA share one physical 15.6 GB pool, but
-  # ComfyUI accounts them as separate budgets — so it caches the 7.67 GB fp16 text
-  # encoder in "CPU" RAM and never evicts it, leaving no headroom for the next run
-  # (NvMap ENOMEM -> poisoned CUDA context -> every subsequent prompt fails).
-  # Loading the text encoder in fp8 (its source weights are already fp8) halves it
-  # to ~3.84 GB, keeping the full pipeline under budget with margin to spare.
-  # Async weight offloading has no benefit on unified memory (no actual DMA).
+  # ComfyUI accounts them as separate budgets. Three flags keep us under that pool:
+  #  --fp8_e4m3fn-text-enc: load the text encoder in fp8 (its source weights are
+  #    already fp8); halves it from 7.67 GB to ~3.84 GB.
+  #  --disable-smart-memory: free models between runs instead of caching them. By
+  #    default ComfyUI's free_memory() only evicts models on the *same* device it
+  #    is loading to, so the CPU-resident text encoder is never freed when the UNET
+  #    loads onto CUDA ("0 models unloaded") — the resident set + CUDA-allocator
+  #    fragmentation then creep to the ceiling over successive runs until an
+  #    allocation hits NvMap ENOMEM and poisons the CUDA context. cozy also POSTs
+  #    /free before each job (full unload_all_models) as the primary mitigation.
+  #  --disable-async-offload: 2-stream offload has no benefit on unified memory.
   jetsonFlags = lib.optionalString (
     config.machines.base.machineType == "jetson"
-  ) "--fp8_e4m3fn-text-enc --disable-async-offload";
+  ) "--fp8_e4m3fn-text-enc --disable-smart-memory --disable-async-offload";
 in
 {
   options.services.comfyui = {
@@ -150,6 +155,12 @@ in
             Group = "dev";
             Environment = [
               "HOME=/data/andrew"
+            ]
+            ++ lib.optionals (config.machines.base.machineType == "jetson") [
+              # On Tegra unified memory the default CUDA allocator fragments and
+              # holds freed blocks, eroding the thin headroom between runs.
+              # expandable_segments lets it return memory so /free actually recovers.
+              "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
             ];
           };
           wantedBy = [ "multi-user.target" ];

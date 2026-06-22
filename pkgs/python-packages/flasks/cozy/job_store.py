@@ -162,6 +162,9 @@ class JobStore:
     def _run(self, graph, client_id):
         events = None
         try:
+            # Free models/memory from any previous job so this one starts from a
+            # clean pool; on unified-memory devices back-to-back jobs OOM otherwise.
+            self.client.free()
             events = self.client.connect_events(client_id)
             prompt_id = self.client.submit(graph, client_id)
             with self._lock:
@@ -184,12 +187,24 @@ class JobStore:
                     break
                 elif mtype == "execution_success" and data.get("prompt_id") == prompt_id:
                     break
-            with self._lock:
-                state = self._read_raw()
-                if not self._fetch_result(prompt_id, state):
+            # ComfyUI emits execution_success over the websocket slightly before
+            # /history is queryable; on slow machines a single fetch loses that
+            # race. Retry briefly before declaring no output.
+            finalized = False
+            for _ in range(20):
+                with self._lock:
+                    state = self._read_raw()
+                    if self._fetch_result(prompt_id, state):
+                        self._write_state(state)
+                        finalized = True
+                        break
+                time.sleep(0.5)
+            if not finalized:
+                with self._lock:
+                    state = self._read_raw()
                     state["job"].update(status="failed", finished_at=_now(),
                                         error="no output image")
-                self._write_state(state)
+                    self._write_state(state)
         except Exception as e:  # noqa: BLE001 - surface any failure to the UI
             self._fail(str(e))
         finally:

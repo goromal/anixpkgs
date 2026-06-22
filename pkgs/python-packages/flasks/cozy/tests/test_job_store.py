@@ -23,6 +23,10 @@ class FakeClient:
         self._history = history or {}
         self._image = image
         self.submitted = None
+        self.freed = False
+
+    def free(self):
+        self.freed = True
 
     def connect_events(self, client_id):
         return FakeEvents(self._events_msgs)
