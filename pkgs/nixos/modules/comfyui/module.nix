@@ -12,8 +12,9 @@ let
   # On Jetson (unified memory), pinned-memory registration via cudaHostRegister
   # exhausts NvMap descriptor resources and causes CUDA OOM after the first run.
   # Async weight offloading also has no benefit on unified memory (no actual DMA).
-  jetsonFlags = lib.optionalString (config.machines.base.machineType == "jetson")
-    "--disable-pinned-memory --disable-async-offload";
+  jetsonFlags = lib.optionalString (
+    config.machines.base.machineType == "jetson"
+  ) "--disable-pinned-memory --disable-async-offload";
 in
 {
   options.services.comfyui = {
