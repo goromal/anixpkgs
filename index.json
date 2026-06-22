@@ -334,6 +334,71 @@
                 "attr": "vdlserver",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "spandrel",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "segment-anything",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfy-kitchen",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-frontend-package",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-core",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-api",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-video",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-image",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-other",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-embedded-docs",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "cozy",
+                "ci": true,
+                "docs": true
             }
         ],
         "bash": [

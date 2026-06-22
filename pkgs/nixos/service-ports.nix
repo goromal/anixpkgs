@@ -27,8 +27,10 @@
   la-quiz-web = 5656;
   tester = 5757;
   launchpad = 8888;
+  comfyui = 8188;
   anix_upgrade_ui = 5858;
   tasks_ui = 5959;
   videodl = 6060;
   intake_ui = 6161;
+  cozy = 6262;
 }

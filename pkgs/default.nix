@@ -149,6 +149,39 @@ let
                   pkg-src = flakeInputs.jetson-stats;
                 }
               );
+              spandrel = pySelf.callPackage ./python-packages/spandrel {
+                pkg-src = flakeInputs.spandrel-src;
+              };
+              segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
+              opencv4 = pySuper.opencv4.override { enableCuda = false; };
+              # aarch64 (Jetson): nixpkgs' from-source kornia-rs is
+              # badPlatforms=aarch64-linux (rustc SIGSEGV); use the prebuilt
+              # wheel so kornia (and thus comfyui) builds. See
+              # ./python-packages/kornia-rs/default.nix. x86 is untouched.
+              kornia-rs =
+                if final.stdenv.hostPlatform.isAarch64 then
+                  pySelf.callPackage ./python-packages/kornia-rs { }
+                else
+                  pySuper.kornia-rs;
+              comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
+              comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
+              comfyui-workflow-templates-core =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
+                  { };
+              comfyui-workflow-templates-media-api =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-api
+                  { };
+              comfyui-workflow-templates-media-video =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-video
+                  { };
+              comfyui-workflow-templates-media-image =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-image
+                  { };
+              comfyui-workflow-templates-media-other =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-other
+                  { };
+              comfyui-workflow-templates = pySelf.callPackage ./python-packages/comfyui-workflow-templates { };
+              comfyui-embedded-docs = pySelf.callPackage ./python-packages/comfyui-embedded-docs { };
               jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
               jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
               jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
@@ -295,6 +328,7 @@ let
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
               intake_ui = addDoc (pySelf.callPackage ./python-packages/flasks/intake_ui { });
+              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { });
               vdlserver = addDoc (
                 pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
               );
@@ -403,6 +437,7 @@ rec {
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
+  cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
@@ -414,6 +449,67 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   jetson-stats = final.python313.pkgs.jetson-stats;
+  spandrel = final.python313.pkgs.spandrel;
+  onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
+  segment-anything = final.python313.pkgs.segment-anything;
+  comfy-kitchen = final.python313.pkgs.comfy-kitchen;
+  comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
+  comfyui-workflow-templates-core = final.python313.pkgs.comfyui-workflow-templates-core;
+  comfyui-workflow-templates-media-api = final.python313.pkgs.comfyui-workflow-templates-media-api;
+  comfyui-workflow-templates-media-video =
+    final.python313.pkgs.comfyui-workflow-templates-media-video;
+  comfyui-workflow-templates-media-image =
+    final.python313.pkgs.comfyui-workflow-templates-media-image;
+  comfyui-workflow-templates-media-other =
+    final.python313.pkgs.comfyui-workflow-templates-media-other;
+  comfyui-workflow-templates = final.python313.pkgs.comfyui-workflow-templates;
+  comfyui-embedded-docs = final.python313.pkgs.comfyui-embedded-docs;
+  comfyui =
+    let
+      py = final.python313;
+      pyPkgs = py.pkgs;
+    in
+    prev.callPackage ./python-packages/comfyui {
+      python313 = py;
+      torch = pyPkgs.torch;
+      torchsde = pyPkgs.torchsde;
+      torchvision = pyPkgs.torchvision;
+      torchaudio = pyPkgs.torchaudio;
+      numpy = pyPkgs.numpy;
+      einops = pyPkgs.einops;
+      transformers = pyPkgs.transformers;
+      tokenizers = pyPkgs.tokenizers;
+      sentencepiece = pyPkgs.sentencepiece;
+      safetensors = pyPkgs.safetensors;
+      aiohttp = pyPkgs.aiohttp;
+      yarl = pyPkgs.yarl;
+      pyyaml = pyPkgs.pyyaml;
+      pillow = pyPkgs.pillow;
+      scipy = pyPkgs.scipy;
+      tqdm = pyPkgs.tqdm;
+      psutil = pyPkgs.psutil;
+      alembic = pyPkgs.alembic;
+      sqlalchemy = pyPkgs.sqlalchemy;
+      requests = pyPkgs.requests;
+      pydantic = pyPkgs.pydantic;
+      pydantic-settings = pyPkgs.pydantic-settings;
+      kornia = pyPkgs.kornia;
+      spandrel = pyPkgs.spandrel;
+      av = pyPkgs.av;
+      comfy-kitchen = pyPkgs."comfy-kitchen";
+      comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
+      comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
+      comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
+      ultralytics = pyPkgs.ultralytics;
+      opencv4 = pyPkgs.opencv4;
+      dill = pyPkgs.dill;
+      scikit-image = pyPkgs."scikit-image";
+      piexif = pyPkgs.piexif;
+      matplotlib = pyPkgs.matplotlib;
+      gitpython = pyPkgs.gitpython;
+      segment-anything = pyPkgs."segment-anything";
+      pkg-src = flakeInputs.comfyui-src;
+    };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
