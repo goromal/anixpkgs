@@ -80,5 +80,6 @@ in
         claudeDefaults.mcpServers.wiki
       ];
     };
+    services.logind.settings.Login.HandleLidSwitch = "ignore";
   };
 }

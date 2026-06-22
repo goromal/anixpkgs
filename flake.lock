@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1781675895,
-        "narHash": "sha256-B8BsxCei00RXNYbl7KGtvD40XlDgSz9cj9UFboS2mYM=",
+        "lastModified": 1782103454,
+        "narHash": "sha256-JLZcjOzYPKFnSI3NKQI10/9kVcPSB7qwGq7/pV89JVA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "6d14d3dc1d3460ab3abbe053d706454842f06321",
+        "rev": "bc7d2248aa6dc581f72a6ecb0628596d5462bb73",
         "type": "github"
       },
       "original": {
@@ -80,6 +80,23 @@
       "original": {
         "owner": "goromal",
         "repo": "ceres-factors",
+        "type": "github"
+      }
+    },
+    "comfyui-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769486881,
+        "narHash": "sha256-CcA3xTVmBVLGMtM5F74R2LfwafFDxFHZ1uzx5MvrB/4=",
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "rev": "09725967cf76304371c390ca1d6483e04061da48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "comfyanonymous",
+        "ref": "refs/tags/v0.11.0",
+        "repo": "ComfyUI",
         "type": "github"
       }
     },
@@ -960,6 +977,7 @@
         "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
+        "comfyui-src": "comfyui-src",
         "crowcpp": "crowcpp",
         "daily_tactical_server": "daily_tactical_server",
         "determinate": "determinate",
@@ -1003,6 +1021,7 @@
         "signals-cpp": "signals-cpp",
         "simple-image-editor": "simple-image-editor",
         "sorting": "sorting",
+        "spandrel-src": "spandrel-src",
         "spelling-corrector": "spelling-corrector",
         "sunnyside": "sunnyside",
         "symforce": "symforce",
@@ -1107,6 +1126,22 @@
       "original": {
         "owner": "goromal",
         "repo": "sorting",
+        "type": "github"
+      }
+    },
+    "spandrel-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776033370,
+        "narHash": "sha256-ohkI7giaAMvi9RatM11WoA2+Ww53TLmJsB+pRf+RWt0=",
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
+        "rev": "e1f2ea14b2eb9dc912bdf335803f8a3d481c45b8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
         "type": "github"
       }
     },

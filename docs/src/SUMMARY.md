@@ -59,6 +59,7 @@
   - [notion-tools](./python/notion-tools.md)
   - [book-notes-sync](./python/book-notes-sync.md)
   - [goromail](./python/goromail.md)
+  - [cozy](./python/cozy.md)
 - [Bash Packages](./bash/bash.md)
   - [aapis-grpcurl](./bash/aapis-grpcurl.md)
   - [aptest](./bash/aptest.md)
