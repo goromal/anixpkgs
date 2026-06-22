@@ -38,3 +38,4 @@ Packages written (or bound) in Python.
 - [notion-tools](./notion-tools.md)
 - [book-notes-sync](./book-notes-sync.md)
 - [goromail](./goromail.md)
+- [cozy](./cozy.md)
