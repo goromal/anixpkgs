@@ -9,6 +9,11 @@ let
   cfg = config.services.comfyui;
   extendedPkgs = pkgs.extend (import ../../../../overlay.nix);
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
+  # On Jetson (unified memory), pinned-memory registration via cudaHostRegister
+  # exhausts NvMap descriptor resources and causes CUDA OOM after the first run.
+  # Async weight offloading also has no benefit on unified memory (no actual DMA).
+  jetsonFlags = lib.optionalString (config.machines.base.machineType == "jetson")
+    "--disable-pinned-memory --disable-async-offload";
 in
 {
   options.services.comfyui = {
@@ -128,7 +133,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag}";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${jetsonFlags}";
             ReadWritePaths = [
               cfg.dataDir
               "/tmp"
