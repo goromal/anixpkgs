@@ -63,7 +63,10 @@ class JobStore:
     def _read_raw(self):
         try:
             with open(self.state_path) as f:
-                return json.load(f)
+                # Merge onto defaults so state files written by an older cozy
+                # (missing newly-added keys like "image") still carry every
+                # field the app/template expects.
+                return {**self._default_state(), **json.load(f)}
         except (OSError, ValueError):
             return self._default_state()
 

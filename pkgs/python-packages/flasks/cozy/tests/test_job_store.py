@@ -168,3 +168,14 @@ def test_start_persists_image(tmp_path):
     store = job_store.JobStore(str(tmp_path), FakeClient([]))
     assert store.start("imggen", _fixture_path(), "a cat", 400, 800, "me.png") is True
     assert store.read_state()["image"] == "me.png"
+
+
+def test_read_backfills_missing_keys(tmp_path):
+    # A state.json written by an older cozy lacks newly-added keys (e.g. "image").
+    # read_state must backfill defaults so the template never sees an undefined key.
+    (tmp_path / "state.json").write_text(json.dumps({"workflow": "imggen", "prompt": "hi"}))
+    store = job_store.JobStore(str(tmp_path), FakeClient([]))
+    st = store.read_state()
+    assert st["image"] == ""
+    assert st["prompt"] == "hi"
+    assert "job" in st
