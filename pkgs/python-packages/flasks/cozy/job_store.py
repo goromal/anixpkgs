@@ -20,6 +20,23 @@ def _idle_job():
             "started_at": None, "finished_at": None, "error": None}
 
 
+def job_duration(job):
+    """Wall-clock seconds from started_at to finished_at, or None if either
+    timestamp is missing or unparseable. Used by the UI to report how long the
+    most recent generation took. Negative deltas (clock skew) collapse to None.
+    """
+    started = job.get("started_at")
+    finished = job.get("finished_at")
+    if not started or not finished:
+        return None
+    try:
+        delta = datetime.fromisoformat(finished) - datetime.fromisoformat(started)
+    except ValueError:
+        return None
+    secs = delta.total_seconds()
+    return secs if secs >= 0 else None
+
+
 class JobStore:
     """Owns the on-disk state of the single cozy generation job.
 
@@ -40,7 +57,7 @@ class JobStore:
 
     def _default_state(self):
         return {"workflow": None, "prompt": "", "width": DEFAULT_W,
-                "height": DEFAULT_H, "job": _idle_job(),
+                "height": DEFAULT_H, "image": "", "job": _idle_job(),
                 "output": os.path.exists(self.image_path)}
 
     def _read_raw(self):
@@ -105,7 +122,7 @@ class JobStore:
 
     # -- inputs --------------------------------------------------------------
 
-    def set_inputs(self, workflow=None, prompt=None, width=None, height=None):
+    def set_inputs(self, workflow=None, prompt=None, width=None, height=None, image=None):
         with self._lock:
             state = self._read_raw()
             if workflow is not None:
@@ -116,22 +133,27 @@ class JobStore:
                 state["width"] = int(width)
             if height is not None:
                 state["height"] = int(height)
+            if image is not None:
+                state["image"] = image
             self._write_state(state)
 
     # -- running -------------------------------------------------------------
 
-    def start(self, workflow_name, workflow_path, prompt, width, height):
+    def start(self, workflow_name, workflow_path, prompt, width, height, image=""):
         with self._lock:
             # Check raw state first: if the persisted state says running,
             # reject regardless of thread liveness (conservative guard).
             # Orphan finalization is deferred to read_state() callers (UI).
             if self._read_raw().get("job", {}).get("status") == "running":
                 return False
-            graph = workflows.load_and_patch(workflow_path, prompt, width, height)
+            # load_and_patch may snap dimensions to a model's resolution buckets;
+            # store the effective size so the UI shows what was actually used.
+            graph, width, height = workflows.load_and_patch(
+                workflow_path, prompt, width, height, image=image)
             client_id = uuid.uuid4().hex
             state = self._read_raw()
             state.update(workflow=workflow_name, prompt=prompt,
-                         width=int(width), height=int(height))
+                         width=int(width), height=int(height), image=image)
             state["job"] = {"status": "running", "prompt_id": None, "progress": 0,
                             "started_at": _now(), "finished_at": None,
                             "error": None, "client_id": client_id}
@@ -221,6 +243,7 @@ class JobStore:
                 pass
             state = self._read_raw()
             state["prompt"] = ""
+            state["image"] = ""
             state["job"] = _idle_job()
             state["output"] = False
             self._write_state(state)
