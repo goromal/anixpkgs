@@ -126,6 +126,33 @@ def test_orphan_finalized_to_success(tmp_path):
     assert st["output"] is True
 
 
+def test_job_duration_computes_seconds():
+    job = {"started_at": "2026-06-23T10:00:00-06:00",
+           "finished_at": "2026-06-23T10:01:23-06:00"}
+    assert job_store.job_duration(job) == 83.0
+
+
+def test_job_duration_none_when_unfinished():
+    assert job_store.job_duration(job_store._idle_job()) is None
+    assert job_store.job_duration(
+        {"started_at": "2026-06-23T10:00:00-06:00", "finished_at": None}) is None
+
+
+def test_start_records_duration(tmp_path):
+    events = [
+        {"type": "executing", "data": {"node": None, "prompt_id": "pid-1"}},
+    ]
+    history = {"pid-1": {"outputs": {"9": {"images": [
+        {"filename": "out.png", "subfolder": "", "type": "output"}]}}}}
+    client = FakeClient(events, history=history, image=b"PNG")
+    store = job_store.JobStore(str(tmp_path), client)
+    assert store.start("imggen", _fixture_path(), "a cat", 400, 800) is True
+    st = _wait_idle(store)
+    assert st["job"]["status"] == "success"
+    assert job_store.job_duration(st["job"]) is not None
+    assert job_store.job_duration(st["job"]) >= 0
+
+
 def test_orphan_without_history_fails(tmp_path):
     client = FakeClient([], history={})
     store = job_store.JobStore(str(tmp_path), client)
@@ -135,3 +162,20 @@ def test_orphan_without_history_fails(tmp_path):
                                 "finished_at": None, "error": None}})
     st = store.read_state()
     assert st["job"]["status"] == "failed"
+
+
+def test_start_persists_image(tmp_path):
+    store = job_store.JobStore(str(tmp_path), FakeClient([]))
+    assert store.start("imggen", _fixture_path(), "a cat", 400, 800, "me.png") is True
+    assert store.read_state()["image"] == "me.png"
+
+
+def test_read_backfills_missing_keys(tmp_path):
+    # A state.json written by an older cozy lacks newly-added keys (e.g. "image").
+    # read_state must backfill defaults so the template never sees an undefined key.
+    (tmp_path / "state.json").write_text(json.dumps({"workflow": "imggen", "prompt": "hi"}))
+    store = job_store.JobStore(str(tmp_path), FakeClient([]))
+    st = store.read_state()
+    assert st["image"] == ""
+    assert st["prompt"] == "hi"
+    assert "job" in st

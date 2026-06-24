@@ -44,6 +44,7 @@
         .progress { margin-top:20px; height:18px; background:#e9ecef; border-radius:9px; overflow:hidden; display:none; }
         .progress > div { height:100%; width:0%; background:linear-gradient(135deg,#4e73df,#224abe); transition:width 0.3s; }
         .error { color:#721c24; background:#f8d7da; border:2px solid #f5c6cb; padding:10px 14px; border-radius:6px; margin-top:16px; display:none; }
+        .duration { margin-top:16px; text-align:center; color:#495057; font-weight:600; display:none; }
         #output { margin-top:24px; text-align:center; }
         #output img { max-width:100%; border-radius:8px; }
         #hidden-inputs { display:none; }
@@ -65,7 +66,14 @@
         </select>
 
         <div id="inputs">
-            <label for="prompt">Prompt</label>
+            <div id="image-picker" style="display:none;">
+                <label for="image-select">Input image</label>
+                <select id="image-select"></select>
+                <div id="preview-wrap" style="margin-top:12px; display:none;">
+                    <img id="preview" alt="input preview" style="max-width:100%; border-radius:8px;" />
+                </div>
+            </div>
+            <label for="prompt" id="prompt-label">Prompt</label>
             <textarea id="prompt">{{ state.prompt }}</textarea>
             <div class="prompt-actions">
                 <button type="button" class="secondary" id="copy-btn" aria-label="Copy prompt to clipboard">&#128203; Copy</button>
@@ -86,6 +94,7 @@
 
         <div class="progress" id="progress"><div id="bar"></div></div>
         <div class="error" id="error"></div>
+        <div class="duration" id="duration"></div>
 
         <div id="output"></div>
         <button class="clear" id="clear">Clear</button>
@@ -93,14 +102,72 @@
 
     <script>
         const root = "{{ urlroot }}";
+        const WORKFLOW_KINDS = {{ workflow_kinds | tojson }};
+        const initialImage = {{ state.image | tojson }};
+        const workflowSel = document.getElementById("workflow");
+        const imagePicker = document.getElementById("image-picker");
+        const imageSelect = document.getElementById("image-select");
+        const previewWrap = document.getElementById("preview-wrap");
+        const preview = document.getElementById("preview");
+        const dimsRow = document.querySelector(".dims");
+        const promptLabel = document.getElementById("prompt-label");
+
+        function currentKind() { return WORKFLOW_KINDS[workflowSel.value] || "generate"; }
+
+        function updatePreview() {
+            const name = imageSelect.value;
+            if (name) {
+                preview.src = root + "api/input-image?name=" + encodeURIComponent(name) + "&t=" + Date.now();
+                previewWrap.style.display = "block";
+            } else {
+                preview.removeAttribute("src");
+                previewWrap.style.display = "none";
+            }
+        }
+
+        async function loadInputImages() {
+            const r = await fetch(root + "api/input-images");
+            const names = (await r.json()).images || [];
+            imageSelect.innerHTML = '<option value="">— choose an image —</option>' +
+                names.map(n => '<option value="' + n + '">' + n + '</option>').join("");
+            if (initialImage && names.includes(initialImage)) imageSelect.value = initialImage;
+            updatePreview();
+        }
+
+        function applyKind() {
+            const edit = currentKind() === "edit";
+            imagePicker.style.display = edit ? "block" : "none";
+            dimsRow.style.display = edit ? "none" : "flex";
+            promptLabel.textContent = edit ? "Edit instruction" : "Prompt";
+            if (edit && !imageSelect.options.length) loadInputImages();
+        }
+
+        workflowSel.addEventListener("change", applyKind);
+        imageSelect.addEventListener("change", updatePreview);
         const bar = document.getElementById("bar");
         const progress = document.getElementById("progress");
         const errorBox = document.getElementById("error");
+        const durationBox = document.getElementById("duration");
         const genBtn = document.getElementById("generate");
         const output = document.getElementById("output");
         let polling = null;
 
         function showError(msg) { errorBox.textContent = msg; errorBox.style.display = msg ? "block" : "none"; }
+
+        // secs -> "45s" or "1m 23s"; null/undefined clears the line.
+        function formatDuration(secs) {
+            if (secs == null) return "";
+            secs = Math.round(secs);
+            if (secs < 60) return secs + "s";
+            const m = Math.floor(secs / 60), s = secs % 60;
+            return m + "m " + (s < 10 ? "0" + s : s) + "s";
+        }
+
+        function showDuration(secs) {
+            const t = formatDuration(secs);
+            durationBox.textContent = t ? "Generated in " + t : "";
+            durationBox.style.display = t ? "block" : "none";
+        }
 
         function setRunning(on) {
             genBtn.disabled = on;
@@ -122,7 +189,7 @@
                 if (polling) { clearInterval(polling); polling = null; }
                 if (s.status === "failed") showError(s.error || "generation failed");
                 else showError("");
-                if (s.has_image) showImage();
+                if (s.has_image) { showImage(); showDuration(s.duration); }
             }
         }
 
@@ -133,6 +200,7 @@
 
         document.getElementById("generate").addEventListener("click", async () => {
             showError("");
+            showDuration(null);
             output.innerHTML = "";
             const payload = {
                 workflow: document.getElementById("workflow").value,
@@ -140,6 +208,7 @@
                 width: parseInt(document.getElementById("width").value, 10),
                 height: parseInt(document.getElementById("height").value, 10),
             };
+            if (currentKind() === "edit") payload.image = imageSelect.value;
             const r = await fetch(root + "api/generate", {
                 method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),
@@ -151,7 +220,8 @@
         document.getElementById("clear").addEventListener("click", async () => {
             await fetch(root + "api/clear", { method: "POST" });
             document.getElementById("prompt").value = "";
-            output.innerHTML = ""; showError(""); bar.style.width = "0%";
+            imageSelect.value = ""; updatePreview();
+            output.innerHTML = ""; showError(""); showDuration(null); bar.style.width = "0%";
         });
 
         // --- Copy / Paste prompt helpers ---
@@ -159,24 +229,51 @@
         const pasteBtn = document.getElementById("paste-btn");
         const promptTA = document.getElementById("prompt");
 
-        copyBtn.addEventListener("click", async () => {
-            const text = promptTA.value;
+        function flashCopied() {
+            const orig = copyBtn.innerHTML;
+            copyBtn.innerHTML = "&#10003; Copied!";
+            copyBtn.disabled = true;
+            setTimeout(() => { copyBtn.innerHTML = orig; copyBtn.disabled = false; }, 1200);
+        }
+
+        // Legacy execCommand copy. Must run synchronously inside the click
+        // gesture. iOS Safari ignores textarea.select(), so build an explicit
+        // Range/Selection and setSelectionRange after temporarily clearing
+        // readOnly/enabling contentEditable, or nothing gets selected and the
+        // copy silently no-ops.
+        function legacyCopy(el, text) {
+            const prevReadOnly = el.readOnly, prevCE = el.contentEditable;
+            el.readOnly = false;
+            el.contentEditable = "true";
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+            el.setSelectionRange(0, text.length);
             let ok = false;
-            try {
-                await navigator.clipboard.writeText(text);
-                ok = true;
-            } catch (_) {
-                // Fallback: select + execCommand for older/restricted browsers.
-                try {
-                    promptTA.select();
-                    ok = document.execCommand("copy");
-                } catch (_) { ok = false; }
-            }
-            if (ok) {
-                const orig = copyBtn.innerHTML;
-                copyBtn.innerHTML = "&#10003; Copied!";
-                copyBtn.disabled = true;
-                setTimeout(() => { copyBtn.innerHTML = orig; copyBtn.disabled = false; }, 1200);
+            try { ok = document.execCommand("copy"); } catch (_) { ok = false; }
+            el.readOnly = prevReadOnly;
+            el.contentEditable = prevCE;
+            sel.removeAllRanges();
+            return ok;
+        }
+
+        copyBtn.addEventListener("click", () => {
+            const text = promptTA.value;
+            // navigator.clipboard exists only in a secure context (HTTPS). cozy
+            // is served over plain HTTP on the LAN, so on iOS Safari it is
+            // undefined and we must take the legacy path synchronously — an
+            // awaited rejection would run the fallback after the user gesture
+            // has expired, which iOS blocks.
+            if (window.isSecureContext && navigator.clipboard) {
+                navigator.clipboard.writeText(text)
+                    .then(flashCopied)
+                    .catch(() => { if (legacyCopy(promptTA, text)) flashCopied(); });
+            } else if (legacyCopy(promptTA, text)) {
+                flashCopied();
+            } else {
+                showError("Copy not supported here — long-press the prompt text and choose Copy.");
             }
         });
 
@@ -202,7 +299,8 @@
             const hasImage = {{ (state.output) | tojson }};
             if (st.status === "running") { startPolling(); }
             else if (st.status === "failed") { showError(st.error || "generation failed"); }
-            if (hasImage) showImage();
+            if (hasImage) { showImage(); showDuration(st.duration); }
+            applyKind();
         })();
     </script>
 </body>
