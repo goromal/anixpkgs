@@ -13,6 +13,12 @@
   machines.base.wifiInterfaceName = "wlp0s13f0u1u4";
   machines.base.acceptRemoteBuilds = true;
   machines.cudaNode.enable = true;
+  services.comfyui.cozy.workflows = [
+    "imggen"
+    "imggen2"
+    "imggen3"
+    "imgedit"
+  ];
   machines.base.timedOrchJobs = [
     {
       name = "launchpad-sync";
