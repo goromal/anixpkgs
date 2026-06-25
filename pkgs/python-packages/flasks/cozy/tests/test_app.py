@@ -102,11 +102,14 @@ def edit_client(tmp_path, monkeypatch):
     img_dir = tmp_path / "input"
     img_dir.mkdir()
     (img_dir / "me.png").write_bytes(b"\x89PNG\r\n")
+    out_dir = tmp_path / "output"
+    out_dir.mkdir()
+    (out_dir / "gen.png").write_bytes(b"\x89PNG\r\n")
     (tmp_path / "secret.txt").write_text("nope")
     (tmp_path / "imgedit.api.json").write_text("{}")
     app = cozy.create_app(store=store, workflows=["imggen", "imgedit"],
                           workflow_dir=str(tmp_path), subdomain="/cozy",
-                          input_dir=str(img_dir),
+                          input_dir=str(img_dir), output_dir=str(out_dir),
                           workflow_kinds={"imggen": "generate", "imgedit": "edit"})
     app.config["TESTING"] = True
     app.config["WTF_CSRF_ENABLED"] = False
@@ -115,16 +118,25 @@ def edit_client(tmp_path, monkeypatch):
     return c
 
 
-def test_input_images_lists(edit_client):
+def test_input_images_lists_both_dirs(edit_client):
     _login(edit_client)
-    r = edit_client.get("/cozy/api/input-images")
-    assert "me.png" in r.get_json()["images"]
+    items = edit_client.get("/cozy/api/input-images").get_json()["images"]
+    by_value = {it["value"]: it for it in items}
+    # input-dir files keep a bare relative path; output-dir files carry the
+    # ComfyUI ' [output]' annotation so LoadImage reads them from the output dir.
+    assert by_value["me.png"]["source"] == "input"
+    assert by_value["gen.png [output]"]["source"] == "output"
+    assert by_value["gen.png [output]"]["label"] == "gen.png"
 
 
-def test_input_image_serves_and_rejects_traversal(edit_client):
+def test_input_image_serves_from_both_dirs_and_rejects_traversal(edit_client):
     _login(edit_client)
     assert edit_client.get("/cozy/api/input-image?name=me.png").status_code == 200
+    assert edit_client.get(
+        "/cozy/api/input-image?name=gen.png [output]").status_code == 200
     assert edit_client.get("/cozy/api/input-image?name=../secret.txt").status_code == 404
+    assert edit_client.get(
+        "/cozy/api/input-image?name=../secret.txt [output]").status_code == 404
     assert edit_client.get("/cozy/api/input-image?name=missing.png").status_code == 404
 
 
@@ -137,3 +149,23 @@ def test_edit_generate_requires_image(edit_client):
                           json={"workflow": "imgedit", "prompt": "hi", "image": "me.png"})
     assert ok.status_code == 200
     assert edit_client._store.started[0] == "imgedit"
+
+
+def test_edit_generate_accepts_output_image(edit_client):
+    _login(edit_client)
+    # A prior generation, picked from the output dir, re-fed as the edit input.
+    ok = edit_client.post(
+        "/cozy/api/generate",
+        json={"workflow": "imgedit", "prompt": "hi", "image": "gen.png [output]"})
+    assert ok.status_code == 200
+    # The annotated value is passed through verbatim to the job store (and on to
+    # ComfyUI's LoadImage), not stripped.
+    assert edit_client._store.started[4] == "gen.png [output]"
+
+
+def test_edit_generate_rejects_output_traversal(edit_client):
+    _login(edit_client)
+    bad = edit_client.post(
+        "/cozy/api/generate",
+        json={"workflow": "imgedit", "prompt": "hi", "image": "../secret.txt [output]"})
+    assert bad.status_code == 400

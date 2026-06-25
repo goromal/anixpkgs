@@ -24,24 +24,55 @@ def _check_password(password):
 
 _IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp")
 
+# ComfyUI's LoadImage resolves an `image` value ending in this suffix against
+# its output directory instead of the input directory (folder_paths
+# .annotated_filepath). cozy uses the same suffix as the picker option value for
+# output-dir files, so the same string is the LoadImage input, the persisted
+# selection, and the preview key -- no conversion anywhere.
+_OUTPUT_SUFFIX = " [output]"
 
-def _list_input_images(input_dir):
-    """Relative paths of image files under input_dir, sorted."""
+
+def _list_dir_images(directory):
+    """Sorted relative paths of image files under directory (empty if unset)."""
     out = []
-    for root, _dirs, files in os.walk(input_dir):
+    if not directory:
+        return out
+    for root, _dirs, files in os.walk(directory):
         for f in files:
             if f.lower().endswith(_IMAGE_EXTS):
-                out.append(os.path.relpath(os.path.join(root, f), input_dir))
+                out.append(os.path.relpath(os.path.join(root, f), directory))
     return sorted(out)
 
 
-def _safe_input_path(input_dir, name):
-    """Resolve name under input_dir, or None if it escapes or is not an image."""
-    if not name or not name.lower().endswith(_IMAGE_EXTS):
+def _list_images(input_dir, output_dir):
+    """Picker options spanning the input and output dirs. Each option's `value`
+    is what gets sent to ComfyUI's LoadImage `image` input: a bare relative path
+    for input-dir files, suffixed with ' [output]' for output-dir files (so a
+    prior generation can be re-fed as the edit input). `label` is the bare path
+    for display; `source` groups the two in the UI."""
+    items = [{"value": r, "label": r, "source": "input"}
+             for r in _list_dir_images(input_dir)]
+    items += [{"value": r + _OUTPUT_SUFFIX, "label": r, "source": "output"}
+              for r in _list_dir_images(output_dir)]
+    return items
+
+
+def _resolve_image_ref(input_dir, output_dir, value):
+    """Map a picker value to an on-disk path, or None if it is not a valid image
+    within the directory it names. Output-dir files carry the ' [output]'
+    annotation; everything else resolves under the input dir. Rejects traversal
+    out of the chosen base via realpath containment."""
+    if not value:
         return None
-    full = os.path.realpath(os.path.join(input_dir, name))
-    base = os.path.realpath(input_dir)
-    if os.path.commonpath([full, base]) != base or not os.path.isfile(full):
+    if value.endswith(_OUTPUT_SUFFIX):
+        base, rel = output_dir, value[:-len(_OUTPUT_SUFFIX)]
+    else:
+        base, rel = input_dir, value
+    if not base or not rel.lower().endswith(_IMAGE_EXTS):
+        return None
+    full = os.path.realpath(os.path.join(base, rel))
+    root = os.path.realpath(base)
+    if os.path.commonpath([full, root]) != root or not os.path.isfile(full):
         return None
     return full
 
@@ -58,8 +89,9 @@ class User(flask_login.UserMixin):
 
 
 def create_app(store, workflows, workflow_dir, subdomain="/cozy",
-               input_dir=None, workflow_kinds=None):
+               input_dir=None, output_dir=None, workflow_kinds=None):
     input_dir = input_dir or os.path.join(workflow_dir, "input")
+    output_dir = output_dir or os.path.join(workflow_dir, "output")
     workflow_kinds = workflow_kinds or {}
     urlroot = subdomain if subdomain == "/" else subdomain + "/"
     prefix = subdomain.replace("/", "")
@@ -118,7 +150,7 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
         prompt = data.get("prompt", "")
         image = data.get("image", "") or ""
         if workflow_kinds.get(wf) == "edit":
-            if not _safe_input_path(input_dir, image):
+            if not _resolve_image_ref(input_dir, output_dir, image):
                 return flask.jsonify({"error": "valid input image required"}), 400
         try:
             width = int(data.get("width", 400))
@@ -155,12 +187,12 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
     @bp.route("/api/input-images", methods=["GET"])
     @flask_login.login_required
     def input_images():
-        return flask.jsonify({"images": _list_input_images(input_dir)})
+        return flask.jsonify({"images": _list_images(input_dir, output_dir)})
 
     @bp.route("/api/input-image", methods=["GET"])
     @flask_login.login_required
     def input_image():
-        full = _safe_input_path(input_dir, flask.request.args.get("name", ""))
+        full = _resolve_image_ref(input_dir, output_dir, flask.request.args.get("name", ""))
         if not full:
             return flask.jsonify({"error": "not found"}), 404
         return flask.send_file(full)
@@ -197,12 +229,16 @@ def run():
                         help="Comma-separated workflow names")
     parser.add_argument("--input-dir", type=str, default="",
                         help="Directory of selectable input images (default <workflow-dir>/input)")
+    parser.add_argument("--output-dir", type=str, default="",
+                        help="Directory of selectable output images for edit workflows "
+                             "(default <workflow-dir>/output)")
     args = parser.parse_args()
 
     state_dir = args.state_dir or os.path.join(os.getcwd(), "cozy-state")
     workflow_dir = args.workflow_dir or os.getcwd()
     names = [w for w in args.workflows.split(",") if w]
     input_dir = args.input_dir or os.path.join(workflow_dir, "input")
+    output_dir = args.output_dir or os.path.join(workflow_dir, "output")
     import workflows as _wf
     workflow_kinds = {
         n: _wf.load_meta(os.path.join(workflow_dir, n + ".api.json"))["kind"]
@@ -211,7 +247,8 @@ def run():
     store = JobStore(state_dir, ComfyUIClient(args.comfyui_url))
     app = create_app(store=store, workflows=names,
                      workflow_dir=workflow_dir, subdomain=args.subdomain,
-                     input_dir=input_dir, workflow_kinds=workflow_kinds)
+                     input_dir=input_dir, output_dir=output_dir,
+                     workflow_kinds=workflow_kinds)
     app.run(host="0.0.0.0", port=args.port)
 
 

@@ -92,6 +92,11 @@ in
         default = "${cfg.dataDir}/input";
         description = "Directory of selectable input images for edit workflows";
       };
+      outputDir = lib.mkOption {
+        type = lib.types.str;
+        default = "${cfg.dataDir}/output";
+        description = "Directory of selectable output images (prior generations) for edit workflows";
+      };
       workflows = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default =
@@ -206,7 +211,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";
