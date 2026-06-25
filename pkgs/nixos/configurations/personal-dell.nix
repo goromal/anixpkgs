@@ -13,9 +13,6 @@
   machines.base.wifiInterfaceName = "wlp0s13f0u1u4";
   machines.base.acceptRemoteBuilds = true;
   machines.cudaNode.enable = true;
-  # Flux.2 dev image-edit (~33 GB UNET + ~33 GB text encoder) only fits this box's
-  # 4 GB VRAM / 62 GB RAM by loading the text encoder in fp8 and freeing models
-  # between runs; swap (in hardware/dell.nix) covers load-time allocation spikes.
   services.comfyui.lowMem = true;
   services.comfyui.cozy.workflows = [
     "imggen"
