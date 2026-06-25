@@ -36,7 +36,14 @@
     ];
   };
 
-  swapDevices = [ ];
+  # Headroom for peak allocation spikes when ComfyUI loads/frees the large Flux.2
+  # weight set (each of the UNET and text encoder is ~33 GB) on top of 62 GB RAM.
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 16384;
+    }
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.enableAllFirmware = true;
