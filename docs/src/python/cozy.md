@@ -9,7 +9,7 @@ One-pager UI for generating images with ComfyUI workflows.
 usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--comfyui-url COMFYUI_URL] [--state-dir STATE_DIR]
             [--workflow-dir WORKFLOW_DIR] [--workflows WORKFLOWS]
-            [--input-dir INPUT_DIR]
+            [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
 
 options:
   -h, --help            show this help message and exit
@@ -27,5 +27,8 @@ options:
   --input-dir INPUT_DIR
                         Directory of selectable input images (default
                         <workflow-dir>/input)
+  --output-dir OUTPUT_DIR
+                        Directory of selectable output images for edit
+                        workflows (default <workflow-dir>/output)
 ```
 
