@@ -8,22 +8,25 @@ let
   service-ports = import ../../service-ports.nix;
   cfg = config.services.comfyui;
   extendedPkgs = pkgs.extend (import ../../../../overlay.nix);
+  isJetson = config.machines.base.machineType == "jetson";
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
-  # On Jetson (unified memory), CPU and CUDA share one physical 15.6 GB pool, but
-  # ComfyUI accounts them as separate budgets. Three flags keep us under that pool:
+  # Memory-pressure flags (cfg.lowMem). Needed wherever the resident weight set
+  # would exceed available memory: Jetson's unified CPU+CUDA pool (~15.6 GB), or a
+  # small-VRAM discrete GPU streaming a model far larger than VRAM (e.g. Flux.2
+  # dev's ~33 GB UNET + ~33 GB text encoder on a 4 GB card).
   #  --fp8_e4m3fn-text-enc: load the text encoder in fp8 (its source weights are
-  #    already fp8); halves it from 7.67 GB to ~3.84 GB.
+  #    already fp8); halves it (Mistral-3 small: ~33 GB -> ~16 GB).
   #  --disable-smart-memory: free models between runs instead of caching them. By
   #    default ComfyUI's free_memory() only evicts models on the *same* device it
   #    is loading to, so the CPU-resident text encoder is never freed when the UNET
   #    loads onto CUDA ("0 models unloaded") — the resident set + CUDA-allocator
   #    fragmentation then creep to the ceiling over successive runs until an
-  #    allocation hits NvMap ENOMEM and poisons the CUDA context. cozy also POSTs
+  #    allocation hits ENOMEM and poisons the CUDA context. cozy also POSTs
   #    /free before each job (full unload_all_models) as the primary mitigation.
-  #  --disable-async-offload: 2-stream offload has no benefit on unified memory.
-  jetsonFlags = lib.optionalString (
-    config.machines.base.machineType == "jetson"
-  ) "--fp8_e4m3fn-text-enc --disable-smart-memory --disable-async-offload";
+  lowMemFlags = lib.optionalString cfg.lowMem "--fp8_e4m3fn-text-enc --disable-smart-memory";
+  #  --disable-async-offload: 2-stream offload has no benefit on unified memory,
+  #    but it does help a discrete GPU, so keep it Jetson-only.
+  jetsonFlags = lib.optionalString isJetson "--disable-async-offload";
 in
 {
   options.services.comfyui = {
@@ -55,6 +58,16 @@ in
       default = "lowvram";
       description = "ComfyUI VRAM strategy; 'auto' lets ComfyUI decide (no flag).";
     };
+    lowMem = lib.mkOption {
+      type = lib.types.bool;
+      default = isJetson;
+      description = ''
+        Apply memory-pressure flags (--fp8_e4m3fn-text-enc, --disable-smart-memory)
+        and the expandable_segments CUDA allocator so the resident weight set stays
+        small enough for constrained memory: Jetson unified memory (default on) or a
+        small-VRAM discrete GPU streaming large models (e.g. Flux.2 dev on 4 GB).
+      '';
+    };
     cozy = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -78,6 +91,11 @@ in
         type = lib.types.str;
         default = "${cfg.dataDir}/input";
         description = "Directory of selectable input images for edit workflows";
+      };
+      outputDir = lib.mkOption {
+        type = lib.types.str;
+        default = "${cfg.dataDir}/output";
+        description = "Directory of selectable output images (prior generations) for edit workflows";
       };
       workflows = lib.mkOption {
         type = lib.types.listOf lib.types.str;
@@ -148,7 +166,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${jetsonFlags}";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${lowMemFlags} ${jetsonFlags}";
             ReadWritePaths = [
               cfg.dataDir
               "/tmp"
@@ -161,10 +179,10 @@ in
             Environment = [
               "HOME=/data/andrew"
             ]
-            ++ lib.optionals (config.machines.base.machineType == "jetson") [
-              # On Tegra unified memory the default CUDA allocator fragments and
-              # holds freed blocks, eroding the thin headroom between runs.
-              # expandable_segments lets it return memory so /free actually recovers.
+            ++ lib.optionals cfg.lowMem [
+              # The default CUDA allocator fragments and holds freed blocks, eroding
+              # the thin headroom between runs. expandable_segments lets it return
+              # memory so /free (and --disable-smart-memory) actually recover it.
               "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
             ];
           };
@@ -193,7 +211,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows}";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";

@@ -125,12 +125,30 @@
             }
         }
 
+        function escAttr(s) {
+            return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+        }
+        function escHtml(s) {
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
         async function loadInputImages() {
             const r = await fetch(root + "api/input-images");
-            const names = (await r.json()).images || [];
-            imageSelect.innerHTML = '<option value="">— choose an image —</option>' +
-                names.map(n => '<option value="' + n + '">' + n + '</option>').join("");
-            if (initialImage && names.includes(initialImage)) imageSelect.value = initialImage;
+            // Each item: {value, label, source}. `value` is the LoadImage string
+            // (bare path for input-dir files, "<path> [output]" for output-dir
+            // files); group by source so the dropdown separates Input from Output.
+            const items = (await r.json()).images || [];
+            const groups = { input: [], output: [] };
+            items.forEach(it => (groups[it.source] || (groups[it.source] = [])).push(it));
+            const opts = (gs) => gs.map(it =>
+                '<option value="' + escAttr(it.value) + '">' + escHtml(it.label) + '</option>').join("");
+            let html = '<option value="">— choose an image —</option>';
+            [["input", "Input"], ["output", "Output"]].forEach(([key, label]) => {
+                const gs = groups[key] || [];
+                if (gs.length) html += '<optgroup label="' + label + '">' + opts(gs) + '</optgroup>';
+            });
+            imageSelect.innerHTML = html;
+            if (initialImage) imageSelect.value = initialImage;
             updatePreview();
         }
 
