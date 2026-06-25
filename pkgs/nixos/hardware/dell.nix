@@ -36,8 +36,6 @@
     ];
   };
 
-  # Headroom for peak allocation spikes when ComfyUI loads/frees the large Flux.2
-  # weight set (each of the UNET and text encoder is ~33 GB) on top of 62 GB RAM.
   swapDevices = [
     {
       device = "/swapfile";
