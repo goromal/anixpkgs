@@ -1,4 +1,6 @@
 import os
+import json
+import sys
 import argparse
 import flask
 import flask_login
@@ -23,7 +25,25 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--port", action="store", type=int, default=5000, help="Port to run the server on")
 parser.add_argument("--subdomain", action="store", type=str, default="/rank", help="Subdomain for a reverse proxy")
 parser.add_argument("--data-dir", action="store", type=str, default="", help="Directory containing the rankable elements")
+parser.add_argument("--secrets-file", action="store", type=str, required=True, help="Path to JSON file with secret_key and password_hash")
 args = parser.parse_args()
+
+
+def _load_secrets(path):
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except OSError as e:
+        sys.exit(f"rankserver: cannot read secrets file {path}: {e}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"rankserver: invalid JSON in secrets file {path}: {e}")
+    missing = [k for k in ("secret_key", "password_hash") if not data.get(k)]
+    if missing:
+        sys.exit(f"rankserver: secrets file {path} missing keys: {', '.join(missing)}")
+    return data
+
+
+_secrets = _load_secrets(args.secrets_file)
 
 urlroot = args.subdomain
 if urlroot != "/":
@@ -41,7 +61,7 @@ class LoginForm(flask_wtf.FlaskForm):
 
 class User(flask_login.UserMixin):
     def check_password(self, password):
-        return check_password_hash("scrypt:32768:8:1$acPu0meyxPfx0SnS$26a570af250e0593c2dbb6bfb1d037a7366109a0ba4886e68191237efdabb2fca07de6c81c337b5e275390c2d7ff96f3455f47b7a05027a7e0ebf1628f537498", password)
+        return check_password_hash(_secrets["password_hash"], password)
     def get_id(self):
         return "anonymous"
 
@@ -54,7 +74,7 @@ else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
-app.secret_key = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+app.secret_key = _secrets["secret_key"].encode()
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
 login_manager = flask_login.LoginManager()
 

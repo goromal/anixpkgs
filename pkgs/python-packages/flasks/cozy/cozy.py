@@ -1,5 +1,7 @@
 import argparse
+import json
 import os
+import sys
 
 import flask
 import flask_login
@@ -11,11 +13,21 @@ from wtforms import PasswordField, StringField, SubmitField
 from comfyui_client import ComfyUIClient
 from job_store import JobStore, job_duration
 
-# Identical to stampserver's credential hash + secret key.
-_PW_HASH = ("scrypt:32768:8:1$acPu0meyxPfx0SnS$26a570af250e0593c2dbb6bfb1d037a7"
-            "366109a0ba4886e68191237efdabb2fca07de6c81c337b5e275390c2d7ff96f3"
-            "455f47b7a05027a7e0ebf1628f537498")
-_SECRET_KEY = b"71d2dcdb895b367a1d5f0c66ca559c8d69af0c29a7e101c18c7c2d10399f264e"
+_PW_HASH = None  # populated from the secrets file at startup; see _load_secrets
+
+
+def _load_secrets(path):
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except OSError as e:
+        sys.exit(f"cozy: cannot read secrets file {path}: {e}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"cozy: invalid JSON in secrets file {path}: {e}")
+    missing = [k for k in ("secret_key", "password_hash") if not data.get(k)]
+    if missing:
+        sys.exit(f"cozy: secrets file {path} missing keys: {', '.join(missing)}")
+    return data
 
 
 def _check_password(password):
@@ -89,7 +101,11 @@ class User(flask_login.UserMixin):
 
 
 def create_app(store, workflows, workflow_dir, subdomain="/cozy",
-               input_dir=None, output_dir=None, workflow_kinds=None):
+               input_dir=None, output_dir=None, workflow_kinds=None,
+               secret_key=None, password_hash=None):
+    global _PW_HASH
+    if password_hash is not None:
+        _PW_HASH = password_hash
     input_dir = input_dir or os.path.join(workflow_dir, "input")
     output_dir = output_dir or os.path.join(workflow_dir, "output")
     workflow_kinds = workflow_kinds or {}
@@ -99,7 +115,7 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
     static_url_path = (subdomain.rstrip("/") or "") + "/static"
 
     app = flask.Flask(__name__, static_url_path=static_url_path, static_folder="static")
-    app.secret_key = _SECRET_KEY
+    app.secret_key = secret_key or os.urandom(24)
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
     app.config.setdefault("WTF_CSRF_ENABLED", True)
 
@@ -232,6 +248,8 @@ def run():
     parser.add_argument("--output-dir", type=str, default="",
                         help="Directory of selectable output images for edit workflows "
                              "(default <workflow-dir>/output)")
+    parser.add_argument("--secrets-file", type=str, required=True,
+                        help="Path to JSON file with secret_key and password_hash")
     args = parser.parse_args()
 
     state_dir = args.state_dir or os.path.join(os.getcwd(), "cozy-state")
@@ -245,10 +263,13 @@ def run():
         for n in names if os.path.exists(os.path.join(workflow_dir, n + ".api.json"))
     }
     store = JobStore(state_dir, ComfyUIClient(args.comfyui_url))
+    secrets = _load_secrets(args.secrets_file)
     app = create_app(store=store, workflows=names,
                      workflow_dir=workflow_dir, subdomain=args.subdomain,
                      input_dir=input_dir, output_dir=output_dir,
-                     workflow_kinds=workflow_kinds)
+                     workflow_kinds=workflow_kinds,
+                     secret_key=secrets["secret_key"].encode(),
+                     password_hash=secrets["password_hash"])
     app.run(host="0.0.0.0", port=args.port)
 
 
