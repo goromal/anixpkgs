@@ -24,7 +24,7 @@ in
     secretsFile = lib.mkOption {
       type = lib.types.str;
       description = "Path to JSON file with secret_key and password_hash";
-      default = "${cfg.rootDir}/secrets/flask/rankserver.json";
+      default = "/data/andrew/secrets/flask/rankserver.json";
     };
   };
 
