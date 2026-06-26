@@ -21,6 +21,11 @@ in
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
+    secretsFile = lib.mkOption {
+      type = lib.types.str;
+      description = "Path to JSON file with secret_key and password_hash";
+      default = "${cfg.rootDir}/secrets/flask/stampserver.json";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -57,7 +62,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/stampserver --port ${builtins.toString service-ports.stampserver} --data-dir ${cfg.rootDir}/stampables --subdomain /stamp";
+        ExecStart = "${cfg.package}/bin/stampserver --port ${builtins.toString service-ports.stampserver} --data-dir ${cfg.rootDir}/stampables --subdomain /stamp --secrets-file ${cfg.secretsFile}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
