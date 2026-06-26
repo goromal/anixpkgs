@@ -21,6 +21,11 @@ in
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
+    secretsFile = lib.mkOption {
+      type = lib.types.str;
+      description = "Path to JSON file with secret_key and password_hash";
+      default = "${cfg.rootDir}/secrets/flask/rankserver.json";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -44,7 +49,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/rankserver --port ${builtins.toString service-ports.rankserver} --data-dir ${cfg.rootDir}/rankables --subdomain /rank";
+        ExecStart = "${cfg.package}/bin/rankserver --port ${builtins.toString service-ports.rankserver} --data-dir ${cfg.rootDir}/rankables --subdomain /rank --secrets-file ${cfg.secretsFile}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
