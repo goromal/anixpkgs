@@ -8,7 +8,7 @@ Spins up a flask webserver (on the specified port) whose purpose is to help a us
 
 ```bash
 usage: rankserver [-h] [--port PORT] [--subdomain SUBDOMAIN]
-                  [--data-dir DATA_DIR]
+                  [--data-dir DATA_DIR] --secrets-file SECRETS_FILE
 
 options:
   -h, --help            show this help message and exit
@@ -16,5 +16,7 @@ options:
   --subdomain SUBDOMAIN
                         Subdomain for a reverse proxy
   --data-dir DATA_DIR   Directory containing the rankable elements
+  --secrets-file SECRETS_FILE
+                        Path to JSON file with secret_key and password_hash
 ```
 
