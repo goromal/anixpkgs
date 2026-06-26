@@ -147,7 +147,7 @@
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;
 
-    sunnyside.url = "github:goromal/sunnyside";
+    sunnyside.url = "github:goromal/sunnyside/dev/ssbu";
     sunnyside.flake = false;
 
     symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
