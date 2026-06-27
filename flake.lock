@@ -938,16 +938,15 @@
     "sunnyside": {
       "flake": false,
       "locked": {
-        "lastModified": 1782501062,
+        "lastModified": 1782521357,
         "narHash": "sha256-YBn5iN5xzxKxg4kjh2dbxkpG1v6i4AkHsG0ZO1kv+7Q=",
         "owner": "goromal",
         "repo": "sunnyside",
-        "rev": "89dd172afcad11eac2ad270722db1a2bf118d7f2",
+        "rev": "0da2719982d168969a9a793b85de9f6d8dd2e6f3",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/ssbu",
         "repo": "sunnyside",
         "type": "github"
       }
