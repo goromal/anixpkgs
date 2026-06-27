@@ -938,11 +938,11 @@
     "sunnyside": {
       "flake": false,
       "locked": {
-        "lastModified": 1717568445,
-        "narHash": "sha256-U2wiyKsJ6ACiajkfULpkdCUJ2/xZKQqNgzIHQL9utIE=",
+        "lastModified": 1782521357,
+        "narHash": "sha256-YBn5iN5xzxKxg4kjh2dbxkpG1v6i4AkHsG0ZO1kv+7Q=",
         "owner": "goromal",
         "repo": "sunnyside",
-        "rev": "d6605667490ce008321b32dea5732d7962609bf7",
+        "rev": "0da2719982d168969a9a793b85de9f6d8dd2e6f3",
         "type": "github"
       },
       "original": {
