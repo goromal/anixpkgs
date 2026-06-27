@@ -32,5 +32,21 @@ SVG_PNG_MD5=$(ckfile svg_out.png)
 rm svg_out.png && png test.svg svg_out.png
 ckfile -c $SVG_PNG_MD5 svg_out.png || { echo_red "SVG to PNG conversion is not deterministic"; exit 1; }
 
+# vacuum: convert every supported file in a directory, preserving filenames.
+# Filenames deliberately include spaces and extra dots to lock in that only the
+# final extension is replaced (the rest of the name is preserved verbatim).
+vacdir="$tmpdir/vac"
+mkdir "$vacdir"
+ffmpeg -f lavfi -i color=red:s=20x20:rate=5 -t 0.4 "$vacdir/my clip.v2.gif" 2>/dev/null
+cat > "$vacdir/pic.svg" << 'SVGEOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="20" height="20" fill="blue"/></svg>
+SVGEOF
+echo "not an image" > "$vacdir/notes.txt"
+png vacuum "$vacdir"
+[[ -s "$vacdir/my clip.v2.png" ]] || { echo_red "vacuum did not preserve filename converting gif -> png"; exit 1; }
+[[ -s "$vacdir/pic.png" ]] || { echo_red "vacuum did not convert pic.svg"; exit 1; }
+[[ -f "$vacdir/notes.png" ]] && { echo_red "vacuum converted an unsupported file"; exit 1; }
+[[ -f "$vacdir/notes.txt" ]] || { echo_red "vacuum removed an unsupported file"; exit 1; }
+
 # Cleanup
 rm -rf "$tmpdir"
