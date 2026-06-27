@@ -239,6 +239,7 @@ in
     ./modules/webserverNode/module.nix
     ./modules/cudaNode/module.nix
     ./modules/comfyui/module.nix
+    ./modules/externalDrives/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
@@ -466,7 +467,7 @@ in
       };
 
       services.stampserver = {
-        enable = cfg.isATS || cfg.enableFileServers;
+        enable = true;
         package = anixpkgs.stampserver;
         rootDir = "${cfg.homeDir}/fileservers";
       };
@@ -663,6 +664,9 @@ in
       # Metrics
       services.metricsNode.enable = cfg.enableMetrics;
       services.metricsNode.openFirewall = cfg.enableMetrics;
+
+      # External drives
+      machines.externalDrives.enable = true;
 
       # Notes Wiki
       services.notes-wiki.enable = cfg.serveNotesWiki;
