@@ -665,6 +665,9 @@ in
       services.metricsNode.enable = cfg.enableMetrics;
       services.metricsNode.openFirewall = cfg.enableMetrics;
 
+      # External drives
+      machines.externalDrives.enable = true;
+
       # Notes Wiki
       services.notes-wiki.enable = cfg.serveNotesWiki;
 

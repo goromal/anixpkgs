@@ -64,11 +64,7 @@ let
 in
 {
   options.machines.externalDrives = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Auto-mount known external drives at /mnt/<name> when connected.";
-    };
+    enable = lib.mkEnableOption "auto-mount known external drives at /mnt/<name> when connected";
     user = lib.mkOption {
       type = lib.types.str;
       default = "andrew";
