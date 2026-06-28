@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Study — Disciple{% endblock %}
+{% block content %}
+
+{% if group is none %}
+  <div class="card" style="text-align:center; padding:48px 24px;">
+    <h2>&#127881; All Done!</h2>
+    <p style="color:#555; margin-bottom:24px;">
+      You've processed all {{ total }} Christ-reference groups.
+    </p>
+    <a href="{{ url_for('disciple.browse') }}" class="btn btn-primary">Browse All Passages</a>
+  </div>
+
+{% else %}
+  <div class="card">
+    <div class="ref">{{ group.ref_range }}</div>
+    {% for m in group.members %}
+      <div class="verse {{ 'christ-ref' if m.role == 'christ_ref' else 'context' }}">
+        <span class="verse-num">
+          {{- m.scripture_ref.split(':')[1] if ':' in m.scripture_ref else '' -}}
+        </span>
+        {{ m.text }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <form method="POST" action="{{ url_for('disciple.process_group', group_id=group.id) }}">
+      <div class="field">
+        <label for="note">Notes</label>
+        <textarea name="note" id="note" rows="4">{{ group.note }}</textarea>
+      </div>
+      <div class="field">
+        <label for="tags">
+          Tags
+          <span style="font-weight:normal; color:#888;">(comma-separated)</span>
+        </label>
+        <input type="text" name="tags" id="tags"
+               value="{{ group.tags | join(', ') }}"
+               list="tag-suggestions" autocomplete="off">
+        <datalist id="tag-suggestions">
+          {% for t in all_tags %}
+            <option value="{{ t }}">
+          {% endfor %}
+        </datalist>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <button type="submit" class="btn btn-primary">Mark as Processed</button>
+        <a href="{{ url_for('disciple.study') }}" class="btn btn-secondary">Skip</a>
+      </div>
+    </form>
+    <div style="margin-top:14px; padding-top:14px; border-top:1px solid #eee;">
+      <form method="POST" action="{{ url_for('disciple.toggle_christ', group_id=group.id) }}"
+            style="display:inline;">
+        <button type="submit" class="btn btn-danger btn-sm"
+                onclick="return confirm('Toggle Christ-reference status for this group?')">
+          Toggle Christ Ref
+        </button>
+      </form>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}

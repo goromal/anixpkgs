@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ tag.name }} — Disciple{% endblock %}
+{% block content %}
+<h1>Tag: {{ tag.name }}</h1>
+<p style="color:#888; margin-bottom:20px;">
+  {{ groups|length }} passage{{ 's' if groups|length != 1 else '' }}
+</p>
+<p><a href="{{ url_for('disciple.tags_list') }}" style="color:#1a3a5c;">&#8592; All tags</a></p>
+
+{% for g in groups %}
+  <details class="card" style="padding:0; margin-bottom:12px;">
+    <summary style="padding:16px; cursor:pointer;">
+      <span style="font-weight:600; color:#1a3a5c;">{{ g.ref_range }}</span>
+      <span style="color:#666; font-size:0.9em; margin-left:12px;">{{ g.snippet }}</span>
+    </summary>
+    <div class="detail-body" style="padding:0 16px 16px;">
+      {% for m in g.members %}
+        <div class="verse {{ 'christ-ref' if m.role == 'christ_ref' else 'context' }}">
+          <span class="verse-num">
+            {{- m.scripture_ref.split(':')[1] if ':' in m.scripture_ref else '' -}}
+          </span>
+          {{ m.text }}
+        </div>
+      {% endfor %}
+      {% if g.note %}
+        <p style="margin-top:12px; color:#666; font-style:italic;
+                   border-top:1px solid #eee; padding-top:10px;">{{ g.note }}</p>
+      {% endif %}
+    </div>
+  </details>
+{% else %}
+  <p style="color:#888;">No passages with this tag.</p>
+{% endfor %}
+{% endblock %}

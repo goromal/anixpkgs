@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Browse — Disciple{% endblock %}
+{% block content %}
+<h1>Browse Passages</h1>
+<p style="color:#888; margin-bottom:16px;">
+  {{ groups|length }} Christ-reference group{{ 's' if groups|length != 1 else '' }}
+</p>
+
+{% if groups %}
+<table>
+  <thead>
+    <tr>
+      <th style="width:160px;">Reference</th>
+      <th>Preview</th>
+      <th style="width:50px;">Done</th>
+      <th style="width:220px;">Tags</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for g in groups %}
+    <tr>
+      <td colspan="4" style="padding:0; border-bottom:1px solid #eee;">
+        <details>
+          <summary style="display:grid; grid-template-columns:160px 1fr 50px 220px;
+                          gap:8px; align-items:start; padding:10px; cursor:pointer;">
+            <span style="font-weight:600; color:#1a3a5c;">{{ g.ref_range }}</span>
+            <span style="color:#666; font-size:0.9em; word-break:break-word;">{{ g.snippet }}</span>
+            <span class="{{ 'status-done' if g.processed else 'status-pending' }}">
+              {{ '&#10003;' if g.processed else '&#8212;' }}
+            </span>
+            <span>
+              {% for tag in g.tags %}
+                <span class="tag-chip">{{ tag }}</span>
+              {% endfor %}
+            </span>
+          </summary>
+          <div class="detail-body" style="padding:0 10px 16px;">
+            {% for m in g.members %}
+              <div class="verse {{ 'christ-ref' if m.role == 'christ_ref' else 'context' }}">
+                <span class="verse-num">
+                  {{- m.scripture_ref.split(':')[1] if ':' in m.scripture_ref else '' -}}
+                </span>
+                {{ m.text }}
+              </div>
+            {% endfor %}
+            {% if g.note %}
+              <p style="margin-top:12px; color:#666; font-style:italic;
+                         border-top:1px solid #eee; padding-top:10px;">{{ g.note }}</p>
+            {% endif %}
+            <div style="margin-top:10px;">
+              <form method="POST"
+                    action="{{ url_for('disciple.toggle_christ', group_id=g.id) }}"
+                    style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm"
+                        onclick="return confirm('Toggle Christ-reference status?')">
+                  Toggle Christ Ref
+                </button>
+              </form>
+            </div>
+          </div>
+        </details>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p style="color:#888;">No passages found. Run <code>disciple-ingest</code> first.</p>
+{% endif %}
+{% endblock %}

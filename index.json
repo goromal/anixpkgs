@@ -256,6 +256,11 @@
                 "docs": true
             },
             {
+                "attr": "disciple",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "anix_upgrade_ui",
                 "ci": true,
                 "docs": true

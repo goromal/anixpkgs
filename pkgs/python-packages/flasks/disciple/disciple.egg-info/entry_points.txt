@@ -1,0 +1,3 @@
+[console_scripts]
+disciple = disciple:run
+disciple-ingest = disciple:ingest

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Manage Tags — Disciple{% endblock %}
+{% block content %}
+<h1>Manage Tags</h1>
+{% if tags %}
+  <div class="card" style="padding:0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Tag</th>
+          <th style="width:80px;">Passages</th>
+          <th style="width:260px;">Rename</th>
+          <th style="width:260px;">Merge into</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for t in tags %}
+        <tr>
+          <td><strong>{{ t.name }}</strong></td>
+          <td>{{ t.count }}</td>
+          <td>
+            <form method="POST"
+                  action="{{ url_for('disciple.rename_tag', tag_id=t.id) }}"
+                  style="display:flex; gap:6px;">
+              <input type="text" name="name" value="{{ t.name }}"
+                     style="width:160px; padding:4px 8px;">
+              <button type="submit" class="btn btn-secondary btn-sm">Rename</button>
+            </form>
+          </td>
+          <td>
+            <form method="POST"
+                  action="{{ url_for('disciple.merge_tags') }}"
+                  style="display:flex; gap:6px; align-items:center;">
+              <input type="hidden" name="source_id" value="{{ t.id }}">
+              <select name="target_id" style="width:140px; padding:4px;">
+                <option value="">— pick target —</option>
+                {% for other in tags %}
+                  {% if other.id != t.id %}
+                    <option value="{{ other.id }}">{{ other.name }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-danger btn-sm"
+                      onclick="return confirm('Merge into selected tag? Cannot be undone.')">
+                Merge
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <p style="color:#888;">No tags yet.</p>
+{% endif %}
+{% endblock %}

@@ -324,6 +324,7 @@ let
               budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
               orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
               la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
+              disciple = addDoc (pySelf.callPackage ./python-packages/flasks/disciple { });
               anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
               self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
               tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
@@ -433,6 +434,7 @@ rec {
   budget_ui = final.python313.pkgs.budget_ui;
   orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
