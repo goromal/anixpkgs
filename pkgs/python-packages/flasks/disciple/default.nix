@@ -29,6 +29,12 @@ buildPythonPackage rec {
   ];
   meta = {
     description = "A Book of Mormon Christ-reference study tool.";
+    longDescription = ''
+      A Flask web application for studying Book of Mormon passages that
+      reference Jesus Christ. Ingests all verses from the nephi.org API,
+      groups consecutive Christ-reference verses with surrounding context,
+      and provides a study interface for annotating and tagging passages.
+    '';
     autoGenUsageCmd = "--help";
   };
 }
