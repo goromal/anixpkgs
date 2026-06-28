@@ -246,6 +246,7 @@ in
     ../modules/mailNode/module.nix
     ../modules/vikunja/module.nix
     ../modules/vikunja-mcp/module.nix
+    ../modules/navidrome/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
     ../modules/jupyter-mcp/module.nix
@@ -476,6 +477,11 @@ in
       services.la-quiz-web = {
         enable = cfg.isATS;
         dataDir = "${cfg.homeDir}/data/la-quiz-web";
+      };
+
+      services.navidrome-ats = {
+        enable = cfg.isATS;
+        dataDir = "${cfg.homeDir}/data/navidrome";
       };
 
       services.tester = {

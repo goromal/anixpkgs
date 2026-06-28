@@ -174,6 +174,17 @@ in
           };
         }
         {
+          name = "ats-navidrome-backup";
+          jobShellScript = pkgs.writeShellScript "ats-navidrome-backup" ''
+            rcrsync override data navidrome || { logger -t ats-navidrome-backup "Navidrome Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-navidrome-backup "Navidrome backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-la-quiz-backup";
           jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
             rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
