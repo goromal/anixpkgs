@@ -24,6 +24,7 @@
     internal = 3456;
     public = 3457;
   };
+  navidrome = 4533;
   la-quiz-web = 5656;
   tester = 5757;
   disciple = 6363;

@@ -415,6 +415,89 @@ Vikunja is served through nginx as a reverse proxy with HTTPS support:
 
 The nixpkgs Vikunja frontend is built with `/vikunja/` as the hardcoded API base path, so we serve the frontend on port 3457 while also proxying `/vikunja/` on ports 80/443 for API access. Both HTTP and HTTPS are supported without forced redirects.
 
+## Navidrome Music Server (ATS Only)
+
+ATS machines automatically include [Navidrome](https://www.navidrome.org/), a self-hosted music streaming server compatible with the [Subsonic API](https://www.navidrome.org/docs/developers/subsonic-api/).
+
+### Accessing Navidrome
+
+Once your ATS machine is running, Navidrome's web UI is accessible at:
+- **Web UI (HTTPS)**: `https://ats.local/navidrome/`
+- **Web UI (HTTP)**: `http://ats.local/navidrome/`
+
+It is served through nginx as a reverse proxy on the default ports (80/443) under the `/navidrome` path. The web UI is mobile-friendly.
+
+**Note**: For HTTPS access to work without certificate warnings, you need to install the SSL certificate on your client devices. See the [Local SSL Setup](#local-ssl-setup-for-https-access) section above.
+
+### Initial Setup
+
+On your **first visit** to `https://ats.local/navidrome/`, Navidrome prompts you to create an admin account. Create it, then log in. (There is no separate registration step — the first account becomes the administrator.)
+
+### Adding Music
+
+**Navidrome has no upload button in its web UI** — it is a streaming server that *scans a folder* for music. To add songs you copy files into the music folder on the server, then let Navidrome scan them.
+
+The music folder is `~/data/navidrome/music` on ATS (owned by `andrew:dev`). Copy files into it however is convenient, for example:
+
+```bash
+# From your local machine, copy an album or directory over:
+rsync -av "My Album/" andrew@ats.local:~/data/navidrome/music/
+
+# Or a single file:
+scp song.flac andrew@ats.local:~/data/navidrome/music/
+```
+
+Navidrome automatically rescans the folder on a schedule and picks up new files; you can also force an immediate scan from the web UI under **Settings → (gear menu) → Quick Scan / Full Scan**. Supported formats include MP3, FLAC, OGG, M4A/AAC, WAV, and more — metadata (artist/album/track/cover art) is read from the files' tags.
+
+> **Don't add music via the cloud copy.** `~/data` is mirrored to `box:data`, but the nightly backup runs `rcrsync override data navidrome` (local → cloud, overwriting the cloud copy). Files added to the cloud side would be wiped on the next backup. Always add music to the folder on the server itself.
+
+### Connecting Third-Party Client Apps
+
+Because Navidrome implements the **Subsonic API**, you can stream your library from any Subsonic-compatible app instead of (or in addition to) the web UI. Popular clients:
+
+- **Android**: [Symfonium](https://symfonium.app/), [DSub](https://f-droid.org/packages/github.daneren2005.dsub/), [Substreamer](https://substreamerapp.com/), [Tempo](https://github.com/CappielloAntonio/tempo)
+- **iOS**: [play:Sub](https://michaelsapps.dk/playsubapp/), [substreamer](https://substreamerapp.com/), [Amperfy](https://github.com/BLeeEZ/amperfy)
+- **Desktop / cross-platform**: [Feishin](https://github.com/jeffvli/feishin), [Sonixd](https://github.com/jeffvli/sonixd), [Supersonic](https://github.com/dweymouth/supersonic)
+
+In the client, add a new **Subsonic / Navidrome server** with these settings:
+
+| Setting | Value |
+|---|---|
+| **Server URL / Address** | `http://ats.local/navidrome` (or `https://ats.local/navidrome`) |
+| **Username** | your Navidrome account username |
+| **Password** | your Navidrome account password |
+
+Notes:
+- Use the base URL **including the `/navidrome` path** — the client appends the Subsonic `/rest/` endpoints itself (the API lives at `http://ats.local/navidrome/rest/`).
+- If you use the `https://` URL, the device must trust the ATS self-signed certificate (see [Local SSL Setup](#local-ssl-setup-for-https-access)); the `http://` URL works without it on the LAN.
+- `ats.local` is resolved via mDNS, so the client must be on the same LAN as the ATS machine (or have the hostname otherwise reachable).
+
+### Data Location
+
+- **Music library**: `~/data/navidrome/music/`
+- **Database & cache**: `~/data/navidrome/` (Navidrome's `navidrome.db` and cache live here)
+
+Both the data folder and the music folder live under `~/data` so they are included in the daily cloud backup.
+
+### Backup
+
+The Navidrome data directory is automatically backed up daily at midnight by the `ats-navidrome-backup` orchestrator job, which syncs `~/data/navidrome` to cloud storage via `rcrsync override data navidrome`.
+
+You can manually trigger a backup with:
+
+```bash
+ssh andrew@ats.local
+sudo systemctl start ats-navidrome-backup.service
+```
+
+### Architecture
+
+Navidrome is served through nginx as a reverse proxy:
+- Runs as the `andrew:dev` user (so the music/data folders live in `~/data` and remain readable by the backup job)
+- Internal service listens on `127.0.0.1:4533` (centrally managed in `service-ports.nix`)
+- Started with `--baseurl /navidrome` so all URLs are served under the `/navidrome` subpath, proxied on ports 80/443
+- SSL certificates: same self-signed certificates as the main web server (`~/secrets/vpn/`)
+
 ## Video Downloader (ATS Only)
 
 ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
