@@ -145,13 +145,17 @@ def do_ingest(db_path, force=False):
         book_id = db.execute("SELECT id FROM books WHERE name=?", (book_name,)).fetchone()[0]
         print(f"  {book_name} ({num_chapters} chapters)...")
         for chapter in range(1, num_chapters + 1):
+            resp = None
             for attempt in range(3):
-                resp = requests.get(API_URL, params={"q": f"{book_name} {chapter}:1-200"}, timeout=15)
-                if resp.status_code < 500:
-                    break
-                print(f"    API error {resp.status_code} on {book_name} {chapter}, retry {attempt+1}/3...")
+                try:
+                    resp = requests.get(API_URL, params={"q": f"{book_name} {chapter}:1-200"}, timeout=15)
+                    if resp.status_code < 500:
+                        break
+                    print(f"    API error {resp.status_code} on {book_name} {chapter}, retry {attempt+1}/3...")
+                except requests.exceptions.RequestException:
+                    pass
                 time.sleep(2)
-            if resp.status_code >= 500:
+            if resp is None or resp.status_code >= 500:
                 print(f"    Skipping {book_name} {chapter} after repeated 5xx errors.")
                 continue
             resp.raise_for_status()
@@ -250,8 +254,10 @@ def _snippet(db, group_id):
 
 @app.context_processor
 def _inject_stats():
+    if DB_PATH is None:
+        return {"total_groups": 0, "processed_groups": 0}
+    db = get_db()
     try:
-        db = get_db()
         total = db.execute(
             "SELECT COUNT(*) FROM verse_groups WHERE is_christ_group=1"
         ).fetchone()[0]
@@ -260,10 +266,11 @@ def _inject_stats():
             JOIN verse_groups vg ON vg.id = gp.group_id
             WHERE vg.is_christ_group = 1
         """).fetchone()[0]
-        db.close()
         return {"total_groups": total, "processed_groups": done}
     except Exception:
         return {"total_groups": 0, "processed_groups": 0}
+    finally:
+        db.close()
 
 
 @bp.route("/")
@@ -306,12 +313,8 @@ def process_group(group_id):
         )
     db.execute("DELETE FROM group_tags WHERE group_id=?", (group_id,))
     for name in [t.strip() for t in tags_raw.split(",") if t.strip()]:
-        tag_row = db.execute("SELECT id FROM tags WHERE name=?", (name,)).fetchone()
-        if tag_row:
-            tag_id = tag_row["id"]
-        else:
-            db.execute("INSERT INTO tags (name, created_at) VALUES (?,?)", (name, now))
-            tag_id = db.execute("SELECT id FROM tags WHERE name=?", (name,)).fetchone()["id"]
+        db.execute("INSERT OR IGNORE INTO tags (name, created_at) VALUES (?,?)", (name, now))
+        tag_id = db.execute("SELECT id FROM tags WHERE name=?", (name,)).fetchone()["id"]
         db.execute(
             "INSERT OR IGNORE INTO group_tags (group_id, tag_id) VALUES (?,?)",
             (group_id, tag_id),
