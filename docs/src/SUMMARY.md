@@ -48,6 +48,7 @@
   - [rankserver](./python/rankserver.md)
   - [stampserver](./python/stampserver.md)
   - [la_quiz_web](./python/la_quiz_web.md)
+  - [disciple](./python/disciple.md)
   - [anix_upgrade_ui](./python/anix_upgrade_ui.md)
   - [tasks_ui](./python/tasks_ui.md)
   - [easy-google-auth](./python/easy-google-auth.md)
