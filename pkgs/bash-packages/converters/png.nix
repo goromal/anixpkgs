@@ -14,8 +14,13 @@ let
   extension = "png";
   usage_str = ''
     usage: png [opts] inputfile outputfile
+           png [opts] vacuum directory
 
     Create a png file.
+
+    With the "vacuum" sub-command, convert every file with a supported input
+    extension in the given directory, preserving each filename (only the
+    extension changes).
 
     Inputs:
         .png
