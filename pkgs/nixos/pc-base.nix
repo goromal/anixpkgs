@@ -259,6 +259,7 @@ in
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../python-packages/flasks/disciple/module.nix
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
@@ -480,6 +481,10 @@ in
       services.tester = {
         enable = cfg.isATS;
         dataDir = "${cfg.homeDir}/data/tester";
+      };
+
+      services.disciple = {
+        enable = cfg.isATS;
       };
 
       services.tasks_ui = {

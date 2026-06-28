@@ -26,6 +26,7 @@
   };
   la-quiz-web = 5656;
   tester = 5757;
+  disciple = 6363;
   launchpad = 8888;
   comfyui = 8188;
   anix_upgrade_ui = 5858;
