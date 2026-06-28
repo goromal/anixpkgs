@@ -50,6 +50,8 @@ in
       }
     ];
 
+    environment.systemPackages = [ cfg.package ];
+
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0755 andrew dev -"
     ];
