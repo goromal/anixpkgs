@@ -938,36 +938,58 @@ in
             }
           );
     }
-    {
-      systemd.timers = builtins.listToAttrs (
-        map (job: {
-          name = job.name;
-          value = {
-            description = "${job.name} trigger timer";
-            wantedBy = [ "timers.target" ];
-            timerConfig = job.timerCfg // {
-              Unit = "${job.name}.service";
+    (
+      let
+        # On-disk blacklist: a marker file named after a job in this directory
+        # causes that job's oneshot service to fail immediately instead of
+        # submitting to orchestratord. Managed via the orchestrator UI.
+        orchBlacklistDir = "${cfg.homeDir}/configs/orchestrator-blacklist.d";
+        orchJobGuard = pkgs.writeShellScript "orch-job-guard" ''
+          name="$1"
+          if [ -e "${orchBlacklistDir}/$name" ]; then
+            ${pkgs.util-linux}/bin/logger -t orchestrator "Job '$name' is blacklisted; refusing to run"
+            echo "Orchestrator job '$name' is blacklisted by ${orchBlacklistDir}/$name" >&2
+            exit 1
+          fi
+        '';
+      in
+      {
+        systemd.tmpfiles.rules = [
+          "d ${orchBlacklistDir} 0775 andrew dev -"
+        ];
+        systemd.timers = builtins.listToAttrs (
+          map (job: {
+            name = job.name;
+            value = {
+              description = "${job.name} trigger timer";
+              wantedBy = [ "timers.target" ];
+              timerConfig = job.timerCfg // {
+                Unit = "${job.name}.service";
+              };
             };
-          };
-        }) cfg.timedOrchJobs
-      );
-      systemd.services = builtins.listToAttrs (
-        map (job: {
-          name = job.name;
-          value = {
-            enable = true;
-            description = "${job.name} oneshot service";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${job.jobShellScript}'";
-              ReadWritePaths = job.readWritePaths or [ "/" ];
-            }
-            // (lib.optionalAttrs ((job.execStartPre or null) != null) {
-              ExecStartPre = job.execStartPre;
-            });
-          };
-        }) cfg.timedOrchJobs
-      );
-    }
+          }) cfg.timedOrchJobs
+        );
+        systemd.services = builtins.listToAttrs (
+          map (job: {
+            name = job.name;
+            value = {
+              enable = true;
+              description = "${job.name} oneshot service";
+              serviceConfig = {
+                Type = "oneshot";
+                ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${job.jobShellScript}'";
+                ReadWritePaths = job.readWritePaths or [ "/" ];
+                # Blacklist guard runs first for every job, then any
+                # job-specific ExecStartPre.
+                ExecStartPre = [
+                  "${orchJobGuard} ${job.name}"
+                ]
+                ++ lib.optionals ((job.execStartPre or null) != null) (lib.toList job.execStartPre);
+              };
+            };
+          }) cfg.timedOrchJobs
+        );
+      }
+    )
   ];
 }
