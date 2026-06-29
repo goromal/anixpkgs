@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sunset — Dolphin control</title>
+  <link rel="icon" type="image/svg+xml" href="{{ subdomain }}/favicon.svg">
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 480px; margin: 60px auto; padding: 0 20px; text-align: center; color: #222; }
+    h1 { font-size: 1.5rem; }
+    #status { font-size: 1.2rem; margin: 24px 0; padding: 16px; border-radius: 8px; background: #f0f0f0; }
+    #status.running { background: #d4edda; color: #155724; }
+    #status.stopped { background: #f8d7da; color: #721c24; }
+    button { font-size: 1.1rem; padding: 12px 28px; border: none; border-radius: 8px; background: #dc3545; color: #fff; cursor: pointer; }
+    button:disabled { background: #c8a9ad; cursor: not-allowed; opacity: 0.6; }
+  </style>
+</head>
+<body>
+  <h1>Dolphin control</h1>
+  <div id="status">Checking…</div>
+  <button id="kill" disabled>Kill Dolphin</button>
+  <script>
+    const sub = {{ subdomain | tojson }};
+    const statusEl = document.getElementById("status");
+    const killBtn = document.getElementById("kill");
+
+    async function refresh() {
+      try {
+        const r = await fetch(sub + "/status");
+        const d = await r.json();
+        if (d.running) {
+          statusEl.textContent = "Dolphin is running" + (d.game ? ": " + d.game : "") + " (pid " + d.pid + ")";
+          statusEl.className = "running";
+          killBtn.disabled = false;
+        } else {
+          statusEl.textContent = "Dolphin is not running";
+          statusEl.className = "stopped";
+          killBtn.disabled = true;
+        }
+      } catch (e) {
+        statusEl.textContent = "Error contacting server";
+        statusEl.className = "stopped";
+      }
+    }
+
+    killBtn.addEventListener("click", async () => {
+      if (!confirm("Force-kill the Dolphin emulator?")) return;
+      killBtn.disabled = true;
+      await fetch(sub + "/kill", { method: "POST" });
+      refresh();
+    });
+
+    refresh();
+    setInterval(refresh, 2000);
+  </script>
+</body>
+</html>
