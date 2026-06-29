@@ -73,12 +73,15 @@
                 {{ state }}
               </span>
             </div>
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 align-items-center">
               <button class="btn btn-sm btn-primary"
                 onclick="triggerRestart('{{ svc }}', {{ loop.index }})"
                 id="btn-{{ loop.index }}">Restart</button>
               <button class="btn btn-sm btn-outline-secondary"
                 onclick="refreshStatus('{{ svc }}', {{ loop.index }})">Refresh</button>
+              <button class="btn btn-sm btn-outline-danger ms-auto"
+                id="blk-{{ loop.index }}" data-job="{{ job_names[svc] }}"
+                onclick="toggleBlacklist('{{ job_names[svc] }}', {{ loop.index }})">Blacklist</button>
             </div>
             <div id="log-{{ loop.index }}" class="log-box mt-2"></div>
           </div>
@@ -155,6 +158,42 @@ function triggerRestart(service, idx) {
     btn.textContent = 'Restart';
     refreshStatus(service, idx);
   });
+}
+
+// ── Blacklist controls ──────────────────────────────────────────────────────
+
+function applyBlacklistState(idx, blacklisted) {
+  const blk = document.getElementById('blk-' + idx);
+  const restart = document.getElementById('btn-' + idx);
+  if (!blk) return;
+  blk.textContent = blacklisted ? 'Allow' : 'Blacklist';
+  blk.className = 'btn btn-sm ms-auto ' + (blacklisted ? 'btn-danger' : 'btn-outline-danger');
+  if (restart) {
+    restart.disabled = blacklisted;
+    restart.title = blacklisted ? 'Job is blacklisted' : '';
+  }
+}
+
+function refreshBlacklist() {
+  fetch(subdomain + '/jobs/blacklist')
+    .then(r => r.json())
+    .then(data => {
+      document.querySelectorAll('[id^="blk-"]').forEach(btn => {
+        applyBlacklistState(btn.id.slice(4), !!data[btn.dataset.job]);
+      });
+    })
+    .catch(() => {});
+}
+
+function toggleBlacklist(jobName, idx) {
+  const blk = document.getElementById('blk-' + idx);
+  const method = blk.textContent.trim() === 'Allow' ? 'DELETE' : 'POST';
+  blk.disabled = true;
+  fetch(subdomain + '/jobs/blacklist/' + encodeURIComponent(jobName), { method })
+    .then(r => r.json())
+    .then(data => applyBlacklistState(idx, !!data.blacklisted))
+    .catch(() => {})
+    .finally(() => { blk.disabled = false; });
 }
 
 // ── Streaming helper ────────────────────────────────────────────────────────
@@ -362,9 +401,11 @@ setInterval(() => {
   refreshStatus('{{ svc }}', {{ loop.index }});
   {% endfor %}
   refreshJobs();
+  refreshBlacklist();
 }, 30000);
 
 refreshJobs();
+refreshBlacklist();
 </script>
 </body>
 </html>
