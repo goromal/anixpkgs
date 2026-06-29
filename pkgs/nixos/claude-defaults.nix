@@ -80,6 +80,9 @@ in
     "mcp__wiki__wiki_search"
     "mcp__notion__notion_list_blocks"
     "mcp__notion__notion_list_subpages"
+    # MCP write tools
+    "mcp__notion__notion_delete_block"
+    "mcp__notion__notion_update_block"
   ];
 
   skills = [
