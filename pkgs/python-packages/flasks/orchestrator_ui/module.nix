@@ -39,7 +39,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator}${
+        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator} --blacklist-dir ${globalCfg.homeDir}/configs/orchestrator-blacklist.d${
           lib.optionalString (serviceList != "") " --services ${serviceList}"
         }";
         Restart = "always";
