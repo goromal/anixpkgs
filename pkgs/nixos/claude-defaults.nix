@@ -111,6 +111,10 @@ in
       name = "mscpp-services";
       file = ./res/claude-skills/mscpp-services/SKILL.md;
     }
+    {
+      name = "itns-notes";
+      file = ./res/claude-skills/itns-notes/SKILL.md;
+    }
   ];
 
   mcpServers = {
