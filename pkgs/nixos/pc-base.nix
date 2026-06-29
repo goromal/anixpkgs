@@ -981,9 +981,10 @@ in
                 ReadWritePaths = job.readWritePaths or [ "/" ];
                 # Blacklist guard runs first for every job, then any
                 # job-specific ExecStartPre.
-                ExecStartPre =
-                  [ "${orchJobGuard} ${job.name}" ]
-                  ++ lib.optionals ((job.execStartPre or null) != null) (lib.toList job.execStartPre);
+                ExecStartPre = [
+                  "${orchJobGuard} ${job.name}"
+                ]
+                ++ lib.optionals ((job.execStartPre or null) != null) (lib.toList job.execStartPre);
               };
             };
           }) cfg.timedOrchJobs
