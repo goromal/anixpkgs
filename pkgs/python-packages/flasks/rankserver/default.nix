@@ -7,6 +7,7 @@
   wtforms,
   werkzeug,
   pysorting,
+  pillow,
   strings,
   redirects,
   writeTextFile,
@@ -35,6 +36,7 @@ buildPythonPackage rec {
     wtforms
     werkzeug
     pysorting
+    pillow
   ];
   meta = {
     description = "A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.";

@@ -1,8 +1,11 @@
 import os
 import json
 import sys
+import hashlib
+import tempfile
 import argparse
 import flask
+from PIL import Image
 import flask_login
 import flask_wtf
 from wtforms import StringField, PasswordField, SubmitField
@@ -73,6 +76,7 @@ if args.data_dir[0] == '/':
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
+THUMB_CACHE = os.path.join(tempfile.gettempdir(), "rankserver-thumbs")
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = _secrets["secret_key"].encode()
@@ -293,6 +297,41 @@ def set_rankables_dir():
         return flask.jsonify({'success': True, 'real_path': new_target})
     except Exception as e:
         return flask.jsonify({'success': False, 'error': str(e)}), 500
+
+@bp.route("/thumb/<path:filename>", methods=["GET"])
+@flask_login.login_required
+def thumb(filename):
+    # Downscaled, disk-cached thumbnail. Lets the ranking page show many images
+    # without downloading every full-resolution file. Cache key includes mtime
+    # and size so edits (rotate/crop elsewhere) invalidate stale thumbnails.
+    safe = os.path.basename(filename)
+    if safe != filename or not safe.lower().endswith(".png"):
+        flask.abort(404)
+    src = os.path.join(RES_DIR, safe)
+    if not os.path.isfile(src):
+        flask.abort(404)
+    try:
+        w = int(flask.request.args.get("w", 240))
+    except (TypeError, ValueError):
+        w = 240
+    w = max(16, min(w, 2000))
+    st = os.stat(src)
+    key = hashlib.sha1(
+        f"{os.path.realpath(src)}|{st.st_mtime_ns}|{st.st_size}|{w}".encode()
+    ).hexdigest()
+    os.makedirs(THUMB_CACHE, exist_ok=True)
+    cached = os.path.join(THUMB_CACHE, key + ".png")
+    if not os.path.exists(cached):
+        try:
+            img = Image.open(src)
+            img.thumbnail((w, 100000000), Image.LANCZOS)
+            tmp = cached + ".tmp"
+            img.save(tmp, format="PNG")
+            os.replace(tmp, cached)
+        except Exception:
+            # Fall back to the original on any decode/encode failure.
+            return flask.send_file(src, mimetype="image/png", max_age=86400)
+    return flask.send_file(cached, mimetype="image/png", max_age=86400)
 
 @app.before_request
 def refresh_session():

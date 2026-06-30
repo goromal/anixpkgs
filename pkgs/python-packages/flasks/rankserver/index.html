@@ -497,7 +497,7 @@
                     {% if l.endswith('.txt') %}
                     <span class="txt-name">{{ l }}</span>
                     {% else %}
-                    <img src="{{ urlroot }}{{ l }}" alt="" />
+                    <img src="{{ urlroot }}thumb/{{ l }}?w=1200" decoding="async" alt="" />
                     {% endif %}
                 </div>
                 <form action="{{ urlroot }}" method="POST">
@@ -509,7 +509,7 @@
                     {% if r.endswith('.txt') %}
                     <span class="txt-name">{{ r }}</span>
                     {% else %}
-                    <img src="{{ urlroot }}{{ r }}" alt="" />
+                    <img src="{{ urlroot }}thumb/{{ r }}?w=1200" decoding="async" alt="" />
                     {% endif %}
                 </div>
                 <form action="{{ urlroot }}" method="POST">
@@ -527,7 +527,7 @@
                     {% if item.endswith('.txt') %}
                     <span class="rank-txt">{{ item }}</span>
                     {% else %}
-                    <img src="{{ urlroot }}{{ item }}" alt="" />
+                    <img src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt="" />
                     {% endif %}
                 </li>
                 {% endfor %}
