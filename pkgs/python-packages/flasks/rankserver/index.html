@@ -161,13 +161,16 @@
         }
 
         .compare-media {
+            /* Plain block flow, NOT flex: a replaced <img> used as a direct flex
+               item with height:auto can fail to reserve its aspect-ratio height in
+               WebKit, collapsing the container so the image overflows and overlaps
+               the ranked list below. Mirrors stampserver's .image-container. */
             width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            text-align: center;
         }
 
         .compare-media img {
+            display: block;
             width: 100%;
             height: auto;
             max-width: 100%;
@@ -175,6 +178,7 @@
         }
 
         .txt-name {
+            display: block;
             font-family: monospace;
             font-size: 1.1rem;
             font-weight: 700;
