@@ -2,7 +2,6 @@ import os
 import json
 import sys
 import hashlib
-import tempfile
 import argparse
 import flask
 from PIL import Image
@@ -76,7 +75,12 @@ if args.data_dir[0] == '/':
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
-THUMB_CACHE = os.path.join(tempfile.gettempdir(), "rankserver-thumbs")
+# Cache thumbnails inside the rankables directory itself. RES_DIR is the symlink
+# path, so this always resolves into whatever directory is currently linked —
+# each rankable directory keeps its own persistent cache, and re-pointing the
+# symlink moves the cache with it. Hidden + a directory, so load()'s .txt/.png
+# scan of RES_DIR never picks it up.
+THUMB_CACHE = os.path.join(RES_DIR, ".rankthumbs")
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = _secrets["secret_key"].encode()
@@ -319,17 +323,17 @@ def thumb(filename):
     key = hashlib.sha1(
         f"{os.path.realpath(src)}|{st.st_mtime_ns}|{st.st_size}|{w}".encode()
     ).hexdigest()
-    os.makedirs(THUMB_CACHE, exist_ok=True)
     cached = os.path.join(THUMB_CACHE, key + ".png")
     if not os.path.exists(cached):
         try:
+            os.makedirs(THUMB_CACHE, exist_ok=True)
             img = Image.open(src)
             img.thumbnail((w, 100000000), Image.LANCZOS)
             tmp = cached + ".tmp"
             img.save(tmp, format="PNG")
             os.replace(tmp, cached)
         except Exception:
-            # Fall back to the original on any decode/encode failure.
+            # Fall back to the original on any cache/decode/encode failure.
             return flask.send_file(src, mimetype="image/png", max_age=86400)
     return flask.send_file(cached, mimetype="image/png", max_age=86400)
 
