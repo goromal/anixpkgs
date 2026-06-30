@@ -181,6 +181,11 @@ in
             RestartSec = 5;
             User = "andrew";
             Group = "dev";
+            # Soft memory ceiling: above this the kernel reclaims comfyui's own
+            # pages (spilling to swap) instead of letting it starve the OS and
+            # trigger a global OOM. Not a hard cap, so workflows whose weight set
+            # exceeds RAM (e.g. flux2-dev) can still spill into swap and complete.
+            # MemoryHigh = "50G"; TODO - non-starter for flux2-dev
             Environment = [
               "HOME=/data/andrew"
             ]
