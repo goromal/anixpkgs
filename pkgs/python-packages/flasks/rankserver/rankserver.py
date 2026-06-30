@@ -72,6 +72,7 @@ if args.data_dir[0] == '/':
     RES_DIR = args.data_dir
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
+SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = _secrets["secret_key"].encode()
@@ -202,7 +203,7 @@ def login():
         flask_login.login_user(user, remember=False)
         flask.session.permanent = True
         next = flask.request.args.get('next')
-        return flask.redirect(next or flask.url_for(url_for_prefix + 'index'))
+        return flask.redirect(next or flask.url_for(url_for_prefix + 'intro'))
     return flask.render_template("login.html", title="Sign In", form=form)
       
 @bp.route("/logout")
@@ -230,13 +231,68 @@ def index():
     
     res, msg = rankserver.load()
     if not res:
-        return flask.render_template("index.html", urlroot=urlroot, err=True, done=False, msg=msg, rlist=[], l="", n="")
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=True, done=False, msg=msg, rlist=[], l="", r="")
     rlist = rankserver.getRankList()
     if rankserver.sortingComplete():
-        return flask.render_template("index.html", urlroot=urlroot, err=False, done=True, msg="", rlist=rlist, l="", n="")
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=True, msg="", rlist=rlist, l="", r="")
     else:
         l, r = rankserver.getCompFiles()
-        return flask.render_template("index.html", urlroot=urlroot, err=False, done=False, msg="", rlist=rlist, l=l, r=r)
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=rlist, l=l, r=r)
+
+@bp.route("/intro", methods=["GET"])
+@flask_login.login_required
+def intro():
+    global urlroot
+    global SHORT_RESDIR
+    return flask.render_template("index.html", urlroot=urlroot, intro=True, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=[], l="", r="")
+
+@bp.route("/api/rankables-info", methods=["GET"])
+@flask_login.login_required
+def rankables_info():
+    is_link = os.path.islink(RES_DIR)
+    realpath = os.path.realpath(RES_DIR)
+    return flask.jsonify({
+        'is_symlink': is_link,
+        'symlink_path': RES_DIR,
+        'real_path': realpath
+    })
+
+@bp.route("/api/list-dirs", methods=["POST"])
+@flask_login.login_required
+def list_dirs():
+    data = flask.request.get_json()
+    path = os.path.normpath(data.get('path', '/'))
+    try:
+        entries = os.listdir(path)
+        dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and not e.startswith('.')])
+        hidden_dirs = sorted([e for e in entries if os.path.isdir(os.path.join(path, e)) and e.startswith('.')])
+        parent = os.path.dirname(path) if path != '/' else None
+        return flask.jsonify({'path': path, 'parent': parent, 'dirs': dirs + hidden_dirs})
+    except PermissionError:
+        return flask.jsonify({'error': 'Permission denied'}), 403
+    except FileNotFoundError:
+        return flask.jsonify({'error': 'Path not found'}), 404
+
+@bp.route("/api/set-rankables-dir", methods=["POST"])
+@flask_login.login_required
+def set_rankables_dir():
+    global SHORT_RESDIR
+    data = flask.request.get_json()
+    new_target = data.get('path')
+    if not new_target:
+        return flask.jsonify({'success': False, 'error': 'Missing path parameter'}), 400
+    new_target = os.path.normpath(new_target)
+    if not os.path.isdir(new_target):
+        return flask.jsonify({'success': False, 'error': 'Path is not a directory'}), 400
+    if not os.path.islink(RES_DIR):
+        return flask.jsonify({'success': False, 'error': 'Rankables path is not a symlink; cannot reroute'}), 400
+    try:
+        os.unlink(RES_DIR)
+        os.symlink(new_target, RES_DIR)
+        SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
+        return flask.jsonify({'success': True, 'real_path': new_target})
+    except Exception as e:
+        return flask.jsonify({'success': False, 'error': str(e)}), 500
 
 @app.before_request
 def refresh_session():

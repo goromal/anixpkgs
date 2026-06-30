@@ -1,23 +1,433 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Rank Server</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preferences</title>
     <style>
-        img {
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        nav {
+            background-color: #224abe;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+
+        nav li { margin: 0; }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        nav a:hover { background-color: #1e3a8a; }
+
+        h1 {
+            color: #212529;
+            margin: 20px 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 2rem; }
+        }
+
+        .btn {
+            padding: 14px 24px;
+            margin: 0;
+            cursor: pointer;
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 48px;
+            touch-action: manipulation;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background-color: #2e59d9;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .btn:active { opacity: 0.85; }
+
+        .btn-danger { background-color: #e74a3b; }
+        .btn-danger:hover { background-color: #d32f2f; }
+
+        .btn-sm {
+            padding: 8px 16px;
+            min-height: 36px;
+            font-size: 0.9rem;
+        }
+
+        .status-message {
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: none;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error-message {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+
+        /* ===== Comparison ===== */
+        .compare-prompt {
+            color: #495057;
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin: 0 0 16px 0;
+        }
+
+        .compare-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .compare-card {
+            flex: 1;
+            min-width: 260px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .compare-media {
             width: 100%;
-            max-width: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .column {
-            float: left;
-            width: 50%;
+        .compare-media img {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            border-radius: 8px;
         }
 
-        .row:after {
-            content: "";
-            display: table;
-            clear: both;
+        .txt-name {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #212529;
+            word-break: break-all;
+            text-align: center;
+            padding: 40px 10px;
+        }
+
+        .compare-card form { margin: 0; width: 100%; }
+
+        .choose-btn {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #1cc88a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 56px;
+            touch-action: manipulation;
+        }
+
+        .choose-btn:hover {
+            background-color: #17a673;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .choose-btn:active { transform: translateY(0); }
+
+        @media (max-width: 600px) {
+            .compare-row { flex-direction: column; }
+        }
+
+        /* ===== Done banner ===== */
+        .done-banner {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .done-banner form { margin: 16px 0 0 0; }
+
+        /* ===== Ranked list ===== */
+        .rank-list {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 30px 0;
+        }
+
+        .rank-list h2 {
+            margin: 0 0 20px 0;
+            color: #495057;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .rank-list ol {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+            counter-reset: rank;
+        }
+
+        .rank-list li {
+            counter-increment: rank;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .rank-list li:last-child { border-bottom: none; }
+
+        .rank-list li::before {
+            content: counter(rank);
+            flex-shrink: 0;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #4e73df;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .rank-list img {
+            max-width: 120px;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        .rank-list .rank-txt {
+            font-family: monospace;
+            font-weight: 600;
+            color: #212529;
+            word-break: break-all;
+        }
+
+        /* ===== Directory config (intro) ===== */
+        .rankables-config {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .rankables-config h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #495057;
+            margin: 0 0 14px 0;
+        }
+
+        .rankables-config p.help {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin: 0 0 16px 0;
+        }
+
+        .rankables-realpath {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .realpath-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .realpath-value {
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #212529;
+            background: #f1f3f5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .dir-picker {
+            margin-top: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dir-picker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+
+        .dir-picker-path {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #495057;
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .dir-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .dir-list li + li {
+            border-top: 1px solid #f1f3f5;
+        }
+
+        .dir-btn {
+            width: 100%;
+            padding: 10px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #212529;
+            transition: background-color 0.15s;
+            touch-action: manipulation;
+        }
+
+        .dir-btn:hover { background-color: #e9f0ff; }
+        .dir-btn:active { background-color: #d0e0ff; }
+
+        .dir-btn::before {
+            content: '📁 ';
+            font-size: 0.9rem;
+        }
+
+        .dir-picker-actions {
+            display: flex;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+
+        .dir-picker-actions .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .start-row {
+            margin: 24px 0;
+        }
+
+        .start-btn {
+            display: inline-flex;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background-color: #1cc88a;
+        }
+
+        .start-btn:hover { background-color: #17a673; }
+
+        @media (max-width: 767px) {
+            .container { padding: 10px; }
+            h1 { font-size: 1.25rem; }
         }
     </style>
 </head>
@@ -25,59 +435,199 @@
 <body>
     <nav>
         <ul>
+            {% if not intro %}
+            <li><a href="{{ urlroot }}intro">Directory</a></li>
+            {% endif %}
             <li><a href="{{ urlroot }}logout">Logout</a></li>
         </ul>
     </nav>
-    <h1>Rank Server</h1>
-    {% if err %}
-    <p>Server returned error:</p>
-    <p>{{ msg }}</p>
-    {% else %}
-    {% if done %}
-    <p>Sorting complete!</p>
-    <form action="{{ urlroot }}" method="POST">
-        <input type="submit" name="refine" value="Refine Rankings" />
-    </form>
-    {% else %}
-    <div class="row">
-        <div class="column">
-            {% if l.endswith('.txt') %}
-            <b>{{ l }}</b>
-            {% else %}
-            <img src="{{ urlroot }}{{ l }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
-            {% endif %}
-            <br>
+
+    <div class="container">
+        <h1>Preferences: {{ datadir }}</h1>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        {% if intro %}
+        <div class="rankables-config">
+            <h2>Rankables Directory</h2>
+            <p class="help">Choose where the <code>rankables</code> symlink should point. The selected
+               directory's files (<code>.txt</code> / <code>.png</code>) become the items you rank.</p>
+            <div class="rankables-realpath">
+                <span class="realpath-label">Current real path:</span>
+                <span class="realpath-value" id="rankablesRealPath">Loading...</span>
+                <button class="btn btn-sm" onclick="openDirPicker()">Change&hellip;</button>
+            </div>
+            <div class="dir-picker" id="dirPicker" style="display: none;">
+                <div class="dir-picker-header">
+                    <span class="dir-picker-path" id="pickerCurrentPath"></span>
+                    <button class="btn btn-sm" onclick="pickerNavigateUp()">&#8593; Up</button>
+                </div>
+                <ul class="dir-list" id="dirList"></ul>
+                <div class="dir-picker-actions">
+                    <button class="btn btn-sm btn-danger" onclick="closeDirPicker()">Cancel</button>
+                    <button class="btn btn-sm" onclick="selectPickerDir()">Select This Directory</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="start-row">
+            <a href="{{ urlroot }}" class="btn start-btn">Start Ranking &rarr;</a>
+        </div>
+
+        {% else %}
+        {% if err %}
+        <div class="error-message">{{ msg }}</div>
+        {% else %}
+        {% if done %}
+        <div class="done-banner">
+            Sorting complete! Your ranking is shown below.
             <form action="{{ urlroot }}" method="POST">
-                <input type="submit" name="choose_l" value="Choose" />
+                <input type="submit" class="btn" name="refine" value="Refine Rankings" />
             </form>
         </div>
-        <div class="column">
-            {% if r.endswith('.txt') %}
-            <b>{{ r }}</b>
-            {% else %}
-            <img src="{{ urlroot }}{{ r }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px" alt="" />
-            {% endif %}
-            <br>
-            <form action="{{ urlroot }}" method="POST">
-                <input type="submit" name="choose_r" value="Choose" />
-            </form>
+        {% else %}
+        <p class="compare-prompt">Which do you prefer?</p>
+        <div class="compare-row">
+            <div class="compare-card">
+                <div class="compare-media">
+                    {% if l.endswith('.txt') %}
+                    <span class="txt-name">{{ l }}</span>
+                    {% else %}
+                    <img src="{{ urlroot }}{{ l }}" alt="" />
+                    {% endif %}
+                </div>
+                <form action="{{ urlroot }}" method="POST">
+                    <input type="submit" class="choose-btn" name="choose_l" value="Choose" />
+                </form>
+            </div>
+            <div class="compare-card">
+                <div class="compare-media">
+                    {% if r.endswith('.txt') %}
+                    <span class="txt-name">{{ r }}</span>
+                    {% else %}
+                    <img src="{{ urlroot }}{{ r }}" alt="" />
+                    {% endif %}
+                </div>
+                <form action="{{ urlroot }}" method="POST">
+                    <input type="submit" class="choose-btn" name="choose_r" value="Choose" />
+                </form>
+            </div>
         </div>
+        {% endif %}
+
+        <div class="rank-list">
+            <h2>Current Ranking</h2>
+            <ol>
+                {% for item in rlist %}
+                <li>
+                    {% if item.endswith('.txt') %}
+                    <span class="rank-txt">{{ item }}</span>
+                    {% else %}
+                    <img src="{{ urlroot }}{{ item }}" alt="" />
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+        {% endif %}
     </div>
-    {% endif %}
-    <hr>
-    <ol>
-        {% for item in rlist %}
-        <li>
-            {% if item.endswith('.txt') %}
-            <b>{{ urlroot }}{{ item }}</b>
-            {% else %}
-            <img src="{{ urlroot }}{{ item }}" sizes="(max-width: 500px) 100vw, (max-width: 900px) 50vw, 800px"
-                alt="" />
-            {% endif %}
-        </li>
-        {% endfor %}
-    </ol>
-    {% endif %}
+
+    <script>
+        function showStatus(message, isError = false) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status-message ' + (isError ? 'status-error' : 'status-success');
+            statusDiv.style.display = 'block';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+        }
+
+        // ===== RANKABLES DIR PICKER =====
+
+        {% if intro %}
+        let _pickerPath = '/';
+
+        function loadRankablesInfo() {
+            fetch('{{ urlroot }}api/rankables-info')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('rankablesRealPath').textContent = data.real_path;
+                    _pickerPath = data.real_path;
+                })
+                .catch(() => {
+                    document.getElementById('rankablesRealPath').textContent = '(error loading)';
+                });
+        }
+
+        function openDirPicker() {
+            document.getElementById('dirPicker').style.display = 'block';
+            loadPickerDirs(_pickerPath);
+        }
+
+        function closeDirPicker() {
+            document.getElementById('dirPicker').style.display = 'none';
+        }
+
+        function loadPickerDirs(path) {
+            fetch('{{ urlroot }}api/list-dirs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: path})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.error) { showStatus('Error: ' + data.error, true); return; }
+                _pickerPath = data.path;
+                document.getElementById('pickerCurrentPath').textContent = data.path;
+                const list = document.getElementById('dirList');
+                list.innerHTML = '';
+                data.dirs.forEach(dir => {
+                    const li = document.createElement('li');
+                    const btn = document.createElement('button');
+                    btn.className = 'dir-btn';
+                    btn.textContent = dir;
+                    const fullPath = data.path === '/' ? '/' + dir : data.path + '/' + dir;
+                    btn.onclick = () => loadPickerDirs(fullPath);
+                    li.appendChild(btn);
+                    list.appendChild(li);
+                });
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function pickerNavigateUp() {
+            fetch('{{ urlroot }}api/list-dirs', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath})
+            })
+            .then(r => r.json())
+            .then(data => { if (data.parent) loadPickerDirs(data.parent); });
+        }
+
+        function selectPickerDir() {
+            if (!confirm('Set rankables directory to:\n' + _pickerPath)) return;
+            fetch('{{ urlroot }}api/set-rankables-dir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    closeDirPicker();
+                    document.getElementById('rankablesRealPath').textContent = data.real_path;
+                    showStatus('Rankables directory updated to: ' + data.real_path);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        loadRankablesInfo();
+        {% endif %}
+    </script>
 </body>
 
 </html>
