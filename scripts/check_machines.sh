@@ -22,12 +22,24 @@ export NIXPKGS_ALLOW_INSECURE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
-configurations=(jetpack-orin-nx personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi)
-for configuration in ${configurations[@]}; do
+
+# Map from display name to flake nixosConfigurations key
+# jetpack-orin-nx is excluded until jetpack-nixos supports nixpkgs 26.05
+# (modules/services-modular uses lib/services/lib.nix which was removed in 26.05)
+configurations=(personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi)
+declare -A flake_keys=(
+    [personal-inspiron]="atorgesen-inspiron"
+    [personal-panasonic]="atorgesen-panasonic"
+    [personal-dell]="atorgesen-dell"
+    [ats-alderlake]="ats"
+    [ats-pi]="ats-pi"
+)
+for configuration in "${configurations[@]}"; do
+    flake_key="${flake_keys[$configuration]}"
     echo
     echo
     echo "Checking derivation for configuration: $configuration..."
-    nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -I nixos-config=${DIR}/../pkgs/nixos/configurations/${configuration}.nix --no-out-link --dry-run --show-trace
+    nix build "${DIR}/..#nixosConfigurations.${flake_key}.config.system.build.toplevel" --no-link --dry-run --impure --show-trace
     echo "Checks out!"
     echo ""
 done

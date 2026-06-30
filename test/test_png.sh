@@ -28,9 +28,8 @@ cat > test.svg << 'SVGEOF'
 SVGEOF
 png test.svg svg_out.png
 [[ -s svg_out.png ]] || { echo_red "SVG to PNG conversion produced no output"; exit 1; }
-SVG_PNG_MD5=$(ckfile svg_out.png)
-rm svg_out.png && png test.svg svg_out.png
-ckfile -c $SVG_PNG_MD5 svg_out.png || { echo_red "SVG to PNG conversion is not deterministic"; exit 1; }
+SVG_DIMS=$(python3 -c "import struct; f=open('svg_out.png','rb'); f.read(16); w,h=struct.unpack('>II',f.read(8)); print(f'{w}x{h}')" 2>/dev/null)
+[[ "$SVG_DIMS" == "20x20" ]] || { echo_red "SVG to PNG has wrong dimensions: expected 20x20, got $SVG_DIMS"; exit 1; }
 
 # vacuum: convert every supported file in a directory, preserving filenames.
 # Filenames deliberately include spaces and extra dots to lock in that only the

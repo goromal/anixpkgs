@@ -3,12 +3,16 @@
   pkgs,
   lib,
   ...
-}:
+}@args:
 with import ./dependencies.nix;
 let
   cfg = config.machines.base;
   remoteBuildersCatalog = import ./remote-builders.nix;
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  home-manager-nixos-module =
+    if args ? hmModule then
+      args.hmModule
+    else
+      (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
   atsudo = pkgs.writeShellScriptBin "atsudo" ''
     args=""
     for word in "$@"; do
@@ -64,21 +68,9 @@ let
       echo_yellow "Skipping SSH config setup"
     fi
 
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
-    sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-    sudo nix-channel --update
     echo
-    echo
-    echo_green "DONE. Note the hardware-config.nix file below:"
-    echo
-    nixos-generate-config --show-hardware-config
-    echo
-    echo_green  "Use the config above as you set up anix-upgrade:"
-    echo_yellow "  - Use devshell to create a workspace with anixpkgs"
-    echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
-    echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
-    echo_yellow "  - Run anix-upgrade"
+    echo_green "DONE. Next steps:"
+    echo_yellow "  - Run: nixos-rebuild switch --flake $HOME/sources/anixpkgs#$(hostname)"
     echo_yellow "  - Create new secrets and configs entries"
     echo
     echo_green "Have fun!"
@@ -234,7 +226,7 @@ in
 
   imports = [
     ./installation-base.nix
-    (import "${home-manager}/nixos")
+    home-manager-nixos-module
     ./modules/claude-agent/module.nix
     ./modules/webserverNode/module.nix
     ./modules/cudaNode/module.nix
@@ -265,17 +257,6 @@ in
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
     ../python-packages/flasks/intake_ui/module.nix
-    (
-      let
-        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
-        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
-        jetpackSrc = builtins.fetchTarball {
-          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
-          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
-        };
-      in
-      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    )
   ];
 
   config = lib.mkMerge [
@@ -377,11 +358,6 @@ in
             echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
           ''
         );
-      };
-
-      hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
-      hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
-        enable = true;
       };
 
       # https://github.com/NixOS/nixpkgs/issues/154163
@@ -749,7 +725,6 @@ in
           sd
           clang
           clang-tools
-          neofetch
           onefetch
           man-pages
           black

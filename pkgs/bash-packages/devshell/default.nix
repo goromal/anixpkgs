@@ -111,6 +111,7 @@ in
         pkgs_var="''${rcinfoarray[2]}"
         if [[ -z "$runcmd" ]]; then
             nix-shell ${shellFile} \
+              --arg pkgs "import $pkgs_var {}" \
               --arg printErr ${printErr} \
               --arg setupws ${setupws} \
               --argstr wsname "$wsname" \
@@ -125,6 +126,7 @@ in
               --argstr devHistFile "$devhist"
         else
             nix-shell ${shellFile} \
+              --arg pkgs "import $pkgs_var {}" \
               --arg printErr ${printErr} \
               --arg setupws ${setupws} \
               --argstr wsname "$wsname" \

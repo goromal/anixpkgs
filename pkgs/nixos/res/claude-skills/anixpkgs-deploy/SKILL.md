@@ -3,7 +3,7 @@ name: anixpkgs-deploy
 description: Use when making or deploying changes to NixOS configuration or any anixpkgs package/module. Covers the edit-deploy-test workflow and common gotchas.
 ---
 
-This machine runs NixOS. All system configuration lives in the `anixpkgs` repo, cloned at `~/sources/anixpkgs` (canonical) and possibly also at another path (e.g. `/data/andrew/dev/claude/sources/anixpkgs`). `/etc/nixos/configuration.nix` is symlinked into `~/sources/anixpkgs`.
+This machine runs NixOS with Determinate Nix. All system configuration lives in the `anixpkgs` flake, cloned at `~/sources/anixpkgs` (canonical) and possibly also at another path (e.g. `/data/andrew/dev/claude/sources/anixpkgs`). Configurations are defined in `pkgs/nixos/configurations/` and registered in `flake.nix` under `nixosConfigurations`; deployments use `nixos-rebuild switch --flake`.
 
 ## Workflow
 

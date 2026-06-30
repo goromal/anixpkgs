@@ -93,6 +93,9 @@ in
         anixpkgs.surveys_report
       ];
     };
+    hardware.nvidia-jetpack.enable = true;
+    hardware.nvidia-jetpack.configureCuda = true;
+    hardware.graphics.enable = true;
     machines.cudaNode.enable = true;
     machines.claude = {
       marketplaces = claudeDefaults.marketplaces;

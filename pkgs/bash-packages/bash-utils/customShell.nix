@@ -1,5 +1,5 @@
 {
-  pkgs ? import <nixpkgs> { },
+  pkgs,
   pkgList ? [ ], # pkgListStr = "[" + (builtins.concatStringsSep " " pkgList) + "]";
   shellName ? "custom-shell",
   colorCode ? 36,
