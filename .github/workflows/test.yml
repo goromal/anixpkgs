@@ -28,10 +28,14 @@ jobs:
         nix-shell -p nixfmt --run "bash scripts/lint.sh"
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
-          echo "Committing linting changes"
-          git add .
-          git commit -m "Lint format"
-          git push origin $branch
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Committing linting changes"
+            git add .
+            git commit -m "Lint format"
+            git push origin $branch
+          else
+            echo "Lint changes detected, but skipping auto-commit on ${{ github.event_name }}"
+          fi
         else
           echo "No linting changes to commit"
         fi
@@ -56,10 +60,14 @@ jobs:
         python scripts/update_deps.py
         num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
         if [[ $num_changes -ge 1 ]]; then
-          echo "Committing changes to flake lock"
-          git add .
-          git commit -m "Update flake lock"
-          git push origin $branch
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Committing changes to flake lock"
+            git add .
+            git commit -m "Update flake lock"
+            git push origin $branch
+          else
+            echo "Flake lock out of date, but skipping auto-commit on ${{ github.event_name }}"
+          fi
         else
           echo "No lock changes to commit"
         fi
