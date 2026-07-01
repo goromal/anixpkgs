@@ -11,6 +11,7 @@ usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--workflow-dir WORKFLOW_DIR] [--workflows WORKFLOWS]
             [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
             --secrets-file SECRETS_FILE
+            [--comfyui-restart-cmd COMFYUI_RESTART_CMD]
 
 options:
   -h, --help            show this help message and exit
@@ -33,5 +34,9 @@ options:
                         workflows (default <workflow-dir>/output)
   --secrets-file SECRETS_FILE
                         Path to JSON file with secret_key and password_hash
+  --comfyui-restart-cmd COMFYUI_RESTART_CMD
+                        Command run to restart ComfyUI (e.g. 'systemctl
+                        restart comfyui.service'); empty hides the restart
+                        button
 ```
 
