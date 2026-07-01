@@ -14,6 +14,7 @@ class FakeStore:
 
     def read_state(self):
         return {"workflow": "imggen", "prompt": "p", "width": 400, "height": 800,
+                "image": "",
                 "job": {"status": "running" if self._running else "idle",
                         "progress": 42, "error": None,
                         "started_at": "2026-06-23T10:00:00-06:00",
@@ -169,3 +170,45 @@ def test_edit_generate_rejects_output_traversal(edit_client):
         "/cozy/api/generate",
         json={"workflow": "imgedit", "prompt": "hi", "image": "../secret.txt [output]"})
     assert bad.status_code == 400
+
+
+def _restart_client(tmp_path, monkeypatch, restart_cmd):
+    monkeypatch.setattr(cozy, "_check_password", lambda pw: True)
+    app = cozy.create_app(store=FakeStore(), workflows=["imggen"],
+                          workflow_dir=str(tmp_path), subdomain="/cozy",
+                          restart_cmd=restart_cmd)
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
+    return app.test_client()
+
+
+def test_restart_disabled_when_unconfigured(tmp_path, monkeypatch):
+    c = _restart_client(tmp_path, monkeypatch, None)
+    _login(c)
+    r = c.post("/cozy/api/restart-comfyui")
+    assert r.status_code == 503
+    # The button is hidden from the page when no restart command is configured.
+    assert b'id="restart"' not in c.get("/cozy/").data
+
+
+def test_restart_runs_configured_command(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(cozy.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd) or None)
+    c = _restart_client(tmp_path, monkeypatch, ["systemctl", "restart", "comfyui.service"])
+    _login(c)
+    r = c.post("/cozy/api/restart-comfyui")
+    assert r.status_code == 200 and r.get_json()["ok"] is True
+    assert calls == [["systemctl", "restart", "comfyui.service"]]
+    assert b'id="restart"' in c.get("/cozy/").data
+
+
+def test_restart_reports_command_failure(tmp_path, monkeypatch):
+    def boom(cmd, **kw):
+        raise cozy.subprocess.CalledProcessError(1, cmd, stderr="unit not found")
+    monkeypatch.setattr(cozy.subprocess, "run", boom)
+    c = _restart_client(tmp_path, monkeypatch, ["systemctl", "restart", "comfyui.service"])
+    _login(c)
+    r = c.post("/cozy/api/restart-comfyui")
+    assert r.status_code == 500
+    assert r.get_json()["error"] == "unit not found"

@@ -69,6 +69,8 @@ if args.data_dir[0] == '/':
 else:
     RES_DIR = os.path.join(PWD, args.data_dir)
 SHORT_RESDIR = os.path.basename(os.path.realpath(RES_DIR))
+# Remember where the symlink pointed at startup so the UI can reset back to it.
+DEFAULT_TARGET = os.path.realpath(RES_DIR)
 
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = _secrets["secret_key"].encode()
@@ -291,7 +293,8 @@ def stampables_info():
     return flask.jsonify({
         'is_symlink': is_link,
         'symlink_path': RES_DIR,
-        'real_path': realpath
+        'real_path': realpath,
+        'default_path': DEFAULT_TARGET
     })
 
 @bp.route("/api/list-dirs", methods=["POST"])
