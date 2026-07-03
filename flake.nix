@@ -90,6 +90,9 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
+    msrs.url = "github:goromal/msrs";
+    msrs.flake = false;
+
     notion-tools.url = "github:goromal/notion-tools";
     notion-tools.flake = false;
 

@@ -484,6 +484,22 @@
         "type": "github"
       }
     },
+    "msrs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783050612,
+        "narHash": "sha256-72q+JfL/mBViK1pyqcQ+sp/0IqXAoC8drvgOGXBNTBs=",
+        "owner": "goromal",
+        "repo": "msrs",
+        "rev": "9528ecf69523e0fde0ff38b2f72441197cf29729",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "msrs",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1768773494,
@@ -775,6 +791,7 @@
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
         "mscpp": "mscpp",
+        "msrs": "msrs",
         "nixpkgs": "nixpkgs_2",
         "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
