@@ -33,6 +33,9 @@
         }
         button:disabled { opacity:0.5; cursor:not-allowed; }
         button.clear { background:#6c757d; box-shadow:none; }
+        button.restart { background:#e74a3b; box-shadow:none; }
+        .restart-row { margin-top:32px; padding-top:20px; border-top:1px solid #e9ecef; }
+        .restart-row button { margin-top:0; }
         .prompt-actions { display:flex; gap:8px; margin-top:6px; }
         button.secondary {
             margin-top:0; width:auto; padding:6px 14px; font-size:0.85rem; font-weight:600;
@@ -98,6 +101,12 @@
 
         <div id="output"></div>
         <button class="clear" id="clear">Clear</button>
+
+        {% if can_restart %}
+        <div class="restart-row">
+            <button class="restart" id="restart">Restart ComfyUI</button>
+        </div>
+        {% endif %}
     </div>
 
     <script>
@@ -241,6 +250,27 @@
             imageSelect.value = ""; updatePreview();
             output.innerHTML = ""; showError(""); showDuration(null); bar.style.width = "0%";
         });
+
+        const restartBtn = document.getElementById("restart");
+        if (restartBtn) {
+            restartBtn.addEventListener("click", async () => {
+                if (!confirm("Restart the ComfyUI service? Any in-progress generation will be interrupted.")) return;
+                showError("");
+                const orig = restartBtn.textContent;
+                restartBtn.disabled = true;
+                restartBtn.textContent = "Restarting…";
+                try {
+                    const r = await fetch(root + "api/restart-comfyui", { method: "POST" });
+                    const d = await r.json().catch(() => ({}));
+                    if (!r.ok) showError(d.error || "restart failed");
+                    else { restartBtn.textContent = "✓ Restarted"; }
+                } catch (e) {
+                    showError("restart failed: " + e.message);
+                } finally {
+                    setTimeout(() => { restartBtn.textContent = orig; restartBtn.disabled = false; }, 1500);
+                }
+            });
+        }
 
         // --- Copy / Paste prompt helpers ---
         const copyBtn = document.getElementById("copy-btn");

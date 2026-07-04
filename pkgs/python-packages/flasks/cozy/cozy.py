@@ -1,6 +1,8 @@
 import argparse
 import json
 import os
+import shlex
+import subprocess
 import sys
 
 import flask
@@ -102,7 +104,7 @@ class User(flask_login.UserMixin):
 
 def create_app(store, workflows, workflow_dir, subdomain="/cozy",
                input_dir=None, output_dir=None, workflow_kinds=None,
-               secret_key=None, password_hash=None):
+               secret_key=None, password_hash=None, restart_cmd=None):
     global _PW_HASH
     if password_hash is not None:
         _PW_HASH = password_hash
@@ -154,7 +156,7 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
         state["job"]["duration"] = job_duration(state["job"])
         return flask.render_template(
             "index.html", urlroot=urlroot, workflows=workflows, state=state,
-            workflow_kinds=workflow_kinds)
+            workflow_kinds=workflow_kinds, can_restart=bool(restart_cmd))
 
     @bp.route("/api/generate", methods=["POST"])
     @flask_login.login_required
@@ -219,6 +221,20 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
         store.clear()
         return flask.jsonify({"ok": True})
 
+    @bp.route("/api/restart-comfyui", methods=["POST"])
+    @flask_login.login_required
+    def restart_comfyui():
+        if not restart_cmd:
+            return flask.jsonify({"error": "restart not configured"}), 503
+        try:
+            subprocess.run(restart_cmd, check=True, timeout=30,
+                           capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return flask.jsonify({"error": (e.stderr or "").strip() or "restart failed"}), 500
+        except Exception as e:
+            return flask.jsonify({"error": str(e)}), 500
+        return flask.jsonify({"ok": True})
+
     app.register_blueprint(bp)
     login_manager.init_app(app)
     login_manager.login_view = prefix + "login"
@@ -250,6 +266,9 @@ def run():
                              "(default <workflow-dir>/output)")
     parser.add_argument("--secrets-file", type=str, required=True,
                         help="Path to JSON file with secret_key and password_hash")
+    parser.add_argument("--comfyui-restart-cmd", type=str, default="",
+                        help="Command run to restart ComfyUI (e.g. "
+                             "'systemctl restart comfyui.service'); empty hides the restart button")
     args = parser.parse_args()
 
     state_dir = args.state_dir or os.path.join(os.getcwd(), "cozy-state")
@@ -264,12 +283,14 @@ def run():
     }
     store = JobStore(state_dir, ComfyUIClient(args.comfyui_url))
     secrets = _load_secrets(args.secrets_file)
+    restart_cmd = shlex.split(args.comfyui_restart_cmd) if args.comfyui_restart_cmd else None
     app = create_app(store=store, workflows=names,
                      workflow_dir=workflow_dir, subdomain=args.subdomain,
                      input_dir=input_dir, output_dir=output_dir,
                      workflow_kinds=workflow_kinds,
                      secret_key=secrets["secret_key"].encode(),
-                     password_hash=secrets["password_hash"])
+                     password_hash=secrets["password_hash"],
+                     restart_cmd=restart_cmd)
     app.run(host="0.0.0.0", port=args.port)
 
 

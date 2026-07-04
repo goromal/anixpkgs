@@ -31,6 +31,16 @@ in
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [ "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -" ];
 
+    machines.base.webServices = [
+      {
+        name = "Preferences";
+        path = "/rank/";
+        description = "Define preference ordering";
+        icon = "ranking-star";
+        faviconSvg = anixpkgs.pkgData.icons.favicons.ranking-star.data;
+      }
+    ];
+
     systemd.services.rankserver-setup = {
       description = "Reset rankables symlink to defaultRankables";
       wantedBy = [ "multi-user.target" ];

@@ -784,6 +784,7 @@
                 <span class="realpath-label">Current real path:</span>
                 <span class="realpath-value" id="stampablesRealPath">Loading...</span>
                 <button class="btn btn-sm" onclick="openDirPicker()">Change&hellip;</button>
+                <button class="btn btn-sm" onclick="resetStampablesDir()">Reset to default</button>
             </div>
             <div class="dir-picker" id="dirPicker" style="display: none;">
                 <div class="dir-picker-header">
@@ -1292,6 +1293,7 @@
 
         {% if root == "zzz" %}
         let _pickerPath = '/';
+        let _defaultPath = null;
 
         function loadStampablesInfo() {
             fetch('{{ urlroot }}api/stampables-info')
@@ -1299,6 +1301,7 @@
                 .then(data => {
                     document.getElementById('stampablesRealPath').textContent = data.real_path;
                     _pickerPath = data.real_path;
+                    _defaultPath = data.default_path;
                 })
                 .catch(() => {
                     document.getElementById('stampablesRealPath').textContent = '(error loading)';
@@ -1364,6 +1367,27 @@
                     closeDirPicker();
                     document.getElementById('stampablesRealPath').textContent = data.real_path;
                     showStatus('Stampables directory updated to: ' + data.real_path);
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function resetStampablesDir() {
+            if (!_defaultPath) { showStatus('Default directory unknown', true); return; }
+            if (!confirm('Reset stampables directory to default:\n' + _defaultPath)) return;
+            fetch('{{ urlroot }}api/set-stampables-dir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _defaultPath})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    closeDirPicker();
+                    document.getElementById('stampablesRealPath').textContent = data.real_path;
+                    showStatus('Stampables directory reset to default: ' + data.real_path);
                 } else {
                     showStatus('Error: ' + (data.error || 'Unknown error'), true);
                 }

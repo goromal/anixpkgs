@@ -181,6 +181,11 @@ in
             RestartSec = 5;
             User = "andrew";
             Group = "dev";
+            # Soft memory ceiling: above this the kernel reclaims comfyui's own
+            # pages (spilling to swap) instead of letting it starve the OS and
+            # trigger a global OOM. Not a hard cap, so workflows whose weight set
+            # exceeds RAM (e.g. flux2-dev) can still spill into swap and complete.
+            # MemoryHigh = "50G"; TODO - non-starter for flux2-dev
             Environment = [
               "HOME=/data/andrew"
             ]
@@ -209,6 +214,19 @@ in
         systemd.tmpfiles.rules = [
           "d ${cfg.cozy.stateDir} 0755 andrew dev -"
         ];
+        # Let the cozy UI (running as andrew) restart ComfyUI via its
+        # "Restart ComfyUI" button. Narrowly scoped: only andrew, only
+        # comfyui.service, no password prompt.
+        security.polkit.enable = true;
+        security.polkit.extraConfig = ''
+          polkit.addRule(function(action, subject) {
+            if (action.id == "org.freedesktop.systemd1.manage-units" &&
+                action.lookup("unit") == "comfyui.service" &&
+                subject.user == "andrew") {
+              return polkit.Result.YES;
+            }
+          });
+        '';
         systemd.services.cozy = {
           enable = true;
           description = "cozy ComfyUI image-generation UI";
@@ -216,7 +234,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile}";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";
