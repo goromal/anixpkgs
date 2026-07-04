@@ -137,8 +137,8 @@ in
               --arg devScript ${devScript} \
               --arg parseScript ${parseScript} \
               --argstr devHistFile "$devhist" \
-              --command "$runcmd"
-        fi 
+              --command "unset DEVSHELL_ACTIVE; $runcmd"
+        fi
     fi
   ''
 )
