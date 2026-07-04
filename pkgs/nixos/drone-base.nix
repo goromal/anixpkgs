@@ -25,7 +25,7 @@ in
       description = "Initiating state of the NixOS install (example: '22.05')";
     };
     machine = lib.mkOption {
-      type = lib.types.enum [ "sitl" ]; # TODO e.g., pi4
+      type = lib.types.enum [ "sitl" ]; # TODO e.g., jetson, pi4
       description = "Machine that the closure is targeting.";
     };
     bootMntPt = lib.mkOption {
@@ -86,10 +86,12 @@ in
         substituters = [
           "https://cache.nixos.org/"
           "https://github-public.cachix.org"
+          "https://ros.cachix.org"
         ];
         trusted-public-keys = [
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
           "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+          "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
         ];
       };
       extraOptions = ''
@@ -231,6 +233,17 @@ in
           # TODO: docs interfere
           # "orchestrator"
         ])
+        ++ [
+          # Core ROS2 infrastructure: rclcpp/rclpy, an rmw implementation, and
+          # the ros2 CLI suite (ros2 topic/service/node/param/run/launch/...)
+          (ros-pkgs.rosPackages.jazzy.buildEnv {
+            paths = with ros-pkgs.rosPackages.jazzy; [
+              ros-core
+              demo-nodes-cpp
+              demo-nodes-py
+            ];
+          })
+        ]
       );
 
     services.orchestratord = {

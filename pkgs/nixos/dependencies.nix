@@ -17,5 +17,15 @@ rec {
   unstable =
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
       { };
+  # ROS2 package set from nix-ros-overlay, built on its own pinned nixpkgs
+  # (required for compatibility and for ros.cachix.org binary cache hits).
+  ros-pkgs =
+    let
+      lock = builtins.fromJSON (builtins.readFile ../../flake.lock);
+    in
+    import (fetchTarball {
+      url = "https://github.com/lopsided98/nix-ros-overlay/archive/${lock.nodes.nix-ros-overlay.locked.rev}.tar.gz";
+      sha256 = lock.nodes.nix-ros-overlay.locked.narHash;
+    }) { };
   service-ports = import ./service-ports.nix;
 }
