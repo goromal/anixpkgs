@@ -30,6 +30,7 @@ Packages written (or bound) in Python.
 - [disciple](./disciple.md)
 - [anix_upgrade_ui](./anix_upgrade_ui.md)
 - [tasks_ui](./tasks_ui.md)
+- [sunset](./sunset.md)
 - [easy-google-auth](./easy-google-auth.md)
 - [rcdo](./rcdo.md)
 - [task-tools](./task-tools.md)
