@@ -75,7 +75,7 @@ To compare NixOS profile closures between a PR branch and its merge base, trigge
 2. Select the PR branch from the branch dropdown
 3. Optionally enter the PR number in the `pr_number` field to have the diff posted as a comment (replacing any previous one); leave blank to only log the output
 
-The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
+The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`, `drone-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
 
 ## SITL
 
@@ -89,7 +89,7 @@ bash scripts/sitl/drone-sim.sh
 The script builds the `driverInteractive` attribute of `pkgs/nixos/sitl-envs/dronesim.nix` and drops into the [interactive NixOS test driver](https://nixos.org/manual/nixos/stable/#sec-running-nixos-tests-interactively) (a Python REPL). From there:
 
 ```python
-machines[0].start()           # boot the drone-sitl VM
+machines[0].start()           # boot the drone-obc-sitl VM
 machines[0].shell_interact()  # open a root shell in the VM
 ```
 

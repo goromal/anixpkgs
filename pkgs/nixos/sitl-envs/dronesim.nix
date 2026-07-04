@@ -15,7 +15,7 @@ pkgs.testers.runNixOSTest {
     drone =
       { config, pkgs, ... }:
       {
-        imports = [ ../configurations/drone-sitl.nix ];
+        imports = [ ../configurations/drone-obc-sitl.nix ];
         virtualisation.cores = 4;
         virtualisation.memorySize = 8192;
         virtualisation.diskSize = 8192;
