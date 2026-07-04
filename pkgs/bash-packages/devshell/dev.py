@@ -10,6 +10,8 @@ class Context:
         self.help_mode = False
         self.dev_dir = ""
         self.hist_file = ""
+        self.devrc = ""
+        self.drop_to_shell = False
         self.wsname = ""
         self.repos = []
         self.scripts = []
@@ -181,7 +183,8 @@ def display_output(stdscr):
             stdscr.addstr(13, 0, "[n]  Nuke")
             stdscr.addstr(14, 0, "[o]  Add source")
             stdscr.addstr(15, 0, "[i]  Add script")
-            stdscr.addstr(16, 0, "[q]  Quit")
+            stdscr.addstr(16, 0, "[d]  Drop into workspace devshell")
+            stdscr.addstr(17, 0, "[q]  Quit")
             for j, script in enumerate(ctx.scripts):
                 stdscr.addstr(3 + j, 42, f"| {script}")
 
@@ -254,6 +257,7 @@ def main(stdscr):
     ctx.dev_dir = sys.argv[2]
     editor = sys.argv[3]
     ctx.hist_file = sys.argv[4]
+    ctx.devrc = sys.argv[5] if len(sys.argv) > 5 else ""
     ctx.load_sources()
 
     curses.curs_set(0)
@@ -275,6 +279,10 @@ def main(stdscr):
             display_output(stdscr)
 
         elif key == ord("q"):
+            break
+
+        elif key == ord("d"):
+            ctx.drop_to_shell = True
             break
 
         elif not ctx.help_mode:
@@ -570,3 +578,19 @@ def script_prompt(stdscr):
 
 if __name__ == "__main__":
     curses.wrapper(main)
+    if ctx.drop_to_shell:
+        # If we're already inside an interactive devshell for this workspace,
+        # exiting the TUI drops us back into it; nothing more to do. Otherwise
+        # (e.g. launched via `devshell WS --run dev` or a bare invocation), we
+        # replace this process with a fresh interactive devshell.
+        if os.environ.get("DEVSHELL_ACTIVE") != ctx.wsname:
+            devshell_cmd = ["devshell", ctx.wsname]
+            if ctx.hist_file:
+                devshell_cmd += ["-s", os.path.expanduser(ctx.hist_file)]
+            if ctx.devrc:
+                devshell_cmd += ["-d", os.path.expanduser(ctx.devrc)]
+            try:
+                os.execvp("devshell", devshell_cmd)
+            except OSError as e:
+                sys.stderr.write(f"Could not launch devshell: {e}\n")
+                sys.exit(1)
