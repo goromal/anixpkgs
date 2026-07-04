@@ -259,3 +259,40 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
         bash scripts/check_machines.sh
+  drone-sim:
+    name: Drone SITL VM Test
+    runs-on: ubuntu-latest
+    # Guards against ros.cachix.org eviction silently degrading this job
+    # into an hours-long ROS-from-source build.
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v5
+    - name: Enable KVM for the test VM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-substituters = https://ros.cachix.org
+          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        # Don't auto-push the whole VM test closure; the mirror step below
+        # pushes only the ROS env closure (the only paths at eviction risk).
+        skipPush: true
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: Build and run drone sim VM test
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        nix-build pkgs/nixos/sitl-envs/dronesim.nix -A driver -o /tmp/dronesim-driver
+        /tmp/dronesim-driver/bin/nixos-test-driver
+    - name: Mirror ROS env closure to github-public
+      run: |
+        nix-store -qR /tmp/dronesim-driver | grep -- '-ros-env$' \
+          | xargs nix-store -qR | sort -u | cachix push github-public

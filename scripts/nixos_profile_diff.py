@@ -20,6 +20,7 @@ KNOWN_CONFIGURATIONS = [
     "personal-dell",
     "ats-alderlake",
     "ats-pi",
+    "drone-obc-sitl",
 ]
 
 NIX_ENV = {
