@@ -94,6 +94,11 @@
                 "docs": true
             },
             {
+                "attr": "msrs",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "xv-lidar-rs",
                 "ci": true,
                 "docs": true

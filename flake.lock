@@ -538,6 +538,22 @@
         "type": "github"
       }
     },
+    "msrs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783050612,
+        "narHash": "sha256-72q+JfL/mBViK1pyqcQ+sp/0IqXAoC8drvgOGXBNTBs=",
+        "owner": "goromal",
+        "repo": "msrs",
+        "rev": "9528ecf69523e0fde0ff38b2f72441197cf29729",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "msrs",
+        "type": "github"
+      }
+    },
     "nix-ros-overlay": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -868,6 +884,7 @@
         "microxrce-dds-agent": "microxrce-dds-agent",
         "microxrce-dds-gen": "microxrce-dds-gen",
         "mscpp": "mscpp",
+        "msrs": "msrs",
         "nix-ros-overlay": "nix-ros-overlay",
         "nixpkgs": "nixpkgs_3",
         "notion-tools": "notion-tools",

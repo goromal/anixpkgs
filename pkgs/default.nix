@@ -699,6 +699,14 @@ rec {
       rustPlatform = patchedRustPlatform;
     }
   );
+  # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
+  # rustc; build it with unstable's rustPlatform until the pin catches up.
+  msrs = addDoc (
+    prev.callPackage ./rust-packages/msrs {
+      pkg-src = flakeInputs.msrs;
+      rustPlatform = unstable.rustPlatform;
+    }
+  );
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
