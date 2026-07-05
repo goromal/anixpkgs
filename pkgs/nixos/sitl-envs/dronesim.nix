@@ -36,6 +36,8 @@ pkgs.testers.runNixOSTest {
     ''
       print("Waiting for default target on drone...")
       machines[0].wait_for_unit("default.target")
+      print("Warming up the ros2 CLI daemon...")
+      machines[0].execute("timeout 120 ros2 daemon start")
       print("Waiting for Ardupilot SITL...")
       machines[0].wait_for_unit("ardusitl.service")
       print("Waiting for mavlink-router...")
@@ -47,8 +49,19 @@ pkgs.testers.runNixOSTest {
       print("Waiting for the Micro XRCE-DDS agent...")
       machines[0].wait_for_unit("microxrce-agent.service")
       print("Checking that Ardupilot's AP_DDS client publishes into the ROS2 graph...")
-      machines[0].wait_until_succeeds("ros2 topic list | grep -q '^/ap/'", timeout=120)
-      machines[0].succeed("timeout 60 ros2 topic echo --once /ap/time")
+      # Timeouts are sized for heavily-loaded CI runners, where the SITL's
+      # simulated clock (and thus AP_DDS session setup) can run much slower
+      # than real time. The per-attempt `timeout` guards keep one wedged
+      # ros2 CLI invocation from eating the whole retry budget.
+      try:
+          machines[0].wait_until_succeeds("timeout 60 ros2 topic list | grep -q '^/ap/'", timeout=600)
+          machines[0].wait_until_succeeds("timeout 60 ros2 topic echo --once /ap/time", timeout=180)
+      except Exception:
+          print("=== ardusitl journal ===")
+          print(machines[0].execute("journalctl -u ardusitl --no-pager | grep -iv 'Loaded defaults' | tail -40")[1])
+          print("=== microxrce-agent journal ===")
+          print(machines[0].execute("journalctl -u microxrce-agent --no-pager | tail -40")[1])
+          raise
       print("Checking ROS2 CLI...")
       machines[0].succeed("ros2 topic list")
       print("Checking ROS2 pub/sub...")
