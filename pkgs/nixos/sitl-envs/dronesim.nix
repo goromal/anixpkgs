@@ -52,9 +52,13 @@ pkgs.testers.runNixOSTest {
       print("Checking ROS2 CLI...")
       machines[0].succeed("ros2 topic list")
       print("Checking ROS2 pub/sub...")
-      machines[0].succeed(
-          "ros2 run demo_nodes_cpp talker >/dev/null 2>&1 & "
-          "timeout 120 ros2 topic echo --once /chatter"
+      machines[0].execute("ros2 run demo_nodes_cpp talker >/dev/null 2>&1 &")
+      # The explicit message type makes echo subscribe and block for data
+      # instead of exiting immediately when the talker's publisher hasn't
+      # been discovered yet (a race this loses on slow CI runners).
+      machines[0].wait_until_succeeds(
+          "timeout 30 ros2 topic echo --once /chatter std_msgs/msg/String",
+          timeout=120,
       )
       print("Done.")
     '';
