@@ -32,19 +32,19 @@ let
       chown ${cfg.user}:${cfg.group} "$ENV_FILE"
     fi
   '';
+  paramsFile = pkgs.writeText "sitl-params.parm" ((lib.concatStringsSep "\n" cfg.parameters) + "\n");
   simExecScript = pkgs.writeShellScriptBin "sim-exec-start" ''
     source "${cfg.rootDir}/${simEnvFileName}"
-    exec ${cfg.package}/bin/ardupilot \
-      --model=quad \
+    exec ${cfg.package}/bin/arducopter \
+      --model=${cfg.platform} \
       --home="$LAT,$LON,$ALT,$HDG" \
       --config=undulation:$UND \
-      -S -I 0 \
-      --defaults ${cfg.paramfile}
+      -S -I 0 ${lib.optionalString (cfg.parameters != [ ]) "\\\n      --defaults ${paramsFile}"}
   '';
 in
 {
-  options.services.ardupilot-sim = with types; {
-    enable = mkEnableOption "Enable Arducopter SITL";
+  options.services.ardupilot-sim = {
+    enable = lib.mkEnableOption "Enable Arducopter SITL";
     package = lib.mkOption {
       type = lib.types.package;
       description = "The ardupilot package to use";
@@ -61,9 +61,22 @@ in
       type = lib.types.str;
       description = "Service owner group";
     };
-    paramfile = lib.mkOption {
+    platform = lib.mkOption {
       type = lib.types.str;
-      description = "Ardupilot param file";
+      description = "Vehicle platform/frame type passed to the SITL --model flag (default: quad)";
+      default = "quad";
+    };
+    parameters = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = ''
+        List of Ardupilot parameter assignments (e.g., "DISARM_DELAY 0") written
+        to a defaults file passed to the SITL via --defaults.
+      '';
+      default = [ ];
+      example = [
+        "DISARM_DELAY 0"
+        "FRAME_CLASS 1"
+      ];
     };
   };
 

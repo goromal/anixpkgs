@@ -84,6 +84,12 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
+    microxrce-dds-agent.url = "github:eProsima/Micro-XRCE-DDS-Agent?ref=refs/tags/v2.4.3";
+    microxrce-dds-agent.flake = false;
+
+    microxrce-dds-gen.url = "git+https://github.com/ardupilot/Micro-XRCE-DDS-Gen?ref=refs/tags/v4.7.1&submodules=1";
+    microxrce-dds-gen.flake = false;
+
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 

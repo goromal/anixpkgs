@@ -4,6 +4,7 @@ let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   unstable = (import ./nixos/dependencies.nix).unstable;
+  ros-pkgs = (import ./nixos/dependencies.nix).ros-pkgs;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -608,7 +609,19 @@ rec {
     }
   );
   ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
-  arducopter = (prev.callPackage ./cxx-packages/arducopter { python = python313; }).copter;
+  arducopter =
+    (prev.callPackage ./cxx-packages/arducopter {
+      python = python313;
+      microxrceddsgen = final.microxrceddsgen;
+    }).copter;
+  microxrceddsgen = prev.callPackage ./cxx-packages/microxrce-dds-gen {
+    pkg-src = flakeInputs.microxrce-dds-gen;
+  };
+  # Built with the nix-ros-overlay jazzy scope so its fastdds matches the rmw
+  # used by the ROS2 environment on drone machines.
+  microxrce-dds-agent = ros-pkgs.rosPackages.jazzy.callPackage ./cxx-packages/microxrce-dds-agent {
+    pkg-src = flakeInputs.microxrce-dds-agent;
+  };
   manif-geom-cpp = addDoc (
     prev.callPackage ./cxx-packages/manif-geom-cpp {
       pkg-src = flakeInputs.manif-geom-cpp;

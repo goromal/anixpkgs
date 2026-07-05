@@ -36,4 +36,14 @@
   intake_ui = 6161;
   cozy = 6262;
   sunset = 6464;
+  # Micro XRCE-DDS agent UDP port (Ardupilot AP_DDS -> ROS2 bridge; matches
+  # the Ardupilot default DDS_UDP_PORT)
+  xrce-dds-agent = 2019;
+  mavlink = {
+    # Ardupilot SITL serial0 TCP server (-S -I 0 convention: 5760 + 10 * instance)
+    ap-sitl-tcp = 5760;
+    # mavlink-router TCP listen port (moved off the default 5760 to avoid
+    # colliding with a colocated SITL instance)
+    router-tcp = 5790;
+  };
 }

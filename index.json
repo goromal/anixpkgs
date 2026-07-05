@@ -75,6 +75,16 @@
                 "attr": "arducopter.sitl",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "microxrceddsgen",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "microxrce-dds-agent",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
