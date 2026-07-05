@@ -93,6 +93,8 @@
     msrs.url = "github:goromal/msrs";
     msrs.flake = false;
 
+    nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
+
     notion-tools.url = "github:goromal/notion-tools";
     notion-tools.flake = false;
 

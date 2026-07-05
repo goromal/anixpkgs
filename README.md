@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v8.35.5](https://github.com/goromal/anixpkgs/tree/v8.35.5)**
+**LATEST RELEASE: [v8.36.0](https://github.com/goromal/anixpkgs/tree/v8.36.0)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
@@ -75,7 +75,7 @@ To compare NixOS profile closures between a PR branch and its merge base, trigge
 2. Select the PR branch from the branch dropdown
 3. Optionally enter the PR number in the `pr_number` field to have the diff posted as a comment (replacing any previous one); leave blank to only log the output
 
-The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
+The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`, `drone-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
 
 ## SITL
 
@@ -84,4 +84,30 @@ Some commands to spin up SITL environments:
 ```bash
 # Drone Sim
 bash scripts/sitl/drone-sim.sh
+```
+
+The script builds the `driverInteractive` attribute of `pkgs/nixos/sitl-envs/dronesim.nix` and drops into the [interactive NixOS test driver](https://nixos.org/manual/nixos/stable/#sec-running-nixos-tests-interactively) (a Python REPL). From there:
+
+```python
+machines[0].start()           # boot the drone-obc-sitl VM
+machines[0].shell_interact()  # open a root shell in the VM
+```
+
+The VM's SSH port is forwarded to the host, so it can also be reached with
+
+```bash
+ssh drone@localhost -p 4444
+```
+
+The drone closure ships the core ROS2 (jazzy) infrastructure from [nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay), including the `ros2` CLI tools. To sanity-check pub/sub inside the VM:
+
+```bash
+ros2 run demo_nodes_cpp talker &
+ros2 topic echo /chatter
+```
+
+To run the non-interactive smoke test (boots the VM and verifies the ROS2 CLI and a pub/sub round-trip):
+
+```bash
+nix-build pkgs/nixos/sitl-envs/dronesim.nix -A driver && ./result/bin/nixos-test-driver
 ```

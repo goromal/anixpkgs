@@ -8,6 +8,6 @@
   imports = [ ../drone-base.nix ];
 
   drone.base = {
-    # TODO machine-agnostic configs as they arise
+    # TODO machine-agnostic drone OBC sim configs as they arise
   };
 }

@@ -22,7 +22,7 @@ export NIXPKGS_ALLOW_INSECURE=1
 export NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1
 
 sed -i 's|local-build = false;|local-build = true;|g' ${DIR}/../pkgs/nixos/dependencies.nix
-configurations=(jetpack-orin-nx personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi)
+configurations=(jetpack-orin-nx personal-inspiron personal-panasonic personal-dell ats-alderlake ats-pi drone-obc-sitl)
 for configuration in ${configurations[@]}; do
     echo
     echo
