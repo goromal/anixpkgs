@@ -115,6 +115,10 @@ in
       file = ./res/claude-skills/mscpp-services/SKILL.md;
     }
     {
+      name = "msrs-services";
+      file = ./res/claude-skills/msrs-services/SKILL.md;
+    }
+    {
       name = "itns-notes";
       file = ./res/claude-skills/itns-notes/SKILL.md;
     }
