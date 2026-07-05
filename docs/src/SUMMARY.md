@@ -20,6 +20,7 @@
   - [mfn](./cpp/mfn.md)
 - [Rust Packages](./rust/rust.md)
   - [manif-geom-rs](./rust/manif-geom-rs.md)
+  - [msrs](./rust/msrs.md)
   - [xv-lidar-rs](./rust/xv-lidar-rs.md)
   - [sunnyside](./rust/sunnyside.md)
 - [Python Packages](./python/python.md)
