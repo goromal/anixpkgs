@@ -486,6 +486,42 @@
         "type": "github"
       }
     },
+    "microxrce-dds-agent": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1710925934,
+        "narHash": "sha256-t2PZurWc8Kbkm3zFyNwHQea4Yj+zHWFXFqZ0E19km54=",
+        "owner": "eProsima",
+        "repo": "Micro-XRCE-DDS-Agent",
+        "rev": "73622810d984349b80bbac0ef55fc0b694d62222",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eProsima",
+        "ref": "v2.4.3",
+        "repo": "Micro-XRCE-DDS-Agent",
+        "type": "github"
+      }
+    },
+    "microxrce-dds-gen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1756997190,
+        "narHash": "sha256-icVd2sqplkTusJeJ4yT6WI+bQbdc8WDSZpGIGybzjFE=",
+        "ref": "refs/tags/v4.7.1",
+        "rev": "f5b96777802bee3b41c3b2a725eeccc8a79dc3f7",
+        "revCount": 123,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/ardupilot/Micro-XRCE-DDS-Gen"
+      },
+      "original": {
+        "ref": "refs/tags/v4.7.1",
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/ardupilot/Micro-XRCE-DDS-Gen"
+      }
+    },
     "mscpp": {
       "flake": false,
       "locked": {
@@ -829,6 +865,8 @@
         "mavlog-utils": "mavlog-utils",
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
+        "microxrce-dds-agent": "microxrce-dds-agent",
+        "microxrce-dds-gen": "microxrce-dds-gen",
         "mscpp": "mscpp",
         "nix-ros-overlay": "nix-ros-overlay",
         "nixpkgs": "nixpkgs_3",

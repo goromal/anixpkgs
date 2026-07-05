@@ -33,9 +33,24 @@ in
       description = "(x86_linux) Boot partition mount point (default: /boot/efi)";
       default = "/boot";
     };
+    runAPSITL = lib.mkOption {
+      type = lib.types.bool;
+      description = "Run Ardupilot onboard the computer in SITL mode (default: false). Configured via the services.ardupilot-sim option set.";
+      default = false;
+    };
+    fcSerialDevice = lib.mkOption {
+      type = lib.types.str;
+      description = "Serial connection (<device>[:<baudrate>]) to an external flight controller, routed by mavlink-router when runAPSITL is false";
+      default = "/dev/ttyACM0:115200";
+    };
   };
 
-  imports = [ ../python-packages/orchestrator/module.nix ];
+  imports = [
+    ../python-packages/orchestrator/module.nix
+    ../cxx-packages/arducopter/sitl-module.nix
+    ../cxx-packages/arducopter/router-module.nix
+    ../cxx-packages/microxrce-dds-agent/module.nix
+  ];
 
   config = {
     system.stateVersion = cfg.nixosState;
@@ -245,6 +260,62 @@ in
           })
         ]
       );
+
+    services.ardupilot-sim = {
+      enable = cfg.runAPSITL;
+      package = anixpkgs.arducopter.sitl;
+      rootDir = "${cfg.homeRoot}/${cfg.homeUser}/ardusitl";
+      user = cfg.homeUser;
+      group = "dev";
+      # Native ROS2 interface: the AP_DDS client connects to the local Micro
+      # XRCE-DDS agent over UDP. These match the Ardupilot defaults, but are
+      # pinned here so upstream default changes can't silently break the
+      # ROS2 bridge.
+      parameters = [
+        "DDS_ENABLE 1"
+        "DDS_DOMAIN_ID 0"
+        "DDS_UDP_PORT ${toString service-ports.xrce-dds-agent}"
+      ];
+    };
+
+    # Bridges the Ardupilot AP_DDS client into the ROS2 graph. Serial
+    # transport for hardware flight controllers is TODO alongside the first
+    # hardware machine target.
+    services.microxrce-agent = {
+      enable = true;
+      package = anixpkgs.microxrce-dds-agent;
+      transportArgs = "udp4 --port ${toString service-ports.xrce-dds-agent}";
+      user = cfg.homeUser;
+      group = "dev";
+    };
+
+    # The AP_DDS client gives up after DDS_MAX_RETRY failed pings, so make
+    # sure the agent is up before the SITL starts.
+    systemd.services.ardusitl = lib.mkIf cfg.runAPSITL {
+      after = [ "microxrce-agent.service" ];
+      wants = [ "microxrce-agent.service" ];
+    };
+
+    # MAVLink routing runs unconditionally: bound to the local SITL instance
+    # when runAPSITL is set, otherwise to the external flight controller serial
+    # connection.
+    services.ardurouter = {
+      enable = true;
+      package = anixpkgs.ardurouter;
+      rootDir = "${cfg.homeRoot}/${cfg.homeUser}/ardurouter";
+      user = cfg.homeUser;
+      group = "dev";
+      interfaceArgs =
+        if cfg.runAPSITL then
+          "--tcp-endpoint 127.0.0.1:${toString service-ports.mavlink.ap-sitl-tcp} --tcp-port ${toString service-ports.mavlink.router-tcp}"
+        else
+          cfg.fcSerialDevice;
+    };
+
+    systemd.services.ardurouter = lib.mkIf cfg.runAPSITL {
+      after = [ "ardusitl.service" ];
+      wants = [ "ardusitl.service" ];
+    };
 
     services.orchestratord = {
       enable = false; # TODO needed?
