@@ -258,6 +258,8 @@ jobs:
         name: github-public
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: >
         bash scripts/check_machines.sh
   drone-sim:
     name: Drone SITL VM Test
