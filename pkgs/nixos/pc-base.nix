@@ -474,7 +474,7 @@ in
       };
 
       services.stampserver = {
-        enable = true;
+        enable = cfg.isATS || cfg.enableFileServers;
         package = anixpkgs.stampserver;
         rootDir = "${cfg.homeDir}/fileservers";
       };
