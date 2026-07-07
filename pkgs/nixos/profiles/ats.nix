@@ -23,6 +23,7 @@ in
       notesWikiPort = 8080;
       enableMetrics = true;
       enableFileServers = true;
+      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";
