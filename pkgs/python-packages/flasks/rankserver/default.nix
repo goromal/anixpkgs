@@ -1,6 +1,7 @@
 {
   buildPythonPackage,
   setuptools,
+  pytestCheckHook,
   flask,
   flask-login,
   flask-wtf,
@@ -45,6 +46,7 @@ buildPythonPackage rec {
     pysorting
     pillow
   ];
+  nativeCheckInputs = [ pytestCheckHook ];
   meta = {
     description = "A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.";
     longDescription = ''
