@@ -2,7 +2,7 @@
 
 A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.
 
-Spins up a flask webserver (on the specified port) whose purpose is to help a user rank files in the chosen `data-dir` directory via manual binary comparisons. The ranking is done via an incremental "RESTful" sorting strategy implemented within the [pysorting](./pysorting.md) library. State is created and maintained within the `data-dir` directory so that the ranking exercise can pick back up where it left off between different spawnings of the server. At this point, only the ranking of `.txt`, `.png`, and `.mp4` files is possible; other file types in `data-dir` will be ignored. Images and videos in the globally ranked list can be clicked to view them maximized in a lightbox overlay.    
+Spins up a flask webserver (on the specified port) whose purpose is to help a user rank files in the chosen `data-dir` directory via manual binary comparisons. The ranking is done via an incremental "RESTful" sorting strategy implemented within the [pysorting](./pysorting.md) library. State is created and maintained within the `data-dir` directory so that the ranking exercise can pick back up where it left off between different spawnings of the server. At this point, only the ranking of `.txt`, `.png`, and `.mp4` files is possible; other file types in `data-dir` will be ignored.
 
 ## Usage
 
