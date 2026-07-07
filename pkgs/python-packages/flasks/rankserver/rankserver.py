@@ -510,6 +510,99 @@ def set_rankables_dir():
     except Exception as e:
         return flask.jsonify({'success': False, 'error': str(e)}), 500
 
+def _count_owned_links(stamp_dir):
+    stamp_real = os.path.realpath(stamp_dir)
+    count = 0
+    for name in os.listdir(RES_DIR):
+        full = os.path.join(RES_DIR, name)
+        if os.path.islink(full):
+            target = os.readlink(full)
+            if not os.path.isabs(target):
+                target = os.path.join(os.path.dirname(full), target)
+            if os.path.realpath(os.path.dirname(target)) == stamp_real:
+                count += 1
+    return count
+
+
+@bp.route("/api/watch-config", methods=["GET"])
+@flask_login.login_required
+def watch_config():
+    cfg, err = load_config()
+    watch = cfg.get("watch")
+    linked = _count_owned_links(watch["stamp_dir"]) if watch else 0
+    ins = cfg.get("insertions") or {}
+    queue_len = len(ins.get("queue", [])) + (1 if ins.get("active") else 0)
+    return flask.jsonify({"watch": watch, "linked_count": linked,
+                          "queue_len": queue_len, "error": err})
+
+
+@bp.route("/api/set-watch-config", methods=["POST"])
+@flask_login.login_required
+def set_watch_config():
+    data = flask.request.get_json(silent=True) or {}
+    # Guard the raw value: normpath("") is "." (the server CWD), which would
+    # slip past an isdir check.
+    raw_dir = data.get("stamp_dir") or ""
+    tag = (data.get("stamp_tag") or "").strip()
+    if not raw_dir:
+        return flask.jsonify({"success": False, "error": "Missing stamp path"}), 400
+    stamp_dir = os.path.normpath(raw_dir)
+    if not os.path.isdir(stamp_dir):
+        return flask.jsonify({"success": False, "error": "Stamp path is not a directory"}), 400
+    if not tag:
+        return flask.jsonify({"success": False, "error": "Missing stamp tag"}), 400
+    cfg, _ = load_config()
+    cfg["watch"] = {"stamp_dir": stamp_dir, "stamp_tag": tag}
+    cfg.setdefault("insertions", {"queue": [], "active": None})
+    save_config(cfg)
+    warnings = sync_symlinks(cfg)
+    return flask.jsonify({"success": True,
+                          "linked_count": _count_owned_links(stamp_dir),
+                          "warnings": warnings})
+
+
+@bp.route("/api/clear-watch-config", methods=["POST"])
+@flask_login.login_required
+def clear_watch_config():
+    cfg, _ = load_config()
+    cfg.pop("watch", None)
+    save_config(cfg)
+    return flask.jsonify({"success": True})
+
+
+@bp.route("/api/list-stamps", methods=["POST"])
+@flask_login.login_required
+def list_stamps():
+    data = flask.request.get_json(silent=True) or {}
+    raw_path = data.get("path") or ""
+    if not raw_path:
+        return flask.jsonify({"error": "Missing path"}), 400
+    path = os.path.normpath(raw_path)
+    try:
+        return flask.jsonify({"tags": rankops.scan_stamps(os.listdir(path))})
+    except PermissionError:
+        return flask.jsonify({"error": "Permission denied"}), 403
+    except (FileNotFoundError, NotADirectoryError):
+        return flask.jsonify({"error": "Path not found"}), 404
+
+
+@bp.route("/api/make-dir", methods=["POST"])
+@flask_login.login_required
+def make_dir():
+    data = flask.request.get_json(silent=True) or {}
+    path = data.get("path")
+    name = (data.get("name") or "").strip()
+    if (not path or not name or "/" in name or "\\" in name
+            or "\x00" in name or name in (".", "..")):
+        return flask.jsonify({"success": False, "error": "Invalid path or name"}), 400
+    target = os.path.join(os.path.normpath(path), name)
+    try:
+        os.mkdir(target)
+        return flask.jsonify({"success": True, "path": target})
+    except OSError as e:
+        return flask.jsonify({"success": False, "error": str(e)}), 500
+
+
 @bp.route("/thumb/<path:filename>", methods=["GET"])
 @flask_login.login_required
 def thumb(filename):
