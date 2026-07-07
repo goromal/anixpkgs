@@ -3,6 +3,7 @@ import json
 import sys
 import hashlib
 import argparse
+import subprocess
 import flask
 from PIL import Image
 import flask_login
@@ -103,10 +104,10 @@ class RankServer:
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
         files = []
         for file in os.listdir(RES_DIR):
-            if file.endswith(".txt") or file.endswith(".png"):
+            if file.endswith(".txt") or file.endswith(".png") or file.endswith(".mp4"):
                 files.append(file)
         if len(files) == 0:
-            return (False, "Data directory has no rankable files (.txt|.png)")
+            return (False, "Data directory has no rankable files (.txt|.png|.mp4)")
         self.mapfilename = os.path.join(RES_DIR, MAPNAME)
         if not os.path.exists(self.mapfilename):
             self.file_map = files
@@ -308,11 +309,17 @@ def set_rankables_dir():
 @bp.route("/thumb/<path:filename>", methods=["GET"])
 @flask_login.login_required
 def thumb(filename):
-    # Downscaled, disk-cached thumbnail. Lets the ranking page show many images
-    # without downloading every full-resolution file. Cache key includes mtime
-    # and size so edits (rotate/crop elsewhere) invalidate stale thumbnails.
+    # Downscaled, disk-cached thumbnail served as PNG. For .png this is a Pillow
+    # downscale; for .mp4 it is the first video frame extracted via ffmpeg. Both
+    # cache to the same store so the ranked list can show many items (images or
+    # video posters) as small lazy <img>s -- without downloading full-resolution
+    # files or spinning up a per-item <video> decoder (which mobile browsers cap
+    # in number). Cache key includes mtime and size so edits invalidate stale
+    # thumbnails.
     safe = os.path.basename(filename)
-    if safe != filename or not safe.lower().endswith(".png"):
+    is_png = safe.lower().endswith(".png")
+    is_mp4 = safe.lower().endswith(".mp4")
+    if safe != filename or not (is_png or is_mp4):
         flask.abort(404)
     src = os.path.join(RES_DIR, safe)
     if not os.path.isfile(src):
@@ -328,17 +335,49 @@ def thumb(filename):
     ).hexdigest()
     cached = os.path.join(THUMB_CACHE, key + ".png")
     if not os.path.exists(cached):
-        try:
-            os.makedirs(THUMB_CACHE, exist_ok=True)
-            img = Image.open(src)
-            img.thumbnail((w, 100000000), Image.LANCZOS)
-            tmp = cached + ".tmp"
-            img.save(tmp, format="PNG")
+        tmp = cached + ".tmp"
+        if is_png:
+            try:
+                os.makedirs(THUMB_CACHE, exist_ok=True)
+                img = Image.open(src)
+                img.thumbnail((w, 100000000), Image.LANCZOS)
+                img.save(tmp, format="PNG")
+                os.replace(tmp, cached)
+            except Exception:
+                # Fall back to the original on any cache/decode/encode failure.
+                return flask.send_file(src, mimetype="image/png", max_age=86400)
+        else:
+            # Extract a single frame near the start, scaled to width w. One decoded
+            # frame, not the whole file. No usable fallback if this fails.
+            try:
+                os.makedirs(THUMB_CACHE, exist_ok=True)
+                proc = subprocess.run(
+                    ["ffmpeg", "-hide_banner", "-loglevel", "error",
+                     "-i", src, "-frames:v", "1", "-vf", f"scale={w}:-1",
+                     "-f", "image2", "-y", tmp],
+                    capture_output=True,
+                )
+                ok = proc.returncode == 0 and os.path.exists(tmp)
+            except Exception:
+                ok = False
+            if not ok:
+                flask.abort(404)
             os.replace(tmp, cached)
-        except Exception:
-            # Fall back to the original on any cache/decode/encode failure.
-            return flask.send_file(src, mimetype="image/png", max_age=86400)
     return flask.send_file(cached, mimetype="image/png", max_age=86400)
+
+@bp.route("/media/<path:filename>", methods=["GET"])
+@flask_login.login_required
+def media(filename):
+    # Serve a rankable video behind the same login gate as thumbnails. send_file
+    # honours Range requests (conditional=True) so the browser can seek/stream
+    # without downloading the whole file up front.
+    safe = os.path.basename(filename)
+    if safe != filename or not safe.lower().endswith(".mp4"):
+        flask.abort(404)
+    src = os.path.join(RES_DIR, safe)
+    if not os.path.isfile(src):
+        flask.abort(404)
+    return flask.send_file(src, mimetype="video/mp4", max_age=86400, conditional=True)
 
 @app.before_request
 def refresh_session():
