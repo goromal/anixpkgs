@@ -20,7 +20,8 @@ in
       agentFramework = "claude";
       serveNotesWiki = false;
       enableMetrics = true;
-      enableFileServers = false;
+      enableFileServers = true;
+      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";
