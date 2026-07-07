@@ -103,10 +103,10 @@ class RankServer:
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
         files = []
         for file in os.listdir(RES_DIR):
-            if file.endswith(".txt") or file.endswith(".png"):
+            if file.endswith(".txt") or file.endswith(".png") or file.endswith(".mp4"):
                 files.append(file)
         if len(files) == 0:
-            return (False, "Data directory has no rankable files (.txt|.png)")
+            return (False, "Data directory has no rankable files (.txt|.png|.mp4)")
         self.mapfilename = os.path.join(RES_DIR, MAPNAME)
         if not os.path.exists(self.mapfilename):
             self.file_map = files
@@ -339,6 +339,20 @@ def thumb(filename):
             # Fall back to the original on any cache/decode/encode failure.
             return flask.send_file(src, mimetype="image/png", max_age=86400)
     return flask.send_file(cached, mimetype="image/png", max_age=86400)
+
+@bp.route("/media/<path:filename>", methods=["GET"])
+@flask_login.login_required
+def media(filename):
+    # Serve a rankable video behind the same login gate as thumbnails. send_file
+    # honours Range requests (conditional=True) so the browser can seek/stream
+    # without downloading the whole file up front.
+    safe = os.path.basename(filename)
+    if safe != filename or not safe.lower().endswith(".mp4"):
+        flask.abort(404)
+    src = os.path.join(RES_DIR, safe)
+    if not os.path.isfile(src):
+        flask.abort(404)
+    return flask.send_file(src, mimetype="video/mp4", max_age=86400, conditional=True)
 
 @app.before_request
 def refresh_session():
