@@ -196,6 +196,10 @@ in
       default = false;
       description = "Whether to turn on file servers";
     };
+    enableUpgradeUI = lib.mkOption {
+      type = lib.types.bool;
+      description = "Whether to serve the anix-upgrade web UI (implies running the reverse-proxy webserver).";
+    };
     cloudDirs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
       description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
@@ -460,7 +464,7 @@ in
       };
 
       services.anix-upgrade-ui = {
-        enable = true;
+        enable = cfg.enableUpgradeUI;
       };
 
       services.sunset = {
