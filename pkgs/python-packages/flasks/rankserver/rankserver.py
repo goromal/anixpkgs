@@ -19,6 +19,7 @@ from pysorting import (
     sortStateFromDisk,
     restfulQuickSort,
 )
+import rankops
 
 UINT32_MAX = 0xffffffff
 LOGNAME = "sort_state.log"
@@ -85,6 +86,95 @@ DEFAULT_TARGET = os.path.realpath(RES_DIR)
 # scan of RES_DIR never picks it up.
 THUMB_CACHE = os.path.join(RES_DIR, ".rankthumbs")
 
+
+def load_config():
+    """Read rank_config.json from the active data dir. Returns (cfg, warning)."""
+    path = os.path.join(RES_DIR, rankops.CONFIG_NAME)
+    if not os.path.exists(path):
+        return {"version": 1}, None
+    try:
+        with open(path) as f:
+            return json.load(f), None
+    except (OSError, json.JSONDecodeError) as e:
+        # Report but never clobber a corrupt config file.
+        return {"version": 1}, "rank_config.json unreadable ({}); watch disabled".format(e)
+
+
+def save_config(cfg):
+    path = os.path.join(RES_DIR, rankops.CONFIG_NAME)
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(cfg, f, indent=2)
+    os.replace(tmp, path)
+
+
+def _data_dir_entries(stamp_real):
+    """Classify data-dir entries for rankops.plan_sync. A symlink is 'owned'
+    when its target's parent directory resolves into the watched stamp dir."""
+    entries = {}
+    for name in os.listdir(RES_DIR):
+        full = os.path.join(RES_DIR, name)
+        if os.path.islink(full):
+            target = os.readlink(full)
+            if not os.path.isabs(target):
+                target = os.path.join(os.path.dirname(full), target)
+            entries[name] = {
+                "type": "symlink",
+                "owned": os.path.realpath(os.path.dirname(target)) == stamp_real,
+                "dangling": not os.path.exists(full),
+            }
+        elif os.path.isdir(full):
+            entries[name] = {"type": "dir"}
+        else:
+            entries[name] = {"type": "file"}
+    return entries
+
+
+def sync_symlinks(cfg):
+    """Mirror tag-matching stamp files into RES_DIR as symlinks; prune owned
+    dangling links. Returns a list of warning strings. Never raises."""
+    watch = cfg.get("watch")
+    if not watch:
+        return []
+    stamp_dir = watch.get("stamp_dir", "")
+    tag = watch.get("stamp_tag", "")
+    if not stamp_dir or not tag:
+        return ["watch config incomplete; sync skipped"]
+    try:
+        stamp_files = os.listdir(stamp_dir)
+    except OSError as e:
+        # A vanished source must not tear down the working set.
+        return ["stamp dir unreadable ({}); sync skipped".format(e)]
+    stamp_real = os.path.realpath(stamp_dir)
+    to_link, to_prune, warnings = rankops.plan_sync(
+        stamp_files, _data_dir_entries(stamp_real), tag)
+    for name in to_link:
+        try:
+            os.symlink(os.path.join(stamp_real, name), os.path.join(RES_DIR, name))
+        except OSError as e:
+            warnings.append("link failed for {}: {}".format(name, e))
+    for name in to_prune:
+        try:
+            os.unlink(os.path.join(RES_DIR, name))
+        except OSError as e:
+            warnings.append("prune failed for {}: {}".format(name, e))
+    return warnings
+
+
+def state_to_dict(s):
+    return {"sorted": s.sorted, "n": s.n, "arr": list(s.arr),
+            "stack": list(s.stack), "top": s.top, "p": s.p, "i": s.i,
+            "j": s.j, "l": s.l, "c": s.c}
+
+
+def dict_to_state(d):
+    s = QuickSortState()
+    s.sorted = d["sorted"]; s.n = d["n"]; s.arr = list(d["arr"])
+    s.stack = list(d["stack"]); s.top = d["top"]; s.p = d["p"]
+    s.i = d["i"]; s.j = d["j"]; s.l = d["l"]; s.c = d["c"]
+    return s
+
+
 app = flask.Flask(__name__, static_url_path=args.subdomain, static_folder=RES_DIR)
 app.secret_key = _secrets["secret_key"].encode()
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)
@@ -98,19 +188,39 @@ class RankServer:
         self.state = None
         self.rank_list = []
         self.rev_rank_list = []
+        self.config = {"version": 1}
+        self.insertions = {"queue": [], "active": None}
+        self.warnings = []
 
     def load(self):
+        self.warnings = []
         if not os.path.isdir(RES_DIR):
             return (False, f"Data directory non-existent or broken: {RES_DIR}")
-        files = []
-        for file in os.listdir(RES_DIR):
-            if file.endswith(".txt") or file.endswith(".png") or file.endswith(".mp4"):
-                files.append(file)
+        cfg, cfg_warn = load_config()
+        self.config = cfg
+        if cfg_warn:
+            self.warnings.append(cfg_warn)
+        self.warnings += sync_symlinks(cfg)
+        raw_ins = cfg.get("insertions") or {}
+        self.insertions = {"queue": list(raw_ins.get("queue", [])),
+                           "active": raw_ins.get("active")}
+        files = [f.strip() for f in os.listdir(RES_DIR) if rankops.is_rankable(f)]
         if len(files) == 0:
             return (False, "Data directory has no rankable files (.txt|.png|.mp4)")
         self.mapfilename = os.path.join(RES_DIR, MAPNAME)
-        if not os.path.exists(self.mapfilename):
+        self.logfilename = os.path.join(RES_DIR, LOGNAME)
+        if not os.path.exists(self.mapfilename) or not os.path.exists(self.logfilename):
+            # Fresh init: everything currently present becomes the settled set.
             self.file_map = files
+            if self.insertions["queue"] or self.insertions["active"]:
+                self.insertions = {"queue": [], "active": None}
+                cfg["insertions"] = self.insertions
+                save_config(cfg)
+            self.state = QuickSortState()
+            self.state.n = len(self.file_map)
+            self.state.arr = [i for i in range(self.state.n)]
+            self.state.stack = [0 for _ in range(self.state.n)]
+            self.submitChoice(0)
         else:
             self.file_map = []
             with open(self.mapfilename, "r") as mapfile:
@@ -119,19 +229,44 @@ class RankServer:
                         self.file_map.append(file.strip())
             if len(self.file_map) == 0:
                 return (False, "Empty file map in provided data dir")
-            # TODO check for incongruencies
-        self.logfilename = os.path.join(RES_DIR, LOGNAME)
-        if not os.path.exists(self.logfilename):
-            self.state = QuickSortState()
-            self.state.n = len(self.file_map)
-            self.state.arr = [i for i in range(self.state.n)]
-            self.state.stack = [0 for _ in range(self.state.n)]
-            self.submitChoice(0)
-        else:
             res, self.state = sortStateFromDisk(self.logfilename)
             if not res:
                 return (False, "Sort state loading from file failed")
-            # TODO check for incongruencies
+            d, fmap, ins, result = rankops.reconcile(
+                state_to_dict(self.state), self.file_map, set(files),
+                self.insertions)
+            if result["reset_all"]:
+                os.remove(self.mapfilename)
+                os.remove(self.logfilename)
+                cfg["insertions"] = {"queue": [], "active": None}
+                save_config(cfg)
+                # The recursive load() resets self.warnings; keep this pass's
+                # sync/config warnings visible alongside the fresh init's.
+                carried = self.warnings
+                res = self.load()
+                self.warnings = carried + self.warnings
+                return res
+            if result["changed"]:
+                ok, msg = rankops.validate_state(d, fmap)
+                if not ok:
+                    return (False,
+                            "Sort state reconciliation failed ({}); on-disk "
+                            "state left untouched. Delete {} and {} in the "
+                            "data dir to reset the ranking.".format(
+                                msg, LOGNAME, MAPNAME))
+                self.state = dict_to_state(d)
+                self.file_map = fmap
+                sres, smsg = self.save()
+                if not sres:
+                    return (False, smsg)
+                if result["partitions_restarted"]:
+                    self.warnings.append(
+                        "Removed file(s) overlapped the comparison in progress; "
+                        "the current round was restarted")
+            if ins != self.insertions:
+                cfg["insertions"] = ins
+                save_config(cfg)
+            self.insertions = ins
         self.rank_list = []
         for idx in self.state.arr:
             self.rank_list.append(self.file_map[idx])
@@ -241,21 +376,22 @@ def index():
         rankserver.save()
     
     res, msg = rankserver.load()
+    warn = " | ".join(rankserver.warnings)
     if not res:
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=True, done=False, msg=msg, rlist=[], l="", r="")
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=True, done=False, msg=msg, rlist=[], l="", r="", warn=warn)
     rlist = rankserver.getRankList()
     if rankserver.sortingComplete():
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=True, msg="", rlist=rlist, l="", r="")
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=True, msg="", rlist=rlist, l="", r="", warn=warn)
     else:
         l, r = rankserver.getCompFiles()
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=rlist, l=l, r=r)
+        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=rlist, l=l, r=r, warn=warn)
 
 @bp.route("/intro", methods=["GET"])
 @flask_login.login_required
 def intro():
     global urlroot
     global SHORT_RESDIR
-    return flask.render_template("index.html", urlroot=urlroot, intro=True, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=[], l="", r="")
+    return flask.render_template("index.html", urlroot=urlroot, intro=True, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=[], l="", r="", warn="")
 
 @bp.route("/api/rankables-info", methods=["GET"])
 @flask_login.login_required

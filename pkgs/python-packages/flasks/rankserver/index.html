@@ -515,6 +515,10 @@
 
         <div id="statusMessage" class="status-message"></div>
 
+        {% if warn %}
+        <div class="status-message status-error" style="display: block;">{{ warn }}</div>
+        {% endif %}
+
         {% if intro %}
         <div class="rankables-config">
             <h2>Rankables Directory</h2>
