@@ -197,3 +197,81 @@ def validate_state(state, file_map):
     if state["l"] not in (0, 1) or state["c"] not in (0, 1, 2, 3):
         return False, "invalid comparator fields"
     return True, ""
+
+
+def reconcile(state, file_map, present_files, insertions):
+    """Bring the settled sort state in line with the files actually present.
+
+    present_files: set of rankable filenames in the data dir (post-sync).
+    insertions: {"queue": [names], "active": {"file","lo","hi"} or None}.
+    Returns (state, file_map, insertions, result) as fresh objects, where
+    result = {"changed": bool,          # state/file_map modified -> persist
+              "reset_all": bool,        # settled set emptied -> delete state
+              "partitions_restarted": int}
+    """
+    insertions = {
+        "queue": [f for f in insertions.get("queue", []) if f in present_files],
+        "active": (dict(insertions["active"])
+                   if insertions.get("active")
+                   and insertions["active"]["file"] in present_files
+                   else None),
+    }
+    result = {"changed": False, "reset_all": False, "partitions_restarted": 0}
+
+    missing = [f for f in file_map if f not in present_files]
+    for fname in missing:
+        if len(file_map) == 1:
+            result["reset_all"] = True
+            result["changed"] = True
+            return state, [], {"queue": [], "active": None}, result
+        k = file_map.index(fname)
+        pos = state["arr"].index(k)
+        state, file_map, restarted = remove_index(state, file_map, k)
+        result["changed"] = True
+        if restarted:
+            result["partitions_restarted"] += 1
+        if insertions["active"]:
+            a = insertions["active"]
+            if a["lo"] > pos:
+                a["lo"] -= 1
+            if a["hi"] > pos:
+                a["hi"] -= 1
+
+    known = set(file_map) | set(insertions["queue"])
+    if insertions["active"]:
+        known.add(insertions["active"]["file"])
+    insertions["queue"].extend(sorted(f for f in present_files if f not in known))
+    return state, file_map, insertions, result
+
+
+def insertion_mid(bounds):
+    return (bounds["lo"] + bounds["hi"]) // 2
+
+
+def insertion_done(bounds):
+    return bounds["lo"] >= bounds["hi"]
+
+
+def insertion_step(bounds, prefer_new):
+    """One binary-search comparison. prefer_new=True means the new file beat
+    the element at position insertion_mid(bounds), so it belongs above it
+    (arr is ascending; choose-left maps to LEFT_GREATER)."""
+    bounds = dict(bounds)
+    mid = insertion_mid(bounds)
+    if prefer_new:
+        bounds["lo"] = mid + 1
+    else:
+        bounds["hi"] = mid
+    return bounds
+
+
+def insertion_complete(state, file_map, fname, pos):
+    """Splice a fully-placed new file into a sorted state at arr position pos."""
+    state = dict(state, arr=list(state["arr"]))
+    file_map = list(file_map) + [fname]
+    new_idx = state["n"]
+    state["arr"].insert(pos, new_idx)
+    state["n"] = new_idx + 1
+    state["stack"] = [0] * state["n"]
+    state["top"] = UINT32_MAX
+    return state, file_map

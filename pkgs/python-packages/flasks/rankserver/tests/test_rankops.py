@@ -162,3 +162,108 @@ def test_validate_rejects_malformed():
     bad = dict(state, p=4)                           # pivot not at range high
     assert not rankops.validate_state(bad, fmap)[0]
     assert not rankops.validate_state(state, fmap[:-1])[0]  # map length mismatch
+
+
+def _sorted_state():
+    return (
+        {"sorted": 1, "n": 4, "arr": [3, 1, 0, 2], "stack": [0, 0, 0, 0],
+         "top": UMAX, "p": 0, "i": 0, "j": 0, "l": 1, "c": 0},
+        ["f0", "f1", "f2", "f3"],
+    )
+
+
+def _no_insertions():
+    return {"queue": [], "active": None}
+
+
+def test_reconcile_queues_new_files_sorted():
+    state, fmap = _sorted_state()
+    present = set(fmap) | {"new_b.png", "new_a.png"}
+    s2, m2, ins2, res = rankops.reconcile(state, fmap, present, _no_insertions())
+    assert ins2["queue"] == ["new_a.png", "new_b.png"]
+    assert not res["changed"] and not res["reset_all"]
+    assert m2 == fmap
+
+
+def test_reconcile_dedupes_known_files():
+    state, fmap = _sorted_state()
+    ins = {"queue": ["q.png"], "active": {"file": "a.png", "lo": 1, "hi": 3}}
+    present = set(fmap) | {"q.png", "a.png"}
+    s2, m2, ins2, res = rankops.reconcile(state, fmap, present, ins)
+    assert ins2["queue"] == ["q.png"]
+    assert ins2["active"]["file"] == "a.png"
+
+
+def test_reconcile_removes_missing_and_shifts_active_bounds():
+    state, fmap = _sorted_state()
+    ins = {"queue": [], "active": {"file": "a.png", "lo": 2, "hi": 4}}
+    present = (set(fmap) - {"f1"}) | {"a.png"}   # f1 sits at arr pos 1
+    s2, m2, ins2, res = rankops.reconcile(state, fmap, present, ins)
+    assert res["changed"] and not res["reset_all"]
+    assert m2 == ["f0", "f2", "f3"]
+    assert s2["n"] == 3
+    assert ins2["active"] == {"file": "a.png", "lo": 1, "hi": 3}
+    ok, msg = rankops.validate_state(s2, m2)
+    assert ok, msg
+
+
+def test_reconcile_mid_sort_removal_counts_restart_and_shifts_bounds():
+    state, fmap = _mid_state()
+    # f3 sits inside the active partition (arr pos 4): its removal restarts
+    # that partition; the active insertion's bounds shift past pos 4.
+    ins = {"queue": [], "active": {"file": "a.png", "lo": 5, "hi": 6}}
+    present = (set(fmap) - {"f3"}) | {"a.png"}
+    s2, m2, ins2, res = rankops.reconcile(state, fmap, present, ins)
+    assert res["changed"] and res["partitions_restarted"] == 1
+    assert m2 == ["f0", "f1", "f2", "f4", "f5"]
+    assert ins2["active"] == {"file": "a.png", "lo": 4, "hi": 5}
+    assert ins == {"queue": [], "active": {"file": "a.png", "lo": 5, "hi": 6}}
+    ok, msg = rankops.validate_state(s2, m2)
+    assert ok, msg
+
+
+def test_reconcile_drops_vanished_queue_and_active():
+    state, fmap = _sorted_state()
+    ins = {"queue": ["gone.png"], "active": {"file": "also_gone.png", "lo": 0, "hi": 4}}
+    s2, m2, ins2, res = rankops.reconcile(state, fmap, set(fmap), ins)
+    assert ins2 == {"queue": [], "active": None}
+
+
+def test_reconcile_reset_all_when_settled_set_empties():
+    state = {"sorted": 1, "n": 1, "arr": [0], "stack": [0], "top": UMAX,
+             "p": 0, "i": 0, "j": 0, "l": 1, "c": 0}
+    s2, m2, ins2, res = rankops.reconcile(state, ["only.png"], {"other.png"},
+                                          _no_insertions())
+    assert res["reset_all"]
+    assert m2 == [] and ins2 == {"queue": [], "active": None}
+
+
+def test_insertion_binary_search_converges_high():
+    b = {"lo": 0, "hi": 4}
+    while not rankops.insertion_done(b):
+        b = rankops.insertion_step(b, prefer_new=True)
+    assert b["lo"] == 4  # always preferred -> inserts at the top
+
+
+def test_insertion_binary_search_converges_low():
+    b = {"lo": 0, "hi": 4}
+    while not rankops.insertion_done(b):
+        b = rankops.insertion_step(b, prefer_new=False)
+    assert b["lo"] == 0
+
+
+def test_insertion_step_moves_correct_bound():
+    b = rankops.insertion_step({"lo": 0, "hi": 5}, prefer_new=True)
+    assert b == {"lo": 3, "hi": 5}   # mid=2, new preferred -> after mid
+    b = rankops.insertion_step({"lo": 0, "hi": 5}, prefer_new=False)
+    assert b == {"lo": 0, "hi": 2}
+
+
+def test_insertion_complete_places_file():
+    state, fmap = _sorted_state()
+    s2, m2 = rankops.insertion_complete(state, fmap, "new.png", 2)
+    assert m2 == ["f0", "f1", "f2", "f3", "new.png"]
+    assert s2["arr"] == [3, 1, 4, 0, 2]   # new index 4 spliced at pos 2
+    assert s2["n"] == 5 and len(s2["stack"]) == 5 and s2["top"] == UMAX
+    ok, msg = rankops.validate_state(s2, m2)
+    assert ok, msg
