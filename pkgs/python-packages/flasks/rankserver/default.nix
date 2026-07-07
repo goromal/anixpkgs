@@ -8,6 +8,7 @@
   werkzeug,
   pysorting,
   pillow,
+  ffmpeg-headless,
   strings,
   redirects,
   writeTextFile,
@@ -29,6 +30,12 @@ buildPythonPackage rec {
     cp ${./index.html} $out/${pythonLibDir}/templates/index.html
     cp ${./login.html} $out/${pythonLibDir}/templates/login.html
   '';
+  makeWrapperArgs = [
+    "--prefix"
+    "PATH"
+    ":"
+    "${ffmpeg-headless}/bin"
+  ];
   propagatedBuildInputs = [
     flask
     flask-login
@@ -41,7 +48,7 @@ buildPythonPackage rec {
   meta = {
     description = "A portable webserver for ranking files via binary manual comparisons, powered by Python's flask library.";
     longDescription = ''
-      Spins up a flask webserver (on the specified port) whose purpose is to help a user rank files in the chosen `data-dir` directory via manual binary comparisons. The ranking is done via an incremental "RESTful" sorting strategy implemented within the [pysorting](./pysorting.md) library. State is created and maintained within the `data-dir` directory so that the ranking exercise can pick back up where it left off between different spawnings of the server. At this point, only the ranking of `.txt` and `.png` files is possible; other file types in `data-dir` will be ignored.    
+      Spins up a flask webserver (on the specified port) whose purpose is to help a user rank files in the chosen `data-dir` directory via manual binary comparisons. The ranking is done via an incremental "RESTful" sorting strategy implemented within the [pysorting](./pysorting.md) library. State is created and maintained within the `data-dir` directory so that the ranking exercise can pick back up where it left off between different spawnings of the server. At this point, only the ranking of `.txt`, `.png`, and `.mp4` files is possible; other file types in `data-dir` will be ignored.
     '';
     autoGenUsageCmd = "--help";
   };

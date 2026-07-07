@@ -296,6 +296,28 @@
             cursor: zoom-in;
         }
 
+        /* Video entries in the ranked list are a cached poster <img> (lazy, cheap)
+           with a play glyph overlaid so they read as playable; the real <video>
+           is only created in the lightbox on click. */
+        .rank-video-poster {
+            position: relative;
+            display: inline-block;
+            line-height: 0;
+        }
+
+        .rank-video-poster::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-style: solid;
+            border-width: 9px 0 9px 16px;
+            border-color: transparent transparent transparent rgba(255, 255, 255, 0.92);
+            filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+            pointer-events: none;
+        }
+
         /* ===== Lightbox (maximize on click) ===== */
         .lightbox {
             display: none;
@@ -540,7 +562,7 @@
                     {% if l.endswith('.txt') %}
                     <span class="txt-name">{{ l }}</span>
                     {% elif l.endswith('.mp4') %}
-                    <video src="{{ urlroot }}media/{{ l }}" controls preload="metadata"></video>
+                    <video src="{{ urlroot }}media/{{ l }}#t=0.001" controls preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ l }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -554,7 +576,7 @@
                     {% if r.endswith('.txt') %}
                     <span class="txt-name">{{ r }}</span>
                     {% elif r.endswith('.mp4') %}
-                    <video src="{{ urlroot }}media/{{ r }}" controls preload="metadata"></video>
+                    <video src="{{ urlroot }}media/{{ r }}#t=0.001" controls preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ r }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -574,8 +596,9 @@
                     {% if item.endswith('.txt') %}
                     <span class="rank-txt">{{ item }}</span>
                     {% elif item.endswith('.mp4') %}
-                    <video class="rank-media" src="{{ urlroot }}media/{{ item }}" preload="metadata" muted
-                           data-full="{{ urlroot }}media/{{ item }}" data-type="video"></video>
+                    <span class="rank-media rank-video-poster" data-full="{{ urlroot }}media/{{ item }}" data-type="video">
+                        <img src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt="" />
+                    </span>
                     {% else %}
                     <img class="rank-media" src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt=""
                          data-full="{{ urlroot }}thumb/{{ item }}?w=1600" data-type="image" />
@@ -613,6 +636,7 @@
                 el.src = src;
                 el.controls = true;
                 el.autoplay = true;
+                el.playsInline = true;
             } else {
                 el = document.createElement('img');
                 el.src = src;
