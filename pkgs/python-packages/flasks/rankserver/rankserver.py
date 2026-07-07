@@ -324,6 +324,44 @@ class RankServer:
             return (False, "Failed to persist sort state to disk")
         return (True, "")
 
+    def insertionPending(self):
+        return bool(self.insertions.get("queue") or self.insertions.get("active"))
+
+    def insertionActive(self):
+        return self.insertions.get("active") is not None
+
+    def activateNextInsertion(self):
+        ins = self.insertions
+        fname = ins["queue"].pop(0)
+        ins["active"] = {"file": fname, "lo": 0, "hi": self.state.n}
+        self.config["insertions"] = ins
+        save_config(self.config)
+
+    def insertionCompFiles(self):
+        a = self.insertions["active"]
+        mid = rankops.insertion_mid(a)
+        return (a["file"], self.file_map[self.state.arr[mid]])
+
+    def submitInsertionChoice(self, prefer_new):
+        a = self.insertions["active"]
+        b = rankops.insertion_step(a, prefer_new)
+        a["lo"], a["hi"] = b["lo"], b["hi"]
+        if rankops.insertion_done(a):
+            d, fmap = rankops.insertion_complete(
+                state_to_dict(self.state), self.file_map, a["file"], a["lo"])
+            self.state = dict_to_state(d)
+            self.file_map = fmap
+            sres, smsg = self.save()
+            if not sres:
+                # Persist nothing: the next load() re-reads the old on-disk
+                # state and the unchanged config, so this tap is simply asked
+                # again instead of silently re-queueing or double-inserting.
+                return (False, "insertion save failed: {}".format(smsg))
+            self.insertions["active"] = None
+        self.config["insertions"] = self.insertions
+        save_config(self.config)
+        return (True, "")
+
 rankserver = RankServer()
 
 @login_manager.user_loader
@@ -365,33 +403,63 @@ def index():
     global args
     global rankserver
     global urlroot
+    post_err = ""
     if flask.request.method == "POST":
-        if rankserver.sortingComplete():
-            rankserver.resetState()
+        if rankserver.insertionActive():
+            ires, imsg = rankserver.submitInsertionChoice(
+                "choose_l" in flask.request.form)
+            if not ires:
+                post_err = imsg
+        elif rankserver.sortingComplete():
+            if not rankserver.insertionPending():
+                rankserver.resetState()
+                rankserver.save()
         else:
             if "choose_l" in flask.request.form:
                 rankserver.submitChoice(int(ComparatorResult.LEFT_GREATER))
             else:
                 rankserver.submitChoice(int(ComparatorResult.LEFT_LESS))
-        rankserver.save()
-    
+            rankserver.save()
+
     res, msg = rankserver.load()
+    if post_err:
+        # load() rebuilt self.warnings; re-attach the POST-time failure.
+        rankserver.warnings.append(post_err)
     warn = " | ".join(rankserver.warnings)
     if not res:
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=True, done=False, msg=msg, rlist=[], l="", r="", warn=warn)
+        return flask.render_template("index.html", urlroot=urlroot, intro=False,
+                                     datadir=SHORT_RESDIR, err=True, done=False,
+                                     msg=msg, rlist=[], l="", r="", warn=warn,
+                                     insert_note="")
     rlist = rankserver.getRankList()
     if rankserver.sortingComplete():
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=True, msg="", rlist=rlist, l="", r="", warn=warn)
-    else:
-        l, r = rankserver.getCompFiles()
-        return flask.render_template("index.html", urlroot=urlroot, intro=False, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=rlist, l=l, r=r, warn=warn)
+        if rankserver.insertionPending():
+            if not rankserver.insertionActive():
+                rankserver.activateNextInsertion()
+            l, r = rankserver.insertionCompFiles()
+            note = "Placing new file — {} more in queue".format(
+                len(rankserver.insertions["queue"]))
+            return flask.render_template("index.html", urlroot=urlroot,
+                                         intro=False, datadir=SHORT_RESDIR,
+                                         err=False, done=False, msg="",
+                                         rlist=rlist, l=l, r=r, warn=warn,
+                                         insert_note=note)
+        return flask.render_template("index.html", urlroot=urlroot, intro=False,
+                                     datadir=SHORT_RESDIR, err=False, done=True,
+                                     msg="", rlist=rlist, l="", r="", warn=warn,
+                                     insert_note="")
+    l, r = rankserver.getCompFiles()
+    return flask.render_template("index.html", urlroot=urlroot, intro=False,
+                                 datadir=SHORT_RESDIR, err=False, done=False,
+                                 msg="", rlist=rlist, l=l, r=r, warn=warn,
+                                 insert_note="")
 
 @bp.route("/intro", methods=["GET"])
 @flask_login.login_required
 def intro():
     global urlroot
     global SHORT_RESDIR
-    return flask.render_template("index.html", urlroot=urlroot, intro=True, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=[], l="", r="", warn="")
+    return flask.render_template("index.html", urlroot=urlroot, intro=True, datadir=SHORT_RESDIR, err=False, done=False, msg="", rlist=[], l="", r="", warn="", insert_note="")
 
 @bp.route("/api/rankables-info", methods=["GET"])
 @flask_login.login_required

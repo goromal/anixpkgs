@@ -559,6 +559,9 @@
             </form>
         </div>
         {% else %}
+        {% if insert_note %}
+        <p class="compare-prompt" style="color: #1cc88a; font-weight: 600;">{{ insert_note }}</p>
+        {% endif %}
         <p class="compare-prompt">Which do you prefer?</p>
         <div class="compare-row">
             <div class="compare-card">
