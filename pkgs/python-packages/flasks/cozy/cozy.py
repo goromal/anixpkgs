@@ -235,6 +235,28 @@ def create_app(store, workflows, workflow_dir, subdomain="/cozy",
             return flask.jsonify({"error": str(e)}), 500
         return flask.jsonify({"ok": True})
 
+    @bp.route("/api/flush", methods=["POST"])
+    @flask_login.login_required
+    def flush():
+        # Run a flush.sh (if present) in the input and output dirs. The scripts
+        # are placed there out-of-band by the admin; a missing one is a no-op, so
+        # the button is always available and simply flushes whatever is wired up.
+        ran = 0
+        for d in (input_dir, output_dir):
+            script = os.path.join(d, "flush.sh")
+            if not os.path.isfile(script):
+                continue
+            try:
+                subprocess.run(["bash", script], check=True, timeout=60,
+                               capture_output=True, text=True, cwd=d)
+            except subprocess.CalledProcessError as e:
+                return flask.jsonify(
+                    {"error": (e.stderr or "").strip() or f"flush failed in {d}"}), 500
+            except Exception as e:
+                return flask.jsonify({"error": str(e)}), 500
+            ran += 1
+        return flask.jsonify({"ok": True, "ran": ran})
+
     app.register_blueprint(bp)
     login_manager.init_app(app)
     login_manager.login_view = prefix + "login"

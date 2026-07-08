@@ -212,3 +212,55 @@ def test_restart_reports_command_failure(tmp_path, monkeypatch):
     r = c.post("/cozy/api/restart-comfyui")
     assert r.status_code == 500
     assert r.get_json()["error"] == "unit not found"
+
+
+def _flush_client(tmp_path, monkeypatch):
+    monkeypatch.setattr(cozy, "_check_password", lambda pw: True)
+    in_dir = tmp_path / "input"
+    in_dir.mkdir()
+    out_dir = tmp_path / "output"
+    out_dir.mkdir()
+    app = cozy.create_app(store=FakeStore(), workflows=["imggen"],
+                          workflow_dir=str(tmp_path), subdomain="/cozy",
+                          input_dir=str(in_dir), output_dir=str(out_dir))
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
+    c = app.test_client()
+    c._in_dir, c._out_dir = in_dir, out_dir
+    return c
+
+
+def test_flush_button_always_present(tmp_path, monkeypatch):
+    c = _flush_client(tmp_path, monkeypatch)
+    _login(c)
+    assert b'id="flush"' in c.get("/cozy/").data
+
+
+def test_flush_runs_existing_scripts_only(tmp_path, monkeypatch):
+    calls = []
+    monkeypatch.setattr(cozy.subprocess, "run",
+                        lambda cmd, **kw: calls.append((cmd, kw.get("cwd"))) or None)
+    c = _flush_client(tmp_path, monkeypatch)
+    _login(c)
+    # Neither script exists yet: no-op, ran == 0.
+    r = c.post("/cozy/api/flush")
+    assert r.status_code == 200 and r.get_json() == {"ok": True, "ran": 0}
+    assert calls == []
+    # Only the input-dir script exists: run just that one.
+    script = c._in_dir / "flush.sh"
+    script.write_text("#!/usr/bin/env bash\n")
+    r = c.post("/cozy/api/flush")
+    assert r.status_code == 200 and r.get_json()["ran"] == 1
+    assert calls == [(["bash", str(script)], str(c._in_dir))]
+
+
+def test_flush_reports_script_failure(tmp_path, monkeypatch):
+    def boom(cmd, **kw):
+        raise cozy.subprocess.CalledProcessError(1, cmd, stderr="disk full")
+    c = _flush_client(tmp_path, monkeypatch)
+    (c._out_dir / "flush.sh").write_text("#!/usr/bin/env bash\n")
+    monkeypatch.setattr(cozy.subprocess, "run", boom)
+    _login(c)
+    r = c.post("/cozy/api/flush")
+    assert r.status_code == 500
+    assert r.get_json()["error"] == "disk full"
