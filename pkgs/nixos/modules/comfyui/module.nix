@@ -232,6 +232,12 @@ in
           description = "cozy ComfyUI image-generation UI";
           after = [ "comfyui.service" ];
           unitConfig.StartLimitIntervalSec = 0;
+          # Tools the input/output flush.sh scripts need when cozy's Flush button runs them.
+          path = [
+            pkgs.bash
+            pkgs.openssh
+            pkgs.gawk
+          ];
           serviceConfig = {
             Type = "simple";
             ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";

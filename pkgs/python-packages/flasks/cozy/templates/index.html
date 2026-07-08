@@ -34,8 +34,11 @@
         button:disabled { opacity:0.5; cursor:not-allowed; }
         button.clear { background:#6c757d; box-shadow:none; }
         button.restart { background:#e74a3b; box-shadow:none; }
+        button.flush { background:#36b9cc; box-shadow:none; }
         .restart-row { margin-top:32px; padding-top:20px; border-top:1px solid #e9ecef; }
         .restart-row button { margin-top:0; }
+        .flush-row { margin-top:16px; }
+        .flush-row button { margin-top:0; }
         .prompt-actions { display:flex; gap:8px; margin-top:6px; }
         button.secondary {
             margin-top:0; width:auto; padding:6px 14px; font-size:0.85rem; font-weight:600;
@@ -107,6 +110,10 @@
             <button class="restart" id="restart">Restart ComfyUI</button>
         </div>
         {% endif %}
+
+        <div class="flush-row">
+            <button class="flush" id="flush">Flush</button>
+        </div>
     </div>
 
     <script>
@@ -271,6 +278,25 @@
                 }
             });
         }
+
+        const flushBtn = document.getElementById("flush");
+        flushBtn.addEventListener("click", async () => {
+            if (!confirm("Flush the input and output directories?")) return;
+            showError("");
+            const orig = flushBtn.textContent;
+            flushBtn.disabled = true;
+            flushBtn.textContent = "Flushing…";
+            try {
+                const r = await fetch(root + "api/flush", { method: "POST" });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) showError(d.error || "flush failed");
+                else flushBtn.textContent = d.ran ? "✓ Flushed" : "Nothing to flush";
+            } catch (e) {
+                showError("flush failed: " + e.message);
+            } finally {
+                setTimeout(() => { flushBtn.textContent = orig; flushBtn.disabled = false; }, 1500);
+            }
+        });
 
         // --- Copy / Paste prompt helpers ---
         const copyBtn = document.getElementById("copy-btn");
