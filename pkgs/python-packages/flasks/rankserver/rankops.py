@@ -26,6 +26,16 @@ def is_rankable(name):
     return name.lower().endswith(RANKABLE_EXTS)
 
 
+def get_watches(cfg):
+    """Normalize watch config to a list of {stamp_dir, stamp_tag} dicts.
+    Accepts the current "watches" list or the legacy single-"watch" dict."""
+    watches = cfg.get("watches")
+    if watches is None:
+        legacy = cfg.get("watch")
+        watches = [legacy] if legacy else []
+    return [w for w in watches if isinstance(w, dict)]
+
+
 def stamp_prefix(tag):
     return "stamped.{}.".format(tag)
 

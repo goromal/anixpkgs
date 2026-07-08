@@ -354,6 +354,33 @@
             user-select: none;
         }
 
+        /* Up/down list traversal while zoomed: stacked on the right edge,
+           vertically centered, so they never cover the media's center. */
+        .lightbox-nav {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            width: 52px;
+            height: 52px;
+            border: none;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            user-select: none;
+            touch-action: manipulation;
+            transition: background-color 0.15s;
+        }
+
+        .lightbox-nav:hover:not(:disabled) { background-color: rgba(255, 255, 255, 0.35); }
+
+        .lightbox-nav:disabled { opacity: 0.25; cursor: default; }
+
+        #lightboxPrev { transform: translateY(-60px); }
+        #lightboxNext { transform: translateY(8px); }
+
         .rank-list .rank-txt {
             font-family: monospace;
             font-weight: 600;
@@ -479,6 +506,24 @@
             min-width: 100px;
         }
 
+        .watch-list {
+            list-style: none;
+            margin: 14px 0 0 0;
+            padding: 0;
+        }
+
+        .watch-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            padding: 8px 0;
+        }
+
+        .watch-list li + li {
+            border-top: 1px solid #f1f3f5;
+        }
+
         .start-row {
             margin: 24px 0;
         }
@@ -547,15 +592,15 @@
         <div class="rankables-config">
             <h2>Stamp Watch</h2>
             <p class="help">Optionally mirror files carrying a chosen stamp tag from a
-               stampserver directory into this rankables directory. Symlinks are kept
-               in sync automatically; newly stamped files queue up for placement into
-               the existing ranking.</p>
+               stampserver directory into this rankables directory. Multiple watch
+               targets can be active at once. Symlinks are kept in sync automatically;
+               newly stamped files queue up for placement into the existing ranking.</p>
             <div class="rankables-realpath">
                 <span class="realpath-label">Status:</span>
                 <span class="realpath-value" id="watchStatus">Loading...</span>
-                <button class="btn btn-sm" onclick="openWatchConfig()">Configure&hellip;</button>
-                <button class="btn btn-sm btn-danger" onclick="clearWatchConfig()">Clear</button>
+                <button class="btn btn-sm" onclick="openWatchConfig()">Add&hellip;</button>
             </div>
+            <ul class="watch-list" id="watchList"></ul>
             <div class="rankables-realpath" id="watchTagRow" style="display: none;">
                 <span class="realpath-label">Tag for <span id="watchChosenDir"></span>:</span>
                 <select id="watchTagSelect"></select>
@@ -590,7 +635,7 @@
                     {% if l.endswith('.txt') %}
                     <span class="txt-name">{{ l }}</span>
                     {% elif l.endswith('.mp4') %}
-                    <video src="{{ urlroot }}media/{{ l }}#t=0.001" controls preload="metadata" playsinline></video>
+                    <video src="{{ urlroot }}media/{{ l }}#t=0.001" controls loop preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ l }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -604,7 +649,7 @@
                     {% if r.endswith('.txt') %}
                     <span class="txt-name">{{ r }}</span>
                     {% elif r.endswith('.mp4') %}
-                    <video src="{{ urlroot }}media/{{ r }}#t=0.001" controls preload="metadata" playsinline></video>
+                    <video src="{{ urlroot }}media/{{ r }}#t=0.001" controls loop preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ r }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -642,6 +687,8 @@
     <div class="lightbox" id="lightbox" onclick="closeLightbox()">
         <span class="lightbox-close">&times;</span>
         <div class="lightbox-content" id="lightboxContent"></div>
+        <button class="lightbox-nav" id="lightboxPrev" onclick="lightboxStep(-1, event)" title="Previous (higher rank)">&#9650;</button>
+        <button class="lightbox-nav" id="lightboxNext" onclick="lightboxStep(1, event)" title="Next (lower rank)">&#9660;</button>
     </div>
 
     <script>
@@ -655,38 +702,63 @@
 
         // ===== LIGHTBOX (maximize ranked-list media on click) =====
 
-        function openLightbox(type, src) {
+        // Zoomable ranked-list entries in rank order; the lightbox tracks an
+        // index into this so up/down traverses the list (skipping .txt items,
+        // which have no media to zoom).
+        const rankMedia = Array.from(document.querySelectorAll('.rank-media'));
+        let lightboxIndex = -1;
+
+        function showLightboxItem(index) {
+            const item = rankMedia[index];
             const content = document.getElementById('lightboxContent');
             content.innerHTML = '';
             let el;
-            if (type === 'video') {
+            if (item.dataset.type === 'video') {
                 el = document.createElement('video');
-                el.src = src;
+                el.src = item.dataset.full;
                 el.controls = true;
                 el.autoplay = true;
+                el.loop = true;
                 el.playsInline = true;
             } else {
                 el = document.createElement('img');
-                el.src = src;
+                el.src = item.dataset.full;
             }
             // Clicks on the media itself shouldn't dismiss the overlay (e.g. video
             // controls); dismissal happens by clicking the dark backdrop or close.
             el.addEventListener('click', (e) => e.stopPropagation());
             content.appendChild(el);
+            lightboxIndex = index;
+            document.getElementById('lightboxPrev').disabled = index <= 0;
+            document.getElementById('lightboxNext').disabled = index >= rankMedia.length - 1;
+        }
+
+        function openLightbox(index) {
+            showLightboxItem(index);
             document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        function lightboxStep(delta, e) {
+            e.stopPropagation();
+            const next = lightboxIndex + delta;
+            if (next >= 0 && next < rankMedia.length) showLightboxItem(next);
         }
 
         function closeLightbox() {
             document.getElementById('lightbox').style.display = 'none';
             document.getElementById('lightboxContent').innerHTML = '';
+            lightboxIndex = -1;
         }
 
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeLightbox();
+            if (lightboxIndex < 0) return;
+            if (e.key === 'ArrowUp') { e.preventDefault(); lightboxStep(-1, e); }
+            if (e.key === 'ArrowDown') { e.preventDefault(); lightboxStep(1, e); }
         });
 
-        document.querySelectorAll('.rank-media').forEach((el) => {
-            el.addEventListener('click', () => openLightbox(el.dataset.type, el.dataset.full));
+        rankMedia.forEach((el, i) => {
+            el.addEventListener('click', () => openLightbox(i));
         });
 
         // ===== RANKABLES DIR PICKER =====
@@ -852,12 +924,31 @@
                 .then(r => r.json())
                 .then(data => {
                     const el = document.getElementById('watchStatus');
+                    const list = document.getElementById('watchList');
+                    list.innerHTML = '';
                     if (data.error) { el.textContent = data.error; return; }
-                    if (!data.watch) { el.textContent = 'Not watching'; return; }
-                    let txt = 'Watching ' + data.watch.stamp_dir + ' for tag "'
-                        + data.watch.stamp_tag + '" — ' + data.linked_count + ' linked';
+                    if (!data.watches || data.watches.length === 0) {
+                        el.textContent = 'Not watching';
+                        return;
+                    }
+                    let txt = data.watches.length + ' watch target'
+                        + (data.watches.length > 1 ? 's' : '');
                     if (data.queue_len > 0) txt += ' (' + data.queue_len + ' queued)';
                     el.textContent = txt;
+                    data.watches.forEach(w => {
+                        const li = document.createElement('li');
+                        const span = document.createElement('span');
+                        span.className = 'realpath-value';
+                        span.textContent = w.stamp_dir + ' — tag "' + w.stamp_tag
+                            + '" — ' + w.linked_count + ' linked';
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm btn-danger';
+                        btn.textContent = 'Remove';
+                        btn.onclick = () => removeWatch(w.stamp_dir, w.stamp_tag);
+                        li.appendChild(span);
+                        li.appendChild(btn);
+                        list.appendChild(li);
+                    });
                 })
                 .catch(() => {
                     document.getElementById('watchStatus').textContent = '(error loading)';
@@ -888,7 +979,7 @@
             .then(data => {
                 if (data.success) {
                     cancelWatchConfig();
-                    showStatus('Watch configured; ' + data.linked_count + ' file(s) linked'
+                    showStatus('Watch added; ' + data.linked_count + ' file(s) linked'
                         + (data.warnings && data.warnings.length ? ' — ' + data.warnings.join('; ') : ''));
                     loadWatchInfo();
                 } else {
@@ -898,12 +989,16 @@
             .catch(err => showStatus('Error: ' + err.message, true));
         }
 
-        function clearWatchConfig() {
-            if (!confirm('Stop watching? Existing symlinks are kept.')) return;
-            fetch('{{ urlroot }}api/clear-watch-config', {method: 'POST'})
+        function removeWatch(dir, tag) {
+            if (!confirm('Stop watching ' + dir + ' for tag "' + tag + '"?\nExisting symlinks are kept.')) return;
+            fetch('{{ urlroot }}api/clear-watch-config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stamp_dir: dir, stamp_tag: tag})
+            })
             .then(r => r.json())
             .then(data => {
-                if (data.success) { cancelWatchConfig(); showStatus('Watch cleared'); loadWatchInfo(); }
+                if (data.success) { showStatus('Watch removed'); loadWatchInfo(); }
                 else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
             })
             .catch(err => showStatus('Error: ' + err.message, true));

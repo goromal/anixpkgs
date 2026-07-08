@@ -17,6 +17,20 @@ def test_scan_stamps_empty():
     assert rankops.scan_stamps(["plain.png", "x.jpg"]) == {}
 
 
+def test_get_watches_normalizes_legacy_and_list():
+    assert rankops.get_watches({}) == []
+    assert rankops.get_watches({"watch": None}) == []
+    legacy = {"watch": {"stamp_dir": "/s", "stamp_tag": "t"}}
+    assert rankops.get_watches(legacy) == [{"stamp_dir": "/s", "stamp_tag": "t"}]
+    multi = {"watches": [{"stamp_dir": "/a", "stamp_tag": "x"},
+                         {"stamp_dir": "/b", "stamp_tag": "y"}]}
+    assert rankops.get_watches(multi) == multi["watches"]
+    # "watches" takes precedence over a stale legacy key; junk entries dropped
+    both = {"watches": [{"stamp_dir": "/a", "stamp_tag": "x"}, "junk"],
+            "watch": {"stamp_dir": "/old", "stamp_tag": "z"}}
+    assert rankops.get_watches(both) == [{"stamp_dir": "/a", "stamp_tag": "x"}]
+
+
 def test_plan_sync_links_missing_matches():
     to_link, to_prune, warns = rankops.plan_sync(
         ["stamped.t.a.png", "stamped.t.b.mp4", "stamped.u.c.png", "stamped.t.d.jpg"],
