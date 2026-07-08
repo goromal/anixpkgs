@@ -515,6 +515,10 @@
 
         <div id="statusMessage" class="status-message"></div>
 
+        {% if warn %}
+        <div class="status-message status-error" style="display: block;">{{ warn }}</div>
+        {% endif %}
+
         {% if intro %}
         <div class="rankables-config">
             <h2>Rankables Directory</h2>
@@ -530,12 +534,33 @@
                 <div class="dir-picker-header">
                     <span class="dir-picker-path" id="pickerCurrentPath"></span>
                     <button class="btn btn-sm" onclick="pickerNavigateUp()">&#8593; Up</button>
+                    <button class="btn btn-sm" onclick="pickerNewFolder()">+ New Folder</button>
                 </div>
                 <ul class="dir-list" id="dirList"></ul>
                 <div class="dir-picker-actions">
                     <button class="btn btn-sm btn-danger" onclick="closeDirPicker()">Cancel</button>
                     <button class="btn btn-sm" onclick="selectPickerDir()">Select This Directory</button>
                 </div>
+            </div>
+        </div>
+
+        <div class="rankables-config">
+            <h2>Stamp Watch</h2>
+            <p class="help">Optionally mirror files carrying a chosen stamp tag from a
+               stampserver directory into this rankables directory. Symlinks are kept
+               in sync automatically; newly stamped files queue up for placement into
+               the existing ranking.</p>
+            <div class="rankables-realpath">
+                <span class="realpath-label">Status:</span>
+                <span class="realpath-value" id="watchStatus">Loading...</span>
+                <button class="btn btn-sm" onclick="openWatchConfig()">Configure&hellip;</button>
+                <button class="btn btn-sm btn-danger" onclick="clearWatchConfig()">Clear</button>
+            </div>
+            <div class="rankables-realpath" id="watchTagRow" style="display: none;">
+                <span class="realpath-label">Tag for <span id="watchChosenDir"></span>:</span>
+                <select id="watchTagSelect"></select>
+                <button class="btn btn-sm" onclick="saveWatchConfig()">Save</button>
+                <button class="btn btn-sm btn-danger" onclick="cancelWatchConfig()">Cancel</button>
             </div>
         </div>
 
@@ -555,6 +580,9 @@
             </form>
         </div>
         {% else %}
+        {% if insert_note %}
+        <p class="compare-prompt" style="color: #1cc88a; font-weight: 600;">{{ insert_note }}</p>
+        {% endif %}
         <p class="compare-prompt">Which do you prefer?</p>
         <div class="compare-row">
             <div class="compare-card">
@@ -666,6 +694,8 @@
         {% if intro %}
         let _pickerPath = '/';
         let _defaultPath = null;
+        let _pickerMode = 'rankables';   // 'rankables' | 'stampdir'
+        let _watchDir = null;
 
         function loadRankablesInfo() {
             fetch('{{ urlroot }}api/rankables-info')
@@ -681,6 +711,8 @@
         }
 
         function openDirPicker() {
+            _pickerMode = 'rankables';
+            document.getElementById('watchTagRow').style.display = 'none';
             document.getElementById('dirPicker').style.display = 'block';
             loadPickerDirs(_pickerPath);
         }
@@ -727,6 +759,36 @@
         }
 
         function selectPickerDir() {
+            if (_pickerMode === 'stampdir') {
+                _watchDir = _pickerPath;
+                closeDirPicker();
+                document.getElementById('watchChosenDir').textContent = _watchDir;
+                fetch('{{ urlroot }}api/list-stamps', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({path: _watchDir})
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) { showStatus('Error: ' + data.error, true); return; }
+                    const sel = document.getElementById('watchTagSelect');
+                    sel.innerHTML = '';
+                    const tags = Object.entries(data.tags);
+                    if (tags.length === 0) {
+                        showStatus('No stamped rankable files found in ' + _watchDir, true);
+                        return;
+                    }
+                    tags.forEach(([tag, count]) => {
+                        const opt = document.createElement('option');
+                        opt.value = tag;
+                        opt.textContent = tag + ' (' + count + ')';
+                        sel.appendChild(opt);
+                    });
+                    document.getElementById('watchTagRow').style.display = 'flex';
+                })
+                .catch(err => showStatus('Error: ' + err.message, true));
+                return;
+            }
             if (!confirm('Set rankables directory to:\n' + _pickerPath)) return;
             fetch('{{ urlroot }}api/set-rankables-dir', {
                 method: 'POST',
@@ -739,6 +801,7 @@
                     closeDirPicker();
                     document.getElementById('rankablesRealPath').textContent = data.real_path;
                     showStatus('Rankables directory updated to: ' + data.real_path);
+                    loadWatchInfo();
                 } else {
                     showStatus('Error: ' + (data.error || 'Unknown error'), true);
                 }
@@ -760,6 +823,7 @@
                     closeDirPicker();
                     document.getElementById('rankablesRealPath').textContent = data.real_path;
                     showStatus('Rankables directory reset to default: ' + data.real_path);
+                    loadWatchInfo();
                 } else {
                     showStatus('Error: ' + (data.error || 'Unknown error'), true);
                 }
@@ -767,7 +831,86 @@
             .catch(err => showStatus('Error: ' + err.message, true));
         }
 
+        function pickerNewFolder() {
+            const name = prompt('New folder name (inside ' + _pickerPath + '):');
+            if (!name) return;
+            fetch('{{ urlroot }}api/make-dir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath, name: name})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { loadPickerDirs(_pickerPath); }
+                else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function loadWatchInfo() {
+            fetch('{{ urlroot }}api/watch-config')
+                .then(r => r.json())
+                .then(data => {
+                    const el = document.getElementById('watchStatus');
+                    if (data.error) { el.textContent = data.error; return; }
+                    if (!data.watch) { el.textContent = 'Not watching'; return; }
+                    let txt = 'Watching ' + data.watch.stamp_dir + ' for tag "'
+                        + data.watch.stamp_tag + '" — ' + data.linked_count + ' linked';
+                    if (data.queue_len > 0) txt += ' (' + data.queue_len + ' queued)';
+                    el.textContent = txt;
+                })
+                .catch(() => {
+                    document.getElementById('watchStatus').textContent = '(error loading)';
+                });
+        }
+
+        function openWatchConfig() {
+            _pickerMode = 'stampdir';
+            document.getElementById('watchTagRow').style.display = 'none';
+            document.getElementById('dirPicker').style.display = 'block';
+            loadPickerDirs(_pickerPath);
+        }
+
+        function cancelWatchConfig() {
+            document.getElementById('watchTagRow').style.display = 'none';
+            _watchDir = null;
+        }
+
+        function saveWatchConfig() {
+            const tag = document.getElementById('watchTagSelect').value;
+            if (!_watchDir || !tag) { showStatus('Choose a directory and tag first', true); return; }
+            fetch('{{ urlroot }}api/set-watch-config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stamp_dir: _watchDir, stamp_tag: tag})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    cancelWatchConfig();
+                    showStatus('Watch configured; ' + data.linked_count + ' file(s) linked'
+                        + (data.warnings && data.warnings.length ? ' — ' + data.warnings.join('; ') : ''));
+                    loadWatchInfo();
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function clearWatchConfig() {
+            if (!confirm('Stop watching? Existing symlinks are kept.')) return;
+            fetch('{{ urlroot }}api/clear-watch-config', {method: 'POST'})
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { cancelWatchConfig(); showStatus('Watch cleared'); loadWatchInfo(); }
+                else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
         loadRankablesInfo();
+        loadWatchInfo();
         {% endif %}
     </script>
 </body>
