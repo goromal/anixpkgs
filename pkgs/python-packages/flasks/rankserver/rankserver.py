@@ -108,9 +108,9 @@ def save_config(cfg):
     os.replace(tmp, path)
 
 
-def _data_dir_entries(stamp_real):
+def _data_dir_entries(stamp_reals):
     """Classify data-dir entries for rankops.plan_sync. A symlink is 'owned'
-    when its target's parent directory resolves into the watched stamp dir."""
+    when its target's parent directory resolves into any watched stamp dir."""
     entries = {}
     for name in os.listdir(RES_DIR):
         full = os.path.join(RES_DIR, name)
@@ -120,7 +120,7 @@ def _data_dir_entries(stamp_real):
                 target = os.path.join(os.path.dirname(full), target)
             entries[name] = {
                 "type": "symlink",
-                "owned": os.path.realpath(os.path.dirname(target)) == stamp_real,
+                "owned": os.path.realpath(os.path.dirname(target)) in stamp_reals,
                 "dangling": not os.path.exists(full),
             }
         elif os.path.isdir(full):
@@ -133,27 +133,39 @@ def _data_dir_entries(stamp_real):
 def sync_symlinks(cfg):
     """Mirror tag-matching stamp files into RES_DIR as symlinks; prune owned
     dangling links. Returns a list of warning strings. Never raises."""
-    watch = cfg.get("watch")
-    if not watch:
+    watches = rankops.get_watches(cfg)
+    if not watches:
         return []
-    stamp_dir = watch.get("stamp_dir", "")
-    tag = watch.get("stamp_tag", "")
-    if not stamp_dir or not tag:
-        return ["watch config incomplete; sync skipped"]
-    try:
-        stamp_files = os.listdir(stamp_dir)
-    except OSError as e:
-        # A vanished source must not tear down the working set.
-        return ["stamp dir unreadable ({}); sync skipped".format(e)]
-    stamp_real = os.path.realpath(stamp_dir)
-    to_link, to_prune, warnings = rankops.plan_sync(
-        stamp_files, _data_dir_entries(stamp_real), tag)
-    for name in to_link:
+    warnings = []
+    listings = []  # (stamp_real, stamp_files, tag)
+    for watch in watches:
+        stamp_dir = watch.get("stamp_dir", "")
+        tag = watch.get("stamp_tag", "")
+        if not stamp_dir or not tag:
+            warnings.append("watch config incomplete; sync skipped for one entry")
+            continue
+        try:
+            stamp_files = os.listdir(stamp_dir)
+        except OSError as e:
+            # A vanished source must not tear down the working set.
+            warnings.append("stamp dir unreadable ({}); sync skipped".format(e))
+            continue
+        listings.append((os.path.realpath(stamp_dir), stamp_files, tag))
+    entries = _data_dir_entries({real for real, _, _ in listings})
+    to_link = {}       # name -> stamp_real; first watch to claim a name wins
+    to_prune = set()   # every plan_sync pass proposes the same owned-dangling set
+    for stamp_real, stamp_files, tag in listings:
+        links, prunes, warns = rankops.plan_sync(stamp_files, entries, tag)
+        warnings += warns
+        for name in links:
+            to_link.setdefault(name, stamp_real)
+        to_prune.update(prunes)
+    for name, stamp_real in sorted(to_link.items()):
         try:
             os.symlink(os.path.join(stamp_real, name), os.path.join(RES_DIR, name))
         except OSError as e:
             warnings.append("link failed for {}: {}".format(name, e))
-    for name in to_prune:
+    for name in sorted(to_prune):
         try:
             os.unlink(os.path.join(RES_DIR, name))
         except OSError as e:
@@ -510,10 +522,13 @@ def set_rankables_dir():
     except Exception as e:
         return flask.jsonify({'success': False, 'error': str(e)}), 500
 
-def _count_owned_links(stamp_dir):
+def _count_owned_links(stamp_dir, tag):
     stamp_real = os.path.realpath(stamp_dir)
+    prefix = rankops.stamp_prefix(tag)
     count = 0
     for name in os.listdir(RES_DIR):
+        if not name.startswith(prefix):
+            continue
         full = os.path.join(RES_DIR, name)
         if os.path.islink(full):
             target = os.readlink(full)
@@ -524,16 +539,28 @@ def _count_owned_links(stamp_dir):
     return count
 
 
+def _set_watches(cfg, watches):
+    """Store the normalized watch list, retiring the legacy single-watch key."""
+    if watches:
+        cfg["watches"] = watches
+    else:
+        cfg.pop("watches", None)
+    cfg.pop("watch", None)
+
+
 @bp.route("/api/watch-config", methods=["GET"])
 @flask_login.login_required
 def watch_config():
     cfg, err = load_config()
-    watch = cfg.get("watch")
-    linked = _count_owned_links(watch["stamp_dir"]) if watch else 0
+    watches = [{"stamp_dir": w.get("stamp_dir", ""),
+                "stamp_tag": w.get("stamp_tag", ""),
+                "linked_count": _count_owned_links(w.get("stamp_dir", ""),
+                                                   w.get("stamp_tag", ""))}
+               for w in rankops.get_watches(cfg)]
     ins = cfg.get("insertions") or {}
     queue_len = len(ins.get("queue", [])) + (1 if ins.get("active") else 0)
-    return flask.jsonify({"watch": watch, "linked_count": linked,
-                          "queue_len": queue_len, "error": err})
+    return flask.jsonify({"watches": watches, "queue_len": queue_len,
+                          "error": err})
 
 
 @bp.route("/api/set-watch-config", methods=["POST"])
@@ -552,20 +579,31 @@ def set_watch_config():
     if not tag:
         return flask.jsonify({"success": False, "error": "Missing stamp tag"}), 400
     cfg, _ = load_config()
-    cfg["watch"] = {"stamp_dir": stamp_dir, "stamp_tag": tag}
+    watches = rankops.get_watches(cfg)
+    entry = {"stamp_dir": stamp_dir, "stamp_tag": tag}
+    if entry not in watches:
+        watches.append(entry)
+    _set_watches(cfg, watches)
     cfg.setdefault("insertions", {"queue": [], "active": None})
     save_config(cfg)
     warnings = sync_symlinks(cfg)
     return flask.jsonify({"success": True,
-                          "linked_count": _count_owned_links(stamp_dir),
+                          "linked_count": _count_owned_links(stamp_dir, tag),
                           "warnings": warnings})
 
 
 @bp.route("/api/clear-watch-config", methods=["POST"])
 @flask_login.login_required
 def clear_watch_config():
+    data = flask.request.get_json(silent=True) or {}
     cfg, _ = load_config()
-    cfg.pop("watch", None)
+    watches = rankops.get_watches(cfg)
+    if data.get("stamp_dir") and data.get("stamp_tag"):
+        target = {"stamp_dir": data["stamp_dir"], "stamp_tag": data["stamp_tag"]}
+        watches = [w for w in watches if w != target]
+    else:
+        watches = []
+    _set_watches(cfg, watches)
     save_config(cfg)
     return flask.jsonify({"success": True})
 
