@@ -22,6 +22,7 @@ in
       serveNotesWiki = false;
       enableMetrics = false; # TODO: perhaps enable in the future
       enableFileServers = true;
+      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";

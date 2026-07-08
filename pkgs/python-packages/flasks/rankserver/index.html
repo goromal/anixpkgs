@@ -169,7 +169,8 @@
             text-align: center;
         }
 
-        .compare-media img {
+        .compare-media img,
+        .compare-media video {
             display: block;
             width: 100%;
             height: auto;
@@ -284,10 +285,73 @@
             font-weight: 700;
         }
 
-        .rank-list img {
+        .rank-list img,
+        .rank-list video {
             max-width: 120px;
             height: auto;
             border-radius: 6px;
+        }
+
+        .rank-media {
+            cursor: zoom-in;
+        }
+
+        /* Video entries in the ranked list are a cached poster <img> (lazy, cheap)
+           with a play glyph overlaid so they read as playable; the real <video>
+           is only created in the lightbox on click. */
+        .rank-video-poster {
+            position: relative;
+            display: inline-block;
+            line-height: 0;
+        }
+
+        .rank-video-poster::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-style: solid;
+            border-width: 9px 0 9px 16px;
+            border-color: transparent transparent transparent rgba(255, 255, 255, 0.92);
+            filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+            pointer-events: none;
+        }
+
+        /* ===== Lightbox (maximize on click) ===== */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: zoom-out;
+        }
+
+        .lightbox-content img,
+        .lightbox-content video {
+            display: block;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: auto;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            color: #fff;
+            font-size: 2.5rem;
+            line-height: 1;
+            font-weight: 300;
+            cursor: pointer;
+            user-select: none;
         }
 
         .rank-list .rank-txt {
@@ -451,11 +515,15 @@
 
         <div id="statusMessage" class="status-message"></div>
 
+        {% if warn %}
+        <div class="status-message status-error" style="display: block;">{{ warn }}</div>
+        {% endif %}
+
         {% if intro %}
         <div class="rankables-config">
             <h2>Rankables Directory</h2>
             <p class="help">Choose where the <code>rankables</code> symlink should point. The selected
-               directory's files (<code>.txt</code> / <code>.png</code>) become the items you rank.</p>
+               directory's files (<code>.txt</code> / <code>.png</code> / <code>.mp4</code>) become the items you rank.</p>
             <div class="rankables-realpath">
                 <span class="realpath-label">Current real path:</span>
                 <span class="realpath-value" id="rankablesRealPath">Loading...</span>
@@ -466,12 +534,33 @@
                 <div class="dir-picker-header">
                     <span class="dir-picker-path" id="pickerCurrentPath"></span>
                     <button class="btn btn-sm" onclick="pickerNavigateUp()">&#8593; Up</button>
+                    <button class="btn btn-sm" onclick="pickerNewFolder()">+ New Folder</button>
                 </div>
                 <ul class="dir-list" id="dirList"></ul>
                 <div class="dir-picker-actions">
                     <button class="btn btn-sm btn-danger" onclick="closeDirPicker()">Cancel</button>
                     <button class="btn btn-sm" onclick="selectPickerDir()">Select This Directory</button>
                 </div>
+            </div>
+        </div>
+
+        <div class="rankables-config">
+            <h2>Stamp Watch</h2>
+            <p class="help">Optionally mirror files carrying a chosen stamp tag from a
+               stampserver directory into this rankables directory. Symlinks are kept
+               in sync automatically; newly stamped files queue up for placement into
+               the existing ranking.</p>
+            <div class="rankables-realpath">
+                <span class="realpath-label">Status:</span>
+                <span class="realpath-value" id="watchStatus">Loading...</span>
+                <button class="btn btn-sm" onclick="openWatchConfig()">Configure&hellip;</button>
+                <button class="btn btn-sm btn-danger" onclick="clearWatchConfig()">Clear</button>
+            </div>
+            <div class="rankables-realpath" id="watchTagRow" style="display: none;">
+                <span class="realpath-label">Tag for <span id="watchChosenDir"></span>:</span>
+                <select id="watchTagSelect"></select>
+                <button class="btn btn-sm" onclick="saveWatchConfig()">Save</button>
+                <button class="btn btn-sm btn-danger" onclick="cancelWatchConfig()">Cancel</button>
             </div>
         </div>
 
@@ -491,12 +580,17 @@
             </form>
         </div>
         {% else %}
+        {% if insert_note %}
+        <p class="compare-prompt" style="color: #1cc88a; font-weight: 600;">{{ insert_note }}</p>
+        {% endif %}
         <p class="compare-prompt">Which do you prefer?</p>
         <div class="compare-row">
             <div class="compare-card">
                 <div class="compare-media">
                     {% if l.endswith('.txt') %}
                     <span class="txt-name">{{ l }}</span>
+                    {% elif l.endswith('.mp4') %}
+                    <video src="{{ urlroot }}media/{{ l }}#t=0.001" controls preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ l }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -509,6 +603,8 @@
                 <div class="compare-media">
                     {% if r.endswith('.txt') %}
                     <span class="txt-name">{{ r }}</span>
+                    {% elif r.endswith('.mp4') %}
+                    <video src="{{ urlroot }}media/{{ r }}#t=0.001" controls preload="metadata" playsinline></video>
                     {% else %}
                     <img src="{{ urlroot }}thumb/{{ r }}?w=1200" decoding="async" alt="" />
                     {% endif %}
@@ -527,8 +623,13 @@
                 <li>
                     {% if item.endswith('.txt') %}
                     <span class="rank-txt">{{ item }}</span>
+                    {% elif item.endswith('.mp4') %}
+                    <span class="rank-media rank-video-poster" data-full="{{ urlroot }}media/{{ item }}" data-type="video">
+                        <img src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt="" />
+                    </span>
                     {% else %}
-                    <img src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt="" />
+                    <img class="rank-media" src="{{ urlroot }}thumb/{{ item }}?w=240" loading="lazy" decoding="async" alt=""
+                         data-full="{{ urlroot }}thumb/{{ item }}?w=1600" data-type="image" />
                     {% endif %}
                 </li>
                 {% endfor %}
@@ -536,6 +637,11 @@
         </div>
         {% endif %}
         {% endif %}
+    </div>
+
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <div class="lightbox-content" id="lightboxContent"></div>
     </div>
 
     <script>
@@ -547,11 +653,49 @@
             setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
         }
 
+        // ===== LIGHTBOX (maximize ranked-list media on click) =====
+
+        function openLightbox(type, src) {
+            const content = document.getElementById('lightboxContent');
+            content.innerHTML = '';
+            let el;
+            if (type === 'video') {
+                el = document.createElement('video');
+                el.src = src;
+                el.controls = true;
+                el.autoplay = true;
+                el.playsInline = true;
+            } else {
+                el = document.createElement('img');
+                el.src = src;
+            }
+            // Clicks on the media itself shouldn't dismiss the overlay (e.g. video
+            // controls); dismissal happens by clicking the dark backdrop or close.
+            el.addEventListener('click', (e) => e.stopPropagation());
+            content.appendChild(el);
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+            document.getElementById('lightboxContent').innerHTML = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        document.querySelectorAll('.rank-media').forEach((el) => {
+            el.addEventListener('click', () => openLightbox(el.dataset.type, el.dataset.full));
+        });
+
         // ===== RANKABLES DIR PICKER =====
 
         {% if intro %}
         let _pickerPath = '/';
         let _defaultPath = null;
+        let _pickerMode = 'rankables';   // 'rankables' | 'stampdir'
+        let _watchDir = null;
 
         function loadRankablesInfo() {
             fetch('{{ urlroot }}api/rankables-info')
@@ -567,6 +711,8 @@
         }
 
         function openDirPicker() {
+            _pickerMode = 'rankables';
+            document.getElementById('watchTagRow').style.display = 'none';
             document.getElementById('dirPicker').style.display = 'block';
             loadPickerDirs(_pickerPath);
         }
@@ -613,6 +759,36 @@
         }
 
         function selectPickerDir() {
+            if (_pickerMode === 'stampdir') {
+                _watchDir = _pickerPath;
+                closeDirPicker();
+                document.getElementById('watchChosenDir').textContent = _watchDir;
+                fetch('{{ urlroot }}api/list-stamps', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({path: _watchDir})
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.error) { showStatus('Error: ' + data.error, true); return; }
+                    const sel = document.getElementById('watchTagSelect');
+                    sel.innerHTML = '';
+                    const tags = Object.entries(data.tags);
+                    if (tags.length === 0) {
+                        showStatus('No stamped rankable files found in ' + _watchDir, true);
+                        return;
+                    }
+                    tags.forEach(([tag, count]) => {
+                        const opt = document.createElement('option');
+                        opt.value = tag;
+                        opt.textContent = tag + ' (' + count + ')';
+                        sel.appendChild(opt);
+                    });
+                    document.getElementById('watchTagRow').style.display = 'flex';
+                })
+                .catch(err => showStatus('Error: ' + err.message, true));
+                return;
+            }
             if (!confirm('Set rankables directory to:\n' + _pickerPath)) return;
             fetch('{{ urlroot }}api/set-rankables-dir', {
                 method: 'POST',
@@ -625,6 +801,7 @@
                     closeDirPicker();
                     document.getElementById('rankablesRealPath').textContent = data.real_path;
                     showStatus('Rankables directory updated to: ' + data.real_path);
+                    loadWatchInfo();
                 } else {
                     showStatus('Error: ' + (data.error || 'Unknown error'), true);
                 }
@@ -646,6 +823,7 @@
                     closeDirPicker();
                     document.getElementById('rankablesRealPath').textContent = data.real_path;
                     showStatus('Rankables directory reset to default: ' + data.real_path);
+                    loadWatchInfo();
                 } else {
                     showStatus('Error: ' + (data.error || 'Unknown error'), true);
                 }
@@ -653,7 +831,86 @@
             .catch(err => showStatus('Error: ' + err.message, true));
         }
 
+        function pickerNewFolder() {
+            const name = prompt('New folder name (inside ' + _pickerPath + '):');
+            if (!name) return;
+            fetch('{{ urlroot }}api/make-dir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({path: _pickerPath, name: name})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { loadPickerDirs(_pickerPath); }
+                else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function loadWatchInfo() {
+            fetch('{{ urlroot }}api/watch-config')
+                .then(r => r.json())
+                .then(data => {
+                    const el = document.getElementById('watchStatus');
+                    if (data.error) { el.textContent = data.error; return; }
+                    if (!data.watch) { el.textContent = 'Not watching'; return; }
+                    let txt = 'Watching ' + data.watch.stamp_dir + ' for tag "'
+                        + data.watch.stamp_tag + '" — ' + data.linked_count + ' linked';
+                    if (data.queue_len > 0) txt += ' (' + data.queue_len + ' queued)';
+                    el.textContent = txt;
+                })
+                .catch(() => {
+                    document.getElementById('watchStatus').textContent = '(error loading)';
+                });
+        }
+
+        function openWatchConfig() {
+            _pickerMode = 'stampdir';
+            document.getElementById('watchTagRow').style.display = 'none';
+            document.getElementById('dirPicker').style.display = 'block';
+            loadPickerDirs(_pickerPath);
+        }
+
+        function cancelWatchConfig() {
+            document.getElementById('watchTagRow').style.display = 'none';
+            _watchDir = null;
+        }
+
+        function saveWatchConfig() {
+            const tag = document.getElementById('watchTagSelect').value;
+            if (!_watchDir || !tag) { showStatus('Choose a directory and tag first', true); return; }
+            fetch('{{ urlroot }}api/set-watch-config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({stamp_dir: _watchDir, stamp_tag: tag})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    cancelWatchConfig();
+                    showStatus('Watch configured; ' + data.linked_count + ' file(s) linked'
+                        + (data.warnings && data.warnings.length ? ' — ' + data.warnings.join('; ') : ''));
+                    loadWatchInfo();
+                } else {
+                    showStatus('Error: ' + (data.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
+        function clearWatchConfig() {
+            if (!confirm('Stop watching? Existing symlinks are kept.')) return;
+            fetch('{{ urlroot }}api/clear-watch-config', {method: 'POST'})
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) { cancelWatchConfig(); showStatus('Watch cleared'); loadWatchInfo(); }
+                else { showStatus('Error: ' + (data.error || 'Unknown error'), true); }
+            })
+            .catch(err => showStatus('Error: ' + err.message, true));
+        }
+
         loadRankablesInfo();
+        loadWatchInfo();
         {% endif %}
     </script>
 </body>
