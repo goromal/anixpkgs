@@ -319,21 +319,52 @@ let
               flask-mp3server = addDoc (pySelf.callPackage ./python-packages/flasks/mp3server { });
               flask-smfserver = addDoc (pySelf.callPackage ./python-packages/flasks/smfserver { });
               flask-oatbox = addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
-              rankserver = addDoc (pySelf.callPackage ./python-packages/flasks/rankserver { });
-              stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
-              authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
-              budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
-              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
-              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
-              disciple = addDoc (pySelf.callPackage ./python-packages/flasks/disciple { });
-              anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
-              sunset = addDoc (pySelf.callPackage ./python-packages/flasks/sunset { });
-              self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
-              tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
-              intake_ui = addDoc (pySelf.callPackage ./python-packages/flasks/intake_ui { });
-              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { });
+              rankserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/rankserver { pkg-src = flakeInputs.flasks; }
+              );
+              stampserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/stampserver { pkg-src = flakeInputs.flasks; }
+              );
+              authui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/authui { pkg-src = flakeInputs.flasks; }
+              );
+              budget_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/budget_ui { pkg-src = flakeInputs.flasks; }
+              );
+              orchestrator_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/orchestrator_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              la_quiz_web = addDoc (
+                pySelf.callPackage ./python-packages/flasks/la-quiz-web { pkg-src = flakeInputs.flasks; }
+              );
+              disciple = addDoc (
+                pySelf.callPackage ./python-packages/flasks/disciple { pkg-src = flakeInputs.flasks; }
+              );
+              anix_upgrade_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              sunset = addDoc (
+                pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
+              );
+              self-tester-app = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
+              );
+              tasks_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
+              );
+              intake_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/intake_ui { pkg-src = flakeInputs.flasks; }
+              );
+              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { pkg-src = flakeInputs.flasks; });
               vdlserver = addDoc (
-                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+                pySelf.callPackage ./python-packages/flasks/videodl {
+                  yt-dlp = unstable.yt-dlp;
+                  pkg-src = flakeInputs.flasks;
+                }
               );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }

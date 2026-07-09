@@ -208,7 +208,7 @@ in
             path = "/cozy/";
             description = "ComfyUI image generation";
             icon = "tv";
-            faviconSvg = ../../../python-packages/flasks/cozy/tv.svg;
+            faviconSvg = "${extendedPkgs.flakeInputs.flasks}/cozy/tv.svg";
           }
         ];
         systemd.tmpfiles.rules = [
