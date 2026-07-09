@@ -4,6 +4,7 @@
   flask,
   requests,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -13,15 +14,15 @@ buildPythonPackage rec {
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/disciple";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./templates/base.html}        $out/${pythonLibDir}/templates/base.html
-    cp ${./templates/study.html}       $out/${pythonLibDir}/templates/study.html
-    cp ${./templates/browse.html}      $out/${pythonLibDir}/templates/browse.html
-    cp ${./templates/tags.html}        $out/${pythonLibDir}/templates/tags.html
-    cp ${./templates/tag_detail.html}  $out/${pythonLibDir}/templates/tag_detail.html
-    cp ${./templates/manage_tags.html} $out/${pythonLibDir}/templates/manage_tags.html
+    cp templates/base.html        $out/${pythonLibDir}/templates/base.html
+    cp templates/study.html       $out/${pythonLibDir}/templates/study.html
+    cp templates/browse.html      $out/${pythonLibDir}/templates/browse.html
+    cp templates/tags.html        $out/${pythonLibDir}/templates/tags.html
+    cp templates/tag_detail.html  $out/${pythonLibDir}/templates/tag_detail.html
+    cp templates/manage_tags.html $out/${pythonLibDir}/templates/manage_tags.html
   '';
   propagatedBuildInputs = [
     flask

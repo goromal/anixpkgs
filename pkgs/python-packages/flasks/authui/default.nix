@@ -6,6 +6,7 @@
   gmail-parser,
   writeShellScript,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -15,10 +16,10 @@ buildPythonPackage rec {
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/authui";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./index.html} $out/${pythonLibDir}/templates/index.html
+    cp index.html $out/${pythonLibDir}/templates/index.html
   '';
   propagatedBuildInputs = [
     flask

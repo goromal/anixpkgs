@@ -59,6 +59,7 @@ def instantiate(repo_dir: str, config: str) -> str | None:
         env=NIX_ENV,
     )
     if result.returncode != 0:
+        print(f"    {config}: eval failed:\n{result.stderr[-3000:]}", flush=True)
         return "ERROR"
     return result.stdout.strip().splitlines()[-1]  # last line is the .drv path
 
