@@ -40,9 +40,11 @@ buildPythonPackage rec {
       groups consecutive Christ-reference verses with surrounding context,
       and provides a study interface for annotating and tagging passages.
 
-      Includes the `disciple-report` CLI, which reports study activity since
-      its last invocation to the tactical server's "Spiritual reflection"
-      survey question (1 processed group = partial credit, 2+ = full credit).
+      Includes the `disciple-report` CLI, which reports study activity for a
+      given local calendar day (yesterday by default, attributed by each
+      group's processed_at timestamp) to the tactical server's "Spiritual
+      reflection" survey question (1 processed group = partial credit,
+      2+ = full credit). Stateless and safe to re-run.
     '';
     autoGenUsageCmd = "--help";
   };
