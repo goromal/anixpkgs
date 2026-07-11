@@ -3,6 +3,8 @@
   setuptools,
   flask,
   requests,
+  aapis-py,
+  grpcio,
   python,
   pkg-src,
 }:
@@ -27,6 +29,8 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     flask
     requests
+    aapis-py
+    grpcio
   ];
   meta = {
     description = "A Book of Mormon Christ-reference study tool.";
@@ -35,6 +39,10 @@ buildPythonPackage rec {
       reference Jesus Christ. Ingests all verses from the nephi.org API,
       groups consecutive Christ-reference verses with surrounding context,
       and provides a study interface for annotating and tagging passages.
+
+      Includes the `disciple-report` CLI, which reports study activity since
+      its last invocation to the tactical server's "Spiritual reflection"
+      survey question (1 processed group = partial credit, 2+ = full credit).
     '';
     autoGenUsageCmd = "--help";
   };

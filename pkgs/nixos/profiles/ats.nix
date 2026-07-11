@@ -111,6 +111,17 @@ in
           };
         }
         {
+          name = "ats-disciple-report";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-report" ''
+            disciple-report --db-path $HOME/data/disciple/disciple.db || { >&2 logger -t ats-disciple-report "disciple report error!"; exit 1; }
+            logger -t ats-disciple-report "🕮 Disciple study result reported to tactical server"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 05:00:00" ];
+            Persistent = true;
+          };
+        }
+        {
           name = "ats-task-migrator";
           jobShellScript = pkgs.writeShellScript "ats-task-migrator" ''
             authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
@@ -284,6 +295,7 @@ in
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
+        anixpkgs.disciple
       ];
     };
     machines.claude = {
