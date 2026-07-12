@@ -276,15 +276,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1783784217,
-        "narHash": "sha256-lbWNExum6ow+7xrwPk+PdevnjlZ3N/8CcD2UYrfGWno=",
+        "lastModified": 1783881134,
+        "narHash": "sha256-HokHopmEt/NXK+obUc4fV2Z/MG9VZgSzuqdcKLWVeAY=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "00d758eba40e9d7f6037829c531dc7d3505ce21b",
+        "rev": "e95e163ecb3a6dfe8e46cc111fc7d2e027657b62",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "cozy-prompt-library",
         "repo": "flasks",
         "type": "github"
       }
