@@ -359,6 +359,9 @@ let
               intake_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/intake_ui { pkg-src = flakeInputs.flasks; }
               );
+              wormhole = addDoc (
+                pySelf.callPackage ./python-packages/flasks/wormhole { pkg-src = flakeInputs.flasks; }
+              );
               cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { pkg-src = flakeInputs.flasks; });
               vdlserver = addDoc (
                 pySelf.callPackage ./python-packages/flasks/videodl {
@@ -473,6 +476,7 @@ rec {
   self-tester-app = final.python313.pkgs.self-tester-app;
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
+  wormhole = final.python313.pkgs.wormhole;
   cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;

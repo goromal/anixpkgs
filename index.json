@@ -424,6 +424,11 @@
                 "attr": "cozy",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "wormhole",
+                "ci": true,
+                "docs": false
             }
         ],
         "bash": [
