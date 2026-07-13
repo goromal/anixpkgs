@@ -1,6 +1,7 @@
 {
   buildPythonPackage,
   setuptools,
+  pytestCheckHook,
   flask,
   flask-login,
   flask-wtf,
@@ -8,6 +9,7 @@
   werkzeug,
   requests,
   websocket-client,
+  wormhole,
   python,
   pkg-src,
 }:
@@ -35,7 +37,9 @@ buildPythonPackage rec {
     werkzeug
     requests
     websocket-client
+    wormhole
   ];
+  nativeCheckInputs = [ pytestCheckHook ];
   meta = {
     description = "One-pager UI for generating images with ComfyUI workflows.";
     longDescription = "";
