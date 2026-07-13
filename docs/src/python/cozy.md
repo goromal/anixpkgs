@@ -10,7 +10,7 @@ usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--comfyui-url COMFYUI_URL] [--state-dir STATE_DIR]
             [--workflow-dir WORKFLOW_DIR] [--workflows WORKFLOWS]
             [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
-            --secrets-file SECRETS_FILE
+            [--prompt-db-dir PROMPT_DB_DIR] --secrets-file SECRETS_FILE
             [--comfyui-restart-cmd COMFYUI_RESTART_CMD]
 
 options:
@@ -32,6 +32,9 @@ options:
   --output-dir OUTPUT_DIR
                         Directory of selectable output images for edit
                         workflows (default <workflow-dir>/output)
+  --prompt-db-dir PROMPT_DB_DIR
+                        Directory of saved prompt .txt files (default <state-
+                        dir>/prompts)
   --secrets-file SECRETS_FILE
                         Path to JSON file with secret_key and password_hash
   --comfyui-restart-cmd COMFYUI_RESTART_CMD
