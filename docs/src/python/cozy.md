@@ -11,7 +11,7 @@ usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--workflow-dir WORKFLOW_DIR] [--workflows WORKFLOWS]
             [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
             [--prompt-db-dir PROMPT_DB_DIR] --secrets-file SECRETS_FILE
-            [--comfyui-restart-cmd COMFYUI_RESTART_CMD]
+            [--comfyui-restart-cmd COMFYUI_RESTART_CMD] [--rest-gap REST_GAP]
 
 options:
   -h, --help            show this help message and exit
@@ -41,5 +41,6 @@ options:
                         Command run to restart ComfyUI (e.g. 'systemctl
                         restart comfyui.service'); empty hides the restart
                         button
+  --rest-gap REST_GAP   Seconds to rest between queued jobs
 ```
 
