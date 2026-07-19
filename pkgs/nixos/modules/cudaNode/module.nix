@@ -37,6 +37,7 @@ in
           pyceres
           pyceres_factors
           mesh-plotter
+          indi-harness
           find_rotational_conventions
         ];
     };

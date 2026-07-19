@@ -84,6 +84,9 @@
     mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
 
+    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.flake = false;
+
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
