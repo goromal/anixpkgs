@@ -337,6 +337,22 @@
         "type": "github"
       }
     },
+    "indi-harness": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784424531,
+        "narHash": "sha256-1Ro5tLFbfVxz16ObMXHUwQ+PXEVjlXQbicV0J+Hs1SU=",
+        "owner": "goromal",
+        "repo": "indi-harness",
+        "rev": "61bc4963327833b7fed08cdf100c53fcec838c42",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "indi-harness",
+        "type": "github"
+      }
+    },
     "jetpack-nixos": {
       "inputs": {
         "cuda-legacy": "cuda-legacy",
@@ -888,6 +904,7 @@
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
+        "indi-harness": "indi-harness",
         "jetpack-nixos": "jetpack-nixos",
         "jetson-stats": "jetson-stats",
         "makepyshell": "makepyshell",

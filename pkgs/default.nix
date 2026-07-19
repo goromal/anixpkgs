@@ -269,6 +269,11 @@ let
                   pkg-src = flakeInputs.mavlog-utils;
                 }
               );
+              indi-harness = addDoc (
+                pySelf.callPackage ./python-packages/indi-harness {
+                  pkg-src = flakeInputs.indi-harness;
+                }
+              );
               mesh-plotter = addDoc (
                 pySelf.callPackage ./python-packages/mesh-plotter {
                   pkg-src = flakeInputs.mesh-plotter;
@@ -440,6 +445,7 @@ rec {
   surveys_report = final.python313.pkgs.surveys_report;
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
+  indi-harness = final.python313.pkgs.indi-harness;
   fqt = final.python313.pkgs.fqt;
   ichabod = final.python313.pkgs.ichabod;
   norbert = final.python313.pkgs.norbert;

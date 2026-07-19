@@ -146,6 +146,11 @@
                 "docs": false
             },
             {
+                "attr": "indi-harness",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "pyceres",
                 "ci": true,
                 "docs": true
