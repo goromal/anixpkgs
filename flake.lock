@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1782792871,
-        "narHash": "sha256-NCe97BA+nohmymtCmG+PlcAgwm8k6Qjo/TwysbXasyE=",
+        "lastModified": 1784525383,
+        "narHash": "sha256-bHebPwRxQOgJrnqVuFA3UvKZNQYykG35EkRswqHMDAQ=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "fb93ef5df1b61a27f4ad65bed9a5802db7042a24",
+        "rev": "195aa8e19fe12f1bb6054432bc518d01ecda9e72",
         "type": "github"
       },
       "original": {
@@ -340,11 +340,11 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1784528584,
-        "narHash": "sha256-TMaZitT47h36cA/CFRgn+0OgHrIKkq90qbhl51ZIU7M=",
+        "lastModified": 1784560662,
+        "narHash": "sha256-N5k91kHK93BnfABBE3Pya7Kix0HVgljBFUQjxqIdwzQ=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "4bf7f9023b8c177bee2dd67bbcf7729c6c65e3be",
+        "rev": "b987b8e423d13b59a9cf935a02bc898e5827e089",
         "type": "github"
       },
       "original": {
