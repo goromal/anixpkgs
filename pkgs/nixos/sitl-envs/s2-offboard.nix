@@ -44,6 +44,33 @@ pkgs.testers.runNixOSTest {
         virtualisation.diskSize = 8192;
         # thrust field = thrust, not climb rate (SET_ATTITUDE_TARGET)
         services.ardupilot-sim.parameters = lib.mkAfter [ "GUID_OPTIONS 8" ];
+        # Expose the mavlink-router GCS port on the host so a GCS (mavproxy /
+        # QGroundControl) can watch the flight when this env is booted
+        # interactively (driverInteractive). Unused by the headless test.
+        virtualisation.forwardPorts = [
+          {
+            from = "host";
+            host.port = 5790;
+            guest.port = 5790;
+          }
+        ];
+        # One-shot helper for interactive/visual verification: GPS/EKF warm-up
+        # then the offboard battery, run through the ROS-overlay python (rclpy)
+        # with the indi-harness env on PYTHONPATH. Same command the headless
+        # testScript runs, wrapped so it is a single copy-paste in the guest.
+        environment.etc."s2-fly.sh".text = ''
+          #!/bin/sh
+          set -e
+          echo "== GPS/EKF warm-up (~90s) =="
+          timeout 180 python3 /etc/s2-arm-probe.py 2>&1 | tail -8 || true
+          echo "== flying offboard battery — watch in mavproxy =="
+          PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3 \
+            -m indi_harness.offboard.baseline \
+            --url tcp:127.0.0.1:5790 --no-indi \
+            --logs-dir /data/drone/ardusitl/logs --out /tmp/s2_manual
+          echo "== done; RMSE: =="
+          cat /tmp/s2_manual/s2_offboard.json
+        '';
         # Same GPS/EKF warm-up + diagnostic probe S1 uses: arm() only passes
         # once prearm clears, but the vehicle needs a sim GPS lock before it
         # will climb on NAV_TAKEOFF. Running this first warms the EKF and
