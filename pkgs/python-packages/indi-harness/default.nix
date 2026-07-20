@@ -4,18 +4,20 @@
   numpy,
   pyyaml,
   pymavlink,
+  rosbags,
   pytestCheckHook,
   pkg-src,
 }:
 buildPythonPackage rec {
   pname = "indi_harness";
-  version = "0.1.0";
+  version = "0.2.0";
   pyproject = true;
   build-system = [ setuptools ];
   propagatedBuildInputs = [
     numpy
     pyyaml
     pymavlink
+    rosbags
   ];
   nativeCheckInputs = [ pytestCheckHook ];
   src = pkg-src;

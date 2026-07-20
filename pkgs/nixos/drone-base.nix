@@ -258,6 +258,9 @@ in
               ros-core
               demo-nodes-cpp
               demo-nodes-py
+              rosbag2
+              rosbag2-storage-mcap
+              rosbag2-storage-sqlite3
             ];
           })
         ]
