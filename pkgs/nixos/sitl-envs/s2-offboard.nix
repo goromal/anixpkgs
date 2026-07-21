@@ -54,6 +54,11 @@ pkgs.testers.runNixOSTest {
             guest.port = 5790;
           }
         ];
+        # The forwarded connection arrives on the guest's external NIC, not
+        # loopback, so the default NixOS firewall drops it (the in-guest
+        # offboard node reaches 5790 over 127.0.0.1 and is unaffected). Open it
+        # for the host GCS. Guest-side only; inert to the headless test.
+        networking.firewall.allowedTCPPorts = [ 5790 ];
         # One-shot helper for interactive/visual verification: GPS/EKF warm-up
         # then the offboard battery, run through the ROS-overlay python (rclpy)
         # with the indi-harness env on PYTHONPATH. Same command the headless
