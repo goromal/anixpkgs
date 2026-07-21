@@ -446,6 +446,7 @@ rec {
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
   indi-harness = final.python313.pkgs.indi-harness;
+  mavproxy = final.python313.pkgs.pinned-mavproxy;
   fqt = final.python313.pkgs.fqt;
   ichabod = final.python313.pkgs.ichabod;
   norbert = final.python313.pkgs.norbert;
