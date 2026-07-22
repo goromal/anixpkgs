@@ -17,7 +17,12 @@ pkgs.testers.runNixOSTest {
   name = "s3-layerA";
   nodes = {
     drone =
-      { config, pkgs, lib, ... }:
+      {
+        config,
+        pkgs,
+        lib,
+        ...
+      }:
       {
         imports = [ ../configurations/drone-obc-sitl.nix ];
         virtualisation.cores = 4;
