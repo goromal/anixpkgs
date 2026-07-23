@@ -60,3 +60,14 @@ def test_coverage_just_below_080_falls_back():
     # consumed=1001 -> coverage 0.799 (< 0.80) -> gate FAILS -> surplus-only.
     # surplus 1001-1101 = -100 (level 2), fat_pct ignored -> 2
     assert eating_discipline_level(1001, 1101, (40, 80, 30, 90.0)) == 2
+
+
+from goromail.cli import _credit_enum
+from aapis.tactical.v1 import tactical_pb2
+
+
+def test_credit_enum_mapping():
+    T = tactical_pb2.SurveyQuestionResultType
+    assert _credit_enum(0) == T.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+    assert _credit_enum(1) == T.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
+    assert _credit_enum(2) == T.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT

@@ -279,14 +279,17 @@ def eating_discipline_level(consumed, budget, nutrients):
     return int((surplus_level + fat_level) / 2 + 0.5)  # round half up
 
 
-def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
-    surplus = consumed - budget
-    if surplus <= 0:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
-    elif surplus <= 200:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
-    else:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+def _credit_enum(level):
+    T = tactical_pb2.SurveyQuestionResultType
+    return {
+        0: T.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT,
+        1: T.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT,
+        2: T.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT,
+    }[level]
+
+
+def report_eating_discipline_to_tactical(tactical_port, date, level):
+    result_type = _credit_enum(level)
 
     async def cmd_impl(port, year, month, day):
         async with aio.insecure_channel(f"localhost:{port}") as channel:
@@ -544,10 +547,21 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             if loseit is not None:
                 summary_date, consumed, budget = loseit
                 summary_date = summary_date.replace(year=date.year)
+                nutrients = parse_loseit_nutrients(msg.raw_text)
+                level = eating_discipline_level(consumed, budget, nutrients)
                 surplus = consumed - budget
-                print(f"  Lose It! daily summary: {consumed} consumed / {budget} budget ({'+' if surplus >= 0 else ''}{surplus} cal)")
+                extra = ""
+                if nutrients is not None and consumed > 0:
+                    fat_g, carb_g, protein_g, fat_pct = nutrients
+                    coverage = (9 * fat_g + 4 * carb_g + 4 * protein_g) / consumed
+                    extra = f", nutrient coverage {coverage:.0%}, fat {fat_pct:.1f}%"
+                print(
+                    f"  Lose It! daily summary: {consumed} consumed / {budget} budget "
+                    f"({'+' if surplus >= 0 else ''}{surplus} cal){extra} -> level {level}"
+                )
+                log(f"Lose It! summary for {summary_date.date()}: level {level}{extra}")
                 if not dry_run:
-                    report_eating_discipline_to_tactical(tactical_port, summary_date, consumed, budget)
+                    report_eating_discipline_to_tactical(tactical_port, summary_date, level)
                     msg.moveToTrash()
                 continue
 
