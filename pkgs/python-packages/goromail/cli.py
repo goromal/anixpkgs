@@ -208,6 +208,44 @@ def parse_loseit_email(raw_text):
     return summary_date, consumed, budget
 
 
+def parse_loseit_nutrients(raw_text):
+    """Return (fat_g, carb_g, protein_g, fat_pct) from a Lose It! email's
+    Nutrient Summary table, or None if the table is absent or incomplete.
+
+    Grams cover only foods that have nutrient data; fat_pct is Fat's reported
+    share of tracked calories ("% Calories" column).
+    """
+    if "Nutrient Summary" not in raw_text:
+        return None
+    section = raw_text.split("Nutrient Summary", 1)[1]
+
+    def grams(label):
+        # A label cell whose text starts with `label` (so "Fat" won't match the
+        # "&nbsp;&nbsp; Saturated Fat" cell), then a grams cell like "47g".
+        m = re.search(
+            r">\s*" + re.escape(label) + r"\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*g\b",
+            section,
+            re.IGNORECASE,
+        )
+        return int(m.group(1).replace(",", "")) if m else None
+
+    fat_g = grams("Fat")
+    carb_g = grams("Carbohydrates")
+    protein_g = grams("Protein")
+    if fat_g is None or carb_g is None or protein_g is None:
+        return None
+
+    fatpct_m = re.search(
+        r">\s*Fat\s*</td>\s*<td[^>]*>\s*[\d,]+\s*g\s*</td>\s*"
+        r'<td[^>]*align="right"[^>]*>\s*([\d.]+)\s*%',
+        section,
+        re.IGNORECASE,
+    )
+    if fatpct_m is None:
+        return None
+    return fat_g, carb_g, protein_g, float(fatpct_m.group(1))
+
+
 def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
     surplus = consumed - budget
     if surplus <= 0:
