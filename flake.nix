@@ -2,7 +2,7 @@
   description = "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11"; 
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
