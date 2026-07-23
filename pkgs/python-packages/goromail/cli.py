@@ -246,6 +246,39 @@ def parse_loseit_nutrients(raw_text):
     return fat_g, carb_g, protein_g, float(fatpct_m.group(1))
 
 
+def eating_discipline_level(consumed, budget, nutrients):
+    """Credit level (2 full / 1 partial / 0 none) for 'Discipline in eating'.
+
+    nutrients is (fat_g, carb_g, protein_g, fat_pct) or None. When >=80% of
+    consumed calories are backed by nutrient stats, blend the surplus score with
+    a fat-share score; otherwise (or with no nutrients) use surplus alone.
+    """
+    surplus = consumed - budget
+    if surplus <= 0:
+        surplus_level = 2
+    elif surplus <= 200:
+        surplus_level = 1
+    else:
+        surplus_level = 0
+
+    if nutrients is None or consumed <= 0:
+        return surplus_level
+
+    fat_g, carb_g, protein_g, fat_pct = nutrients
+    tracked_cal = 9 * fat_g + 4 * carb_g + 4 * protein_g
+    if tracked_cal / consumed < 0.80:
+        return surplus_level
+
+    if fat_pct <= 30:
+        fat_level = 2
+    elif fat_pct <= 40:
+        fat_level = 1
+    else:
+        fat_level = 0
+
+    return int((surplus_level + fat_level) / 2 + 0.5)  # round half up
+
+
 def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
     surplus = consumed - budget
     if surplus <= 0:
