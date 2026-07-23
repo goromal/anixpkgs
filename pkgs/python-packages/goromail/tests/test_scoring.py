@@ -39,3 +39,24 @@ def test_gate_no_and_good_fat():        # surplus 0, fat 2 -> avg 1.0 -> 1
 # --- guard: consumed 0 does not divide by zero ---
 def test_consumed_zero():
     assert eating_discipline_level(0, 100, n(COV_OK, 90.0)) == 2  # surplus -100
+
+
+# --- surplus threshold boundaries (nutrients=None) ---
+def test_surplus_zero_is_full():      # surplus == 0 -> full
+    assert eating_discipline_level(1000, 1000, None) == 2
+def test_surplus_200_is_partial():    # surplus == 200 (<=200) -> partial
+    assert eating_discipline_level(1200, 1000, None) == 1
+def test_surplus_201_is_no():         # surplus == 201 (>200) -> no
+    assert eating_discipline_level(1201, 1000, None) == 0
+
+
+# --- coverage gate boundary at exactly 0.80 ---
+# grams (40, 80, 30): tracked = 9*40 + 4*80 + 4*30 = 800
+def test_coverage_exactly_080_passes_gate():
+    # consumed=1000 -> coverage 0.80 (>= 0.80) -> gate PASSES -> blend.
+    # surplus -100 (level 2), fat_pct 90 (fat_level 0) -> avg 1.0 -> int(1.5) -> 1
+    assert eating_discipline_level(1000, 1100, (40, 80, 30, 90.0)) == 1
+def test_coverage_just_below_080_falls_back():
+    # consumed=1001 -> coverage 0.799 (< 0.80) -> gate FAILS -> surplus-only.
+    # surplus 1001-1101 = -100 (level 2), fat_pct ignored -> 2
+    assert eating_discipline_level(1001, 1101, (40, 80, 30, 90.0)) == 2
