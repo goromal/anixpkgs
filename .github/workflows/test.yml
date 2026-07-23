@@ -1,0 +1,300 @@
+name: "Build Anixpkgs"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+env:
+  NIXOS_VERSION: 25.11
+
+jobs:
+  lint:
+    name: Check Lint Nix Files
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: ${{ github.head_ref || github.ref_name }}
+        fetch-depth: 0
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: |
+        branch=${{ github.head_ref || github.ref_name }}
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        nix-shell -p nixfmt --run "bash scripts/lint.sh"
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Committing linting changes"
+            git add .
+            git commit -m "Lint format"
+            git push origin $branch
+          else
+            echo "Lint changes detected, but skipping auto-commit on ${{ github.event_name }}"
+          fi
+        else
+          echo "No linting changes to commit"
+        fi
+        nix-shell -p nixfmt --run "bash scripts/lint.sh check"
+  check-flake-lock:
+    name: Check Flake Lock Sync
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: ${{ github.head_ref || github.ref_name }}
+        fetch-depth: 0
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: |
+        branch=${{ github.head_ref || github.ref_name }}
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        python scripts/update_deps.py
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Committing changes to flake lock"
+            git add .
+            git commit -m "Update flake lock"
+            git push origin $branch
+          else
+            echo "Flake lock out of date, but skipping auto-commit on ${{ github.event_name }}"
+          fi
+        else
+          echo "No lock changes to commit"
+        fi
+        nix flake lock --no-update-lock-file
+  check-deps:
+    name: Check Dependencies
+    needs: check-flake-lock
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: |
+        num_side_branches=$(python scripts/check_deps.py | wc -l)
+        if [[ $num_side_branches -ge 1 ]]; then
+          echo "ERROR: Detected $num_side_branches dependencies on a side branch"
+          exit 1
+        else
+          echo "No dependencies detected on a side branch"
+        fi
+  envs:
+    name: Build Environments
+    needs: check-flake-lock
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_envs.sh
+  cpp:
+    name: C++ Packages
+    needs: envs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_pkgs.sh cpp
+  rust:
+    name: Rust Packages
+    needs: envs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_pkgs.sh rust
+  python:
+    name: Python Packages
+    needs: cpp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_pkgs.sh python
+  bash:
+    name: Bash Packages
+    needs: python
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_pkgs.sh bash
+  java:
+    name: Java Packages
+    needs: envs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: ./scripts/build_pkgs.sh java
+  generate-docs-dry:
+    name: Generate Docs (Dry Run)
+    needs:
+    - cpp
+    - rust
+    - python
+    - bash
+    - java
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: |
+        NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
+        num_changes=$(git status --porcelain=v1 2>/dev/null | wc -l)
+        if [[ $num_changes -ge 1 ]]; then
+          echo "Found changes to $num_changes docs"
+        else
+          echo "No detected changes to auto-generated docs"
+        fi
+  regression:
+    name: Regression Tests
+    needs:
+    - cpp
+    - rust
+    - python
+    - bash
+    - java
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        cd test && nix-shell --run "bash test.sh"
+  profile-smoke-test:
+    name: Profile Option Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - run: NIXOS_VERSION=${{ env.NIXOS_VERSION }} python3 scripts/smoke_test_profiles.py
+  machines:
+    name: Machine Checks
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: docker/setup-qemu-action@v4
+      with:
+        platforms: arm64
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-platforms = aarch64-linux
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - run: >
+        bash scripts/check_machines.sh
+  drone-sim:
+    name: Drone SITL VM Test
+    runs-on: ubuntu-latest
+    # Guards against ros.cachix.org eviction silently degrading this job
+    # into an hours-long ROS-from-source build.
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v5
+    - name: Enable KVM for the test VM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-substituters = https://ros.cachix.org
+          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        # Don't auto-push the whole VM test closure; the mirror step below
+        # pushes only the ROS env closure (the only paths at eviction risk).
+        skipPush: true
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: Build and run drone sim VM test
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        nix-build pkgs/nixos/sitl-envs/dronesim.nix -A driver -o /tmp/dronesim-driver
+        /tmp/dronesim-driver/bin/nixos-test-driver
+    - name: Mirror ROS env closure to github-public
+      run: |
+        nix-store -qR /tmp/dronesim-driver | grep -- '-ros-env$' \
+          | xargs nix-store -qR | sort -u | cachix push github-public
