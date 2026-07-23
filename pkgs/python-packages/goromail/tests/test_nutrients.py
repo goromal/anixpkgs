@@ -80,3 +80,8 @@ def test_saturated_fat_not_mistaken_for_fat():
     # Remove the real Fat row; only "Saturated Fat" remains -> Fat grams missing -> None
     html = NUTRIENT_HTML.replace("      Fat\n", "      Removed\n")
     assert parse_loseit_nutrients(html) is None
+
+
+def test_fat_pct_missing_returns_none():
+    html = NUTRIENT_HTML.replace("      51.5%\n", "    -\n")
+    assert parse_loseit_nutrients(html) is None
