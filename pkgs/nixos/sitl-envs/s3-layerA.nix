@@ -96,8 +96,10 @@ pkgs.testers.runNixOSTest {
       machines[0].wait_until_succeeds("ss -tn state established '( dport = :5760 )' | grep -q 5760", timeout=120)
       machines[0].wait_until_succeeds("ss -tln '( sport = :5790 )' | grep -q 5790", timeout=60)
       machines[0].succeed("python3 -c 'import indi_harness.sitl.baseline_cc'")
-      # EKF/GPS warm-up + diagnostics before flying.
-      print(machines[0].execute("timeout 180 python3 /etc/s3-arm-probe.py 2>&1")[1])
+      # EKF/GPS warm-up before flying. The probe output is captured, not
+      # printed -- it is only surfaced (with the ardusitl journal) if the
+      # battery fails to arm/fly, keeping the CI log quiet on success.
+      arm_probe = machines[0].execute("timeout 180 python3 /etc/s3-arm-probe.py 2>&1")[1]
       try:
           machines[0].succeed(
               "timeout 3600 python3 -m indi_harness.sitl.baseline_cc"
@@ -106,14 +108,16 @@ pkgs.testers.runNixOSTest {
               " --out /tmp/s3_layerA >&2"
           )
       except Exception:
+          print("=== arm/EKF/GPS probe ===")
+          print(arm_probe)
           print("=== ardusitl journal (arm/EKF/GPS/CC lines) ===")
           print(machines[0].execute("journalctl -u ardusitl --no-pager | grep -iE 'prearm|arm|ekf|gps|home|custom' | grep -iv 'Loaded defaults' | tail -60")[1])
           print(machines[0].execute("find /data/drone -name '*.BIN' 2>/dev/null; ls -la /data/drone/ardusitl 2>/dev/null")[1])
           raise
-      # Hard requirement: the scored 5-case battery JSON.
+      # Hard requirement: the scored 5-case battery JSON (exported as an
+      # artifact rather than dumped to stdout).
       machines[0].succeed("test -s /tmp/s3_layerA/s3_layerA.json")
       machines[0].copy_from_vm("/tmp/s3_layerA/s3_layerA.json", "")
-      print(machines[0].succeed("cat /tmp/s3_layerA/s3_layerA.json"))
       # Export the newest .BIN (INDI health source of truth) for offline scoring
       # of predicted-vs-measured angular accel.
       machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerA/s3_layerA.BIN")
