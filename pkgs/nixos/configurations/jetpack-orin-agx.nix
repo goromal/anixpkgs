@@ -18,7 +18,6 @@
   services.comfyui.cozy.workflows = [
     "imggen"
     "imggen2"
-    "imgedit3"
   ];
 
   nix.settings.max-jobs = lib.mkForce 1;
