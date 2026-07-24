@@ -19,7 +19,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
+    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
 
     book-notes-sync.url = "github:goromal/book-notes-sync";
@@ -84,7 +84,7 @@
     mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
 
-    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.url = "github:goromal/indi-harness/dev/indi-align";
     indi-harness.flake = false;
 
     mesh-plotter.url = "github:goromal/mesh-plotter";

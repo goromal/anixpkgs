@@ -13,7 +13,37 @@ rec {
       ../../default.nix
     else
       (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anixpkgs-version}.tar.gz");
-  anixpkgs = import anixpkgs-src { };
+
+  # S3 firmware dev: build arducopter (the goromal/ardupilot fork, with the
+  # INDI custom-controller backend) and indi-harness from local working
+  # checkouts instead of the flake.lock pins. Flip to true locally to validate
+  # the s3-layerA sitl-env before the pins are bumped; keep false on committed/
+  # CI builds (which use the pinned inputs). Requires local-build = true.
+  drone-local-fork = false;
+  drone-fork-paths = {
+    ardupilot = "/data/andrew/dev/drone/sources/ardupilot";
+    indi-harness = "/data/andrew/dev/drone/sources/indi-harness";
+  };
+  # Overlay (composed after overlay.nix, so it sees the flake.lock-based
+  # flakeInputs as prev) that repoints ardupilot + indi-harness at the local
+  # working checkouts. default.nix threads `overlays` through, and arducopter /
+  # the indi-harness python package both read final.flakeInputs.
+  droneForkOverlay = final: prev: {
+    flakeInputs = prev.flakeInputs // {
+      ardupilot = builtins.fetchGit {
+        url = "file://${drone-fork-paths.ardupilot}";
+        ref = "HEAD";
+        submodules = true;
+      };
+      indi-harness = builtins.fetchGit {
+        url = "file://${drone-fork-paths.indi-harness}";
+        ref = "HEAD";
+      };
+    };
+  };
+  anixpkgs = import anixpkgs-src (
+    if drone-local-fork then { overlays = [ droneForkOverlay ]; } else { }
+  );
   unstable =
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
       { };
