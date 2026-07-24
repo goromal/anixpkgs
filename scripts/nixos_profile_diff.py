@@ -15,6 +15,7 @@ from pathlib import Path
 
 KNOWN_CONFIGURATIONS = [
     "jetpack-orin-nx",
+    "jetpack-orin-agx",
     "personal-inspiron",
     "personal-panasonic",
     "personal-dell",
