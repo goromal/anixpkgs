@@ -17,9 +17,8 @@
   services.comfyui.cozy.workflows = [
     "imggen"
     "imggen2"
-    "imggen3"
-    "imgedit"
     "imgedit2"
+    "imgedit3"
   ];
   machines.base.timedOrchJobs = [
     {
