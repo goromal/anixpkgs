@@ -13,7 +13,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    anixdata.url = "github:goromal/anixdata/dev/mail-icon";
+    anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
     aapis.url = "github:goromal/aapis";
@@ -49,13 +49,13 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks/dev/mail-ui";
+    flasks.url = "github:goromal/flasks";
     flasks.flake = false;
 
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser/dev/gmail-cleaner";
+    gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
     indi-harness.url = "github:goromal/indi-harness";
