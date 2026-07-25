@@ -58,6 +58,9 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.flake = false;
+
     jetson-stats.url = "github:rbonghi/jetson_stats";
     jetson-stats.flake = false;
 
@@ -83,9 +86,6 @@
 
     mavlog-utils.url = "github:goromal/mavlog-utils";
     mavlog-utils.flake = false;
-
-    indi-harness.url = "github:goromal/indi-harness/dev/indi-align";
-    indi-harness.flake = false;
 
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
