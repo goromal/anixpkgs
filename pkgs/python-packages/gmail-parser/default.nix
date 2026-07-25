@@ -68,6 +68,9 @@ buildPythonPackage rec {
     autoGenUsageCmd = "--help";
     subCmds = [
       "clean"
+      "process"
+      "archive-index"
+      "archive-delete"
       "send"
       "gbot-send"
       "journal-send"

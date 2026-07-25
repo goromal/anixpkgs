@@ -19,15 +19,16 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1784525383,
-        "narHash": "sha256-bHebPwRxQOgJrnqVuFA3UvKZNQYykG35EkRswqHMDAQ=",
+        "lastModified": 1784988933,
+        "narHash": "sha256-+cjOSsbFp5+4W/4LFA9ktzXcDB4Cy85HeIH1Zs0KZ2s=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "195aa8e19fe12f1bb6054432bc518d01ecda9e72",
+        "rev": "1d73096df089807b29c7865f76c9750d81e0f6b7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/mail-icon",
         "repo": "anixdata",
         "type": "github"
       }
@@ -276,15 +277,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1784783474,
-        "narHash": "sha256-9AaOMohEII0zNc4u0yYU5y29MCzlthJD3do6GoaHooY=",
+        "lastModified": 1784988910,
+        "narHash": "sha256-RnbqdwmRBLFH2VQAh/Vvp5IT89wdP/gv7oPSRJOEqlY=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "dacd4715170d79a7dd4deb43ee0aa3aaafdb834f",
+        "rev": "6c43a70e984776d4da8902b9805d5aa9006205ea",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/mail-ui",
         "repo": "flasks",
         "type": "github"
       }
@@ -308,15 +310,16 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1730958833,
-        "narHash": "sha256-i/gVXHiE79Gvz+VSPiBRhD0sLigsbE0yolQdZJurrlM=",
+        "lastModified": 1784988881,
+        "narHash": "sha256-MXJn6o/XWRSQoBJ+FQ89Hbhz052ChvJVjS2uEzx+ONI=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "cbad2d3c0b4b022a50bad8e2073293aadff6f795",
+        "rev": "ea87a5eecb9713cc40f40713ddde734b86e3cb62",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/gmail-cleaner",
         "repo": "gmail_parser",
         "type": "github"
       }
