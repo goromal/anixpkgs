@@ -36,6 +36,7 @@
   intake_ui = 6161;
   cozy = 6262;
   sunset = 6464;
+  mail_ui = 6565;
   # Micro XRCE-DDS agent UDP port (Ardupilot AP_DDS -> ROS2 bridge; matches
   # the Ardupilot default DDS_UDP_PORT)
   xrce-dds-agent = 2019;
