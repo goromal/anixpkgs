@@ -16,8 +16,8 @@
   networking.hostName = "jetson-orin-agx";
 
   services.comfyui.cozy.workflows = [
-    "imggen"
-    "imggen2"
+    "imggen-quantized"
+    "imggen2-quantized"
   ];
 
   nix.settings.max-jobs = lib.mkForce 1;
