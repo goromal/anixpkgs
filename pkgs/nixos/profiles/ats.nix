@@ -230,6 +230,18 @@ in
           };
         }
         {
+          name = "ats-gmail-archive-backup";
+          jobShellScript = pkgs.writeShellScript "ats-gmail-archive-backup" ''
+            mkdir -p $HOME/data/gmail
+            rcrsync mirror data gmail || { logger -t ats-gmail-archive-backup "GMail archive backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-gmail-archive-backup "GMail archive backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
