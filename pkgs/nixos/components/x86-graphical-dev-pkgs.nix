@@ -7,38 +7,6 @@
 with import ../dependencies.nix;
 let
   cfg = config.mods.opts;
-  claudeCodeVersion = "2.1.116";
-  claudeCodeExt =
-    let
-      base = builtins.head (
-        unstable.vscode-utils.extensionsFromVscodeMarketplace [
-          {
-            name = "claude-code";
-            publisher = "anthropic";
-            version = claudeCodeVersion;
-            sha256 = "sha256-47LEeYQGaeZiU+W+KGDi1g5OcTqDl/H4hW3TjeBMBbY=";
-          }
-        ]
-      );
-    in
-    pkgs.stdenvNoCC.mkDerivation {
-      name = "vscode-extension-anthropic-claude-code-${claudeCodeVersion}-nixos";
-      version = claudeCodeVersion;
-      dontUnpack = true;
-      dontBuild = true;
-      installPhase = ''
-        cp -r ${base} $out
-        chmod -R u+w $out
-        mkdir -p $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64
-        ln -s ${anixpkgs.claude-code-bin}/bin/claude \
-          $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64/claude
-      '';
-      passthru = {
-        vscodeExtUniqueId = base.vscodeExtUniqueId;
-        vscodeExtPublisher = base.vscodeExtPublisher;
-        vscodeExtName = base.vscodeExtName;
-      };
-    };
 in
 {
   home.packages = [
@@ -70,10 +38,9 @@ in
         "terminal.integrated.env.linux" = {
           "TMPDIR" = "/tmp";
         };
-        "claudeCode.preferredLocation" = "panel";
       };
       extensions =
-        with unstable.vscode-extensions;
+        with pkgs.vscode-extensions;
         [
           eamodio.gitlens
           ms-python.vscode-pylance
@@ -85,9 +52,8 @@ in
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
           ms-vscode.cpptools
-          claudeCodeExt
         ]
-        ++ unstable.vscode-utils.extensionsFromVscodeMarketplace [
+        ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
             name = "cmake";
             publisher = "twxs";

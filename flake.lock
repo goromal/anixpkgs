@@ -19,11 +19,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1771825089,
-        "narHash": "sha256-AbyLbEfPdEcgYTnqv1/4hofSwmN+UBNLJ5B6cWAX+I0=",
+        "lastModified": 1784525383,
+        "narHash": "sha256-bHebPwRxQOgJrnqVuFA3UvKZNQYykG35EkRswqHMDAQ=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "467fef9fe1e9daf72de5eb6bf868ea29da590cb1",
+        "rev": "195aa8e19fe12f1bb6054432bc518d01ecda9e72",
         "type": "github"
       },
       "original": {
@@ -35,17 +35,17 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1770503432,
-        "narHash": "sha256-QrilSQb87TDkQBXC0x3saQgdC08z5YWW+VZsY9FOlRg=",
-        "ref": "master",
-        "rev": "4fb7f3bb865e6bc523c0f5bfb8609f4a9daf0ef2",
-        "revCount": 70888,
+        "lastModified": 1784692587,
+        "narHash": "sha256-0cHUMaVv2/76uB2uSz64B9ZckadGzNHtV+mSHD3u/34=",
+        "ref": "dev/controller",
+        "rev": "1b9e40c30ff52f20450ddcb4ed1e7b4b42d5ae10",
+        "revCount": 70893,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
-        "ref": "master",
+        "ref": "dev/controller",
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
@@ -80,6 +80,23 @@
       "original": {
         "owner": "goromal",
         "repo": "ceres-factors",
+        "type": "github"
+      }
+    },
+    "comfyui-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1769486881,
+        "narHash": "sha256-CcA3xTVmBVLGMtM5F74R2LfwafFDxFHZ1uzx5MvrB/4=",
+        "owner": "comfyanonymous",
+        "repo": "ComfyUI",
+        "rev": "09725967cf76304371c390ca1d6483e04061da48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "comfyanonymous",
+        "ref": "refs/tags/v0.11.0",
+        "repo": "ComfyUI",
         "type": "github"
       }
     },
@@ -127,11 +144,11 @@
     "daily_tactical_server": {
       "flake": false,
       "locked": {
-        "lastModified": 1766035688,
-        "narHash": "sha256-/lq485V/warVmf38ICCN2tK44xKzlxHMyQuriq+RGto=",
+        "lastModified": 1779950628,
+        "narHash": "sha256-xSY93NS0a7ul9humQxhGOsB6LEFfbvRk/zt6culkvPg=",
         "owner": "goromal",
         "repo": "daily_tactical_server",
-        "rev": "9ff6f97ce5c193f95996e8a886c5995ab5ff86dd",
+        "rev": "d6a97775412c5e2e45a897d26af5aa6e7f596a20",
         "type": "github"
       },
       "original": {
@@ -238,14 +255,48 @@
         "type": "github"
       }
     },
+    "flake-utils_2": {
+      "inputs": {
+        "systems": "systems_2"
+      },
+      "locked": {
+        "lastModified": 1731533236,
+        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "flasks": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784783474,
+        "narHash": "sha256-9AaOMohEII0zNc4u0yYU5y29MCzlthJD3do6GoaHooY=",
+        "owner": "goromal",
+        "repo": "flasks",
+        "rev": "dacd4715170d79a7dd4deb43ee0aa3aaafdb834f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "flasks",
+        "type": "github"
+      }
+    },
     "geometry": {
       "flake": false,
       "locked": {
-        "lastModified": 1771609177,
-        "narHash": "sha256-tJgSBbC9lHSJdWy4HSW2POk5XZr2IIM+l0ABEaI+IDA=",
+        "lastModified": 1784000076,
+        "narHash": "sha256-Xe4Wxpce5U46NVW28ESpcdV4+JLWQtOh7ztEWJM85XM=",
         "owner": "goromal",
         "repo": "geometry",
-        "rev": "27564549b423069373d8e2324bc87d8c36d2b4bf",
+        "rev": "c1c675bf33563d888fe8975789e0bc3316229f52",
         "type": "github"
       },
       "original": {
@@ -286,6 +337,22 @@
         "type": "github"
       }
     },
+    "indi-harness": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784942364,
+        "narHash": "sha256-OYKrqNw+KEMShzKKlsqUudaTCzxlfHHYhdxW8oe8txA=",
+        "owner": "goromal",
+        "repo": "indi-harness",
+        "rev": "331229b82e14a4a564ed8988ee3f705f1a8bca2e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "indi-harness",
+        "type": "github"
+      }
+    },
     "jetpack-nixos": {
       "inputs": {
         "cuda-legacy": "cuda-legacy",
@@ -302,6 +369,22 @@
       "original": {
         "owner": "anduril",
         "repo": "jetpack-nixos",
+        "type": "github"
+      }
+    },
+    "jetson-stats": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777975381,
+        "narHash": "sha256-fmfuYZHRtMyvNC7fLfrUgl5CGtz6+MkqQ2YI6Ac//cc=",
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
+        "rev": "365a8790c74771dcdc72fe9ebeb475168ea573bb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rbonghi",
+        "repo": "jetson_stats",
         "type": "github"
       }
     },
@@ -324,16 +407,16 @@
     "manif-geom-cpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1742189520,
-        "narHash": "sha256-0xF03b3GfZrJpjspc7MsJYiTl/mBrbVjVNl4c4iYrxQ=",
+        "lastModified": 1784000194,
+        "narHash": "sha256-+CaVpBx7yHgVOdTSm7fg93GzW9t9cm25BrNPIzyg6r4=",
         "owner": "goromal",
         "repo": "manif-geom-cpp",
-        "rev": "9bbb6c47c8d0b2d90a53e868cfea855354106bad",
+        "rev": "d976fb0d397d6a69656d0548fe33be50b583ed20",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/tags/release/1.0",
+        "ref": "refs/tags/release/1.1",
         "repo": "manif-geom-cpp",
         "type": "github"
       }
@@ -341,11 +424,11 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1769379491,
-        "narHash": "sha256-3MpS9AReLB2M7Lxz+qAI2UBWJvhm7PmAG6bulQ/O0S4=",
+        "lastModified": 1784000104,
+        "narHash": "sha256-NDwG/5hUujFxYevxxJ7hLhjSp24OeBH4+tWMMoN4eyY=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "0175d43b0ed22d99cd82649eda98a99501bca63e",
+        "rev": "310624d0643bd8c23551cd8fd74a96f08859f360",
         "type": "github"
       },
       "original": {
@@ -435,6 +518,42 @@
         "type": "github"
       }
     },
+    "microxrce-dds-agent": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1710925934,
+        "narHash": "sha256-t2PZurWc8Kbkm3zFyNwHQea4Yj+zHWFXFqZ0E19km54=",
+        "owner": "eProsima",
+        "repo": "Micro-XRCE-DDS-Agent",
+        "rev": "73622810d984349b80bbac0ef55fc0b694d62222",
+        "type": "github"
+      },
+      "original": {
+        "owner": "eProsima",
+        "ref": "refs/tags/v2.4.3",
+        "repo": "Micro-XRCE-DDS-Agent",
+        "type": "github"
+      }
+    },
+    "microxrce-dds-gen": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1756997190,
+        "narHash": "sha256-icVd2sqplkTusJeJ4yT6WI+bQbdc8WDSZpGIGybzjFE=",
+        "ref": "refs/tags/v4.7.1",
+        "rev": "f5b96777802bee3b41c3b2a725eeccc8a79dc3f7",
+        "revCount": 123,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/ardupilot/Micro-XRCE-DDS-Gen"
+      },
+      "original": {
+        "ref": "refs/tags/v4.7.1",
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/ardupilot/Micro-XRCE-DDS-Gen"
+      }
+    },
     "mscpp": {
       "flake": false,
       "locked": {
@@ -448,6 +567,43 @@
       "original": {
         "owner": "goromal",
         "repo": "mscpp",
+        "type": "github"
+      }
+    },
+    "msrs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783050612,
+        "narHash": "sha256-72q+JfL/mBViK1pyqcQ+sp/0IqXAoC8drvgOGXBNTBs=",
+        "owner": "goromal",
+        "repo": "msrs",
+        "rev": "9528ecf69523e0fde0ff38b2f72441197cf29729",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "msrs",
+        "type": "github"
+      }
+    },
+    "nix-ros-overlay": {
+      "inputs": {
+        "flake-utils": "flake-utils_2",
+        "nixpkgs": "nixpkgs_2",
+        "rosdistro": "rosdistro"
+      },
+      "locked": {
+        "lastModified": 1781294130,
+        "narHash": "sha256-5YNXRhVC6tYWc18tN4ZkWKgQaPnsiFOWQPOasyKjMZM=",
+        "owner": "lopsided98",
+        "repo": "nix-ros-overlay",
+        "rev": "13634b579b61299abfc5389d7d47dd7d1701a3a2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lopsided98",
+        "ref": "master",
+        "repo": "nix-ros-overlay",
         "type": "github"
       }
     },
@@ -469,6 +625,22 @@
     },
     "nixpkgs_2": {
       "locked": {
+        "lastModified": 1778869304,
+        "narHash": "sha256-30sZNZoA1cqF5JNO9fVX+wgiQYjB7HJqqJ4ztCDeBZE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_3": {
+      "locked": {
         "lastModified": 1764521362,
         "narHash": "sha256-M101xMtWdF1eSD0xhiR8nG8CXRlHmv6V+VoY65Smwf4=",
         "owner": "NixOS",
@@ -483,7 +655,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
+    "nixpkgs_4": {
       "locked": {
         "lastModified": 1718276985,
         "narHash": "sha256-u1fA0DYQYdeG+5kDm1bOoGcHtX0rtC7qs2YA2N1X++I=",
@@ -566,7 +738,7 @@
     "phps": {
       "inputs": {
         "flake-compat": "flake-compat_2",
-        "nixpkgs": "nixpkgs_3",
+        "nixpkgs": "nixpkgs_4",
         "utils": "utils"
       },
       "locked": {
@@ -720,6 +892,7 @@
         "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
         "ceres-factors": "ceres-factors",
+        "comfyui-src": "comfyui-src",
         "crowcpp": "crowcpp",
         "daily_tactical_server": "daily_tactical_server",
         "easy-google-auth": "easy-google-auth",
@@ -727,10 +900,13 @@
         "find_rotational_conventions": "find_rotational_conventions",
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
+        "flasks": "flasks",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
+        "indi-harness": "indi-harness",
         "jetpack-nixos": "jetpack-nixos",
+        "jetson-stats": "jetson-stats",
         "makepyshell": "makepyshell",
         "manif-geom-cpp": "manif-geom-cpp",
         "manif-geom-rs": "manif-geom-rs",
@@ -739,8 +915,12 @@
         "mavlog-utils": "mavlog-utils",
         "mesh-plotter": "mesh-plotter",
         "mfn": "mfn",
+        "microxrce-dds-agent": "microxrce-dds-agent",
+        "microxrce-dds-gen": "microxrce-dds-gen",
         "mscpp": "mscpp",
-        "nixpkgs": "nixpkgs_2",
+        "msrs": "msrs",
+        "nix-ros-overlay": "nix-ros-overlay",
+        "nixpkgs": "nixpkgs_3",
         "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
@@ -760,6 +940,7 @@
         "signals-cpp": "signals-cpp",
         "simple-image-editor": "simple-image-editor",
         "sorting": "sorting",
+        "spandrel-src": "spandrel-src",
         "spelling-corrector": "spelling-corrector",
         "sunnyside": "sunnyside",
         "symforce": "symforce",
@@ -768,6 +949,22 @@
         "wiki-tools": "wiki-tools",
         "workout-planner": "workout-planner",
         "xv-lidar-rs": "xv-lidar-rs"
+      }
+    },
+    "rosdistro": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1780665549,
+        "narHash": "sha256-QzobMKNpcpS4uWETzPxXkt0F66Sji15N+xsK1JcEWDU=",
+        "owner": "ros",
+        "repo": "rosdistro",
+        "rev": "bcec45c05427f0ad6860cb323695995d8cb1e4bd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ros",
+        "repo": "rosdistro",
+        "type": "github"
       }
     },
     "rtk": {
@@ -867,6 +1064,22 @@
         "type": "github"
       }
     },
+    "spandrel-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776033370,
+        "narHash": "sha256-ohkI7giaAMvi9RatM11WoA2+Ww53TLmJsB+pRf+RWt0=",
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
+        "rev": "e1f2ea14b2eb9dc912bdf335803f8a3d481c45b8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "chaiNNer-org",
+        "repo": "spandrel",
+        "type": "github"
+      }
+    },
     "spelling-corrector": {
       "flake": false,
       "locked": {
@@ -886,11 +1099,11 @@
     "sunnyside": {
       "flake": false,
       "locked": {
-        "lastModified": 1717568445,
-        "narHash": "sha256-U2wiyKsJ6ACiajkfULpkdCUJ2/xZKQqNgzIHQL9utIE=",
+        "lastModified": 1782521357,
+        "narHash": "sha256-YBn5iN5xzxKxg4kjh2dbxkpG1v6i4AkHsG0ZO1kv+7Q=",
         "owner": "goromal",
         "repo": "sunnyside",
-        "rev": "d6605667490ce008321b32dea5732d7962609bf7",
+        "rev": "0da2719982d168969a9a793b85de9f6d8dd2e6f3",
         "type": "github"
       },
       "original": {
@@ -946,14 +1159,29 @@
         "type": "github"
       }
     },
+    "systems_3": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1767334634,
-        "narHash": "sha256-zYvvI2k/rDuF+9uvQFCsQQzMPmhnXLZO6nLPlgeUYFc=",
+        "lastModified": 1781406286,
+        "narHash": "sha256-Hshdgk7lR6X4FfNAeUJstdYStVQuxJfF9De8j0cz7cs=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "0c08127eb7111da929ce5514b4b8411bc46f250b",
+        "rev": "0c7b7a9b632bd8f25b6a522022e7f1167f60aa73",
         "type": "github"
       },
       "original": {
@@ -980,7 +1208,7 @@
     },
     "utils": {
       "inputs": {
-        "systems": "systems_2"
+        "systems": "systems_3"
       },
       "locked": {
         "lastModified": 1710146030,

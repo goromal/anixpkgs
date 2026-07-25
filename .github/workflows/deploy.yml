@@ -10,7 +10,7 @@ jobs:
     if: ${{ (github.event.pull_request.merged == true) }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
       with:
         ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - run: |
@@ -76,7 +76,7 @@ jobs:
       contents: write  # To push a branch 
       pull-requests: write  # To create a PR from that branch
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
       with:
         fetch-depth: 0
     - name: Install latest mdbook
@@ -109,7 +109,7 @@ jobs:
     needs: generate-docs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
       with:
         ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - run: |

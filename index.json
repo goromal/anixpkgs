@@ -75,11 +75,26 @@
                 "attr": "arducopter.sitl",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "microxrceddsgen",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "microxrce-dds-agent",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
             {
                 "attr": "manif-geom-rs",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "msrs",
                 "ci": true,
                 "docs": true
             },
@@ -127,6 +142,11 @@
             },
             {
                 "attr": "mavlog-utils",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "indi-harness",
                 "ci": true,
                 "docs": false
             },
@@ -256,6 +276,26 @@
                 "docs": true
             },
             {
+                "attr": "disciple",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "anix_upgrade_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "tasks_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "sunset",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "easy-google-auth",
                 "ci": true,
                 "docs": true
@@ -308,6 +348,91 @@
             {
                 "attr": "symforce",
                 "ci": false,
+                "docs": false
+            },
+            {
+                "attr": "jetson-stats",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "jupyter-mcp-server",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "vdlserver",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "spandrel",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "segment-anything",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfy-kitchen",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-frontend-package",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-core",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-api",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-video",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-image",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-other",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-embedded-docs",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "cozy",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "wormhole",
+                "ci": true,
                 "docs": false
             }
         ],
@@ -424,6 +549,11 @@
             },
             {
                 "attr": "local-ssh-proxy",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "ssht",
                 "ci": true,
                 "docs": true
             },

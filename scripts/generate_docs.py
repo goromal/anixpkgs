@@ -91,7 +91,9 @@ for lang, title, desc in langs:
                         f"ERROR: doc attribute generation for package {lang_pkg['attr']} failed: {docf.decode()}\n\n{stderr.decode()}"
                     )
                     exit(1)
-                with open(docf.decode().strip(), "r") as docfile:
+                docpath = docf.decode().strip()
+                docpath = os.path.join(docpath, "doc.txt") if os.path.isdir(docpath) else docpath
+                with open(docpath, "r") as docfile:
                     docstr = docfile.read()
                     pkgfile.write(docstr)
 

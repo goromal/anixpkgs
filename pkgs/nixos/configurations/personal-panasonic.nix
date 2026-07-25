@@ -11,5 +11,6 @@
   ];
   machines.base.nixosState = "25.05";
   machines.base.wifiInterfaceName = "wlo1";
+  machines.base.acceptRemoteBuilds = true;
   networking.hostName = "atorgesen-panasonic";
 }

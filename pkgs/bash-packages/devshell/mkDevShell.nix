@@ -39,7 +39,7 @@ let
     fi
   '';
   dev = pkgs.writeShellScriptBin "dev" ''
-    ${pkgs.python3}/bin/python ${devScript} ${wsname} ${devDir}/${wsname} ${editorName} ${devHistFile}
+    ${pkgs.python3}/bin/python ${devScript} ${wsname} ${devDir}/${wsname} ${editorName} ${devHistFile} ${devrcFile}
   '';
   addsrc = pkgs.writeShellScriptBin "addsrc" ''
     if [[ "$1" == "-h" ]] || [[ "$1" == "--help" ]]; then
@@ -73,6 +73,7 @@ pkgs.mkShell {
   ];
   shellHook = ''
     export PS1='\n\[\033[1;36m\][devshell=${wsname}:\w]\$\[\033[0m\] '
+    case $- in *i*) export DEVSHELL_ACTIVE=${wsname} ;; esac
     alias godev='cd ${devDir}/${wsname}'
     setupcurrentws
     cd ${devDir}/${wsname}

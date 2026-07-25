@@ -5,20 +5,25 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  claudeDefaults = import ../claude-defaults.nix;
+in
 {
   imports = [ ../pc-base.nix ];
 
-  config =
-    (mkProfileConfig {
+  config = {
+    machines.base = {
       machineType = "x86_linux";
       graphical = false;
       recreational = false;
       developer = true;
       isATS = true;
+      agentFramework = "claude";
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
       enableFileServers = true;
+      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";
@@ -75,13 +80,15 @@ with import ../dependencies.nix;
             if [ -z "$( ls -A '/var/mail/goromail/new' )" ]; then
               exit
             fi
-            authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
-            rcrsync sync configs || { >&2 logger -t authm "configs sync error!"; exit 1; }
-            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix ${anixpkgs.redirects.suppress_all}
+            DIAG_LOG="$HOME/goromail/mailman-diag.log"
+            mkdir -p "$HOME/goromail"
+            authm refresh --headless >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "authm refresh error!"; exit 1; }
+            rcrsync sync configs >> "$DIAG_LOG" 2>&1 || { logger -t ats-mailman "configs sync error!"; exit 1; }
+            goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless postfix >> "$DIAG_LOG" 2>&1
             if [[ ! -z "$(cat $HOME/goromail/postfix.log)" ]]; then
               logger -t ats-mailman "Processed mail"
               if grep -qi "notion" $HOME/goromail/postfix.log; then
-                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages ${anixpkgs.redirects.suppress_all}
+                goromail --wiki-user "$(cat $HOME/secrets/wiki/u.txt)" --wiki-pass "$(sread $HOME/secrets/wiki/p.txt.tyz)" --wiki-url http://${config.networking.hostName}.local --headless annotate-triage-pages >> "$DIAG_LOG" 2>&1
               fi
             fi
           '';
@@ -100,6 +107,17 @@ with import ../dependencies.nix;
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 05:30:00" ];
+            Persistent = true;
+          };
+        }
+        {
+          name = "ats-disciple-report";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-report" ''
+            disciple-report --db-path $HOME/data/disciple/disciple.db || { >&2 logger -t ats-disciple-report "disciple report error!"; exit 1; }
+            logger -t ats-disciple-report "🕮 Disciple study result reported to tactical server"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 05:00:00" ];
             Persistent = true;
           };
         }
@@ -168,6 +186,17 @@ with import ../dependencies.nix;
           };
         }
         {
+          name = "ats-navidrome-backup";
+          jobShellScript = pkgs.writeShellScript "ats-navidrome-backup" ''
+            rcrsync override data navidrome || { logger -t ats-navidrome-backup "Navidrome Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-navidrome-backup "Navidrome backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-la-quiz-backup";
           jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
             rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
@@ -183,6 +212,17 @@ with import ../dependencies.nix;
           jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
             rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-tester-backup "Tester backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-disciple-backup";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-backup" ''
+            rcrsync override data disciple || { logger -t ats-disciple-backup "Disciple Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-disciple-backup "Disciple backup successful!"
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 00:00:00" ];
@@ -249,19 +289,28 @@ with import ../dependencies.nix;
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.workout-planner
-        anixpkgs.mp4
-        anixpkgs.mp4unite
         anixpkgs.goromail
         anixpkgs.sread
         anixpkgs.gmail-parser
-        anixpkgs.scrape
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
+        anixpkgs.disciple
       ];
-    })
-    // {
-      users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-      users.users.andrew.extraGroups = [ "vikunja" ];
     };
+    machines.claude = {
+      marketplaces = claudeDefaults.marketplaces;
+      plugins = claudeDefaults.plugins;
+      permissionsAllow = claudeDefaults.permissionsAllow;
+      hooks = claudeDefaults.hooks;
+      skills = claudeDefaults.skills;
+      mcpServers = [
+        claudeDefaults.mcpServers.vikunja
+        claudeDefaults.mcpServers.notion
+        claudeDefaults.mcpServers.wiki
+      ];
+    };
+    users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+    users.users.andrew.extraGroups = [ "vikunja" ];
+  };
 }

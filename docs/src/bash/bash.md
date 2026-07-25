@@ -19,6 +19,7 @@ Packages written (or glued together) in Bash.
 - [manage-gmail](./manage-gmail.md)
 - [gantter](./gantter.md)
 - [local-ssh-proxy](./local-ssh-proxy.md)
+- [ssht](./ssht.md)
 - [la-quiz](./la-quiz.md)
 - [play](./play.md)
 - [budget_report](./budget_report.md)

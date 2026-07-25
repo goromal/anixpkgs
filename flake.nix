@@ -19,7 +19,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
+    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
 
     book-notes-sync.url = "github:goromal/book-notes-sync";
@@ -37,17 +37,32 @@
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
+    spandrel-src.url = "github:chaiNNer-org/spandrel";
+    spandrel-src.flake = false;
+
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.flake = false;
+
     evil-hangman.url = "github:goromal/evil-hangman";
     evil-hangman.flake = false;
 
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
+    flasks.url = "github:goromal/flasks";
+    flasks.flake = false;
+
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
+
+    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.flake = false;
+
+    jetson-stats.url = "github:rbonghi/jetson_stats";
+    jetson-stats.flake = false;
 
     gnc.url = "github:goromal/gnc";
     gnc.flake = false;
@@ -57,7 +72,7 @@
     makepyshell.url = "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
     makepyshell.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
+    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.1";
     manif-geom-cpp.flake = false;
 
     manif-geom-rs.url = "github:goromal/manif-geom-rs";
@@ -75,11 +90,22 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
+    microxrce-dds-agent.url = "github:eProsima/Micro-XRCE-DDS-Agent?ref=refs/tags/v2.4.3";
+    microxrce-dds-agent.flake = false;
+
+    microxrce-dds-gen.url = "git+https://github.com/ardupilot/Micro-XRCE-DDS-Gen?ref=refs/tags/v4.7.1&submodules=1";
+    microxrce-dds-gen.flake = false;
+
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
+
+    msrs.url = "github:goromal/msrs";
+    msrs.flake = false;
+
+    nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
 
     notion-tools.url = "github:goromal/notion-tools";
     notion-tools.flake = false;
@@ -209,6 +235,18 @@
                   (pkgs.writeShellScriptBin "anix-install" ''
                     set -euo pipefail
 
+                    # --- HARDWARE NAME SELECTION ---
+                    echo "Enter hardware name for this PC (e.g., inspiron, alderlake, thinkpad):"
+                    read -rp "Hardware name: " HARDWARE_NAME
+
+                    if [ -z "$HARDWARE_NAME" ]; then
+                      echo "Error: Hardware name cannot be empty."
+                      exit 1
+                    fi
+
+                    echo "Selected hardware name: $HARDWARE_NAME"
+                    echo
+
                     # --- CONFIGURATION ---
                     BOOT_LABEL="EFI"
                     ROOT_LABEL="NixOS"
@@ -288,21 +326,26 @@
                     nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
                     nix-channel --update
                     nixos-generate-config --root /mnt/nixos
-                    sudo -u andrew bash <<'EOF'
+                    sudo -u andrew HARDWARE_NAME="$HARDWARE_NAME" bash <<'EOF'
                     cd /data/andrew
                     git clone https://github.com/goromal/anixpkgs.git
-                    cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
-                    cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i 's/inspiron/temp/g' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
-                    sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-temp.nix
+                    cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/$HARDWARE_NAME.nix
+                    cp anixpkgs/pkgs/nixos/configurations/personal-inspiron.nix anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i "s/inspiron/$HARDWARE_NAME/g" anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    cd anixpkgs
+                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
+                    cd /data/andrew
                     mkdir -p ~/.config/nixpkgs
                     echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
                     EOF
                     mkdir -p /root/.config/nixpkgs
                     cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                     rm /mnt/nixos/etc/nixos/*
-                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-''${HARDWARE_NAME}.nix /mnt/nixos/etc/nixos/configuration.nix
+                    export NIXPKGS_ALLOW_UNFREE=1
+                    export NIXPKGS_ALLOW_INSECURE=1
                     nixos-install --root /mnt/nixos
                     echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                   '')
@@ -344,6 +387,18 @@
                   environment.systemPackages = [
                     (pkgs.writeShellScriptBin "anix-install" ''
                       set -euo pipefail
+
+                      # --- NVIDIA VARIANT SELECTION ---
+                      echo "Enter NVIDIA Jetpack variant (e.g., orin-nx, orin-agx):"
+                      read -rp "Variant: " VARIANT
+
+                      if [ -z "$VARIANT" ]; then
+                        echo "Error: Variant cannot be empty."
+                        exit 1
+                      fi
+
+                      echo "Selected variant: $VARIANT"
+                      echo
 
                       # --- CONFIGURATION ---
                       BOOT_LABEL="EFI"
@@ -424,20 +479,25 @@
                       nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
                       nix-channel --update
                       nixos-generate-config --root /mnt/nixos
-                      sudo -u andrew bash <<'EOF'
+                      sudo -u andrew VARIANT="$VARIANT" bash <<'INNEREOF'
                       cd /data/andrew
                       git clone https://github.com/goromal/anixpkgs.git
-                      cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/temp.nix
-                      cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/orin-nx/temp/g' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
-                      sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix
+                      cp /mnt/nixos/etc/nixos/hardware-configuration.nix anixpkgs/pkgs/nixos/hardware/$VARIANT.nix
+                      cp anixpkgs/pkgs/nixos/configurations/jetpack-orin-nx.nix anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      sed -i "s/orin-nx/$VARIANT/g" anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      sed -i 's/machines\.base\.nixosState *= *[^;]*/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      cd anixpkgs
+                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix
+                      cd /data/andrew
                       mkdir -p ~/.config/nixpkgs
                       echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
-                      EOF
+                      INNEREOF
                       mkdir -p /root/.config/nixpkgs
                       cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
                       rm /mnt/nixos/etc/nixos/*
-                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-temp.nix /mnt/nixos/etc/nixos/configuration.nix
+                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-''${VARIANT}.nix /mnt/nixos/etc/nixos/configuration.nix
+                      export NIXPKGS_ALLOW_UNFREE=1
+                      export NIXPKGS_ALLOW_INSECURE=1
                       nixos-install --root /mnt/nixos
                       echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                     '')

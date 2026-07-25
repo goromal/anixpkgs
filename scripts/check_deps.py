@@ -3,7 +3,16 @@ import os
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-branches_whitelist = ["nixpkgs-unstable", "Copter-4.4", "master", "main"]
+branches_whitelist = [
+    "nixpkgs-unstable",
+    "Copter-4.4",
+    "master",
+    "main",
+    # INDI custom-controller work lives on these fork side branches until it
+    # graduates to the fork mainline (see indi-harness S3 Layer-A).
+    "dev/controller",  # goromal/ardupilot INDI backend
+    "dev/indi-align",  # goromal/indi-harness INDI + SITL harness
+]
 
 def is_whitelisted(ref):
     """Check if a ref is whitelisted, including version-agnostic patterns."""

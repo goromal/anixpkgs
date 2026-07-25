@@ -6,6 +6,7 @@
   requests,
   beautifulsoup4,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -15,18 +16,18 @@ buildPythonPackage rec {
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/tester";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./templates/base.html}      $out/${pythonLibDir}/templates/base.html
-    cp ${./templates/index.html}     $out/${pythonLibDir}/templates/index.html
-    cp ${./templates/create.html}    $out/${pythonLibDir}/templates/create.html
-    cp ${./templates/take_rote.html} $out/${pythonLibDir}/templates/take_rote.html
-    cp ${./templates/take_mc.html}   $out/${pythonLibDir}/templates/take_mc.html
-    cp ${./templates/take_sa.html}   $out/${pythonLibDir}/templates/take_sa.html
-    cp ${./templates/result.html}    $out/${pythonLibDir}/templates/result.html
-    cp ${./templates/results.html}    $out/${pythonLibDir}/templates/results.html
-    cp ${./templates/passage.html}   $out/${pythonLibDir}/templates/passage.html
+    cp templates/base.html      $out/${pythonLibDir}/templates/base.html
+    cp templates/index.html     $out/${pythonLibDir}/templates/index.html
+    cp templates/create.html    $out/${pythonLibDir}/templates/create.html
+    cp templates/take_rote.html $out/${pythonLibDir}/templates/take_rote.html
+    cp templates/take_mc.html   $out/${pythonLibDir}/templates/take_mc.html
+    cp templates/take_sa.html   $out/${pythonLibDir}/templates/take_sa.html
+    cp templates/result.html    $out/${pythonLibDir}/templates/result.html
+    cp templates/results.html    $out/${pythonLibDir}/templates/results.html
+    cp templates/passage.html   $out/${pythonLibDir}/templates/passage.html
   '';
   propagatedBuildInputs = [
     flask

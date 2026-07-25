@@ -5,7 +5,7 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "manif-geom-rs";
-  version = "0.0.0";
+  version = "0.0.1";
   src = pkg-src;
   cargoHash = "sha256-Y7pS5WeFLRdj9jrWiA/kbHdzkdZL+eEZ9Ft0Wh2XNr0=";
   meta = {

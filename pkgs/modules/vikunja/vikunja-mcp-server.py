@@ -351,11 +351,25 @@ def main():
     # Read configuration from environment
     base_url = os.environ.get("VIKUNJA_URL", "https://localhost:3457")
     api_token = os.environ.get("VIKUNJA_API_TOKEN")
+    if not api_token:
+        token_file = os.environ.get("VIKUNJA_TOKEN_FILE")
+        if token_file:
+            try:
+                with open(os.path.expanduser(token_file)) as f:
+                    api_token = json.load(f).get("token")
+            except (OSError, json.JSONDecodeError) as e:
+                print(
+                    json.dumps(
+                        {"error": f"Failed to read token from {token_file}: {e}"}
+                    ),
+                    file=sys.stderr,
+                )
+                sys.exit(1)
 
     if not api_token:
         print(
             json.dumps(
-                {"error": "VIKUNJA_API_TOKEN environment variable not set"}
+                {"error": "VIKUNJA_API_TOKEN or VIKUNJA_TOKEN_FILE must be set"}
             ),
             file=sys.stderr,
         )

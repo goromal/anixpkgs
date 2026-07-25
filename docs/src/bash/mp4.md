@@ -6,9 +6,14 @@ Generate and edit MP4 video files using `ffmpeg`.
 ## Usage
 
 ```bash
-usage: mp4 inputfile outputfile
+usage: mp4 [opts] inputfile outputfile
+       mp4 [opts] vacuum directory
 
 Create a mp4 file.
+
+With the "vacuum" sub-command, convert every file with a supported input
+extension in the given directory, preserving each filename (only the
+extension changes).
 
 Inputs:
     .mp4

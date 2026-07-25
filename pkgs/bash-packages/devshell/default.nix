@@ -41,6 +41,7 @@ let
   shellFile = ./mkDevShell.nix;
   shellSetupScript = ./setupWsShell.py;
   devScript = ./dev.py;
+  selectWsScript = ./selectWorkspace.py;
 in
 (writeArgparseScriptBin pkgname usage_str
   [
@@ -136,12 +137,13 @@ in
               --arg devScript ${devScript} \
               --arg parseScript ${parseScript} \
               --argstr devHistFile "$devhist" \
-              --command "$runcmd"
-        fi 
+              --command "unset DEVSHELL_ACTIVE; $runcmd"
+        fi
     fi
   ''
 )
 // {
+  inherit selectWsScript;
   meta = {
     description = "Developer tool for creating siloed dev environments.";
     longDescription = ''

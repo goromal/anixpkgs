@@ -15,11 +15,11 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "claude-code";
-  version = "2.1.113";
+  version = "2.1.177";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${finalAttrs.version}.tgz";
-    hash = "sha256-VPAP15/GedLvE6bFZsvsrISUkI3RD1x3xFsQxm8drDs=";
+    hash = "sha256-uzSTB+4sbK/mpMbN8q/gpjjV5abYF5x19KUN5fSRcrw=";
   };
 
   npmDepsHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
@@ -28,10 +28,6 @@ buildNpmPackage (finalAttrs: {
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
-
-    # https://github.com/anthropics/claude-code/issues/15195
-    substituteInPlace cli.js \
-          --replace-fail '#!/bin/sh' '#!/usr/bin/env sh'
   '';
 
   dontNpmBuild = true;

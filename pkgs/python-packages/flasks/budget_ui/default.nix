@@ -4,6 +4,7 @@
   flask,
   werkzeug,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -13,11 +14,11 @@ buildPythonPackage rec {
   version = "0.0.0";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/budget_ui";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./main.html} $out/${pythonLibDir}/templates/main.html
-    cp ${./upload_config.html} $out/${pythonLibDir}/templates/upload_config.html
+    cp main.html $out/${pythonLibDir}/templates/main.html
+    cp upload_config.html $out/${pythonLibDir}/templates/upload_config.html
   '';
   propagatedBuildInputs = [
     flask

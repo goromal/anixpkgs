@@ -49,6 +49,7 @@ in
         name = "Tactical";
         path = "/tactical/";
         description = "Daily tactical planning";
+        icon = "calendar-check";
       }
     ];
 

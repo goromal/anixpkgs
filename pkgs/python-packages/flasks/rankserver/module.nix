@@ -21,10 +21,25 @@ in
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
+    secretsFile = lib.mkOption {
+      type = lib.types.str;
+      description = "Path to JSON file with secret_key and password_hash";
+      default = "/data/andrew/secrets/flask/rankserver.json";
+    };
   };
 
   config = lib.mkIf cfg.enable {
     systemd.tmpfiles.rules = [ "d ${cfg.rootDir}/defaultRankables 0755 andrew dev -" ];
+
+    machines.base.webServices = [
+      {
+        name = "Preferences";
+        path = "/rank/";
+        description = "Define preference ordering";
+        icon = "ranking-star";
+        faviconSvg = anixpkgs.pkgData.icons.favicons.ranking-star.data;
+      }
+    ];
 
     systemd.services.rankserver-setup = {
       description = "Reset rankables symlink to defaultRankables";
@@ -44,7 +59,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/rankserver --port ${builtins.toString service-ports.rankserver} --data-dir ${cfg.rootDir}/rankables --subdomain /rank";
+        ExecStart = "${cfg.package}/bin/rankserver --port ${builtins.toString service-ports.rankserver} --data-dir ${cfg.rootDir}/rankables --subdomain /rank --secrets-file ${cfg.secretsFile}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";

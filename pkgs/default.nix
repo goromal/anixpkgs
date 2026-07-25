@@ -3,6 +3,8 @@ with prev.lib;
 let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
+  unstable = (import ./nixos/dependencies.nix).unstable;
+  ros-pkgs = (import ./nixos/dependencies.nix).ros-pkgs;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -47,7 +49,8 @@ let
     pkg-attr
     // rec {
       doc = prev.writeTextFile {
-        name = "doc.txt";
+        name = "doc";
+        destination = "/doc.txt";
         text = (
           if builtins.hasAttr "description" pkg-attr.meta then
             (''
@@ -72,6 +75,33 @@ let
   baseJavaArgs = {
     jre = minJRE;
   };
+
+  # crates.io returns 403 for requests without a User-Agent header. nixpkgs PR #512735 fixes this
+  # in fetchCargoVendor but was not backported to nixos-25.11. Remove this once the flake.nix
+  # nixpkgs input is updated to a branch/rev that includes that PR (nixos-26.05 or later).
+  patchedRustPlatform = prev.rustPlatform.overrideScope (
+    rFinal: rPrev: {
+      fetchCargoVendor = rPrev.fetchCargoVendor.override {
+        writers = prev.writers // {
+          writePython3Bin =
+            name: args: content:
+            prev.writers.writePython3Bin name args (
+              if name != "fetch-cargo-vendor-util" then
+                content
+              else
+                builtins.replaceStrings
+                  [
+                    "    session = requests.Session()\n    session.mount('http://"
+                  ]
+                  [
+                    "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
+                  ]
+                  content
+            );
+        };
+      };
+    }
+  );
 
   baseModuleArgs = {
     pkgs = final;
@@ -115,6 +145,51 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              jetson-stats = addDoc (
+                pySelf.callPackage ./python-packages/jetson-stats {
+                  pkg-src = flakeInputs.jetson-stats;
+                }
+              );
+              spandrel = pySelf.callPackage ./python-packages/spandrel {
+                pkg-src = flakeInputs.spandrel-src;
+              };
+              segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
+              opencv4 = pySuper.opencv4.override { enableCuda = false; };
+              # aarch64 (Jetson): nixpkgs' from-source kornia-rs is
+              # badPlatforms=aarch64-linux (rustc SIGSEGV); use the prebuilt
+              # wheel so kornia (and thus comfyui) builds. See
+              # ./python-packages/kornia-rs/default.nix. x86 is untouched.
+              kornia-rs =
+                if final.stdenv.hostPlatform.isAarch64 then
+                  pySelf.callPackage ./python-packages/kornia-rs { }
+                else
+                  pySuper.kornia-rs;
+              comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
+              comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
+              comfyui-workflow-templates-core =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
+                  { };
+              comfyui-workflow-templates-media-api =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-api
+                  { };
+              comfyui-workflow-templates-media-video =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-video
+                  { };
+              comfyui-workflow-templates-media-image =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-image
+                  { };
+              comfyui-workflow-templates-media-other =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-other
+                  { };
+              comfyui-workflow-templates = pySelf.callPackage ./python-packages/comfyui-workflow-templates { };
+              comfyui-embedded-docs = pySelf.callPackage ./python-packages/comfyui-embedded-docs { };
+              jupyter-mimetypes = pySelf.callPackage ./python-packages/jupyter-mimetypes { };
+              jupyter-kernel-client = pySelf.callPackage ./python-packages/jupyter-kernel-client { };
+              jupyter-server-client = pySelf.callPackage ./python-packages/jupyter-server-client { };
+              jupyter-nbmodel-client = pySelf.callPackage ./python-packages/jupyter-nbmodel-client { };
+              jupyter-mcp-tools = pySelf.callPackage ./python-packages/jupyter-mcp-tools { };
+              jupyter-server-nbmodel = pySelf.callPackage ./python-packages/jupyter-server-nbmodel { };
+              jupyter-mcp-server = addDoc (pySelf.callPackage ./python-packages/jupyter-mcp-server { });
               goromail = addDoc (pySelf.callPackage ./python-packages/goromail { });
               symforce = addDoc (pySelf.callPackage ./python-packages/symforce { });
               fqt = addDoc (pySelf.callPackage ./python-packages/fqt { });
@@ -194,6 +269,11 @@ let
                   pkg-src = flakeInputs.mavlog-utils;
                 }
               );
+              indi-harness = addDoc (
+                pySelf.callPackage ./python-packages/indi-harness {
+                  pkg-src = flakeInputs.indi-harness;
+                }
+              );
               mesh-plotter = addDoc (
                 pySelf.callPackage ./python-packages/mesh-plotter {
                   pkg-src = flakeInputs.mesh-plotter;
@@ -244,13 +324,56 @@ let
               flask-mp3server = addDoc (pySelf.callPackage ./python-packages/flasks/mp3server { });
               flask-smfserver = addDoc (pySelf.callPackage ./python-packages/flasks/smfserver { });
               flask-oatbox = addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
-              rankserver = addDoc (pySelf.callPackage ./python-packages/flasks/rankserver { });
-              stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
-              authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
-              budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
-              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
-              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
-              self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
+              rankserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/rankserver { pkg-src = flakeInputs.flasks; }
+              );
+              stampserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/stampserver { pkg-src = flakeInputs.flasks; }
+              );
+              authui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/authui { pkg-src = flakeInputs.flasks; }
+              );
+              budget_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/budget_ui { pkg-src = flakeInputs.flasks; }
+              );
+              orchestrator_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/orchestrator_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              la_quiz_web = addDoc (
+                pySelf.callPackage ./python-packages/flasks/la-quiz-web { pkg-src = flakeInputs.flasks; }
+              );
+              disciple = addDoc (
+                pySelf.callPackage ./python-packages/flasks/disciple { pkg-src = flakeInputs.flasks; }
+              );
+              anix_upgrade_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              sunset = addDoc (
+                pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
+              );
+              self-tester-app = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
+              );
+              tasks_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
+              );
+              intake_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/intake_ui { pkg-src = flakeInputs.flasks; }
+              );
+              wormhole = addDoc (
+                pySelf.callPackage ./python-packages/flasks/wormhole { pkg-src = flakeInputs.flasks; }
+              );
+              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { pkg-src = flakeInputs.flasks; });
+              vdlserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/videodl {
+                  yt-dlp = unstable.yt-dlp;
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -322,6 +445,8 @@ rec {
   surveys_report = final.python313.pkgs.surveys_report;
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
+  indi-harness = final.python313.pkgs.indi-harness;
+  mavproxy = final.python313.pkgs.pinned-mavproxy;
   fqt = final.python313.pkgs.fqt;
   ichabod = final.python313.pkgs.ichabod;
   norbert = final.python313.pkgs.norbert;
@@ -352,7 +477,15 @@ rec {
   budget_ui = final.python313.pkgs.budget_ui;
   orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  disciple = final.python313.pkgs.disciple;
+  anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  tasks_ui = final.python313.pkgs.tasks_ui;
+  intake_ui = final.python313.pkgs.intake_ui;
+  wormhole = final.python313.pkgs.wormhole;
+  cozy = final.python313.pkgs.cozy;
+  vdlserver = final.python313.pkgs.vdlserver;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
@@ -362,6 +495,69 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  jetson-stats = final.python313.pkgs.jetson-stats;
+  spandrel = final.python313.pkgs.spandrel;
+  onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
+  segment-anything = final.python313.pkgs.segment-anything;
+  comfy-kitchen = final.python313.pkgs.comfy-kitchen;
+  comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
+  comfyui-workflow-templates-core = final.python313.pkgs.comfyui-workflow-templates-core;
+  comfyui-workflow-templates-media-api = final.python313.pkgs.comfyui-workflow-templates-media-api;
+  comfyui-workflow-templates-media-video =
+    final.python313.pkgs.comfyui-workflow-templates-media-video;
+  comfyui-workflow-templates-media-image =
+    final.python313.pkgs.comfyui-workflow-templates-media-image;
+  comfyui-workflow-templates-media-other =
+    final.python313.pkgs.comfyui-workflow-templates-media-other;
+  comfyui-workflow-templates = final.python313.pkgs.comfyui-workflow-templates;
+  comfyui-embedded-docs = final.python313.pkgs.comfyui-embedded-docs;
+  comfyui =
+    let
+      py = final.python313;
+      pyPkgs = py.pkgs;
+    in
+    prev.callPackage ./python-packages/comfyui {
+      python313 = py;
+      torch = pyPkgs.torch;
+      torchsde = pyPkgs.torchsde;
+      torchvision = pyPkgs.torchvision;
+      torchaudio = pyPkgs.torchaudio;
+      numpy = pyPkgs.numpy;
+      einops = pyPkgs.einops;
+      transformers = pyPkgs.transformers;
+      tokenizers = pyPkgs.tokenizers;
+      sentencepiece = pyPkgs.sentencepiece;
+      safetensors = pyPkgs.safetensors;
+      aiohttp = pyPkgs.aiohttp;
+      yarl = pyPkgs.yarl;
+      pyyaml = pyPkgs.pyyaml;
+      pillow = pyPkgs.pillow;
+      scipy = pyPkgs.scipy;
+      tqdm = pyPkgs.tqdm;
+      psutil = pyPkgs.psutil;
+      alembic = pyPkgs.alembic;
+      sqlalchemy = pyPkgs.sqlalchemy;
+      requests = pyPkgs.requests;
+      pydantic = pyPkgs.pydantic;
+      pydantic-settings = pyPkgs.pydantic-settings;
+      kornia = pyPkgs.kornia;
+      spandrel = pyPkgs.spandrel;
+      av = pyPkgs.av;
+      comfy-kitchen = pyPkgs."comfy-kitchen";
+      comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
+      comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
+      comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
+      ultralytics = pyPkgs.ultralytics;
+      opencv4 = pyPkgs.opencv4;
+      dill = pyPkgs.dill;
+      scikit-image = pyPkgs."scikit-image";
+      piexif = pyPkgs.piexif;
+      matplotlib = pyPkgs.matplotlib;
+      gitpython = pyPkgs.gitpython;
+      segment-anything = pyPkgs."segment-anything";
+      pkg-src = flakeInputs.comfyui-src;
+    };
+  jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
 
@@ -372,6 +568,7 @@ rec {
     }
   );
   local-ssh-proxy = addDoc (prev.callPackage ./bash-packages/local-ssh-proxy { });
+  ssht = addDoc (prev.callPackage ./bash-packages/ssht { });
   gantter = addDoc (
     prev.callPackage ./bash-packages/gantter {
       python = final.python313;
@@ -454,7 +651,19 @@ rec {
     }
   );
   ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
-  arducopter = (prev.callPackage ./cxx-packages/arducopter { python = python313; }).copter;
+  arducopter =
+    (prev.callPackage ./cxx-packages/arducopter {
+      python = python313;
+      microxrceddsgen = final.microxrceddsgen;
+    }).copter;
+  microxrceddsgen = prev.callPackage ./cxx-packages/microxrce-dds-gen {
+    pkg-src = flakeInputs.microxrce-dds-gen;
+  };
+  # Built with the nix-ros-overlay jazzy scope so its fastdds matches the rmw
+  # used by the ROS2 environment on drone machines.
+  microxrce-dds-agent = ros-pkgs.rosPackages.jazzy.callPackage ./cxx-packages/microxrce-dds-agent {
+    pkg-src = flakeInputs.microxrce-dds-agent;
+  };
   manif-geom-cpp = addDoc (
     prev.callPackage ./cxx-packages/manif-geom-cpp {
       pkg-src = flakeInputs.manif-geom-cpp;
@@ -529,21 +738,33 @@ rec {
   manif-geom-rs = addDoc (
     prev.callPackage ./rust-packages/manif-geom-rs {
       pkg-src = flakeInputs.manif-geom-rs;
+      rustPlatform = patchedRustPlatform;
+    }
+  );
+  # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
+  # rustc; build it with unstable's rustPlatform until the pin catches up.
+  msrs = addDoc (
+    prev.callPackage ./rust-packages/msrs {
+      pkg-src = flakeInputs.msrs;
+      rustPlatform = unstable.rustPlatform;
     }
   );
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
+      rustPlatform = patchedRustPlatform;
     }
   );
   sunnyside = addDoc (
     prev.callPackage ./rust-packages/sunnyside {
       pkg-src = flakeInputs.sunnyside;
+      rustPlatform = patchedRustPlatform;
     }
   );
   rtk = addDoc (
     prev.callPackage ./rust-packages/rtk {
       pkg-src = flakeInputs.rtk;
+      rustPlatform = patchedRustPlatform;
     }
   );
 
@@ -564,6 +785,6 @@ rec {
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
 
-  # Override claude-code-bin to use version 2.1.113
+  # Override claude-code-bin to use version 2.1.177
   claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

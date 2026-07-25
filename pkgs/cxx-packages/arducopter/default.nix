@@ -11,6 +11,7 @@
   gcc13,
   gcc-arm-embedded-13,
   flakeInputs,
+  microxrceddsgen ? null,
 }:
 let
   arduSitlEnv = overrideCC stdenv gcc13;
@@ -25,6 +26,8 @@ let
       arduEnv,
       board,
       installPhase,
+      extraConfigureFlags ? "",
+      extraNativeBuildInputs ? [ ],
     }:
     arduEnv.mkDerivation rec {
       name = "arducopter-${flakeInputs.ardupilot.shortRev}-${board}";
@@ -34,10 +37,11 @@ let
       nativeBuildInputs = [
         git
         pythonWithPkgs
-      ];
+      ]
+      ++ extraNativeBuildInputs;
       patchPhase = ''
         git init
-        git add modules/ChibiOS modules/mavlink modules/gtest modules/littlefs
+        git add modules/ChibiOS modules/mavlink modules/gtest modules/littlefs modules/Micro-XRCE-DDS-Client modules/Micro-CDR
         echo ${flakeInputs.ardupilot.rev} > .git/HEAD
         patchShebangs ./waf
         sed -i 's#BINDING_CC="gcc"#BINDING_CC="${gcc13}/bin/gcc"#g' libraries/AP_Scripting/wscript
@@ -45,7 +49,7 @@ let
         sed -i '1s/^/#include <cstdint>\n/' libraries/AP_HAL_SITL/CANSocketIface.cpp
       '';
       configurePhase = ''
-        ./waf configure --board ${board}
+        ./waf configure --board ${board} ${extraConfigureFlags}
         ./waf clean
       '';
       buildPhase = ''
@@ -77,6 +81,9 @@ rec {
     sitl = mkArduCopter {
       arduEnv = arduSitlEnv;
       board = "sitl";
+      # Native ROS2 support via the embedded AP_DDS Micro XRCE-DDS client
+      extraConfigureFlags = "--enable-DDS";
+      extraNativeBuildInputs = [ microxrceddsgen ];
       installPhase = ''
         mkdir -p $out/bin
         mv ./build/sitl/bin/* $out/bin/arducopter

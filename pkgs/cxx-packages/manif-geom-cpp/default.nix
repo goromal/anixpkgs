@@ -7,7 +7,7 @@
 }:
 clangStdenv.mkDerivation {
   name = "manif-geom-cpp";
-  version = "1.0.0";
+  version = "1.1.0";
   src = pkg-src;
   nativeBuildInputs = [ cmake ];
   buildInputs = [

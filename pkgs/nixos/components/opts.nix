@@ -55,35 +55,5 @@ with import ../dependencies.nix;
       default = false;
       description = "Whether to export OS metrics";
     };
-    claudeMarketplaces = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "List of extra plugin marketplaces to install";
-    };
-    claudePlugins = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "List of claude plugins to install";
-    };
-    extraClaudeSettings = lib.mkOption {
-      type = lib.types.attrs;
-      default = { };
-      description = "Attrs describing the Claude JSON settings";
-    };
-    vikunjaEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether Vikunja is enabled on this machine (enables MCP setup in claude-setup)";
-    };
-    notionMcpEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether the Notion MCP server is installed on this machine (enables MCP setup in claude-setup)";
-    };
-    wikiMcpEnabled = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether the Wiki MCP server is installed on this machine (enables MCP setup in claude-setup)";
-    };
   };
 }

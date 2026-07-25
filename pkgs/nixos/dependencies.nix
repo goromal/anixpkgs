@@ -17,39 +17,15 @@ rec {
   unstable =
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
       { };
-  service-ports = import ./service-ports.nix;
-  mkProfileConfig =
-    baseCfg:
+  # ROS2 package set from nix-ros-overlay, built on its own pinned nixpkgs
+  # (required for compatibility and for ros.cachix.org binary cache hits).
+  ros-pkgs =
     let
-      mkOneshotTimedOrchService =
-        {
-          name,
-          jobShellScript,
-          timerCfg,
-          readWritePaths ? [ "/" ],
-          execStartPre ? null,
-        }:
-        {
-          systemd.timers."${name}" = {
-            description = "${name} trigger timer";
-            wantedBy = [ "timers.target" ];
-            timerConfig = timerCfg // {
-              Unit = "${name}.service";
-            };
-          };
-          systemd.services."${name}" = {
-            enable = true;
-            description = "${name} oneshot service";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${jobShellScript}'";
-              ReadWritePaths = readWritePaths;
-            }
-            // (if execStartPre != null then { ExecStartPre = execStartPre; } else { });
-          };
-        };
+      lock = builtins.fromJSON (builtins.readFile ../../flake.lock);
     in
-    (builtins.foldl' (acc: set: anixpkgs.lib.recursiveUpdate acc set) {
-      machines.base = baseCfg;
-    } (map (x: (mkOneshotTimedOrchService x)) baseCfg.timedOrchJobs));
+    import (fetchTarball {
+      url = "https://github.com/lopsided98/nix-ros-overlay/archive/${lock.nodes.nix-ros-overlay.locked.rev}.tar.gz";
+      sha256 = lock.nodes.nix-ros-overlay.locked.narHash;
+    }) { };
+  service-ports = import ./service-ports.nix;
 }

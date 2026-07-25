@@ -10,7 +10,7 @@ let
     map (x: ''
       echo -e "\n\n### ${x}" >> $out/helpstr.txt
       echo -e "\n\n\`\`\`bash" >> $out/helpstr.txt
-      "$xc" ${x} ${helpCmd} >> $out/helpstr.txt
+      "$xc" ${x} ${helpCmd} >> $out/helpstr.txt || true
       echo -n "\`\`\`" >> $out/helpstr.txt
     '') subCmds
   );
@@ -19,7 +19,7 @@ let
       mkdir $out
       for xc in "${packageAttr}/bin"/*; do
         echo "\`\`\`bash" >> $out/helpstr.txt
-        "$xc" ${helpCmd} >> $out/helpstr.txt
+        "$xc" ${helpCmd} >> $out/helpstr.txt || true
         echo -n "\`\`\`" >> $out/helpstr.txt
         ${mkSubCmds}
       done  

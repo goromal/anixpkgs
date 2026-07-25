@@ -62,6 +62,7 @@ in
         anixpkgs.book-notes-sync
         anixpkgs.budget_report
         anixpkgs.surveys_report
+        anixpkgs.ssht
         anixpkgs.backup
         anixpkgs.ckfile
         anixpkgs.color-prints

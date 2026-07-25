@@ -113,7 +113,7 @@ in
             repourl="''${i#*:}"
             if [[ ! -d $reponame ]]; then
                 ${printGrn} "Cloning and setting up $reponame..."
-                git clone --recurse-submodules "$repourl" "$reponame"
+                git clone --filter=blob:none --recurse-submodules "$repourl" "$reponame"
             else
                 ${printGrn} "Repo $reponame present."
             fi

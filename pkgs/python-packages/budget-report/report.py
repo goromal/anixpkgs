@@ -73,7 +73,8 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
                 secrets_json,
                 refresh_file,
                 headless=True,
-            )
+            ),
+            http_client=gspread.BackOffHTTPClient,
         ).open_by_key(config["spreadsheetId"])
         config_data = sheet.worksheet(config["configSheetName"]).get_all_records()
         ctx.obj = {
@@ -149,18 +150,24 @@ def transactions_process(ctx: click.Context, dry_run):
     ]
     if len(unprocessed_transactions) > 0:
         print("Processing the following raw transactions:")
+        dest_sheet_cache = {}  # (sheet_name, dest_lfcol) -> [sheet_obj, next_row_index]
         for t in unprocessed_transactions:
             print(t[1], t[2], t[3], t[4])
             if not dry_run:
                 if t[5] == "NONE":
                     raw_transactions_sheet.update_cell(int(t[0]), 1, "X")
                 elif t[5] in category_sheets:
-                    time.sleep(1.0)
-                    dest_sheet = ctx.obj["sheet"].worksheet(category_sheets[t[5]][0])
+                    sheet_name = category_sheets[t[5]][0]
                     dest_lfcol = category_sheets[t[5]][1] + 1
-                    col_vals = dest_sheet.col_values(dest_lfcol)
+                    cache_key = (sheet_name, dest_lfcol)
+                    if cache_key not in dest_sheet_cache:
+                        time.sleep(1.0)
+                        dest_sheet = ctx.obj["sheet"].worksheet(sheet_name)
+                        col_vals = dest_sheet.col_values(dest_lfcol)
+                        dest_sheet_cache[cache_key] = [dest_sheet, len(col_vals) + 1]
+                    dest_sheet, empty_row_index = dest_sheet_cache[cache_key]
+                    dest_sheet_cache[cache_key][1] += 1
                     time.sleep(1.0)
-                    empty_row_index = len(col_vals) + 1
                     first_col_letter = column_index_to_letter(dest_lfcol)
                     last_col_letter = column_index_to_letter(dest_lfcol + 4)
                     dest_sheet.update(
