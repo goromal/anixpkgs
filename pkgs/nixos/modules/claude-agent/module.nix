@@ -71,8 +71,7 @@
     # takes you from anywhere inside a devshell to that workspace's `sources`
     # directory and opens claude there. `godev` is only defined inside a
     # devshell, so this is a no-op outside one.
-    environment.shellAliases.goclaude =
-      ''if [ -n "$DEVSHELL_ACTIVE" ]; then godev && cd sources && claude; else echo "goclaude: only available inside a devshell"; fi'';
+    environment.shellAliases.goclaude = ''if [ -n "$DEVSHELL_ACTIVE" ]; then godev && cd sources && claude; else echo "goclaude: only available inside a devshell"; fi'';
 
     services.vikunja-mcp.enable = lib.mkDefault (
       builtins.any (s: s.name == "vikunja") config.machines.claude.mcpServers
