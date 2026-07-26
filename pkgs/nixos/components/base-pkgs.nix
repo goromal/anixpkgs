@@ -108,7 +108,6 @@ in
       ++ (
         if cfg.standalone == false then
           [
-            pkgs.docker
             pkgs.tmux
           ]
         else

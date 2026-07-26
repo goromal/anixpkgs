@@ -63,6 +63,7 @@ in
 
   systemd.tmpfiles.rules = [
     "d /data 0777 root root"
+    "d ${homeDir}/sources 0755 andrew dev -"
   ];
 
   # Nix daemon settings ----------------------------------------------------------
