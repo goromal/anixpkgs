@@ -270,6 +270,7 @@ in
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
     ../python-packages/flasks/intake_ui/module.nix
+    ../python-packages/flasks/mail/module.nix
     (
       let
         # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
@@ -513,6 +514,11 @@ in
 
       services.intake_ui = {
         enable = cfg.isATS;
+      };
+
+      services.mail_ui = {
+        enable = cfg.isATS;
+        rcrsync = machine-rcrsync;
       };
 
       environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
