@@ -40,7 +40,7 @@ runCommand "make-wallpaper-${builtins.toString randomInt}" { } ''
   ${imagemagick}/bin/magick -font ${pkgData.fonts.nexa.data} -pointsize 30 -fill white \
     ${sourceImage} \
     -resize ${screenResolution}^ -gravity west -extent ${screenResolution} -gravity northwest \
-    \( ${pkgData.img.ajt-logo-white.data} -resize ${builtins.toString logo_w}x${builtins.toString logo_h}! \) -geometry +${builtins.toString logo_x}+${builtins.toString logo_y} -composite \
+    \( ${pkgData.img.ajt-logo-outline.data} -resize ${builtins.toString logo_w}x${builtins.toString logo_h}! \) -geometry +${builtins.toString logo_x}+${builtins.toString logo_y} -composite \
     \( ${pkgData.img.anix-logo-white-bmp.data} -resize ${builtins.toString anix_w}x${builtins.toString anix_h}! \) -geometry +${builtins.toString anix_x}+${builtins.toString anix_y} -composite \
     -draw 'text ${builtins.toString label_x},${builtins.toString label_y} "${label}"' \
     $out
