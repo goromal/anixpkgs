@@ -4,7 +4,7 @@
   lib,
   ...
 }:
-with import ../../dependencies.nix;
+with import ../../nixos/dependencies.nix;
 let
   cfg = config.machines.base;
   # Built entirely via JS DOM so element.style overrides any page stylesheet.
