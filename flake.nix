@@ -11,7 +11,7 @@
     flake-compat.url = "github:edolstra/flake-compat";
     flake-compat.flake = false;
 
-    flake-utils.url = "github:numtide/flake-utils"; 
+    flake-utils.url = "github:numtide/flake-utils";
 
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
