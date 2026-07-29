@@ -119,6 +119,12 @@ let
   '';
 in
 {
+  # Pull in the generic upgrade-hooks option so this leaf module can define its
+  # own on-change hooks regardless of how it is imported (NixOS pc-base or a
+  # standalone home.nix). Module imports dedupe by path, so pc-base importing
+  # upgrade-hooks.nix too is harmless.
+  imports = [ ./upgrade-hooks.nix ];
+
   options.mods.claude = {
     marketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
