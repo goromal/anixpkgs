@@ -72,6 +72,51 @@ let
       else
         registerCmd
     );
+
+  # Status line script (see res/claude-statusline.sh). PATH is prepended so the
+  # jq/date/coreutils it relies on resolve regardless of the caller's env.
+  statuslineScript = pkgs.writeShellScript "claude-statusline" ''
+    export PATH="${
+      lib.makeBinPath [
+        pkgs.jq
+        pkgs.coreutils
+      ]
+    }:$PATH"
+    ${builtins.readFile ../res/claude-statusline.sh}
+  '';
+
+  # claude-setup as a named derivation so its store path can be watched by an
+  # upgrade hook (re-run setup only when this script's content changes). The gh
+  # auth step is TTY-guarded so the hook can run it non-interactively.
+  claudeSetupScript = pkgs.writeShellScriptBin "claude-setup" ''
+    if ! command -v claude &> /dev/null; then
+      echo_red "Error: claude not found in PATH"
+      exit 1
+    fi
+    echo_yellow "Installing claude plugins..."
+    ${lib.concatMapStringsSep "\n      " (
+      marketplace: "claude plugin marketplace add ${marketplace}"
+    ) cfg.marketplaces}
+    ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.plugins}
+    echo_green "Done! Verify installed plugins with \"claude plugin list\""
+
+    ${lib.concatMapStringsSep "\n" mcpServerSetupScript cfg.mcpServers}
+
+    echo_yellow "Installing rtk Claude Code hook..."
+    rtk init -g
+    echo_green "rtk hook installed"
+
+    echo_yellow "Other setup..."
+    if [ -t 0 ]; then
+      read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        gh auth login
+      fi
+    else
+      echo_yellow "Non-interactive session; skipping gh auth login."
+    fi
+  '';
 in
 {
   options.mods.claude = {
@@ -177,31 +222,7 @@ in
     home.packages = [
       anixpkgs.claude-code-bin
       anixpkgs.rtk
-      (pkgs.writeShellScriptBin "claude-setup" ''
-        if ! command -v claude &> /dev/null; then
-          echo_red "Error: claude not found in PATH"
-          exit 1
-        fi
-        echo_yellow "Installing claude plugins..."
-        ${lib.concatMapStringsSep "\n      " (
-          marketplace: "claude plugin marketplace add ${marketplace}"
-        ) cfg.marketplaces}
-        ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.plugins}
-        echo_green "Done! Verify installed plugins with \"claude plugin list\""
-
-        ${lib.concatMapStringsSep "\n" mcpServerSetupScript cfg.mcpServers}
-
-        echo_yellow "Installing rtk Claude Code hook..."
-        rtk init -g
-        echo_green "rtk hook installed"
-
-        echo_yellow "Other setup..."
-        read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          gh auth login
-        fi
-      '')
+      claudeSetupScript
       (pkgs.writeShellScriptBin "claude-update" ''
         if ! command -v claude &> /dev/null; then
           echo_red "Error: claude not found in PATH"
@@ -240,6 +261,11 @@ in
         );
         baseConfig = {
           enabledPlugins = pluginsObj;
+          statusLine = {
+            type = "command";
+            command = "${statuslineScript}";
+            padding = 0;
+          };
         };
         nixosSettings = baseConfig // cfg.extraSettings;
         nixosSettingsJson = builtins.toJSON nixosSettings;
@@ -324,5 +350,18 @@ in
           WantedBy = [ "default.target" ];
         };
       };
+
+    # Re-run claude-setup after an upgrade only when the setup script's content
+    # changes (new plugins/marketplaces/MCP servers). Settings-file regen is
+    # already handled by the claude-settings-update unit above, which is itself
+    # an on-change oneshot (the reference pattern this hook generalizes).
+    mods.upgradeHooks = [
+      {
+        name = "claude-setup";
+        watch = [ claudeSetupScript ];
+        command = "${claudeSetupScript}/bin/claude-setup";
+        description = "Re-run claude-setup when its script content changes";
+      }
+    ];
   };
 }
