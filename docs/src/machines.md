@@ -81,6 +81,47 @@ export NIXPKGS_ALLOW_UNFREE=1
 # eval "$(direnv hook bash)"
 ```
 
+### Claude Code status line & on-change upgrade hooks
+
+Machines that import `components/claude-agent.nix` (either via `pc-base.nix` or a
+standalone `home.nix` as above) get two extra behaviors for free — no additional
+options need to be set:
+
+- **Status line.** The generated `~/.claude/settings.json` sets a
+  [status line](https://code.claude.com/docs/en/statusline) (see
+  `pkgs/nixos/res/claude-statusline.sh`) showing a colored context-usage bar
+  (with a `⚠200k+` marker), 5-hour / 7-day rate-limit warnings when usage climbs,
+  and the model, effort level, and session cost. It is written into the
+  `statusLine` key by the `claude-settings-update` user service.
+
+- **On-change upgrade hooks.** `claude-agent.nix` registers a `claude-setup`
+  hook via the generic `mods.upgradeHooks` mechanism (declared in
+  `components/upgrade-hooks.nix`, which `claude-agent.nix` imports itself, so it
+  is available even in a standalone `home.nix`). After an `anix-upgrade`, the
+  `claude-setup` script re-runs **only if its content changed** (new plugins,
+  marketplaces, or MCP servers) — its `gh auth login` prompt is skipped
+  automatically when run non-interactively.
+
+To add your own hook from any leaf module, append to `mods.upgradeHooks`:
+
+```nix
+mods.upgradeHooks = [
+  {
+    name = "my-hook";               # systemd unit: upgrade-hook-my-hook
+    watch = [ someScriptDerivation ]; # store paths whose content, if changed, triggers the hook
+    command = "${someScriptDerivation}/bin/do-thing";
+    description = "Runs do-thing when someScriptDerivation changes";
+  }
+];
+```
+
+Each hook becomes a `oneshot` user service whose `ExecStart` script embeds every
+`watch` store path. Because that script's own store hash then depends on the
+watched content, home-manager only re-runs the unit during the
+`nixos-rebuild`/`home-manager switch` that `anix-upgrade` performs **when a
+watched path actually changed** — no manual diffing. Inspect a run with
+`journalctl --user -u upgrade-hook-<name>`.
+
 ## Personal Machine Installation Instructions
 
 *Sources*
