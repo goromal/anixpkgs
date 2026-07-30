@@ -82,5 +82,6 @@ in
       ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
+    services.homeVpnNode.enable = true;
   };
 }
