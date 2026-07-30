@@ -897,6 +897,7 @@ in
             imports = [
               ./components/opts.nix
               ./components/base-pkgs.nix
+              ./components/upgrade-hooks.nix
             ]
             ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
             ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
