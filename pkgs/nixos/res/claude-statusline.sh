@@ -13,6 +13,7 @@ YELLOW=$'\033[33m'
 RED=$'\033[31m'
 CYAN=$'\033[36m'
 DIM=$'\033[2m'
+SEP="${DIM} │ ${RESET}"
 
 # Pick a color for a 0-100 percentage: green <50, yellow 50-80, red >80.
 pct_color() {
@@ -66,15 +67,15 @@ fmt_reset() {
 }
 
 rl_segment() {
-  # $1 = label, $2 = used_percentage (or empty), $3 = resets_at (or empty)
-  local label="$1" pct="$2" at="$3"
+  # $1 = icon, $2 = label, $3 = used_percentage (or empty), $4 = resets_at (or empty)
+  # Mirrors /usage, which always shows both session and week percentages —
+  # so always render here too (color still escalates as it climbs).
+  local icon="$1" label="$2" pct="$3" at="$4"
   [ -z "$pct" ] && return 0
   pct=$(printf '%s' "$pct" | cut -d. -f1)
-  # Only surface when meaningfully consumed; escalate color as it climbs.
-  [ "$pct" -lt 50 ] && return 0
   local c
   c=$(pct_color "$pct")
-  printf ' %s%s %s%%%s%s' "$c" "$label" "$pct" "$(fmt_reset "$at")" "$RESET"
+  printf '%s%s %s %s%%%s%s' "$c" "$icon" "$label" "$pct" "$(fmt_reset "$at")" "$RESET"
 }
 
 five_pct=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
@@ -82,8 +83,14 @@ five_at=$(printf '%s' "$input" | jq -r '.rate_limits.five_hour.resets_at // empt
 week_pct=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
 week_at=$(printf '%s' "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
-out="${out}$(rl_segment "5h" "$five_pct" "$five_at")"
-out="${out}$(rl_segment "7d" "$week_pct" "$week_at")"
+five_seg=$(rl_segment "⏱" "session" "$five_pct" "$five_at")
+week_seg=$(rl_segment "📅" "week" "$week_pct" "$week_at")
+if [ -n "$five_seg" ] || [ -n "$week_seg" ]; then
+  rl_out="$five_seg"
+  [ -n "$five_seg" ] && [ -n "$week_seg" ] && rl_out="${rl_out}  "
+  rl_out="${rl_out}${week_seg}"
+  out="${out}${SEP}${rl_out}"
+fi
 
 # --- Cost & model ---------------------------------------------------------
 model=$(printf '%s' "$input" | jq -r '.model.display_name // empty')
@@ -91,13 +98,13 @@ effort=$(printf '%s' "$input" | jq -r '.effort.level // empty')
 cost=$(printf '%s' "$input" | jq -r '.cost.total_cost_usd // empty')
 
 meta="${DIM}"
-[ -n "$model" ] && meta="${meta} ${CYAN}${model}${RESET}${DIM}"
+[ -n "$model" ] && meta="${meta}${CYAN}${model}${RESET}${DIM}"
 [ -n "$effort" ] && meta="${meta}/${effort}"
 if [ -n "$cost" ]; then
   meta="${meta} \$$(printf '%.4f' "$cost")"
 fi
 meta="${meta}${RESET}"
 
-out="${out}  ${meta}"
+out="${out}${SEP}${meta}"
 
 printf '%b\n' "$out"
