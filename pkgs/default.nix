@@ -668,6 +668,10 @@ rec {
   microxrce-dds-agent = ros-pkgs.rosPackages.jazzy.callPackage ./cxx-packages/microxrce-dds-agent {
     pkg-src = flakeInputs.microxrce-dds-agent;
   };
+  # Custom ROS 2 interface package (S3 Layer-B FlatSetpoint). Built with the
+  # jazzy scope so the generated fastrtps type support is wire-compatible with
+  # the AP_DDS FlatSetpoint message in the arducopter fork.
+  ardupilot-msgs = ros-pkgs.rosPackages.jazzy.callPackage ./nixos/ros/ardupilot_msgs { };
   manif-geom-cpp = addDoc (
     prev.callPackage ./cxx-packages/manif-geom-cpp {
       pkg-src = flakeInputs.manif-geom-cpp;
