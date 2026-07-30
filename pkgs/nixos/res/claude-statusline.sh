@@ -67,11 +67,11 @@ fmt_reset() {
 
 rl_segment() {
   # $1 = label, $2 = used_percentage (or empty), $3 = resets_at (or empty)
+  # Mirrors /usage, which always shows both session and week percentages —
+  # so always render here too (color still escalates as it climbs).
   local label="$1" pct="$2" at="$3"
   [ -z "$pct" ] && return 0
   pct=$(printf '%s' "$pct" | cut -d. -f1)
-  # Only surface when meaningfully consumed; escalate color as it climbs.
-  [ "$pct" -lt 50 ] && return 0
   local c
   c=$(pct_color "$pct")
   printf ' %s%s %s%%%s%s' "$c" "$label" "$pct" "$(fmt_reset "$at")" "$RESET"
