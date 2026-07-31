@@ -285,8 +285,8 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/ip-trans",
         "repo": "flasks",
-        "rev": "82f900f1b9a57a5938dfaf10b06d81cad4655b7f",
         "type": "github"
       }
     },

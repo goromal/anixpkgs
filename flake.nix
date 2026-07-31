@@ -49,7 +49,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks?rev=82f900f1b9a57a5938dfaf10b06d81cad4655b7f";
+    flasks.url = "github:goromal/flasks?ref=dev/ip-trans";
     flasks.flake = false;
 
     geometry.url = "github:goromal/geometry";
