@@ -72,13 +72,40 @@ let
     esac
   '';
 
-  homevpnDesktop = pkgs.makeDesktopItem {
-    name = "home-vpn-toggle";
-    desktopName = "Home VPN (toggle)";
-    comment = "Toggle the home OpenVPN tunnel on/off";
+  pyEnv = pkgs.python3.withPackages (ps: [ ps.pygobject3 ]);
+
+  homevpnGui = pkgs.stdenv.mkDerivation {
+    pname = "homevpn-gui";
+    version = "0.1.0";
+    dontUnpack = true;
+    dontConfigure = true;
+    dontBuild = true;
+    nativeBuildInputs = [
+      pkgs.wrapGAppsHook4
+      pkgs.gobject-introspection
+    ];
+    buildInputs = [
+      pyEnv
+      pkgs.gtk4
+      pkgs.libadwaita
+    ];
+    installPhase = ''
+      runHook preInstall
+      install -Dm755 ${./homevpn_gui.py} $out/bin/homevpn-gui
+      substituteInPlace $out/bin/homevpn-gui \
+        --replace '#!/usr/bin/env python3' '#!${pyEnv}/bin/python3' \
+        --replace '@homevpn@' '${homevpn}/bin/homevpn'
+      runHook postInstall
+    '';
+  };
+
+  homevpnGuiDesktop = pkgs.makeDesktopItem {
+    name = "homevpn-gui";
+    desktopName = "Home VPN";
+    comment = "Toggle the home OpenVPN tunnel";
     icon = "network-vpn";
-    exec = "${homevpn}/bin/homevpn toggle";
-    terminal = true;
+    exec = "${homevpnGui}/bin/homevpn-gui";
+    terminal = false;
     categories = [ "Network" ];
   };
 in
@@ -93,7 +120,10 @@ in
     environment.systemPackages = [
       pkgs.openvpn
       homevpn
-      homevpnDesktop
+    ]
+    ++ lib.optionals globalCfg.graphical [
+      homevpnGui
+      homevpnGuiDesktop
     ];
 
     # Manual-only client. NOT in wantedBy → never auto-starts at boot.
