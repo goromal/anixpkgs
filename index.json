@@ -433,7 +433,7 @@
             {
                 "attr": "wormhole",
                 "ci": true,
-                "docs": false
+                "docs": true
             }
         ],
         "bash": [
