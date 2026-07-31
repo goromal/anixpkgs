@@ -5,6 +5,7 @@
   anthropic,
   requests,
   beautifulsoup4,
+  wormhole,
   python,
   pkg-src,
 }:
@@ -28,12 +29,14 @@ buildPythonPackage rec {
     cp templates/result.html    $out/${pythonLibDir}/templates/result.html
     cp templates/results.html    $out/${pythonLibDir}/templates/results.html
     cp templates/passage.html   $out/${pythonLibDir}/templates/passage.html
+    cp templates/create_folio.html $out/${pythonLibDir}/templates/create_folio.html
   '';
   propagatedBuildInputs = [
     flask
     anthropic
     requests
     beautifulsoup4
+    wormhole
   ];
   meta = {
     description = "A self-testing and exam tool with rote, multiple choice, and short answer modes.";
