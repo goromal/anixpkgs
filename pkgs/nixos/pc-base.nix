@@ -244,6 +244,7 @@ in
     ../modules/cudaNode/module.nix
     ../modules/comfyui/module.nix
     ../modules/externalDrives/module.nix
+    ../modules/homeVpnNode/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
