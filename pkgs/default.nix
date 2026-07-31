@@ -358,6 +358,9 @@ let
               self-tester-app = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
               );
+              folio-backend = pySelf.callPackage ./python-packages/folio-backend {
+                pkg-src = flakeInputs.folio;
+              };
               tasks_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
               );
@@ -484,6 +487,7 @@ rec {
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  folio-backend = final.python313.pkgs.folio-backend;
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
