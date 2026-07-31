@@ -266,6 +266,11 @@
                 "docs": false
             },
             {
+                "attr": "folio-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "rankserver",
                 "ci": true,
                 "docs": true

@@ -361,6 +361,9 @@ let
               folio-backend = pySelf.callPackage ./python-packages/folio-backend {
                 pkg-src = flakeInputs.folio;
               };
+              folio-mcp = pySelf.callPackage ./python-packages/folio-mcp {
+                pkg-src = flakeInputs.folio;
+              };
               tasks_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
               );
@@ -488,6 +491,7 @@ rec {
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
+  folio-mcp = final.python313.pkgs.folio-mcp;
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
