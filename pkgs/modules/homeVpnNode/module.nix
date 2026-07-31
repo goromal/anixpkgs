@@ -133,7 +133,10 @@ in
       wants = [ "network-online.target" ];
       unitConfig = {
         # No material on this machine → unit is skipped (not failed), never errors.
-        ConditionPathExists = [ ovpnFile authFile ];
+        ConditionPathExists = [
+          ovpnFile
+          authFile
+        ];
         # Files present but connection fails → cap retries instead of crash-looping.
         StartLimitIntervalSec = 60;
         StartLimitBurst = 4;
