@@ -141,7 +141,6 @@ in
       env = {
         FOLIO_API_URL = "http://localhost:${toString ports.folio.internal}";
       };
-      # No secretsPath — the backend is unauthenticated on localhost.
     };
     notion = {
       name = "notion";

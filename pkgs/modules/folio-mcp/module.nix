@@ -10,7 +10,6 @@
   };
 
   config = lib.mkIf config.services.folio-mcp.enable {
-    # folio-mcp exposes the `folio-mcp-server` console script.
     environment.systemPackages = [ pkgs.folio-mcp ];
   };
 }

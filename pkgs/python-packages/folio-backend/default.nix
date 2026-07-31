@@ -24,7 +24,6 @@ buildPythonPackage {
     beautifulsoup4
     python-multipart
   ];
-  # httpx is required only by Starlette's TestClient (tests), not at runtime.
   nativeCheckInputs = [ httpx ];
   checkPhase = ''
     runHook preCheck

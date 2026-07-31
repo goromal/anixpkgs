@@ -9,7 +9,6 @@ buildPythonPackage {
   pyproject = true;
   build-system = [ setuptools ];
   src = "${pkg-src}/mcp";
-  # Pure stdlib — no runtime deps.
   checkPhase = ''
     runHook preCheck
     python -m unittest discover -s tests -v

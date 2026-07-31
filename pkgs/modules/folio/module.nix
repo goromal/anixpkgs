@@ -29,8 +29,6 @@ in
     };
     users.groups.folio = { };
 
-    # Dir traversable + DB readable by the folio group (andrew is added to it
-    # in the personal profile, so backups + subsystem E's wormhole read work).
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0750 folio folio -"
       "z ${cfg.dataDir}/folio.db 0640 folio folio -"
@@ -49,7 +47,6 @@ in
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
         RestartSec = "5s";
-        # Group-readable (0640) DB on creation, so andrew (in group folio) can read it.
         UMask = "0027";
         Environment = [
           "FOLIO_DB=${cfg.dataDir}/folio.db"
@@ -57,7 +54,6 @@ in
           "FOLIO_PORT=${toString service-ports.folio.internal}"
         ];
 
-        # Hardening (mirrors the vikunja module).
         NoNewPrivileges = true;
         PrivateTmp = true;
         ProtectSystem = "strict";
