@@ -53,7 +53,22 @@ let
         fi ;;
       status) show_status ;;
       logs)   ${pkgs.systemd}/bin/journalctl -u "$unit" -n "''${2:-50}" --no-pager ;;
-      *)      echo "usage: homevpn {on|off|toggle|status|logs}" >&2; exit 2 ;;
+      state)
+        if [ ! -f "$ovpn" ] || [ ! -f "$auth" ]; then echo "unconfigured"; exit 0; fi
+        if active; then
+          ip=$(${pkgs.iproute2}/bin/ip -4 -o addr show tun0 2>/dev/null \
+               | ${pkgs.gawk}/bin/awk '{split($4,a,"/"); print a[1]; exit}')
+          if [ -n "$ip" ]; then echo "connected $ip"; else echo "connecting"; fi
+        else
+          last=$(${pkgs.systemd}/bin/journalctl -u "$unit" -o cat -n 40 2>/dev/null \
+                 | ${pkgs.gnugrep}/bin/grep -aE 'AUTH_FAILED|Initialization Sequence Completed|Started ' \
+                 | tail -n1)
+          case "$last" in
+            *AUTH_FAILED*) echo "auth-failed" ;;
+            *)             echo "off" ;;
+          esac
+        fi ;;
+      *)      echo "usage: homevpn {on|off|toggle|status|state|logs}" >&2; exit 2 ;;
     esac
   '';
 
