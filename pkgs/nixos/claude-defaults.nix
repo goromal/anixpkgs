@@ -135,6 +135,14 @@ in
       secretsPath = "$HOME/secrets/vikunja/secrets.json";
       secretsEnvVar = "VIKUNJA_TOKEN_FILE";
     };
+    folio = {
+      name = "folio";
+      command = "/run/current-system/sw/bin/folio-mcp-server";
+      env = {
+        FOLIO_API_URL = "http://localhost:${toString ports.folio.internal}";
+      };
+      # No secretsPath — the backend is unauthenticated on localhost.
+    };
     notion = {
       name = "notion";
       command = "/run/current-system/sw/bin/notion-mcp-server";

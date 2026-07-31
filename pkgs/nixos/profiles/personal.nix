@@ -67,6 +67,22 @@ in
             OnUnitActiveSec = "60m";
           };
         }
+        {
+          name = "folio-backup";
+          jobShellScript = pkgs.writeShellScript "folio-backup" ''
+            DEST="$HOME/data/folio/${config.networking.hostName}"
+            mkdir -p "$DEST"
+            ${pkgs.sqlite}/bin/sqlite3 /var/lib/folio/folio.db ".backup '$DEST/folio.db'" \
+              || { logger -t folio-backup "DB backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data folio \
+              || { logger -t folio-backup "folio backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t folio-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
       ];
       extraOrchestratorPackages = [ ];
     };
@@ -79,9 +95,12 @@ in
       mcpServers = [
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
+        claudeDefaults.mcpServers.folio
       ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
     services.homeVpnNode.enable = true;
+    services.folio-backend.enable = true;
+    users.users.andrew.extraGroups = [ "folio" ];
   };
 }
