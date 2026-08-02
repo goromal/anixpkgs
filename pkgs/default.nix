@@ -492,6 +492,7 @@ rec {
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
   folio-mcp = final.python313.pkgs.folio-mcp;
+  folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
