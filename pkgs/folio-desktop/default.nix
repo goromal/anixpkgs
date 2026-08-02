@@ -30,6 +30,7 @@ stdenvNoCC.mkDerivation {
     Name=folio
     Comment=Book Study Companion
     Exec=$out/bin/folio-desktop
+    Icon=accessories-dictionary
     Terminal=false
     Categories=Office;Education;
     EOF

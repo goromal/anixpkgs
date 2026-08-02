@@ -102,6 +102,17 @@ in
           '';
         };
       };
+    # Landing-page entry (https://<host>.local/). folio's SPA lives at /folio (not
+    # the port root), so use an explicit path rather than the "#"+port pattern.
+    machines.base.webServices = [
+      {
+        name = "folio";
+        path = "https://${config.networking.hostName}.local:${toString service-ports.folio.public}/folio";
+        description = "Book Study Companion";
+        icon = "book-open";
+      }
+    ];
+
     networking.firewall.allowedTCPPorts = [ service-ports.folio.public ];
 
     environment.systemPackages = mkIf cfg.desktop [ anixpkgs.folio-desktop ];
