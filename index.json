@@ -276,6 +276,11 @@
     "docs": false
    },
    {
+    "attr": "folio-desktop",
+    "ci": true,
+    "docs": false
+   },
+   {
     "attr": "rankserver",
     "ci": true,
     "docs": true
