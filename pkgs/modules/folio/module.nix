@@ -81,6 +81,11 @@ in
             ssl = true;
           }
         ];
+        # Port root -> the SPA. The landing page's "#"+port card sends the browser
+        # to https://<current-host>:6667/ ; redirect that to the SPA at /folio/.
+        locations."= /" = {
+          return = "302 /folio/";
+        };
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString service-ports.folio.internal}";
           proxyWebsockets = true;
@@ -102,13 +107,16 @@ in
           '';
         };
       };
-    # Landing-page entry (https://<host>.local/). folio's SPA lives at /folio (not
-    # the port root), so use an explicit path rather than the "#"+port pattern.
+    # Landing-page entry (https://<host>.local/). Use the "#"+port convention (like
+    # every other separate-port service) so the card links to the CURRENT host's
+    # :6667 root -- an absolute URL would hardcode the hostname and break when the
+    # landing page is reached via a different name (localhost, tunnel, IP). The
+    # "(port N)" token in the description is what the landing renderer parses.
     machines.base.webServices = [
       {
         name = "folio";
-        path = "https://${config.networking.hostName}.local:${toString service-ports.folio.public}/folio";
-        description = "Book Study Companion";
+        path = "#";
+        description = "Book Study Companion (port ${toString service-ports.folio.public})";
         icon = "book-open";
       }
     ];
