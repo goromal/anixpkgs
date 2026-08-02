@@ -3,6 +3,7 @@
   makeWrapper,
   electron,
   pkg-src,
+  folioPort,
 }:
 stdenvNoCC.mkDerivation {
   pname = "folio-desktop";
@@ -13,7 +14,10 @@ stdenvNoCC.mkDerivation {
   dontBuild = true;
 
   # Thin shell: wrap nixpkgs' prebuilt electron over the desktop/ app dir (main.js
-  # loads the backend-served SPA at http://localhost:6666/folio). No electron-builder.
+  # loads the backend-served SPA at http://localhost:$FOLIO_PORT/folio). No
+  # electron-builder. FOLIO_PORT must match the backend's internal port and must
+  # stay clear of Chromium's restricted-port list (electron is Chromium: it refuses
+  # ERR_UNSAFE_PORT ports such as the 6665-6669 IRC range).
   installPhase = ''
     runHook preInstall
 
@@ -21,6 +25,7 @@ stdenvNoCC.mkDerivation {
     cp main.js package.json $out/share/folio-desktop/
 
     makeWrapper ${electron}/bin/electron $out/bin/folio-desktop \
+      --set FOLIO_PORT ${toString folioPort} \
       --add-flags $out/share/folio-desktop
 
     mkdir -p $out/share/applications

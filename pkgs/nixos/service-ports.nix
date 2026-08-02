@@ -25,8 +25,12 @@
     public = 3457;
   };
   folio = {
-    internal = 6666;
-    public = 6667;
+    # NB: keep both clear of the browser-restricted "unsafe port" list (Chromium &
+    # Firefox refuse to navigate to them, e.g. the 6665-6669 IRC range, 6697, 6566).
+    # The public port is opened in a browser; the internal port is opened by the
+    # Electron shell (also Chromium). 6666/6667 are IRC ports -> silently blocked.
+    internal = 6868;
+    public = 6869;
   };
   navidrome = 4533;
   la-quiz-web = 5656;
