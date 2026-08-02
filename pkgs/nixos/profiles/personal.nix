@@ -101,6 +101,7 @@ in
     services.logind.settings.Login.HandleLidSwitch = "ignore";
     services.homeVpnNode.enable = true;
     services.folio-backend.enable = true;
+    services.folio-backend.desktop = true;
     users.users.andrew.extraGroups = [ "folio" ];
   };
 }

@@ -7,6 +7,7 @@
 with lib;
 with import ../../nixos/dependencies.nix;
 let
+  globalCfg = config.machines.base;
   cfg = config.services.folio-backend;
 in
 {
@@ -18,6 +19,8 @@ in
       default = "/var/lib/folio";
       description = "Directory holding the folio SQLite database.";
     };
+
+    desktop = mkEnableOption "folio Electron desktop shell + Gnome launcher";
   };
 
   config = mkIf cfg.enable {
@@ -52,6 +55,7 @@ in
           "FOLIO_DB=${cfg.dataDir}/folio.db"
           "FOLIO_HOST=127.0.0.1"
           "FOLIO_PORT=${toString service-ports.folio.internal}"
+          "FOLIO_STATIC_DIR=${pkgs.folio-frontend}"
         ];
 
         NoNewPrivileges = true;
@@ -61,6 +65,46 @@ in
         ReadWritePaths = [ cfg.dataDir ];
       };
     };
+
+    # ---- web: nginx serves folio (SPA at /folio + API) on the dedicated public
+    # port; the backend itself binds localhost only. Mirrors the vikunja pattern. ----
+    machines.base.runWebServer = true;
+    services.nginx.virtualHosts."${config.networking.hostName}.local:${toString service-ports.folio.public}" =
+      {
+        onlySSL = true;
+        sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
+        sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
+        listen = [
+          {
+            addr = "0.0.0.0";
+            port = service-ports.folio.public;
+            ssl = true;
+          }
+        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString service-ports.folio.internal}";
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+          '';
+        };
+        # SSE (agent view-follow F + live sync G) must not be buffered.
+        locations."/view/stream" = {
+          proxyPass = "http://127.0.0.1:${toString service-ports.folio.internal}";
+          extraConfig = ''
+            proxy_set_header Host $host;
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_read_timeout 3600s;
+          '';
+        };
+      };
+    networking.firewall.allowedTCPPorts = [ service-ports.folio.public ];
+
+    environment.systemPackages = mkIf cfg.desktop [ pkgs.folio-desktop ];
 
     services.folio-mcp.enable = true;
   };
