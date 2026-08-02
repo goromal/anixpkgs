@@ -46,7 +46,7 @@ in
         Type = "simple";
         User = "folio";
         Group = "folio";
-        ExecStart = "${pkgs.folio-backend}/bin/folio-backend";
+        ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
         RestartSec = "5s";
@@ -55,7 +55,7 @@ in
           "FOLIO_DB=${cfg.dataDir}/folio.db"
           "FOLIO_HOST=127.0.0.1"
           "FOLIO_PORT=${toString service-ports.folio.internal}"
-          "FOLIO_STATIC_DIR=${pkgs.folio-frontend}"
+          "FOLIO_STATIC_DIR=${anixpkgs.folio-frontend}"
         ];
 
         NoNewPrivileges = true;
@@ -104,7 +104,7 @@ in
       };
     networking.firewall.allowedTCPPorts = [ service-ports.folio.public ];
 
-    environment.systemPackages = mkIf cfg.desktop [ pkgs.folio-desktop ];
+    environment.systemPackages = mkIf cfg.desktop [ anixpkgs.folio-desktop ];
 
     services.folio-mcp.enable = true;
   };
