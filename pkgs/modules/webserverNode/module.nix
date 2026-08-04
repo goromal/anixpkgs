@@ -10,6 +10,23 @@ let
   # Built entirely via JS DOM so element.style overrides any page stylesheet.
   # No single quotes (nginx wraps replacement in single quotes).
   homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src="/icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  ownPortHomeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/";var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href=b;a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src=b+"icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  ownPortHomeButtonVhosts = lib.listToAttrs (
+    lib.concatMap (
+      s:
+      let
+        m = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+      in
+      lib.optional (s.path == "#" && m != null) {
+        name = "${config.networking.hostName}.local:${builtins.head m}";
+        value.extraConfig = ''
+          sub_filter </body> '${ownPortHomeButton}';
+          sub_filter_once on;
+          proxy_set_header Accept-Encoding "";
+        '';
+      }
+    ) cfg.webServices
+  );
 in
 {
   config = lib.mkIf cfg.runWebServer {
@@ -17,7 +34,8 @@ in
       enable = true;
       user = "andrew";
       group = "dev";
-      virtualHosts."${config.networking.hostName}.local" = {
+      virtualHosts = {
+        "${config.networking.hostName}.local" = {
         # Support both HTTP and HTTPS (no forced redirect)
         forceSSL = false;
         addSSL = true;
@@ -189,7 +207,9 @@ in
           // rootFaviconLocation
           // faviconLocations
           // homeButtonLocations;
-      };
+        };
+      }
+      // ownPortHomeButtonVhosts;
     };
   };
 }
