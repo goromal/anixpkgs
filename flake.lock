@@ -289,6 +289,22 @@
         "type": "github"
       }
     },
+    "folio": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785822161,
+        "narHash": "sha256-sjyOeC31IeunKPNWoiseoSb7g0AD2oASbR1pSa/zgY4=",
+        "owner": "goromal",
+        "repo": "folio",
+        "rev": "1d34e44c4ee42415fcd75f2dad3a519a348155cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "folio",
+        "type": "github"
+      }
+    },
     "geometry": {
       "flake": false,
       "locked": {
@@ -901,6 +917,7 @@
         "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
         "flasks": "flasks",
+        "folio": "folio",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
         "gnc": "gnc",
