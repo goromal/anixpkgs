@@ -33,7 +33,6 @@ in
     users.groups.folio = { };
 
     systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 0750 folio folio -"
       "z ${cfg.dataDir}/folio.db 0640 folio folio -"
     ];
 
@@ -46,6 +45,8 @@ in
         Type = "simple";
         User = "folio";
         Group = "folio";
+        StateDirectory = "folio";
+        StateDirectoryMode = "0750";
         ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
