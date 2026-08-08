@@ -11,12 +11,10 @@ let
   agentLib = import ./agent-lib.nix { inherit pkgs lib; };
 
   # Claude CLI sourced from llm-agents.nix (cache-backed via cache.numtide.com,
-  # auto-updated upstream). Parity with the in-repo claude-code-bin was verified:
-  # its wrapper sets DISABLE_AUTOUPDATER/DISABLE_INSTALLATION_CHECKS and puts
-  # bubblewrap + socat (the sandbox deps) on PATH. Deltas are benign: it uses
-  # claude's builtin ripgrep (vs USE_BUILTIN_RIPGREP=0), and relies on ambient
-  # procps (present in the NixOS system PATH). claude-code-bin is kept in-tree
-  # (retirement is a follow-up) but no longer referenced here.
+  # auto-updated upstream). Its wrapper sets DISABLE_AUTOUPDATER /
+  # DISABLE_INSTALLATION_CHECKS and puts bubblewrap + socat (the sandbox deps)
+  # on PATH; it uses claude's builtin ripgrep and relies on ambient procps
+  # (present in the NixOS system PATH). Replaces the retired claude-code-bin.
   claudeCli = flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
 
   claudeCodeVersion = "2.1.116";

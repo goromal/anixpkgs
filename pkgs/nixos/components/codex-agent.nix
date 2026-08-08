@@ -39,9 +39,6 @@ let
     else
       echo "Non-interactive session; skipping codex login."
     fi
-    # FUTURE: rtk codex hook. `rtk init` has no codex target today
-    # (claude/cursor/windsurf/cline only). When it gains one, install here:
-    #   rtk init -g --agent codex
   '';
 
   codexUpdate = pkgs.writeShellScriptBin "codex-update" ''
