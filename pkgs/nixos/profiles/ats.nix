@@ -7,6 +7,7 @@
 with import ../dependencies.nix;
 let
   claudeDefaults = import ../claude-defaults.nix;
+  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
 in
 {
   imports = [ ../pc-base.nix ];
@@ -18,7 +19,7 @@ in
       recreational = false;
       developer = true;
       isATS = true;
-      agentFrameworks = [ "claude" ];
+      agentFrameworks = [ "claude" "codex" ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
@@ -320,6 +321,16 @@ in
         claudeDefaults.mcpServers.vikunja
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
+      ];
+    };
+    machines.codex = {
+      model = codexDefaults.model;
+      modelProvider = codexDefaults.modelProvider;
+      approvalPolicy = codexDefaults.approvalPolicy;
+      sandboxMode = codexDefaults.sandboxMode;
+      mcpServers = [
+        codexDefaults.mcpServers.notion
+        codexDefaults.mcpServers.wiki
       ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
