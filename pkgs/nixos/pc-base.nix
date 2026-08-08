@@ -220,7 +220,12 @@ in
       default = [ ];
     };
     agentFrameworks = lib.mkOption {
-      type = lib.types.listOf (lib.types.enum [ "claude" "codex" ]);
+      type = lib.types.listOf (
+        lib.types.enum [
+          "claude"
+          "codex"
+        ]
+      );
       default = [ ];
       description = "AI agent frameworks to install and configure (may include both).";
     };
@@ -942,31 +947,33 @@ in
               enableMetrics = cfg.enableMetrics;
             };
           }
-          (lib.foldl lib.recursiveUpdate { } [
-            (lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
-              mods.claude = {
-                marketplaces = config.machines.claude.marketplaces;
-                plugins = config.machines.claude.plugins;
-                permissionsAllow = config.machines.claude.permissionsAllow;
-                hooks = config.machines.claude.hooks;
-                skills = config.machines.claude.skills;
-                extraSettings = config.machines.claude.extraSettings;
-                mcpServers = config.machines.claude.mcpServers;
-                graphical = cfg.graphical;
-              };
-            })
-            (lib.optionalAttrs (lib.elem "codex" cfg.agentFrameworks) {
-              mods.codex = {
-                model = config.machines.codex.model;
-                modelProvider = config.machines.codex.modelProvider;
-                approvalPolicy = config.machines.codex.approvalPolicy;
-                sandboxMode = config.machines.codex.sandboxMode;
-                extraSettings = config.machines.codex.extraSettings;
-                mcpServers = config.machines.codex.mcpServers;
-                graphical = cfg.graphical;
-              };
-            })
-          ]);
+          (
+            lib.foldl lib.recursiveUpdate { } [
+              (lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
+                mods.claude = {
+                  marketplaces = config.machines.claude.marketplaces;
+                  plugins = config.machines.claude.plugins;
+                  permissionsAllow = config.machines.claude.permissionsAllow;
+                  hooks = config.machines.claude.hooks;
+                  skills = config.machines.claude.skills;
+                  extraSettings = config.machines.claude.extraSettings;
+                  mcpServers = config.machines.claude.mcpServers;
+                  graphical = cfg.graphical;
+                };
+              })
+              (lib.optionalAttrs (lib.elem "codex" cfg.agentFrameworks) {
+                mods.codex = {
+                  model = config.machines.codex.model;
+                  modelProvider = config.machines.codex.modelProvider;
+                  approvalPolicy = config.machines.codex.approvalPolicy;
+                  sandboxMode = config.machines.codex.sandboxMode;
+                  extraSettings = config.machines.codex.extraSettings;
+                  mcpServers = config.machines.codex.mcpServers;
+                  graphical = cfg.graphical;
+                };
+              })
+            ]
+          );
     }
     (
       let

@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   agentLib = import ../../nixos/components/agent-lib.nix { inherit pkgs lib; };
 in
@@ -15,12 +20,21 @@ in
       description = "codex model_provider";
     };
     approvalPolicy = lib.mkOption {
-      type = lib.types.enum [ "on-request" "untrusted" "never" "granular" ];
+      type = lib.types.enum [
+        "on-request"
+        "untrusted"
+        "never"
+        "granular"
+      ];
       default = "on-request";
       description = "codex approval_policy";
     };
     sandboxMode = lib.mkOption {
-      type = lib.types.enum [ "read-only" "workspace-write" "danger-full-access" ];
+      type = lib.types.enum [
+        "read-only"
+        "workspace-write"
+        "danger-full-access"
+      ];
       default = "workspace-write";
       description = "codex sandbox_mode";
     };

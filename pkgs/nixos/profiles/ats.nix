@@ -19,7 +19,10 @@ in
       recreational = false;
       developer = true;
       isATS = true;
-      agentFrameworks = [ "claude" "codex" ];
+      agentFrameworks = [
+        "claude"
+        "codex"
+      ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;

@@ -18,7 +18,10 @@ in
       recreational = true;
       developer = true;
       isATS = false;
-      agentFrameworks = [ "claude" "codex" ];
+      agentFrameworks = [
+        "claude"
+        "codex"
+      ];
       serveNotesWiki = false;
       enableMetrics = true;
       enableFileServers = true;
