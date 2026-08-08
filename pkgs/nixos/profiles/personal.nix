@@ -6,6 +6,7 @@
 }:
 let
   claudeDefaults = import ../claude-defaults.nix;
+  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
 in
 {
   imports = [ ../pc-base.nix ];
@@ -17,7 +18,10 @@ in
       recreational = true;
       developer = true;
       isATS = false;
-      agentFramework = "claude";
+      agentFrameworks = [
+        "claude"
+        "codex"
+      ];
       serveNotesWiki = false;
       enableMetrics = true;
       enableFileServers = true;
@@ -79,6 +83,16 @@ in
       mcpServers = [
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
+      ];
+    };
+    machines.codex = {
+      model = codexDefaults.model;
+      modelProvider = codexDefaults.modelProvider;
+      approvalPolicy = codexDefaults.approvalPolicy;
+      sandboxMode = codexDefaults.sandboxMode;
+      mcpServers = [
+        codexDefaults.mcpServers.notion
+        codexDefaults.mcpServers.wiki
       ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";

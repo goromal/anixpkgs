@@ -1,0 +1,33 @@
+# Default Codex configuration values, referenced by profiles.
+#
+# Unlike claude-defaults.nix (whose MCP secret paths use "$HOME/..." and are
+# shell-expanded by claude-setup at `claude mcp add` time), codex reads
+# ~/.codex/config.toml literally — TOML values are NOT shell-expanded. So MCP
+# secret paths must be absolute, which is why this is a function of the machine's
+# homeDir. Codex also has no secrets-existence guard (claude-setup skips a server
+# whose secret file is missing); a codex MCP server whose secret is absent simply
+# errors when first invoked.
+{ homeDir }:
+{
+  model = "gpt-5.6";
+  modelProvider = "openai";
+  approvalPolicy = "on-request";
+  sandboxMode = "workspace-write";
+
+  mcpServers = {
+    notion = {
+      name = "notion";
+      command = "/run/current-system/sw/bin/notion-mcp-server";
+      env = {
+        NOTION_TOKEN_FILE = "${homeDir}/secrets/notion/secret.json";
+      };
+    };
+    wiki = {
+      name = "wiki";
+      command = "/run/current-system/sw/bin/wiki-mcp-server";
+      env = {
+        WIKI_SECRETS_DIR = "${homeDir}/secrets/wiki";
+      };
+    };
+  };
+}
