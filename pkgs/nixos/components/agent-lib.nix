@@ -48,8 +48,8 @@ rec {
   #   targetFile  : shell string, e.g. "$HOME/.codex/config.toml"
   #   format      : "json" | "toml"
   #   settings    : attrset rendered to JSON and merged with `existing * nixos`
-  #   extraMerge  : optional extra jq passes, list of { name; jqProgram; guardJson; }
-  #                 applied AFTER the base deep-merge (used by Claude for hooks/permissions)
+  #   extraMerge  : list of { name; varName; valueJson; jqProgram; } — each applied as an
+  #                 extra `jq --argjson <varName> <valueJson> '<jqProgram>'` pass AFTER the base deep-merge
   mkAgentSettingsService =
     {
       name,
@@ -82,10 +82,8 @@ rec {
           ''echo '${settingsJson}' > "$TARGET"'';
 
       extraMergeSteps = lib.concatMapStringsSep "\n" (m: ''
-        if [ "${m.guardJson}" != "" ]; then
-          ${jq} '${m.jqProgram}' "$TARGET" > "$TMP" && ${coreutils}/bin/mv "$TMP" "$TARGET"
-          echo "Applied ${m.name} merge"
-        fi
+        ${jq} --argjson ${m.varName} '${m.valueJson}' '${m.jqProgram}' "$TARGET" > "$TMP" && ${coreutils}/bin/mv "$TMP" "$TARGET"
+        echo "Applied ${m.name} merge"
       '') extraMerge;
 
       mergeScript = pkgs.writeShellScript "merge-${name}-settings" ''

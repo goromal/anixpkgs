@@ -8,6 +8,8 @@ with import ../dependencies.nix;
 let
   cfg = config.mods.claude;
 
+  agentLib = import ./agent-lib.nix { inherit pkgs lib; };
+
   claudeCodeVersion = "2.1.116";
   claudeCodeExt =
     let
@@ -185,35 +187,7 @@ in
       description = "Attrs describing extra Claude JSON settings";
     };
     mcpServers = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            name = lib.mkOption {
-              type = lib.types.str;
-              description = "MCP server name (passed to `claude mcp add`)";
-            };
-            command = lib.mkOption {
-              type = lib.types.str;
-              description = "Absolute path to the MCP server executable";
-            };
-            env = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              default = { };
-              description = "Plain (non-secret) environment variables for the server";
-            };
-            secretsPath = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Path checked for existence; if missing, server registration is skipped";
-            };
-            secretsEnvVar = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Name of env var that should receive secretsPath (the server reads + parses it)";
-            };
-          };
-        }
-      );
+      type = lib.types.listOf agentLib.mcpServerType;
       default = [ ];
       description = "List of MCP servers to register with claude during claude-setup";
     };
@@ -274,7 +248,6 @@ in
           };
         };
         nixosSettings = baseConfig // cfg.extraSettings;
-        nixosSettingsJson = builtins.toJSON nixosSettings;
 
         hooksByEvent = lib.groupBy (h: h.event) cfg.hooks;
         hooksConfig = lib.mapAttrs (
@@ -294,67 +267,26 @@ in
         ) hooksByEvent;
         hooksJson = builtins.toJSON hooksConfig;
         permissionsAllowJson = builtins.toJSON cfg.permissionsAllow;
-
-        mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
-          set -e
-
-          SETTINGS_DIR="$HOME/.claude"
-          SETTINGS_FILE="$SETTINGS_DIR/settings.json"
-          NIXOS_SETTINGS='${nixosSettingsJson}'
-          NIXOS_HOOKS='${hooksJson}'
-          NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
-
-          ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
-
-          if [ ! -f "$SETTINGS_FILE" ]; then
-            echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
-            echo "Created new Claude settings file with NixOS configuration"
-          else
-            ${pkgs.jq}/bin/jq -n \
-              --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
-              --argjson nixos "$NIXOS_SETTINGS" \
-              '$existing * $nixos' > "$SETTINGS_FILE.tmp"
-
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Updated Claude settings, preserving user modifications"
-          fi
-
-          if [ "$NIXOS_HOOKS" != "{}" ]; then
-            ${pkgs.jq}/bin/jq \
-              --argjson new_hooks "$NIXOS_HOOKS" \
-              'reduce ($new_hooks | to_entries[]) as $ev (
-                .;
-                .hooks[$ev.key] = (
-                  (.hooks[$ev.key] // []) + $ev.value
-                  | unique_by(.hooks[0].command)
-                )
-              )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Merged declarative hooks into Claude settings"
-          fi
-
-          if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
-            ${pkgs.jq}/bin/jq \
-              --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
-              '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
-              "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Merged declarative permissions into Claude settings"
-          fi
-        '';
       in
-      {
-        Unit = {
-          Description = "Update Claude Code settings with NixOS configuration";
-        };
-        Service = {
-          Type = "oneshot";
-          ExecStart = "${mergeScript}";
-          RemainAfterExit = true;
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
+      agentLib.mkAgentSettingsService {
+        name = "claude";
+        description = "Update Claude Code settings with NixOS configuration";
+        targetFile = "$HOME/.claude/settings.json";
+        format = "json";
+        settings = nixosSettings;
+        extraMerge =
+          (lib.optional (hooksConfig != { }) {
+            name = "hooks";
+            varName = "new_hooks";
+            valueJson = hooksJson;
+            jqProgram = "reduce ($new_hooks | to_entries[]) as $ev (.; .hooks[$ev.key] = ((.hooks[$ev.key] // []) + $ev.value | unique_by(.hooks[0].command)))";
+          })
+          ++ (lib.optional (cfg.permissionsAllow != [ ]) {
+            name = "permissions";
+            varName = "new_allow";
+            valueJson = permissionsAllowJson;
+            jqProgram = ".permissions.allow = ((.permissions.allow // []) + $new_allow | unique)";
+          });
       };
 
     # Re-run claude-setup after an upgrade only when the setup script's content
