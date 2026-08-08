@@ -17,7 +17,7 @@ let
   # claude's builtin ripgrep (vs USE_BUILTIN_RIPGREP=0), and relies on ambient
   # procps (present in the NixOS system PATH). claude-code-bin is kept in-tree
   # (retirement is a follow-up) but no longer referenced here.
-  claudeCli = pkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+  claudeCli = flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
 
   claudeCodeVersion = "2.1.116";
   claudeCodeExt =

@@ -3,7 +3,7 @@ with import ../dependencies.nix;
 let
   cfg = config.mods.codex;
   agentLib = import ./agent-lib.nix { inherit pkgs lib; };
-  codexPkg = pkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
+  codexPkg = flakeInputs.llm-agents.packages.${pkgs.system}.codex;
 
   mcpServersAttr = builtins.listToAttrs (map (s: {
     name = s.name;
