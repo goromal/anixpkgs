@@ -903,6 +903,7 @@ in
             ]
             ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
             ++ (lib.optionals (lib.elem "claude" cfg.agentFrameworks) [ ./components/claude-agent.nix ])
+            ++ (lib.optionals (lib.elem "codex" cfg.agentFrameworks) [ ./components/codex-agent.nix ])
             ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
             ++ (
               if cfg.machineType == "x86_linux" then
@@ -941,8 +942,8 @@ in
               enableMetrics = cfg.enableMetrics;
             };
           }
-          (
-            lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
+          (lib.foldl lib.recursiveUpdate { } [
+            (lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
               mods.claude = {
                 marketplaces = config.machines.claude.marketplaces;
                 plugins = config.machines.claude.plugins;
@@ -953,8 +954,19 @@ in
                 mcpServers = config.machines.claude.mcpServers;
                 graphical = cfg.graphical;
               };
-            }
-          );
+            })
+            (lib.optionalAttrs (lib.elem "codex" cfg.agentFrameworks) {
+              mods.codex = {
+                model = config.machines.codex.model;
+                modelProvider = config.machines.codex.modelProvider;
+                approvalPolicy = config.machines.codex.approvalPolicy;
+                sandboxMode = config.machines.codex.sandboxMode;
+                extraSettings = config.machines.codex.extraSettings;
+                mcpServers = config.machines.codex.mcpServers;
+                graphical = cfg.graphical;
+              };
+            })
+          ]);
     }
     (
       let
