@@ -17,7 +17,7 @@ in
       recreational = true;
       developer = true;
       isATS = false;
-      agentFramework = "claude";
+      agentFrameworks = [ "claude" ];
       serveNotesWiki = false;
       enableMetrics = true;
       enableFileServers = true;

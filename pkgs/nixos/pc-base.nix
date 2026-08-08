@@ -219,10 +219,10 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
-    agentFramework = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "claude" ]);
-      default = null;
-      description = "AI agent framework to install and configure. Null means none.";
+    agentFrameworks = lib.mkOption {
+      type = lib.types.listOf (lib.types.enum [ "claude" "codex" ]);
+      default = [ ];
+      description = "AI agent frameworks to install and configure (may include both).";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -901,7 +901,7 @@ in
               ./components/upgrade-hooks.nix
             ]
             ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
-            ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
+            ++ (lib.optionals (lib.elem "claude" cfg.agentFrameworks) [ ./components/claude-agent.nix ])
             ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
             ++ (
               if cfg.machineType == "x86_linux" then
@@ -941,7 +941,7 @@ in
             };
           }
           (
-            lib.optionalAttrs (cfg.agentFramework == "claude") {
+            lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
               mods.claude = {
                 marketplaces = config.machines.claude.marketplaces;
                 plugins = config.machines.claude.plugins;

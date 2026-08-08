@@ -18,7 +18,7 @@ in
       recreational = false;
       developer = true;
       isATS = true;
-      agentFramework = "claude";
+      agentFrameworks = [ "claude" ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
