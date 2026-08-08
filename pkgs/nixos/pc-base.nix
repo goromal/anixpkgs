@@ -240,6 +240,7 @@ in
     ./installation-base.nix
     (import "${home-manager}/nixos")
     ../modules/claude-agent/module.nix
+    ../modules/codex-agent/module.nix
     ../modules/webserverNode/module.nix
     ../modules/cudaNode/module.nix
     ../modules/comfyui/module.nix
