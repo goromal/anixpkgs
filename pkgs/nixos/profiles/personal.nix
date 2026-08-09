@@ -90,6 +90,7 @@ in
       modelProvider = codexDefaults.modelProvider;
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
+      extraSettings = codexDefaults.extraSettings;
       mcpServers = [
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki

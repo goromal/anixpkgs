@@ -13,6 +13,9 @@
   modelProvider = "openai";
   approvalPolicy = "on-request";
   sandboxMode = "workspace-write";
+  extraSettings = {
+    model_reasoning_effort = "medium";
+  };
 
   mcpServers = {
     notion = {
