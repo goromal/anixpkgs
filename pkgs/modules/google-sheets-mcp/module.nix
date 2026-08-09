@@ -1,6 +1,13 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  requirements = pkgs.writeText "mcp-google-sheets-requirements.txt" (builtins.readFile ./requirements.txt);
+  requirements = pkgs.writeText "mcp-google-sheets-requirements.txt" (
+    builtins.readFile ./requirements.txt
+  );
   googleSheetsMcp = pkgs.writeShellScriptBin "mcp-google-sheets-locked" ''
     exec ${pkgs.uv}/bin/uvx \
       --from "mcp-google-sheets==0.6.3" \

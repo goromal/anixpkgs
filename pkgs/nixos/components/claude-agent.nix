@@ -56,11 +56,15 @@ let
       envFlags = lib.concatStringsSep " " (
         lib.mapAttrsToList (k: v: "-e ${k}=${lib.escapeShellArg v}") server.env
       );
-      secretsEnv = server.secretsEnv // lib.optionalAttrs (server.secretsEnvVar != null) {
-        ${server.secretsEnvVar} = server.secretsPath;
-      };
+      secretsEnv =
+        server.secretsEnv
+        // lib.optionalAttrs (server.secretsEnvVar != null) {
+          ${server.secretsEnvVar} = server.secretsPath;
+        };
       secretsFlags = lib.concatStringsSep " " (lib.mapAttrsToList (k: v: "-e ${k}=${v}") secretsEnv);
-      secretsCheck = lib.concatStringsSep " && " (lib.mapAttrsToList (k: v: "[ -e \"${v}\" ]") secretsEnv);
+      secretsCheck = lib.concatStringsSep " && " (
+        lib.mapAttrsToList (k: v: "[ -e \"${v}\" ]") secretsEnv
+      );
       hasSecretsCheck = secretsEnv != { };
       registerCmd = ''
         claude mcp remove ${server.name} 2>/dev/null || true
