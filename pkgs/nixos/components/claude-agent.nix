@@ -15,7 +15,7 @@ let
   # DISABLE_INSTALLATION_CHECKS and puts bubblewrap + socat (the sandbox deps)
   # on PATH; it uses claude's builtin ripgrep and relies on ambient procps
   # (present in the NixOS system PATH). Replaces the retired claude-code-bin.
-  claudeCli = flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+  claudeCli = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
 
   claudeCodeVersion = "2.1.116";
   claudeCodeExt =

@@ -28,19 +28,4 @@ rec {
       sha256 = lock.nodes.nix-ros-overlay.locked.narHash;
     }) { };
   service-ports = import ./service-ports.nix;
-  # Flake inputs (e.g. llm-agents) for home-manager components. Those modules run
-  # with their own pkgs instance that lacks the anixpkgs overlay, so `pkgs.flakeInputs`
-  # is unavailable there; derive the inputs via flake-compat on the repo root instead
-  # (mirrors overlay.nix). Consume as e.g. `flakeInputs.llm-agents.packages.${pkgs.system}.codex`.
-  flakeInputs =
-    let
-      lock = builtins.fromJSON (builtins.readFile ../../flake.lock);
-      flake-compat = import (
-        builtins.fetchTarball {
-          url = "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
-          sha256 = lock.nodes.flake-compat.locked.narHash;
-        }
-      );
-    in
-    (flake-compat { src = ../../.; }).defaultNix.inputs;
 }

@@ -8,7 +8,7 @@ with import ../dependencies.nix;
 let
   cfg = config.mods.codex;
   agentLib = import ./agent-lib.nix { inherit pkgs lib; };
-  codexPkg = flakeInputs.llm-agents.packages.${pkgs.system}.codex;
+  codexPkg = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
 
   mcpServersAttr = builtins.listToAttrs (
     map (s: {
