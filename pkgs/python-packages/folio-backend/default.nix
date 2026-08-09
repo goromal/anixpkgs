@@ -8,6 +8,7 @@
   beautifulsoup4,
   python-multipart,
   httpx,
+  wormhole,
   pkg-src,
 }:
 buildPythonPackage {
@@ -23,6 +24,8 @@ buildPythonPackage {
     ebooklib
     beautifulsoup4
     python-multipart
+    httpx
+    wormhole
   ];
   nativeCheckInputs = [ httpx ];
   checkPhase = ''

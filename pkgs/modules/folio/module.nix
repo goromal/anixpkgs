@@ -21,19 +21,20 @@ in
     };
 
     desktop = mkEnableOption "folio Electron desktop shell + Gnome launcher";
+
+    isHub = mkEnableOption "folio hub role (ground-truth DB + lock server)";
+
+    hubHost = mkOption {
+      type = types.str;
+      default = "";
+      description = "For spokes: the hub's mDNS host (e.g. \"ats.local\"), resolved via wormhole.";
+    };
   };
 
   config = mkIf cfg.enable {
-    users.users.folio = {
-      isSystemUser = true;
-      group = "folio";
-      home = cfg.dataDir;
-      createHome = true;
-    };
-    users.groups.folio = { };
-
     systemd.tmpfiles.rules = [
-      "z ${cfg.dataDir}/folio.db 0640 folio folio -"
+      "d ${cfg.dataDir} 0750 andrew dev -"
+      "z ${cfg.dataDir}/folio.db 0640 andrew dev -"
     ];
 
     systemd.services.folio-backend = {
@@ -43,27 +44,23 @@ in
 
       serviceConfig = {
         Type = "simple";
-        User = "folio";
-        Group = "folio";
-        StateDirectory = "folio";
-        StateDirectoryMode = "0750";
+        User = "andrew";
+        Group = "dev";
         ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
         RestartSec = "5s";
-        UMask = "0027";
         Environment = [
+          "HOME=${globalCfg.homeDir}"
           "FOLIO_DB=${cfg.dataDir}/folio.db"
           "FOLIO_HOST=127.0.0.1"
           "FOLIO_PORT=${toString service-ports.folio.internal}"
           "FOLIO_STATIC_DIR=${anixpkgs.folio-frontend}"
+          "FOLIO_MACHINE=${config.networking.hostName}"
+          "FOLIO_IS_HUB=${if cfg.isHub then "true" else "false"}"
+          "FOLIO_HUB_HOST=${cfg.hubHost}"
+          "FOLIO_HUB_PORT=${toString service-ports.folio.public}"
         ];
-
-        NoNewPrivileges = true;
-        PrivateTmp = true;
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        ReadWritePaths = [ cfg.dataDir ];
       };
     };
 
@@ -75,6 +72,9 @@ in
         onlySSL = true;
         sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
+        extraConfig = ''
+          client_max_body_size 512m;
+        '';
         listen = [
           {
             addr = "0.0.0.0";
@@ -126,6 +126,6 @@ in
 
     environment.systemPackages = mkIf cfg.desktop [ anixpkgs.folio-desktop ];
 
-    services.folio-mcp.enable = true;
+    services.folio-mcp.enable = mkDefault (!cfg.isHub);
   };
 }
