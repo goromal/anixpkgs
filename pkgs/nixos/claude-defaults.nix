@@ -99,6 +99,10 @@ in
       file = ./res/claude-skills/editing-skills/SKILL.md;
     }
     {
+      name = "folio-usage";
+      file = ./res/claude-skills/folio-usage/SKILL.md;
+    }
+    {
       name = "rtk-usage";
       file = ./res/claude-skills/rtk-usage/SKILL.md;
     }
