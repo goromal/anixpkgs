@@ -8,11 +8,13 @@
 # whose secret file is missing); a codex MCP server whose secret is absent simply
 # errors when first invoked.
 { homeDir }:
-with import ./dependencies.nix;
+let
+  ports = import ./service-ports.nix;
+in
 {
   model = "gpt-5.6";
   modelProvider = "openai";
-  approvalPolicy = "on-request";
+  approvalPolicy = "never";
   sandboxMode = "workspace-write";
   extraSettings = {
     model_reasoning_effort = "medium";
