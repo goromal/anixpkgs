@@ -193,16 +193,15 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1786251218,
+        "lastModified": 1786255414,
         "narHash": "sha256-cw7AW3snr2cGS82sEdyyCc1a563h5ygFUMS0Axhb0dk=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "84985c7a4cde24568493b37a0a69d86caeade5b6",
+        "rev": "3d876182015e6e307d7c608df243dae499f2b453",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/more-scopes",
         "repo": "easy-google-auth",
         "type": "github"
       }
