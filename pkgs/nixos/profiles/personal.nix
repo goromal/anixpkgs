@@ -102,6 +102,7 @@ in
     services.homeVpnNode.enable = true;
     services.folio-backend.enable = true;
     services.folio-backend.desktop = true;
-    users.users.andrew.extraGroups = [ "folio" ];
+    # Spoke: lease the ground-truth database from the ATS hub over the VPN.
+    services.folio-backend.hubHost = "ats.local";
   };
 }

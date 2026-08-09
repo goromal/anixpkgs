@@ -296,6 +296,22 @@ in
             Persistent = false;
           };
         }
+        {
+          name = "ats-folio-backup";
+          jobShellScript = pkgs.writeShellScript "ats-folio-backup" ''
+            DEST="$HOME/data/folio"
+            mkdir -p "$DEST"
+            ${pkgs.sqlite}/bin/sqlite3 /var/lib/folio/folio.db ".backup '$DEST/folio.db'" \
+              || { logger -t ats-folio-backup "DB backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data folio \
+              || { logger -t ats-folio-backup "folio backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-folio-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
       ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
@@ -324,5 +340,9 @@ in
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
     users.users.andrew.extraGroups = [ "vikunja" ];
+    # Hub: ATS holds the ground-truth folio database and serves the lock/transfer
+    # endpoints. Headless (no desktop); MCP defaults off on the hub.
+    services.folio-backend.enable = true;
+    services.folio-backend.isHub = true;
   };
 }
