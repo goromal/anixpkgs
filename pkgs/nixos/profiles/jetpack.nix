@@ -108,6 +108,7 @@ in
       mcpServers = [
         claudeDefaults.mcpServers.vikunja
         claudeDefaults.mcpServers.jupyter
+        claudeDefaults.mcpServers.googleSheets
       ];
     };
     machines.codex = {
@@ -119,9 +120,11 @@ in
       mcpServers = [
         codexDefaults.mcpServers.vikunja
         codexDefaults.mcpServers.jupyter
+        codexDefaults.mcpServers.googleSheets
       ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
+    services.google-sheets-mcp.enable = true;
     environment.systemPackages = [
       anixpkgs.jetson-stats
     ];

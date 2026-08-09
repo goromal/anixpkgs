@@ -56,13 +56,20 @@ let
       envFlags = lib.concatStringsSep " " (
         lib.mapAttrsToList (k: v: "-e ${k}=${lib.escapeShellArg v}") server.env
       );
-      secretsFlag =
-        if server.secretsEnvVar != null then "-e ${server.secretsEnvVar}=${server.secretsPath}" else "";
-      hasSecretsCheck = server.secretsPath != null;
+      secretsEnv =
+        server.secretsEnv
+        // lib.optionalAttrs (server.secretsEnvVar != null) {
+          ${server.secretsEnvVar} = server.secretsPath;
+        };
+      secretsFlags = lib.concatStringsSep " " (lib.mapAttrsToList (k: v: "-e ${k}=${v}") secretsEnv);
+      secretsCheck = lib.concatStringsSep " && " (
+        lib.mapAttrsToList (k: v: "[ -e \"${v}\" ]") secretsEnv
+      );
+      hasSecretsCheck = secretsEnv != { };
       registerCmd = ''
         claude mcp remove ${server.name} 2>/dev/null || true
-        claude mcp add -s user ${envFlags} ${secretsFlag} \
-          -- ${server.name} ${server.command}
+        claude mcp add -s user ${envFlags} ${secretsFlags} \
+          -- ${server.name} ${server.command} ${lib.concatMapStringsSep " " lib.escapeShellArg server.args}
         echo_green "${server.name} MCP server registered successfully"
       '';
     in
@@ -72,10 +79,10 @@ let
     + (
       if hasSecretsCheck then
         ''
-          if [ -e "${server.secretsPath}" ]; then
+          if ${secretsCheck}; then
             ${registerCmd}
           else
-            echo_yellow "Warning: ${server.secretsPath} not found. Skipping ${server.name} MCP setup."
+            echo_yellow "Warning: required secret file for ${server.name} not found. Skipping MCP setup."
           fi
         ''
       else

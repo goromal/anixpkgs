@@ -30,6 +30,9 @@
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.flake = false;
+
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
@@ -38,12 +41,6 @@
 
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
-
-    spandrel-src.url = "github:chaiNNer-org/spandrel";
-    spandrel-src.flake = false;
-
-    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
-    comfyui-src.flake = false;
 
     evil-hangman.url = "github:goromal/evil-hangman";
     evil-hangman.flake = false;
@@ -63,14 +60,14 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    gnc.url = "github:goromal/gnc";
+    gnc.flake = false;
+
     indi-harness.url = "github:goromal/indi-harness";
     indi-harness.flake = false;
 
     jetson-stats.url = "github:rbonghi/jetson_stats";
     jetson-stats.flake = false;
-
-    gnc.url = "github:goromal/gnc";
-    gnc.flake = false;
 
     # TODO gradebook would need dev/warn-suppress branch
 
@@ -165,6 +162,9 @@
 
     sorting.url = "github:goromal/sorting";
     sorting.flake = false;
+
+    spandrel-src.url = "github:chaiNNer-org/spandrel";
+    spandrel-src.flake = false;
 
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;

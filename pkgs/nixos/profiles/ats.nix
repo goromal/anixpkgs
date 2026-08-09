@@ -340,6 +340,7 @@ in
         claudeDefaults.mcpServers.vikunja
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
+        claudeDefaults.mcpServers.googleSheets
       ];
     };
     machines.codex = {
@@ -352,10 +353,12 @@ in
         codexDefaults.mcpServers.vikunja
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki
+        codexDefaults.mcpServers.googleSheets
       ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
     users.users.andrew.extraGroups = [ "vikunja" ];
+    services.google-sheets-mcp.enable = true;
     # Hub: ATS holds the ground-truth folio database and serves the lock/transfer
     # endpoints. Headless (no desktop); MCP defaults off on the hub.
     services.folio-backend.enable = true;

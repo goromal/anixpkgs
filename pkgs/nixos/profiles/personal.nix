@@ -100,6 +100,7 @@ in
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
         claudeDefaults.mcpServers.folio
+        claudeDefaults.mcpServers.googleSheets
       ];
     };
     machines.codex = {
@@ -111,9 +112,11 @@ in
       mcpServers = [
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki
+        codexDefaults.mcpServers.googleSheets
       ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
+    services.google-sheets-mcp.enable = true;
     services.homeVpnNode.enable = true;
     services.folio-backend.enable = true;
     services.folio-backend.desktop = true;
