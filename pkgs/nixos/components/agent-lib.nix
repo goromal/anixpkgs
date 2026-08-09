@@ -1,7 +1,8 @@
 { pkgs, lib }:
 rec {
-  # Shared MCP-server submodule. Codex extends usage with args/startup_timeout_sec;
-  # Claude ignores those. `command` is an absolute path to the server executable.
+  # Shared MCP-server submodule. `command` is an absolute path to the server
+  # executable; both Claude and Codex pass `args` to it. Codex also uses
+  # startup_timeout_sec.
   mcpServerType = lib.types.submodule {
     options = {
       name = lib.mkOption {
@@ -15,7 +16,7 @@ rec {
       args = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [ ];
-        description = "Arguments passed to the server (codex config.toml only)";
+        description = "Arguments passed to the server";
       };
       env = lib.mkOption {
         type = lib.types.attrsOf lib.types.str;
@@ -36,6 +37,11 @@ rec {
         type = lib.types.nullOr lib.types.str;
         default = null;
         description = "Env var that should receive secretsPath";
+      };
+      secretsEnv = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = { };
+        description = "Environment variables whose file paths must exist before the server is registered";
       };
     };
   };

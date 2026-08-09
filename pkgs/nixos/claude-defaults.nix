@@ -165,6 +165,14 @@ in
         SERVER_URL = "http://localhost:${toString ports.launchpad}";
       };
     };
+    googleSheets = {
+      name = "google-sheets";
+      command = "/run/current-system/sw/bin/mcp-google-sheets-locked";
+      secretsEnv = {
+        CREDENTIALS_PATH = "$HOME/secrets/google/client_secrets.json";
+        TOKEN_PATH = "$HOME/secrets/google/refresh.json";
+      };
+    };
   };
 
   hooks = [

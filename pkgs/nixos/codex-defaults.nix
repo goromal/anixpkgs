@@ -15,7 +15,7 @@ in
   model = "gpt-5.6";
   modelProvider = "openai";
   approvalPolicy = "never";
-  sandboxMode = "workspace-write";
+  sandboxMode = "danger-full-access";
   extraSettings = {
     model_reasoning_effort = "medium";
   };
@@ -49,6 +49,14 @@ in
       command = "/run/current-system/sw/bin/jupyter-mcp-server";
       env = {
         SERVER_URL = "http://localhost:${toString ports.launchpad}";
+      };
+    };
+    googleSheets = {
+      name = "google-sheets";
+      command = "/run/current-system/sw/bin/mcp-google-sheets-locked";
+      env = {
+        CREDENTIALS_PATH = "${homeDir}/secrets/google/client_secrets.json";
+        TOKEN_PATH = "${homeDir}/secrets/google/refresh.json";
       };
     };
   };

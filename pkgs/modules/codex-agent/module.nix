@@ -35,7 +35,7 @@ in
         "workspace-write"
         "danger-full-access"
       ];
-      default = "workspace-write";
+      default = "danger-full-access";
       description = "codex sandbox_mode";
     };
     extraSettings = lib.mkOption {

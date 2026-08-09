@@ -36,7 +36,7 @@
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth";
+    easy-google-auth.url = "github:goromal/easy-google-auth/dev/more-scopes";
     easy-google-auth.flake = false;
 
     spandrel-src.url = "github:chaiNNer-org/spandrel";

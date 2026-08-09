@@ -72,7 +72,7 @@ in
     };
     sandboxMode = lib.mkOption {
       type = lib.types.str;
-      default = "workspace-write";
+      default = "danger-full-access";
     };
     extraSettings = lib.mkOption {
       type = lib.types.attrs;
