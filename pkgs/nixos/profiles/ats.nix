@@ -333,6 +333,7 @@ in
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
       mcpServers = [
+        codexDefaults.mcpServers.vikunja
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki
       ];

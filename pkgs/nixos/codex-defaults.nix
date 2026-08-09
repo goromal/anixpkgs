@@ -8,6 +8,7 @@
 # whose secret file is missing); a codex MCP server whose secret is absent simply
 # errors when first invoked.
 { homeDir }:
+with import ./dependencies.nix;
 {
   model = "gpt-5.6";
   modelProvider = "openai";
@@ -18,6 +19,15 @@
   };
 
   mcpServers = {
+    vikunja = {
+      name = "vikunja";
+      command = "/run/current-system/sw/bin/vikunja-mcp-server";
+      env = {
+        VIKUNJA_URL = "https://ats.local:${toString ports.vikunja.public}";
+        VIKUNJA_INSECURE = "1";
+        VIKUNJA_TOKEN_FILE = "${homeDir}/secrets/vikunja/secrets.json";
+      };
+    };
     notion = {
       name = "notion";
       command = "/run/current-system/sw/bin/notion-mcp-server";
@@ -30,6 +40,13 @@
       command = "/run/current-system/sw/bin/wiki-mcp-server";
       env = {
         WIKI_SECRETS_DIR = "${homeDir}/secrets/wiki";
+      };
+    };
+    jupyter = {
+      name = "jupyter-mcp";
+      command = "/run/current-system/sw/bin/jupyter-mcp-server";
+      env = {
+        SERVER_URL = "http://localhost:${toString ports.launchpad}";
       };
     };
   };
