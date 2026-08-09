@@ -6,6 +6,8 @@
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
+    llm-agents.url = "github:numtide/llm-agents.nix";
+
     phps.url = "github:fossar/nix-phps";
 
     flake-compat.url = "github:edolstra/flake-compat";

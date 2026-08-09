@@ -219,10 +219,15 @@ in
       description = "Packages to add to orchestrator's path";
       default = [ ];
     };
-    agentFramework = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "claude" ]);
-      default = null;
-      description = "AI agent framework to install and configure. Null means none.";
+    agentFrameworks = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.enum [
+          "claude"
+          "codex"
+        ]
+      );
+      default = [ ];
+      description = "AI agent frameworks to install and configure (may include both).";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -240,6 +245,7 @@ in
     ./installation-base.nix
     (import "${home-manager}/nixos")
     ../modules/claude-agent/module.nix
+    ../modules/codex-agent/module.nix
     ../modules/webserverNode/module.nix
     ../modules/cudaNode/module.nix
     ../modules/comfyui/module.nix
@@ -903,7 +909,8 @@ in
               ./components/upgrade-hooks.nix
             ]
             ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
-            ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
+            ++ (lib.optionals (lib.elem "claude" cfg.agentFrameworks) [ ./components/claude-agent.nix ])
+            ++ (lib.optionals (lib.elem "codex" cfg.agentFrameworks) [ ./components/codex-agent.nix ])
             ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
             ++ (
               if cfg.machineType == "x86_linux" then
@@ -943,18 +950,31 @@ in
             };
           }
           (
-            lib.optionalAttrs (cfg.agentFramework == "claude") {
-              mods.claude = {
-                marketplaces = config.machines.claude.marketplaces;
-                plugins = config.machines.claude.plugins;
-                permissionsAllow = config.machines.claude.permissionsAllow;
-                hooks = config.machines.claude.hooks;
-                skills = config.machines.claude.skills;
-                extraSettings = config.machines.claude.extraSettings;
-                mcpServers = config.machines.claude.mcpServers;
-                graphical = cfg.graphical;
-              };
-            }
+            lib.foldl lib.recursiveUpdate { } [
+              (lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
+                mods.claude = {
+                  marketplaces = config.machines.claude.marketplaces;
+                  plugins = config.machines.claude.plugins;
+                  permissionsAllow = config.machines.claude.permissionsAllow;
+                  hooks = config.machines.claude.hooks;
+                  skills = config.machines.claude.skills;
+                  extraSettings = config.machines.claude.extraSettings;
+                  mcpServers = config.machines.claude.mcpServers;
+                  graphical = cfg.graphical;
+                };
+              })
+              (lib.optionalAttrs (lib.elem "codex" cfg.agentFrameworks) {
+                mods.codex = {
+                  model = config.machines.codex.model;
+                  modelProvider = config.machines.codex.modelProvider;
+                  approvalPolicy = config.machines.codex.approvalPolicy;
+                  sandboxMode = config.machines.codex.sandboxMode;
+                  extraSettings = config.machines.codex.extraSettings;
+                  mcpServers = config.machines.codex.mcpServers;
+                  graphical = cfg.graphical;
+                };
+              })
+            ]
           );
     }
     (

@@ -66,7 +66,7 @@
     };
   };
 
-  config = lib.mkIf (config.machines.base.agentFramework == "claude") {
+  config = lib.mkIf (lib.elem "claude" config.machines.base.agentFrameworks) {
     # Like `godev` (which drops you at the devshell workspace root), `goclaude`
     # takes you from anywhere inside a devshell to that workspace's `sources`
     # directory and opens claude there. `godev` is only defined inside a
