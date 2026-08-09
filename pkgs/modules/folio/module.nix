@@ -46,6 +46,11 @@ in
         Type = "simple";
         User = "andrew";
         Group = "dev";
+        # Run as root (the "+" prefix) to (re)claim ownership of the data dir and
+        # DB before the andrew-owned service opens it. Makes the migration off the
+        # old dedicated "folio" user robust: a pre-existing folio.db keeps the old
+        # (now-removed) owner, which tmpfiles "z" does not reliably re-chown.
+        ExecStartPre = "+${pkgs.coreutils}/bin/chown -R andrew:dev ${cfg.dataDir}";
         ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
