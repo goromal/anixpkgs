@@ -20,6 +20,7 @@ mkShell {
     mp4separate
     scrape
     orchestrator
+    orchestrator-cpp
     fix-perms
     dirgather
     dirgroups

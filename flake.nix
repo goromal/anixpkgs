@@ -18,7 +18,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?rev=9e8510b5e6cb36f00b26b53d998c6f2a893417fb";
     aapis.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
@@ -101,7 +101,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp";
+    mscpp.url = "github:goromal/mscpp?rev=027929453fb3535e1023409d905c45c2d8ad71e6";
     mscpp.flake = false;
 
     msrs.url = "github:goromal/msrs";
@@ -115,7 +115,7 @@
     orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
-    orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
+    orchestrator-cpp.url = "github:goromal/orchestrator-cpp?rev=3e5c6a8acb0b786630f53d62eab762dfab6e2f74";
     orchestrator-cpp.flake = false;
 
     photos-tools.url = "github:goromal/photos-tools";
