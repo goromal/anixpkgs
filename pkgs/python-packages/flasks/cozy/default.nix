@@ -10,6 +10,7 @@
   requests,
   websocket-client,
   pillow,
+  pillow-heif,
   wormhole,
   python,
   pkg-src,
@@ -39,6 +40,9 @@ buildPythonPackage rec {
     requests
     websocket-client
     pillow
+    # HEIC is what phones produce and ComfyUI's own Pillow cannot read it;
+    # cozy transcodes on its side so LoadImage never sees one.
+    pillow-heif
     wormhole
   ];
   nativeCheckInputs = [ pytestCheckHook ];
