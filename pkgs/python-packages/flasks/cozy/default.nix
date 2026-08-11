@@ -9,6 +9,7 @@
   werkzeug,
   requests,
   websocket-client,
+  pillow,
   wormhole,
   python,
   pkg-src,
@@ -37,6 +38,7 @@ buildPythonPackage rec {
     werkzeug
     requests
     websocket-client
+    pillow
     wormhole
   ];
   nativeCheckInputs = [ pytestCheckHook ];
