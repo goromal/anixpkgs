@@ -81,7 +81,11 @@ in
     "mcp__notion__notion_list_blocks"
     "mcp__notion__notion_list_subpages"
     # MCP write tools
+    "mcp__notion__notion_append"
+    "mcp__notion__notion_create_subpage"
     "mcp__notion__notion_delete_block"
+    "mcp__notion__notion_move_block"
+    "mcp__notion__notion_move_blocks"
     "mcp__notion__notion_update_block"
   ];
 

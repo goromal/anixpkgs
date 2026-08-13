@@ -43,6 +43,24 @@ in
       default = { };
       description = "Extra keys merged into ~/.codex/config.toml";
     };
+    skills = lib.mkOption {
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption {
+              type = lib.types.str;
+              description = "Skill directory name under ~/.agents/skills/";
+            };
+            file = lib.mkOption {
+              type = lib.types.path;
+              description = "Path to the SKILL.md file for this skill";
+            };
+          };
+        }
+      );
+      default = [ ];
+      description = "List of Codex skills to install into ~/.agents/skills/<name>/SKILL.md";
+    };
     mcpServers = lib.mkOption {
       type = lib.types.listOf agentLib.mcpServerType;
       default = [ ];
