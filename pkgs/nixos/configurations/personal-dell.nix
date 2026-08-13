@@ -17,6 +17,7 @@
   services.comfyui.cozy.workflows = [
     "imggen"
     "imggen2"
+    "imggen4"
     "imgedit2"
     "imgedit3"
   ];
