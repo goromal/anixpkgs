@@ -971,6 +971,7 @@ in
                   approvalPolicy = config.machines.codex.approvalPolicy;
                   sandboxMode = config.machines.codex.sandboxMode;
                   extraSettings = config.machines.codex.extraSettings;
+                  skills = config.machines.codex.skills;
                   mcpServers = config.machines.codex.mcpServers;
                   graphical = cfg.graphical;
                 };

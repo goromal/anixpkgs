@@ -109,6 +109,7 @@ in
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
+      skills = codexDefaults.skills;
       mcpServers = [
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki

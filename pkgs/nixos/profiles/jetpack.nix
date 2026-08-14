@@ -107,6 +107,7 @@ in
       skills = claudeDefaults.skills;
       mcpServers = [
         claudeDefaults.mcpServers.vikunja
+        claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.jupyter
         claudeDefaults.mcpServers.googleSheets
       ];
@@ -117,8 +118,10 @@ in
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
+      skills = codexDefaults.skills;
       mcpServers = [
         codexDefaults.mcpServers.vikunja
+        codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.jupyter
         codexDefaults.mcpServers.googleSheets
       ];

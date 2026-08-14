@@ -20,6 +20,13 @@ in
     model_reasoning_effort = "medium";
   };
 
+  skills = [
+    {
+      name = "itns-notes";
+      file = ./res/claude-skills/itns-notes/SKILL.md;
+    }
+  ];
+
   mcpServers = {
     vikunja = {
       name = "vikunja";

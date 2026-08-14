@@ -76,8 +76,9 @@
     services.vikunja-mcp.enable = lib.mkDefault (
       builtins.any (s: s.name == "vikunja") config.machines.claude.mcpServers
     );
-    services.notion-mcp.enable =
-      config.machines.base.isATS || (config.machines.base.recreational && config.machines.base.developer);
+    services.notion-mcp.enable = lib.mkDefault (
+      builtins.any (s: s.name == "notion") config.machines.claude.mcpServers
+    );
     services.wiki-mcp.enable =
       config.machines.base.isATS || (config.machines.base.recreational && config.machines.base.developer);
   };
