@@ -9,6 +9,7 @@ import re
 import socket
 import subprocess
 import http.cookiejar
+import urllib.parse
 import urllib.request
 import xmlrpc.client
 from typing import Any
@@ -17,14 +18,15 @@ from typing import Any
 class CookieTransport(xmlrpc.client.Transport):
     """XMLRPC transport using cookie-based session auth (DokuWiki cookieAuth mode)."""
 
-    def __init__(self):
+    def __init__(self, scheme: str):
         super().__init__()
+        self._scheme = scheme
         jar = http.cookiejar.CookieJar()
         self._opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
 
     def request(self, host, handler, request_body, verbose=False):
         self.verbose = verbose
-        url = f"http://{host}{handler}"
+        url = f"{self._scheme}://{host}{handler}"
         req = urllib.request.Request(url, request_body, {"Content-Type": "text/xml"})
         resp = self._opener.open(req)
         return self.parse_response(resp)
@@ -36,7 +38,10 @@ class WikiClient:
     def __init__(self, wiki_url: str, wiki_user: str, wiki_pass: str):
         self.wiki_url = wiki_url
         xmlrpc_url = f"{wiki_url}/lib/exe/xmlrpc.php"
-        transport = CookieTransport()
+        scheme = urllib.parse.urlparse(xmlrpc_url).scheme
+        if scheme not in ("http", "https"):
+            raise ValueError(f"Unsupported wiki URL scheme: {scheme!r}")
+        transport = CookieTransport(scheme)
         self.server = xmlrpc.client.ServerProxy(xmlrpc_url, transport=transport)
         if not self.server.dokuwiki.login(wiki_user, wiki_pass):
             raise Exception(f"DokuWiki login failed for user {wiki_user!r}")

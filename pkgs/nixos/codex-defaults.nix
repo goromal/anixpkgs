@@ -48,6 +48,7 @@ in
       name = "wiki";
       command = "/run/current-system/sw/bin/wiki-mcp-server";
       env = {
+        WIKI_URL = "http://ats.local";
         WIKI_SECRETS_DIR = "${homeDir}/secrets/wiki";
       };
     };
