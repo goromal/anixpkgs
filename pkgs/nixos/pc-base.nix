@@ -881,6 +881,7 @@ in
       environment.shellAliases = {
         jfu = "journalctl -fu";
         nohistory = "set +o history";
+        ta = "tmux attach";
       };
 
       programs.captive-browser = {
