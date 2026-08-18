@@ -248,6 +248,7 @@ in
     ../modules/codex-agent/module.nix
     ../modules/webserverNode/module.nix
     ../modules/cudaNode/module.nix
+    ../modules/localLlm/module.nix
     ../modules/comfyui/module.nix
     ../modules/externalDrives/module.nix
     ../modules/homeVpnNode/module.nix
@@ -880,6 +881,7 @@ in
       environment.shellAliases = {
         jfu = "journalctl -fu";
         nohistory = "set +o history";
+        ta = "tmux attach";
       };
 
       programs.captive-browser = {

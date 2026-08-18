@@ -161,6 +161,9 @@ in
       command = "/run/current-system/sw/bin/wiki-mcp-server";
       secretsPath = "$HOME/secrets/wiki";
       secretsEnvVar = "WIKI_SECRETS_DIR";
+      env = {
+        WIKI_URL = "http://ats.local";
+      };
     };
     jupyter = {
       name = "jupyter-mcp";

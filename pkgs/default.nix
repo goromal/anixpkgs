@@ -577,6 +577,7 @@ rec {
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
+  anix-llm = addDoc (prev.callPackage ./python-packages/anix-llm { });
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
