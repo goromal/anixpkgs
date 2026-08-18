@@ -48,8 +48,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    # TODO revert to "github:goromal/flasks" once goromal/flasks#16 merges.
-    flasks.url = "github:goromal/flasks?ref=dev/czapi";
+    flasks.url = "github:goromal/flasks";
     flasks.flake = false;
 
     folio.url = "github:goromal/folio";
