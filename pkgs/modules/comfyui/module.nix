@@ -220,6 +220,13 @@ in
           "d ${cfg.cozy.stateDir} 0755 andrew dev -"
           "d ${cfg.cozy.promptDbDir} 0755 andrew dev -"
         ];
+        environment.systemPackages = [
+          (pkgs.runCommand "cozyctl" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
+            mkdir -p $out/bin
+            makeWrapper ${cfg.cozy.package}/bin/cozyctl $out/bin/cozyctl \
+              --set-default COZY_URL "http://127.0.0.1:${builtins.toString service-ports.cozy}/cozy"
+          '')
+        ];
         # Let the cozy UI (running as andrew) restart ComfyUI via its
         # "Restart ComfyUI" button. Narrowly scoped: only andrew, only
         # comfyui.service, no password prompt.
