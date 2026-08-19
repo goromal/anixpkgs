@@ -35,14 +35,14 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1785337863,
-        "narHash": "sha256-h+/DKghyfEqceURfWMR5lE7MLvCktic5pUyu0F7JnUI=",
+        "lastModified": 1785443760,
+        "narHash": "sha256-j0FNhYqGmludHVrBlm+zIiccMUNG8A5xgQSJQyV2j54=",
         "ref": "dev/controller",
-        "rev": "cba0b1b0bf4d8d1aec5c7c1ce1e1f814b4b8c6f0",
-        "revCount": 70896,
+        "rev": "8ce531a48394a0d7c789b24f4ee7a3ba5872ca6e",
+        "revCount": 70903,
         "submodules": true,
         "type": "git",
-        "url": "ssh://git@github.com/goromal/ardupilot"
+        "url": "file:///data/andrew/dev/drone/sources/ardupilot"
       },
       "original": {
         "ref": "dev/controller",
@@ -410,12 +410,13 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1785393063,
-        "narHash": "sha256-XxDweQEvwufZIjcOJoOtoNafkC81CfklnUIFSXOz90E=",
-        "owner": "goromal",
-        "repo": "indi-harness",
-        "rev": "340f2b8ee77a24640e7c94a91193d2e8074a64e3",
-        "type": "github"
+        "lastModified": 1785440652,
+        "narHash": "sha256-iBDTCIVHPx1yNedbsZ8ssNzb3PVJn05tIvczGy6QtlY=",
+        "ref": "dev/indi-s3-layerB",
+        "rev": "f1496ac33f5a65d180dee952e9b64fac3156b340",
+        "revCount": 36,
+        "type": "git",
+        "url": "file:///data/andrew/dev/drone/sources/indi-harness"
       },
       "original": {
         "owner": "goromal",
