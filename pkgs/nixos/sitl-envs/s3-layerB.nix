@@ -24,10 +24,12 @@ let
   # ROS python (rclpy) for the trajectory-server, with the custom ardupilot_msgs
   # interface package so `from ardupilot_msgs.msg import FlatSetpoint` resolves.
   rosPy = ros-pkgs.rosPackages.jazzy.buildEnv {
-    paths = (with ros-pkgs.rosPackages.jazzy; [
-      ros-core
-      geometry-msgs
-    ]) ++ [ anixpkgs.ardupilot-msgs ];
+    paths =
+      (with ros-pkgs.rosPackages.jazzy; [
+        ros-core
+        geometry-msgs
+      ])
+      ++ [ anixpkgs.ardupilot-msgs ];
   };
   indiPy = anixpkgs.python313.withPackages (ps: [ ps.indi-harness ]);
   indiSitePackages = "${indiPy}/lib/python3.13/site-packages";
