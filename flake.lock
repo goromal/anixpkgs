@@ -35,14 +35,14 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1785443760,
-        "narHash": "sha256-j0FNhYqGmludHVrBlm+zIiccMUNG8A5xgQSJQyV2j54=",
+        "lastModified": 1785444444,
+        "narHash": "sha256-qy8yMsW2Nv8gkwjqmrASaTBlJGBTaK2QGio8FrIatIA=",
         "ref": "dev/controller",
-        "rev": "8ce531a48394a0d7c789b24f4ee7a3ba5872ca6e",
-        "revCount": 70903,
+        "rev": "7f577c2af01b82ba7460eeb926846ce12dcc9815",
+        "revCount": 70904,
         "submodules": true,
         "type": "git",
-        "url": "file:///data/andrew/dev/drone/sources/ardupilot"
+        "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
         "ref": "dev/controller",
