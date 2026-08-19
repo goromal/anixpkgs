@@ -412,14 +412,14 @@
       "locked": {
         "lastModified": 1785440652,
         "narHash": "sha256-iBDTCIVHPx1yNedbsZ8ssNzb3PVJn05tIvczGy6QtlY=",
-        "ref": "dev/indi-s3-layerB",
+        "owner": "goromal",
+        "repo": "indi-harness",
         "rev": "f1496ac33f5a65d180dee952e9b64fac3156b340",
-        "revCount": 36,
-        "type": "git",
-        "url": "file:///data/andrew/dev/drone/sources/indi-harness"
+        "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/indi-s3-layerB",
         "repo": "indi-harness",
         "type": "github"
       }
