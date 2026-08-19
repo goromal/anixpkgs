@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anix-llm"
+version = "1.0.0"
+description = "Private local LLM workflows for anixpkgs"
+requires-python = ">=3.11"
+
+[project.scripts]
+anix-llm = "anix_llm.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["anix_llm*"]

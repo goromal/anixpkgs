@@ -42,5 +42,27 @@ options:
                         restart comfyui.service'); empty hides the restart
                         button
   --rest-gap REST_GAP   Seconds to rest between queued jobs
+``````bash
+usage: cozyctl [-h] [--url URL] [--token TOKEN] [--token-file TOKEN_FILE]
+               {queue,status,start,stop} ...
+
+Queue cozy image-generation jobs from the command line.
+
+positional arguments:
+  {queue,status,start,stop}
+    queue               queue one generator job per prompt file
+    status              show the queue
+    start               start draining the queue
+    stop                stop after the current job
+
+options:
+  -h, --help            show this help message and exit
+  --url URL             base URL of the cozy app, e.g.
+                        http://myhost.local/cozy (env COZY_URL; set for you on
+                        hosts running cozy)
+  --token TOKEN         API token (env COZY_TOKEN; prefer --token-file)
+  --token-file TOKEN_FILE
+                        file holding the API token (default
+                        ~/secrets/flask/cozy-api-token)
 ```
 

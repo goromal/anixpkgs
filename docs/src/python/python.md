@@ -41,3 +41,4 @@ Packages written (or bound) in Python.
 - [book-notes-sync](./book-notes-sync.md)
 - [goromail](./goromail.md)
 - [cozy](./cozy.md)
+- [wormhole](./wormhole.md)

@@ -358,6 +358,12 @@ let
               self-tester-app = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
               );
+              folio-backend = pySelf.callPackage ./python-packages/folio-backend {
+                pkg-src = flakeInputs.folio;
+              };
+              folio-mcp = pySelf.callPackage ./python-packages/folio-mcp {
+                pkg-src = flakeInputs.folio;
+              };
               tasks_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
               );
@@ -484,6 +490,13 @@ rec {
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  folio-backend = final.python313.pkgs.folio-backend;
+  folio-mcp = final.python313.pkgs.folio-mcp;
+  folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
+  folio-desktop = final.callPackage ./folio-desktop {
+    pkg-src = flakeInputs.folio;
+    folioPort = service-ports.folio.internal;
+  };
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
@@ -564,6 +577,7 @@ rec {
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
+  anix-llm = addDoc (prev.callPackage ./python-packages/anix-llm { });
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
@@ -792,7 +806,4 @@ rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
-
-  # Override claude-code-bin to use version 2.1.177
-  claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

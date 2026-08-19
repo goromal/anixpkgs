@@ -55,6 +55,7 @@ in
         anixpkgs.manage-gmail
         anixpkgs.gmail-parser
         anixpkgs.local-ssh-proxy
+        anixpkgs.wormhole
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.notion-tools
