@@ -99,6 +99,10 @@ in
       file = ./res/claude-skills/anixpkgs-packages/SKILL.md;
     }
     {
+      name = "workspace-development";
+      file = ./res/claude-skills/workspace-development/SKILL.md;
+    }
+    {
       name = "editing-skills";
       file = ./res/claude-skills/editing-skills/SKILL.md;
     }
