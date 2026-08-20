@@ -2,6 +2,7 @@
   stdenvNoCC,
   makeWrapper,
   electron,
+  pkgData,
   pkg-src,
   folioPort,
 }:
@@ -29,13 +30,16 @@ stdenvNoCC.mkDerivation {
       --add-flags $out/share/folio-desktop
 
     mkdir -p $out/share/applications
+    install -Dm644 ${pkgData.icons.apps.folio.data} \
+      $out/share/icons/hicolor/512x512/apps/folio.png
     cat > $out/share/applications/folio.desktop <<EOF
     [Desktop Entry]
     Type=Application
     Name=folio
     Comment=Book Study Companion
     Exec=$out/bin/folio-desktop
-    Icon=accessories-dictionary
+    Icon=folio
+    StartupWMClass=folio-desktop
     Terminal=false
     Categories=Office;Education;
     EOF

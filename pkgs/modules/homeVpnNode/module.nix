@@ -4,6 +4,7 @@
   lib,
   ...
 }:
+with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.homeVpnNode;
@@ -92,6 +93,8 @@ let
     installPhase = ''
       runHook preInstall
       install -Dm755 ${./homevpn_gui.py} $out/bin/homevpn-gui
+      install -Dm644 ${anixpkgs.pkgData.icons.apps.home-vpn.data} \
+        $out/share/icons/hicolor/512x512/apps/homevpn-gui.png
       substituteInPlace $out/bin/homevpn-gui \
         --replace '#!/usr/bin/env python3' '#!${pyEnv}/bin/python3' \
         --replace '@homevpn@' '${homevpn}/bin/homevpn'
@@ -103,7 +106,8 @@ let
     name = "homevpn-gui";
     desktopName = "Home VPN";
     comment = "Toggle the home OpenVPN tunnel";
-    icon = "network-vpn";
+    icon = "homevpn-gui";
+    startupWMClass = "dev.anix.HomeVpn";
     exec = "${homevpnGui}/bin/homevpn-gui";
     terminal = false;
     categories = [ "Network" ];
