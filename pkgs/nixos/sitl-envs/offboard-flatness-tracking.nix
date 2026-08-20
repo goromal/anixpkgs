@@ -1,6 +1,7 @@
-# Headless S2: offboard ROS2 outer loop flying the S1 battery through the
-# stock inner loop via SET_ATTITUDE_TARGET (design doc S2 exit).
-# Run: nix-build pkgs/nixos/sitl-envs/s2-offboard.nix
+# Offboard flatness tracking: an off-board ROS2 outer loop flies the trajectory
+# battery through the stock inner loop via SET_ATTITUDE_TARGET (a differential-
+# flatness attitude reference computed off-board).
+# Run: nix-build pkgs/nixos/sitl-envs/offboard-flatness-tracking.nix
 with import ../dependencies.nix;
 let
   pkgs = (
@@ -28,7 +29,7 @@ let
   indiSitePackages = "${indiPy}/lib/python3.13/site-packages";
 in
 pkgs.testers.runNixOSTest {
-  name = "s2-offboard";
+  name = "offboard-flatness-tracking";
   nodes = {
     drone =
       {

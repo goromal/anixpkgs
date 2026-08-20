@@ -334,15 +334,19 @@ jobs:
       run: |
         nix-store -qR /tmp/dronesim-driver | grep -- '-ros-env$' \
           | xargs nix-store -qR | sort -u | cachix push github-public
+
   drone-indi-flight:
     name: Drone INDI Flight Gate
     needs: changes
     if: needs.changes.outputs.drone == 'true'
     runs-on: ubuntu-latest
-    # Flies the S1 trajectory battery with the in-firmware INDI backend
-    # (CC_TYPE=3) and requires the scored 5-case JSON + INDI .BIN health --
-    # unlike the boot/DDS smoke test, this actually arms and flies. Timeout
-    # covers the battery's own 3600s flight cap plus VM/build overhead.
+    # The single comprehensive drone flight gate. Boots the SITL + ROS2/DDS stack
+    # and flies the full trajectory battery with the in-firmware INDI outer loop
+    # (CC_TYPE=3, CC3_OUTER_EN=1), driven by the ROS2 trajectory-server publishing
+    # ardupilot_msgs/FlatSetpoint over the custom AP_DDS topic. Asserts the
+    # flat-tracking win (aggregate RMS < 1.5 m, which forces the figure-eight
+    # improvement over the stock/inner-only controllers' ~5.0 m), no altitude
+    # runaway, and the DDS-staleness -> stock-fallback path between cases.
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v5
@@ -364,83 +368,8 @@ jobs:
         skipPush: true
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - name: Build and run the INDI flight gate
+    - name: Build and run the drone flight gate
       run: |
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
-        nix-build pkgs/nixos/sitl-envs/s3-layerA.nix -A driver -o /tmp/s3a-driver
-        /tmp/s3a-driver/bin/nixos-test-driver
-
-  drone-indi-layerc:
-    name: Drone INDI Layer-C Gate
-    needs: changes
-    if: needs.changes.outputs.drone == 'true'
-    runs-on: ubuntu-latest
-    # Flies the S1 trajectory battery with the C1 in-firmware INDI backend
-    # (CC_TYPE=3, CC3_OMG_FILT=80, CC3_G1_RP=500) and, beyond the Layer-A flight
-    # gate, asserts the excitation-aware angular-accel (omega_dot) tracking gate:
-    # roll/pitch must do real omega_dot-inversion (NRMSE < 0.75). Yaw inversion
-    # needs the RPM-fed G2 term SITL can't model -> reported, deferred to HW/S4.
-    timeout-minutes: 60
-    steps:
-    - uses: actions/checkout@v5
-    - name: Enable KVM for the test VM
-      run: |
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-        sudo udevadm control --reload-rules
-        sudo udevadm trigger --name-match=kvm
-    - uses: cachix/install-nix-action@v31
-      with:
-        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
-        extra_nix_config: |
-          extra-substituters = https://ros.cachix.org
-          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
-    - uses: cachix/cachix-action@v14
-      with:
-        name: github-public
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-        skipPush: true
-    - run: >
-        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - name: Build and run the INDI Layer-C gate
-      run: |
-        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
-        nix-build pkgs/nixos/sitl-envs/s3-layerC.nix -A driver -o /tmp/s3c-driver
-        /tmp/s3c-driver/bin/nixos-test-driver
-
-  drone-indi-layerb:
-    name: Drone INDI Layer-B Gate
-    needs: changes
-    if: needs.changes.outputs.drone == 'true'
-    runs-on: ubuntu-latest
-    # Boots the SITL + ROS2/DDS stack and flies the S1 trajectory battery with
-    # the in-firmware INDI *outer* loop (CC_TYPE=3, CC3_OUTER_EN=1), driven by
-    # the ROS2 trajectory-server publishing ardupilot_msgs/FlatSetpoint over the
-    # custom AP_DDS topic. Asserts the flat-tracking win (aggregate RMS < 1.5 m,
-    # which forces the lemniscate improvement over stock/C1's ~5.0 m), no
-    # altitude runaway, and the DDS-staleness -> stock-fallback path between cases.
-    timeout-minutes: 60
-    steps:
-    - uses: actions/checkout@v5
-    - name: Enable KVM for the test VM
-      run: |
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-        sudo udevadm control --reload-rules
-        sudo udevadm trigger --name-match=kvm
-    - uses: cachix/install-nix-action@v31
-      with:
-        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
-        extra_nix_config: |
-          extra-substituters = https://ros.cachix.org
-          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
-    - uses: cachix/cachix-action@v14
-      with:
-        name: github-public
-        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
-        skipPush: true
-    - run: >
-        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
-    - name: Build and run the INDI Layer-B gate
-      run: |
-        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
-        nix-build pkgs/nixos/sitl-envs/s3-layerB.nix -A driver -o /tmp/s3b-driver
-        /tmp/s3b-driver/bin/nixos-test-driver
+        nix-build pkgs/nixos/sitl-envs/indi-flatness-outer-loop.nix -A driver -o /tmp/flight-driver
+        /tmp/flight-driver/bin/nixos-test-driver

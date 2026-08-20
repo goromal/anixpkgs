@@ -1,6 +1,7 @@
-# Headless S1 baseline: boots the SITL stack and flies the stock-controller
-# trajectory battery, exporting RMSE artifacts (design doc S1 exit).
-# Run: nix-build pkgs/nixos/sitl-envs/s1-baseline.nix
+# Stock-controller tracking baseline: boots the SITL stack and flies the
+# trajectory battery through the stock ArduCopter guided controller, exporting
+# RMSE artifacts -- the reference the INDI controllers are measured against.
+# Run: nix-build pkgs/nixos/sitl-envs/stock-tracking-baseline.nix
 with import ../dependencies.nix;
 let
   pkgs = (
@@ -11,7 +12,7 @@ let
   );
 in
 pkgs.testers.runNixOSTest {
-  name = "s1-baseline";
+  name = "stock-tracking-baseline";
   nodes = {
     drone =
       { config, pkgs, ... }:

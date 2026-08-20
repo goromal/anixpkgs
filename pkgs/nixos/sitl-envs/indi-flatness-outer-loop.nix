@@ -1,17 +1,19 @@
-# Headless S3 Layer-B: boots the SITL + ROS2/DDS stack, engages the in-firmware
-# INDI *outer* loop (CC_TYPE=3, CC3_OUTER_EN=1), and flies a trajectory driven
-# by the ROS2 trajectory-server publishing ardupilot_msgs/FlatSetpoint over the
-# custom AP_DDS topic (rt/ap/flat_setpoint). Unlike S2 (offboard SET_ATTITUDE_
-# TARGET, latency-unstable INDI accel loop) the whole outer loop is in firmware,
-# so the flatness + linear-INDI thrust-vector increment runs at the low-latency
-# controller rate. Exports the .BIN and reports the INDB outer-loop health
-# (fallback fraction + reference-vs-measured tracking).
-# Run: nix-build pkgs/nixos/sitl-envs/s3-layerB.nix
+# In-firmware INDI flatness outer loop: boots the SITL + ROS2/DDS stack, engages
+# the in-firmware INDI *outer* loop (CC_TYPE=3, CC3_OUTER_EN=1), and flies a
+# trajectory driven by the ROS2 trajectory-server publishing
+# ardupilot_msgs/FlatSetpoint over the custom AP_DDS topic (rt/ap/flat_setpoint).
+# Unlike the off-board flatness controller (SET_ATTITUDE_TARGET, latency-unstable
+# INDI accel loop) the whole outer loop is in firmware, so the flatness +
+# linear-INDI thrust-vector increment runs at the low-latency controller rate.
+# This is the most comprehensive drone gate: it exercises the full stack (SITL +
+# ROS2/DDS + in-firmware outer loop + INDI inner loop) and asserts flat-tracking,
+# no altitude runaway, and the DDS-staleness fallback path.
+# Run: nix-build pkgs/nixos/sitl-envs/indi-flatness-outer-loop.nix
 with import ../dependencies.nix;
 let
-  # CC3_B_ACC_FILT sweep knob (Hz): the outer-loop specific-force / thrust-state
-  # phase-margin cutoff. Swept in Task B5 (stable+active across 4-30 Hz); 8 is
-  # the firmware default. The gate flies the full battery at this cutoff.
+  # CC3_B_ACC_FILT (Hz): the outer-loop specific-force / thrust-state phase-margin
+  # cutoff. Stable+active across a 4-30 Hz sweep; 8 is the firmware default. The
+  # gate flies the full battery at this cutoff.
   accFilt = 8;
 
   pkgs = (
@@ -34,7 +36,7 @@ let
   indiSitePackages = "${indiPy}/lib/python3.13/site-packages";
 in
 pkgs.testers.runNixOSTest {
-  name = "s3-layerB";
+  name = "indi-flatness-outer-loop";
   nodes = {
     drone =
       {
@@ -48,9 +50,9 @@ pkgs.testers.runNixOSTest {
         virtualisation.cores = 4;
         virtualisation.memorySize = 8192;
         virtualisation.diskSize = 8192;
-        # INDI backend on all axes, RC9 -> CUSTOM_CONTROLLER (109), the C1 inner
-        # config (OMG_FILT 80, G1_RP 500), and the Layer-B outer loop enabled
-        # with the swept specific-force cutoff.
+        # INDI backend on all axes, RC9 -> CUSTOM_CONTROLLER (109), the inner
+        # rate loop tuned for angular-accel inversion (OMG_FILT 80, G1_RP 500),
+        # and the flatness outer loop enabled with the swept specific-force cutoff.
         services.ardupilot-sim.parameters = lib.mkAfter [
           "CC_TYPE 3"
           "CC_AXIS_MASK 7"
@@ -58,17 +60,18 @@ pkgs.testers.runNixOSTest {
           "CC3_OMG_FILT 80"
           "CC3_G1_RP 500"
           "CC3_OUTER_EN 1"
-          # Attitude-only outer loop (plan-faithful B4): drive q_ref/w_ff/dw_ff
-          # into the C1 inner loop, leave collective to the stock altitude
-          # controller. The collective-drive experiment (CC3_B_THR_EN=1) caused a
-          # self-referential altitude runaway across 3 fix attempts; disabled.
+          # Attitude-only outer loop: drive q_ref/w_ff/dw_ff into the inner rate
+          # loop, leave collective to the stock altitude controller. Driving the
+          # collective from the outer loop (CC3_B_THR_EN=1) self-references into an
+          # altitude runaway (throttle -> thrust-state -> thrust-vector), so it is
+          # disabled here; the RPM-fed thrust path is deferred to hardware.
           "CC3_B_THR_EN 0"
           "CC3_B_ACC_FILT ${toString accFilt}"
         ];
-        # Same GPS/EKF warm-up probe as S1/S2/S3-C.
-        environment.etc."s3-arm-probe.py".source = ./s3-arm-probe.py;
-        # Layer-B battery gate scorer (flat-tracking + fallback assertions).
-        environment.etc."s3-layerB-score.py".source = ./s3-layerB-score.py;
+        # Shared GPS/EKF warm-up probe (same one the other SITL gates use).
+        environment.etc."arm-probe.py".source = ./arm-probe.py;
+        # Battery gate scorer (flat-tracking + omega_dot-inversion + fallback).
+        environment.etc."indi-flatness-outer-loop-score.py".source = ./indi-flatness-outer-loop-score.py;
       };
   };
   testScript =
@@ -85,7 +88,7 @@ pkgs.testers.runNixOSTest {
       machines[0].succeed("python3 -c 'import indi_harness.sitl.baseline_outer'")
 
       # GPS/EKF warm-up (captured; surfaced only on failure).
-      arm_probe = machines[0].execute("timeout 180 python3 /etc/s3-arm-probe.py 2>&1")[1]
+      arm_probe = machines[0].execute("timeout 180 python3 /etc/arm-probe.py 2>&1")[1]
 
       # Fly the FULL battery: the mavlink runner takes off + engages the custom
       # controller once, then holds station case-by-case, writing {case,origin}
@@ -97,7 +100,7 @@ pkgs.testers.runNixOSTest {
       machines[0].execute("rm -f /tmp/lb_ready")
       machines[0].execute(
           "(timeout 900 python3 -m indi_harness.sitl.baseline_outer"
-          " --url tcp:127.0.0.1:5790 --out /tmp/s3_layerB --engage-rc 9"
+          " --url tcp:127.0.0.1:5790 --out /tmp/flight --engage-rc 9"
           " --ready-file /tmp/lb_ready >/tmp/runner.log 2>&1 &"
           " echo $! >/tmp/runner.pid)"
       )
@@ -114,7 +117,7 @@ pkgs.testers.runNixOSTest {
           machines[0].succeed(
               "PID=$(cat /tmp/runner.pid); for i in $(seq 1 900); do "
               "kill -0 $PID 2>/dev/null || break; sleep 1; done; "
-              "test -s /tmp/s3_layerB/s3_layerB_flown.json"
+              "test -s /tmp/flight/s3_layerB_flown.json"
           )
       except Exception:
           print("=== runner.log ==="); print(machines[0].execute("cat /tmp/runner.log 2>/dev/null | tail -40")[1])
@@ -126,17 +129,18 @@ pkgs.testers.runNixOSTest {
           machines[0].execute("kill -INT $(cat /tmp/traj.pid) 2>/dev/null || true; sleep 1")
 
       # Export the newest .BIN (outer-loop health source of truth).
-      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerB/s3_layerB.BIN")
-      machines[0].copy_from_vm("/tmp/s3_layerB/s3_layerB.BIN", "")
+      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/flight/flight.BIN")
+      machines[0].copy_from_vm("/tmp/flight/flight.BIN", "")
 
-      # Hard gate: all 5 cases flown via DDS, tracked (RMS < 1.5 m -> forces the
-      # lemniscate win), no altitude runaway, and the DDS-staleness->fallback
-      # path exercised between cases. Quiet on success (summary line + PASS);
-      # on failure the runner/traj logs are surfaced above.
+      # Hard gate (the one comprehensive drone check): all 5 cases flown via DDS,
+      # tracked (RMS < 1.5 m -> forces the figure-eight win, and is itself proof
+      # the inner INDI loop delivers real torque), no altitude runaway, and the
+      # DDS-staleness->fallback path exercised between cases. Quiet on success
+      # (summary line + PASS); on failure the runner/traj logs are surfaced above.
       try:
           print(machines[0].succeed(
-              "python3 /etc/s3-layerB-score.py"
-              " /tmp/s3_layerB/s3_layerB.BIN /tmp/s3_layerB/s3_layerB_flown.json"))
+              "python3 /etc/indi-flatness-outer-loop-score.py"
+              " /tmp/flight/flight.BIN /tmp/flight/s3_layerB_flown.json"))
       except Exception:
           print("=== traj_server log ==="); print(machines[0].execute("tail -12 /tmp/traj.log 2>/dev/null")[1])
           print("=== runner.log ==="); print(machines[0].execute("tail -20 /tmp/runner.log 2>/dev/null")[1])

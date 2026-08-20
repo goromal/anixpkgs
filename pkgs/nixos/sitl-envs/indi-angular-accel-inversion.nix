@@ -1,9 +1,18 @@
-# Headless S3 Layer-A: boots the SITL stack, engages the in-firmware INDI
-# attitude/rate backend (CC_TYPE=3) and flies the S1 trajectory battery via the
-# stock GUIDED position streaming, exporting RMSE + the .BIN INDI health
-# (design doc S3 Layer-A exit). Same command path as S1 -- Layer A keeps the
-# stock outer loop and only swaps the inner controller.
-# Run: nix-build pkgs/nixos/sitl-envs/s3-layerA.nix
+# In-firmware INDI angular-acceleration inversion: boots the SITL stack, engages
+# the in-firmware INDI rate controller (CC_TYPE=3) tuned for true omega_dot-
+# inversion (CC3_OMG_FILT=80, CC3_G1_RP=500), flies the trajectory battery via
+# stock GUIDED position streaming, exports RMSE + the .BIN INDI health, then
+# asserts an excitation-aware omega_dot-tracking gate on the excited (roll/pitch)
+# axes -- proving the rate loop truly inverts the measured angular acceleration.
+# The tuning is what makes the inversion real: an earlier de-tuned INDI
+# limit-cycled on angular-accel-estimator group delay; raising the estimate
+# cutoff (30->80 Hz) and dropping the effectiveness toward its true value
+# (G1_RP 1000->500) gives clean omega_dot-inversion on roll/pitch (RATE-gyro RMS
+# 3-4 deg/s). The bidi-DShot extensions (G2 rotor-inertia, measured-actuator-
+# state feedback, per-motor RPM loop) are deferred to hardware -- SITL does not
+# model the physics they address. Same command path as the stock baseline:
+# stock outer loop, INDI inner controller only.
+# Run: nix-build pkgs/nixos/sitl-envs/indi-angular-accel-inversion.nix
 with import ../dependencies.nix;
 let
   pkgs = (
@@ -14,7 +23,7 @@ let
   );
 in
 pkgs.testers.runNixOSTest {
-  name = "s3-layerA";
+  name = "indi-angular-accel-inversion";
   nodes = {
     drone =
       {
@@ -30,17 +39,22 @@ pkgs.testers.runNixOSTest {
         virtualisation.diskSize = 8192;
         # Select the INDI backend (CC_TYPE=3), apply it to all three axes, and
         # wire RC9 to the CUSTOM_CONTROLLER aux function (109) so baseline_cc can
-        # engage it mid-flight via an RC override. G1/filter/gain flight config
-        # ships in the firmware param defaults (CC3_G1_RP/YAW=1000, FILT_HZ=40).
+        # engage it mid-flight via an RC override. Pin the C1 config explicitly
+        # (CC3_OMG_FILT=80 estimator cutoff, CC3_G1_RP=500 near-true roll/pitch
+        # effectiveness) even though these are now the firmware param defaults --
+        # this env is the permanent record of the config that fixed the
+        # delay-driven limit cycle.
         services.ardupilot-sim.parameters = lib.mkAfter [
           "CC_TYPE 3"
           "CC_AXIS_MASK 7"
           "RC9_OPTION 109"
+          "CC3_OMG_FILT 80"
+          "CC3_G1_RP 500"
         ];
         # Same prearm/EKF warm-up probe S1 uses (arm() needs a sim GPS lock
         # before NAV_TAKEOFF will climb); prints STATUSTEXT/GPS/params so an
         # arm/takeoff failure in the headless battery is explainable.
-        environment.etc."s3-arm-probe.py".text = ''
+        environment.etc."arm-probe.py".text = ''
           import time
           from pymavlink import mavutil
 
@@ -99,13 +113,13 @@ pkgs.testers.runNixOSTest {
       # EKF/GPS warm-up before flying. The probe output is captured, not
       # printed -- it is only surfaced (with the ardusitl journal) if the
       # battery fails to arm/fly, keeping the CI log quiet on success.
-      arm_probe = machines[0].execute("timeout 180 python3 /etc/s3-arm-probe.py 2>&1")[1]
+      arm_probe = machines[0].execute("timeout 180 python3 /etc/arm-probe.py 2>&1")[1]
       try:
           machines[0].succeed(
               "timeout 3600 python3 -m indi_harness.sitl.baseline_cc"
               " --url tcp:127.0.0.1:5790 --engage-rc 9"
               " --logs-dir /data/drone/ardusitl/logs"
-              " --out /tmp/s3_layerA >&2"
+              " --out /tmp/s3_layerC >&2"
           )
       except Exception:
           print("=== arm/EKF/GPS probe ===")
@@ -114,20 +128,34 @@ pkgs.testers.runNixOSTest {
           print(machines[0].execute("journalctl -u ardusitl --no-pager | grep -iE 'prearm|arm|ekf|gps|home|custom' | grep -iv 'Loaded defaults' | tail -60")[1])
           print(machines[0].execute("find /data/drone -name '*.BIN' 2>/dev/null; ls -la /data/drone/ardusitl 2>/dev/null")[1])
           raise
-      # Hard requirement: the scored 5-case battery JSON (exported as an
-      # artifact rather than dumped to stdout).
-      machines[0].succeed("test -s /tmp/s3_layerA/s3_layerA.json")
-      machines[0].copy_from_vm("/tmp/s3_layerA/s3_layerA.json", "")
+      # Hard requirement: the scored 5-case battery JSON. baseline_cc hardcodes
+      # the filename "s3_layerA.json" into --out; reference the file it actually
+      # writes and rename it to the Layer-C artifact name.
+      machines[0].succeed("test -s /tmp/s3_layerC/s3_layerA.json")
+      machines[0].succeed("cp /tmp/s3_layerC/s3_layerA.json /tmp/s3_layerC/s3_layerC.json")
+      machines[0].copy_from_vm("/tmp/s3_layerC/s3_layerC.json", "")
       # Export the newest .BIN (INDI health source of truth) for offline scoring
       # of predicted-vs-measured angular accel.
-      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerA/s3_layerA.BIN")
-      machines[0].copy_from_vm("/tmp/s3_layerA/s3_layerA.BIN", "")
+      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerC/s3_layerC.BIN")
+      machines[0].copy_from_vm("/tmp/s3_layerC/s3_layerC.BIN", "")
       # INDI health summary (proves the INDI backend actually flew it).
       print(machines[0].succeed(
           "python3 -c \""
           "from indi_harness.sitl.binlog import read_indi_health; import numpy as np; "
-          "h=read_indi_health('/tmp/s3_layerA/s3_layerA.BIN'); "
+          "h=read_indi_health('/tmp/s3_layerC/s3_layerC.BIN'); "
           "print('INDI msgs', len(h['time_us']), 'sat_frac', round(float(h['sat'].mean()),3))\""
+      ))
+      # C1 exit gate: excitation-aware omega_dot-tracking. omega_gate_ok skips
+      # unexcited axes (yaw is quiescent on this battery) and requires the excited
+      # roll/pitch axes to track with NRMSE < 0.75 -- proves real omega_dot
+      # inversion (not Layer A's attenuated / limit-cycling predictor).
+      print(machines[0].succeed(
+          "python3 -c \""
+          "from indi_harness.sitl.binlog import read_indi_health; "
+          "from indi_harness.sitl.align import omega_gate_ok; "
+          "ok,per=omega_gate_ok(read_indi_health('/tmp/s3_layerC/s3_layerC.BIN')); "
+          "print('omega gate', ok, {a:(round(v['nrmse'],3),round(v['exc_rms'],3),v['excited']) for a,v in per.items()}); "
+          "assert ok\""
       ))
     '';
 }
