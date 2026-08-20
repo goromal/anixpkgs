@@ -406,3 +406,41 @@ jobs:
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         nix-build pkgs/nixos/sitl-envs/s3-layerC.nix -A driver -o /tmp/s3c-driver
         /tmp/s3c-driver/bin/nixos-test-driver
+
+  drone-indi-layerb:
+    name: Drone INDI Layer-B Gate
+    needs: changes
+    if: needs.changes.outputs.drone == 'true'
+    runs-on: ubuntu-latest
+    # Boots the SITL + ROS2/DDS stack and flies the S1 trajectory battery with
+    # the in-firmware INDI *outer* loop (CC_TYPE=3, CC3_OUTER_EN=1), driven by
+    # the ROS2 trajectory-server publishing ardupilot_msgs/FlatSetpoint over the
+    # custom AP_DDS topic. Asserts the flat-tracking win (aggregate RMS < 1.5 m,
+    # which forces the lemniscate improvement over stock/C1's ~5.0 m), no
+    # altitude runaway, and the DDS-staleness -> stock-fallback path between cases.
+    timeout-minutes: 60
+    steps:
+    - uses: actions/checkout@v5
+    - name: Enable KVM for the test VM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-substituters = https://ros.cachix.org
+          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        skipPush: true
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: Build and run the INDI Layer-B gate
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        nix-build pkgs/nixos/sitl-envs/s3-layerB.nix -A driver -o /tmp/s3b-driver
+        /tmp/s3b-driver/bin/nixos-test-driver

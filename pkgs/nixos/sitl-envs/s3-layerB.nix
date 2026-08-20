@@ -10,10 +10,9 @@
 with import ../dependencies.nix;
 let
   # CC3_B_ACC_FILT sweep knob (Hz): the outer-loop specific-force / thrust-state
-  # phase-margin cutoff. Swept in Task B5 to find a stable+active operating point.
+  # phase-margin cutoff. Swept in Task B5 (stable+active across 4-30 Hz); 8 is
+  # the firmware default. The gate flies the full battery at this cutoff.
   accFilt = 8;
-  # Trajectory case flown (single-case smoke; the full battery is Task B6).
-  case = "circle_slow";
 
   pkgs = (
     import (fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-${nixos-version}") {
@@ -59,10 +58,17 @@ pkgs.testers.runNixOSTest {
           "CC3_OMG_FILT 80"
           "CC3_G1_RP 500"
           "CC3_OUTER_EN 1"
+          # Attitude-only outer loop (plan-faithful B4): drive q_ref/w_ff/dw_ff
+          # into the C1 inner loop, leave collective to the stock altitude
+          # controller. The collective-drive experiment (CC3_B_THR_EN=1) caused a
+          # self-referential altitude runaway across 3 fix attempts; disabled.
+          "CC3_B_THR_EN 0"
           "CC3_B_ACC_FILT ${toString accFilt}"
         ];
         # Same GPS/EKF warm-up probe as S1/S2/S3-C.
         environment.etc."s3-arm-probe.py".source = ./s3-arm-probe.py;
+        # Layer-B battery gate scorer (flat-tracking + fallback assertions).
+        environment.etc."s3-layerB-score.py".source = ./s3-layerB-score.py;
       };
   };
   testScript =
@@ -81,30 +87,32 @@ pkgs.testers.runNixOSTest {
       # GPS/EKF warm-up (captured; surfaced only on failure).
       arm_probe = machines[0].execute("timeout 180 python3 /etc/s3-arm-probe.py 2>&1")[1]
 
-      # Fly: the mavlink runner takes off + engages the custom controller and
-      # holds station (writes /tmp/lb_ready when hovering+engaged); the ROS2
-      # trajectory-server then streams FlatSetpoint so the in-firmware INDI
-      # outer loop flies ${case}.
+      # Fly the FULL battery: the mavlink runner takes off + engages the custom
+      # controller once, then holds station case-by-case, writing {case,origin}
+      # to /tmp/lb_ready before each hold and unlinking it between cases. The
+      # trajectory-server runs in battery mode (--ready-file): it follows the
+      # ready-file, streaming each case's FlatSetpoint relative to that case's
+      # hover origin, and stops between cases -> the backend falls back (the
+      # DDS-staleness sub-case, exercised at every case boundary).
       machines[0].execute("rm -f /tmp/lb_ready")
       machines[0].execute(
-          "(timeout 600 python3 -m indi_harness.sitl.baseline_outer"
+          "(timeout 900 python3 -m indi_harness.sitl.baseline_outer"
           " --url tcp:127.0.0.1:5790 --out /tmp/s3_layerB --engage-rc 9"
-          " --ready-file /tmp/lb_ready --cases ${case} >/tmp/runner.log 2>&1 &"
+          " --ready-file /tmp/lb_ready >/tmp/runner.log 2>&1 &"
           " echo $! >/tmp/runner.pid)"
       )
       try:
-          # wait for takeoff+engage (the ready file)
+          # wait for takeoff+engage (first case's ready file), then start the
+          # battery-mode trajectory-server (rclpy + ardupilot_msgs).
           machines[0].wait_for_file("/tmp/lb_ready", timeout=300)
-          # start the trajectory-server (rclpy + ardupilot_msgs), streaming until
-          # the runner finishes the hold and we stop it.
           machines[0].execute(
               "(PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3"
-              " -m indi_harness.offboard.traj_server --case ${case}"
+              " -m indi_harness.offboard.traj_server --ready-file /tmp/lb_ready"
               " >/tmp/traj.log 2>&1 & echo $! >/tmp/traj.pid)"
           )
-          # wait for the runner to complete the hold + land phase
+          # wait for the runner to finish the whole battery (writes flown.json)
           machines[0].succeed(
-              "PID=$(cat /tmp/runner.pid); for i in $(seq 1 600); do "
+              "PID=$(cat /tmp/runner.pid); for i in $(seq 1 900); do "
               "kill -0 $PID 2>/dev/null || break; sleep 1; done; "
               "test -s /tmp/s3_layerB/s3_layerB_flown.json"
           )
@@ -117,24 +125,21 @@ pkgs.testers.runNixOSTest {
       finally:
           machines[0].execute("kill -INT $(cat /tmp/traj.pid) 2>/dev/null || true; sleep 1")
 
-      print("=== traj_server log ===")
-      print(machines[0].execute("tail -8 /tmp/traj.log 2>/dev/null")[1])
-
       # Export the newest .BIN (outer-loop health source of truth).
       machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerB/s3_layerB.BIN")
       machines[0].copy_from_vm("/tmp/s3_layerB/s3_layerB.BIN", "")
 
-      # INDB outer-loop health: fallback fraction over the flight + the
-      # reference-vs-measured position RMSE while the outer loop was active.
-      print(machines[0].succeed(
-          "python3 -c \""
-          "import numpy as np; from indi_harness.sitl.binlog import read_outer_health; "
-          "h=read_outer_health('/tmp/s3_layerB/s3_layerB.BIN'); "
-          "n=len(h['time_us']); fb=h['fallback']; act=fb==0; "
-          "err=np.linalg.norm(h['ref_p'][act]-h['meas_p'][act],axis=1) if act.any() else np.array([0.0]); "
-          "print('INDB msgs', n, 'active_frac', round(float((act).mean()),3) if n else 0, "
-          "'track_rms_m', round(float(np.sqrt((err**2).mean())),3), "
-          "'track_max_m', round(float(err.max()),3))\""
-      ))
+      # Hard gate: all 5 cases flown via DDS, tracked (RMS < 1.5 m -> forces the
+      # lemniscate win), no altitude runaway, and the DDS-staleness->fallback
+      # path exercised between cases. Quiet on success (summary line + PASS);
+      # on failure the runner/traj logs are surfaced above.
+      try:
+          print(machines[0].succeed(
+              "python3 /etc/s3-layerB-score.py"
+              " /tmp/s3_layerB/s3_layerB.BIN /tmp/s3_layerB/s3_layerB_flown.json"))
+      except Exception:
+          print("=== traj_server log ==="); print(machines[0].execute("tail -12 /tmp/traj.log 2>/dev/null")[1])
+          print("=== runner.log ==="); print(machines[0].execute("tail -20 /tmp/runner.log 2>/dev/null")[1])
+          raise
     '';
 }
