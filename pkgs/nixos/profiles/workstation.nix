@@ -48,7 +48,7 @@ in
       plugins = claudeDefaults.plugins;
       permissionsAllow = claudeDefaults.permissionsAllow;
       hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
+      skills = builtins.filter (skill: skill.name != "workspace-development") claudeDefaults.skills;
     };
   };
 }
