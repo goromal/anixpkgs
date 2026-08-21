@@ -419,7 +419,7 @@
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/indi-s3-layerB",
+        "ref": "master",
         "repo": "indi-harness",
         "type": "github"
       }
