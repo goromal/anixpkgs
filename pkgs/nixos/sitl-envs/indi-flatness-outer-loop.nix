@@ -83,8 +83,12 @@ pkgs.testers.runNixOSTest {
       machines[0].wait_for_unit("microxrce-agent.service")
       machines[0].wait_until_succeeds("ss -tn state established '( dport = :5760 )' | grep -q 5760", timeout=120)
       machines[0].wait_until_succeeds("ss -tln '( sport = :5790 )' | grep -q 5790", timeout=60)
-      machines[0].wait_until_succeeds("timeout 60 ros2 topic list 2>/dev/null | grep -q '^/ap/pose'", timeout=600)
-      machines[0].wait_until_succeeds("timeout 60 ros2 topic list 2>/dev/null | grep -q '^/ap/clock'", timeout=120)
+      # Capture-then-grep (no pipe): grep -q on a live 'ros2 topic list' pipe
+      # closes it on first match -> SIGPIPE -> under pipefail the poll returns
+      # 141 even on a match and never succeeds. Writing to a file first avoids
+      # the pipe (and silences ros2's SIGPIPE traceback via 2>/dev/null).
+      machines[0].wait_until_succeeds("timeout 60 ros2 topic list > /tmp/rostopics 2>/dev/null || true; grep -q '^/ap/pose' /tmp/rostopics", timeout=600)
+      machines[0].wait_until_succeeds("timeout 60 ros2 topic list > /tmp/rostopics 2>/dev/null || true; grep -q '^/ap/clock' /tmp/rostopics", timeout=600)
       machines[0].succeed("python3 -c 'import indi_harness.sitl.baseline_outer'")
 
       # GPS/EKF warm-up (captured; surfaced only on failure).
