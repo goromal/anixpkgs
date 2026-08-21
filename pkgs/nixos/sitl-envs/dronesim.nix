@@ -54,7 +54,7 @@ pkgs.testers.runNixOSTest {
       # than real time. The per-attempt `timeout` guards keep one wedged
       # ros2 CLI invocation from eating the whole retry budget.
       try:
-          machines[0].wait_until_succeeds("timeout 60 ros2 topic list | grep -q '^/ap/'", timeout=600)
+          machines[0].wait_until_succeeds("timeout 60 ros2 topic list 2>/dev/null | grep -q '^/ap/'", timeout=600)
           machines[0].wait_until_succeeds("timeout 60 ros2 topic echo --once /ap/time", timeout=180)
       except Exception:
           print("=== ardusitl journal ===")
