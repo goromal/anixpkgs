@@ -419,7 +419,6 @@
       },
       "original": {
         "owner": "goromal",
-        "ref": "master",
         "repo": "indi-harness",
         "type": "github"
       }
