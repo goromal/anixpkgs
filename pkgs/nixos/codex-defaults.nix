@@ -25,6 +25,10 @@ in
       name = "itns-notes";
       file = ./res/claude-skills/itns-notes/SKILL.md;
     }
+    {
+      name = "workspace-development";
+      file = ./res/claude-skills/workspace-development/SKILL.md;
+    }
   ];
 
   mcpServers = {
