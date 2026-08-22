@@ -32,11 +32,16 @@ let
       chown ${cfg.user}:${cfg.group} "$ENV_FILE"
     fi
   '';
-  paramsFile = pkgs.writeText "sitl-params.parm" (
-    (lib.optionalString (cfg.baseDefaultsFile != null) (builtins.readFile cfg.baseDefaultsFile + "\n"))
-    + (lib.concatStringsSep "\n" cfg.parameters)
-    + "\n"
+  extraParamsFile = pkgs.writeText "sitl-extra-params.parm" (
+    (lib.concatStringsSep "\n" cfg.parameters) + "\n"
   );
+  paramsFile = pkgs.runCommand "sitl-params.parm" { } ''
+    ${lib.optionalString (cfg.baseDefaultsFile != null) ''
+      cat ${cfg.baseDefaultsFile} > $out
+      printf '\n' >> $out
+    ''}
+    cat ${extraParamsFile} >> $out
+  '';
   haveDefaults = cfg.baseDefaultsFile != null || cfg.parameters != [ ];
   simExecScript = pkgs.writeShellScriptBin "sim-exec-start" ''
     source "${cfg.rootDir}/${simEnvFileName}"
