@@ -1,6 +1,7 @@
-# Headless S2: offboard ROS2 outer loop flying the S1 battery through the
-# stock inner loop via SET_ATTITUDE_TARGET (design doc S2 exit).
-# Run: nix-build pkgs/nixos/sitl-envs/s2-offboard.nix
+# Offboard flatness tracking: an off-board ROS2 outer loop flies the trajectory
+# battery through the stock inner loop via SET_ATTITUDE_TARGET (a differential-
+# flatness attitude reference computed off-board).
+# Run: nix-build pkgs/nixos/sitl-envs/offboard-flatness-tracking.nix
 with import ../dependencies.nix;
 let
   pkgs = (
@@ -28,7 +29,7 @@ let
   indiSitePackages = "${indiPy}/lib/python3.13/site-packages";
 in
 pkgs.testers.runNixOSTest {
-  name = "s2-offboard";
+  name = "offboard-flatness-tracking";
   nodes = {
     drone =
       {
@@ -137,7 +138,7 @@ pkgs.testers.runNixOSTest {
       machines[0].wait_for_unit("microxrce-agent.service")
       machines[0].wait_until_succeeds("ss -tn state established '( dport = :5760 )' | grep -q 5760", timeout=120)
       machines[0].wait_until_succeeds("ss -tln '( sport = :5790 )' | grep -q 5790", timeout=60)
-      machines[0].wait_until_succeeds("timeout 60 ros2 topic list | grep -q '^/ap/pose'", timeout=600)
+      machines[0].wait_until_succeeds("timeout 60 ros2 topic list > /tmp/rostopics 2>/dev/null || true; grep -q '^/ap/pose' /tmp/rostopics", timeout=600)
       machines[0].succeed("python3 -c 'import indi_harness.offboard.bridge'")
       # GPS/EKF warm-up + diagnostics (see s2-arm-probe.py) before flying.
       print(machines[0].execute("timeout 180 python3 /etc/s2-arm-probe.py 2>&1")[1])

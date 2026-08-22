@@ -85,6 +85,11 @@
     "attr": "microxrce-dds-agent",
     "ci": true,
     "docs": false
+   },
+   {
+    "attr": "ardupilot-msgs",
+    "ci": true,
+    "docs": false
    }
   ],
   "rust": [
