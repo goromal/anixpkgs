@@ -185,6 +185,9 @@ in
                   lib.optional (s.path != "#") {
                     name = s.path;
                     value.extraConfig = ''
+                      ${lib.optionalString (s.faviconSvg != null) ''
+                        sub_filter </head> '<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg"></head>';
+                      ''}
                       sub_filter </body> '${homeButton}';
                       sub_filter_once on;
                       proxy_set_header Accept-Encoding "";
