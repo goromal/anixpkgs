@@ -49,7 +49,7 @@ in
           options = {
             name = lib.mkOption {
               type = lib.types.str;
-              description = "Skill directory name under ~/.agents/skills/";
+              description = "Skill directory name under the Codex skill roots";
             };
             file = lib.mkOption {
               type = lib.types.path;
@@ -59,7 +59,7 @@ in
         }
       );
       default = [ ];
-      description = "List of Codex skills to install into ~/.agents/skills/<name>/SKILL.md";
+      description = "List of Codex skill directories to link into ~/.agents/skills and ~/.codex/skills";
     };
     mcpServers = lib.mkOption {
       type = lib.types.listOf agentLib.mcpServerType;
