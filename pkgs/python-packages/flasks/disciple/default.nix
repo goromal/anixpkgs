@@ -20,6 +20,7 @@ buildPythonPackage rec {
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
     cp templates/base.html        $out/${pythonLibDir}/templates/base.html
+    cp templates/_note_form.html  $out/${pythonLibDir}/templates/_note_form.html
     cp templates/study.html       $out/${pythonLibDir}/templates/study.html
     cp templates/browse.html      $out/${pythonLibDir}/templates/browse.html
     cp templates/tags.html        $out/${pythonLibDir}/templates/tags.html

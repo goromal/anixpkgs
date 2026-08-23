@@ -46,7 +46,7 @@ in
         path = "/disciple/";
         description = "Book of Mormon Christ-reference study tool";
         icon = "book-open";
-        faviconSvg = null;
+        faviconSvg = anixpkgs.pkgData.icons.fa6-solid."book-open".data;
       }
     ];
 
