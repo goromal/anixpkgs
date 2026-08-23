@@ -4,7 +4,9 @@ let
   anixpkgs-meta = (builtins.readFile ../../ANIX_META);
 in
 rec {
-  local-build = false;
+  local-build = true; # S4 drag-rejection: build against the LOCAL anixpkgs tree
+  # (and the git+file indi-harness pin in flake.lock) so the sitl-env flies the
+  # in-repo jsonsim backend rather than the github release. Local-dev only.
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
   inherit anixpkgs-meta;

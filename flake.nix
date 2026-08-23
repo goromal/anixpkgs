@@ -63,7 +63,10 @@
     gnc.url = "github:goromal/gnc";
     gnc.flake = false;
 
-    indi-harness.url = "github:goromal/indi-harness";
+    # S4 drag-rejection: local git+file pin so the sitl-env flies the in-repo
+    # jsonsim backend + ground-contact fixes (dev/indi-s4-drag). Local-dev only;
+    # revert to github:goromal/indi-harness before merge.
+    indi-harness.url = "git+file:///data/andrew/dev/drone/sources/indi-harness?ref=dev/indi-s4-drag";
     indi-harness.flake = false;
 
     jetson-stats.url = "github:rbonghi/jetson_stats";

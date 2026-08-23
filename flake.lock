@@ -410,17 +410,18 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1787194534,
-        "narHash": "sha256-b7Cn/4ZK6a8lm0ECq30An/S4Fm3/DxCIl/2O9vyQUKw=",
-        "owner": "goromal",
-        "repo": "indi-harness",
-        "rev": "e621a58d6257e02b03bbca6da45e07b9769a0c0b",
-        "type": "github"
+        "lastModified": 1787445798,
+        "narHash": "sha256-rufEakhuggnLZo3+CYwUwrkvZGkiaqtb5npQVMBD7ZI=",
+        "ref": "dev/indi-s4-drag",
+        "rev": "f7de4e196a2e9c6f9b9f24a51456734750e6cab4",
+        "revCount": 45,
+        "type": "git",
+        "url": "file:///data/andrew/dev/drone/sources/indi-harness"
       },
       "original": {
-        "owner": "goromal",
-        "repo": "indi-harness",
-        "type": "github"
+        "ref": "dev/indi-s4-drag",
+        "type": "git",
+        "url": "file:///data/andrew/dev/drone/sources/indi-harness"
       }
     },
     "jetpack-nixos": {
