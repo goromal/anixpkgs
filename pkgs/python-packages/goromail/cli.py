@@ -19,13 +19,14 @@ from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
+INTAKE_EMAIL = "andrew@localhost"
 MAILDIR_PATH = "/var/mail/goromail"
 
 # Senders whose mail may only ever become a survey result -- never a Notion
 # block, whatever the body looks like. Domains match subdomains too.
 NUTRITION_SENDERS = ("loseit.com",)
 # Senders allowed to issue the full command set (journal, keywords, tasks, ITNS).
-OWNER_SENDERS = (MAIL_EMAIL, TEXT_EMAIL)
+OWNER_SENDERS = (MAIL_EMAIL, TEXT_EMAIL, INTAKE_EMAIL)
 
 
 class PostfixMessage:

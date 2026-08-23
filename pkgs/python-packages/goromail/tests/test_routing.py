@@ -4,6 +4,7 @@ import pytest
 
 from goromail import cli
 from goromail.cli import (
+    INTAKE_EMAIL,
     MAIL_EMAIL,
     TEXT_EMAIL,
     classify_sender,
@@ -74,6 +75,10 @@ def test_owner_email_routes_to_owner():
 
 def test_owner_text_routes_to_owner():
     assert classify_sender(TEXT_EMAIL) == "owner"
+
+
+def test_intake_ui_routes_to_owner():
+    assert classify_sender(INTAKE_EMAIL) == "owner"
 
 
 def test_stranger_routes_to_unknown():
