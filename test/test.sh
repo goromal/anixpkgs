@@ -1,6 +1,7 @@
 exit_code=0
 
 tests=(
+    "test_no_ifd.sh"
     "test_dirstuff.sh"
     "test_ws_tools.sh"
     "test_sunnyside.sh"

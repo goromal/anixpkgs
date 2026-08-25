@@ -25,45 +25,43 @@ let
     let
       # TODO: maybe remove the (Auto-Generated) qualifier when the functionality has proven out
       sub-cmds = if builtins.hasAttr "subCmds" pkg-attr.meta then pkg-attr.meta.subCmds else [ ];
-      auto-usage-doc = (
-        if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
-          (
-            if pkg-attr.meta.autoGenUsageCmd != null then
-              ''
+      has-description = builtins.hasAttr "description" pkg-attr.meta;
+      has-auto-usage =
+        has-description
+        && builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta
+        && pkg-attr.meta.autoGenUsageCmd != null;
+      static-doc = prev.writeText "package-doc-static" (
+        if has-description then
+          ''
+            ${pkg-attr.meta.description}
 
-                ## Usage
-
-                ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
-                  packageAttr = pkg-attr;
-                  helpCmd = pkg-attr.meta.autoGenUsageCmd;
-                  subCmds = sub-cmds;
-                }}
-              ''
-            else
-              ""
-          )
+            ${pkg-attr.meta.longDescription}${optionalString has-auto-usage "\n## Usage\n"}
+          ''
         else
-          ""
+          ''
+            No package documentation currently provided.
+          ''
       );
+      usage-doc =
+        if has-auto-usage then
+          prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
+            packageAttr = pkg-attr;
+            helpCmd = pkg-attr.meta.autoGenUsageCmd;
+            subCmds = sub-cmds;
+          }
+        else
+          null;
     in
     pkg-attr
-    // rec {
-      doc = prev.writeTextFile {
-        name = "doc";
-        destination = "/doc.txt";
-        text = (
-          if builtins.hasAttr "description" pkg-attr.meta then
-            (''
-              ${pkg-attr.meta.description}
-
-              ${pkg-attr.meta.longDescription}${auto-usage-doc}
-            '')
-          else
-            ''
-              No package documentation currently provided.
-            ''
-        );
-      };
+    // {
+      doc = prev.runCommand "doc" { } ''
+        mkdir -p $out
+        cat ${static-doc} > $out/doc.txt
+        ${optionalString has-auto-usage ''
+          cat ${usage-doc} >> $out/doc.txt
+          printf '\n\n' >> $out/doc.txt
+        ''}
+      '';
     };
 
   minJRE = prev.jre_minimal.override {

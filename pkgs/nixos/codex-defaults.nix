@@ -10,6 +10,7 @@
 { homeDir }:
 let
   ports = import ./service-ports.nix;
+  sharedSkills = import ./shared-agent-skills.nix;
 in
 {
   model = "gpt-5.6";
@@ -20,16 +21,7 @@ in
     model_reasoning_effort = "medium";
   };
 
-  skills = [
-    {
-      name = "itns-notes";
-      file = ./res/claude-skills/itns-notes/SKILL.md;
-    }
-    {
-      name = "workspace-development";
-      file = ./res/claude-skills/workspace-development/SKILL.md;
-    }
-  ];
+  skills = sharedSkills;
 
   mcpServers = {
     vikunja = {

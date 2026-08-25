@@ -101,6 +101,8 @@ def devrc_components_by_ws(devrcfile, wsname, DATADIR=None):
         )
 
     for repo, spec in repos.items():
+        if repo not in wssources:
+            continue
         specsplit = spec.split()
         if len(specsplit) > 1:
             attr = specsplit[1]

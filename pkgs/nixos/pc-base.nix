@@ -153,7 +153,7 @@ in
             };
             faviconSvg = lib.mkOption {
               type = lib.types.nullOr lib.types.path;
-              description = "Path to SVG file served at {path}favicon.svg; null disables";
+              description = "Path to SVG file served and linked at {path}favicon.svg; null disables";
               default = null;
             };
           };

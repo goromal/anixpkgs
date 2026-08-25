@@ -37,6 +37,16 @@ in
   ''
     set -euo pipefail
 
+    write_if_changed() {
+      local target="$1"
+      local contents="$2"
+      if [[ ! -f "$target" ]] || [[ "$(<"$target")" != "$contents" ]]; then
+        printf '%s\n' "$contents" > "$target"
+        return 0
+      fi
+      return 1
+    }
+
     wsname=$1
     if [[ -z "$wsname" ]]; then
         ${printErr} "ERROR: no workspace name provided."
@@ -71,28 +81,47 @@ in
       mkdir -p "$(dirname "$link_path")"
       ln -sf -- "$TARGET_DIR" "$link_path"
     done
-    touch "$TARGET_DIR/CLAUDE.md"
+    if [[ ! -f "$TARGET_DIR/CLAUDE.md" ]]; then
+      touch "$TARGET_DIR/CLAUDE.md"
+    fi
     if [[ ! -d sources ]]; then
         mkdir sources
     fi
-    if [[ -d .bin ]]; then
-        rm -rf .bin
-    fi
-    mkdir .bin
 
-    echo "export WSROOT=$dev_ws_dir" > .envrc
-    lorri init
-    echo 'eval "$(lorri direnv)"' >> .envrc
-    echo 'PATH_add $WSROOT/.bin' >> .envrc
-    direnv allow
+    envrc_contents=$(printf '%s\n' \
+      "export WSROOT=$dev_ws_dir" \
+      'eval "$(lorri direnv)"' \
+      'if [[ -n "''${DEVSHELL_RUNTIME_BIN:-}" ]]; then PATH_add "$DEVSHELL_RUNTIME_BIN"; fi' \
+      'PATH_add $WSROOT/.bin')
+    envrc_changed=0
+    if write_if_changed .envrc "$envrc_contents"; then
+      envrc_changed=1
+    fi
+    if [[ ! -f shell.nix ]]; then
+      lorri init
+    fi
+    if [[ "$envrc_changed" == "1" ]]; then
+      direnv allow
+    fi
 
     pushd data
-    echo "export WSROOT=$dev_ws_dir" > .envrc
-    echo 'PATH_add $WSROOT/.bin' >> .envrc
-    direnv allow
+    data_envrc_contents=$(printf '%s\n' \
+      "export WSROOT=$dev_ws_dir" \
+      'PATH_add $WSROOT/.bin')
+    if write_if_changed .envrc "$data_envrc_contents"; then
+      direnv allow
+    fi
     popd
 
     cd sources
+
+    next_bin_dir=$(mktemp -d "$dev_ws_dir/.bin.next.XXXXXX")
+    cleanup_next_bin() {
+      if [[ -n "$next_bin_dir" ]]; then
+        rm -rf "$next_bin_dir"
+      fi
+    }
+    trap cleanup_next_bin EXIT
 
     for i in ''${@:2}; do
         if [[ "$i" == *"="* ]]; then
@@ -103,11 +132,10 @@ in
                 continue
             fi
             if [[ ! -x "$scriptpath" ]]; then
-                ${printYlw} "Script $scriptpath not executable; skipping."
-                continue
+              ${printYlw} "Script $scriptpath not executable; skipping."
+              continue
             fi
-            ${printGrn} "Adding script $scriptpath..."
-            cp "$scriptpath" ../.bin/$scriptalias
+            cp "$scriptpath" "$next_bin_dir/$scriptalias"
         else
             reponame="''${i%%:*}"
             repourl="''${i#*:}"
@@ -119,6 +147,13 @@ in
             fi
         fi
     done
+
+    if [[ ! -d ../.bin ]] || ! diff -qr ../.bin "$next_bin_dir" >/dev/null; then
+      ${printGrn} "Updating workspace scripts..."
+      rm -rf ../.bin
+      mv "$next_bin_dir" ../.bin
+      next_bin_dir=""
+    fi
 
     ${printGrn} "Done"
   ''

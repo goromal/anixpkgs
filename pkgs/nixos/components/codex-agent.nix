@@ -53,6 +53,14 @@ let
   codexUpdate = pkgs.writeShellScriptBin "codex-update" ''
     echo "codex is pinned via nix (llm-agents.nix). Version: $(codex --version 2>/dev/null || echo unknown)"
   '';
+
+  skillTargets = lib.concatMap (
+    skill:
+    map (root: "${config.home.homeDirectory}/${root}/${skill.name}") [
+      ".agents/skills"
+      ".codex/skills"
+    ]
+  ) cfg.skills;
 in
 {
   imports = [ ./upgrade-hooks.nix ];
@@ -84,7 +92,7 @@ in
           options = {
             name = lib.mkOption {
               type = lib.types.str;
-              description = "Skill directory name under ~/.agents/skills/";
+              description = "Skill directory name under the Codex skill roots";
             };
             file = lib.mkOption {
               type = lib.types.path;
@@ -94,7 +102,7 @@ in
         }
       );
       default = [ ];
-      description = "List of Codex skills to install into ~/.agents/skills/<name>/SKILL.md";
+      description = "List of Codex skill directories to link into ~/.agents/skills and ~/.codex/skills";
     };
     mcpServers = lib.mkOption {
       type = lib.types.listOf agentLib.mcpServerType;
@@ -113,13 +121,36 @@ in
       codexUpdate
     ];
 
+    home.activation.migrateCodexSkillLinks = lib.hm.dag.entryBefore [ "linkGeneration" ] (
+      lib.concatMapStringsSep "\n" (target: ''
+        target=${lib.escapeShellArg target}
+        if [ -d "$target" ] && [ ! -L "$target" ] && [ -L "$target/SKILL.md" ]; then
+          entry_count="$(${pkgs.findutils}/bin/find "$target" -mindepth 1 -maxdepth 1 | ${pkgs.coreutils}/bin/wc -l)"
+          if [ "$entry_count" -eq 1 ]; then
+            ${pkgs.coreutils}/bin/rm "$target/SKILL.md"
+            ${pkgs.coreutils}/bin/rmdir "$target"
+          fi
+        fi
+      '') skillTargets
+    );
+
     home.file = builtins.listToAttrs (
-      map (skill: {
-        name = ".agents/skills/${skill.name}/SKILL.md";
-        value = {
-          source = skill.file;
-        };
-      }) cfg.skills
+      lib.concatMap (skill: [
+        {
+          name = ".agents/skills/${skill.name}";
+          value = {
+            source = builtins.dirOf skill.file;
+            force = true;
+          };
+        }
+        {
+          name = ".codex/skills/${skill.name}";
+          value = {
+            source = builtins.dirOf skill.file;
+            force = true;
+          };
+        }
+      ]) cfg.skills
     );
 
     # NOTE: the Codex VSCode extension (openai.chatgpt) is intentionally deferred.
