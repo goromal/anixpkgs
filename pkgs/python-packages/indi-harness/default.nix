@@ -5,6 +5,8 @@
   pyyaml,
   pymavlink,
   rosbags,
+  pysignals,
+  geometry,
   pytestCheckHook,
   pkg-src,
 }:
@@ -18,6 +20,8 @@ buildPythonPackage rec {
     pyyaml
     pymavlink
     rosbags
+    pysignals
+    geometry
   ];
   nativeCheckInputs = [ pytestCheckHook ];
   src = pkg-src;
