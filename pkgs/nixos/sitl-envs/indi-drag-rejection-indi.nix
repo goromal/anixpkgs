@@ -18,6 +18,13 @@
 # is a reported finding, not an assumption.
 #
 # Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection-indi.nix
+#
+# omgFilt parameterizes the C1 inner-loop angular-accel filter cutoff
+# CC3_OMG_FILT (Hz). Default 80 = the SHIPPED Layer-B tune (which BUZZES on this
+# real-lag backend under the OUTER_EN=1 demo condition). The omg160 variant
+# (indi-drag-rejection-indi-omg160.nix) sweeps it to 160 to test the runtime-
+# swept candidate fix under the REAL condition.
+{ omgFilt ? 80 }:
 with import ../dependencies.nix;
 let
   # CC3_B_ACC_FILT (Hz): outer-loop specific-force / thrust-state phase-margin
@@ -68,7 +75,7 @@ let
   ]);
 in
 pkgs.testers.runNixOSTest {
-  name = "indi-drag-rejection-indi";
+  name = "indi-drag-rejection-indi-omg${toString omgFilt}";
   nodes = {
     drone =
       {
@@ -95,12 +102,13 @@ pkgs.testers.runNixOSTest {
           "MOT_HOVER_LEARN 0"
           # Shipped Layer-B INDI config (identical to indi-flatness-outer-loop):
           # INDI on all axes, RC9 -> CUSTOM_CONTROLLER (109), inner rate loop
-          # tuned for angular-accel inversion (OMG_FILT 80, G1_RP 500), flatness
-          # outer loop enabled, collective left to the stock altitude controller.
+          # tuned for angular-accel inversion (OMG_FILT=${toString omgFilt}, G1_RP 500),
+          # flatness outer loop enabled, collective left to the stock altitude
+          # controller. OMG_FILT is the swept variable (80 shipped vs 160 fix).
           "CC_TYPE 3"
           "CC_AXIS_MASK 7"
           "RC9_OPTION 109"
-          "CC3_OMG_FILT 80"
+          "CC3_OMG_FILT ${toString omgFilt}"
           "CC3_G1_RP 500"
           "CC3_OUTER_EN 1"
           "CC3_B_THR_EN 0"
