@@ -47,6 +47,7 @@ in
     machines.base.webServices = [
       {
         name = "LA Quiz Game";
+        tag = "Aspiration";
         path = "/la-quiz/";
         description = "LA geography challenge game";
         icon = "map-location-dot";

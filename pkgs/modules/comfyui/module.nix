@@ -131,6 +131,7 @@ in
         machines.base.webServices = [
           {
             name = "ComfyUI";
+            tag = "Content";
             path = "/comfyui/";
             description = "Stable Diffusion (SDXL) image generation";
             icon = "film";
@@ -210,6 +211,7 @@ in
         machines.base.webServices = [
           {
             name = "cozy";
+            tag = "Content";
             path = "/cozy/";
             description = "ComfyUI image generation";
             icon = "tv";

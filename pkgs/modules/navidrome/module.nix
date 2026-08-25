@@ -42,6 +42,7 @@ in
     machines.base.webServices = [
       {
         name = "Navidrome";
+        tag = "Content";
         path = "${cfg.subdomain}/";
         description = "Personal music streaming server";
         icon = "music";

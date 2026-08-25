@@ -37,6 +37,7 @@ in
     machines.base.webServices = [
       {
         name = "Files";
+        tag = "Content";
         path = "/stamp/";
         description = "Manage filesystem";
         icon = "folder";

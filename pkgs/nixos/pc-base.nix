@@ -138,6 +138,10 @@ in
               type = lib.types.str;
               description = "Display name of the service";
             };
+            tag = lib.mkOption {
+              type = lib.types.str;
+              description = "Landing-page group for the service";
+            };
             path = lib.mkOption {
               type = lib.types.str;
               description = "URL path or full URL to the service";

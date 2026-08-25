@@ -43,6 +43,7 @@ in
     machines.base.webServices = [
       {
         name = "Disciple";
+        tag = "Aspiration";
         path = "/disciple/";
         description = "Book of Mormon Christ-reference study tool";
         icon = "book-open";

@@ -121,6 +121,7 @@ in
     machines.base.webServices = [
       {
         name = "folio";
+        tag = "Aspiration";
         path = "#";
         description = "Book Study Companion (port ${toString service-ports.folio.public})";
         icon = "book-open";

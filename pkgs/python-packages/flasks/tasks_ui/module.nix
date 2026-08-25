@@ -38,6 +38,7 @@ in
     machines.base.webServices = [
       {
         name = "Tasks";
+        tag = "Utilities";
         path = "/tasks/";
         description = "Task management";
         icon = "list-check";
