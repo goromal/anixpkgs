@@ -1,25 +1,12 @@
-"""INDI-on-JSON-backend scorer: assert the shipped in-firmware Layer-B INDI
-outer loop (CC_TYPE=3, CC3_OUTER_EN=1) flies the trajectory battery on the
-higher-fidelity pysignals JSON physics backend (actuator lag tau_m=0.03, momentum
-thrust), DRAG OFF, and tracks within a documented tolerance of the benign-SITL
-Layer-B baseline (indi-harness/baselines/s3_layerB_sitl.json).
+"""INDI-on-JSON-backend scorer (diagnostic).
 
-This is a drop-in-fidelity gate BEFORE drag is introduced: the point is "flies
-and tracks reasonably on the real-lag backend", not bit-parity with benign SITL.
-It ALSO makes the actuator-lag inner-loop risk explicit: the C1 omega_dot
-inversion (OMG_FILT=80) was calibrated for benign SITL, and the backend's
-first-order actuator lag can re-stress it into a rate-loop limit cycle (buzz).
-So the scorer extracts and prints roll/pitch RATE (desired vs actual) and the
-INDI inner-loop health (domega_pred vs domega_meas, du, saturation) over the
-active window -- clean numbers vs buzz is a first-class reported finding.
-
-Everything is PRINTED first (and written to a JSON artifact) so the diagnostic
-numbers survive even when a tolerance assertion fails -- controller buzz is a
-finding to report, not a plumbing failure to hide.
-
-The reusable helpers (RMS, active-run segmentation, low-rate RATE + engagement
-readers, windowed buzz/omega/rate extractors) live in indi_harness.sitl.binscore;
-this driver only wires them to the flown-cases + baseline and prints/gates.
+Asserts the shipped Layer-B INDI (CC_TYPE=3, CC3_OUTER_EN=1) flies the battery on
+the pysignals JSON backend (drag OFF) within a documented tolerance of the
+benign-SITL Layer-B baseline, and extracts the inner-loop buzz / omega-inversion
+health so clean-vs-buzz is a first-class finding. All diagnostics are PRINTED
+before any assertion, so a controller-buzz finding survives a failed gate.
+Reusable helpers live in indi_harness.sitl.binscore. Finding writeup:
+indi-harness/docs/json_physics_backend_results.md
 
 argv: <flight.BIN> <flown.json> <baseline.json> [track_tol_abs_m] [track_tol_mult]
 """

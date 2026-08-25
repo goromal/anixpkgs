@@ -11,6 +11,7 @@ failure. Thin driver over the shared indi_harness.sitl.mavflight helpers.
 """
 import argparse
 import json
+import os
 import sys
 import time
 
@@ -81,7 +82,6 @@ def main():
 
 
 def _write(path, obj):
-    import os
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(obj, f, indent=2)

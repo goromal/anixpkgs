@@ -1,29 +1,15 @@
-# INDI-controller drop-in-fidelity gate on the JSON physics backend.
+# INDI-on-JSON-backend drop-in DIAGNOSTIC (not a green CI gate).
 #
-# Boots ArduPilot SITL wired to the custom pysignals JSON physics backend
-# (indi_harness.sitl.jsonsim, --no-drag) -- the SAME higher-fidelity backend as
-# indi-drag-rejection.nix (first-order actuator lag tau_m=0.03, momentum thrust)
-# -- but instead of flying STOCK ArduCopter it engages the shipped in-firmware
-# Layer-B INDI outer loop (CC_TYPE=3, CC3_OUTER_EN=1) and flies a trajectory
-# battery over ROS2/DDS, exactly like indi-flatness-outer-loop.nix.
+# Engages the shipped Layer-B INDI (CC_TYPE=3, CC3_OUTER_EN=1) on the pysignals
+# JSON backend (--no-drag) over ROS2/DDS and scores tracking + inner-loop buzz
+# against the benign-SITL Layer-B baseline. FAILS BY DESIGN on the shipped tune:
+# the backend's real actuator lag re-stresses the C1 rate loop. It is a documented
+# diagnostic, not wired into CI. Finding writeup + numbers:
+# indi-harness/docs/json_physics_backend_results.md
 #
-# GOAL: prove the JSON backend is a faithful DROP-IN for benign SITL for the
-# shipped INDI controller BEFORE drag is introduced -- the controller flies and
-# tracks the battery within a documented tolerance of the benign-SITL Layer-B
-# baseline (indi-harness/baselines/s3_layerB_sitl.json). It ALSO makes explicit
-# the actuator-lag inner-loop risk: the C1 omega_dot inversion (OMG_FILT=80) was
-# tuned for benign SITL, and the backend's real actuator lag can re-stress it
-# into a rate-loop limit cycle. The scorer extracts + prints roll/pitch RATE and
-# the INDI inner-loop health (domega_pred/meas, du, saturation) so clean-vs-buzz
-# is a reported finding, not an assumption.
-#
+# omgFilt: the C1 angular-accel filter cutoff CC3_OMG_FILT (Hz). Default 80 = the
+# shipped tune (buzzes here); the -omg160 variant tests the candidate fix.
 # Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection-indi.nix
-#
-# omgFilt parameterizes the C1 inner-loop angular-accel filter cutoff
-# CC3_OMG_FILT (Hz). Default 80 = the SHIPPED Layer-B tune (which BUZZES on this
-# real-lag backend under the OUTER_EN=1 demo condition). The omg160 variant
-# (indi-drag-rejection-indi-omg160.nix) sweeps it to 160 to test the runtime-
-# swept candidate fix under the REAL condition.
 {
   omgFilt ? 80,
 }:

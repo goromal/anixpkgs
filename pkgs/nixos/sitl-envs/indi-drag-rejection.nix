@@ -1,17 +1,10 @@
-# INDI drag-rejection demonstration -- JSON-backend frame/sign gate.
+# JSON-backend frame/sign gate -- the GREEN platform gate (built by the drone CI).
 #
-# Boots ArduPilot SITL wired to the custom pysignals JSON physics backend
-# (indi_harness.sitl.jsonsim) instead of ArduPilot's built-in multicopter model:
-# SITL launches `arducopter --model=JSON:127.0.0.1`, connecting to the backend on
-# UDP 9002. This gate proves the backend's FRAMES AND SIGNS ARE CORRECT by flying
-# STOCK ArduCopter (no custom controller) with drag OFF and asserting the EKF
-# tracks commanded NED motion with no N/E swap and no sign inversion -- the
-# prerequisite for the later drag-on A/B rejection demo.
-#
-# Deliberately simpler than the flatness/rate SITL gates: no ROS2/DDS, no custom
-# controller, no trajectory battery -- just stock GUIDED takeoff + NED velocity
-# moves against the JSON backend.
-#
+# Boots ArduPilot SITL against the custom pysignals JSON physics backend
+# (arducopter --model=JSON:127.0.0.1, backend on UDP 9002) instead of the built-in
+# quad, flies STOCK ArduCopter (drag OFF, no custom controller), and asserts the
+# EKF tracks commanded NED motion with no axis swap / sign inversion -- the frame
+# correctness prerequisite for any INDI work on this backend.
 # Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection.nix
 with import ../dependencies.nix;
 let
@@ -41,7 +34,6 @@ pkgs.testers.runNixOSTest {
         virtualisation.memorySize = 8192;
         virtualisation.diskSize = 8192;
 
-        # Point SITL's --model at the JSON backend instead of the built-in quad.
         services.ardupilot-sim.platform = "JSON:127.0.0.1";
 
         # The JSON backend's true hover throttle is ~0.30 (m*g vs its thrust
