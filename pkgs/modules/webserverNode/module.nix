@@ -87,17 +87,14 @@ in
                   else
                     ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
                 ) selectedServices;
-              serviceGroups = lib.concatMapStringsSep "\n" (
-                tag:
-                ''
-                  <section class="service-group">
-                    <h2>${tag}</h2>
-                    <ul>
-                      ${serviceLinks (lib.filter (s: s.tag == tag) services)}
-                    </ul>
-                  </section>
-                ''
-              ) tags;
+              serviceGroups = lib.concatMapStringsSep "\n" (tag: ''
+                <section class="service-group">
+                  <h2>${tag}</h2>
+                  <ul>
+                    ${serviceLinks (lib.filter (s: s.tag == tag) services)}
+                  </ul>
+                </section>
+              '') tags;
               # Build one directory containing index.html and per-service favicon.svg files
               staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
                 ''
