@@ -1,4 +1,4 @@
-# S4 Phase-1: omg160 confirmation variant of the INDI-on-JSON-backend gate.
+# omg160 confirmation variant of the INDI-on-JSON-backend gate.
 #
 # Identical to indi-drag-rejection-indi.nix (drag OFF, CC3_OUTER_EN=1, DDS
 # traj_server, circle_slow + lemniscate_fast, CC3_G1_RP=500) EXCEPT the C1

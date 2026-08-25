@@ -1,4 +1,4 @@
-# INDI drag-rejection demonstration -- S4 Phase 1 frame/sign gate.
+# INDI drag-rejection demonstration -- JSON-backend frame/sign gate.
 #
 # Boots ArduPilot SITL wired to the custom pysignals JSON physics backend
 # (indi_harness.sitl.jsonsim) instead of ArduPilot's built-in multicopter model:

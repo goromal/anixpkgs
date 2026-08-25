@@ -1,4 +1,4 @@
-# S4 Phase-1: INDI-controller drop-in-fidelity gate on the JSON physics backend.
+# INDI-controller drop-in-fidelity gate on the JSON physics backend.
 #
 # Boots ArduPilot SITL wired to the custom pysignals JSON physics backend
 # (indi_harness.sitl.jsonsim, --no-drag) -- the SAME higher-fidelity backend as

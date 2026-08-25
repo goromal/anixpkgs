@@ -1,8 +1,8 @@
-"""S4 Phase-1 INDI-on-JSON-backend scorer: assert the shipped in-firmware
-Layer-B INDI outer loop (CC_TYPE=3, CC3_OUTER_EN=1) flies the trajectory battery
-on the higher-fidelity pysignals JSON physics backend (actuator lag tau_m=0.03,
-momentum thrust), DRAG OFF, and tracks within a documented tolerance of the
-benign-SITL Layer-B baseline (indi-harness/baselines/s3_layerB_sitl.json).
+"""INDI-on-JSON-backend scorer: assert the shipped in-firmware Layer-B INDI
+outer loop (CC_TYPE=3, CC3_OUTER_EN=1) flies the trajectory battery on the
+higher-fidelity pysignals JSON physics backend (actuator lag tau_m=0.03, momentum
+thrust), DRAG OFF, and tracks within a documented tolerance of the benign-SITL
+Layer-B baseline (indi-harness/baselines/s3_layerB_sitl.json).
 
 This is a drop-in-fidelity gate BEFORE drag is introduced: the point is "flies
 and tracks reasonably on the real-lag backend", not bit-parity with benign SITL.
@@ -17,6 +17,10 @@ Everything is PRINTED first (and written to a JSON artifact) so the diagnostic
 numbers survive even when a tolerance assertion fails -- controller buzz is a
 finding to report, not a plumbing failure to hide.
 
+The reusable helpers (RMS, active-run segmentation, low-rate RATE + engagement
+readers, windowed buzz/omega/rate extractors) live in indi_harness.sitl.binscore;
+this driver only wires them to the flown-cases + baseline and prints/gates.
+
 argv: <flight.BIN> <flown.json> <baseline.json> [track_tol_abs_m] [track_tol_mult]
 """
 import json
@@ -29,10 +33,16 @@ from indi_harness.sitl.binlog import (
     read_indi_health,
     read_imu_gyro,
 )
-from indi_harness.sitl.align import flat_tracking_score, omega_tracking_score
-from pymavlink import DFReader
-
-RAD2DEG = 180.0 / np.pi
+from indi_harness.sitl.align import flat_tracking_score
+from indi_harness.sitl.binscore import (
+    rms,
+    active_runs,
+    read_rate_msgs,
+    read_engage_msgs,
+    gyro_window,
+    omega_window,
+    rate_window,
+)
 
 BIN = sys.argv[1]
 FLOWN = sys.argv[2]
@@ -46,69 +56,6 @@ TRACK_TOL_ABS_M = float(sys.argv[4]) if len(sys.argv) > 4 else 1.5
 TRACK_TOL_MULT = float(sys.argv[5]) if len(sys.argv) > 5 else 2.0
 
 
-def _rms(x):
-    x = np.asarray(x, float)
-    return float(np.sqrt(np.mean(x ** 2))) if x.size else 0.0
-
-
-def _active_runs(fb, min_len=50):
-    """Contiguous fallback==0 runs (each = one case's engaged tracking block).
-    The runner unlinks the ready-file between cases -> the DDS reference goes
-    stale -> fallback rises, cleanly separating cases in the INDB stream."""
-    fb = np.asarray(fb, int)
-    runs = []
-    i = 0
-    n = len(fb)
-    while i < n:
-        if fb[i] == 0:
-            j = i
-            while j < n and fb[j] == 0:
-                j += 1
-            if j - i >= min_len:
-                runs.append((i, j))
-            i = j
-        else:
-            i += 1
-    return runs
-
-
-def _read_rate(path):
-    """Roll/pitch rate desired-vs-actual (deg/s) from the RATE message.
-
-    WARNING: RATE logs at only ~10 Hz and ALIASES the rate-loop limit cycle --
-    it reads a near-constant ~57 deg/s everywhere (including hover), so it is
-    GARBAGE for buzz detection. Kept only as a low-rate desired-vs-actual sanity
-    trace; the trustworthy buzz signal is the ~50 Hz IMU gyro (_read_gyro /
-    _gyro_window below) plus the 400 Hz INDI-message saturation + du."""
-    log = DFReader.DFReader_binary(str(path))
-    t, rd, r, pd, p = [], [], [], [], []
-    while True:
-        m = log.recv_match(type="RATE")
-        if m is None:
-            break
-        t.append(m.TimeUS)
-        rd.append(m.RDes); r.append(m.R)
-        pd.append(m.PDes); p.append(m.P)
-    return (np.asarray(t, float), np.asarray(rd, float), np.asarray(r, float),
-            np.asarray(pd, float), np.asarray(p, float))
-
-
-def _read_engage_msgs(path):
-    """Return the list of 'Custom controller is ON/OFF' STATUSTEXT strings the
-    firmware logged to the MSG dataflash message -- the concrete proof the RC
-    aux LOW->HIGH edge actually engaged the custom controller (vs flying stock)."""
-    log = DFReader.DFReader_binary(str(path))
-    msgs = []
-    while True:
-        m = log.recv_match(type="MSG")
-        if m is None:
-            break
-        txt = getattr(m, "Message", "")
-        if "custom controller" in txt.lower():
-            msgs.append(txt.strip())
-    return msgs
-
-
 # --- outer-loop tracking (INDB) ---------------------------------------------
 h = read_outer_health(BIN)
 tus = h["time_us"]
@@ -117,69 +64,18 @@ meas = h["meas_p"]
 fb = np.asarray(h["fallback"], int)
 
 agg = flat_tracking_score(h)              # active-window aggregate (both cases)
-runs = _active_runs(fb)
+runs = active_runs(fb)
 flown = json.loads(open(FLOWN).read())
 case_names = [f["case"] for f in flown]
 baseline = {b["case"]: b for b in json.loads(open(BASELINE).read())}
 
 # Inner-loop sources, read once; sliced per case by TimeUS window below.
 ih = read_indi_health(BIN)
-it = ih["time_us"]
-rt, rdes_all, ract_all, pdes_all, pact_all = _read_rate(BIN)
+rt, rdes_all, ract_all, pdes_all, pact_all = read_rate_msgs(BIN)
 # Trustworthy buzz source: ~50 Hz IMU gyro (roll=GyrX, pitch=GyrY), deg/s.
 gt, gyro_all = read_imu_gyro(BIN)
 # Concrete engagement proof from the firmware STATUSTEXT log.
-engage_msgs = _read_engage_msgs(BIN)
-
-
-def _gyro_window(t0, t1):
-    """Trustworthy inner-loop buzz over an IMU-gyro TimeUS window (deg/s).
-
-    For roll (GyrX) and pitch (GyrY): rms is the overall body-rate magnitude;
-    buzz_hp_rms is the high-pass residual (gyro minus a ~9-sample moving average)
-    -- a rate-loop limit cycle shows up as large high-frequency body-rate motion
-    even where the commanded rate is smooth, so buzz_hp_rms spikes under buzz and
-    stays small under clean tracking. n is the sample count (guards aliasing)."""
-    if gt.size == 0:
-        return {"roll": {"rms": 0.0, "buzz_hp_rms": 0.0},
-                "pitch": {"rms": 0.0, "buzz_hp_rms": 0.0}, "n": 0}
-    w = (gt >= t0) & (gt <= t1)
-    g = gyro_all[w] * RAD2DEG
-    def axis(x):
-        if x.size < 3:
-            return {"rms": _rms(x), "buzz_hp_rms": 0.0}
-        k = min(9, x.size)
-        lp = np.convolve(x, np.ones(k) / k, mode="same")
-        return {"rms": _rms(x), "buzz_hp_rms": _rms(x - lp)}
-    return {"roll": axis(g[:, 0]), "pitch": axis(g[:, 1]), "n": int(g.shape[0])}
-
-
-def _omega_window(t0, t1):
-    """Per-axis omega_dot-inversion score over an INDI TimeUS window."""
-    w = (it >= t0) & (it <= t1)
-    ihw = {k: (v[w] if getattr(v, "ndim", 1) else v) for k, v in ih.items()}
-    om = omega_tracking_score(ihw)
-    du = np.asarray(ihw["du"], float)
-    sat = np.asarray(ihw["sat"], int)
-    return {
-        "roll": om[0], "pitch": om[1], "yaw": om[2],
-        "du_rms": [_rms(du[:, ax]) for ax in range(3)] if du.size else [0.0] * 3,
-        "sat_frac": float(sat.mean()) if sat.size else 0.0,
-    }
-
-
-def _rate_window(t0, t1):
-    """Roll/pitch rate tracking + buzz proxy over a RATE TimeUS window. The buzz
-    proxy is RMS of the sample-to-sample change of the ACTUAL rate: a limit
-    cycle (inner-loop buzz) shows up as large high-frequency actual-rate motion
-    even where the desired rate is smooth, so d(actual)/sample RMS spikes."""
-    w = (rt >= t0) & (rt <= t1)
-    rd, ra, pd, pa = rdes_all[w], ract_all[w], pdes_all[w], pact_all[w]
-    def axis(des, act):
-        return {"des_rms": _rms(des), "act_rms": _rms(act),
-                "err_rms": _rms(act - des),
-                "buzz_ddt_rms": _rms(np.diff(act)) if act.size > 1 else 0.0}
-    return {"roll": axis(rd, ra), "pitch": axis(pd, pa)}
+engage_msgs = read_engage_msgs(BIN)
 
 
 # Map contiguous engaged blocks to the cases in flight order; score each case's
@@ -193,14 +89,14 @@ for idx, (i, j) in enumerate(runs):
     alt = -meas[i:j][:, 2]
     per_case.append({
         "case": name,
-        "rms_m": _rms(err),
+        "rms_m": rms(err),
         "max_m": float(err.max()) if err.size else 0.0,
         "peak_alt_m": float(alt.max()) if alt.size else 0.0,
         "n": int(j - i),
         "t0_us": t0, "t1_us": t1,
-        "omega": _omega_window(t0, t1),
-        "rate": _rate_window(t0, t1),
-        "gyro": _gyro_window(t0, t1),
+        "omega": omega_window(ih, t0, t1),
+        "rate": rate_window(rt, rdes_all, ract_all, pdes_all, pact_all, t0, t1),
+        "gyro": gyro_window(gt, gyro_all, t0, t1),
     })
 
 # Active-window aggregate bounds (whole battery).
@@ -209,13 +105,13 @@ t_lo = float(tus[act].min()) if act.any() else float(tus.min())
 t_hi = float(tus[act].max()) if act.any() else float(tus.max())
 meas_d = meas[act][:, 2] if act.any() else np.array([0.0])
 peak_alt_m = float(-meas_d.min())
-omega = _omega_window(t_lo, t_hi)
+omega = omega_window(ih, t_lo, t_hi)
 du_rms = omega["du_rms"]
 sat_frac = omega["sat_frac"]
-agg_rate = _rate_window(t_lo, t_hi)
+agg_rate = rate_window(rt, rdes_all, ract_all, pdes_all, pact_all, t_lo, t_hi)
 roll_rate = agg_rate["roll"]
 pitch_rate = agg_rate["pitch"]
-agg_gyro = _gyro_window(t_lo, t_hi)
+agg_gyro = gyro_window(gt, gyro_all, t_lo, t_hi)
 # Engagement proof: STATUSTEXT saw "ON" AND the INDI increment du is non-zero
 # over the active window (a stock flight logs no du / all-zero du).
 du_active_rms = float(np.sqrt(np.mean(np.square(du_rms)))) if du_rms else 0.0
@@ -243,7 +139,7 @@ report = {
 }
 open("/tmp/flight/indi_score.json", "w").write(json.dumps(report, indent=1))
 
-print("=== S4 INDI-on-JSON-backend battery ===", flush=True)
+print("=== INDI-on-JSON-backend battery ===", flush=True)
 print(f"cases flown       : {case_names}", flush=True)
 print(f"ENGAGEMENT        : statustext={engage_msgs} engaged_on={engaged_on} "
       f"du_active_rms={du_active_rms:.5f} indi_active={indi_active}", flush=True)
@@ -337,8 +233,8 @@ for pc in per_case:
                     f">= abs tol {TRACK_TOL_ABS_M} m")
 
 if errs:
-    print("=== S4 INDI-on-JSON-backend gate FAIL ===", flush=True)
+    print("=== INDI-on-JSON-backend gate FAIL ===", flush=True)
     for e in errs:
         print("  FAIL:", e, flush=True)
     sys.exit(1)
-print("=== S4 INDI-on-JSON-backend gate PASS ===", flush=True)
+print("=== INDI-on-JSON-backend gate PASS ===", flush=True)

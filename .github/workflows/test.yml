@@ -379,14 +379,15 @@ jobs:
     needs: changes
     if: needs.changes.outputs.drone == 'true'
     runs-on: ubuntu-latest
-    # Validates the S4 custom pysignals-based ArduPilot-SITL JSON physics
+    # Validates the custom pysignals-based ArduPilot-SITL JSON physics
     # platform: boots the aero-fidelity jsonsim backend and flies STOCK
     # ArduCopter (CC_TYPE=0, unmodified PID) through the drag-rejection
     # battery, asserting correct frame/sign conventions (NED, motor mixing,
     # attitude) so the platform is trustworthy for controller A/B work. The
     # INDI-buzz envs (indi-drag-rejection-indi*.nix) are NOT gated here: they
-    # fail by design to encode the Phase-1 finding and ship as documented
-    # diagnostics only (see indi-harness/docs/s4_results.md).
+    # fail by design to encode the actuator-lag INDI finding and ship as
+    # documented diagnostics only (see
+    # indi-harness/docs/json_physics_backend_results.md).
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v5
