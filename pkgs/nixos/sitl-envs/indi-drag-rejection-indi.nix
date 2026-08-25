@@ -24,7 +24,9 @@
 # real-lag backend under the OUTER_EN=1 demo condition). The omg160 variant
 # (indi-drag-rejection-indi-omg160.nix) sweeps it to 160 to test the runtime-
 # swept candidate fix under the REAL condition.
-{ omgFilt ? 80 }:
+{
+  omgFilt ? 80,
+}:
 with import ../dependencies.nix;
 let
   # CC3_B_ACC_FILT (Hz): outer-loop specific-force / thrust-state phase-margin
@@ -63,16 +65,18 @@ let
   # Benign-SITL Layer-B baseline rows for the two flown cases (from
   # indi-harness/baselines/s3_layerB_sitl.json). Embedded so the env is
   # self-contained (the baselines/ dir is not shipped in site-packages).
-  baselineJson = pkgs.writeText "s3_layerB_baseline.json" (builtins.toJSON [
-    {
-      case = "circle_slow";
-      rms_m = 0.4849;
-    }
-    {
-      case = "lemniscate_fast";
-      rms_m = 0.711;
-    }
-  ]);
+  baselineJson = pkgs.writeText "s3_layerB_baseline.json" (
+    builtins.toJSON [
+      {
+        case = "circle_slow";
+        rms_m = 0.4849;
+      }
+      {
+        case = "lemniscate_fast";
+        rms_m = 0.711;
+      }
+    ]
+  );
 in
 pkgs.testers.runNixOSTest {
   name = "indi-drag-rejection-indi-omg${toString omgFilt}";
