@@ -373,3 +373,43 @@ jobs:
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         nix-build pkgs/nixos/sitl-envs/indi-flatness-outer-loop.nix -A driver -o /tmp/flight-driver
         /tmp/flight-driver/bin/nixos-test-driver
+
+  drone-indi-drag-frame:
+    name: Drone INDI Drag-Rejection Frame Gate
+    needs: changes
+    if: needs.changes.outputs.drone == 'true'
+    runs-on: ubuntu-latest
+    # Validates the S4 custom pysignals-based ArduPilot-SITL JSON physics
+    # platform: boots the aero-fidelity jsonsim backend and flies STOCK
+    # ArduCopter (CC_TYPE=0, unmodified PID) through the drag-rejection
+    # battery, asserting correct frame/sign conventions (NED, motor mixing,
+    # attitude) so the platform is trustworthy for controller A/B work. The
+    # INDI-buzz envs (indi-drag-rejection-indi*.nix) are NOT gated here: they
+    # fail by design to encode the Phase-1 finding and ship as documented
+    # diagnostics only (see indi-harness/docs/s4_results.md).
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v5
+    - name: Enable KVM for the test VM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-substituters = https://ros.cachix.org
+          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        skipPush: true
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: Build and run the drone frame gate
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        nix-build pkgs/nixos/sitl-envs/indi-drag-rejection.nix -A driver -o /tmp/dragframe-driver
+        /tmp/dragframe-driver/bin/nixos-test-driver
