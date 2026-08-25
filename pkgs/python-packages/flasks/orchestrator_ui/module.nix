@@ -24,6 +24,7 @@ in
     machines.base.webServices = [
       {
         name = "Orchestrator";
+        tag = "Utilities";
         path = "/orchestrator/";
         description = "Orchestrator job management";
         icon = "gears";

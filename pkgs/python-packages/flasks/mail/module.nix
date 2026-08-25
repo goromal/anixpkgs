@@ -43,6 +43,7 @@ in
     machines.base.webServices = [
       {
         name = "Mail";
+        tag = "Aspiration";
         path = "/mail/";
         description = "GMail cleaner and email archive";
         icon = "envelope";

@@ -67,23 +67,37 @@ in
             let
               hostname = config.networking.hostName;
               services = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) cfg.webServices;
+              tags = lib.sort (a: b: lib.toLower a < lib.toLower b) (lib.unique (map (s: s.tag) services));
               serviceIcon =
                 s:
                 if s.icon != "" then
                   ''<img src="/icons/${s.icon}.svg" class="service-icon" alt="${s.icon}">''
                 else
                   "";
-              serviceLinks = lib.concatMapStringsSep "\n" (
-                s:
-                if s.path == "#" then
-                  let
-                    portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
-                    port = if portMatch != null then builtins.head portMatch else "";
-                  in
-                  ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
-                else
-                  ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
-              ) services;
+              serviceLinks =
+                selectedServices:
+                lib.concatMapStringsSep "\n" (
+                  s:
+                  if s.path == "#" then
+                    let
+                      portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+                      port = if portMatch != null then builtins.head portMatch else "";
+                    in
+                    ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                  else
+                    ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                ) selectedServices;
+              serviceGroups = lib.concatMapStringsSep "\n" (
+                tag:
+                ''
+                  <section class="service-group">
+                    <h2>${tag}</h2>
+                    <ul>
+                      ${serviceLinks (lib.filter (s: s.tag == tag) services)}
+                    </ul>
+                  </section>
+                ''
+              ) tags;
               # Build one directory containing index.html and per-service favicon.svg files
               staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
                 ''
@@ -97,26 +111,32 @@ in
                     <title>${hostname} Services</title>
                     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
                     <style>
-                      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
-                      .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                      * { box-sizing: border-box; }
+                      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f7f9; color: #17212b; }
+                      .container { background: white; padding: 30px; border: 1px solid #dce3e8; border-radius: 20px; box-shadow: 0 12px 34px rgba(31,48,61,0.08); }
                       h1 { color: #333; margin-top: 0; display: flex; align-items: center; gap: 14px; }
+                      h2 { color: #075eac; font-size: 1.05rem; margin: 0 0 12px; }
                       .title-icon { width: 28px; height: 28px; flex-shrink: 0; filter: invert(18%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%); }
-                      ul { list-style: none; padding: 0; }
-                      li { margin: 12px 0; }
-                      .service-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #f9f9f9; border-radius: 8px; border: 2px solid #007bff; text-decoration: none; transition: background 0.15s, border-color 0.15s; }
-                      .service-card:hover { background: #e8f0fe; border-color: #0056b3; }
+                      .service-group { background: linear-gradient(135deg, #f3f8fd, #fff 70%); border: 2px solid #2680d9; border-radius: 16px; margin-top: 18px; padding: 18px; }
+                      ul { list-style: none; margin: 0; padding: 0; }
+                      li + li { margin-top: 9px; }
+                      .service-card { display: flex; align-items: center; gap: 14px; padding: 13px 15px; background: rgba(255,255,255,0.82); border-radius: 10px; border: 1px solid #dce5ec; text-decoration: none; transition: background 0.15s, border-color 0.15s, transform 0.15s; }
+                      .service-card:hover { background: #e8f2fc; border-color: #78ade0; transform: translateY(-1px); }
                       .service-icon { width: 22px; height: 22px; flex-shrink: 0; filter: invert(29%) sepia(96%) saturate(2145%) hue-rotate(204deg) brightness(104%) contrast(101%); }
                       .service-info { display: flex; flex-direction: column; }
                       .service-name { color: #007bff; font-weight: 600; font-size: 1em; }
                       .description { color: #666; font-size: 0.9em; margin-top: 2px; }
+                      @media (max-width: 575px) {
+                        body { margin: 0 auto; padding: 14px; }
+                        .container { padding: 18px; }
+                        .service-group { padding: 14px; }
+                      }
                     </style>
                   </head>
                   <body>
                     <div class="container">
                       <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
-                      <ul>
-                  ${serviceLinks}
-                      </ul>
+                  ${serviceGroups}
                     </div>
                   </body>
                   </html>

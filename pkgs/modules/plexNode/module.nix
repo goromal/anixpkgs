@@ -38,6 +38,7 @@ in
     machines.base.webServices = [
       {
         name = "Plex";
+        tag = "Content";
         path = "#";
         description = "Plex Media Server (port 32400)";
         icon = "film";

@@ -38,6 +38,7 @@ in
     machines.base.webServices = [
       {
         name = "Intake";
+        tag = "Aspiration";
         path = "/intake/";
         description = "Send goromail messages";
         icon = "inbox";
