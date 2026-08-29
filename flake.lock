@@ -330,15 +330,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1787508662,
-        "narHash": "sha256-fxJcABxLDo86uL5IYXOIyCnT5kmZ8V4z69QmDwVb4hw=",
+        "lastModified": 1788037767,
+        "narHash": "sha256-93Fz3FMAtmzjyMo1RpIHwWShwUrPaZECpfyVjEfUia0=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "c661a8ef8c8fdc00a19081500e62ac308509c782",
+        "rev": "7bd457f39fc4f43eccf6acb5f8e25af379ddce94",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/cozy-picker-memory",
         "repo": "flasks",
         "type": "github"
       }
