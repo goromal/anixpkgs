@@ -63,7 +63,7 @@
     gnc.url = "github:goromal/gnc";
     gnc.flake = false;
 
-    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.url = "github:goromal/indi-harness?ref=dev/indi-s4-phase2";
     indi-harness.flake = false;
 
     jetson-stats.url = "github:rbonghi/jetson_stats";
