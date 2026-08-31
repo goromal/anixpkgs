@@ -330,16 +330,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788143734,
+        "lastModified": 1788148738,
         "narHash": "sha256-DNvfmfURWG5YBQ1RYV1R/S83m4t6GHcX2u55R9ZDfz0=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "01a8c399736fc2dbb2b7984b6fce80c83ddc558d",
+        "rev": "549d4750711e1a06fcba7724d940d503f5ff8660",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/heic",
         "repo": "flasks",
         "type": "github"
       }
