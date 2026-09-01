@@ -1,6 +1,6 @@
 # stampserver
 
-Provides an interface for stamping metadata on PNGs and MP4s.
+Provides an interface for stamping metadata on PNGs, JPEGs, HEICs, and MP4s.
 
 
 ## Usage
