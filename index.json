@@ -459,6 +459,11 @@
     "attr": "wormhole",
     "ci": true,
     "docs": true
+   },
+   {
+    "attr": "grafana_dash",
+    "ci": true,
+    "docs": true
    }
   ],
   "bash": [
