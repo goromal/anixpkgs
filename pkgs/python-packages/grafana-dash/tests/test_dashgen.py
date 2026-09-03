@@ -1,11 +1,15 @@
 import json
 import os
+import sys
 
 import pytest
 
 from grafana_dash.cli import (
     PROM_UID,
     LOKI_UID,
+    lint_dashboards,
+    lint_files,
+    main,
     render_dashboard,
     render_files,
     sanitize_dashboard,
@@ -19,6 +23,9 @@ def _write_dashboard(path, uid):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"uid": uid, "title": uid, "panels": []}))
     return str(path)
+
+
+# --- sanitize ---------------------------------------------------------------
 
 
 def test_sanitize_strips_import_only_keys():
@@ -131,6 +138,21 @@ def test_sanitize_files_rejects_duplicate_basenames_without_writing(tmp_path):
         sanitize_files(inputs, str(out_dir))
 
     assert not out_dir.exists()
+
+
+def test_sanitize_files_names_the_file_that_does_not_parse(tmp_path):
+    # Which of N inputs is malformed is the whole question inside a build log.
+    inputs = [
+        _write_dashboard(tmp_path / "src" / "good.json", "uid-a"),
+        str(tmp_path / "src" / "broken.json"),
+    ]
+    (tmp_path / "src" / "broken.json").write_text("{oops")
+
+    with pytest.raises(ValueError, match="broken.json"):
+        sanitize_files(inputs, str(tmp_path / "out"))
+
+
+# --- render -----------------------------------------------------------------
 
 
 SPEC = {
@@ -302,3 +324,224 @@ def test_render_files_writes_a_reproducible_file_per_dashboard(tmp_path):
     assert text == (tmp_path / "b" / "diagnostics.json").read_text()
     top_level_keys = json.loads(text, object_pairs_hook=lambda kvs: [k for k, _ in kvs])
     assert top_level_keys == sorted(top_level_keys)
+
+
+def test_render_files_rejects_dashboard_names_that_escape_the_output_dir(tmp_path):
+    # Only this check can see an escaping name; see _VALID_STEM in dashgen.py.
+    out_dir = tmp_path / "out"
+    for name in ("../evil", "sub/evil"):
+        # The good dashboard trailing the bad one matters: every name is checked,
+        # not just whichever one the name-collecting loop happened to end on.
+        spec = {"hostname": "h", "panels": [
+            {"kind": "stat", "title": "Evil", "metric": "m", "dashboard": name},
+            {"kind": "stat", "title": "Fine", "metric": "m", "dashboard": "ok"}]}
+        with pytest.raises(ValueError, match="evil") as caught:
+            render_files(spec, str(out_dir))
+        # The message is where a reader learns what a legal name looks like.
+        assert "allowed: A-Z a-z 0-9 _ -" in str(caught.value)
+
+    # Nothing anywhere: not in the output directory, and not beside it either.
+    assert not out_dir.exists()
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_render_cli_names_a_spec_that_does_not_parse(tmp_path, capsys, monkeypatch):
+    # The third _load_json call site: the spec comes from Nix, so a parse failure
+    # here means a generator bug, and the log has to say which file.
+    spec = tmp_path / "spec.json"
+    spec.write_text("{oops")
+    monkeypatch.setattr(sys, "argv", ["grafana_dash", "render", "--spec", str(spec),
+                                      "--out", str(tmp_path / "out")])
+
+    assert main() == 1
+
+    err = capsys.readouterr().err.splitlines()
+    assert len(err) == 1
+    assert err[0].startswith("grafana_dash: error: ")
+    assert "spec.json" in err[0]
+
+
+# --- lint -------------------------------------------------------------------
+
+
+def test_lint_accepts_rendered_and_sanitized_output():
+    # Both halves of what the derivation provisions must lint clean. The rendered
+    # half also pins the row-panel tolerance: `render` emits one row per group and
+    # rows legitimately carry no `datasource`.
+    with open(FIXTURE) as f:
+        vendored = sanitize_dashboard(json.load(f))
+    rendered = render_dashboard("diagnostics", SPEC["panels"], SPEC["hostname"])
+    assert any(p["type"] == "row" for p in rendered["panels"])
+    assert lint_dashboards({"node.json": vendored, "diagnostics.json": rendered}) == []
+
+
+def test_lint_finds_datasources_at_every_nesting_depth():
+    # A dashboard's datasources are not all at panel top level: `render` puts one
+    # on every target, a collapsed row hides its panels a level down, and template
+    # variables carry their own. A walk that stops at panels sees none of these.
+    deep = {
+        "uid": "a", "title": "A",
+        "panels": [
+            {"type": "timeseries", "title": "T",
+             "datasource": {"type": "prometheus", "uid": PROM_UID},
+             "targets": [{"datasource": {"type": "prometheus", "uid": "in-target"}}]},
+            {"type": "row", "title": "R", "collapsed": True,
+             "panels": [{"datasource": {"type": "prometheus", "uid": "in-row"}}]},
+        ],
+        "templating": {"list": [
+            {"name": "job", "type": "query",
+             "datasource": {"type": "prometheus", "uid": "in-variable"}},
+        ]},
+    }
+    assert lint_dashboards({"deep.json": deep}) == [
+        "deep.json: unknown datasource uid 'in-row'",
+        "deep.json: unknown datasource uid 'in-target'",
+        "deep.json: unknown datasource uid 'in-variable'",
+    ]
+
+
+def test_lint_rejects_unknown_datasource_uid():
+    # One finding per distinct uid per dashboard: repeats within a dashboard
+    # collapse so the build log stays readable, each file keeps its own finding,
+    # and the order is sorted rather than whatever the JSON happened to say.
+    panel = {"datasource": {"type": "prometheus", "uid": "zz-dedb5gw15rls0c"}}
+    other = {"datasource": {"type": "prometheus", "uid": "aa-p8e80f9aef21f69"}}
+    errors = lint_dashboards({
+        "a.json": {"uid": "a", "title": "A", "panels": [panel, panel, other]},
+        "b.json": {"uid": "b", "title": "B", "panels": [panel]},
+    })
+    assert errors == [
+        "a.json: unknown datasource uid 'aa-p8e80f9aef21f69'",
+        "a.json: unknown datasource uid 'zz-dedb5gw15rls0c'",
+        "b.json: unknown datasource uid 'zz-dedb5gw15rls0c'",
+    ]
+
+
+def test_lint_rejects_unresolved_input_token():
+    bad = {"uid": "a", "title": "A",
+           "panels": [{"datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"}}]}
+    errors = lint_dashboards({"bad.json": bad})
+    # Reported as unresolved rather than merely unknown: a `${` uid means the
+    # export was never sanitized, which is a different fix from a stale uid.
+    assert any("unresolved" in e and "${DS_PROMETHEUS}" in e for e in errors)
+
+
+def test_lint_rejects_string_form_datasource():
+    # sanitize only rewrites the object form, so a pre-Grafana-8 export would
+    # otherwise pass straight through to a host.
+    bad = {"uid": "a", "title": "A",
+           "panels": [{"datasource": "${DS_PROMETHEUS}"},
+                      {"datasource": "${DS_PROMETHEUS}"}]}
+    errors = lint_dashboards({"bad.json": bad})
+    assert len(errors) == 1
+    assert "string-form datasource" in errors[0] and "${DS_PROMETHEUS}" in errors[0]
+
+
+def test_lint_rejects_string_form_datasource_naming_a_known_uid():
+    # The shape is the defect, not the value: Grafana 8+ resolves `datasource` by
+    # object, so a bare string does not resolve even when it names a real one.
+    bad = {"uid": "a", "title": "A", "panels": [{"datasource": "grafana"}]}
+    errors = lint_dashboards({"bad.json": bad})
+    assert errors == [
+        "bad.json: string-form datasource 'grafana' is a pre-Grafana-8 shape "
+        "and will not resolve"
+    ]
+
+
+def test_lint_rejects_duplicate_dashboard_uids():
+    one = {"uid": "dup", "title": "One", "panels": []}
+    two = {"uid": "dup", "title": "Two", "panels": []}
+    # Insertion order is deliberately not sorted order: the report names the file
+    # that loses the race by filename, so it does not churn with caller order.
+    errors = lint_dashboards({"b.json": two, "a.json": one})
+    assert errors == ["b.json: duplicate dashboard uid 'dup' (also in a.json)"]
+
+
+def test_lint_rejects_missing_identity_fields():
+    # Each field is checked independently: a dashboard with a uid but no title is
+    # just as unusable as one with neither.
+    errors = lint_dashboards({
+        "a.json": {"uid": "", "title": "A", "panels": []},
+        "b.json": {"uid": "b", "title": "", "panels": []},
+    })
+    assert errors == ["a.json: missing uid", "b.json: missing title"]
+
+
+def test_lint_rejects_filenames_that_are_not_plain_identifiers():
+    # The output-directory end of the check; see _VALID_STEM in dashgen.py.
+    errors = lint_dashboards({
+        "../evil.json": {"uid": "a", "title": "A", "panels": []},
+        "sub/evil.json": {"uid": "b", "title": "B", "panels": []},
+    })
+    assert len(errors) == 2
+    assert all("not a plain identifier (allowed: A-Z a-z 0-9 _ -)" in e for e in errors)
+
+
+def test_lint_files_reads_only_json_and_keys_findings_by_filename(tmp_path):
+    (tmp_path / "good.json").write_text(json.dumps({"uid": "g", "title": "G", "panels": []}))
+    (tmp_path / "bad.json").write_text(json.dumps({"uid": "", "title": "B", "panels": []}))
+    (tmp_path / "notes.txt").write_text("not a dashboard, and not valid JSON either")
+
+    errors, linted = lint_files(str(tmp_path))
+
+    assert errors == ["bad.json: missing uid"]
+    assert linted == 2
+
+
+def test_lint_files_rejects_an_empty_directory(tmp_path):
+    # Zero dashboards is the silently-broken outcome lint exists to convert into a
+    # build failure: a provisioning run always renders at least one.
+    errors, linted = lint_files(str(tmp_path))
+
+    assert len(errors) == 1
+    assert str(tmp_path) in errors[0]
+    assert linted == 0
+
+
+def test_lint_files_names_the_file_that_does_not_parse(tmp_path):
+    (tmp_path / "broken.json").write_text("{oops")
+
+    with pytest.raises(ValueError, match="broken.json"):
+        lint_files(str(tmp_path))
+
+
+def test_lint_cli_prints_errors_to_stderr_and_exits_nonzero(tmp_path, capsys, monkeypatch):
+    (tmp_path / "bad.json").write_text(json.dumps({"uid": "", "title": "T", "panels": []}))
+    monkeypatch.setattr(sys, "argv", ["grafana_dash", "lint", str(tmp_path)])
+
+    assert main() == 1
+
+    # Every line carries the program name, because Nix interleaves builder logs,
+    # and the trailing count is what survives a truncated one.
+    assert capsys.readouterr().err.splitlines() == [
+        "grafana_dash: bad.json: missing uid",
+        "grafana_dash: 1 problem(s) in 1 dashboard(s)",
+    ]
+
+
+def test_lint_cli_names_an_unparseable_file_with_the_program_name(tmp_path, capsys,
+                                                                 monkeypatch):
+    (tmp_path / "broken.json").write_text("{oops")
+    monkeypatch.setattr(sys, "argv", ["grafana_dash", "lint", str(tmp_path)])
+
+    assert main() == 1
+
+    # Raised errors reach the log through main()'s handler wearing the same prefix
+    # as the findings above -- not as a traceback, and never nameless.
+    err = capsys.readouterr().err.splitlines()
+    assert len(err) == 1
+    assert err[0].startswith("grafana_dash: error: ")
+    assert "broken.json" in err[0]
+
+
+def test_lint_cli_exits_zero_and_says_nothing_on_a_clean_directory(tmp_path, capsys,
+                                                                   monkeypatch):
+    # Task 4 runs this inside the derivation, so a clean directory has to succeed
+    # as reliably as a dirty one has to fail -- and quietly, so the summary line
+    # only ever appears when there is something to summarize.
+    render_files(SPEC, str(tmp_path))
+    monkeypatch.setattr(sys, "argv", ["grafana_dash", "lint", str(tmp_path)])
+
+    assert main() == 0
+
+    assert capsys.readouterr().err == ""
