@@ -156,6 +156,49 @@ in
       }
     ];
 
+    # Log panels are derived rather than hand-listed: every timed orchestrator job
+    # gets one. `logTags` overrides the default for jobs whose `logger -t` tag
+    # differs from the job name (e.g. ats-task-migrator logs as ats-grader).
+    #
+    # Two tags are registered by hand because they are shared channels rather
+    # than job names, so nothing would derive them:
+    #   - `authm`: the credential-refresh error channel several jobs emit to.
+    #   - `orchestrator`: systemd derives SYSLOG_IDENTIFIER from the ExecStart
+    #     basename, which is `orchestrator` for every job unit, so all job
+    #     output not routed through an explicit `logger -t` lands here — as do
+    #     the blacklist refusals from the orchJobGuard in pc-base.nix. It is the
+    #     busiest log stream on an orchestrator host.
+    services.metricsNode.panels = [
+      {
+        kind = "timeseries";
+        title = "Home Directory Contents";
+        metric = "home_dir_file_count";
+        group = "Host";
+        width = 24;
+      }
+      {
+        kind = "logs";
+        title = "authm Logs";
+        tag = "authm";
+        group = "Job Logs";
+      }
+      {
+        kind = "logs";
+        title = "orchestrator Logs";
+        tag = "orchestrator";
+        group = "Job Logs";
+      }
+    ]
+    ++ lib.concatMap (
+      job:
+      map (t: {
+        kind = "logs";
+        title = "${t} Logs";
+        tag = t;
+        group = "Job Logs";
+      }) (job.logTags or [ job.name ])
+    ) globalCfg.timedOrchJobs;
+
     # Register Grafana in the web services landing page
     machines.base.webServices = [
       {
