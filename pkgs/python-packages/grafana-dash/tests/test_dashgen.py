@@ -96,11 +96,17 @@ def test_sanitize_does_not_mutate_its_input():
 
 
 def test_sanitize_real_node_exporter_full_leaves_no_unresolved_inputs():
+    # A shape-preserving trim of the upstream export, not the whole 508K file:
+    # the full dashboard lives in anixdata, and the properties that matter here
+    # are the shapes it contains, not its size. The real file is still checked
+    # end to end -- `lint` runs against it inside the metricsNode derivation, so
+    # a regression fails the build rather than this suite.
     with open(FIXTURE) as f:
         raw = json.load(f)
+    assert "${DS_" in json.dumps(raw), "fixture must still carry unresolved inputs"
     out = sanitize_dashboard(raw)
     assert "${DS_" not in json.dumps(out)
-    assert len(out["panels"]) == 32
+    assert len(out["panels"]) == len(raw["panels"])
 
 
 def test_sanitize_preserves_builtin_datasource_in_real_fixture():

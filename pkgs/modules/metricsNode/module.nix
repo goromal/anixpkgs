@@ -50,10 +50,17 @@ let
       panels = sortedPanels;
     }
   );
+  # Vendored community dashboards live in anixdata, not here: every host fetches
+  # the anixpkgs tarball on every upgrade, and this one file would be ~10% of it.
+  # Copied to its declared name first because `sanitize` keys the output on the
+  # input's basename, and a raw store path carries a hash prefix that would churn
+  # the output filename on every anixdata bump.
+  vendoredDashboards = [ anixpkgs.pkgData.dashboards.node-exporter-full ];
   dashboardPkg = pkgs.runCommand "anix-grafana-dashboards" { } ''
-    mkdir -p $out
+    mkdir -p $out vendor
+    ${lib.concatMapStringsSep "\n" (d: ''cp ${d.data} "vendor/${d.name}"'') vendoredDashboards}
     ${grafana-dash} render --spec ${dashboardSpec} --out $out
-    ${grafana-dash} sanitize ${./vendor}/*.json --out $out
+    ${grafana-dash} sanitize vendor/*.json --out $out
     ${grafana-dash} lint $out
   '';
 in
