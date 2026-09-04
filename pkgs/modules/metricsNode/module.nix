@@ -24,6 +24,38 @@ let
     mv "$tmp" "$out"
     chmod 644 "$out"
   '';
+  dashboardConstants = import ./panels.nix;
+  grafana-dash = "${anixpkgs.grafana_dash}/bin/grafana_dash";
+
+  # Panels named in an assertion failure, so the message points at the offending
+  # registration instead of leaving the reader to grep three files for it.
+  panelTitles = panels: lib.concatMapStringsSep ", " (p: "'${p.title}'") panels;
+  logsWithoutTag = lib.filter (p: p.kind == "logs" && p.tag == null) cfg.panels;
+  queriesWithoutSource = lib.filter (
+    p: p.kind != "logs" && p.metric == null && p.expr == null
+  ) cfg.panels;
+
+  # `types.listOf` concatenates definitions later-module-first, so the raw list is
+  # in reverse import order: adding an unrelated import to pc-base.nix would
+  # silently reshuffle every row and panel. Sorting on (dashboard, group, title)
+  # makes the rendered layout depend only on the panels themselves.
+  sortedPanels = builtins.sort (
+    a: b:
+    lib.compareLists lib.compare [ a.dashboard a.group a.title ] [ b.dashboard b.group b.title ] < 0
+  ) cfg.panels;
+
+  dashboardSpec = pkgs.writeText "grafana-spec.json" (
+    builtins.toJSON {
+      hostname = config.networking.hostName;
+      panels = sortedPanels;
+    }
+  );
+  dashboardPkg = pkgs.runCommand "anix-grafana-dashboards" { } ''
+    mkdir -p $out
+    ${grafana-dash} render --spec ${dashboardSpec} --out $out
+    ${grafana-dash} sanitize ${./vendor}/*.json --out $out
+    ${grafana-dash} lint $out
+  '';
 in
 {
   options.services.metricsNode = {
@@ -33,9 +65,97 @@ in
       description = "Whether to open the specific firewall port for inter-computer usage";
       default = false;
     };
+    # Declared outside `config = lib.mkIf cfg.enable`, so any module can append a
+    # panel without first knowing whether metrics are enabled on this host.
+    panels = lib.mkOption {
+      default = [ ];
+      description = ''
+        Panels contributed by enabled services; assembled into generated dashboards.
+        Order of registration is not preserved: panels are sorted by
+        (dashboard, group, title), so rows and the panels within them appear
+        alphabetically. `group` is therefore how you control layout.
+      '';
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            kind = lib.mkOption {
+              type = lib.types.enum [
+                "timeseries"
+                "stat"
+                "logs"
+              ];
+              description = "Panel style. 'logs' queries Loki; the others query Prometheus.";
+            };
+            title = lib.mkOption {
+              type = lib.types.str;
+              description = "Heading shown on the panel, and the sort key within a group.";
+            };
+            group = lib.mkOption {
+              type = lib.types.str;
+              default = "General";
+              description = "Row heading the panel is placed under.";
+            };
+            dashboard = lib.mkOption {
+              type = lib.types.str;
+              default = "diagnostics";
+              description = ''
+                Which dashboard the panel lands on. The name becomes both the
+                output filename (`<name>.json`) and the dashboard uid
+                (`anix-<name>`), so a typo here silently creates a second,
+                nearly-empty dashboard rather than failing the build.
+              '';
+            };
+            metric = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Prometheus metric name; shorthand for a bare PromQL query.";
+            };
+            expr = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Raw PromQL, overriding `metric` when both are set.";
+            };
+            tag = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = "Loki `tag` label, i.e. the unit's SYSLOG_IDENTIFIER.";
+            };
+            unit = lib.mkOption {
+              type = lib.types.str;
+              default = "short";
+              description = ''
+                Grafana unit id for the panel's values, e.g. `short`, `bytes`,
+                `percentunit`, `s`. Grafana ignores an unrecognized id without
+                complaint, and neither `grafana_dash lint` nor the assertions
+                below can catch one, so a typo shows up only as unformatted axes.
+              '';
+            };
+            width = lib.mkOption {
+              type = lib.types.ints.between 1 24;
+              default = 12;
+              description = ''
+                Panel width in columns of Grafana's 24-column grid; 12 is half
+                the row. Panels wrap to a new row once a group's widths exceed 24.
+              '';
+            };
+          };
+        }
+      );
+    };
   };
 
   config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = logsWithoutTag == [ ];
+        message = "services.metricsNode.panels: every 'logs' panel must set `tag`; missing on ${panelTitles logsWithoutTag}.";
+      }
+      {
+        assertion = queriesWithoutSource == [ ];
+        message = "services.metricsNode.panels: 'timeseries'/'stat' panels must set `metric` or `expr`; missing on ${panelTitles queriesWithoutSource}.";
+      }
+    ];
+
     # Register Grafana in the web services landing page
     machines.base.webServices = [
       {
@@ -204,21 +324,11 @@ in
       };
     };
 
+    # Only the node_exporter textfile collector needs a managed directory now;
+    # dashboards live in the Nix store, which is already world-readable.
     systemd.tmpfiles.rules = [
-      "d /var/lib/grafana/dashboards 0750 grafana grafana -"
-      "d ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} 0750 andrew dev -"
       "d ${textfileDir} 0755 node-exporter node-exporter -"
     ];
-    users.users.grafana.extraGroups = [ "dev" ];
-    fileSystems."/var/lib/grafana/dashboards" = {
-      device = "${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}";
-      fsType = "none";
-      options = [ "bind" ];
-    };
-    system.activationScripts.grafanaPerms.text = ''
-      chmod -R g+rx ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName}
-      find ${globalCfg.homeDir}/configs/grafana/${config.networking.hostName} -type f -exec chmod g+r {} +
-    '';
 
     services.grafana = {
       enable = true;
@@ -232,24 +342,43 @@ in
       };
       provision = {
         enable = true;
-        dashboards = {
-          settings = {
-            providers = [
-              {
-                name = config.networking.hostName;
-                options.path = "/var/lib/grafana/dashboards";
-              }
-            ];
-          };
-        };
-        datasources.settings.datasources = [
+        dashboards.settings.providers = [
           {
-            name = "Loki";
-            type = "loki";
-            access = "proxy";
-            url = "http://localhost:${builtins.toString service-ports.loki}";
+            name = "anix";
+            options.path = "${dashboardPkg}";
+            disableDeletion = true;
+            allowUiUpdates = false;
           }
         ];
+        datasources.settings = {
+          datasources = [
+            {
+              name = "Prometheus";
+              uid = dashboardConstants.prometheusUid;
+              type = "prometheus";
+              access = "proxy";
+              url = "http://localhost:${builtins.toString service-ports.prometheus.output}";
+              isDefault = true;
+            }
+            {
+              name = "Loki";
+              uid = dashboardConstants.lokiUid;
+              type = "loki";
+              access = "proxy";
+              url = "http://localhost:${builtins.toString service-ports.loki}";
+            }
+          ];
+          # Every host that ran the old workflow has a lowercase "prometheus"
+          # datasource created by hand in the UI, carrying a database-generated
+          # uid. Dashboards referencing it were only ever valid on the host that
+          # made it; dropping it forces everything onto the pinned uids above.
+          deleteDatasources = [
+            {
+              name = "prometheus";
+              orgId = 1;
+            }
+          ];
+        };
       };
     };
 
