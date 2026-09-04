@@ -411,13 +411,22 @@ in
               url = "http://localhost:${builtins.toString service-ports.loki}";
             }
           ];
-          # Every host that ran the old workflow has a lowercase "prometheus"
-          # datasource created by hand in the UI, carrying a database-generated
-          # uid. Dashboards referencing it were only ever valid on the host that
-          # made it; dropping it forces everything onto the pinned uids above.
+          # Grafana cannot change the uid of an existing datasource through
+          # provisioning: the upsert matches by name, then looks the record up
+          # by the incoming uid, which does not exist yet, and aborts the whole
+          # provisioner with "data source not found" -- taking the service down
+          # with it. Hosts that ran the old module already have a Loki
+          # datasource carrying a database-generated uid, so pinning the uids
+          # above requires deleting first and letting the insert recreate them.
+          # Deletes run before inserts, and naming a datasource that is absent
+          # is a no-op, so this is also correct on a fresh host.
           deleteDatasources = [
             {
-              name = "prometheus";
+              name = "Prometheus";
+              orgId = 1;
+            }
+            {
+              name = "Loki";
               orgId = 1;
             }
           ];
