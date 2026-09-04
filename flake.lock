@@ -19,15 +19,16 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1787112205,
-        "narHash": "sha256-fMTQFXTEWs53EHL8IhOFW+KfjQnhal2sL657Ub0tjyA=",
+        "lastModified": 1788489269,
+        "narHash": "sha256-7QUBkSAQwzzLD8nYAlCOPL0vHKbz3uapVA9/TU2cIgA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "19b7855654ab90bbfbebe1e0a69c6527389a9239",
+        "rev": "540d01ebeb2d9b25100b99075ac024b4a5f3c9b4",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/grafana-declarative-dashboards",
         "repo": "anixdata",
         "type": "github"
       }
@@ -330,11 +331,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788148738,
-        "narHash": "sha256-DNvfmfURWG5YBQ1RYV1R/S83m4t6GHcX2u55R9ZDfz0=",
+        "lastModified": 1788382011,
+        "narHash": "sha256-7spnK/d374rk2nXgPeAGHVzZVGM1wYgYIh6RrGK+Kh8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "549d4750711e1a06fcba7724d940d503f5ff8660",
+        "rev": "3c97b1fbc7dae9c6920222caa92f98abbaa099ed",
         "type": "github"
       },
       "original": {

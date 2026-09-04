@@ -132,6 +132,7 @@ let
                 }
               );
               budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
+              grafana_dash = addDoc (pySelf.callPackage ./python-packages/grafana-dash { });
               surveys_report = addDoc (pySelf.callPackage ./python-packages/surveys-report { });
               easy-google-auth = addDoc (
                 pySelf.callPackage ./python-packages/easy-google-auth {
@@ -449,6 +450,7 @@ rec {
 
   aapis-py = final.python313.pkgs.aapis-py;
   budget_report = final.python313.pkgs.budget_report;
+  grafana_dash = final.python313.pkgs.grafana_dash;
   surveys_report = final.python313.pkgs.surveys_report;
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
