@@ -50,6 +50,9 @@ jobs:
           extra_nix_config: |
             extra-platforms = aarch64-linux
 
+      - run: >
+          git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+
       - name: Run profile diff
         run: |
           echo "Base: ${{ steps.refs.outputs.base_sha }}"

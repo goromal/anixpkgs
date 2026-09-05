@@ -45,6 +45,21 @@ if [[ ! -f $tmpdir/dev/test_env/sources/.claude/CLAUDE.md ]]; then
     exit 1
 fi
 [[ -d "$tmpdir/data2" ]] || { echo_red "Failed data dir override"; exit 1; }
+root_envrc_mtime=$(stat -c '%y' "$tmpdir/dev/test_env/.envrc")
+data_envrc_mtime=$(stat -c '%y' "$tmpdir/data2/test_env/.envrc")
+shell_mtime=$(stat -c '%y' "$tmpdir/dev/test_env/shell.nix")
+bin_inode=$(stat -c '%i' "$tmpdir/dev/test_env/.bin")
+devshell --override-data-dir "$tmpdir/data2" -d data/devrc test_env --run "true"
+[[ "$root_envrc_mtime" == "$(stat -c '%y' "$tmpdir/dev/test_env/.envrc")" ]] || { echo_red "devshell rewrote unchanged root .envrc"; exit 1; }
+[[ "$data_envrc_mtime" == "$(stat -c '%y' "$tmpdir/data2/test_env/.envrc")" ]] || { echo_red "devshell rewrote unchanged data .envrc"; exit 1; }
+[[ "$shell_mtime" == "$(stat -c '%y' "$tmpdir/dev/test_env/shell.nix")" ]] || { echo_red "devshell rewrote unchanged generated shell"; exit 1; }
+[[ "$bin_inode" == "$(stat -c '%i' "$tmpdir/dev/test_env/.bin")" ]] || { echo_red "devshell replaced unchanged script directory"; exit 1; }
+sed -i 's|python311\.pkgs\.geometry|python3.pkgs.geometry|g' data/devrc
+devshell --override-data-dir "$tmpdir/data2" -d data/devrc test_env --run "true"
+if [[ -z $(grep "pkgs.python3.withPackages" "$tmpdir/dev/test_env/shell.nix") ]]; then
+    echo_red "devshell did not update an unedited generated shell"
+    exit 1
+fi
 echo "<scr> = scripts/test" >> data/devrc
 echo "scr_env = geometry" >> data/devrc
 mkdir -p "$tmpdir/data/scripts"

@@ -3,6 +3,7 @@
   setuptools,
   flask,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -12,12 +13,12 @@ buildPythonPackage rec {
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/la-quiz-web";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./templates/index.html} $out/${pythonLibDir}/templates/index.html
-    cp ${./templates/quiz.html} $out/${pythonLibDir}/templates/quiz.html
-    cp ${./templates/setup_region.html} $out/${pythonLibDir}/templates/setup_region.html
+    cp templates/index.html $out/${pythonLibDir}/templates/index.html
+    cp templates/quiz.html $out/${pythonLibDir}/templates/quiz.html
+    cp templates/setup_region.html $out/${pythonLibDir}/templates/setup_region.html
   '';
   propagatedBuildInputs = [
     flask

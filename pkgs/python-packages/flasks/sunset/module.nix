@@ -32,6 +32,7 @@ in
     machines.base.webServices = [
       {
         name = "sunset";
+        tag = "Utilities";
         path = "/sunset/";
         description = "Kill the Dolphin emulator";
         icon = "gamepad";

@@ -8,6 +8,15 @@ with import ../dependencies.nix;
 let
   cfg = config.mods.claude;
 
+  agentLib = import ./agent-lib.nix { inherit pkgs lib; };
+
+  # Claude CLI sourced from llm-agents.nix (cache-backed via cache.numtide.com,
+  # auto-updated upstream). Its wrapper sets DISABLE_AUTOUPDATER /
+  # DISABLE_INSTALLATION_CHECKS and puts bubblewrap + socat (the sandbox deps)
+  # on PATH; it uses claude's builtin ripgrep and relies on ambient procps
+  # (present in the NixOS system PATH). Replaces the retired claude-code-bin.
+  claudeCli = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+
   claudeCodeVersion = "2.1.116";
   claudeCodeExt =
     let
@@ -31,7 +40,7 @@ let
         cp -r ${base} $out
         chmod -R u+w $out
         mkdir -p $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64
-        ln -s ${anixpkgs.claude-code-bin}/bin/claude \
+        ln -s ${claudeCli}/bin/claude \
           $out/share/vscode/extensions/anthropic.claude-code/resources/native-binaries/linux-x64/claude
       '';
       passthru = {
@@ -47,13 +56,20 @@ let
       envFlags = lib.concatStringsSep " " (
         lib.mapAttrsToList (k: v: "-e ${k}=${lib.escapeShellArg v}") server.env
       );
-      secretsFlag =
-        if server.secretsEnvVar != null then "-e ${server.secretsEnvVar}=${server.secretsPath}" else "";
-      hasSecretsCheck = server.secretsPath != null;
+      secretsEnv =
+        server.secretsEnv
+        // lib.optionalAttrs (server.secretsEnvVar != null) {
+          ${server.secretsEnvVar} = server.secretsPath;
+        };
+      secretsFlags = lib.concatStringsSep " " (lib.mapAttrsToList (k: v: "-e ${k}=${v}") secretsEnv);
+      secretsCheck = lib.concatStringsSep " && " (
+        lib.mapAttrsToList (k: v: "[ -e \"${v}\" ]") secretsEnv
+      );
+      hasSecretsCheck = secretsEnv != { };
       registerCmd = ''
         claude mcp remove ${server.name} 2>/dev/null || true
-        claude mcp add -s user ${envFlags} ${secretsFlag} \
-          -- ${server.name} ${server.command}
+        claude mcp add -s user ${envFlags} ${secretsFlags} \
+          -- ${server.name} ${server.command} ${lib.concatMapStringsSep " " lib.escapeShellArg server.args}
         echo_green "${server.name} MCP server registered successfully"
       '';
     in
@@ -63,17 +79,68 @@ let
     + (
       if hasSecretsCheck then
         ''
-          if [ -e "${server.secretsPath}" ]; then
+          if ${secretsCheck}; then
             ${registerCmd}
           else
-            echo_yellow "Warning: ${server.secretsPath} not found. Skipping ${server.name} MCP setup."
+            echo_yellow "Warning: required secret file for ${server.name} not found. Skipping MCP setup."
           fi
         ''
       else
         registerCmd
     );
+
+  # Status line script (see res/claude-statusline.sh). PATH is prepended so the
+  # jq/date/coreutils it relies on resolve regardless of the caller's env.
+  statuslineScript = pkgs.writeShellScript "claude-statusline" ''
+    export PATH="${
+      lib.makeBinPath [
+        pkgs.jq
+        pkgs.coreutils
+      ]
+    }:$PATH"
+    ${builtins.readFile ../res/claude-statusline.sh}
+  '';
+
+  # claude-setup as a named derivation so its store path can be watched by an
+  # upgrade hook (re-run setup only when this script's content changes). The gh
+  # auth step is TTY-guarded so the hook can run it non-interactively.
+  claudeSetupScript = pkgs.writeShellScriptBin "claude-setup" ''
+    if ! command -v claude &> /dev/null; then
+      echo_red "Error: claude not found in PATH"
+      exit 1
+    fi
+    echo_yellow "Installing claude plugins..."
+    ${lib.concatMapStringsSep "\n      " (
+      marketplace: "claude plugin marketplace add ${marketplace}"
+    ) cfg.marketplaces}
+    ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.plugins}
+    echo_green "Done! Verify installed plugins with \"claude plugin list\""
+
+    ${lib.concatMapStringsSep "\n" mcpServerSetupScript cfg.mcpServers}
+
+    echo_yellow "Installing rtk Claude Code hook..."
+    rtk init -g
+    echo_green "rtk hook installed"
+
+    echo_yellow "Other setup..."
+    if [ -t 0 ]; then
+      read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        gh auth login
+      fi
+    else
+      echo_yellow "Non-interactive session; skipping gh auth login."
+    fi
+  '';
 in
 {
+  # Pull in the generic upgrade-hooks option so this leaf module can define its
+  # own on-change hooks regardless of how it is imported (NixOS pc-base or a
+  # standalone home.nix). Module imports dedupe by path, so pc-base importing
+  # upgrade-hooks.nix too is harmless.
+  imports = [ ./upgrade-hooks.nix ];
+
   options.mods.claude = {
     marketplaces = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -134,35 +201,7 @@ in
       description = "Attrs describing extra Claude JSON settings";
     };
     mcpServers = lib.mkOption {
-      type = lib.types.listOf (
-        lib.types.submodule {
-          options = {
-            name = lib.mkOption {
-              type = lib.types.str;
-              description = "MCP server name (passed to `claude mcp add`)";
-            };
-            command = lib.mkOption {
-              type = lib.types.str;
-              description = "Absolute path to the MCP server executable";
-            };
-            env = lib.mkOption {
-              type = lib.types.attrsOf lib.types.str;
-              default = { };
-              description = "Plain (non-secret) environment variables for the server";
-            };
-            secretsPath = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Path checked for existence; if missing, server registration is skipped";
-            };
-            secretsEnvVar = lib.mkOption {
-              type = lib.types.nullOr lib.types.str;
-              default = null;
-              description = "Name of env var that should receive secretsPath (the server reads + parses it)";
-            };
-          };
-        }
-      );
+      type = lib.types.listOf agentLib.mcpServerType;
       default = [ ];
       description = "List of MCP servers to register with claude during claude-setup";
     };
@@ -175,33 +214,9 @@ in
 
   config = {
     home.packages = [
-      anixpkgs.claude-code-bin
+      claudeCli
       anixpkgs.rtk
-      (pkgs.writeShellScriptBin "claude-setup" ''
-        if ! command -v claude &> /dev/null; then
-          echo_red "Error: claude not found in PATH"
-          exit 1
-        fi
-        echo_yellow "Installing claude plugins..."
-        ${lib.concatMapStringsSep "\n      " (
-          marketplace: "claude plugin marketplace add ${marketplace}"
-        ) cfg.marketplaces}
-        ${lib.concatMapStringsSep "\n      " (plugin: "claude plugin install ${plugin}") cfg.plugins}
-        echo_green "Done! Verify installed plugins with \"claude plugin list\""
-
-        ${lib.concatMapStringsSep "\n" mcpServerSetupScript cfg.mcpServers}
-
-        echo_yellow "Installing rtk Claude Code hook..."
-        rtk init -g
-        echo_green "rtk hook installed"
-
-        echo_yellow "Other setup..."
-        read -p "Proceed with gh CLI setup? (y|n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          gh auth login
-        fi
-      '')
+      claudeSetupScript
       (pkgs.writeShellScriptBin "claude-update" ''
         if ! command -v claude &> /dev/null; then
           echo_red "Error: claude not found in PATH"
@@ -240,9 +255,13 @@ in
         );
         baseConfig = {
           enabledPlugins = pluginsObj;
+          statusLine = {
+            type = "command";
+            command = "${statuslineScript}";
+            padding = 0;
+          };
         };
         nixosSettings = baseConfig // cfg.extraSettings;
-        nixosSettingsJson = builtins.toJSON nixosSettings;
 
         hooksByEvent = lib.groupBy (h: h.event) cfg.hooks;
         hooksConfig = lib.mapAttrs (
@@ -262,67 +281,39 @@ in
         ) hooksByEvent;
         hooksJson = builtins.toJSON hooksConfig;
         permissionsAllowJson = builtins.toJSON cfg.permissionsAllow;
-
-        mergeScript = pkgs.writeShellScript "merge-claude-settings" ''
-          set -e
-
-          SETTINGS_DIR="$HOME/.claude"
-          SETTINGS_FILE="$SETTINGS_DIR/settings.json"
-          NIXOS_SETTINGS='${nixosSettingsJson}'
-          NIXOS_HOOKS='${hooksJson}'
-          NIXOS_PERMISSIONS_ALLOW='${permissionsAllowJson}'
-
-          ${pkgs.coreutils}/bin/mkdir -p "$SETTINGS_DIR"
-
-          if [ ! -f "$SETTINGS_FILE" ]; then
-            echo "$NIXOS_SETTINGS" > "$SETTINGS_FILE"
-            echo "Created new Claude settings file with NixOS configuration"
-          else
-            ${pkgs.jq}/bin/jq -n \
-              --argjson existing "$(${pkgs.coreutils}/bin/cat "$SETTINGS_FILE")" \
-              --argjson nixos "$NIXOS_SETTINGS" \
-              '$existing * $nixos' > "$SETTINGS_FILE.tmp"
-
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Updated Claude settings, preserving user modifications"
-          fi
-
-          if [ "$NIXOS_HOOKS" != "{}" ]; then
-            ${pkgs.jq}/bin/jq \
-              --argjson new_hooks "$NIXOS_HOOKS" \
-              'reduce ($new_hooks | to_entries[]) as $ev (
-                .;
-                .hooks[$ev.key] = (
-                  (.hooks[$ev.key] // []) + $ev.value
-                  | unique_by(.hooks[0].command)
-                )
-              )' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Merged declarative hooks into Claude settings"
-          fi
-
-          if [ "$NIXOS_PERMISSIONS_ALLOW" != "[]" ]; then
-            ${pkgs.jq}/bin/jq \
-              --argjson new_allow "$NIXOS_PERMISSIONS_ALLOW" \
-              '.permissions.allow = ((.permissions.allow // []) + $new_allow | unique)' \
-              "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp"
-            ${pkgs.coreutils}/bin/mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
-            echo "Merged declarative permissions into Claude settings"
-          fi
-        '';
       in
-      {
-        Unit = {
-          Description = "Update Claude Code settings with NixOS configuration";
-        };
-        Service = {
-          Type = "oneshot";
-          ExecStart = "${mergeScript}";
-          RemainAfterExit = true;
-        };
-        Install = {
-          WantedBy = [ "default.target" ];
-        };
+      agentLib.mkAgentSettingsService {
+        name = "claude";
+        description = "Update Claude Code settings with NixOS configuration";
+        targetFile = "$HOME/.claude/settings.json";
+        format = "json";
+        settings = nixosSettings;
+        extraMerge =
+          (lib.optional (hooksConfig != { }) {
+            name = "hooks";
+            varName = "new_hooks";
+            valueJson = hooksJson;
+            jqProgram = "reduce ($new_hooks | to_entries[]) as $ev (.; .hooks[$ev.key] = ((.hooks[$ev.key] // []) + $ev.value | unique_by(.hooks[0].command)))";
+          })
+          ++ (lib.optional (cfg.permissionsAllow != [ ]) {
+            name = "permissions";
+            varName = "new_allow";
+            valueJson = permissionsAllowJson;
+            jqProgram = ".permissions.allow = ((.permissions.allow // []) + $new_allow | unique)";
+          });
       };
+
+    # Re-run claude-setup after an upgrade only when the setup script's content
+    # changes (new plugins/marketplaces/MCP servers). Settings-file regen is
+    # already handled by the claude-settings-update unit above, which is itself
+    # an on-change oneshot (the reference pattern this hook generalizes).
+    mods.upgradeHooks = [
+      {
+        name = "claude-setup";
+        watch = [ claudeSetupScript ];
+        command = "${claudeSetupScript}/bin/claude-setup";
+        description = "Re-run claude-setup when its script content changes";
+      }
+    ];
   };
 }

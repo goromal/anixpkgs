@@ -4,7 +4,7 @@ import os
 import sys
 from email import policy
 from email.parser import BytesParser
-from email.utils import parsedate_to_datetime
+from email.utils import parsedate_to_datetime, parseaddr
 from colorama import Fore, Style
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +19,14 @@ from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 MAIL_EMAIL = "andrew.torgesen@gmail.com"
 TEXT_EMAIL = "6612105214@vzwpix.com"
+INTAKE_EMAIL = "andrew@localhost"
 MAILDIR_PATH = "/var/mail/goromail"
+
+# Senders whose mail may only ever become a survey result -- never a Notion
+# block, whatever the body looks like. Domains match subdomains too.
+NUTRITION_SENDERS = ("loseit.com",)
+# Senders allowed to issue the full command set (journal, keywords, tasks, ITNS).
+OWNER_SENDERS = (MAIL_EMAIL, TEXT_EMAIL, INTAKE_EMAIL)
 
 
 class PostfixMessage:
@@ -51,6 +58,81 @@ class PostfixMessage:
 
     def moveToTrash(self):
         self.maildir.remove(self.key)
+
+
+def sender_matches(sender, patterns):
+    """True if the address in a From header matches any of `patterns`.
+
+    A pattern is either a full address ("a@b.com") or a bare domain
+    ("loseit.com"), which also covers its subdomains. Only the address is
+    matched, never the display name, so a From header of
+    `"andrew.torgesen@gmail.com" <spam@elsewhere.net>` will not match.
+    """
+    addr = parseaddr(sender or "")[1].lower()
+    if not addr:
+        return False
+    for pattern in patterns:
+        pattern = pattern.lower()
+        if addr == pattern or addr.endswith(f"@{pattern}") or addr.endswith(f".{pattern}"):
+            return True
+    return False
+
+
+def classify_sender(sender):
+    """Route a postfix message on its From header rather than its body.
+
+    "nutrition" -- may only produce a survey result; never reaches Notion.
+    "owner"     -- the full command set (journal, keywords, calories, tasks, ITNS).
+    "unknown"   -- anything else that reached the mailbox; left untouched.
+
+    Postfix accepts mail for the whole domain, so the catch-all ITNS branch is
+    reachable by any stranger unless senders are classified up front.
+    """
+    if sender_matches(sender, NUTRITION_SENDERS):
+        return "nutrition"
+    if sender_matches(sender, OWNER_SENDERS):
+        return "owner"
+    return "unknown"
+
+
+def handle_nutrition_message(msg, date, tactical_port, dry_run, log):
+    """Report a nutrition email as a survey result. Never writes to Notion.
+
+    Unparseable mail from a nutrition sender is logged and trashed rather than
+    falling through to another handler -- the underlying data still lives in
+    the source app, so there is nothing to recover from the email itself.
+    """
+    loseit = parse_loseit_email(msg.raw_text)
+    if loseit is None:
+        print(
+            Fore.YELLOW
+            + f"  Unparsed nutrition email from {date}; discarding"
+            + Style.RESET_ALL
+        )
+        log(f"Unparsed nutrition email from {date}; discarded")
+        if not dry_run:
+            msg.moveToTrash()
+        return False
+
+    summary_date, consumed, budget = loseit
+    summary_date = summary_date.replace(year=date.year)
+    nutrients = parse_loseit_nutrients(msg.raw_text)
+    level = eating_discipline_level(consumed, budget, nutrients)
+    surplus = consumed - budget
+    extra = ""
+    if nutrients is not None and consumed > 0:
+        fat_g, carb_g, protein_g, fat_pct = nutrients
+        coverage = (9 * fat_g + 4 * carb_g + 4 * protein_g) / consumed
+        extra = f", nutrient coverage {coverage:.0%}, fat {fat_pct:.1f}%"
+    print(
+        f"  Lose It! daily summary: {consumed} consumed / {budget} budget "
+        f"({'+' if surplus >= 0 else ''}{surplus} cal){extra} -> level {level}"
+    )
+    log(f"Lose It! summary for {summary_date.date()}: level {level}{extra}")
+    if not dry_run:
+        report_eating_discipline_to_tactical(tactical_port, summary_date, level)
+        msg.moveToTrash()
+    return True
 
 
 def process_keyword(
@@ -208,14 +290,88 @@ def parse_loseit_email(raw_text):
     return summary_date, consumed, budget
 
 
-def report_eating_discipline_to_tactical(tactical_port, date, consumed, budget):
+def parse_loseit_nutrients(raw_text):
+    """Return (fat_g, carb_g, protein_g, fat_pct) from a Lose It! email's
+    Nutrient Summary table, or None if the table is absent or incomplete.
+
+    Grams cover only foods that have nutrient data; fat_pct is Fat's reported
+    share of tracked calories ("% Calories" column).
+    """
+    if "Nutrient Summary" not in raw_text:
+        return None
+    section = raw_text.split("Nutrient Summary", 1)[1]
+
+    def grams(label):
+        # A label cell whose text starts with `label` (so "Fat" won't match the
+        # "&nbsp;&nbsp; Saturated Fat" cell), then a grams cell like "47g".
+        m = re.search(
+            r">\s*" + re.escape(label) + r"\s*</td>\s*<td[^>]*>\s*([\d,]+)\s*g\b",
+            section,
+            re.IGNORECASE,
+        )
+        return int(m.group(1).replace(",", "")) if m else None
+
+    fat_g = grams("Fat")
+    carb_g = grams("Carbohydrates")
+    protein_g = grams("Protein")
+    if fat_g is None or carb_g is None or protein_g is None:
+        return None
+
+    fatpct_m = re.search(
+        r">\s*Fat\s*</td>\s*<td[^>]*>\s*[\d,]+\s*g\s*</td>\s*"
+        r'<td[^>]*align="right"[^>]*>\s*([\d.]+)\s*%',
+        section,
+        re.IGNORECASE,
+    )
+    if fatpct_m is None:
+        return None
+    return fat_g, carb_g, protein_g, float(fatpct_m.group(1))
+
+
+def eating_discipline_level(consumed, budget, nutrients):
+    """Credit level (2 full / 1 partial / 0 none) for 'Discipline in eating'.
+
+    nutrients is (fat_g, carb_g, protein_g, fat_pct) or None. When >=80% of
+    consumed calories are backed by nutrient stats, blend the surplus score with
+    a fat-share score; otherwise (or with no nutrients) use surplus alone.
+    """
     surplus = consumed - budget
     if surplus <= 0:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT
+        surplus_level = 2
     elif surplus <= 200:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT
+        surplus_level = 1
     else:
-        result_type = tactical_pb2.SurveyQuestionResultType.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT
+        surplus_level = 0
+
+    if nutrients is None or consumed <= 0:
+        return surplus_level
+
+    fat_g, carb_g, protein_g, fat_pct = nutrients
+    tracked_cal = 9 * fat_g + 4 * carb_g + 4 * protein_g
+    if tracked_cal / consumed < 0.80:
+        return surplus_level
+
+    if fat_pct <= 30:
+        fat_level = 2
+    elif fat_pct <= 40:
+        fat_level = 1
+    else:
+        fat_level = 0
+
+    return int((surplus_level + fat_level) / 2 + 0.5)  # round half up
+
+
+def _credit_enum(level):
+    T = tactical_pb2.SurveyQuestionResultType
+    return {
+        0: T.SURVEY_QUESTION_RESULT_TYPE_NO_CREDIT,
+        1: T.SURVEY_QUESTION_RESULT_TYPE_PARTIAL_CREDIT,
+        2: T.SURVEY_QUESTION_RESULT_TYPE_FULL_CREDIT,
+    }[level]
+
+
+def report_eating_discipline_to_tactical(tactical_port, date, level):
+    result_type = _credit_enum(level)
 
     async def cmd_impl(port, year, month, day):
         async with aio.insecure_channel(f"localhost:{port}") as channel:
@@ -469,15 +625,25 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
             text = msg.getText().strip()
             date = msg.getDate()
 
-            loseit = parse_loseit_email(msg.raw_text)
-            if loseit is not None:
-                summary_date, consumed, budget = loseit
-                summary_date = summary_date.replace(year=date.year)
-                surplus = consumed - budget
-                print(f"  Lose It! daily summary: {consumed} consumed / {budget} budget ({'+' if surplus >= 0 else ''}{surplus} cal)")
-                if not dry_run:
-                    report_eating_discipline_to_tactical(tactical_port, summary_date, consumed, budget)
-                    msg.moveToTrash()
+            route = classify_sender(msg.sender)
+
+            if route == "nutrition":
+                handle_nutrition_message(msg, date, tactical_port, dry_run, log)
+                continue
+
+            if route == "unknown":
+                # Left in the maildir on purpose: silently deleting inbound mail
+                # loses real messages, and a growing queue is a visible signal.
+                print(
+                    Fore.YELLOW
+                    + f"  Ignoring mail from unrecognized sender: {msg.sender}"
+                    + Style.RESET_ALL
+                )
+                # The address goes to stdout (the diag log) but deliberately not
+                # into postfix.log, which ats-mailman greps for "notion" -- a
+                # sender like notion.so would otherwise trigger a spurious
+                # annotate-triage-pages run.
+                log("Ignored mail from unrecognized sender")
                 continue
 
             if text[:8].lower() == f"journal:":

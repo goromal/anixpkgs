@@ -6,6 +6,8 @@
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
+    llm-agents.url = "github:numtide/llm-agents.nix";
+
     phps.url = "github:fossar/nix-phps";
 
     flake-compat.url = "github:edolstra/flake-compat";
@@ -19,7 +21,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
+    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
 
     book-notes-sync.url = "github:goromal/book-notes-sync";
@@ -27,6 +29,9 @@
 
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
+
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.flake = false;
 
     crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
@@ -37,17 +42,17 @@
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
-    spandrel-src.url = "github:chaiNNer-org/spandrel";
-    spandrel-src.flake = false;
-
-    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
-    comfyui-src.flake = false;
-
     evil-hangman.url = "github:goromal/evil-hangman";
     evil-hangman.flake = false;
 
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
+
+    flasks.url = "github:goromal/flasks";
+    flasks.flake = false;
+
+    folio.url = "github:goromal/folio";
+    folio.flake = false;
 
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
@@ -55,18 +60,21 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
-    jetson-stats.url = "github:rbonghi/jetson_stats";
-    jetson-stats.flake = false;
-
     gnc.url = "github:goromal/gnc";
     gnc.flake = false;
+
+    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.flake = false;
+
+    jetson-stats.url = "github:rbonghi/jetson_stats";
+    jetson-stats.flake = false;
 
     # TODO gradebook would need dev/warn-suppress branch
 
     makepyshell.url = "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
     makepyshell.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
+    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.1";
     manif-geom-cpp.flake = false;
 
     manif-geom-rs.url = "github:goromal/manif-geom-rs";
@@ -154,6 +162,9 @@
 
     sorting.url = "github:goromal/sorting";
     sorting.flake = false;
+
+    spandrel-src.url = "github:chaiNNer-org/spandrel";
+    spandrel-src.flake = false;
 
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;

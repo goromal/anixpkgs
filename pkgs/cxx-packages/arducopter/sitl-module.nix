@@ -32,14 +32,24 @@ let
       chown ${cfg.user}:${cfg.group} "$ENV_FILE"
     fi
   '';
-  paramsFile = pkgs.writeText "sitl-params.parm" ((lib.concatStringsSep "\n" cfg.parameters) + "\n");
+  extraParamsFile = pkgs.writeText "sitl-extra-params.parm" (
+    (lib.concatStringsSep "\n" cfg.parameters) + "\n"
+  );
+  paramsFile = pkgs.runCommand "sitl-params.parm" { } ''
+    ${lib.optionalString (cfg.baseDefaultsFile != null) ''
+      cat ${cfg.baseDefaultsFile} > $out
+      printf '\n' >> $out
+    ''}
+    cat ${extraParamsFile} >> $out
+  '';
+  haveDefaults = cfg.baseDefaultsFile != null || cfg.parameters != [ ];
   simExecScript = pkgs.writeShellScriptBin "sim-exec-start" ''
     source "${cfg.rootDir}/${simEnvFileName}"
     exec ${cfg.package}/bin/arducopter \
       --model=${cfg.platform} \
       --home="$LAT,$LON,$ALT,$HDG" \
       --config=undulation:$UND \
-      -S -I 0 ${lib.optionalString (cfg.parameters != [ ]) "\\\n      --defaults ${paramsFile}"}
+      -S -I 0 ${lib.optionalString haveDefaults "\\\n      --defaults ${paramsFile}"}
   '';
 in
 {
@@ -65,6 +75,16 @@ in
       type = lib.types.str;
       description = "Vehicle platform/frame type passed to the SITL --model flag (default: quad)";
       default = "quad";
+    };
+    baseDefaultsFile = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = ''
+        Base parameter defaults file prepended to `parameters` (e.g. ArduPilot's
+        Tools/autotest/default_params/copter.parm, which carries the frame class
+        and sensor-calibration values SITL needs to pass prearm checks). Entries
+        in `parameters` override it (last assignment wins).
+      '';
     };
     parameters = lib.mkOption {
       type = lib.types.listOf lib.types.str;

@@ -44,6 +44,7 @@ in
     machines.base.webServices = [
       {
         name = "Launchpad";
+        tag = "Aspiration";
         path = "/lab/";
         description = "Hardware-accelerated Jupyter notebook server";
         icon = "rocket";

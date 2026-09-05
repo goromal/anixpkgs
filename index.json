@@ -1,755 +1,790 @@
 {
-    "pkgs": {
-        "cpp": [
-            {
-                "attr": "manif-geom-cpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "aapis-cpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mscpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "quad-sim-cpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "ceres-factors",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "signals-cpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "gnc",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "secure-delete",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "sorting",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "crowcpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rankserver-cpp",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mfn",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "orchestrator-cpp",
-                "ci": false,
-                "docs": false
-            },
-            {
-                "attr": "ardurouter",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "arducopter.sitl",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "microxrceddsgen",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "microxrce-dds-agent",
-                "ci": true,
-                "docs": false
-            }
-        ],
-        "rust": [
-            {
-                "attr": "manif-geom-rs",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "msrs",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "xv-lidar-rs",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "sunnyside",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rtk",
-                "ci": true,
-                "docs": false
-            }
-        ],
-        "python": [
-            {
-                "attr": "aapis-py",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "fqt",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "find_rotational_conventions",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "daily_tactical_server",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "geometry",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mavlog-utils",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "pyceres",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "pyceres_factors",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "pysorting",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "makepyshell",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "norbert",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "scrape",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "spleeter",
-                "ci": false,
-                "docs": false
-            },
-            {
-                "attr": "ichabod",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "pysignals",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mesh-plotter",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "orchestrator",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "gmail-parser",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "trafficsim",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "imutils-cv4",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "vidstab-cv4",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "flask-hello-world",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flask-url2mp4",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flask-mp4server",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flask-mp3server",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flask-smfserver",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flask-oatbox",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "self-tester-app",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rankserver",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "stampserver",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "la_quiz_web",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "disciple",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "anix_upgrade_ui",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "tasks_ui",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "sunset",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "easy-google-auth",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "python-dokuwiki",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "rcdo",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "task-tools",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "workout-planner",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "photos-tools",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "wiki-tools",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "notion-tools",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "book-notes-sync",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "goromail",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "symforce",
-                "ci": false,
-                "docs": false
-            },
-            {
-                "attr": "jetson-stats",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "jupyter-mcp-server",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "vdlserver",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "spandrel",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "segment-anything",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfy-kitchen",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-frontend-package",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates-core",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates-media-api",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates-media-video",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates-media-image",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates-media-other",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-workflow-templates",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui-embedded-docs",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "comfyui",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "cozy",
-                "ci": true,
-                "docs": true
-            }
-        ],
-        "bash": [
-            {
-                "attr": "aapis-grpcurl",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "aptest",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "authm",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "abc",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "doku",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "epub",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "gif",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "getres",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "md",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "mp3",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mp4",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "pdf",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "png",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "svg",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "zipper",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "ckfile",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "color-prints",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "dirgroups",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "dirgather",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "playabc",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "manage-gmail",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "gantter",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "local-ssh-proxy",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "ssht",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "la-quiz",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "play",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "budget_report",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "surveys_report",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "md2pdf",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "notabilify",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "fix-perms",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "sread",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "swrite",
-                "ci": true,
-                "docs": false
-            },
-            {
-                "attr": "make-title",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "pb",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "code2pdf",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "cpp-helper",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "py-helper",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rust-helper",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "backup",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mp4unite",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mp3unite",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mp3separate",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "mp4separate",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "git-cc",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "git-shortcuts",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "setupws",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "listsources",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "pkgshell",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "devshell",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "providence",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "providence-tasker",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "fixfname",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "nix-deps",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "nix-diffs",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "anix-version",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "anix-upgrade",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "anix-changelog-compare",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "flake-update",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "rcrsync",
-                "ci": true,
-                "docs": true
-            }
-        ],
-        "java": [
-            {
-                "attr": "evil-hangman",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "spelling-corrector",
-                "ci": true,
-                "docs": true
-            },
-            {
-                "attr": "simple-image-editor",
-                "ci": true,
-                "docs": true
-            }
-        ]
-    },
-    "rfcs": [
-        {
-            "file": "002.oscd",
-            "title": "Continuous OS Deployment"
-        }
-    ]
+ "pkgs": {
+  "cpp": [
+   {
+    "attr": "manif-geom-cpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "aapis-cpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mscpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "quad-sim-cpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "ceres-factors",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "signals-cpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "gnc",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "secure-delete",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "sorting",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "crowcpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "rankserver-cpp",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mfn",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "orchestrator-cpp",
+    "ci": false,
+    "docs": false
+   },
+   {
+    "attr": "ardurouter",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "arducopter.sitl",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "microxrceddsgen",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "microxrce-dds-agent",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "ardupilot-msgs",
+    "ci": true,
+    "docs": false
+   }
+  ],
+  "rust": [
+   {
+    "attr": "manif-geom-rs",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "msrs",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "xv-lidar-rs",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "sunnyside",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "rtk",
+    "ci": true,
+    "docs": false
+   }
+  ],
+  "python": [
+   {
+    "attr": "aapis-py",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "fqt",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "find_rotational_conventions",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "daily_tactical_server",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "geometry",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mavlog-utils",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "indi-harness",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "pyceres",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "pyceres_factors",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "pysorting",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "makepyshell",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "norbert",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "scrape",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "spleeter",
+    "ci": false,
+    "docs": false
+   },
+   {
+    "attr": "ichabod",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "pysignals",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mesh-plotter",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "orchestrator",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "gmail-parser",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "trafficsim",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "imutils-cv4",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "vidstab-cv4",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "flask-hello-world",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flask-url2mp4",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flask-mp4server",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flask-mp3server",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flask-smfserver",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flask-oatbox",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "self-tester-app",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "folio-backend",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "folio-mcp",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "folio-frontend",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "folio-desktop",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "rankserver",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "stampserver",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "la_quiz_web",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "disciple",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "anix_upgrade_ui",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "tasks_ui",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "sunset",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "easy-google-auth",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "python-dokuwiki",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "rcdo",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "task-tools",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "workout-planner",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "photos-tools",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "wiki-tools",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "notion-tools",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "book-notes-sync",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "goromail",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "symforce",
+    "ci": false,
+    "docs": false
+   },
+   {
+    "attr": "jetson-stats",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "jupyter-mcp-server",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "vdlserver",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "spandrel",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "segment-anything",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfy-kitchen",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-frontend-package",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates-core",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates-media-api",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates-media-video",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates-media-image",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates-media-other",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-workflow-templates",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui-embedded-docs",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "comfyui",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "cozy",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "wormhole",
+    "ci": true,
+    "docs": true
+   }
+  ],
+  "bash": [
+   {
+    "attr": "aapis-grpcurl",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "aptest",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "authm",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "abc",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "doku",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "epub",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "gif",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "getres",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "md",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "mp3",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mp4",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "pdf",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "png",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "svg",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "zipper",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "ckfile",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "color-prints",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "dirgroups",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "dirgather",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "playabc",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "manage-gmail",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "gantter",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "local-ssh-proxy",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "ssht",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "la-quiz",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "play",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "budget_report",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "surveys_report",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "md2pdf",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "notabilify",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "fix-perms",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "sread",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "swrite",
+    "ci": true,
+    "docs": false
+   },
+   {
+    "attr": "make-title",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "pb",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "code2pdf",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "cpp-helper",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "py-helper",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "rust-helper",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "backup",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mp4unite",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mp3unite",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mp3separate",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "mp4separate",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "git-cc",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "git-shortcuts",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "setupws",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "listsources",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "pkgshell",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "devshell",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "providence",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "providence-tasker",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "fixfname",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "nix-deps",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "nix-diffs",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "anix-version",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "anix-upgrade",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "anix-changelog-compare",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "flake-update",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "rcrsync",
+    "ci": true,
+    "docs": true
+   }
+  ],
+  "java": [
+   {
+    "attr": "evil-hangman",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "spelling-corrector",
+    "ci": true,
+    "docs": true
+   },
+   {
+    "attr": "simple-image-editor",
+    "ci": true,
+    "docs": true
+   }
+  ]
+ },
+ "rfcs": [
+  {
+   "file": "002.oscd",
+   "title": "Continuous OS Deployment"
+  }
+ ]
 }

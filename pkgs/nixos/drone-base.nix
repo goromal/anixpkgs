@@ -172,7 +172,9 @@ in
           iotop
           iperf
           iftop
-          python3
+          # python with the S1 trajectory harness replaces the bare python3
+          # (avoids a bin/python3 collision between two interpreters).
+          (anixpkgs.python313.withPackages (ps: [ ps.indi-harness ]))
           xsel
           htop
           jq
@@ -256,6 +258,9 @@ in
               ros-core
               demo-nodes-cpp
               demo-nodes-py
+              rosbag2
+              rosbag2-storage-mcap
+              rosbag2-storage-sqlite3
             ];
           })
         ]
@@ -271,6 +276,11 @@ in
       # XRCE-DDS agent over UDP. These match the Ardupilot defaults, but are
       # pinned here so upstream default changes can't silently break the
       # ROS2 bridge.
+      # Upstream SITL copter defaults (frame class/type, INS calibration, RC
+      # ranges): without them a fresh eeprom fails prearm ("Motors: Check
+      # frame class and type", "3D Accel calibration needed") and the vehicle
+      # can never arm — sim_vehicle.py always launches SITL with this file.
+      baseDefaultsFile = "${anixpkgs.arducopter.sitl.src}/Tools/autotest/default_params/copter.parm";
       parameters = [
         "DDS_ENABLE 1"
         "DDS_DOMAIN_ID 0"

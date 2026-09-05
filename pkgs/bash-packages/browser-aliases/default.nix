@@ -5,6 +5,7 @@
   redirects,
   wiki-tools,
   sread,
+  wormhole,
   browserExec,
 }:
 let
@@ -29,6 +30,25 @@ let
             exit 1
         fi
         ${browserExec} "https://github.com/goromal/anixpkgs/compare/v$1...v$2" ${redirects.suppress_all}
+      '';
+  homepage =
+    writeArgparseScriptBin "homepage"
+      ''
+        usage: homepage HOST
+
+        Open the home page (https://HOST/) of HOST in the browser. HOST may be a
+        [hostname].local mDNS name or an IP address: over the VPN a .local name is
+        mapped to the LAN IP in ~/secrets/[hostname]/i.txt, while an IP (or any
+        non-.local host) is used as-is.
+      ''
+      [ ]
+      ''
+        if [[ -z $1 ]]; then
+            ${printErr} "No host specified."
+            exit 1
+        fi
+        resolved=$(${wormhole}/bin/wormhole resolve "$1")
+        ${browserExec} "https://''${resolved}/" ${redirects.suppress_all}
       '';
   open-notes =
     writeArgparseScriptBin "open-notes"
@@ -98,6 +118,7 @@ stdenv.mkDerivation {
   installPhase = ''
     mkdir -p                            $out/bin
     cp ${anix-compare}/bin/anix-compare $out/bin
+    cp ${homepage}/bin/homepage         $out/bin
     cp ${open-notes}/bin/open-notes     $out/bin
     cp ${triage}/bin/triage-and-action  $out/bin
     cp ${a4s}/bin/a4s                   $out/bin

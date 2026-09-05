@@ -40,6 +40,7 @@ in
     machines.base.webServices = [
       {
         name = "Grafana";
+        tag = "Utilities";
         path = "/grafana/";
         description = "Metrics and monitoring dashboards";
         icon = "chart-line";

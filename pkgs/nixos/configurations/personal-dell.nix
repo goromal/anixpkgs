@@ -13,13 +13,16 @@
   machines.base.wifiInterfaceName = "wlp0s13f0u1u4";
   machines.base.acceptRemoteBuilds = true;
   machines.cudaNode.enable = true;
+  machines.localLlm = {
+    enable = true;
+    acceleration = "cuda";
+  };
   services.comfyui.lowMem = true;
   services.comfyui.cozy.workflows = [
     "imggen"
     "imggen2"
-    "imggen3"
-    "imgedit"
     "imgedit2"
+    "imgedit3"
   ];
   machines.base.timedOrchJobs = [
     {

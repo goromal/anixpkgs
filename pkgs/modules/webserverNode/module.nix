@@ -1,0 +1,235 @@
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with import ../../nixos/dependencies.nix;
+let
+  cfg = config.machines.base;
+  # Built entirely via JS DOM so element.style overrides any page stylesheet.
+  # No single quotes (nginx wraps replacement in single quotes).
+  homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src="/icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  ownPortHomeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/";var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href=b;a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src=b+"icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  ownPortHomeButtonVhosts = lib.listToAttrs (
+    lib.concatMap (
+      s:
+      let
+        m = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+      in
+      lib.optional (s.path == "#" && m != null) {
+        name = "${config.networking.hostName}.local:${builtins.head m}";
+        value.extraConfig = ''
+          sub_filter </body> '${ownPortHomeButton}';
+          sub_filter_once on;
+          proxy_set_header Accept-Encoding "";
+        '';
+      }
+    ) cfg.webServices
+  );
+in
+{
+  config = lib.mkIf cfg.runWebServer {
+    services.nginx = {
+      enable = true;
+      user = "andrew";
+      group = "dev";
+      virtualHosts = {
+        "${config.networking.hostName}.local" = {
+          # Support both HTTP and HTTPS (no forced redirect)
+          forceSSL = false;
+          addSSL = true;
+          sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
+          sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
+          # Server-level fallback: covers locations without their own sub_filter
+          # (e.g. wiki's ~ \.php$ FastCGI location). The homeButtonLocations entries
+          # define their own sub_filter, which takes precedence per nginx inheritance rules.
+          extraConfig = ''
+            sub_filter </body> '${homeButton}';
+            sub_filter_once on;
+          '';
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = cfg.webServerInsecurePort;
+            }
+            {
+              addr = "0.0.0.0";
+              port = cfg.webServerSecurePort;
+              ssl = true;
+            }
+          ];
+
+          # Landing page listing all available services + per-service favicon endpoints.
+          # Static content is written into a Nix store directory; nginx serves it via
+          # root+try_files (avoids alias_traversal gixy warning and return-length limits).
+          locations =
+            let
+              hostname = config.networking.hostName;
+              services = lib.sort (a: b: lib.toLower a.name < lib.toLower b.name) cfg.webServices;
+              tags = lib.sort (a: b: lib.toLower a < lib.toLower b) (lib.unique (map (s: s.tag) services));
+              serviceIcon =
+                s:
+                if s.icon != "" then
+                  ''<img src="/icons/${s.icon}.svg" class="service-icon" alt="${s.icon}">''
+                else
+                  "";
+              serviceLinks =
+                selectedServices:
+                lib.concatMapStringsSep "\n" (
+                  s:
+                  if s.path == "#" then
+                    let
+                      portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
+                      port = if portMatch != null then builtins.head portMatch else "";
+                    in
+                    ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                  else
+                    ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                ) selectedServices;
+              serviceGroups = lib.concatMapStringsSep "\n" (tag: ''
+                <section class="service-group">
+                  <h2>${tag}</h2>
+                  <ul>
+                    ${serviceLinks (lib.filter (s: s.tag == tag) services)}
+                  </ul>
+                </section>
+              '') tags;
+              # Build one directory containing index.html and per-service favicon.svg files
+              staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
+                ''
+                  mkdir -p $out
+                  cat > $out/index.html << 'HTMLEOF'
+                  <!DOCTYPE html>
+                  <html>
+                  <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${hostname} Services</title>
+                    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+                    <style>
+                      * { box-sizing: border-box; }
+                      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f7f9; color: #17212b; }
+                      .container { background: white; padding: 30px; border: 1px solid #dce3e8; border-radius: 20px; box-shadow: 0 12px 34px rgba(31,48,61,0.08); }
+                      h1 { color: #333; margin-top: 0; display: flex; align-items: center; gap: 14px; }
+                      h2 { color: #075eac; font-size: 1.05rem; margin: 0 0 12px; }
+                      .title-icon { width: 28px; height: 28px; flex-shrink: 0; filter: invert(18%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%); }
+                      .service-group { background: linear-gradient(135deg, #f3f8fd, #fff 70%); border: 2px solid #2680d9; border-radius: 16px; margin-top: 18px; padding: 18px; }
+                      ul { list-style: none; margin: 0; padding: 0; }
+                      li + li { margin-top: 9px; }
+                      .service-card { display: flex; align-items: center; gap: 14px; padding: 13px 15px; background: rgba(255,255,255,0.82); border-radius: 10px; border: 1px solid #dce5ec; text-decoration: none; transition: background 0.15s, border-color 0.15s, transform 0.15s; }
+                      .service-card:hover { background: #e8f2fc; border-color: #78ade0; transform: translateY(-1px); }
+                      .service-icon { width: 22px; height: 22px; flex-shrink: 0; filter: invert(29%) sepia(96%) saturate(2145%) hue-rotate(204deg) brightness(104%) contrast(101%); }
+                      .service-info { display: flex; flex-direction: column; }
+                      .service-name { color: #007bff; font-weight: 600; font-size: 1em; }
+                      .description { color: #666; font-size: 0.9em; margin-top: 2px; }
+                      @media (max-width: 575px) {
+                        body { margin: 0 auto; padding: 14px; }
+                        .container { padding: 18px; }
+                        .service-group { padding: 14px; }
+                      }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="container">
+                      <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
+                  ${serviceGroups}
+                    </div>
+                  </body>
+                  </html>
+                  HTMLEOF
+                ''
+                +
+                  # Copy per-service favicon SVGs
+                  lib.concatMapStrings (
+                    s:
+                    lib.optionalString (s.faviconSvg != null && s.path != "#") (
+                      let
+                        dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                      in
+                      "mkdir -p $out/${dir} && cp ${s.faviconSvg} $out/${dir}/favicon.svg\n"
+                    )
+                  ) cfg.webServices
+                +
+                  # Copy root-page icon SVGs from anixdata (deduped by icon name)
+                  (
+                    let
+                      iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                      fa6 = anixpkgs.pkgData.icons.fa6-solid;
+                    in
+                    "mkdir -p $out/icons\n"
+                    + lib.concatMapStrings (name: "cp ${fa6.${name}.data} $out/icons/${name}.svg\n") iconNames
+                    + "cp ${fa6.house.data} $out/icons/house.svg\n"
+                    + "cp ${fa6.server.data} $out/icons/server.svg\n"
+                    + "cp ${fa6.server.data} $out/favicon.svg\n"
+                  )
+              );
+              rootPage = {
+                root = "${staticRoot}";
+                tryFiles = "/index.html =404";
+                extraConfig = "add_header Content-Type text/html;";
+              };
+              iconsLocation = {
+                "/icons/" = {
+                  root = "${staticRoot}";
+                  tryFiles = "$uri =404";
+                  extraConfig = ''add_header Content-Type "image/svg+xml";'';
+                };
+              };
+              faviconLocations = lib.listToAttrs (
+                lib.concatMap (
+                  s:
+                  lib.optional (s.faviconSvg != null && s.path != "#") (
+                    let
+                      dir = lib.removePrefix "/" (lib.removeSuffix "/" s.path);
+                    in
+                    {
+                      name = "${s.path}favicon.svg";
+                      value = {
+                        root = "${staticRoot}";
+                        tryFiles = "/${dir}/favicon.svg =404";
+                        extraConfig = ''add_header Content-Type "image/svg+xml";'';
+                      };
+                    }
+                  )
+                ) cfg.webServices
+              );
+              # homeButton defined in the outer let; accessible here via lexical scoping.
+              # extraConfig is types.lines so this concatenates with each service's existing config.
+              homeButtonLocations = lib.listToAttrs (
+                lib.concatMap (
+                  s:
+                  lib.optional (s.path != "#") {
+                    name = s.path;
+                    value.extraConfig = ''
+                      ${lib.optionalString (s.faviconSvg != null) ''
+                        sub_filter </head> '<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg"></head>';
+                      ''}
+                      sub_filter </body> '${homeButton}';
+                      sub_filter_once on;
+                      proxy_set_header Accept-Encoding "";
+                    '';
+                  }
+                ) services
+              );
+              rootFaviconLocation = {
+                "= /favicon.svg" = {
+                  root = "${staticRoot}";
+                  tryFiles = "/favicon.svg =404";
+                  extraConfig = ''add_header Content-Type "image/svg+xml";'';
+                };
+              };
+            in
+            {
+              "= /" = rootPage;
+            }
+            // iconsLocation
+            // rootFaviconLocation
+            // faviconLocations
+            // homeButtonLocations;
+        };
+      }
+      // ownPortHomeButtonVhosts;
+    };
+  };
+}

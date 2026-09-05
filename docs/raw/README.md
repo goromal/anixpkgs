@@ -77,6 +77,16 @@ To compare NixOS profile closures between a PR branch and its merge base, trigge
 
 The job evaluates each known machine configuration (`personal-*`, `ats-*`, `jetpack-*`, `drone-*`) on both the PR branch and the merge-base, reports any package additions or removals per profile, and flags new or deleted profiles.
 
+## Manual Release Tag
+
+If a PR gets merged without a `MajorRelease`/`MinorRelease`/`PatchRelease` label (so `deploy.yml` doesn't bump `ANIX_VERSION` or cut a tag), trigger the **Manual Release Tag** workflow to do it after the fact:
+
+1. Go to **Actions → Manual Release Tag → Run workflow**
+2. Choose a `release_type` of `major`, `minor`, or `patch`
+3. Run it (branch selection in the dropdown doesn't matter — the job always operates on the head of `master`)
+
+The job bumps `ANIX_VERSION` accordingly, commits and pushes to `master`, then tags the new version as `v<ANIX_VERSION>` and pushes the tag.
+
 ## SITL
 
 Some commands to spin up SITL environments:

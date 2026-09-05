@@ -1,7 +1,0 @@
-disciple.py
-setup.py
-disciple.egg-info/PKG-INFO
-disciple.egg-info/SOURCES.txt
-disciple.egg-info/dependency_links.txt
-disciple.egg-info/entry_points.txt
-disciple.egg-info/top_level.txt

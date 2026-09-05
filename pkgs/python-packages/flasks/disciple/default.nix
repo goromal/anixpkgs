@@ -3,7 +3,10 @@
   setuptools,
   flask,
   requests,
+  aapis-py,
+  grpcio,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -13,19 +16,22 @@ buildPythonPackage rec {
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/disciple";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./templates/base.html}        $out/${pythonLibDir}/templates/base.html
-    cp ${./templates/study.html}       $out/${pythonLibDir}/templates/study.html
-    cp ${./templates/browse.html}      $out/${pythonLibDir}/templates/browse.html
-    cp ${./templates/tags.html}        $out/${pythonLibDir}/templates/tags.html
-    cp ${./templates/tag_detail.html}  $out/${pythonLibDir}/templates/tag_detail.html
-    cp ${./templates/manage_tags.html} $out/${pythonLibDir}/templates/manage_tags.html
+    cp templates/base.html        $out/${pythonLibDir}/templates/base.html
+    cp templates/_note_form.html  $out/${pythonLibDir}/templates/_note_form.html
+    cp templates/study.html       $out/${pythonLibDir}/templates/study.html
+    cp templates/browse.html      $out/${pythonLibDir}/templates/browse.html
+    cp templates/tags.html        $out/${pythonLibDir}/templates/tags.html
+    cp templates/tag_detail.html  $out/${pythonLibDir}/templates/tag_detail.html
+    cp templates/manage_tags.html $out/${pythonLibDir}/templates/manage_tags.html
   '';
   propagatedBuildInputs = [
     flask
     requests
+    aapis-py
+    grpcio
   ];
   meta = {
     description = "A Book of Mormon Christ-reference study tool.";
@@ -34,6 +40,12 @@ buildPythonPackage rec {
       reference Jesus Christ. Ingests all verses from the nephi.org API,
       groups consecutive Christ-reference verses with surrounding context,
       and provides a study interface for annotating and tagging passages.
+
+      Includes the `disciple-report` CLI, which reports study activity for a
+      given local calendar day (yesterday by default, attributed by each
+      group's processed_at timestamp) to the tactical server's "Spiritual
+      reflection" survey question (1 processed group = partial credit,
+      2+ = full credit). Stateless and safe to re-run.
     '';
     autoGenUsageCmd = "--help";
   };

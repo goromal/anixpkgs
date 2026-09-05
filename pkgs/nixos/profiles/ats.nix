@@ -7,6 +7,7 @@
 with import ../dependencies.nix;
 let
   claudeDefaults = import ../claude-defaults.nix;
+  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
 in
 {
   imports = [ ../pc-base.nix ];
@@ -18,7 +19,10 @@ in
       recreational = false;
       developer = true;
       isATS = true;
-      agentFramework = "claude";
+      agentFrameworks = [
+        "claude"
+        "codex"
+      ];
       serveNotesWiki = true;
       notesWikiPort = 8080;
       enableMetrics = true;
@@ -107,6 +111,17 @@ in
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 05:30:00" ];
+            Persistent = true;
+          };
+        }
+        {
+          name = "ats-disciple-report";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-report" ''
+            disciple-report --db-path $HOME/data/disciple/disciple.db || { >&2 logger -t ats-disciple-report "disciple report error!"; exit 1; }
+            logger -t ats-disciple-report "🕮 Disciple study result reported to tactical server"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 05:00:00" ];
             Persistent = true;
           };
         }
@@ -219,6 +234,18 @@ in
           };
         }
         {
+          name = "ats-gmail-archive-backup";
+          jobShellScript = pkgs.writeShellScript "ats-gmail-archive-backup" ''
+            mkdir -p $HOME/data/gmail
+            rcrsync mirror data gmail || { logger -t ats-gmail-archive-backup "GMail archive backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-gmail-archive-backup "GMail archive backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-tactical-dailies";
           jobShellScript = pkgs.writeShellScript "ats-tactical-dailies" ''
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
@@ -273,6 +300,22 @@ in
             Persistent = false;
           };
         }
+        {
+          name = "ats-folio-backup";
+          jobShellScript = pkgs.writeShellScript "ats-folio-backup" ''
+            DEST="$HOME/data/folio"
+            mkdir -p "$DEST"
+            ${pkgs.sqlite}/bin/sqlite3 /var/lib/folio/folio.db ".backup '$DEST/folio.db'" \
+              || { logger -t ats-folio-backup "DB backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data folio \
+              || { logger -t ats-folio-backup "folio backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-folio-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
       ];
       extraOrchestratorPackages = [
         anixpkgs.wiki-tools
@@ -284,6 +327,7 @@ in
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
+        anixpkgs.disciple
       ];
     };
     machines.claude = {
@@ -296,9 +340,29 @@ in
         claudeDefaults.mcpServers.vikunja
         claudeDefaults.mcpServers.notion
         claudeDefaults.mcpServers.wiki
+        claudeDefaults.mcpServers.googleSheets
+      ];
+    };
+    machines.codex = {
+      model = codexDefaults.model;
+      modelProvider = codexDefaults.modelProvider;
+      approvalPolicy = codexDefaults.approvalPolicy;
+      sandboxMode = codexDefaults.sandboxMode;
+      extraSettings = codexDefaults.extraSettings;
+      skills = codexDefaults.skills;
+      mcpServers = [
+        codexDefaults.mcpServers.vikunja
+        codexDefaults.mcpServers.notion
+        codexDefaults.mcpServers.wiki
+        codexDefaults.mcpServers.googleSheets
       ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
     users.users.andrew.extraGroups = [ "vikunja" ];
+    services.google-sheets-mcp.enable = true;
+    # Hub: ATS holds the ground-truth folio database and serves the lock/transfer
+    # endpoints. Headless (no desktop); MCP defaults off on the hub.
+    services.folio-backend.enable = true;
+    services.folio-backend.isHub = true;
   };
 }

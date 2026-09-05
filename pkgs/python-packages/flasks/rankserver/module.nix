@@ -34,6 +34,7 @@ in
     machines.base.webServices = [
       {
         name = "Preferences";
+        tag = "Content";
         path = "/rank/";
         description = "Define preference ordering";
         icon = "ranking-star";
