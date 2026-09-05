@@ -59,12 +59,19 @@ any RtConfig requirements (scheduler policy, core pinning).
 ## State Machine
 ```mermaid
 stateDiagram-v2
-    [*] --> idle
-    idle --> active : foo_cmd [store.can_activate()]
-    active --> idle : stop_cmd
-    active --> faulted : fault_detected
-    faulted --> idle : reset_cmd
+    [*] --> disabled
+    disabled --> enabled : enable_cmd [store.can_enable()]
+    state enabled {
+        [*] --> idle
+        idle --> active : start_cmd [store.can_start()]
+        active --> idle : stop_cmd
+    }
+    enabled --> faulted : fault_detected
+    faulted --> disabled : reset_cmd
 ```
+
+Cross-cutting modes (enable/disable, fault supersedence, e-stop) are Mermaid
+composite states, which map 1:1 to statig superstates (see Hierarchical Modes).
 
 ## Store
 Invariants the store maintains, and the pure queries/mutations it exposes.
@@ -87,7 +94,9 @@ What happens on `Tick` (periodic) vs `Message` triggers; any timeout logic
 | Edge label `foo_cmd` | An event variant/struct dispatched to the machine |
 | Guard `[store.can_activate()]` | A pure `Store` query called inside the handler |
 | Initial-state arrow | `#[state_machine(initial = "State::idle()")]` |
-| Every edge | One `run_step` unit test exercising that transition |
+| Composite state `enabled` | `#[superstate] fn enabled(...)` handler; contained states declare `superstate = "enabled"` |
+| Edge leaving a composite boundary | Transition in the superstate handler; substates defer by returning `Super` |
+| Every edge | One `run_step` unit test exercising that transition (a boundary edge fires from *every* substate — test each) |
 
 If implementation reveals the diagram is wrong or incomplete, **update SPEC.md in the same PR** — the diagram is the spec, not an illustration. A reviewer must be able to check the machine against the diagram state-by-state, edge-by-edge.
 
@@ -165,6 +174,48 @@ let sm = EchoGate::default()
 // dispatch:
 sm.handle_with_context(&EchoEvent(msg.clone()), &mut self.ctx);
 ```
+
+### Hierarchical modes: superstates, not multiple FSMs
+
+When mode logic is interdependent — a cross-cutting command (e-stop, disable) must
+apply across a whole family of states, or one mode conceptually contains others —
+model it as **one statig machine with superstates**. Do **not** split it into
+multiple `FsmTask`s: separate copper tasks are for genuine pipeline-stage
+boundaries (distinct input domain worth isolating for replay/testing), and each
+`FsmTask` has exactly one `In` and one `Out` port — no fan-in — while every extra
+stage adds a tick of propagation latency.
+
+```rust
+#[state_machine(initial = "State::disabled()", state(derive(Debug)))]
+impl FlightGate {
+    #[superstate]
+    fn enabled(context: &mut Ctx, event: &Event) -> Outcome<State> {
+        match event {
+            // handled ONCE for every substate inside the boundary
+            Event::Estop => Transition(State::disabled()),
+            _ => Handled,
+        }
+    }
+
+    #[state(superstate = "enabled")]
+    fn idle(context: &mut Ctx, event: &Event) -> Outcome<State> {
+        match event {
+            Event::Start if context.store.can_start() => Transition(State::active()),
+            _ => Super,   // bubble everything else up to `enabled`
+        }
+    }
+}
+```
+
+- Substates return `Super` for events they don't own; the superstate implements
+  cross-cutting transitions exactly once.
+- In the Mermaid diagram this is a composite state; the mapping table above
+  covers the correspondence. Don't draw separate copper tasks as composite
+  states — composite = same machine, hierarchical; separate task = message-coupled.
+- A transition *into* a composite boundary lands on its `[*]` initial substate;
+  make the diagram show that inner initial arrow explicitly.
+- Exact compiling superstate signatures: see the msrs notes file
+  (`docs/superpowers/notes/copper-statig-signatures.md`), which wins on conflict.
 
 ### FsmSpec: the copper-agnostic seam
 
