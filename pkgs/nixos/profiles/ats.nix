@@ -127,6 +127,9 @@ in
         }
         {
           name = "ats-task-migrator";
+          # This job's `logger -t` tag does not match its name; without the
+          # override the derived log panel would query a tag nothing emits.
+          logTags = [ "ats-grader" ];
           jobShellScript = pkgs.writeShellScript "ats-task-migrator" ''
             authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
             tmpdir=$(mktemp -d)
