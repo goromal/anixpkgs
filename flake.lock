@@ -19,16 +19,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1788489269,
+        "lastModified": 1788634120,
         "narHash": "sha256-7QUBkSAQwzzLD8nYAlCOPL0vHKbz3uapVA9/TU2cIgA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "540d01ebeb2d9b25100b99075ac024b4a5f3c9b4",
+        "rev": "0adcae1cefea46f29813f9f96acbb7ec8a0a80d8",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/grafana-declarative-dashboards",
         "repo": "anixdata",
         "type": "github"
       }
