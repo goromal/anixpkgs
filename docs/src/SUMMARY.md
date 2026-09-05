@@ -64,6 +64,7 @@
   - [goromail](./python/goromail.md)
   - [cozy](./python/cozy.md)
   - [wormhole](./python/wormhole.md)
+  - [grafana_dash](./python/grafana_dash.md)
 - [Bash Packages](./bash/bash.md)
   - [aapis-grpcurl](./bash/aapis-grpcurl.md)
   - [aptest](./bash/aptest.md)
