@@ -86,6 +86,9 @@ in
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_read_timeout 600;
           proxy_send_timeout 600;
+          # Media uploads (videos, HEIC photos) routinely exceed nginx's 10 MB
+          # default body limit; raise it so /api/upload isn't rejected with 413.
+          client_max_body_size 512m;
         '';
       };
     };
