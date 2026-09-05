@@ -15,8 +15,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    # TODO: re-pin to github:goromal/anixdata once goromal/anixdata#17 merges.
-    anixdata.url = "github:goromal/anixdata?ref=refs/heads/dev/grafana-declarative-dashboards";
+    anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
     aapis.url = "github:goromal/aapis";
