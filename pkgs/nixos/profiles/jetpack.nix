@@ -24,7 +24,7 @@ in
         "codex"
       ];
       serveNotesWiki = false;
-      enableMetrics = false; # TODO: perhaps enable in the future
+      enableMetrics = true;
       enableFileServers = true;
       enableUpgradeUI = true;
       cloudDirs = [
