@@ -42,5 +42,6 @@
   {
     name = "rtk-usage";
     file = ./res/claude-skills/rtk-usage/SKILL.md;
+    frameworks = [ "claude" ];
   }
 ]

@@ -2,14 +2,31 @@
 let
   frameworks = config.machines.base.agentFrameworks;
   enabled = frameworks != [ ];
-  defaults = import ../../nixos/shared-agent-mcp-servers.nix {
-    homeDir = config.machines.base.homeDir;
-  };
-  mcpServers = builtins.attrValues defaults;
-  skills = builtins.filter (skill: !(lib.elem skill.name config.machines.agents.excludedSkills)) (
-    import ../../nixos/shared-agent-skills.nix
+  mcpServerCatalog = builtins.attrValues (
+    import ../../nixos/shared-agent-mcp-servers.nix {
+      homeDir = config.machines.base.homeDir;
+    }
   );
-  hasServer = name: builtins.any (server: server.name == name) mcpServers;
+  skillCatalog = builtins.filter (
+    skill: !(lib.elem skill.name config.machines.agents.excludedSkills)
+  ) (import ../../nixos/shared-agent-skills.nix);
+  forFramework =
+    framework: catalog:
+    map (entry: builtins.removeAttrs entry [ "frameworks" ]) (
+      builtins.filter (
+        entry:
+        lib.elem framework (
+          entry.frameworks or [
+            "claude"
+            "codex"
+          ]
+        )
+      ) catalog
+    );
+  mcpServersFor = framework: forFramework framework mcpServerCatalog;
+  skillsFor = framework: forFramework framework skillCatalog;
+  activeMcpServers = lib.concatMap mcpServersFor frameworks;
+  hasServer = name: builtins.any (server: server.name == name) activeMcpServers;
 in
 {
   options.machines.agents.excludedSkills = lib.mkOption {
@@ -22,12 +39,14 @@ in
     lib.mkMerge [
       (lib.mkIf (lib.elem "claude" frameworks) {
         machines.claude = {
-          inherit skills mcpServers;
+          skills = skillsFor "claude";
+          mcpServers = mcpServersFor "claude";
         };
       })
       (lib.mkIf (lib.elem "codex" frameworks) {
         machines.codex = {
-          inherit skills mcpServers;
+          skills = skillsFor "codex";
+          mcpServers = mcpServersFor "codex";
         };
       })
       {
