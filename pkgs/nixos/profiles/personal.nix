@@ -113,6 +113,7 @@ in
       mcpServers = [
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki
+        codexDefaults.mcpServers.folio
         codexDefaults.mcpServers.googleSheets
       ];
     };
