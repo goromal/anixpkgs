@@ -6,7 +6,7 @@
 with import ../../nixos/dependencies.nix;
 {
   options.services.jupyter-mcp = {
-    enable = lib.mkEnableOption "Jupyter MCP server for Claude Code";
+    enable = lib.mkEnableOption "Jupyter MCP server for local coding agents";
     serverUrl = lib.mkOption {
       type = lib.types.str;
       default = "http://localhost:${toString service-ports.launchpad}";
