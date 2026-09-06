@@ -357,6 +357,7 @@ in
         codexDefaults.mcpServers.vikunja
         codexDefaults.mcpServers.notion
         codexDefaults.mcpServers.wiki
+        codexDefaults.mcpServers.folio
         codexDefaults.mcpServers.googleSheets
       ];
     };
@@ -364,8 +365,9 @@ in
     users.users.andrew.extraGroups = [ "vikunja" ];
     services.google-sheets-mcp.enable = true;
     # Hub: ATS holds the ground-truth folio database and serves the lock/transfer
-    # endpoints. Headless (no desktop); MCP defaults off on the hub.
+    # endpoints. Headless (no desktop), but local agents still use the MCP server.
     services.folio-backend.enable = true;
     services.folio-backend.isHub = true;
+    services.folio-mcp.enable = true;
   };
 }

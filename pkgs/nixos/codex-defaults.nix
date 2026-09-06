@@ -21,7 +21,12 @@ in
     model_reasoning_effort = "medium";
   };
 
-  skills = sharedSkills;
+  skills = sharedSkills ++ [
+    {
+      name = "folio-usage";
+      file = ./res/claude-skills/folio-usage/SKILL.md;
+    }
+  ];
 
   mcpServers = {
     vikunja = {
@@ -31,6 +36,13 @@ in
         VIKUNJA_URL = "https://ats.local:${toString ports.vikunja.public}";
         VIKUNJA_INSECURE = "1";
         VIKUNJA_TOKEN_FILE = "${homeDir}/secrets/vikunja/secrets.json";
+      };
+    };
+    folio = {
+      name = "folio";
+      command = "/run/current-system/sw/bin/folio-mcp-server";
+      env = {
+        FOLIO_API_URL = "http://localhost:${toString ports.folio.internal}";
       };
     };
     notion = {
