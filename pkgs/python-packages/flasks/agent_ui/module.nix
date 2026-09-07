@@ -50,7 +50,7 @@ let
 
       export AGENT_UI_AGENT="$2"
       # shellcheck disable=SC2016 # Expanded by the devshell's inner shell.
-      exec devshell "$1" --run 'exec direnv exec "$DEVSHELL_ROOT" agent-ui-enter'
+      exec devshell "$1" --run 'exec direnv exec "$DEVSHELL_ROOT" ${agentEnter}/bin/agent-ui-enter'
     '';
   };
 
