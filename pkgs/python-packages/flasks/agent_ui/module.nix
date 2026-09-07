@@ -21,11 +21,14 @@ let
     name = "agent-ui-enter";
     text = ''
       case "''${AGENT_UI_AGENT:-}" in
-        claude|codex) ;;
+        claude|codex|shell) ;;
         *) echo "agent-ui-enter: unsupported agent" >&2; exit 2 ;;
       esac
 
       cd "$DEVSHELL_ROOT/sources"
+      if [ "$AGENT_UI_AGENT" = shell ]; then
+        exec ${pkgs.bashInteractive}/bin/bash -i
+      fi
       exec "$AGENT_UI_AGENT"
     '';
   };
@@ -44,7 +47,7 @@ let
       fi
 
       case "$2" in
-        claude|codex) ;;
+        claude|codex|shell) ;;
         *) echo "agent-ui-session: unsupported agent" >&2; exit 2 ;;
       esac
 
@@ -58,7 +61,7 @@ let
     name = "agent-ui-attach";
     runtimeInputs = [ pkgs.tmux ];
     text = ''
-      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(claude|codex)--[0-9a-f]{8}$ ]]; then
+      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(claude|codex|shell)--[0-9a-f]{8}$ ]]; then
         echo "agent-ui-attach: invalid session" >&2
         exit 2
       fi
@@ -130,7 +133,7 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --token-file /var/lib/agent-ui/token --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session ${agentArgs}";
+        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --token-file /var/lib/agent-ui/token --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";

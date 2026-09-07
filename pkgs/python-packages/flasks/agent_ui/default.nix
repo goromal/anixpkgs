@@ -17,16 +17,16 @@ buildPythonPackage rec {
   src = "${pkg-src}/agent_ui";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp templates/main.html $out/${pythonLibDir}/templates/main.html
+    cp templates/*.html $out/${pythonLibDir}/templates/
   '';
   propagatedBuildInputs = [ flask ];
   nativeCheckInputs = [ pytestCheckHook ];
   pytestFlagsArray = [ "tests" ];
   meta = {
-    description = "Workspace-aware web launcher for Claude and Codex terminals.";
+    description = "Web console for devshell workspaces and agent terminals.";
     longDescription = ''
-      Provides an authenticated browser interface for starting and attaching to
-      tmux-backed Claude and Codex sessions in configured devshell workspaces.
+      Provides an authenticated browser interface for managing devshell
+      workspaces and attaching to tmux-backed shell, Claude, and Codex sessions.
     '';
     autoGenUsageCmd = "--help";
   };
