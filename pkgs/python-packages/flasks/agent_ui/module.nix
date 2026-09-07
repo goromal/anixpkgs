@@ -114,7 +114,7 @@ in
     machines.base.webServices = [
       {
         name = "Agent Terminal";
-        tag = "Development";
+        tag = "Aspiration";
         path = "${cfg.subdomain}/";
         description = "Claude and Codex workspace terminals";
         icon = "gears";
