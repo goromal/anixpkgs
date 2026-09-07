@@ -391,22 +391,6 @@
         "type": "github"
       }
     },
-    "gnc": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1769404494,
-        "narHash": "sha256-rSVQkLqNaQjG5ELajLpZiL7QBVd+KQBk3KntqeNybR4=",
-        "owner": "goromal",
-        "repo": "gnc",
-        "rev": "82fe050acea9c1524168b1ec85d046d3d31ed1b0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "goromal",
-        "repo": "gnc",
-        "type": "github"
-      }
-    },
     "indi-harness": {
       "flake": false,
       "locked": {
@@ -1012,7 +996,6 @@
         "folio": "folio",
         "geometry": "geometry",
         "gmail-parser": "gmail-parser",
-        "gnc": "gnc",
         "indi-harness": "indi-harness",
         "jetpack-nixos": "jetpack-nixos",
         "jetson-stats": "jetson-stats",
