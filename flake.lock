@@ -330,16 +330,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788752994,
+        "lastModified": 1788761724,
         "narHash": "sha256-ScIcDN9vv2iCj1ROKj/YzqeJZtCb4ZHCn8eIETVhPoo=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "c8207011c8e52bd75b635df943f44d65922198a5",
+        "rev": "1c676ef8230f9f29b791ebeed183c59265e54fe4",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/stampserver-media-fit-viewport",
         "repo": "flasks",
         "type": "github"
       }
