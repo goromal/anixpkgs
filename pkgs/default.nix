@@ -144,6 +144,9 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
+                pkg-src = flakeInputs.gmail-parser;
+              };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -512,6 +515,7 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  gmail-mcp = final.python313.pkgs.gmail-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
   onnxruntime = prev.onnxruntime.override { cudaSupport = false; };

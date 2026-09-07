@@ -193,11 +193,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1786255414,
-        "narHash": "sha256-cw7AW3snr2cGS82sEdyyCc1a563h5ygFUMS0Axhb0dk=",
+        "lastModified": 1788764390,
+        "narHash": "sha256-HydaaM146lEXS2SwidzXk0TZxhd9emcG4kbGY3gleUQ=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "3d876182015e6e307d7c608df243dae499f2b453",
+        "rev": "20339d592be5cd9e251630074249117936bdd2fd",
         "type": "github"
       },
       "original": {
@@ -378,11 +378,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1785008968,
-        "narHash": "sha256-UD+BmWRkZucnG/9nDtjVEkp9TqnG3n7l+pdmxRNRDAg=",
+        "lastModified": 1788764413,
+        "narHash": "sha256-wSk7P0xMQXFJNi2OamVaNmdz9Z8pfxXlkg84i1T6K4M=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "6526f9c2fb77b286e577016af6cadde12ffaa1eb",
+        "rev": "d467b941350833bcc1de462b23375c50b6e68f64",
         "type": "github"
       },
       "original": {

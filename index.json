@@ -211,6 +211,11 @@
                 "docs": true
             },
             {
+                "attr": "gmail-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "trafficsim",
                 "ci": true,
                 "docs": true
