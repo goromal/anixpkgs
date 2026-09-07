@@ -378,15 +378,16 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1785008968,
-        "narHash": "sha256-UD+BmWRkZucnG/9nDtjVEkp9TqnG3n7l+pdmxRNRDAg=",
+        "lastModified": 1788759040,
+        "narHash": "sha256-BAs2+dxjl8fBQpQxybBpfCa+TlRmiqwgUeGqWDbNp7Q=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "6526f9c2fb77b286e577016af6cadde12ffaa1eb",
+        "rev": "8be0f7980c476b83534592b72bc46d0963d75d13",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/gmail-mcp",
         "repo": "gmail_parser",
         "type": "github"
       }

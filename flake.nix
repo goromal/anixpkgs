@@ -57,7 +57,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser";
+    gmail-parser.url = "github:goromal/gmail_parser?ref=refs/heads/dev/gmail-mcp";
     gmail-parser.flake = false;
 
     gnc.url = "github:goromal/gnc";

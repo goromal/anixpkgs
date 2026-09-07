@@ -283,6 +283,7 @@ in
     ../modules/vikunja-mcp/module.nix
     ../modules/folio/module.nix
     ../modules/folio-mcp/module.nix
+    ../modules/gmail-mcp/module.nix
     ../modules/navidrome/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix

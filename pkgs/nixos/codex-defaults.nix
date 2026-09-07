@@ -63,5 +63,14 @@ in
         TOKEN_PATH = "${homeDir}/secrets/google/refresh.json";
       };
     };
+    gmail = {
+      name = "gmail";
+      command = "/run/current-system/sw/bin/gmail-mcp-server";
+      env = {
+        GMAIL_ADDRESS = "andrew.torgesen@gmail.com";
+        GMAIL_SECRETS_JSON = "${homeDir}/secrets/google/client_secrets.json";
+        GMAIL_REFRESH_FILE = "${homeDir}/secrets/google/refresh.json";
+      };
+    };
   };
 }
