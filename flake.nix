@@ -39,7 +39,7 @@
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth?ref=refs/heads/dev/gmail-mcp";
+    easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
     evil-hangman.url = "github:goromal/evil-hangman";
@@ -57,7 +57,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser?ref=refs/heads/dev/gmail-mcp";
+    gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
     indi-harness.url = "github:goromal/indi-harness";
