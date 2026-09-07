@@ -6,7 +6,7 @@
 }:
 let
   claudeDefaults = import ../claude-defaults.nix;
-  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
+  codexDefaults = import ../codex-defaults.nix;
 in
 {
   imports = [ ../pc-base.nix ];
@@ -95,13 +95,6 @@ in
       plugins = claudeDefaults.plugins;
       permissionsAllow = claudeDefaults.permissionsAllow;
       hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
-        claudeDefaults.mcpServers.folio
-        claudeDefaults.mcpServers.googleSheets
-      ];
     };
     machines.codex = {
       model = codexDefaults.model;
@@ -109,15 +102,8 @@ in
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
-      skills = codexDefaults.skills;
-      mcpServers = [
-        codexDefaults.mcpServers.notion
-        codexDefaults.mcpServers.wiki
-        codexDefaults.mcpServers.googleSheets
-      ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
-    services.google-sheets-mcp.enable = true;
     services.homeVpnNode.enable = true;
     services.folio-backend.enable = true;
     services.folio-backend.desktop = true;

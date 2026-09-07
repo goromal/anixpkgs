@@ -712,7 +712,6 @@ rec {
       pkg-src = flakeInputs.signals-cpp;
     }
   );
-  gnc = addDoc (prev.callPackage ./cxx-packages/gnc { pkg-src = flakeInputs.gnc; });
   secure-delete = addDoc (
     prev.callPackage ./cxx-packages/secure-delete {
       pkg-src = flakeInputs.secure-delete;

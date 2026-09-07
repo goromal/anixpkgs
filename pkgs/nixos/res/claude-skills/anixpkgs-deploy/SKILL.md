@@ -11,13 +11,15 @@ This machine runs NixOS; all system config lives in the `anixpkgs` repo, cloned 
 2. **Stage new files** — `git-cc` (used by `anix-upgrade`) only copies tracked files (`git ls-files`). `git add` new files first, or they are silently absent from the build.
 3. **Deploy** via the local `anix-upgrade-ui` API (preferred), streaming until done:
    ```bash
-   curl -si http://localhost/anix-upgrade/api/v1/run -X POST \
+   upgrade_host="$(hostname).local"
+   curl -si "http://${upgrade_host}/anix-upgrade/api/v1/run" -X POST \
      -H 'Content-Type: application/json' \
      -d '{"source": "/path/to/anixpkgs", "local": true}'
    # 202 → {"run_id": "<uuid>", "started": true};  409 → already running
-   curl -N http://localhost/anix-upgrade/api/v1/stream/<run_id>
+   curl -N "http://${upgrade_host}/anix-upgrade/api/v1/stream/<run_id>"
    # ends with [UPGRADE SUCCESSFUL] or [UPGRADE FAILED (exit N)], then [DONE]
    ```
+   Use the machine's `.local` hostname, not `localhost`: nginx exposes this route only on the machine-specific virtual host.
    CLI fallback (only if the API is unreachable): `anix-upgrade --local -s /path/to/anixpkgs`.
 4. **Test** the result on this machine before committing.
 
