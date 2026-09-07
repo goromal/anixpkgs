@@ -267,6 +267,7 @@ in
   imports = [
     ./installation-base.nix
     (import "${home-manager}/nixos")
+    ../modules/agent-common/module.nix
     ../modules/claude-agent/module.nix
     ../modules/codex-agent/module.nix
     ../modules/webserverNode/module.nix
@@ -785,9 +786,6 @@ in
         enable = true;
         domain = "${config.networking.hostName}.local";
       };
-
-      # Jupyter MCP Server
-      services.jupyter-mcp.enable = (cfg.machineType == "jetson");
 
       # Global packages
       environment.systemPackages =
