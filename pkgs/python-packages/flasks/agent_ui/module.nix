@@ -159,6 +159,16 @@ in
 
     machines.base.runWebServer = true;
     services.nginx.virtualHosts."${config.networking.hostName}.local" = {
+      locations."= ${cfg.subdomain}/auth-check" = {
+        proxyPass = "http://127.0.0.1:${toString cfg.port}${cfg.subdomain}/auth-check";
+        extraConfig = ''
+          internal;
+          proxy_pass_request_body off;
+          proxy_set_header Content-Length "";
+          proxy_set_header Connection "";
+          proxy_set_header Upgrade "";
+        '';
+      };
       locations."${cfg.subdomain}/terminal/" = {
         proxyPass = "http://127.0.0.1:${toString cfg.terminalPort}";
         proxyWebsockets = true;
