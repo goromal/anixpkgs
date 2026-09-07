@@ -311,6 +311,11 @@
                 "docs": true
             },
             {
+                "attr": "agent_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "tasks_ui",
                 "ci": true,
                 "docs": true

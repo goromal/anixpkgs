@@ -330,15 +330,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788761724,
-        "narHash": "sha256-ScIcDN9vv2iCj1ROKj/YzqeJZtCb4ZHCn8eIETVhPoo=",
+        "lastModified": 1788817633,
+        "narHash": "sha256-SSjTVz3zHeUNbSz9IQJ+XL7D2YVEWz9CEPsyMq7gBgA=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "1c676ef8230f9f29b791ebeed183c59265e54fe4",
+        "rev": "966bed913c59a0e216d24a01ac660206fda0b3e5",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/agent-terminal-ui",
         "repo": "flasks",
         "type": "github"
       }
