@@ -39,7 +39,7 @@
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth";
+    easy-google-auth.url = "github:goromal/easy-google-auth?ref=refs/heads/dev/gmail-mcp";
     easy-google-auth.flake = false;
 
     evil-hangman.url = "github:goromal/evil-hangman";

@@ -56,6 +56,7 @@ in
         services.wiki-mcp.enable = hasServer "wiki";
         services.jupyter-mcp.enable = hasServer "jupyter-mcp";
         services.google-sheets-mcp.enable = hasServer "google-sheets";
+        services.gmail-mcp.enable = hasServer "gmail";
       }
     ]
   );
