@@ -45,7 +45,12 @@
   };
   tasks_ui = 5959;
   videodl = 6060;
-  brom = 6767;
+  # NB: 6767/6768 belong to agent_ui above. brom originally took 6767 too --
+  # both were added on separate branches, so git merged the file without a
+  # textual conflict while the values collided. agent_ui won the bind and
+  # bromserver crash-looped on "Address already in use". Check values, not just
+  # keys, when adding a port here.
+  brom = 6700;
   brom-aria2-rpc = 6800;
   intake_ui = 6161;
   cozy = 6262;
