@@ -41,6 +41,8 @@
   anix_upgrade_ui = 5858;
   tasks_ui = 5959;
   videodl = 6060;
+  brom = 6767;
+  brom-aria2-rpc = 6800;
   intake_ui = 6161;
   cozy = 6262;
   sunset = 6464;

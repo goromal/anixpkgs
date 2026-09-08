@@ -305,6 +305,7 @@ in
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
+    ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix
     ../python-packages/flasks/mail/module.nix
     (
@@ -546,6 +547,10 @@ in
 
       services.vdlserver = {
         enable = cfg.isATS;
+      };
+
+      services.brom = {
+        enable = cfg.machineType == "jetson";
       };
 
       services.intake_ui = {
