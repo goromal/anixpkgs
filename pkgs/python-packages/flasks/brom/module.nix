@@ -22,6 +22,16 @@ let
     save-session-interval=60
     dir=${cfg.defaultDownloadDir}
     follow-torrent=true
+    # Peer discovery. ichabod builds TRACKERLESS magnets
+    # (`magnet:?xt=urn:btih:<hash>&dn=<name>` -- no `&tr=`), so every torrent
+    # brom adds arrives with an empty announce list and has no tracker of its
+    # own to ask. Without the two settings below aria2 has no way to find a
+    # single peer: DHT is enabled by default but cannot join the network with
+    # no entry point and an empty routing table, and PEX needs an existing
+    # peer to bootstrap from. The symptom is a download that sits at 0 bytes
+    # in the metadata phase forever, with 0 connections and no error.
+    bt-tracker=${lib.concatStringsSep "," cfg.btTrackers}
+    dht-entry-point=${cfg.dhtEntryPoint}
   '';
 in
 {
@@ -60,6 +70,31 @@ in
       type = lib.types.str;
       description = "aria2's fallback download dir; every add overrides it";
       default = "${globalCfg.homeDir}/downloads";
+    };
+    btTrackers = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      description = ''
+        Trackers appended to every torrent. Required, not optional: ichabod
+        emits trackerless magnets, so without these a download has no peer
+        source at all and sits at 0 bytes forever.
+      '';
+      default = [
+        "udp://tracker.opentrackr.org:1337/announce"
+        "udp://open.tracker.cl:1337/announce"
+        "udp://exodus.desync.com:6969/announce"
+        "udp://tracker.torrent.eu.org:451/announce"
+        "udp://open.demonii.com:1337/announce"
+        "udp://tracker.openbittorrent.com:6969/announce"
+      ];
+    };
+    dhtEntryPoint = lib.mkOption {
+      type = lib.types.str;
+      description = ''
+        DHT bootstrap node, as HOST:PORT. aria2 enables DHT by default but
+        cannot join the network without an entry point when its routing table
+        (dht.dat) is empty, which it is on a fresh machine.
+      '';
+      default = "router.bittorrent.com:6881";
     };
   };
 
