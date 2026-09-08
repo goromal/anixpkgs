@@ -1,5 +1,6 @@
 import curses
 import os
+import shlex
 import subprocess
 import sys
 
@@ -157,7 +158,9 @@ def main(stdscr):
 
     ctx.wsname = sys.argv[1]
     ctx.dev_dir = sys.argv[2]
-    editor = sys.argv[3]
+    # Editor may be a multi-word command (e.g. "code --no-sandbox"), so split
+    # it into argv tokens rather than passing the whole string as argv[0].
+    editor = shlex.split(sys.argv[3])
     ctx.hist_file = sys.argv[4]
     ctx.devrc = sys.argv[5] if len(sys.argv) > 5 else ""
     ctx.manager = WorkspaceManager(
@@ -210,7 +213,7 @@ def main(stdscr):
                 display_output(stdscr)
                 try:
                     subprocess.check_output(
-                        [editor, os.path.join(ctx.dev_dir, "sources", reponame)],
+                        [*editor, os.path.join(ctx.dev_dir, "sources", reponame)],
                         stderr=subprocess.PIPE,
                     )
                 except:
@@ -223,7 +226,7 @@ def main(stdscr):
                 display_output(stdscr)
                 try:
                     subprocess.check_output(
-                        [editor, os.path.join(ctx.dev_dir, "sources")],
+                        [*editor, os.path.join(ctx.dev_dir, "sources")],
                         stderr=subprocess.PIPE,
                     )
                 except:

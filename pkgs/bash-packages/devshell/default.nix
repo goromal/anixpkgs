@@ -204,7 +204,7 @@ let
           export DEVSHELL_ROOT="$dev_dir/$wsname"
           export DEVSHELL_DEVRC="$devrc"
           export DEVSHELL_DATA_OVERRIDE="$overridedatadir"
-          export DEVSHELL_EDITOR=${editorName}
+          export DEVSHELL_EDITOR="${editorName}"
           export DEVSHELL_HISTORY="$devhist"
           export DEVSHELL_RUNTIME_BIN="${runtimeCommands}/bin"
           export PATH="${runtimeCommands}/bin:$PATH"
