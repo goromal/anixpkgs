@@ -92,12 +92,14 @@ in
         StateDirectoryMode = "0700";
         ExecStartPre = [
           "${pkgs.coreutils}/bin/touch ${sessionFile}"
-          ("${pkgs.bash}/bin/bash -c '"
+          (
+            "${pkgs.bash}/bin/bash -c '"
             + "if [ ! -s ${secretFile} ]; then "
             + "umask 077; "
             + "${pkgs.coreutils}/bin/head -c 32 /dev/urandom "
             + "| ${pkgs.coreutils}/bin/base64 | ${pkgs.coreutils}/bin/tr -d \"\\n\" > ${secretFile}; "
-            + "${pkgs.coreutils}/bin/chmod 600 ${secretFile}; fi'")
+            + "${pkgs.coreutils}/bin/chmod 600 ${secretFile}; fi'"
+          )
           "${pkgs.coreutils}/bin/mkdir -p ${cfg.defaultDownloadDir}"
         ];
         ExecStart =
