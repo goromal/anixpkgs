@@ -299,6 +299,7 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
+    ../python-packages/flasks/agent_ui/module.nix
     ../python-packages/flasks/sunset/module.nix
     ../python-packages/flasks/tester/module.nix
     ../python-packages/flasks/disciple/module.nix
@@ -504,6 +505,8 @@ in
       services.anix-upgrade-ui = {
         enable = cfg.enableUpgradeUI;
       };
+
+      services.agent_ui.enable = cfg.developer;
 
       services.sunset = {
         enable = enableSunshine;

@@ -39,6 +39,10 @@
   launchpad = 8888;
   comfyui = 8188;
   anix_upgrade_ui = 5858;
+  agent_ui = {
+    web = 6767;
+    terminal = 6768;
+  };
   tasks_ui = 5959;
   videodl = 6060;
   brom = 6767;

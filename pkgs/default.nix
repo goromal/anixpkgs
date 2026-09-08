@@ -354,6 +354,11 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              agent_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/agent_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
               sunset = addDoc (
                 pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
               );
@@ -496,6 +501,7 @@ rec {
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  agent_ui = final.python313.pkgs.agent_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;

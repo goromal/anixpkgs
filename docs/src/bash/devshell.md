@@ -50,5 +50,22 @@ pkgs_var = <anixpkgs>
 signals = manif-geom-cpp geometry pyvitools script_ref
 =================================================================
 
+``````bash
+usage: devshellctl.py [-h] [--devrc DEVRC] [--history HISTORY]
+                      [--devshell-command DEVSHELL_COMMAND]
+                      [--parse-script PARSE_SCRIPT]
+                      {list,status,create,save-branch,push,sync,rebase-push,branch-create,checkout,add-source,add-script} ...
+
+Noninteractive devshell workspace manager
+
+positional arguments:
+  {list,status,create,save-branch,push,sync,rebase-push,branch-create,checkout,add-source,add-script}
+
+options:
+  -h, --help            show this help message and exit
+  --devrc DEVRC
+  --history HISTORY
+  --devshell-command DEVSHELL_COMMAND
+  --parse-script PARSE_SCRIPT
 ```
 
