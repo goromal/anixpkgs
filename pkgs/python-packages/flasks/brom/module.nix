@@ -47,7 +47,7 @@ in
       description = "Subdomain path for reverse proxy";
       default = "/brom";
     };
-    # NB: dataDir intentionally sits under the Dropbox-synced `data` cloudDir -- it
+    # NB: dataDir intentionally sits under the Box-synced `data` cloudDir -- it
     # holds only brom.db, following the la-quiz-web/tester/navidrome convention. This
     # is the opposite of secretFile/sessionFile below, which must NEVER be cloud-synced
     # and therefore live under /var/lib/brom instead. Don't "fix" one to match the other.
