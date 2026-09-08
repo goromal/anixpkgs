@@ -391,6 +391,11 @@
                 "docs": false
             },
             {
+                "attr": "brom",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "spandrel",
                 "ci": true,
                 "docs": false
