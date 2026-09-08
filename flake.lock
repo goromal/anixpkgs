@@ -330,16 +330,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788839742,
-        "narHash": "sha256-Z1A2k5nvQPrhca+mBJ4PQCZ8cuV0ZbwEKNnPR53x4u8=",
+        "lastModified": 1788842427,
+        "narHash": "sha256-rcSrc2RTMNIaRuoSalaVxk7Zlbo8sWdCTq10jCOr/o0=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "f7e8a63ef2137131a547f712ff7a7a763dd50297",
+        "rev": "b96dcf6626e767eb99eb95ecccc84b8a1370db00",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/rankserver-readjudication",
         "repo": "flasks",
         "type": "github"
       }
