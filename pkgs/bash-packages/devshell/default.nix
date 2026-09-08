@@ -1,12 +1,15 @@
 {
   bashInteractive,
   writeArgparseScriptBin,
+  writeShellApplication,
   writeShellScriptBin,
   writeText,
   symlinkJoin,
   python3,
   color-prints,
   setupws,
+  git,
+  openssh,
   editorName ? "code",
 }:
 let
@@ -41,9 +44,11 @@ let
     =================================================================
   '';
   printErr = "${color-prints}/bin/echo_red";
-  parseScript = ./parseWorkspace.py;
-  shellSetupScript = ./setupWsShell.py;
-  devScript = ./dev.py;
+  devSource = ./.;
+  parseScript = "${devSource}/parseWorkspace.py";
+  shellSetupScript = "${devSource}/setupWsShell.py";
+  devScript = "${devSource}/dev.py";
+  devshellCtlScript = "${devSource}/devshellctl.py";
   selectWsScript = ./selectWorkspace.py;
   setupCurrentWs = writeShellScriptBin "setupcurrentws" ''
     set -e
@@ -128,95 +133,115 @@ let
     export PS1='\n\[\033[1;36m\][devshell='"$DEVSHELL_WSNAME"':\w]\$\[\033[0m\] '
     alias godev='cd "$DEVSHELL_ROOT"'
   '';
+  devshellCommand =
+    writeArgparseScriptBin pkgname usage_str
+      [
+        {
+          var = "devrc";
+          isBool = false;
+          default = "~/.devrc";
+          flags = "-d";
+        }
+        {
+          var = "devhist";
+          isBool = false;
+          default = "~/.devhist";
+          flags = "-s";
+        }
+        {
+          var = "overridedatadir";
+          isBool = false;
+          default = "";
+          flags = "--override-data-dir";
+        }
+        {
+          var = "runcmd";
+          isBool = false;
+          default = "";
+          flags = "--run";
+        }
+        {
+          var = "newws";
+          isBool = true;
+          default = "0";
+          flags = "-n|--new";
+        }
+      ]
+      ''
+        set -e
+
+        wsname=$1
+        if [[ -z "$wsname" ]]; then
+            ${printErr} "ERROR: no workspace name provided."
+            exit 1
+        fi
+
+        if [[ "$newws" == "1" ]]; then
+            ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
+        fi
+
+        if [[ -z "$overridedatadir" ]]; then
+          rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
+        else
+          rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
+        fi
+        if [[ "$rcinfo" == "_NODEVRC_" ]]; then
+            ${printErr} "ERROR: no $devrc file found"
+            exit 1
+        elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
+            ${printErr} "ERROR: no workspace name provided."
+            exit 1
+        elif [[ "$rcinfo" == ERROR* ]]; then
+            ${printErr} "''${rcinfo}"
+            exit 1
+        elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
+            ${printErr} "ERROR: workspace $wsname not found in $devrc"
+            exit 1
+        else
+          IFS='|' read -ra rcinfoarray <<< "$rcinfo"
+          dev_dir="''${rcinfoarray[0]}"
+          export DEVSHELL_WSNAME="$wsname"
+          export DEVSHELL_ROOT="$dev_dir/$wsname"
+          export DEVSHELL_DEVRC="$devrc"
+          export DEVSHELL_DATA_OVERRIDE="$overridedatadir"
+          export DEVSHELL_EDITOR=${editorName}
+          export DEVSHELL_HISTORY="$devhist"
+          export DEVSHELL_RUNTIME_BIN="${runtimeCommands}/bin"
+          export PATH="${runtimeCommands}/bin:$PATH"
+
+          setupcurrentws "$rcinfo"
+          cd "$DEVSHELL_ROOT"
+
+          if [[ -z "$runcmd" ]]; then
+            export DEVSHELL_ACTIVE="$wsname"
+            exec ${bashInteractive}/bin/bash --rcfile ${interactiveRc} -i
+          else
+            unset DEVSHELL_ACTIVE
+            exec ${bashInteractive}/bin/bash -c "$runcmd"
+          fi
+        fi
+      '';
+  devshellCtlCommand = writeShellApplication {
+    name = "devshellctl";
+    runtimeInputs = [
+      git
+      openssh
+    ];
+    text = ''
+      exec ${python3}/bin/python ${devshellCtlScript} \
+        --devshell-command ${devshellCommand}/bin/devshell \
+        --parse-script ${parseScript} \
+        "$@"
+    '';
+  };
 in
-(writeArgparseScriptBin pkgname usage_str
-  [
-    {
-      var = "devrc";
-      isBool = false;
-      default = "~/.devrc";
-      flags = "-d";
-    }
-    {
-      var = "devhist";
-      isBool = false;
-      default = "~/.devhist";
-      flags = "-s";
-    }
-    {
-      var = "overridedatadir";
-      isBool = false;
-      default = "";
-      flags = "--override-data-dir";
-    }
-    {
-      var = "runcmd";
-      isBool = false;
-      default = "";
-      flags = "--run";
-    }
-    {
-      var = "newws";
-      isBool = true;
-      default = "0";
-      flags = "-n|--new";
-    }
-  ]
-  ''
-    set -e
-
-    wsname=$1
-    if [[ -z "$wsname" ]]; then
-        ${printErr} "ERROR: no workspace name provided."
-        exit 1
-    fi
-
-    if [[ "$newws" == "1" ]]; then
-        ${python3}/bin/python ${parseScript} ADDWS "$devrc" $wsname
-    fi
-
-    if [[ -z "$overridedatadir" ]]; then
-      rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname)
-    else
-      rcinfo=$(${python3}/bin/python ${parseScript} PARSE "$devrc" $wsname "$overridedatadir")
-    fi
-    if [[ "$rcinfo" == "_NODEVRC_" ]]; then
-        ${printErr} "ERROR: no $devrc file found"
-        exit 1
-    elif [[ "$rcinfo" == "_NOWSGIVEN_" ]]; then
-        ${printErr} "ERROR: no workspace name provided."
-        exit 1
-    elif [[ "$rcinfo" == ERROR* ]]; then
-        ${printErr} "''${rcinfo}"
-        exit 1
-    elif [[ "$rcinfo" == "_NOWSFOUND_" ]]; then
-        ${printErr} "ERROR: workspace $wsname not found in $devrc"
-        exit 1
-    else
-      IFS='|' read -ra rcinfoarray <<< "$rcinfo"
-      dev_dir="''${rcinfoarray[0]}"
-      export DEVSHELL_WSNAME="$wsname"
-      export DEVSHELL_ROOT="$dev_dir/$wsname"
-      export DEVSHELL_DEVRC="$devrc"
-      export DEVSHELL_DATA_OVERRIDE="$overridedatadir"
-      export DEVSHELL_EDITOR=${editorName}
-      export DEVSHELL_HISTORY="$devhist"
-      export DEVSHELL_RUNTIME_BIN="${runtimeCommands}/bin"
-      export PATH="${runtimeCommands}/bin:$PATH"
-
-      setupcurrentws "$rcinfo"
-      cd "$DEVSHELL_ROOT"
-
-      if [[ -z "$runcmd" ]]; then
-        export DEVSHELL_ACTIVE="$wsname"
-        exec ${bashInteractive}/bin/bash --rcfile ${interactiveRc} -i
-      else
-        unset DEVSHELL_ACTIVE
-        exec ${bashInteractive}/bin/bash -c "$runcmd"
-      fi
-    fi
-  ''
-)
+(symlinkJoin {
+  name = pkgname;
+  paths = [
+    devshellCommand
+    devshellCtlCommand
+  ];
+})
 // {
   inherit selectWsScript;
   meta = {
