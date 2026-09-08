@@ -1,12 +1,14 @@
 {
   bashInteractive,
   writeArgparseScriptBin,
+  writeShellApplication,
   writeShellScriptBin,
   writeText,
   symlinkJoin,
   python3,
   color-prints,
   setupws,
+  git,
   editorName ? "code",
 }:
 let
@@ -218,12 +220,16 @@ let
           fi
         fi
       '';
-  devshellCtlCommand = writeShellScriptBin "devshellctl" ''
-    exec ${python3}/bin/python ${devshellCtlScript} \
-      --devshell-command ${devshellCommand}/bin/devshell \
-      --parse-script ${parseScript} \
-      "$@"
-  '';
+  devshellCtlCommand = writeShellApplication {
+    name = "devshellctl";
+    runtimeInputs = [ git ];
+    text = ''
+      exec ${python3}/bin/python ${devshellCtlScript} \
+        --devshell-command ${devshellCommand}/bin/devshell \
+        --parse-script ${parseScript} \
+        "$@"
+    '';
+  };
 in
 (symlinkJoin {
   name = pkgname;
