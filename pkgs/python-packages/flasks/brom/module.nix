@@ -47,6 +47,10 @@ in
       description = "Subdomain path for reverse proxy";
       default = "/brom";
     };
+    # NB: dataDir intentionally sits under the Dropbox-synced `data` cloudDir -- it
+    # holds only brom.db, following the la-quiz-web/tester/navidrome convention. This
+    # is the opposite of secretFile/sessionFile below, which must NEVER be cloud-synced
+    # and therefore live under /var/lib/brom instead. Don't "fix" one to match the other.
     dataDir = lib.mkOption {
       type = lib.types.str;
       description = "Directory holding brom.db";
@@ -90,6 +94,7 @@ in
           "${pkgs.coreutils}/bin/touch ${sessionFile}"
           ("${pkgs.bash}/bin/bash -c '"
             + "if [ ! -s ${secretFile} ]; then "
+            + "umask 077; "
             + "${pkgs.coreutils}/bin/head -c 32 /dev/urandom "
             + "| ${pkgs.coreutils}/bin/base64 | ${pkgs.coreutils}/bin/tr -d \"\\n\" > ${secretFile}; "
             + "${pkgs.coreutils}/bin/chmod 600 ${secretFile}; fi'")
@@ -119,6 +124,7 @@ in
       serviceConfig = {
         Type = "simple";
         StateDirectory = "brom";
+        StateDirectoryMode = "0700";
         ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${cfg.dataDir}";
         ExecStart =
           "${cfg.package}/bin/brom"
