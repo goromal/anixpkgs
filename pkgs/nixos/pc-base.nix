@@ -324,6 +324,55 @@ in
 
   config = lib.mkMerge [
     {
+      # Fail evaluation if two services claim the same port.
+      #
+      # This is specifically a merge hazard: two branches can each add a
+      # DIFFERENT key with the SAME value to service-ports.nix, which git
+      # merges without a textual conflict because the added lines don't
+      # overlap. `brom` and `agent_ui` both took 6767 exactly that way, and
+      # the collision only surfaced after deployment as a unit crash-looping
+      # on "Address already in use" — by which point the other service had
+      # already won the bind. Checking keys is not enough; check values.
+      assertions =
+        let
+          flattenPorts =
+            prefix: attrs:
+            lib.concatLists (
+              lib.mapAttrsToList (
+                n: v:
+                let
+                  path = if prefix == "" then n else "${prefix}.${n}";
+                in
+                if builtins.isInt v then
+                  [
+                    {
+                      name = path;
+                      port = v;
+                    }
+                  ]
+                else if builtins.isAttrs v then
+                  flattenPorts path v
+                else
+                  [ ]
+              ) attrs
+            );
+          entries = flattenPorts "" service-ports;
+          duplicates = lib.filterAttrs (_: es: builtins.length es > 1) (
+            lib.groupBy (e: builtins.toString e.port) entries
+          );
+          rendered = lib.concatStringsSep "; " (
+            lib.mapAttrsToList (
+              p: es: "${p} claimed by ${lib.concatStringsSep " and " (map (e: e.name) es)}"
+            ) duplicates
+          );
+        in
+        [
+          {
+            assertion = duplicates == { };
+            message = "service-ports.nix assigns the same port to more than one service: ${rendered}. Two services cannot bind the same port — pick a free value.";
+          }
+        ];
+
       system.stateVersion = cfg.nixosState;
 
       users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
