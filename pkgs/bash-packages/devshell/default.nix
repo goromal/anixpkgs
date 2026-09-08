@@ -9,6 +9,7 @@
   color-prints,
   setupws,
   git,
+  openssh,
   editorName ? "code",
 }:
 let
@@ -222,7 +223,10 @@ let
       '';
   devshellCtlCommand = writeShellApplication {
     name = "devshellctl";
-    runtimeInputs = [ git ];
+    runtimeInputs = [
+      git
+      openssh
+    ];
     text = ''
       exec ${python3}/bin/python ${devshellCtlScript} \
         --devshell-command ${devshellCommand}/bin/devshell \
