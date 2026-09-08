@@ -390,6 +390,11 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              brom = addDoc (
+                pySelf.callPackage ./python-packages/flasks/brom {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
           );
@@ -512,6 +517,7 @@ rec {
   wormhole = final.python313.pkgs.wormhole;
   cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
+  brom = final.python313.pkgs.brom;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
