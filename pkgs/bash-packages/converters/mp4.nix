@@ -222,6 +222,5 @@ callPackage ./mkConverter.nix {
     optsWithVarsAndDefaults
     convOptCmds
     ;
-  vacuumExcludeOutputExt = true;
   description = "Generate and edit MP4 video files using `ffmpeg`.";
 }

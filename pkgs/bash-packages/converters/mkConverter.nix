@@ -2,6 +2,7 @@
   lib,
   writeArgparseScriptBin,
   color-prints,
+  coreutils,
   strings,
   name,
   extension,
@@ -11,10 +12,6 @@
   description ? "",
   longDescription ? "",
   autoGenUsageCmd ? "--help",
-  # Drop the output extension from the set of extensions `vacuum` discovers.
-  # Useful when vacuum is a bulk "convert everything else into this format"
-  # operation rather than an in-place re-encode.
-  vacuumExcludeOutputExt ? false,
   # Dispatch vacuum's conversions as orchestrator jobs instead of running them
   # inline. Each file becomes a bash job re-invoking this very converter, so
   # every option the converter accepts applies to the dispatched work.
@@ -51,19 +48,15 @@ let
 
   # Input extensions that `vacuum` can discover on disk. The `random`
   # pseudo-extension is synthesized from a filename spec rather than read off a
-  # real file, so it is excluded, as is the output extension when the caller
-  # asks for it.
-  isExcludedToken =
+  # real file, so it is excluded.
+  isRandomToken =
     e:
-    builtins.elem (lib.toLower e) (
-      [
-        "random"
-        "rand"
-      ]
-      ++ lib.optional vacuumExcludeOutputExt (lib.toLower extension)
-    );
+    builtins.elem (lib.toLower e) [
+      "random"
+      "rand"
+    ];
   inputExtTokens = lib.concatMap (x: lib.splitString "|" x.extension) convOptCmds;
-  vacuumExts = lib.unique (map lib.toLower (lib.filter (e: !isExcludedToken e) inputExtTokens));
+  vacuumExts = lib.unique (map lib.toLower (lib.filter (e: !isRandomToken e) inputExtTokens));
   inameArgs = lib.concatStringsSep " -o " (map (e: ''-iname "*.${e}"'') vacuumExts);
 
   # Options injected into every orchestrator-backed converter. Deliberately
@@ -89,6 +82,10 @@ let
     # No backticks or $ here: usage is printed through an unquoted heredoc, so
     # either would be evaluated by the shell instead of shown.
     + lib.optionalString vacuumViaOrchestrator ''
+
+      Vacuum sweeps files already in .${extension} form only when an option
+      above (other than verbosity) asks for a different conversion; those are
+      re-encoded in place. Otherwise they are skipped as a no-op.
 
       Vacuum options (vacuum requires orchestrator on PATH):
                --orch-port PORT        Orchestrator daemon port
@@ -145,13 +142,49 @@ let
     if [[ ! -z "$orch_port" ]]; then orch_args+=( "-p" "$orch_port" ); fi
     job_args=()
     if [[ ! -z "$orch_priority" ]]; then job_args+=( "--priority" "$orch_priority" ); fi
+
+    # Files already in the output format are swept only when an option was given
+    # that changes the conversion -- re-encoding them is the whole point then.
+    # With no such option the conversion would be a no-op, so they are skipped.
+    # Verbosity is not forwarded and so never lands in conv_opts, which is
+    # exactly the "besides verbosity" part of that rule.
+    #
+    # Expressed as a find predicate rather than by dropping the extension from
+    # the match list, so it also covers converters that match "*".
+    same_ext_filter=()
+    if [[ ''${#conv_opts[@]} -eq 0 ]]; then
+        same_ext_filter=( ! -iname "*.${extension}" )
+    fi
+  '';
+
+  # Removal of the source, for the ordinary case where output and source are
+  # distinct paths. Blocked on the conversion, so an error cancels it.
+  vacuumRemoveStep = lib.optionalString vacuumRemoveSources ''
+        rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
+            if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
+                ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
+                exit 1
+            fi
+            note=", remove job $rmjob"
   '';
 
   # The orchestrator CLI reports a missing daemon on stdout and still exits 0,
   # so a captured job id has to be validated rather than trusted.
   vacuumDispatch = ''
-    cmdstr="$(shquote "$self")"
-        for a in "''${conv_opts[@]}" "$f" "$outfile"; do
+    # A source already in the output format converts onto its own path. Writing
+        # a file while reading it would destroy it, so the work goes to a
+        # sibling temporary and is moved over the original once it succeeds --
+        # and no removal job is queued, since the move consumes the source.
+        if [[ "$outfile" == "$f" ]]; then
+            target="''${f%.*}.vacuum-tmp.${extension}"
+            in_place=1
+        else
+            target="$outfile"
+            in_place=0
+        fi
+
+        cmdstr="$(shquote "$self")"
+        for a in "''${conv_opts[@]}" "$f" "$target"; do
             cmdstr="$cmdstr $(shquote "$a")"
         done
         convjob=$(orchestrator "''${orch_args[@]}" bash "''${job_args[@]}" "$cmdstr")
@@ -159,22 +192,21 @@ let
             ${printerr} "ERROR: could not kick off conversion job for $f: $convjob"
             exit 1
         fi
-  ''
-  + (
-    if vacuumRemoveSources then
-      ''
-        rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
-        if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
-            ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
-            exit 1
+
+        note=""
+        if [[ "$in_place" == "1" ]]; then
+            movecmd="$(shquote "${coreutils}/bin/mv") $(shquote "$target") $(shquote "$f")"
+            movejob=$(orchestrator "''${orch_args[@]}" bash "''${job_args[@]}" "$movecmd" -b "$convjob")
+            if [[ ! "$movejob" =~ ^[0-9]+$ ]]; then
+                ${printerr} "ERROR: could not kick off in-place move job for $f: $movejob"
+                exit 1
+            fi
+            echo "$f (in place) -> convert job $convjob, move job $movejob"
+        else
+            ${vacuumRemoveStep}
+            echo "$f -> $outfile (convert job $convjob''${note})"
         fi
-        echo "$f -> $outfile (convert job $convjob, remove job $rmjob)"
-      ''
-    else
-      ''
-        echo "$f -> $outfile (convert job $convjob)"
-      ''
-  );
+  '';
 in
 (writeArgparseScriptBin name full_usage_str allOpts ''
   convert_one() {
@@ -216,7 +248,9 @@ in
           found=1
           outfile=`${strings.replaceExtension} "$f" ${extension}`
           ${if vacuumViaOrchestrator then vacuumDispatch else ''convert_one "$f" "$outfile"''}
-      done < <(find "$indir" -maxdepth 1 -type f \( ${inameArgs} \) -print0 | sort -z)
+      done < <(find "$indir" -maxdepth 1 -type f \( ${inameArgs} \) ${
+        lib.optionalString vacuumViaOrchestrator ''"''${same_ext_filter[@]}"''
+      } -print0 | sort -z)
       if [[ "$found" == "0" ]]; then
           ${printwarn} "No files with supported extensions found in $indir."
       fi

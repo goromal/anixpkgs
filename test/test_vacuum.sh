@@ -131,6 +131,44 @@ discarded=$(drain $ORCH_PORT) || fail "relative-path jobs never drained"
 orchestrator -p $ORCH_PORT status get-pending > /dev/null 2>&1 \
     || fail "orchestrator status get-pending failed"
 
+########################################################################
+# Files already in the output format are swept only when an option asks for a
+# different conversion, and are then re-encoded in place.
+########################################################################
+sxdir="$tmpdir/sameext"
+mkdir "$sxdir"
+mkvid "$sxdir/already.mp4" red
+mkvid "$sxdir/source.webm" blue
+before_md5=$(ckfile "$sxdir/already.mp4")
+
+# No conversion-changing option: the .mp4 is a no-op and must be left alone,
+# byte for byte, while the .webm is still converted.
+mp4 --orch-port $ORCH_PORT vacuum "$sxdir" || fail "vacuum failed on same-extension dir"
+discarded=$(drain $ORCH_PORT) || fail "same-extension jobs never drained"
+[[ "$discarded" == "0" ]] || fail "same-extension sweep discarded $discarded job(s)"
+ckfile -c "$before_md5" "$sxdir/already.mp4" > /dev/null \
+    || fail "vacuum re-encoded an .mp4 with no conversion option given"
+[[ -s "$sxdir/source.mp4" ]] || fail "vacuum did not convert source.webm"
+
+# Verbosity alone is not a conversion-changing option.
+mp4 --orch-port $ORCH_PORT -v vacuum "$sxdir" > /dev/null 2>&1 \
+    || fail "vacuum failed with -v on same-extension dir"
+discarded=$(drain $ORCH_PORT) || fail "verbose same-extension jobs never drained"
+[[ "$discarded" == "0" ]] || fail "-v same-extension sweep discarded $discarded job(s)"
+ckfile -c "$before_md5" "$sxdir/already.mp4" > /dev/null \
+    || fail "vacuum re-encoded an .mp4 when only -v was given"
+
+# A real conversion option: the .mp4 is re-encoded in place, same path, and no
+# stray temporary is left behind.
+mp4 --orch-port $ORCH_PORT -q - vacuum "$sxdir" || fail "vacuum failed with -q on same-extension dir"
+discarded=$(drain $ORCH_PORT) || fail "in-place jobs never drained"
+[[ "$discarded" == "0" ]] || fail "in-place sweep discarded $discarded job(s)"
+[[ -s "$sxdir/already.mp4" ]] || fail "in-place conversion lost already.mp4"
+ckfile -c "$before_md5" "$sxdir/already.mp4" > /dev/null \
+    && fail "in-place conversion did not actually re-encode already.mp4"
+compgen -G "$sxdir/*vacuum-tmp*" > /dev/null \
+    && fail "in-place conversion left a temporary behind"
+
 kill $serverPID
 serverPID=""
 
