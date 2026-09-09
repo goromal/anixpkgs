@@ -160,12 +160,12 @@ let
   # Removal of the source, for the ordinary case where output and source are
   # distinct paths. Blocked on the conversion, so an error cancels it.
   vacuumRemoveStep = lib.optionalString vacuumRemoveSources ''
-        rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
-            if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
-                ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
-                exit 1
-            fi
-            note=", remove job $rmjob"
+    rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
+        if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
+            ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
+            exit 1
+        fi
+        note=", remove job $rmjob"
   '';
 
   # The orchestrator CLI reports a missing daemon on stdout and still exits 0,
@@ -248,9 +248,7 @@ in
           found=1
           outfile=`${strings.replaceExtension} "$f" ${extension}`
           ${if vacuumViaOrchestrator then vacuumDispatch else ''convert_one "$f" "$outfile"''}
-      done < <(find "$indir" -maxdepth 1 -type f \( ${inameArgs} \) ${
-        lib.optionalString vacuumViaOrchestrator ''"''${same_ext_filter[@]}"''
-      } -print0 | sort -z)
+      done < <(find "$indir" -maxdepth 1 -type f \( ${inameArgs} \) ${lib.optionalString vacuumViaOrchestrator ''"''${same_ext_filter[@]}"''} -print0 | sort -z)
       if [[ "$found" == "0" ]]; then
           ${printwarn} "No files with supported extensions found in $indir."
       fi
