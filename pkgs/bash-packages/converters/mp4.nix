@@ -16,9 +16,11 @@ let
 
     Create a mp4 file.
 
-    With the "vacuum" sub-command, convert every file with a supported input
-    extension in the given directory, preserving each filename (only the
-    extension changes).
+    With the "vacuum" sub-command, dispatch an orchestrator job for every file
+    with a supported input extension -- excluding .mp4 itself -- in the given
+    directory, preserving each filename (only the extension changes). Every
+    option above applies to each dispatched conversion, and each source file is
+    removed only once its conversion has succeeded.
 
     Inputs:
         .mp4
@@ -28,6 +30,7 @@ let
         .mov
         .avi
         .webm
+        .flv
         .random (e.g., seed-width-height-frames.random)
 
     Options:
@@ -156,7 +159,7 @@ let
 
   convOptCmds = [
     {
-      extension = "mp4|MP4|gif|GIF|mpeg|MPEG|mkv|MKV|mov|MOV|avi|AVI|webm|WEBM";
+      extension = "mp4|MP4|gif|GIF|mpeg|MPEG|mkv|MKV|mov|MOV|avi|AVI|webm|WEBM|flv|FLV";
       commands = ''
         ffmpeg_args=("-y" "-vcodec" "libx264")
         ${qualityRule}
@@ -219,5 +222,6 @@ callPackage ./mkConverter.nix {
     optsWithVarsAndDefaults
     convOptCmds
     ;
+  vacuumExcludeOutputExt = true;
   description = "Generate and edit MP4 video files using `ffmpeg`.";
 }
