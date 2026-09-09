@@ -146,16 +146,16 @@ let
   + (
     if vacuumRemoveSources then
       ''
-            rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
-            if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
-                ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
-                exit 1
-            fi
-            echo "$f -> $outfile (convert job $convjob, remove job $rmjob)"
+        rmjob=$(orchestrator "''${orch_args[@]}" remove "''${job_args[@]}" "$f" -b "$convjob")
+        if [[ ! "$rmjob" =~ ^[0-9]+$ ]]; then
+            ${printerr} "ERROR: could not kick off removal job for $f: $rmjob"
+            exit 1
+        fi
+        echo "$f -> $outfile (convert job $convjob, remove job $rmjob)"
       ''
     else
       ''
-            echo "$f -> $outfile (convert job $convjob)"
+        echo "$f -> $outfile (convert job $convjob)"
       ''
   );
 in
