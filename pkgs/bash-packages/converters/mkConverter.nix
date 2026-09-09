@@ -23,6 +23,11 @@
   # daemon cancels jobs whose blocker errored, so a source outlives a failed
   # conversion.
   vacuumRemoveSources ? true,
+  # Option variables never forwarded to dispatched jobs. Verbosity is excluded
+  # by default because the daemon treats any output on stderr as job failure:
+  # a verbose conversion would succeed, then be recorded as an error, and its
+  # source would survive on a job that did its work.
+  vacuumUnforwardedVars ? [ "verbose" ],
 }:
 let
   conv_opt_list = map (x: ''
@@ -94,13 +99,20 @@ let
   # re-invokes this converter exactly as it was invoked. An option is forwarded
   # only when it differs from its default, which keeps the command legible and
   # makes a non-empty default (e.g. a font size) behave the same either way.
+  #
+  # Options named in vacuumUnforwardedVars are dropped instead, with a warning
+  # so the difference is never silent.
   forwardOpt =
     x:
     let
       flag = builtins.head (lib.splitString "|" x.flags);
       val = if x.isBool then "" else " \"${d}${x.var}\"";
+      changed = "[[ \"${d}${x.var}\" != \"${x.default}\" ]]";
     in
-    "    if [[ \"${d}${x.var}\" != \"${x.default}\" ]]; then conv_opts+=( \"${flag}\"${val} ); fi\n";
+    if builtins.elem x.var vacuumUnforwardedVars then
+      "    if ${changed}; then ${printwarn} \"${flag} does not apply to vacuum; ignoring it.\"; fi\n"
+    else
+      "    if ${changed}; then conv_opts+=( \"${flag}\"${val} ); fi\n";
   forwardOpts = lib.concatStrings (map forwardOpt optsWithVarsAndDefaults);
 
   # Preflight for the orchestrator path: refuse to run rather than silently
@@ -172,6 +184,14 @@ in
       exit 1
       ;;
       esac
+      # A converter that claims success must have produced its output. Several
+      # conversions end in cleanup that masks the real exit status, and some
+      # suppress stderr entirely, so the output file is the one dependable
+      # signal -- and vacuum deletes sources based on it.
+      if [[ ! -s "$outfile" ]]; then
+          ${printerr} "ERROR: conversion of $infile produced no output ($outfile)."
+          return 1
+      fi
   }
 
   if [[ "$1" == "vacuum" ]]; then
