@@ -128,6 +128,11 @@ let
     # different ${name} from the daemon's PATH.
     self="$(readlink -f "$0")"
 
+    # Dispatched jobs run in the daemon's working directory, not this shell's,
+    # so every path handed to them has to be absolute. Resolving the input
+    # directory here makes find emit absolute paths for both source and output.
+    indir="$(readlink -f "$indir")"
+
     # Orchestrator execs job argv directly and splits the command with shlex,
     # so each word is single-quoted here to survive whitespace and quotes.
     shquote() {

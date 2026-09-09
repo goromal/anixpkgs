@@ -110,6 +110,27 @@ discarded=$(drain $ORCH_PORT) || fail "verbose jobs never drained"
 [[ -s "$vdir/loud.mp4" ]] || fail "vacuum did not convert loud.webm"
 [[ -e "$vdir/loud.webm" ]] && fail "vacuum left loud.webm behind"
 
+########################################################################
+# A relative directory argument must still work. Dispatched jobs run in the
+# daemon's working directory, not the caller's, so relative paths have to be
+# resolved before they are handed over.
+########################################################################
+mkdir -p "$tmpdir/relparent/reldir"
+mkvid "$tmpdir/relparent/reldir/rel.webm" red
+pushd "$tmpdir/relparent" > /dev/null
+mp4 --orch-port $ORCH_PORT vacuum reldir || fail "vacuum failed on a relative directory"
+popd > /dev/null
+
+discarded=$(drain $ORCH_PORT) || fail "relative-path jobs never drained"
+[[ "$discarded" == "0" ]] || fail "relative directory produced $discarded discarded job(s); expected 0"
+[[ -s "$tmpdir/relparent/reldir/rel.mp4" ]] || fail "vacuum did not convert through a relative directory"
+[[ -e "$tmpdir/relparent/reldir/rel.webm" ]] && fail "vacuum left rel.webm behind"
+
+# Listing pending job ids must not blow up (repeated protobuf fields do not
+# concatenate with +).
+orchestrator -p $ORCH_PORT status get-pending > /dev/null 2>&1 \
+    || fail "orchestrator status get-pending failed"
+
 kill $serverPID
 serverPID=""
 
