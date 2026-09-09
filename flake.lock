@@ -330,16 +330,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1788904358,
+        "lastModified": 1788912040,
         "narHash": "sha256-h2nCYkZ1vySVWirP00Dqaej0cz+ZQjkbHNLVNTVDdtY=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d36a0944496d670d44a754648d393a9004e9e786",
+        "rev": "febf243a477af6a81a13e92af965526ec5b33c2f",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/compare-video-autoplay",
         "repo": "flasks",
         "type": "github"
       }
