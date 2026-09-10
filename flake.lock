@@ -500,16 +500,15 @@
     "manif-geom-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1789021983,
+        "lastModified": 1789076358,
         "narHash": "sha256-wPWhzJrQk9ihWK12B4/MOOm8ibCzrsy7KTLkfrC6w7Q=",
         "owner": "goromal",
         "repo": "manif-geom-rs",
-        "rev": "8e12d7fccc5fb0e106e707368877c45cb1e63b40",
+        "rev": "8466111f1acc4e4d14144575a38455f29c39325d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/manif-geom-rs-parity",
         "repo": "manif-geom-rs",
         "type": "github"
       }
