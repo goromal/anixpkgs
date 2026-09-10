@@ -782,16 +782,15 @@
     "orchestrator": {
       "flake": false,
       "locked": {
-        "lastModified": 1788925458,
+        "lastModified": 1789019857,
         "narHash": "sha256-+DNPDIH5+EjQSkT+M8y3AbvEjm3MVdaG76lRBpFWz/M=",
         "owner": "goromal",
         "repo": "orchestrator",
-        "rev": "8ed049046121a685f28f27b1560d7b1753372a5f",
+        "rev": "a0d2c4d1d909f4981c97cd2d1c16dcf7aa7c1f5d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/converter-vacuum",
         "repo": "orchestrator",
         "type": "github"
       }
