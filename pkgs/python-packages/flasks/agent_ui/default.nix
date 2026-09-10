@@ -2,6 +2,8 @@
   buildPythonPackage,
   setuptools,
   flask,
+  flask-login,
+  werkzeug,
   pytestCheckHook,
   python,
   pkg-src,
@@ -19,7 +21,11 @@ buildPythonPackage rec {
     mkdir -p $out/${pythonLibDir}/templates
     cp templates/*.html $out/${pythonLibDir}/templates/
   '';
-  propagatedBuildInputs = [ flask ];
+  propagatedBuildInputs = [
+    flask
+    flask-login
+    werkzeug
+  ];
   nativeCheckInputs = [ pytestCheckHook ];
   pytestFlagsArray = [ "tests" ];
   meta = {
