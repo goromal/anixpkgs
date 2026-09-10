@@ -14,6 +14,7 @@ callPackage ../pythonPkgFromScript.nix {
   version = "1.0.0";
   description = "Generate survey reports.";
   script-file = ./report.py;
+  test-dir = ./tests;
   inherit pytestCheckHook buildPythonPackage;
   propagatedBuildInputs = [
     aapis-py
