@@ -11,9 +11,11 @@ usage: mp4 [opts] inputfile outputfile
 
 Create a mp4 file.
 
-With the "vacuum" sub-command, convert every file with a supported input
-extension in the given directory, preserving each filename (only the
-extension changes).
+With the "vacuum" sub-command, dispatch an orchestrator job for every file
+with a supported input extension -- excluding .mp4 itself -- in the given
+directory, preserving each filename (only the extension changes). Every
+option above applies to each dispatched conversion, and each source file is
+removed only once its conversion has succeeded.
 
 Inputs:
     .mp4
@@ -23,6 +25,7 @@ Inputs:
     .mov
     .avi
     .webm
+    .flv
     .random (e.g., seed-width-height-frames.random)
 
 Options:
@@ -35,6 +38,14 @@ Options:
     -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
     -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
     -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
+
+Vacuum sweeps files already in .mp4 form only when an option
+above (other than verbosity) asks for a different conversion; those are
+re-encoded in place. Otherwise they are skipped as a no-op.
+
+Vacuum options (vacuum requires orchestrator on PATH):
+         --orch-port PORT        Orchestrator daemon port
+         --orch-priority INT     Priority for dispatched jobs
 
 ```
 
