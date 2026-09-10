@@ -33,6 +33,7 @@ mkShell {
     png
     mp3
     mp4
+    gif
     ckfile
     ffmpeg
   ];
