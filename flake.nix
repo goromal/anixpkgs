@@ -74,7 +74,7 @@
     manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.1";
     manif-geom-cpp.flake = false;
 
-    manif-geom-rs.url = "github:goromal/manif-geom-rs?ref=refs/heads/dev/manif-geom-rs-parity";
+    manif-geom-rs.url = "github:goromal/manif-geom-rs";
     manif-geom-rs.flake = false;
 
     mavlink.url = "github:mavlink/c_library_v2?rev=f9cec4814082af27c2fd27259aed302f52ce9cf7";
