@@ -9,7 +9,7 @@ workspaces and attaching to tmux-backed shell, Claude, and Codex sessions.
 
 ```bash
 usage: agent-ui [-h] [--port PORT] [--subdomain SUBDOMAIN] [--devrc DEVRC]
-                [--agent AGENTS] [--token-file TOKEN_FILE]
+                [--agent AGENTS] --secrets-file SECRETS_FILE
                 [--tmux-bin TMUX_BIN] [--session-command SESSION_COMMAND]
                 [--workspace-command WORKSPACE_COMMAND] [--history HISTORY]
 
@@ -21,7 +21,8 @@ options:
   --subdomain SUBDOMAIN
   --devrc DEVRC
   --agent AGENTS
-  --token-file TOKEN_FILE
+  --secrets-file SECRETS_FILE
+                        Path to JSON file with secret_key and password_hash
   --tmux-bin TMUX_BIN
   --session-command SESSION_COMMAND
   --workspace-command WORKSPACE_COMMAND
