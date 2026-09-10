@@ -38,6 +38,7 @@ let
     runtimeInputs = [
       anixpkgs.devshell
       pkgs.direnv
+      pkgs.lorri
       agentEnter
     ];
     text = ''
@@ -69,17 +70,6 @@ let
     '';
   };
 
-  tokenCommand = pkgs.writeShellApplication {
-    name = "agent-ui-token";
-    text = ''
-      token_file=/var/lib/agent-ui/token
-      if [ ! -r "$token_file" ]; then
-        echo "agent-ui-token: token is not available" >&2
-        exit 1
-      fi
-      cat "$token_file"
-    '';
-  };
 in
 {
   options.services.agent_ui = {
@@ -109,11 +99,14 @@ in
       default = "${globalCfg.homeDir}/.devrc";
       description = "Workspace configuration file.";
     };
+    secretsFile = lib.mkOption {
+      type = lib.types.str;
+      default = "${globalCfg.homeDir}/secrets/flask/agent_ui.json";
+      description = "Path to JSON file with secret_key and password_hash.";
+    };
   };
 
   config = lib.mkIf (cfg.enable && agents != [ ]) {
-    environment.systemPackages = [ tokenCommand ];
-
     machines.base.webServices = [
       {
         name = "Agent Terminal";
@@ -133,12 +126,11 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --token-file /var/lib/agent-ui/token --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
+        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";
         Group = "dev";
-        StateDirectory = "agent-ui";
         UMask = "0077";
       };
     };
