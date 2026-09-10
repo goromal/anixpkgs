@@ -11,3 +11,4 @@ coefficient access, scalar casts, and nalgebra quaternion interop.
 
 Coefficient and tangent ordering follow
 [manif-geom-cpp](https://github.com/goromal/manif-geom-cpp).
+
