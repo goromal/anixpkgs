@@ -109,7 +109,7 @@
     notion-tools.url = "github:goromal/notion-tools";
     notion-tools.flake = false;
 
-    orchestrator.url = "github:goromal/orchestrator?ref=refs/heads/dev/converter-vacuum";
+    orchestrator.url = "github:goromal/orchestrator";
     orchestrator.flake = false;
 
     orchestrator-cpp.url = "github:goromal/orchestrator-cpp";
