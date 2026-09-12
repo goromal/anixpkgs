@@ -330,16 +330,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1789192487,
+        "lastModified": 1789193064,
         "narHash": "sha256-6BADstLByqf6qeUiQzM6tnEWynWNIeW6xJ2XlC/ko68=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "b3ab256f9469604b9133b2cf6422716d4c942137",
+        "rev": "3e75db804cde48d282338c9353cbe59273b06205",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/agent-ui-clipboard",
         "repo": "flasks",
         "type": "github"
       }
