@@ -7,7 +7,7 @@
 with import ../dependencies.nix;
 let
   claudeDefaults = import ../claude-defaults.nix;
-  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
+  codexDefaults = import ../codex-defaults.nix;
 in
 {
   imports = [ ../pc-base.nix ];
@@ -24,7 +24,7 @@ in
         "codex"
       ];
       serveNotesWiki = false;
-      enableMetrics = false; # TODO: perhaps enable in the future
+      enableMetrics = true;
       enableFileServers = true;
       enableUpgradeUI = true;
       cloudDirs = [
@@ -104,13 +104,6 @@ in
       plugins = claudeDefaults.plugins;
       permissionsAllow = claudeDefaults.permissionsAllow;
       hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.jupyter
-        claudeDefaults.mcpServers.googleSheets
-      ];
     };
     machines.codex = {
       model = codexDefaults.model;
@@ -118,16 +111,8 @@ in
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
-      skills = codexDefaults.skills;
-      mcpServers = [
-        codexDefaults.mcpServers.vikunja
-        codexDefaults.mcpServers.notion
-        codexDefaults.mcpServers.jupyter
-        codexDefaults.mcpServers.googleSheets
-      ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-    services.google-sheets-mcp.enable = true;
     environment.systemPackages = [
       anixpkgs.jetson-stats
     ];

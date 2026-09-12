@@ -7,7 +7,7 @@
 with import ../dependencies.nix;
 let
   claudeDefaults = import ../claude-defaults.nix;
-  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
+  codexDefaults = import ../codex-defaults.nix;
 in
 {
   imports = [ ../pc-base.nix ];
@@ -127,6 +127,9 @@ in
         }
         {
           name = "ats-task-migrator";
+          # This job's `logger -t` tag does not match its name; without the
+          # override the derived log panel would query a tag nothing emits.
+          logTags = [ "ats-grader" ];
           jobShellScript = pkgs.writeShellScript "ats-task-migrator" ''
             authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
             tmpdir=$(mktemp -d)
@@ -335,13 +338,6 @@ in
       plugins = claudeDefaults.plugins;
       permissionsAllow = claudeDefaults.permissionsAllow;
       hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
-        claudeDefaults.mcpServers.googleSheets
-      ];
     };
     machines.codex = {
       model = codexDefaults.model;
@@ -349,19 +345,11 @@ in
       approvalPolicy = codexDefaults.approvalPolicy;
       sandboxMode = codexDefaults.sandboxMode;
       extraSettings = codexDefaults.extraSettings;
-      skills = codexDefaults.skills;
-      mcpServers = [
-        codexDefaults.mcpServers.vikunja
-        codexDefaults.mcpServers.notion
-        codexDefaults.mcpServers.wiki
-        codexDefaults.mcpServers.googleSheets
-      ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
     users.users.andrew.extraGroups = [ "vikunja" ];
-    services.google-sheets-mcp.enable = true;
     # Hub: ATS holds the ground-truth folio database and serves the lock/transfer
-    # endpoints. Headless (no desktop); MCP defaults off on the hub.
+    # endpoints. Headless (no desktop), but local agents still use the MCP server.
     services.folio-backend.enable = true;
     services.folio-backend.isHub = true;
   };

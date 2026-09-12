@@ -1,13 +1,14 @@
 # manif-geom-rs
 
-Rust implementation of [manif-geom-cpp](https://github.com/goromal/manif-geom-cpp) (*under construction*).
+Rust implementations of SO(2), SE(2), SO(3), and SE(3), compatible with manif-geom-cpp.
 
 [Repository](https://github.com/goromal/manif-geom-rs)
 
-***TODO*** Once finished, these docs will contrast the API with `manif-geom-cpp`.
+Provides complete 2D and 3D rotation and rigid-transform Lie groups,
+including matrix conversions, point actions, composition, inverse,
+exponential and logarithmic maps, right-side perturbations, contiguous
+coefficient access, scalar casts, and nalgebra quaternion interop.
 
-- [x] SO2
-- [ ] SO3
-- [ ] SE2
-- [ ] SE3
+Coefficient and tangent ordering follow
+[manif-geom-cpp](https://github.com/goromal/manif-geom-cpp).
 

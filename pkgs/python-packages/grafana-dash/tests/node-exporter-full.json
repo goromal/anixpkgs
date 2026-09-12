@@ -1,0 +1,334 @@
+{
+ "__elements": {},
+ "__inputs": [
+  {
+   "description": "",
+   "label": "prometheus",
+   "name": "DS_PROMETHEUS",
+   "pluginId": "prometheus",
+   "pluginName": "Prometheus",
+   "type": "datasource"
+  }
+ ],
+ "__requires": [
+  {
+   "id": "bargauge",
+   "name": "Bar gauge",
+   "type": "panel",
+   "version": ""
+  },
+  {
+   "id": "gauge",
+   "name": "Gauge",
+   "type": "panel",
+   "version": ""
+  }
+ ],
+ "annotations": {
+  "list": [
+   {
+    "builtIn": 1,
+    "datasource": {
+     "type": "datasource",
+     "uid": "grafana"
+    },
+    "enable": true,
+    "hide": true,
+    "iconColor": "rgba(0, 211, 255, 1)",
+    "name": "Annotations & Alerts",
+    "target": {
+     "limit": 100,
+     "matchAny": false,
+     "tags": [],
+     "type": "dashboard"
+    },
+    "type": "dashboard"
+   }
+  ]
+ },
+ "id": null,
+ "panels": [
+  {
+   "collapsed": false,
+   "gridPos": {
+    "h": 1,
+    "w": 24,
+    "x": 0,
+    "y": 0
+   },
+   "id": 261,
+   "panels": [],
+   "title": "Quick CPU / Mem / Disk",
+   "type": "row"
+  },
+  {
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "Resource pressure via PSI",
+   "fieldConfig": {
+    "defaults": {
+     "color": {
+      "mode": "thresholds"
+     },
+     "decimals": 1,
+     "links": [],
+     "mappings": [],
+     "max": 1,
+     "min": 0,
+     "thresholds": {
+      "mode": "percentage",
+      "steps": [
+       {
+        "color": "green"
+       },
+       {
+        "color": "dark-yellow",
+        "value": 70
+       },
+       {
+        "color": "dark-red",
+        "value": 90
+       }
+      ]
+     },
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "gridPos": {
+    "h": 4,
+    "w": 3,
+    "x": 0,
+    "y": 1
+   },
+   "id": 323,
+   "options": {
+    "displayMode": "basic",
+    "legend": {
+     "calcs": [],
+     "displayMode": "list",
+     "placement": "bottom",
+     "showLegend": false
+    },
+    "maxVizHeight": 300,
+    "minVizHeight": 10,
+    "minVizWidth": 0,
+    "namePlacement": "auto",
+    "orientation": "horizontal",
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "showUnfilled": true,
+    "sizing": "auto",
+    "text": {},
+    "valueMode": "color"
+   },
+   "pluginVersion": "12.0.4",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "editorMode": "code",
+     "exemplar": false,
+     "expr": "irate(node_pressure_cpu_waiting_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+     "format": "time_series",
+     "instant": true,
+     "intervalFactor": 1,
+     "legendFormat": "CPU",
+     "range": false,
+     "refId": "A",
+     "step": 240
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "editorMode": "code",
+     "exemplar": false,
+     "expr": "irate(node_pressure_memory_waiting_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+     "format": "time_series",
+     "hide": false,
+     "instant": true,
+     "intervalFactor": 1,
+     "legendFormat": "Mem",
+     "range": false,
+     "refId": "B",
+     "step": 240
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "editorMode": "code",
+     "exemplar": false,
+     "expr": "irate(node_pressure_io_waiting_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+     "format": "time_series",
+     "hide": false,
+     "instant": true,
+     "intervalFactor": 1,
+     "legendFormat": "I/O",
+     "range": false,
+     "refId": "C",
+     "step": 240
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "editorMode": "code",
+     "exemplar": false,
+     "expr": "irate(node_pressure_irq_stalled_seconds_total{instance=\"$node\",job=\"$job\"}[$__rate_interval])",
+     "format": "time_series",
+     "hide": false,
+     "instant": true,
+     "intervalFactor": 1,
+     "legendFormat": "Irq",
+     "range": false,
+     "refId": "D",
+     "step": 240
+    }
+   ],
+   "title": "Pressure",
+   "type": "bargauge"
+  },
+  {
+   "datasource": {
+    "type": "prometheus",
+    "uid": "${DS_PROMETHEUS}"
+   },
+   "description": "Overall CPU busy percentage (averaged across all cores)",
+   "fieldConfig": {
+    "defaults": {
+     "color": {
+      "mode": "thresholds"
+     },
+     "decimals": 1,
+     "mappings": [
+      {
+       "options": {
+        "match": "null",
+        "result": {
+         "text": "N/A"
+        }
+       },
+       "type": "special"
+      }
+     ],
+     "max": 100,
+     "min": 0,
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "rgba(50, 172, 45, 0.97)"
+       },
+       {
+        "color": "rgba(237, 129, 40, 0.89)",
+        "value": 85
+       },
+       {
+        "color": "rgba(245, 54, 54, 0.9)",
+        "value": 95
+       }
+      ]
+     },
+     "unit": "percent"
+    },
+    "overrides": []
+   },
+   "gridPos": {
+    "h": 4,
+    "w": 3,
+    "x": 3,
+    "y": 1
+   },
+   "id": 20,
+   "options": {
+    "minVizHeight": 75,
+    "minVizWidth": 75,
+    "orientation": "auto",
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "showThresholdLabels": false,
+    "showThresholdMarkers": true,
+    "sizing": "auto"
+   },
+   "pluginVersion": "12.0.4",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "${DS_PROMETHEUS}"
+     },
+     "editorMode": "code",
+     "exemplar": false,
+     "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\", instance=\"$node\"}[$__rate_interval])))",
+     "hide": false,
+     "instant": true,
+     "intervalFactor": 1,
+     "legendFormat": "",
+     "range": false,
+     "refId": "A",
+     "step": 240
+    }
+   ],
+   "title": "CPU Busy",
+   "type": "gauge"
+  }
+ ],
+ "schemaVersion": 41,
+ "templating": {
+  "list": [
+   {
+    "current": {},
+    "includeAll": false,
+    "label": "Datasource",
+    "name": "DS_PROMETHEUS",
+    "options": [],
+    "query": "prometheus",
+    "refresh": 1,
+    "regex": "",
+    "type": "datasource"
+   },
+   {
+    "current": {},
+    "datasource": {
+     "type": "prometheus",
+     "uid": "${DS_PROMETHEUS}"
+    },
+    "definition": "",
+    "includeAll": false,
+    "label": "Job",
+    "name": "job",
+    "options": [],
+    "query": {
+     "query": "label_values(node_uname_info, job)",
+     "refId": "Prometheus-job-Variable-Query"
+    },
+    "refresh": 1,
+    "regex": "",
+    "sort": 1,
+    "type": "query"
+   }
+  ]
+ },
+ "title": "Node Exporter Full",
+ "uid": "rYdddlPWk",
+ "version": 1
+}

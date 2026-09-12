@@ -132,6 +132,7 @@ let
                 }
               );
               budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
+              grafana_dash = addDoc (pySelf.callPackage ./python-packages/grafana-dash { });
               surveys_report = addDoc (pySelf.callPackage ./python-packages/surveys-report { });
               easy-google-auth = addDoc (
                 pySelf.callPackage ./python-packages/easy-google-auth {
@@ -143,6 +144,9 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
+                pkg-src = flakeInputs.gmail-parser;
+              };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -350,6 +354,11 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              agent_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/agent_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
               sunset = addDoc (
                 pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
               );
@@ -378,6 +387,11 @@ let
               vdlserver = addDoc (
                 pySelf.callPackage ./python-packages/flasks/videodl {
                   yt-dlp = unstable.yt-dlp;
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              brom = addDoc (
+                pySelf.callPackage ./python-packages/flasks/brom {
                   pkg-src = flakeInputs.flasks;
                 }
               );
@@ -449,6 +463,7 @@ rec {
 
   aapis-py = final.python313.pkgs.aapis-py;
   budget_report = final.python313.pkgs.budget_report;
+  grafana_dash = final.python313.pkgs.grafana_dash;
   surveys_report = final.python313.pkgs.surveys_report;
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
@@ -486,6 +501,7 @@ rec {
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  agent_ui = final.python313.pkgs.agent_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
@@ -501,6 +517,7 @@ rec {
   wormhole = final.python313.pkgs.wormhole;
   cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
+  brom = final.python313.pkgs.brom;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
@@ -510,6 +527,7 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  gmail-mcp = final.python313.pkgs.gmail-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
   onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
@@ -710,7 +728,6 @@ rec {
       pkg-src = flakeInputs.signals-cpp;
     }
   );
-  gnc = addDoc (prev.callPackage ./cxx-packages/gnc { pkg-src = flakeInputs.gnc; });
   secure-delete = addDoc (
     prev.callPackage ./cxx-packages/secure-delete {
       pkg-src = flakeInputs.secure-delete;

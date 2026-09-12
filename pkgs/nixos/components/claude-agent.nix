@@ -17,7 +17,7 @@ let
   # (present in the NixOS system PATH). Replaces the retired claude-code-bin.
   claudeCli = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
 
-  claudeCodeVersion = "2.1.116";
+  claudeCodeVersion = "2.1.263";
   claudeCodeExt =
     let
       base = builtins.head (
@@ -26,7 +26,7 @@ let
             name = "claude-code";
             publisher = "anthropic";
             version = claudeCodeVersion;
-            sha256 = "sha256-myBC6iy7EsA1at4QKWjgiq3TRuC4VMqeH4jop9zo4BM=";
+            sha256 = "sha256-BtMWvq+8OaEAmpzrameNuKEu5G419optcjCGz1c1Z8g=";
           }
         ]
       );

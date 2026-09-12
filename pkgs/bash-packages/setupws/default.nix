@@ -1,4 +1,11 @@
-{ writeArgparseScriptBin, color-prints }:
+{
+  writeArgparseScriptBin,
+  color-prints,
+  git,
+  direnv,
+  lorri,
+  diffutils,
+}:
 let
   default-dev-dir = "~/dev";
   default-data-dir = "~/data";
@@ -98,10 +105,10 @@ in
       envrc_changed=1
     fi
     if [[ ! -f shell.nix ]]; then
-      lorri init
+      ${lorri}/bin/lorri init
     fi
     if [[ "$envrc_changed" == "1" ]]; then
-      direnv allow
+      ${direnv}/bin/direnv allow
     fi
 
     pushd data
@@ -109,7 +116,7 @@ in
       "export WSROOT=$dev_ws_dir" \
       'PATH_add $WSROOT/.bin')
     if write_if_changed .envrc "$data_envrc_contents"; then
-      direnv allow
+      ${direnv}/bin/direnv allow
     fi
     popd
 
@@ -141,14 +148,14 @@ in
             repourl="''${i#*:}"
             if [[ ! -d $reponame ]]; then
                 ${printGrn} "Cloning and setting up $reponame..."
-                git clone --filter=blob:none --recurse-submodules "$repourl" "$reponame"
+                ${git}/bin/git clone --filter=blob:none --recurse-submodules "$repourl" "$reponame"
             else
                 ${printGrn} "Repo $reponame present."
             fi
         fi
     done
 
-    if [[ ! -d ../.bin ]] || ! diff -qr ../.bin "$next_bin_dir" >/dev/null; then
+    if [[ ! -d ../.bin ]] || ! ${diffutils}/bin/diff -qr ../.bin "$next_bin_dir" >/dev/null; then
       ${printGrn} "Updating workspace scripts..."
       rm -rf ../.bin
       mv "$next_bin_dir" ../.bin

@@ -54,6 +54,7 @@ folio_add_note(passage_id=p.id, body="...")            # note attaches to exactl
 
 - `end_off` past the end of the block **clamps to the block end**, so a large constant (e.g. `20000`) reliably selects "the whole paragraph." Because `start_block == end_block`, the highlight can never bleed into a neighbouring block.
 - Do the `create_passage` calls first (they return the ids), then batch the highlight/tag/note calls.
+- **Note bodies render as Markdown** in the reader UI (the passage panel and the Notes page), so `folio_add_note` bodies may use Markdown — headings, `**bold**`/`*italic*`, `` `code` ``, fenced code blocks, links, blockquotes and nested lists. Summaries render the same way. Plain text still works unchanged.
 
 ## Gotchas
 

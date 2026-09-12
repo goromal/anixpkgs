@@ -12,7 +12,7 @@ let
 in
 {
   options.services.vikunja-mcp = {
-    enable = lib.mkEnableOption "Vikunja MCP server for Claude Code";
+    enable = lib.mkEnableOption "Vikunja MCP server for local coding agents";
   };
 
   config = lib.mkIf config.services.vikunja-mcp.enable {

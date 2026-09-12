@@ -7,6 +7,7 @@
   wtforms,
   werkzeug,
   pillow,
+  pillow-heif,
   opencv4,
   ffmpeg-headless,
   writeShellScript,
@@ -40,10 +41,11 @@ buildPythonPackage rec {
     wtforms
     werkzeug
     pillow
+    pillow-heif
     opencv4
   ];
   meta = {
-    description = "Provides an interface for stamping metadata on PNGs and MP4s.";
+    description = "Provides an interface for stamping metadata on PNGs, JPEGs, HEICs, and MP4s.";
     longDescription = "";
     autoGenUsageCmd = "--help";
   };

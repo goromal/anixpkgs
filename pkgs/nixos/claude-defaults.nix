@@ -2,8 +2,6 @@
 # Kept in a separate file to avoid bloating the options declarations.
 let
   sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
-  ports = import ./service-ports.nix;
-  sharedSkills = import ./shared-agent-skills.nix;
 in
 {
   marketplaces = [
@@ -89,71 +87,6 @@ in
     "mcp__notion__notion_move_blocks"
     "mcp__notion__notion_update_block"
   ];
-
-  skills = sharedSkills ++ [
-    {
-      name = "editing-skills";
-      file = ./res/claude-skills/editing-skills/SKILL.md;
-    }
-    {
-      name = "folio-usage";
-      file = ./res/claude-skills/folio-usage/SKILL.md;
-    }
-    {
-      name = "rtk-usage";
-      file = ./res/claude-skills/rtk-usage/SKILL.md;
-    }
-  ];
-
-  mcpServers = {
-    vikunja = {
-      name = "vikunja";
-      command = "/run/current-system/sw/bin/vikunja-mcp-server";
-      env = {
-        VIKUNJA_URL = "https://ats.local:${toString ports.vikunja.public}";
-        VIKUNJA_INSECURE = "1";
-      };
-      secretsPath = "$HOME/secrets/vikunja/secrets.json";
-      secretsEnvVar = "VIKUNJA_TOKEN_FILE";
-    };
-    folio = {
-      name = "folio";
-      command = "/run/current-system/sw/bin/folio-mcp-server";
-      env = {
-        FOLIO_API_URL = "http://localhost:${toString ports.folio.internal}";
-      };
-    };
-    notion = {
-      name = "notion";
-      command = "/run/current-system/sw/bin/notion-mcp-server";
-      secretsPath = "$HOME/secrets/notion/secret.json";
-      secretsEnvVar = "NOTION_TOKEN_FILE";
-    };
-    wiki = {
-      name = "wiki";
-      command = "/run/current-system/sw/bin/wiki-mcp-server";
-      secretsPath = "$HOME/secrets/wiki";
-      secretsEnvVar = "WIKI_SECRETS_DIR";
-      env = {
-        WIKI_URL = "http://ats.local";
-      };
-    };
-    jupyter = {
-      name = "jupyter-mcp";
-      command = "/run/current-system/sw/bin/jupyter-mcp-server";
-      env = {
-        SERVER_URL = "http://localhost:${toString ports.launchpad}";
-      };
-    };
-    googleSheets = {
-      name = "google-sheets";
-      command = "/run/current-system/sw/bin/mcp-google-sheets-locked";
-      secretsEnv = {
-        CREDENTIALS_PATH = "$HOME/secrets/google/client_secrets.json";
-        TOKEN_PATH = "$HOME/secrets/google/refresh.json";
-      };
-    };
-  };
 
   hooks = [
     {

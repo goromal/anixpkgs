@@ -29,6 +29,7 @@ Packages written (or bound) in Python.
 - [la_quiz_web](./la_quiz_web.md)
 - [disciple](./disciple.md)
 - [anix_upgrade_ui](./anix_upgrade_ui.md)
+- [agent_ui](./agent_ui.md)
 - [tasks_ui](./tasks_ui.md)
 - [sunset](./sunset.md)
 - [easy-google-auth](./easy-google-auth.md)
@@ -42,3 +43,4 @@ Packages written (or bound) in Python.
 - [goromail](./goromail.md)
 - [cozy](./cozy.md)
 - [wormhole](./wormhole.md)
+- [grafana_dash](./grafana_dash.md)

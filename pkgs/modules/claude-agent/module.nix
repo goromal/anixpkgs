@@ -72,14 +72,5 @@
     # directory and opens claude there. `godev` is only defined inside a
     # devshell, so this is a no-op outside one.
     environment.shellAliases.goclaude = ''if [ -n "$DEVSHELL_ACTIVE" ]; then godev && cd sources && claude; else echo "goclaude: only available inside a devshell"; fi'';
-
-    services.vikunja-mcp.enable = lib.mkDefault (
-      builtins.any (s: s.name == "vikunja") config.machines.claude.mcpServers
-    );
-    services.notion-mcp.enable = lib.mkDefault (
-      builtins.any (s: s.name == "notion") config.machines.claude.mcpServers
-    );
-    services.wiki-mcp.enable =
-      config.machines.base.isATS || (config.machines.base.recreational && config.machines.base.developer);
   };
 }

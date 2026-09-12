@@ -215,7 +215,26 @@ in
     };
     timedOrchJobs = lib.mkOption {
       type = lib.types.listOf lib.types.attrs;
-      description = "Orchestrator job definitions";
+      description = ''
+        Orchestrator job definitions. The type is `attrs`, so unrecognized keys
+        are accepted silently; the keys actually read are:
+
+        - `name` (required): systemd unit name, and the default Loki log tag.
+        - `jobShellScript` (required): script the orchestrator runs.
+        - `timerCfg` (required): `systemd.timers.<name>.timerConfig`; `Unit` is
+          filled in automatically.
+        - `readWritePaths` (optional): `ReadWritePaths=`, defaulting to `[ "/" ]`.
+        - `execStartPre` (optional): extra `ExecStartPre=` entries, appended
+          after the blacklist guard.
+        - `logTags` (optional): list of Loki tags the job's Grafana log panels
+          query, defaulting to `[ name ]`. Set it only when the job's
+          `logger -t` tag differs from its name (e.g. `ats-task-migrator` logs
+          as `ats-grader`). Misspelling this key silently falls back to the
+          default and yields a permanently empty panel, so check the rendered
+          dashboard after adding one. Output not routed through `logger -t` at
+          all does not need an entry here: it lands under the `orchestrator`
+          tag, which `metricsNode` already registers a panel for.
+      '';
       default = [ ];
     };
     extraOrchestratorPackages = lib.mkOption {
@@ -248,6 +267,7 @@ in
   imports = [
     ./installation-base.nix
     (import "${home-manager}/nixos")
+    ../modules/agent-common/module.nix
     ../modules/claude-agent/module.nix
     ../modules/codex-agent/module.nix
     ../modules/webserverNode/module.nix
@@ -264,6 +284,7 @@ in
     ../modules/vikunja-mcp/module.nix
     ../modules/folio/module.nix
     ../modules/folio-mcp/module.nix
+    ../modules/gmail-mcp/module.nix
     ../modules/navidrome/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
@@ -278,12 +299,14 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
+    ../python-packages/flasks/agent_ui/module.nix
     ../python-packages/flasks/sunset/module.nix
     ../python-packages/flasks/tester/module.nix
     ../python-packages/flasks/disciple/module.nix
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
+    ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix
     ../python-packages/flasks/mail/module.nix
     (
@@ -301,6 +324,55 @@ in
 
   config = lib.mkMerge [
     {
+      # Fail evaluation if two services claim the same port.
+      #
+      # This is specifically a merge hazard: two branches can each add a
+      # DIFFERENT key with the SAME value to service-ports.nix, which git
+      # merges without a textual conflict because the added lines don't
+      # overlap. `brom` and `agent_ui` both took 6767 exactly that way, and
+      # the collision only surfaced after deployment as a unit crash-looping
+      # on "Address already in use" — by which point the other service had
+      # already won the bind. Checking keys is not enough; check values.
+      assertions =
+        let
+          flattenPorts =
+            prefix: attrs:
+            lib.concatLists (
+              lib.mapAttrsToList (
+                n: v:
+                let
+                  path = if prefix == "" then n else "${prefix}.${n}";
+                in
+                if builtins.isInt v then
+                  [
+                    {
+                      name = path;
+                      port = v;
+                    }
+                  ]
+                else if builtins.isAttrs v then
+                  flattenPorts path v
+                else
+                  [ ]
+              ) attrs
+            );
+          entries = flattenPorts "" service-ports;
+          duplicates = lib.filterAttrs (_: es: builtins.length es > 1) (
+            lib.groupBy (e: builtins.toString e.port) entries
+          );
+          rendered = lib.concatStringsSep "; " (
+            lib.mapAttrsToList (
+              p: es: "${p} claimed by ${lib.concatStringsSep " and " (map (e: e.name) es)}"
+            ) duplicates
+          );
+        in
+        [
+          {
+            assertion = duplicates == { };
+            message = "service-ports.nix assigns the same port to more than one service: ${rendered}. Two services cannot bind the same port — pick a free value.";
+          }
+        ];
+
       system.stateVersion = cfg.nixosState;
 
       users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
@@ -483,6 +555,8 @@ in
         enable = cfg.enableUpgradeUI;
       };
 
+      services.agent_ui.enable = cfg.developer;
+
       services.sunset = {
         enable = enableSunshine;
       };
@@ -525,6 +599,10 @@ in
 
       services.vdlserver = {
         enable = cfg.isATS;
+      };
+
+      services.brom = {
+        enable = cfg.machineType == "jetson";
       };
 
       services.intake_ui = {
@@ -651,6 +729,39 @@ in
           ++ cfg.extraOrchestratorPackages;
         statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
       };
+      # Metric panels are registered by the services that emit them. Both the
+      # orchestrator and tactical panels live in one assignment because Nix
+      # forbids assigning `services.metricsNode.panels` twice in this attrset.
+      services.metricsNode.panels =
+        lib.optionals cfg.enableOrchestrator [
+          {
+            kind = "timeseries";
+            title = "Completed Jobs";
+            metric = "orchestrator_jobs_completed";
+            group = "Orchestrator";
+          }
+          {
+            kind = "timeseries";
+            title = "Discarded Jobs";
+            metric = "orchestrator_jobs_discarded";
+            group = "Orchestrator";
+          }
+          {
+            kind = "timeseries";
+            title = "Queued Jobs";
+            metric = "orchestrator_jobs_queued";
+            group = "Orchestrator";
+          }
+        ]
+        ++ lib.optionals cfg.isATS [
+          {
+            kind = "timeseries";
+            title = "Tactical Visits";
+            metric = "tactical_page_visits";
+            group = "Tactical";
+          }
+        ];
+
       systemd.timers."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
         description = "Restart orchestratord weekly";
         wantedBy = [ "timers.target" ];
@@ -732,9 +843,6 @@ in
         enable = true;
         domain = "${config.networking.hostName}.local";
       };
-
-      # Jupyter MCP Server
-      services.jupyter-mcp.enable = (cfg.machineType == "jetson");
 
       # Global packages
       environment.systemPackages =

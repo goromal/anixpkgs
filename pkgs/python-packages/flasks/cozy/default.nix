@@ -10,6 +10,7 @@
   requests,
   websocket-client,
   pillow,
+  pillow-heif,
   wormhole,
   python,
   pkg-src,
@@ -39,6 +40,7 @@ buildPythonPackage rec {
     requests
     websocket-client
     pillow
+    pillow-heif
     wormhole
   ];
   nativeCheckInputs = [ pytestCheckHook ];
