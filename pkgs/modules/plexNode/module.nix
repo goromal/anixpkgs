@@ -33,6 +33,7 @@ let
         echo "Pass --apply as the first argument to make the proposed changes."
         echo "Existing destination files are never overwritten."
         echo "Review matches interactively; batch mode can select the wrong title."
+        echo "Episode filenames must contain SxxEyy; bare part numbers are ambiguous."
         echo "Target loose media: recursive moves do not include NFO or artwork sidecars."
         echo
         echo "Examples:"
@@ -92,9 +93,9 @@ in
     # Make sure the Plex user can read media
     users.users.plex.extraGroups = [ "media" ];
 
-    # Ensure the media directory exists with correct ownership
+    # Let the primary user manage the library while Plex reads it via the media group.
     systemd.tmpfiles.rules = [
-      "d ${cfg.mediaDir} 0755 plex media -"
+      "d ${cfg.mediaDir} 0750 andrew media -"
     ];
 
     environment.systemPackages = [ mediaOrganizer ];
