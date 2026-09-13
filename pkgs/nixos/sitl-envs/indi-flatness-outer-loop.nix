@@ -96,32 +96,32 @@ pkgs.testers.runNixOSTest {
 
       # Fly the FULL battery: the mavlink runner takes off + engages the custom
       # controller once, then holds station case-by-case, writing {case,origin}
-      # to /tmp/lb_ready before each hold and unlinking it between cases. The
+      # to /tmp/trajectory_ready before each hold and unlinking it between cases. The
       # trajectory-server runs in battery mode (--ready-file): it follows the
       # ready-file, streaming each case's FlatSetpoint relative to that case's
       # hover origin, and stops between cases -> the backend falls back (the
       # DDS-staleness sub-case, exercised at every case boundary).
-      machines[0].execute("rm -f /tmp/lb_ready")
+      machines[0].execute("rm -f /tmp/trajectory_ready")
       machines[0].execute(
           "(timeout 900 python3 -m indi_harness.sitl.baseline_outer"
           " --url tcp:127.0.0.1:5790 --out /tmp/flight --engage-rc 9"
-          " --ready-file /tmp/lb_ready >/tmp/runner.log 2>&1 &"
+          " --ready-file /tmp/trajectory_ready >/tmp/runner.log 2>&1 &"
           " echo $! >/tmp/runner.pid)"
       )
       try:
           # wait for takeoff+engage (first case's ready file), then start the
           # battery-mode trajectory-server (rclpy + ardupilot_msgs).
-          machines[0].wait_for_file("/tmp/lb_ready", timeout=300)
+          machines[0].wait_for_file("/tmp/trajectory_ready", timeout=300)
           machines[0].execute(
               "(PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3"
-              " -m indi_harness.offboard.traj_server --ready-file /tmp/lb_ready"
+              " -m indi_harness.offboard.traj_server --ready-file /tmp/trajectory_ready"
               " >/tmp/traj.log 2>&1 & echo $! >/tmp/traj.pid)"
           )
           # wait for the runner to finish the whole battery (writes flown.json)
           machines[0].succeed(
               "PID=$(cat /tmp/runner.pid); for i in $(seq 1 900); do "
               "kill -0 $PID 2>/dev/null || break; sleep 1; done; "
-              "test -s /tmp/flight/s3_layerB_flown.json"
+              "test -s /tmp/flight/indi_flatness_flown.json"
           )
       except Exception:
           print("=== runner.log ==="); print(machines[0].execute("cat /tmp/runner.log 2>/dev/null | tail -40")[1])
@@ -144,7 +144,7 @@ pkgs.testers.runNixOSTest {
       try:
           print(machines[0].succeed(
               "python3 /etc/indi-flatness-outer-loop-score.py"
-              " /tmp/flight/flight.BIN /tmp/flight/s3_layerB_flown.json"))
+              " /tmp/flight/flight.BIN /tmp/flight/indi_flatness_flown.json"))
       except Exception:
           print("=== traj_server log ==="); print(machines[0].execute("tail -12 /tmp/traj.log 2>/dev/null")[1])
           print("=== runner.log ==="); print(machines[0].execute("tail -20 /tmp/runner.log 2>/dev/null")[1])

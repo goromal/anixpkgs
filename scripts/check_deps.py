@@ -8,9 +8,8 @@ branches_whitelist = [
     "Copter-4.4",
     "master",
     "main",
-    # The ArduPilot INDI backend lives on this fork side branch until it
-    # graduates to the fork mainline (see indi-harness S3 Layer-C). The
-    # indi-harness side has graduated to master (whitelisted above).
+    # The ArduPilot INDI backend is maintained on the fork's controller branch.
+    # The companion indi-harness is integrated on master (whitelisted above).
     "dev/controller",  # goromal/ardupilot INDI backend
 ]
 

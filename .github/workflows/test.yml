@@ -374,6 +374,9 @@ jobs:
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         nix-build pkgs/nixos/sitl-envs/indi-flatness-outer-loop.nix -A driver -o /tmp/flight-driver
         /tmp/flight-driver/bin/nixos-test-driver
+    - name: Check measured-actuator math, flight, RPM dropout and recovery
+      run: |
+        nix-build pkgs/nixos/sitl-envs/indi-actuator-probe.nix -A flight -o /tmp/actuator-probe
 
   drone-indi-drag-frame:
     name: Drone INDI Drag-Rejection Frame Gate

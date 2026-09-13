@@ -35,11 +35,11 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1787114863,
-        "narHash": "sha256-FiKsY3fXL3acri4R8y5N+ESV97S81jVCV7rIDsgyvAo=",
+        "lastModified": 1789275431,
+        "narHash": "sha256-kzv4rosLTZV0FiliOHegAnVhviiiK7gAOc9cNbM2cfI=",
         "ref": "dev/controller",
-        "rev": "158afe2b064cc9a75cfddc6a34275ad7d29d4f48",
-        "revCount": 70905,
+        "rev": "8a68fdc9f079d0fd79dc07cae2f005343c7f724b",
+        "revCount": 70911,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
