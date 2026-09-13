@@ -3,7 +3,7 @@
 <package format="3">
   <name>ardupilot_msgs</name>
   <version>0.0.1</version>
-  <description>ArduPilot custom ROS 2 messages (S3 Layer-B differential-flatness FlatSetpoint).</description>
+  <description>ArduPilot custom ROS 2 differential-flatness setpoint messages.</description>
   <maintainer email="andrew.torgesen@gmail.com">Andrew Torgesen</maintainer>
   <license>GPL-3.0-or-later</license>
 
