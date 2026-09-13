@@ -776,6 +776,11 @@
                 "attr": "rcrsync",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "tor-ephemeral",
+                "ci": true,
+                "docs": true
             }
         ],
         "java": [
