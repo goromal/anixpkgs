@@ -71,10 +71,74 @@ class WorkspaceManagerTest(unittest.TestCase):
             self.manager.status("alpha")["repositories"][0]["branch"], "dev/test"
         )
 
-    def test_checkout_rejects_dirty_repository(self):
+    def _add_origin(self):
+        origin = self.root / "origin.git"
+        subprocess.run(
+            ["git", "init", "--bare", "-b", "master", origin],
+            check=True,
+            capture_output=True,
+        )
+        subprocess.run(
+            ["git", "-C", self.repo, "remote", "add", "origin", str(origin)], check=True
+        )
+        subprocess.run(
+            ["git", "-C", self.repo, "push", "-u", "origin", "master"],
+            check=True,
+            capture_output=True,
+        )
+        return origin
+
+    def _git(self, *args):
+        return subprocess.run(
+            ["git", "-C", self.repo, *args],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+
+    def test_checkout_stashes_dirty_repository(self):
+        self._add_origin()
         (self.repo / "README").write_text("dirty\n", encoding="utf-8")
-        with self.assertRaisesRegex(WorkspaceError, "uncommitted"):
-            self.manager.checkout("alpha", "repo", "master")
+
+        result = self.manager.checkout("alpha", "repo", "master")
+
+        self.assertTrue(result["stashed"])
+        self.assertEqual((self.repo / "README").read_text(encoding="utf-8"), "test\n")
+        self.assertIn("devshellctl autostash", self._git("stash", "list"))
+
+    def test_checkout_leaves_clean_repository_unstashed(self):
+        self._add_origin()
+
+        result = self.manager.checkout("alpha", "repo", "master")
+
+        self.assertFalse(result["stashed"])
+        self.assertEqual(self._git("stash", "list"), "")
+
+    def test_rebase_push_accepts_dirty_repository(self):
+        self._add_origin()
+        (self.repo / "README").write_text("dirty\n", encoding="utf-8")
+
+        self.manager.rebase_push("alpha", "repo")
+
+        self.assertEqual((self.repo / "README").read_text(encoding="utf-8"), "dirty\n")
+
+    def test_nuke_reclones_repository(self):
+        self._add_origin()
+        (self.repo / "README").write_text("dirty\n", encoding="utf-8")
+        (self.repo / "junk").write_text("junk\n", encoding="utf-8")
+
+        self.manager.nuke("alpha", "repo")
+
+        self.assertFalse((self.repo / "junk").exists())
+        self.assertEqual((self.repo / "README").read_text(encoding="utf-8"), "test\n")
+        self.assertEqual(
+            self.manager.status("alpha")["repositories"][0]["branch"], "master"
+        )
+
+    def test_nuke_requires_a_remote(self):
+        with self.assertRaisesRegex(WorkspaceError, "no remote URL"):
+            self.manager.nuke("alpha", "repo")
+        self.assertTrue((self.repo / "README").exists())
 
     def test_rejects_unsafe_names(self):
         with self.assertRaisesRegex(WorkspaceError, "Invalid workspace"):

@@ -365,36 +365,14 @@ def main(stdscr):
 
             elif key == ord("n"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                url = ctx.repos[ctx.current_row - ctx.start_row][6]
-                if url is None:
-                    ctx.status_msg = f"Cannot nuke {reponame}: no remote URL configured."
-                    continue
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = branch_prompt(stdscr)
                 if not branch:
                     branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = f"Nuking and checking out {reponame}:{branch}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["rm", "-rf", repopath],
-                        stderr=subprocess.PIPE,
-                    )
-                    subprocess.check_output(
-                        [
-                            "git",
-                            "clone",
-                            "--filter=blob:none",
-                            "--no-single-branch",
-                            "--recurse-submodules",
-                            url,
-                            repopath,
-                            "--branch",
-                            branch,
-                        ],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.nuke(ctx.wsname, reponame, branch)
+                except (OSError, WorkspaceError):
                     ctx.load_sources()
                     ctx.status_msg = (
                         f"Nuking and checking out {reponame}:{branch}... UNSUCCESSFUL."

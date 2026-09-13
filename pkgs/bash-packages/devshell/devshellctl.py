@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -132,11 +133,10 @@ class WorkspaceManager:
         self._git(repo, "switch", "-c", branch)
         return {"message": f"Created {repository}:{branch}"}
 
-    def checkout(self, workspace, repository, branch, allow_dirty=False):
+    def checkout(self, workspace, repository, branch):
         repo = self._repository(workspace, repository)
         self._validate_branch(repo, branch)
-        if not allow_dirty:
-            self._require_clean(repo)
+        stashed = self._stash(repo)
         self._git(repo, "fetch", "origin", branch)
         local = (
             subprocess.run(
@@ -158,7 +158,10 @@ class WorkspaceManager:
         else:
             self._git(repo, "switch", "--track", "-c", branch, f"origin/{branch}")
         self._git(repo, "pull", "--ff-only", "origin", branch)
-        return {"message": f"Checked out {repository}:{branch}"}
+        message = f"Checked out {repository}:{branch}"
+        if stashed:
+            message += " (local changes stashed)"
+        return {"message": message, "stashed": stashed}
 
     def push(self, workspace, repository):
         repo = self._repository(workspace, repository)
@@ -176,11 +179,36 @@ class WorkspaceManager:
 
     def rebase_push(self, workspace, repository):
         repo = self._repository(workspace, repository)
-        self._require_clean(repo)
         branch = self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
-        self._git(repo, "pull", "--rebase", "origin", branch)
+        # --autostash pops the working tree back afterwards, so a dirty repo
+        # rebases without the caller having to stage or lose anything.
+        self._git(repo, "pull", "--rebase", "--autostash", "origin", branch)
         self._git(repo, "push", "origin", branch)
         return {"message": f"Rebased and pushed {repository}:{branch}"}
+
+    def nuke(self, workspace, repository, branch=""):
+        repo = self._repository(workspace, repository)
+        remote = self._git_optional(repo, "remote", "get-url", "--push", "origin")
+        if not remote:
+            raise WorkspaceError(f"Cannot nuke {repository}: no remote URL configured")
+        branch = branch or self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+        self._validate_branch(repo, branch)
+        shutil.rmtree(repo)
+        self._run(
+            [
+                "git",
+                "clone",
+                "--filter=blob:none",
+                "--no-single-branch",
+                "--recurse-submodules",
+                remote,
+                str(repo),
+                "--branch",
+                branch,
+            ],
+            timeout=900,
+        )
+        return {"message": f"Nuked and re-cloned {repository}:{branch}"}
 
     def create_workspace(self, workspace):
         self._validate_name(workspace, "workspace")
@@ -307,9 +335,18 @@ class WorkspaceManager:
         if result.returncode != 0:
             raise WorkspaceError("Invalid branch name")
 
-    def _require_clean(self, repo):
-        if self._git(repo, "status", "--porcelain"):
-            raise WorkspaceError("Repository has uncommitted changes")
+    def _stash(self, repo):
+        """Park tracked modifications so a branch switch can proceed.
+
+        Untracked files are deliberately left alone - they don't block a
+        switch, and sweeping build output into a stash surprises people. The
+        stash is never popped: the target branch may be unrelated to whatever
+        was in flight, so restoring is left as a deliberate `git stash pop`.
+        """
+        if not self._git(repo, "status", "--porcelain", "--untracked-files=no"):
+            return False
+        self._git(repo, "stash", "push", "--message", "devshellctl autostash")
+        return True
 
     @staticmethod
     def _git(repo, *args):
@@ -373,6 +410,10 @@ def build_parser():
         action.add_argument("workspace")
         action.add_argument("repository")
         action.add_argument("branch")
+    nuke = subparsers.add_parser("nuke")
+    nuke.add_argument("workspace")
+    nuke.add_argument("repository")
+    nuke.add_argument("branch", nargs="?", default="")
     source = subparsers.add_parser("add-source")
     source.add_argument("workspace")
     source.add_argument("name")
@@ -400,6 +441,7 @@ def main():
         "checkout": lambda: manager.checkout(
             args.workspace, args.repository, args.branch
         ),
+        "nuke": lambda: manager.nuke(args.workspace, args.repository, args.branch),
         "push": lambda: manager.push(args.workspace, args.repository),
         "sync": lambda: manager.sync(args.workspace, args.repository),
         "rebase-push": lambda: manager.rebase_push(args.workspace, args.repository),
