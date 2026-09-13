@@ -671,6 +671,7 @@ rec {
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   generate-local-ssl-certs = prev.callPackage ./bash-packages/generate-local-ssl-certs { };
+  tor-ephemeral = addDoc (prev.callPackage ./bash-packages/tor-ephemeral { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {

@@ -6,7 +6,19 @@
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
+    # Pin bun2nix (a transitive input of llm-agents) by rev rather than the
+    # upstream "fix-structured-attrs-hook" side branch, so check_deps.py stays
+    # green. This is the exact commit upstream currently points that branch at;
+    # its sub-inputs follow llm-agents' as upstream wires them, so the build is
+    # identical to the floating side-branch lock.
+    bun2nix.url = "github:Mic92/bun2nix/5765b0614591f75ee8ba5596e81ae85c167d1071";
+    bun2nix.inputs.nixpkgs.follows = "llm-agents/nixpkgs";
+    bun2nix.inputs.flake-parts.follows = "llm-agents/flake-parts";
+    bun2nix.inputs.systems.follows = "llm-agents/systems";
+    bun2nix.inputs.treefmt-nix.follows = "llm-agents/treefmt-nix";
+
     llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents.inputs.bun2nix.follows = "bun2nix";
 
     phps.url = "github:fossar/nix-phps";
 
