@@ -1,33 +1,37 @@
-# INDI-on-JSON-backend drop-in DIAGNOSTIC (not a green CI gate).
+# INDI measured-RPM feedback "measured actuator state" trajectory acceptance experiment.
+# NOT a green CI gate until the original tracking/buzz thresholds pass.
 #
-# Engages the shipped flatness outer loop INDI (CC_TYPE=3, CC3_OUTER_EN=1) on the pysignals
-# JSON backend (--no-drag) over ROS2/DDS and scores tracking + inner-loop buzz
-# against the benign-SITL flatness outer loop baseline. FAILS BY DESIGN on the shipped tune:
-# the backend's real actuator lag re-stresses the angular-acceleration feedback rate loop. It is a documented
-# diagnostic, not wired into CI. Finding writeup + numbers:
-# indi-harness/docs/json_physics_backend_results.md
+# Flies the two-case battery (circle_slow, lemniscate_fast) over the pysignals
+# JSON backend (--no-drag) with CC3_USE_RPM=1 -- the measured-RPM feedback measured-actuator-state
+# INDI path (u0 reconstructed in normalized mixer units from mechanical RPM,
+# fed into the angular-acceleration feedback
+# rate loop). G2 OFF, OMG_FILT at the shipped 80.
 #
-# omgFilt: the angular-acceleration feedback angular-accel filter cutoff CC3_OMG_FILT (Hz). Default 80 = the
-# shipped tune (buzzes here); the -omg160 variant tests the candidate fix.
-# Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection-indi.nix
-{
-  omgFilt ? 80,
-}:
+# September audit: the August failure did not establish structural instability.
+# The old yaw effectiveness (1000) was ~35x the normalized plant value (28.8),
+# and INDC Cx is current PID, not previous custom output. Small attitude flights
+# now pass with corrected units; this larger DDS battery still needs validation.
+# Current handoff: indi-harness/docs/2026-09-12-controller-audit.md.
+#
+# Preserve the original acceptance thresholds; do not loosen them to get green.
+# Run with dependencies.nix local-build=true to test this checkout's lock pins.
+# Run: nix-build pkgs/nixos/sitl-envs/indi-measured-rpm-tracking.nix
 with import ../dependencies.nix;
 let
+  # CC3_OMG_FILT (Hz): hardcoded at the shipped default. measured-RPM feedback (measured actuator
+  # state) must close the buzz WITHOUT the omg160 filter crutch -- that is the
+  # point of this gate.
+  omgFilt = 80;
   # CC3_B_ACC_FILT (Hz): outer-loop specific-force / thrust-state phase-margin
   # cutoff; 8 is the firmware default and the swept-stable value the benign
   # flatness gate flies at.
   accFilt = 8;
-  # Documented tolerance band for the backend-vs-benign comparison. The JSON
-  # backend has real actuator lag + momentum thrust that benign SITL lacks, so
-  # bit-parity is NOT the bar -- "flies and tracks reasonably" is. HARD gate:
-  # per-case tracking RMS < trackTolAbs m (the same 1.5 m "it flew the
-  # trajectory" threshold the benign flatness gate asserts on its aggregate).
-  # trackTolMult is a REPORTED degradation class (clean-drop-in <= 2x baseline;
-  # degraded-but-flies below the abs bound), not a hard fail.
-  trackTolAbs = "1.5";
-  trackTolMult = "2.0";
+
+  # Buzz-closes thresholds (provisional; calibrate-then-freeze after first clean
+  # run -- see indi_harness.buzz_score.score for the exact per-criterion math).
+  buzzTol = "1.5"; # track_rms <= benign_rms * buzzTol
+  satTol = "0.02"; # saturation fraction ceiling
+  nrmseTol = "0.6"; # omega-dot inversion NRMSE ceiling (initial JSON-backend experiments buzz was ~1.5)
 
   pkgs = (
     import (fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-${nixos-version}") {
@@ -65,7 +69,7 @@ let
   );
 in
 pkgs.testers.runNixOSTest {
-  name = "indi-drag-rejection-indi-omg${toString omgFilt}";
+  name = "indi-measured-rpm-tracking";
   nodes = {
     drone =
       {
@@ -90,19 +94,32 @@ pkgs.testers.runNixOSTest {
           # doesn't over-thrust the high-TWR takeoff (mirrors the stock gate).
           "MOT_THST_HOVER 0.30"
           "MOT_HOVER_LEARN 0"
+          # Linear command-to-Omega^2 map required by the normalized G1 seed.
+          "MOT_THST_EXPO 0"
+          "MOT_SPIN_ARM 0"
+          "MOT_SPIN_MIN 0"
+          "MOT_SPIN_MAX 1"
+          "MOT_BAT_VOLT_MIN 0"
+          "MOT_BAT_VOLT_MAX 0"
           # Shipped flatness outer loop INDI config (identical to indi-flatness-outer-loop):
           # INDI on all axes, RC9 -> CUSTOM_CONTROLLER (109), inner rate loop
           # tuned for angular-accel inversion (OMG_FILT=${toString omgFilt}, G1_RP 500),
           # flatness outer loop enabled, collective left to the stock altitude
-          # controller. OMG_FILT is the swept variable (80 shipped vs 160 fix).
+          # controller.
           "CC_TYPE 3"
           "CC_AXIS_MASK 7"
           "RC9_OPTION 109"
           "CC3_OMG_FILT ${toString omgFilt}"
           "CC3_G1_RP 500"
+          "CC3_G1_YAW 28.8"
           "CC3_OUTER_EN 1"
           "CC3_B_THR_EN 0"
           "CC3_B_ACC_FILT ${toString accFilt}"
+          # measured-RPM feedback measured-actuator-state path: the fix under test. G2 (rotor-inertia
+          # yaw reaction) stays OFF for this first flight to isolate whether
+          # measured actuator state alone closes the roll/pitch buzz.
+          "CC3_USE_RPM 1"
+          "CC3_G2_YAW 0"
         ];
 
         # The custom physics backend, drag OFF (the clean drop-in baseline before
@@ -121,8 +138,10 @@ pkgs.testers.runNixOSTest {
 
         # Shared GPS/EKF warm-up probe (same one the other SITL gates use).
         environment.etc."arm-probe.py".source = ./arm-probe.py;
-        # INDI-on-backend battery scorer (tracking + omega-inversion + rate buzz).
-        environment.etc."indi-drag-rejection-indi-score.py".source = ./indi-drag-rejection-indi-score.py;
+        # measured-RPM feedback buzz-closes battery scorer (tracking + omega-inversion + rate buzz +
+        # measured-RPM engagement proof).
+        environment.etc."indi-measured-rpm-tracking-score.py".source =
+          ./indi-measured-rpm-tracking-score.py;
         environment.etc."indi_flatness_baseline.json".source = baselineJson;
       };
   };
@@ -192,15 +211,16 @@ pkgs.testers.runNixOSTest {
       machines[0].copy_from_vm("/tmp/flight/indi_flatness_flown.json", "")
 
       # Score: run via execute() so ALL diagnostic numbers (tracking, omega
-      # inversion, rate buzz) print into the build log even when a tolerance
-      # assertion fails -- controller buzz is a finding to surface, not to hide.
+      # inversion, rate buzz, INDC measured-RPM health) print into the build log
+      # even when a buzz-closes assertion fails -- controller buzz is a finding
+      # to surface, not to hide.
       rc, out = machines[0].execute(
-          "python3 /etc/indi-drag-rejection-indi-score.py"
+          "python3 /etc/indi-measured-rpm-tracking-score.py"
           " /tmp/flight/flight.BIN /tmp/flight/indi_flatness_flown.json"
-          " /etc/indi_flatness_baseline.json ${trackTolAbs} ${trackTolMult} 2>&1")
+          " /etc/indi_flatness_baseline.json ${buzzTol} ${satTol} ${nrmseTol} 2>&1")
       print(out)
       machines[0].execute("cp /tmp/flight/indi_score.json /tmp/flight/ 2>/dev/null || true")
       machines[0].copy_from_vm("/tmp/flight/indi_score.json", "")
-      assert rc == 0, f"INDI-on-JSON-backend gate failed (rc={rc}); see score output above"
+      assert rc == 0, f"measured-RPM feedback buzz-closes gate failed (rc={rc}); see score output above"
     '';
 }
