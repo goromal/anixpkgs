@@ -96,8 +96,8 @@
       },
       "original": {
         "owner": "Mic92",
-        "ref": "fix-structured-attrs-hook",
         "repo": "bun2nix",
+        "rev": "5765b0614591f75ee8ba5596e81ae85c167d1071",
         "type": "github"
       }
     },
@@ -445,7 +445,9 @@
     },
     "llm-agents": {
       "inputs": {
-        "bun2nix": "bun2nix",
+        "bun2nix": [
+          "bun2nix"
+        ],
         "flake-parts": "flake-parts",
         "nixpkgs": "nixpkgs_2",
         "systems": "systems_2",
@@ -984,6 +986,7 @@
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",
+        "bun2nix": "bun2nix",
         "ceres-factors": "ceres-factors",
         "comfyui-src": "comfyui-src",
         "crowcpp": "crowcpp",
