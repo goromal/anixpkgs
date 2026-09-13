@@ -39,7 +39,7 @@ pkgs.testers.runNixOSTest {
         virtualisation.diskSize = 8192;
         # Select the INDI backend (CC_TYPE=3), apply it to all three axes, and
         # wire RC9 to the CUSTOM_CONTROLLER aux function (109) so baseline_cc can
-        # engage it mid-flight via an RC override. Pin the C1 config explicitly
+        # engage it mid-flight via an RC override. Pin the angular-acceleration feedback config explicitly
         # (CC3_OMG_FILT=80 estimator cutoff, CC3_G1_RP=500 near-true roll/pitch
         # effectiveness) even though these are now the firmware param defaults --
         # this env is the permanent record of the config that fixed the
@@ -51,7 +51,7 @@ pkgs.testers.runNixOSTest {
           "CC3_OMG_FILT 80"
           "CC3_G1_RP 500"
         ];
-        # Same prearm/EKF warm-up probe S1 uses (arm() needs a sim GPS lock
+        # Same prearm/EKF warm-up probe stock-guided uses (arm() needs a sim GPS lock
         # before NAV_TAKEOFF will climb); prints STATUSTEXT/GPS/params so an
         # arm/takeoff failure in the headless battery is explainable.
         environment.etc."arm-probe.py".text = ''
@@ -119,7 +119,7 @@ pkgs.testers.runNixOSTest {
               "timeout 3600 python3 -m indi_harness.sitl.baseline_cc"
               " --url tcp:127.0.0.1:5790 --engage-rc 9"
               " --logs-dir /data/drone/ardusitl/logs"
-              " --out /tmp/s3_layerC >&2"
+              " --out /tmp/indi_angular_accel >&2"
           )
       except Exception:
           print("=== arm/EKF/GPS probe ===")
@@ -129,31 +129,31 @@ pkgs.testers.runNixOSTest {
           print(machines[0].execute("find /data/drone -name '*.BIN' 2>/dev/null; ls -la /data/drone/ardusitl 2>/dev/null")[1])
           raise
       # Hard requirement: the scored 5-case battery JSON. baseline_cc hardcodes
-      # the filename "s3_layerA.json" into --out; reference the file it actually
-      # writes and rename it to the Layer-C artifact name.
-      machines[0].succeed("test -s /tmp/s3_layerC/s3_layerA.json")
-      machines[0].succeed("cp /tmp/s3_layerC/s3_layerA.json /tmp/s3_layerC/s3_layerC.json")
-      machines[0].copy_from_vm("/tmp/s3_layerC/s3_layerC.json", "")
+      # the filename "indi_rate.json" into --out; reference the file it actually
+      # writes and rename it to the actuator feedback artifact name.
+      machines[0].succeed("test -s /tmp/indi_angular_accel/indi_rate.json")
+      machines[0].succeed("cp /tmp/indi_angular_accel/indi_rate.json /tmp/indi_angular_accel/indi_angular_accel.json")
+      machines[0].copy_from_vm("/tmp/indi_angular_accel/indi_angular_accel.json", "")
       # Export the newest .BIN (INDI health source of truth) for offline scoring
       # of predicted-vs-measured angular accel.
-      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerC/s3_layerC.BIN")
-      machines[0].copy_from_vm("/tmp/s3_layerC/s3_layerC.BIN", "")
+      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/indi_angular_accel/indi_angular_accel.BIN")
+      machines[0].copy_from_vm("/tmp/indi_angular_accel/indi_angular_accel.BIN", "")
       # INDI health summary (proves the INDI backend actually flew it).
       print(machines[0].succeed(
           "python3 -c \""
           "from indi_harness.sitl.binlog import read_indi_health; import numpy as np; "
-          "h=read_indi_health('/tmp/s3_layerC/s3_layerC.BIN'); "
+          "h=read_indi_health('/tmp/indi_angular_accel/indi_angular_accel.BIN'); "
           "print('INDI msgs', len(h['time_us']), 'sat_frac', round(float(h['sat'].mean()),3))\""
       ))
-      # C1 exit gate: excitation-aware omega_dot-tracking. omega_gate_ok skips
+      # angular-acceleration feedback exit gate: excitation-aware omega_dot-tracking. omega_gate_ok skips
       # unexcited axes (yaw is quiescent on this battery) and requires the excited
       # roll/pitch axes to track with NRMSE < 0.75 -- proves real omega_dot
-      # inversion (not Layer A's attenuated / limit-cycling predictor).
+      # inversion (not legacy INDI rate controller's attenuated / limit-cycling predictor).
       print(machines[0].succeed(
           "python3 -c \""
           "from indi_harness.sitl.binlog import read_indi_health; "
           "from indi_harness.sitl.align import omega_gate_ok; "
-          "ok,per=omega_gate_ok(read_indi_health('/tmp/s3_layerC/s3_layerC.BIN')); "
+          "ok,per=omega_gate_ok(read_indi_health('/tmp/indi_angular_accel/indi_angular_accel.BIN')); "
           "print('omega gate', ok, {a:(round(v['nrmse'],3),round(v['exc_rms'],3),v['excited']) for a,v in per.items()}); "
           "assert ok\""
       ))

@@ -1,7 +1,7 @@
-"""C2 measured-actuator-state buzz-closes scorer (S4 Phase 2 spec Section 5).
+"""Score trajectory tracking with measured-RPM actuator feedback.
 
 Flies the same INDI-on-JSON-backend battery as the indi-drag-rejection-indi.nix
-DIAGNOSTIC (shipped tune, buzzes-by-design) but scores the C2 fix
+DIAGNOSTIC (shipped tune, buzzes-by-design) but scores the measured-RPM feedback fix
 (CC3_USE_RPM=1) against a BUZZ-CLOSES gate instead of the diagnostic's
 tolerance band: per case, indi_harness.buzz_score.score() must report
 closed=True (tracking RMS within tol of the benign-SITL baseline, actuator
@@ -10,8 +10,8 @@ All diagnostics -- tracking, omega inversion, IMU-gyro buzz, and the INDC
 measured-RPM channel health -- are PRINTED before any assertion, so a
 buzz-still-open finding survives a failed gate with full evidence.
 
-Reusable helpers live in indi_harness.sitl.binscore. Design doc:
-indi-harness/docs/s4_phase2_design.md (Section 5, buzz-closes gate).
+Reusable helpers live in indi_harness.sitl.binscore. Results and limitations:
+indi-harness/docs/measured_rpm_feedback_results.md.
 
 argv: <flight.BIN> <flown.json> <baseline.json> [buzz_tol sat_tol nrmse_tol report.json]
 """
@@ -52,7 +52,7 @@ NRMSE_TOL = float(sys.argv[6]) if len(sys.argv) > 6 else 0.6
 REPORT = sys.argv[7] if len(sys.argv) > 7 else "/tmp/flight/indi_score.json"
 
 
-# --- DIAGNOSTIC (Task 8 debug): does the reconstruction recover the command? --
+# --- DIAGNOSTIC: does the reconstruction recover the command? --
 # Read INDC Ux/Uy/Uz (reconstructed measured actuator state) vs Cx/Cy/Cz (stock
 # current PID command). This is NOT the previous custom output: correlation
 # alone cannot establish reconstruction fidelity or structural instability.
@@ -112,12 +112,12 @@ rt, rdes_all, ract_all, pdes_all, pact_all = read_rate_msgs(BIN)
 gt, gyro_all = read_imu_gyro(BIN)
 # Concrete engagement proof from the firmware STATUSTEXT log.
 engage_msgs = read_engage_msgs(BIN)
-# C2 measured-actuator-state channel (INDC): per-motor measured omega/omega_dot
+# measured-RPM feedback measured-actuator-state channel (INDC): per-motor measured omega/omega_dot
 # and the reconstructed actuator torque -- proof the RPM path actually ran.
 ic = read_indc_health(BIN)
 
 # A controller comparison requires a settled stock handover. Otherwise later
-# runaway is not evidence that C2 (or the DDS outer loop) caused the onset.
+# runaway is not evidence that measured-RPM feedback (or the DDS outer loop) caused the onset.
 engage_us = float(ih["time_us"][0]) if ih["time_us"].size else float("nan")
 stock_window = (rt >= engage_us - 2e6) & (rt < engage_us)
 stock_peak_rate = (float(np.max(np.hypot(ract_all[stock_window],
@@ -205,7 +205,7 @@ report = {
                        "limit_rad_s": 1.0},
 }
 
-print("=== C2 buzz-closes battery (INDI-on-JSON-backend) ===", flush=True)
+print("=== measured-RPM feedback buzz-closes battery (INDI-on-JSON-backend) ===", flush=True)
 print(f"cases flown       : {case_names}", flush=True)
 print(f"ENGAGEMENT        : statustext={engage_msgs} engaged_on={engaged_on} "
       f"du_active_rms={du_active_rms:.5f} indi_active={indi_active}", flush=True)
@@ -234,7 +234,7 @@ def _print_gyro(label, gy):
 
 def _print_inner(label, om, rate):
     """Inner-loop buzz block: omega_dot inversion + roll/pitch RATE. Benign-SITL
-    Layer-B reference (circle_slow fixture): roll/pitch exc_rms ~3.8/4.9 rad/s^2,
+    flatness outer loop reference (circle_slow fixture): roll/pitch exc_rms ~3.8/4.9 rad/s^2,
     RATE act_rms ~31/38 deg/s, buzz_ddt_rms ~21/27 deg/s. Multiples of THOSE are
     the buzz signal (the actuator-lag inner-loop risk)."""
     print(f"--- inner-loop [{label}] omega_dot inversion + RATE buzz ---", flush=True)
@@ -259,7 +259,7 @@ for pc in per_case:
     _print_gyro(pc["case"], pc["gyro"])
 
 # --- buzz-closes scoring (per case) -------------------------------------------
-# omega_dot_nrmse per case = MAX of roll/pitch nrmse (the two axes the Phase-1
+# omega_dot_nrmse per case = MAX of roll/pitch nrmse (the two axes the initial JSON-backend experiments
 # buzz was found on); sat_frac per case comes straight from that case's
 # omega_window(). track_rms/benign_rms are the same per-case tracking numbers
 # printed above.
@@ -332,7 +332,7 @@ if not (peak_alt_m < 14.0):
     errs.append(f"altitude runaway suspected: peak {peak_alt_m:.1f} m")
 # RPM channel live: if the measured-actuator-state path never actually ran
 # (all fallback, or omega reads all-zero) then a closed buzz score would be
-# meaningless -- the C2 path wasn't exercised.
+# meaningless -- the measured-RPM feedback path wasn't exercised.
 if indc_fallback_frac >= 0.5 or indc_mean_abs_omega <= 0.0:
     errs.append(f"INDC measured-RPM channel not live: fallback_frac="
                 f"{indc_fallback_frac:.3f} mean_abs_omega={indc_mean_abs_omega:.2f} "
@@ -357,8 +357,8 @@ for r in buzz_results:
         errs.append(f"{r['case']}: buzz NOT closed ({'; '.join(fails)})")
 
 if errs:
-    print("=== C2 buzz-closes gate FAIL ===", flush=True)
+    print("=== measured-RPM feedback buzz-closes gate FAIL ===", flush=True)
     for e in errs:
         print("  FAIL:", e, flush=True)
     sys.exit(1)
-print("=== C2 buzz-closes gate PASS ===", flush=True)
+print("=== measured-RPM feedback buzz-closes gate PASS ===", flush=True)

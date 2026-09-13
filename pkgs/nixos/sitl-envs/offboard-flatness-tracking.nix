@@ -64,25 +64,25 @@ pkgs.testers.runNixOSTest {
         # then the offboard battery, run through the ROS-overlay python (rclpy)
         # with the indi-harness env on PYTHONPATH. Same command the headless
         # testScript runs, wrapped so it is a single copy-paste in the guest.
-        environment.etc."s2-fly.sh".text = ''
+        environment.etc."offboard-fly.sh".text = ''
           #!/bin/sh
           set -e
           echo "== GPS/EKF warm-up (~90s) =="
-          timeout 180 python3 /etc/s2-arm-probe.py 2>&1 | tail -8 || true
+          timeout 180 python3 /etc/offboard-arm-probe.py 2>&1 | tail -8 || true
           echo "== flying offboard battery — watch in mavproxy =="
           PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3 \
             -m indi_harness.offboard.baseline \
             --url tcp:127.0.0.1:5790 --no-indi \
-            --logs-dir /data/drone/ardusitl/logs --out /tmp/s2_manual
+            --logs-dir /data/drone/ardusitl/logs --out /tmp/offboard_manual
           echo "== done; RMSE: =="
-          cat /tmp/s2_manual/s2_offboard.json
+          cat /tmp/offboard_manual/offboard_flatness.json
         '';
-        # Same GPS/EKF warm-up + diagnostic probe S1 uses: arm() only passes
+        # Same GPS/EKF warm-up + diagnostic probe stock-guided uses: arm() only passes
         # once prearm clears, but the vehicle needs a sim GPS lock before it
         # will climb on NAV_TAKEOFF. Running this first warms the EKF and
         # prints STATUSTEXT/GPS/param lines so any arm/takeoff failure in the
         # headless battery is explainable from the log.
-        environment.etc."s2-arm-probe.py".text = ''
+        environment.etc."offboard-arm-probe.py".text = ''
           import time
           from pymavlink import mavutil
 
@@ -140,8 +140,8 @@ pkgs.testers.runNixOSTest {
       machines[0].wait_until_succeeds("ss -tln '( sport = :5790 )' | grep -q 5790", timeout=60)
       machines[0].wait_until_succeeds("timeout 60 ros2 topic list > /tmp/rostopics 2>/dev/null || true; grep -q '^/ap/pose' /tmp/rostopics", timeout=600)
       machines[0].succeed("python3 -c 'import indi_harness.offboard.bridge'")
-      # GPS/EKF warm-up + diagnostics (see s2-arm-probe.py) before flying.
-      print(machines[0].execute("timeout 180 python3 /etc/s2-arm-probe.py 2>&1")[1])
+      # GPS/EKF warm-up + diagnostics (see offboard-arm-probe.py) before flying.
+      print(machines[0].execute("timeout 180 python3 /etc/offboard-arm-probe.py 2>&1")[1])
       # §L: bag of what the graph saw, /ap/time included for the time bridge.
       # sqlite3 storage (default), not mcap: the non-interactive test harness
       # cannot cleanly SIGINT-finalize the recorder, and an unfinalized mcap
@@ -151,7 +151,7 @@ pkgs.testers.runNixOSTest {
       # (rosbag2-storage-mcap) and records — proven separately below.
       machines[0].succeed("(ros2 bag record -s mcap -o /tmp/mcap_probe /ap/time >/dev/null 2>&1 & echo $! >/tmp/mp.pid); sleep 5; kill -INT $(cat /tmp/mp.pid) 2>/dev/null; sleep 2; ls -la /tmp/mcap_probe/*.mcap")
       machines[0].execute(
-          "cd /tmp && (ros2 bag record -s sqlite3 -o s2bag "
+          "cd /tmp && (ros2 bag record -s sqlite3 -o offboard_bag "
           "/ap/pose/filtered /ap/twist/filtered /ap/time "
           "/indi/ref_pose /indi/cmd_attitude >/tmp/bag.log 2>&1 & "
           "echo $! >/tmp/bag.pid)"
@@ -163,14 +163,14 @@ pkgs.testers.runNixOSTest {
           # command-path latency the previous-command and measured specific
           # force do not cancel -> f_cmd winds up; observed commanded tilt
           # >130 deg, thrust surrogate ->1e4). Stabilizing INDI offboard needs
-          # a faster/lower-latency inner path (design-doc S3+); S2 flies the
+          # a faster/lower-latency inner path ; offboard flies the
           # battery with the stable flatness PD+ff outer loop.
           machines[0].succeed(
               "PYTHONPATH=${indiSitePackages} timeout 3600 ${rosPy}/bin/python3"
               " -m indi_harness.offboard.baseline"
               " --url tcp:127.0.0.1:5790 --no-indi"
               " --logs-dir /data/drone/ardusitl/logs"
-              " --out /tmp/s2_offboard >&2"
+              " --out /tmp/offboard_flatness >&2"
           )
       except Exception:
           print("=== baseline failure diagnostics ===")
@@ -189,23 +189,23 @@ pkgs.testers.runNixOSTest {
           "kill -9 $PID 2>/dev/null || true; "
           "pkill -9 -f 'ros2 bag record' 2>/dev/null || true; sleep 2"
       )
-      machines[0].execute("test -f /tmp/s2bag/metadata.yaml || ros2 bag reindex -s sqlite3 /tmp/s2bag")
-      print(machines[0].execute("tail -6 /tmp/bag.log; echo '--- bag dir ---'; ls -la /tmp/s2bag")[1])
+      machines[0].execute("test -f /tmp/offboard_bag/metadata.yaml || ros2 bag reindex -s sqlite3 /tmp/offboard_bag")
+      print(machines[0].execute("tail -6 /tmp/bag.log; echo '--- bag dir ---'; ls -la /tmp/offboard_bag")[1])
 
       # Hard requirement: the scored 5-case battery JSON. Export it + the raw
       # bag before the (best-effort) latency analysis, so control diagnosis and
       # the exit-gate artifact survive any bag-tooling hiccup.
-      machines[0].succeed("test -s /tmp/s2_offboard/s2_offboard.json")
-      machines[0].succeed("cd /tmp && tar czf /tmp/s2_offboard/s2bag.tgz s2bag")
-      machines[0].copy_from_vm("/tmp/s2_offboard/s2_offboard.json", "")
-      machines[0].copy_from_vm("/tmp/s2_offboard/s2bag.tgz", "")
-      print(machines[0].succeed("cat /tmp/s2_offboard/s2_offboard.json"))
+      machines[0].succeed("test -s /tmp/offboard_flatness/offboard_flatness.json")
+      machines[0].succeed("cd /tmp && tar czf /tmp/offboard_flatness/offboard_bag.tgz offboard_bag")
+      machines[0].copy_from_vm("/tmp/offboard_flatness/offboard_flatness.json", "")
+      machines[0].copy_from_vm("/tmp/offboard_flatness/offboard_bag.tgz", "")
+      print(machines[0].succeed("cat /tmp/offboard_flatness/offboard_flatness.json"))
 
       # Best-effort latency report (§L command-path evidence).
-      rc, _ = machines[0].execute("python3 -m indi_harness.offboard.bags /tmp/s2bag --json /tmp/s2_offboard/latency.json 2>/tmp/lat.err")
+      rc, _ = machines[0].execute("python3 -m indi_harness.offboard.bags /tmp/offboard_bag --json /tmp/offboard_flatness/latency.json 2>/tmp/lat.err")
       if rc == 0:
-          machines[0].copy_from_vm("/tmp/s2_offboard/latency.json", "")
-          print(machines[0].succeed("cat /tmp/s2_offboard/latency.json"))
+          machines[0].copy_from_vm("/tmp/offboard_flatness/latency.json", "")
+          print(machines[0].succeed("cat /tmp/offboard_flatness/latency.json"))
       else:
           print("=== latency analysis failed (non-fatal) ===")
           print(machines[0].execute("cat /tmp/lat.err | tail -10")[1])

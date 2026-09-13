@@ -1,13 +1,13 @@
 # INDI-on-JSON-backend drop-in DIAGNOSTIC (not a green CI gate).
 #
-# Engages the shipped Layer-B INDI (CC_TYPE=3, CC3_OUTER_EN=1) on the pysignals
+# Engages the shipped flatness outer loop INDI (CC_TYPE=3, CC3_OUTER_EN=1) on the pysignals
 # JSON backend (--no-drag) over ROS2/DDS and scores tracking + inner-loop buzz
-# against the benign-SITL Layer-B baseline. FAILS BY DESIGN on the shipped tune:
-# the backend's real actuator lag re-stresses the C1 rate loop. It is a documented
+# against the benign-SITL flatness outer loop baseline. FAILS BY DESIGN on the shipped tune:
+# the backend's real actuator lag re-stresses the angular-acceleration feedback rate loop. It is a documented
 # diagnostic, not wired into CI. Finding writeup + numbers:
 # indi-harness/docs/json_physics_backend_results.md
 #
-# omgFilt: the C1 angular-accel filter cutoff CC3_OMG_FILT (Hz). Default 80 = the
+# omgFilt: the angular-acceleration feedback angular-accel filter cutoff CC3_OMG_FILT (Hz). Default 80 = the
 # shipped tune (buzzes here); the -omg160 variant tests the candidate fix.
 # Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection-indi.nix
 {
@@ -48,10 +48,10 @@ let
   indiPy = anixpkgs.python313.withPackages (ps: [ ps.indi-harness ]);
   indiSitePackages = "${indiPy}/lib/python3.13/site-packages";
 
-  # Benign-SITL Layer-B baseline rows for the two flown cases (from
-  # indi-harness/baselines/s3_layerB_sitl.json). Embedded so the env is
+  # Benign-SITL flatness outer loop baseline rows for the two flown cases (from
+  # indi-harness/baselines/indi_flatness_sitl.json). Embedded so the env is
   # self-contained (the baselines/ dir is not shipped in site-packages).
-  baselineJson = pkgs.writeText "s3_layerB_baseline.json" (
+  baselineJson = pkgs.writeText "indi_flatness_baseline.json" (
     builtins.toJSON [
       {
         case = "circle_slow";
@@ -90,7 +90,7 @@ pkgs.testers.runNixOSTest {
           # doesn't over-thrust the high-TWR takeoff (mirrors the stock gate).
           "MOT_THST_HOVER 0.30"
           "MOT_HOVER_LEARN 0"
-          # Shipped Layer-B INDI config (identical to indi-flatness-outer-loop):
+          # Shipped flatness outer loop INDI config (identical to indi-flatness-outer-loop):
           # INDI on all axes, RC9 -> CUSTOM_CONTROLLER (109), inner rate loop
           # tuned for angular-accel inversion (OMG_FILT=${toString omgFilt}, G1_RP 500),
           # flatness outer loop enabled, collective left to the stock altitude
@@ -123,7 +123,7 @@ pkgs.testers.runNixOSTest {
         environment.etc."arm-probe.py".source = ./arm-probe.py;
         # INDI-on-backend battery scorer (tracking + omega-inversion + rate buzz).
         environment.etc."indi-drag-rejection-indi-score.py".source = ./indi-drag-rejection-indi-score.py;
-        environment.etc."s3_layerB_baseline.json".source = baselineJson;
+        environment.etc."indi_flatness_baseline.json".source = baselineJson;
       };
   };
   testScript =
@@ -154,27 +154,27 @@ pkgs.testers.runNixOSTest {
       # Fly the two-case battery (circle_slow + lemniscate_fast) with the
       # in-firmware INDI outer loop, DDS-driven by traj_server. The runner takes
       # off + engages once, then holds case-by-case writing {case,origin} to
-      # /tmp/lb_ready; traj_server (battery mode) follows the ready-file and
+      # /tmp/trajectory_ready; traj_server (battery mode) follows the ready-file and
       # stops between cases -> DDS-staleness fallback at the case boundary.
-      machines[0].execute("mkdir -p /tmp/flight; rm -f /tmp/lb_ready")
+      machines[0].execute("mkdir -p /tmp/flight; rm -f /tmp/trajectory_ready")
       machines[0].execute(
           "(timeout 600 python3 -m indi_harness.sitl.baseline_outer"
           " --url tcp:127.0.0.1:5790 --out /tmp/flight --engage-rc 9"
-          " --ready-file /tmp/lb_ready --cases circle_slow,lemniscate_fast"
+          " --ready-file /tmp/trajectory_ready --cases circle_slow,lemniscate_fast"
           " >/tmp/runner.log 2>&1 &"
           " echo $! >/tmp/runner.pid)"
       )
       try:
-          machines[0].wait_for_file("/tmp/lb_ready", timeout=300)
+          machines[0].wait_for_file("/tmp/trajectory_ready", timeout=300)
           machines[0].execute(
               "(PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3"
-              " -m indi_harness.offboard.traj_server --ready-file /tmp/lb_ready"
+              " -m indi_harness.offboard.traj_server --ready-file /tmp/trajectory_ready"
               " >/tmp/traj.log 2>&1 & echo $! >/tmp/traj.pid)"
           )
           machines[0].succeed(
               "PID=$(cat /tmp/runner.pid); for i in $(seq 1 600); do "
               "kill -0 $PID 2>/dev/null || break; sleep 1; done; "
-              "test -s /tmp/flight/s3_layerB_flown.json"
+              "test -s /tmp/flight/indi_flatness_flown.json"
           )
       except Exception:
           print("=== runner.log ==="); print(machines[0].execute("cat /tmp/runner.log 2>/dev/null | tail -40")[1])
@@ -189,15 +189,15 @@ pkgs.testers.runNixOSTest {
       # Export the newest .BIN (outer + inner loop health source of truth).
       machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/flight/flight.BIN")
       machines[0].copy_from_vm("/tmp/flight/flight.BIN", "")
-      machines[0].copy_from_vm("/tmp/flight/s3_layerB_flown.json", "")
+      machines[0].copy_from_vm("/tmp/flight/indi_flatness_flown.json", "")
 
       # Score: run via execute() so ALL diagnostic numbers (tracking, omega
       # inversion, rate buzz) print into the build log even when a tolerance
       # assertion fails -- controller buzz is a finding to surface, not to hide.
       rc, out = machines[0].execute(
           "python3 /etc/indi-drag-rejection-indi-score.py"
-          " /tmp/flight/flight.BIN /tmp/flight/s3_layerB_flown.json"
-          " /etc/s3_layerB_baseline.json ${trackTolAbs} ${trackTolMult} 2>&1")
+          " /tmp/flight/flight.BIN /tmp/flight/indi_flatness_flown.json"
+          " /etc/indi_flatness_baseline.json ${trackTolAbs} ${trackTolMult} 2>&1")
       print(out)
       machines[0].execute("cp /tmp/flight/indi_score.json /tmp/flight/ 2>/dev/null || true")
       machines[0].copy_from_vm("/tmp/flight/indi_score.json", "")

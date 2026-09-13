@@ -1,4 +1,4 @@
-# Small-flight regression, not the S4 DDS trajectory acceptance gate.
+# Small-flight regression, not the realistic-physics DDS trajectory acceptance gate.
 # Always uses this checkout's remote lock pins, independent of local-build.
 # nix-build pkgs/nixos/sitl-envs/indi-actuator-probe.nix -A flight
 let
