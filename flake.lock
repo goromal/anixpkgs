@@ -35,17 +35,17 @@
     "ardupilot": {
       "flake": false,
       "locked": {
-        "lastModified": 1787926744,
-        "narHash": "sha256-xz1MkdwKwgKEIAID4kWU/rt0sjtgqfkCIS/S3MzI/m4=",
-        "ref": "dev/controller",
-        "rev": "67d90b5693db071afdf8023aa14669ac3a81d77a",
-        "revCount": 70910,
+        "lastModified": 1789263892,
+        "narHash": "sha256-LinXIcF5Dcu6xlVj46z+4VmqnYquornSwt8KMCe5c34=",
+        "ref": "refs/heads/dev/indi-s4-phase2",
+        "rev": "64c387baea232de7fd2730e15e32c9808b31cb27",
+        "revCount": 70912,
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
       },
       "original": {
-        "ref": "dev/controller",
+        "ref": "refs/heads/dev/indi-s4-phase2",
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
@@ -394,16 +394,16 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1787976655,
-        "narHash": "sha256-kG7TWRbjID+1eMG8c3qwzWFU12UcVlHY0mVYEdbNSlM=",
+        "lastModified": 1789264190,
+        "narHash": "sha256-KmidFwC/adyGmQPl04/p95jXuwIMoJYZXW+f1gHBghA=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "bbdab5d82d3ad72cfbe0508dddbb519cbdc545c8",
+        "rev": "d801c05718bb8aeefe639d8a5ce68c349bb2236c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/indi-s4-phase2",
+        "ref": "refs/heads/dev/indi-s4-phase2",
         "repo": "indi-harness",
         "type": "github"
       }

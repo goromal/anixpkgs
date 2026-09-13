@@ -1,31 +1,21 @@
-# INDI C2 "measured actuator state" DIAGNOSTIC (fail-by-design, NOT a green CI
-# gate). Sibling of indi-drag-rejection-indi.nix; encodes the S4-Phase-2 finding.
+# INDI C2 "measured actuator state" trajectory acceptance experiment.
+# NOT a green CI gate until the original tracking/buzz thresholds pass.
 #
 # Flies the two-case battery (circle_slow, lemniscate_fast) over the pysignals
 # JSON backend (--no-drag) with CC3_USE_RPM=1 -- the C2 measured-actuator-state
-# INDI path (u0 reconstructed in torque-space from bidi-eRPM, fed into the C1
+# INDI path (u0 reconstructed in normalized mixer units from mechanical RPM,
+# fed into the C1
 # rate loop). G2 OFF, OMG_FILT at the shipped 80.
 #
-# FINDING (2026-08-28): C2-in-torque-space DIVERGES on the realistic backend
-# (circle_slow track_rms ~138 m, altitude runaway ~865 m), NOT the shipped
-# path's benign 3-10 m buzz. Two principled fixes -- a genuine reconstruction
-# scale bug (projection onto mixer factors / sum(f^2)) and thrust-map
-# linearization (MOT_THST_EXPO 0 + SPIN_MIN/MAX so o2n == thrust_rpyt_out) --
-# were both applied; neither stopped the divergence. Windowing the .BIN to
-# BEFORE divergence (INDC Cx/Cy/Cz stock-command vs Ux/Uy/Uz reconstruction)
-# showed the reconstruction DOES recover the command (roll corr 0.92, slope
-# 0.73 -> 0.99 after linearization) yet the loop still diverged, and faster
-# (900 ms -> 30 ms). So the instability is structural: putting the actuator lag
-# inside u_filt (which the previous-command path avoids -- why it merely buzzes)
-# is a loop phase/gain-margin instability of the increment itself, not a
-# reconstruction-fidelity bug. This is the spec's C2-insufficient -> C3 trigger;
-# C3 (native rotor-speed^2 allocation + per-motor RPM loop) is Phase 3.
-# Full writeup: indi-harness/docs/s4_phase2_results.md.
+# September audit: the August failure did not establish structural instability.
+# The old yaw effectiveness (1000) was ~35x the normalized plant value (28.8),
+# and INDC Cx is current PID, not previous custom output. Small attitude flights
+# now pass with corrected units; this larger DDS battery still needs validation.
+# Current handoff: indi-harness/docs/2026-09-12-controller-audit.md.
 #
-# The scorer still runs the buzz_score gate (which FAILS by design here) and
-# prints the U-vs-C reconstruction diagnostic. Run manually to reproduce the
-# finding; NOT wired into CI (a red build is the documented outcome).
-# Run: nix-build pkgs/nixos/sitl-envs/indi-s4-phase2-c2.nix   # fails by design
+# Preserve the original acceptance thresholds; do not loosen them to get green.
+# Run with dependencies.nix local-build=true to test this checkout's lock pins.
+# Run: nix-build pkgs/nixos/sitl-envs/indi-s4-phase2-c2.nix
 with import ../dependencies.nix;
 let
   # CC3_OMG_FILT (Hz): hardcoded at the shipped default. C2 (measured actuator
@@ -104,6 +94,13 @@ pkgs.testers.runNixOSTest {
           # doesn't over-thrust the high-TWR takeoff (mirrors the stock gate).
           "MOT_THST_HOVER 0.30"
           "MOT_HOVER_LEARN 0"
+          # Linear command-to-Omega^2 map required by the normalized G1 seed.
+          "MOT_THST_EXPO 0"
+          "MOT_SPIN_ARM 0"
+          "MOT_SPIN_MIN 0"
+          "MOT_SPIN_MAX 1"
+          "MOT_BAT_VOLT_MIN 0"
+          "MOT_BAT_VOLT_MAX 0"
           # Shipped Layer-B INDI config (identical to indi-flatness-outer-loop):
           # INDI on all axes, RC9 -> CUSTOM_CONTROLLER (109), inner rate loop
           # tuned for angular-accel inversion (OMG_FILT=${toString omgFilt}, G1_RP 500),
@@ -114,6 +111,7 @@ pkgs.testers.runNixOSTest {
           "RC9_OPTION 109"
           "CC3_OMG_FILT ${toString omgFilt}"
           "CC3_G1_RP 500"
+          "CC3_G1_YAW 28.8"
           "CC3_OUTER_EN 1"
           "CC3_B_THR_EN 0"
           "CC3_B_ACC_FILT ${toString accFilt}"

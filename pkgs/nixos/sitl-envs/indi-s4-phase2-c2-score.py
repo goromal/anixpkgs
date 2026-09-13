@@ -13,7 +13,7 @@ buzz-still-open finding survives a failed gate with full evidence.
 Reusable helpers live in indi_harness.sitl.binscore. Design doc:
 indi-harness/docs/s4_phase2_design.md (Section 5, buzz-closes gate).
 
-argv: <flight.BIN> <flown.json> <baseline.json> <buzz_tol> <sat_tol> <nrmse_tol>
+argv: <flight.BIN> <flown.json> <baseline.json> [buzz_tol sat_tol nrmse_tol report.json]
 """
 import json
 import sys
@@ -37,7 +37,7 @@ from indi_harness.sitl.binscore import (
     rate_window,
 )
 from indi_harness.buzz_score import score as buzz_score
-from indi_harness.sysid import analytic_g1
+from indi_harness.sysid import normalized_effectiveness
 from indi_harness.params import QuadParams
 
 BIN = sys.argv[1]
@@ -49,13 +49,14 @@ BASELINE = sys.argv[3]
 BUZZ_TOL = float(sys.argv[4]) if len(sys.argv) > 4 else 1.5
 SAT_TOL = float(sys.argv[5]) if len(sys.argv) > 5 else 0.02
 NRMSE_TOL = float(sys.argv[6]) if len(sys.argv) > 6 else 0.6
+REPORT = sys.argv[7] if len(sys.argv) > 7 else "/tmp/flight/indi_score.json"
 
 
 # --- DIAGNOSTIC (Task 8 debug): does the reconstruction recover the command? --
 # Read INDC Ux/Uy/Uz (reconstructed measured actuator state) vs Cx/Cy/Cz (stock
-# previous-command). If U ~= C the reconstruction is faithful (instability is
-# structural loop dynamics); if U = a*C + b with a != 1 the thrust-curve /
-# spin-scaling distorts the operating point (reconstruction bug).
+# current PID command). This is NOT the previous custom output: correlation
+# alone cannot establish reconstruction fidelity or structural instability.
+# INDU separates PID, previous custom output, and current custom output.
 def _diag_recon():
     from pymavlink import DFReader
     log = DFReader.DFReader_binary(str(BIN))
@@ -115,6 +116,14 @@ engage_msgs = read_engage_msgs(BIN)
 # and the reconstructed actuator torque -- proof the RPM path actually ran.
 ic = read_indc_health(BIN)
 
+# A controller comparison requires a settled stock handover. Otherwise later
+# runaway is not evidence that C2 (or the DDS outer loop) caused the onset.
+engage_us = float(ih["time_us"][0]) if ih["time_us"].size else float("nan")
+stock_window = (rt >= engage_us - 2e6) & (rt < engage_us)
+stock_peak_rate = (float(np.max(np.hypot(ract_all[stock_window],
+                                        pact_all[stock_window]))) * np.pi / 180
+                   if stock_window.any() else None)
+
 
 # Map contiguous engaged blocks to the cases in flight order; score each case's
 # outer-loop tracking AND its inner-loop (omega inversion + rate buzz) in the
@@ -158,7 +167,7 @@ indi_active = du_active_rms > 1e-6
 
 # --- INDC measured-RPM channel health -----------------------------------------
 # Proof the CC3_USE_RPM=1 path actually ran: mostly non-fallback ticks (the
-# firmware falls back to the previous command when RPM telemetry is stale/
+# firmware falls back to current stock PID when RPM telemetry is stale/
 # missing) and a non-zero measured rotor speed.
 indc_n = int(ic["time_us"].size)
 indc_fallback_frac = float(ic["fallback"].mean()) if indc_n else 1.0
@@ -191,6 +200,9 @@ report = {
         "mean_abs_omega": indc_mean_abs_omega,
     },
     "n_runs": len(runs),
+    "stock_handover": {"first_indi_us": engage_us,
+                       "peak_roll_pitch_rate_rad_s": stock_peak_rate,
+                       "limit_rad_s": 1.0},
 }
 
 print("=== C2 buzz-closes battery (INDI-on-JSON-backend) ===", flush=True)
@@ -266,27 +278,40 @@ for pc in per_case:
           f"nrmse={nrmse_case:.3f}/{NRMSE_TOL:.3f}", flush=True)
 report["buzz_closes"]["per_case"] = buzz_results
 
-# G1-ceiling note: the buzz must close because the actuator state is now
-# MEASURED (C2), not because CC3_G1_RP was inflated past a physically
-# implausible effectiveness. analytic_g1(QuadParams())[0] is the roll-axis
-# 1/J effectiveness (~200 rad/s^2 per N*m for the default SITL quad); the
-# shipped CC3_G1_RP=500 stays comfortably under 3x that ceiling.
-analytic_g1_roll = float(analytic_g1(QuadParams())[0])
-effective_g1 = 500.0  # CC3_G1_RP (kept identical to the diagnostic tune)
-print(f"G1 ceiling check  : effective_g1={effective_g1:.0f} "
-      f"analytic_g1_roll≈{analytic_g1_roll:.1f} "
-      f"(3x={3 * analytic_g1_roll:.1f})", flush=True)
+# Compare actual logged gains in normalized mixer-command units, on all axes.
+# Physical 1/J has incompatible torque units and is not this ceiling.
+from pymavlink import DFReader
+parameter_log = DFReader.DFReader_binary(str(BIN))
+parameters = {}
+while (message := parameter_log.recv_match(type="PARM")) is not None:
+    parameters[message.Name] = message.Value
+linear_map = {"MOT_THST_EXPO": 0, "MOT_SPIN_MIN": 0, "MOT_SPIN_MAX": 1,
+              "MOT_BAT_VOLT_MIN": 0, "MOT_BAT_VOLT_MAX": 0}
+linear_ok = all(np.isclose(parameters.get(k, np.nan), v) for k, v in linear_map.items())
+analytic_g1 = normalized_effectiveness(QuadParams())["g1"]
+effective_g1 = np.array([parameters.get("CC3_G1_RP", np.nan)] * 2 +
+                        [parameters.get("CC3_G1_YAW", np.nan)])
+ratios = effective_g1 / analytic_g1
+print(f"G1 ceiling check: logged={effective_g1} normalized={analytic_g1} "
+      f"ratios={ratios} linear_map={linear_ok}", flush=True)
 report["g1_ceiling"] = {
-    "effective_g1": effective_g1,
-    "analytic_g1_roll": analytic_g1_roll,
+    "effective_g1": effective_g1.tolist(),
+    "analytic_g1": analytic_g1.tolist(),
+    "ratios": ratios.tolist(),
+    "linear_map": linear_ok,
 }
 
-open("/tmp/flight/indi_score.json", "w").write(json.dumps(report, indent=1))
+with open(REPORT, "w") as output:
+    json.dump(report, output, indent=1)
 
 # --- hard gate (buzz-closes) --------------------------------------------------
 # These assertions run AFTER all diagnostics are printed + persisted, so a buzz
 # or tracking failure surfaces the numbers (the finding) rather than hiding them.
 errs = []
+if stock_peak_rate is None or not np.isfinite(stock_peak_rate) or stock_peak_rate >= 1.0:
+    errs.append(f"invalid controller handover: pre-INDI stock roll/pitch rate "
+                f"peaked at {stock_peak_rate} rad/s (limit 1.0); "
+                "do not infer the cause of onset from the later trajectory failure")
 # Engagement gate: if the INDI increment du is ~zero over the active window the
 # custom controller never engaged and the vehicle flew STOCK -- every INDI
 # tracking/buzz number would be meaningless, so hard-fail with the evidence.
@@ -314,9 +339,10 @@ if indc_fallback_frac >= 0.5 or indc_mean_abs_omega <= 0.0:
                 f"(CC3_USE_RPM path did not actually run)")
 # G1-ceiling: the buzz must close via measured actuator state, not via an
 # inflated effectiveness gain.
-if not (effective_g1 < 3 * analytic_g1_roll):
-    errs.append(f"G1 ceiling violated: effective_g1={effective_g1} >= "
-                f"3*analytic_g1_roll={3 * analytic_g1_roll:.1f}")
+if not linear_ok:
+    errs.append("normalized G1 ceiling requires the linearized actuator map")
+if not np.all(np.isfinite(ratios) & (ratios > 0) & (ratios < 3)):
+    errs.append(f"G1 ceiling violated: normalized gain ratios={ratios}")
 # Buzz-closes gate: EVERY case must report closed=True.
 for r in buzz_results:
     if not r["closed"]:
