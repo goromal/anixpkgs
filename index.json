@@ -780,7 +780,7 @@
             {
                 "attr": "tor-ephemeral",
                 "ci": true,
-                "docs": true
+                "docs": false
             }
         ],
         "java": [
