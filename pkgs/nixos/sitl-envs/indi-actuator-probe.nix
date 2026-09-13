@@ -22,17 +22,20 @@ rec {
       grep -Eq 'tests="([2-9][0-9]|[1-9][0-9]{2,})"' $out/results.xml
     '';
   });
-  flight = pkgs.runCommand "indi-actuator-probe" {
-    nativeBuildInputs = [ python ];
-    # Include the host test in the build graph as well as the DDS SITL package.
-    controllerMath = math;
-  } ''
-    python -m indi_harness.sitl.rate_probe \
-      --binary ${firmware}/bin/arducopter \
-      --defaults ${firmware.src}/Tools/autotest/default_params/copter.parm \
-      --out "$TMPDIR/flight"
-    python -m indi_harness.sitl.probe_score "$TMPDIR/flight"
-    mkdir -p $out
-    cp -r "$TMPDIR/flight/." $out/
-  '';
+  flight =
+    pkgs.runCommand "indi-actuator-probe"
+      {
+        nativeBuildInputs = [ python ];
+        # Include the host test in the build graph as well as the DDS SITL package.
+        controllerMath = math;
+      }
+      ''
+        python -m indi_harness.sitl.rate_probe \
+          --binary ${firmware}/bin/arducopter \
+          --defaults ${firmware.src}/Tools/autotest/default_params/copter.parm \
+          --out "$TMPDIR/flight"
+        python -m indi_harness.sitl.probe_score "$TMPDIR/flight"
+        mkdir -p $out
+        cp -r "$TMPDIR/flight/." $out/
+      '';
 }
