@@ -288,17 +288,26 @@ while (message := parameter_log.recv_match(type="PARM")) is not None:
 linear_map = {"MOT_THST_EXPO": 0, "MOT_SPIN_MIN": 0, "MOT_SPIN_MAX": 1,
               "MOT_BAT_VOLT_MIN": 0, "MOT_BAT_VOLT_MAX": 0}
 linear_ok = all(np.isclose(parameters.get(k, np.nan), v) for k, v in linear_map.items())
+actuator_layout = {"FRAME_CLASS": 1, "FRAME_TYPE": 1}
+layout_ok = all(np.isclose(parameters.get(k, np.nan), v)
+                for k, v in actuator_layout.items())
 analytic_g1 = normalized_effectiveness(QuadParams())["g1"]
 effective_g1 = np.array([parameters.get("CC3_G1_RP", np.nan)] * 2 +
                         [parameters.get("CC3_G1_YAW", np.nan)])
 ratios = effective_g1 / analytic_g1
 print(f"G1 ceiling check: logged={effective_g1} normalized={analytic_g1} "
-      f"ratios={ratios} linear_map={linear_ok}", flush=True)
+      f"ratios={ratios} linear_map={linear_ok} "
+      f"actuator_layout={actuator_layout} layout_ok={layout_ok}", flush=True)
 report["g1_ceiling"] = {
     "effective_g1": effective_g1.tolist(),
     "analytic_g1": analytic_g1.tolist(),
     "ratios": ratios.tolist(),
     "linear_map": linear_ok,
+}
+report["actuator_layout"] = {
+    "expected": actuator_layout,
+    "logged": {k: parameters.get(k) for k in actuator_layout},
+    "ok": layout_ok,
 }
 
 with open(REPORT, "w") as output:
@@ -341,6 +350,9 @@ if indc_fallback_frac >= 0.5 or indc_mean_abs_omega <= 0.0:
 # inflated effectiveness gain.
 if not linear_ok:
     errs.append("normalized G1 ceiling requires the linearized actuator map")
+if not layout_ok:
+    errs.append(f"JSON QuadParams plant requires X actuator ordering: "
+                f"logged={report['actuator_layout']['logged']}")
 if not np.all(np.isfinite(ratios) & (ratios > 0) & (ratios < 3)):
     errs.append(f"G1 ceiling violated: normalized gain ratios={ratios}")
 # Buzz-closes gate: EVERY case must report closed=True.

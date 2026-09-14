@@ -88,6 +88,10 @@ pkgs.testers.runNixOSTest {
         services.ardupilot-sim.platform = "JSON:127.0.0.1";
 
         services.ardupilot-sim.parameters = lib.mkAfter [
+          # The JSON backend uses QuadParams' X motor layout.  ArduPilot's
+          # default FRAME_TYPE=0 is Plus ordering and destabilizes stock RATE
+          # before the custom controller can engage.
+          "FRAME_TYPE 1"
           # JSON backend's true hover throttle (~0.30) is below ArduPilot's
           # default; tell the (stock, since CC3_B_THR_EN=0) altitude controller
           # the real hover point and freeze hover learning so its feedforward
@@ -168,7 +172,9 @@ pkgs.testers.runNixOSTest {
       machines[0].succeed("python3 -c 'import indi_harness.sitl.jsonsim.model'")
 
       # GPS/EKF warm-up (captured; surfaced only on failure).
-      arm_probe = machines[0].execute("timeout 180 python3 /etc/arm-probe.py 2>&1")[1]
+      arm_probe_rc, arm_probe = machines[0].execute(
+          "timeout 180 python3 /etc/arm-probe.py 2>&1")
+      assert arm_probe_rc == 0, f"arm probe failed to leave SITL disarmed:\n{arm_probe}"
 
       # Fly the two-case battery (circle_slow + lemniscate_fast) with the
       # in-firmware INDI outer loop, DDS-driven by traj_server. The runner takes
@@ -184,7 +190,10 @@ pkgs.testers.runNixOSTest {
           " echo $! >/tmp/runner.pid)"
       )
       try:
-          machines[0].wait_for_file("/tmp/trajectory_ready", timeout=300)
+          machines[0].wait_until_succeeds(
+              "test -s /tmp/trajectory_ready || "
+              "! kill -0 $(cat /tmp/runner.pid) 2>/dev/null", timeout=300)
+          machines[0].succeed("test -s /tmp/trajectory_ready")
           machines[0].execute(
               "(PYTHONPATH=${indiSitePackages} ${rosPy}/bin/python3"
               " -m indi_harness.offboard.traj_server --ready-file /tmp/trajectory_ready"
@@ -204,10 +213,17 @@ pkgs.testers.runNixOSTest {
           raise
       finally:
           machines[0].execute("kill -INT $(cat /tmp/traj.pid) 2>/dev/null || true; sleep 1")
+          # Retain bounded-failure evidence as well as passing artifacts.
+          machines[0].execute(
+              "cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1)"
+              " /tmp/flight/flight.BIN 2>/dev/null || true;"
+              " cp /tmp/runner.log /tmp/traj.log /tmp/flight/ 2>/dev/null || true")
+          for artifact in ["flight.BIN", "handover.json", "runner.log", "traj.log"]:
+              rc, _ = machines[0].execute(f"test -s /tmp/flight/{artifact}")
+              if rc == 0:
+                  machines[0].copy_from_vm(f"/tmp/flight/{artifact}", "")
 
       # Export the newest .BIN (outer + inner loop health source of truth).
-      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/flight/flight.BIN")
-      machines[0].copy_from_vm("/tmp/flight/flight.BIN", "")
       machines[0].copy_from_vm("/tmp/flight/indi_flatness_flown.json", "")
 
       # Score: run via execute() so ALL diagnostic numbers (tracking, omega
