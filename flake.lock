@@ -331,15 +331,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1789349878,
-        "narHash": "sha256-ooEW/flSRbdOE9UU2bqVrYnXCGMZ/MNWd/mwH74AbE0=",
+        "lastModified": 1789440845,
+        "narHash": "sha256-Efe6/uJJD+canJdELytdQRsPwgBbPX5ohk6YjFxqGco=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "0d5ab68fecef5ee3101af23c12a94206b5ff00e8",
+        "rev": "e91ff79af8c3dc1a9ea55c909fc7350791562e41",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/cozy-input-size-ceiling",
         "repo": "flasks",
         "type": "github"
       }
