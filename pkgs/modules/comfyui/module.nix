@@ -115,6 +115,17 @@ in
         default = "/data/andrew/secrets/flask/cozy.json";
         description = "Path to JSON file with secret_key and password_hash";
       };
+      maxInputBytes = lib.mkOption {
+        type = lib.types.int;
+        default = 1048576;
+        description = ''
+          Byte ceiling on the image an edit workflow hands to ComfyUI. Larger
+          inputs are re-encoded and, if that is not enough, resized down; a
+          cropped selection is measured on its own, and the outer image is
+          scaled to match so the composite stays accurate. 0 disables the
+          ceiling.
+        '';
+      };
       promptDbDir = lib.mkOption {
         type = lib.types.str;
         default = "${cfg.cozy.stateDir}/prompts";
@@ -255,7 +266,7 @@ in
           ];
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --max-input-bytes ${builtins.toString cfg.cozy.maxInputBytes} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";

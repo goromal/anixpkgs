@@ -12,6 +12,7 @@ usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
             [--prompt-db-dir PROMPT_DB_DIR] --secrets-file SECRETS_FILE
             [--comfyui-restart-cmd COMFYUI_RESTART_CMD] [--rest-gap REST_GAP]
+            [--max-input-bytes MAX_INPUT_BYTES]
 
 options:
   -h, --help            show this help message and exit
@@ -42,6 +43,10 @@ options:
                         restart comfyui.service'); empty hides the restart
                         button
   --rest-gap REST_GAP   Seconds to rest between queued jobs
+  --max-input-bytes MAX_INPUT_BYTES
+                        Byte ceiling on the image an edit workflow hands to
+                        ComfyUI; larger inputs are resized down. 0 disables
+                        the ceiling
 ``````bash
 usage: cozyctl [-h] [--url URL] [--token TOKEN] [--token-file TOKEN_FILE]
                {queue,status,start,stop} ...
