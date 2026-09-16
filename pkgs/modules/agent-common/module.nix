@@ -1,6 +1,8 @@
 { config, lib, ... }:
 let
-  frameworks = config.machines.base.agentFrameworks;
+  claudeDefaults = import ../../nixos/claude-defaults.nix;
+  codexDefaults = import ../../nixos/codex-defaults.nix;
+  frameworks = config.machines.features.agents.frameworks;
   enabled = frameworks != [ ];
   mcpServerCatalog = builtins.attrValues (
     import ../../nixos/shared-agent-mcp-servers.nix {
@@ -38,13 +40,13 @@ in
   config = lib.mkIf enabled (
     lib.mkMerge [
       (lib.mkIf (lib.elem "claude" frameworks) {
-        machines.claude = {
+        machines.claude = (lib.mapAttrs (_: lib.mkDefault) claudeDefaults) // {
           skills = skillsFor "claude";
           mcpServers = mcpServersFor "claude";
         };
       })
       (lib.mkIf (lib.elem "codex" frameworks) {
-        machines.codex = {
+        machines.codex = (lib.mapAttrs (_: lib.mkDefault) codexDefaults) // {
           skills = skillsFor "codex";
           mcpServers = mcpServersFor "codex";
         };

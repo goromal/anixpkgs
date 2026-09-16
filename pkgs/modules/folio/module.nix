@@ -87,7 +87,7 @@ in
             ssl = true;
           }
         ];
-        # Port root -> the SPA. The landing page's "#"+port card sends the browser
+        # Port root -> the SPA. The landing page's dedicated-port card sends the browser
         # to https://<current-host>:6667/ ; redirect that to the SPA at /folio/.
         locations."= /" = {
           return = "302 /folio/";
@@ -113,16 +113,13 @@ in
           '';
         };
       };
-    # Landing-page entry (https://<host>.local/). Use the "#"+port convention (like
-    # every other separate-port service) so the card links to the CURRENT host's
-    # :6667 root -- an absolute URL would hardcode the hostname and break when the
-    # landing page is reached via a different name (localhost, tunnel, IP). The
-    # "(port N)" token in the description is what the landing renderer parses.
+    # Dedicated public port is registered structurally for the landing page.
     machines.base.webServices = [
       {
         name = "folio";
         tag = "Aspiration";
         path = "#";
+        port = service-ports.folio.public;
         description = "Book Study Companion (port ${toString service-ports.folio.public})";
         icon = "book-open";
       }

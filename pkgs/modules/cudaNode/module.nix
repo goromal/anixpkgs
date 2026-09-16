@@ -9,46 +9,11 @@ let
 in
 {
   options.machines.cudaNode = {
-    enable = lib.mkEnableOption "CUDA workload node (launchpad Jupyter server + CUDA dev tooling)";
-    pythonPackages = lib.mkOption {
-      type = lib.types.functionTo (lib.types.listOf lib.types.package);
-      description = "Python packages for the launchpad Jupyter server (function from python313 package set to list)";
-      default =
-        ps: with ps; [
-          numpy
-          scipy
-          matplotlib
-          pandas
-          scikit-learn
-          sympy
-          cvxpy
-          statsmodels
-          torch
-          tqdm
-          pywavelets
-          ipyparallel
-          (hmmlearn.overridePythonAttrs (_: {
-            nativeCheckInputs = [ ];
-          }))
-          imageio
-          opencv4
-          geometry
-          pysignals
-          pyceres
-          pyceres_factors
-          mesh-plotter
-          indi-harness
-          find_rotational_conventions
-        ];
-    };
+    enable = lib.mkEnableOption "CUDA development tooling";
   };
 
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
-      {
-        services.launchpad.enable = true;
-        services.launchpad.pythonPackages = cfg.pythonPackages;
-      }
       (lib.mkIf (config.machines.base.machineType == "jetson") {
         hardware.nvidia-jetpack.configureCuda = true;
       })

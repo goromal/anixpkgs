@@ -125,7 +125,7 @@ in
       pkgs.openvpn
       homevpn
     ]
-    ++ lib.optionals globalCfg.graphical [
+    ++ lib.optionals config.machines.features.desktop.enable [
       homevpnGui
       homevpnGuiDesktop
     ];
