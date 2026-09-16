@@ -122,6 +122,18 @@ in
               default = null;
               description = "Raw PromQL, overriding `metric` when both are set.";
             };
+            legend = lib.mkOption {
+              type = lib.types.nullOr lib.types.str;
+              default = null;
+              description = ''
+                Grafana legend template for a Prometheus panel, e.g. `{{dir}}` to
+                label each series by its `dir` label. Defaults to `{{instance}}`,
+                the scrape target's host:port -- correct only when a metric has
+                one series per host, and wrong for a metric that fans out over
+                another label, where every series would collapse to the same
+                host:port line. Ignored by `logs` panels.
+              '';
+            };
             tag = lib.mkOption {
               type = lib.types.nullOr lib.types.str;
               default = null;
@@ -180,6 +192,7 @@ in
         kind = "timeseries";
         title = "Home Directory Contents";
         metric = "home_dir_file_count";
+        legend = "{{dir}}";
         group = "Host";
         width = 24;
       }
@@ -196,15 +209,17 @@ in
         group = "Job Logs";
       }
     ]
-    ++ lib.concatMap (
-      job:
-      map (t: {
-        kind = "logs";
-        title = "${t} Logs";
-        tag = t;
-        group = "Job Logs";
-      }) (job.logTags or [ job.name ])
-    ) globalCfg.timedOrchJobs;
+    ++ lib.optionals config.machines.features.orchestrator.enable (
+      lib.concatMap (
+        job:
+        map (t: {
+          kind = "logs";
+          title = "${t} Logs";
+          tag = t;
+          group = "Job Logs";
+        }) job.logTags
+      ) config.machines.features.orchestrator.jobs
+    );
 
     # Register Grafana in the web services landing page
     machines.base.webServices = [

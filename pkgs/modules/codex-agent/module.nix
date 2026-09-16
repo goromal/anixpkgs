@@ -68,7 +68,7 @@ in
     };
   };
 
-  config = lib.mkIf (lib.elem "codex" config.machines.base.agentFrameworks) {
+  config = lib.mkIf (lib.elem "codex" config.machines.features.agents.frameworks) {
     # gocodex: from anywhere in a devshell, jump to sources/ and open codex
     # (mirrors the claude module's goclaude alias).
     environment.shellAliases.gocodex = ''if [ -n "$DEVSHELL_ACTIVE" ]; then godev && cd sources && codex; else echo "gocodex: only available inside a devshell"; fi'';

@@ -12,20 +12,14 @@ let
   homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src="/icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
   ownPortHomeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/";var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href=b;a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src=b+"icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
   ownPortHomeButtonVhosts = lib.listToAttrs (
-    lib.concatMap (
-      s:
-      let
-        m = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
-      in
-      lib.optional (s.path == "#" && m != null) {
-        name = "${config.networking.hostName}.local:${builtins.head m}";
-        value.extraConfig = ''
-          sub_filter </body> '${ownPortHomeButton}';
-          sub_filter_once on;
-          proxy_set_header Accept-Encoding "";
-        '';
-      }
-    ) cfg.webServices
+    map (s: {
+      name = "${config.networking.hostName}.local:${toString s.port}";
+      value.extraConfig = ''
+        sub_filter </body> '${ownPortHomeButton}';
+        sub_filter_once on;
+        proxy_set_header Accept-Encoding "";
+      '';
+    }) (lib.filter (s: s.port != null) cfg.webServices)
   );
 in
 {
@@ -78,12 +72,8 @@ in
                 selectedServices:
                 lib.concatMapStringsSep "\n" (
                   s:
-                  if s.path == "#" then
-                    let
-                      portMatch = builtins.match ".*\\(port ([0-9]+)\\).*" s.description;
-                      port = if portMatch != null then builtins.head portMatch else "";
-                    in
-                    ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${lib.escapeShellArg port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
+                  if s.port != null then
+                    ''<li><a href="#" class="service-card" onclick="window.location.href=window.location.protocol+String.fromCharCode(47,47)+window.location.hostname+String.fromCharCode(58)+${toString s.port}+String.fromCharCode(47); return false;">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
                   else
                     ''<li><a href="${s.path}" class="service-card">${serviceIcon s}<span class="service-info"><span class="service-name">${s.name}</span><span class="description">${s.description}</span></span></a></li>''
                 ) selectedServices;

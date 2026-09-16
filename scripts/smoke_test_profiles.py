@@ -5,6 +5,7 @@ Tests that every pair of boolean option values can co-exist without a Nix
 evaluation error, catching module-level conflicts without exhaustive 2^N checks.
 """
 
+import json
 import os
 import random
 import subprocess
@@ -18,15 +19,18 @@ NIXOS_DIR = REPO_ROOT / "pkgs/nixos"
 NIXOS_STATE = os.environ.get("NIXOS_VERSION", "25.11")
 
 BOOL_OPTIONS = [
-    "graphical",
-    "recreational",
-    "developer",
-    "isATS",
-    "serveNotesWiki",
-    "enableMetrics",
-    "enableFileServers",
-    "enableOrchestrator",
-    "enableUpgradeUI",
+    "desktop",
+    "recreation",
+    "development",
+    "notesWiki",
+    "metrics",
+    "fileServers",
+    "orchestrator",
+    "upgradeUi",
+    "agentUi",
+    "auth",
+    "budget",
+    "folio",
 ]
 
 # x86 only in CI; pi4/jetson require cross-compilation setup
@@ -64,21 +68,24 @@ def pairwise_cases(options, seed=42):
 
 def render_config(machine_type, opts):
     bool_lines = "\n".join(
-        f"  machines.base.{k} = {'true' if v else 'false'};"
-        for k, v in opts.items()
+        f"    {k}.enable = {'true' if v else 'false'};" for k, v in opts.items()
     )
     return f"""\
-{{ ... }}:
+{{ lib, ... }}:
 {{
   imports = [ {NIXOS_DIR}/pc-base.nix ];
   machines.base.nixosState = "{NIXOS_STATE}";
   machines.base.machineType = "{machine_type}";
   machines.base.cloudDirs = [];
+  machines.features = (lib.mapAttrs (_: _: {{ enable = false; }})
+    (import {NIXOS_DIR}/features/catalog.nix)) // {{
+    agents.frameworks = [ "claude" ];
 {bool_lines}
+  }};
   networking.hostName = "smoke-test";
   # Minimal stub so fileSystems assertion passes
   fileSystems."/" = {{ device = "none"; fsType = "tmpfs"; }};
-  boot.loader.grub.enable = false;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
 }}
 """
 
@@ -89,15 +96,18 @@ def eval_config(config_str, label):
         tmp = f.name
     try:
         t0 = time.monotonic()
-        # Eval config.assertions: forces module merge and all assertion checks
-        # without building any derivation. ~3-4s per check vs ~86s for --dry-run.
+        # Evaluating the assertion records alone does not enforce their values.
+        # Only force messages for failed assertions (some are partial expressions).
         r = subprocess.run(
             [
                 "nix",
                 "eval",
                 "--impure",
+                "--json",
                 "--expr",
-                f"(import <nixpkgs/nixos> {{ configuration = {tmp}; }}).config.assertions",
+                "let c = (import <nixpkgs/nixos> "
+                f"{{ configuration = {tmp}; }}).config; "
+                "in map (a: a.message) (builtins.filter (a: !a.assertion) c.assertions)",
             ],
             env={
                 **os.environ,
@@ -109,11 +119,13 @@ def eval_config(config_str, label):
             text=True,
         )
         elapsed = time.monotonic() - t0
-        ok = r.returncode == 0
+        failed = json.loads(r.stdout) if r.returncode == 0 else []
+        ok = r.returncode == 0 and not failed
         status = "OK  " if ok else "FAIL"
         print(f"  [{status}] {label} ({elapsed:.1f}s)")
         if not ok:
             print(r.stderr[-2000:])
+            print("\n".join(failed))
         return ok, elapsed
     finally:
         os.unlink(tmp)
@@ -121,21 +133,23 @@ def eval_config(config_str, label):
 
 class _LocalBuildPatch:
     def __enter__(self):
-        text = DEPS_NIX.read_text()
+        self.original = text = DEPS_NIX.read_text()
         if "local-build = false;" in text:
-            DEPS_NIX.write_text(text.replace("local-build = false;", "local-build = true;"))
+            DEPS_NIX.write_text(
+                text.replace("local-build = false;", "local-build = true;")
+            )
         return self
 
     def __exit__(self, *_):
-        text = DEPS_NIX.read_text()
-        if "local-build = true;" in text:
-            DEPS_NIX.write_text(text.replace("local-build = true;", "local-build = false;"))
+        DEPS_NIX.write_text(self.original)
 
 
 def main():
     cases = pairwise_cases(BOOL_OPTIONS)
     total = len(cases) * len(MACHINE_TYPES)
-    print(f"Pairwise cases: {len(cases)}  machine types: {MACHINE_TYPES}  total checks: {total}")
+    print(
+        f"Pairwise cases: {len(cases)}  machine types: {MACHINE_TYPES}  total checks: {total}"
+    )
     print()
 
     failures = []
@@ -154,8 +168,10 @@ def main():
                     failures.append(label)
 
     print()
-    print(f"Timings: min={min(timings):.1f}s  max={max(timings):.1f}s  "
-          f"avg={sum(timings)/len(timings):.1f}s  total={sum(timings):.1f}s")
+    print(
+        f"Timings: min={min(timings):.1f}s  max={max(timings):.1f}s  "
+        f"avg={sum(timings)/len(timings):.1f}s  total={sum(timings):.1f}s"
+    )
 
     if failures:
         print(f"\n{len(failures)}/{total} FAILED:")

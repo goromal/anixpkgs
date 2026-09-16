@@ -14,7 +14,7 @@ let
       "claude"
       "codex"
     ]
-  ) globalCfg.agentFrameworks;
+  ) config.machines.features.agents.frameworks;
   agentArgs = lib.concatMapStringsSep " " (agent: "--agent ${lib.escapeShellArg agent}") agents;
 
   agentEnter = pkgs.writeShellApplication {
@@ -106,7 +106,13 @@ in
     };
   };
 
-  config = lib.mkIf (cfg.enable && agents != [ ]) {
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = agents != [ ];
+        message = "Agent UI requires at least one machines.features.agents.frameworks entry.";
+      }
+    ];
     machines.base.webServices = [
       {
         name = "Agent Terminal";

@@ -120,7 +120,12 @@ def _target(panel):
     # Missing both `expr` and `metric` is a spec bug; raise rather than emit a
     # silently blank panel, matching the KeyError the logs branch raises above.
     expr = panel.get("expr") or panel["metric"]
-    return {"expr": expr, "refId": "A", "legendFormat": "{{instance}}"}
+    # `{{instance}}` (the scrape target's host:port) is the right legend only for a
+    # single-series-per-host metric. A metric that fans out over another label --
+    # e.g. `home_dir_file_count{dir="..."}` -- needs `legend` set to `{{dir}}`, or
+    # every series collapses to the same host:port line.
+    return {"expr": expr, "refId": "A",
+            "legendFormat": panel.get("legend") or "{{instance}}"}
 
 
 def _datasource(panel):
