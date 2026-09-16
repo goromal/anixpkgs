@@ -4,28 +4,12 @@
   lib,
   ...
 }:
-let
-  claudeDefaults = import ../claude-defaults.nix;
-  codexDefaults = import ../codex-defaults.nix;
-in
 {
   imports = [ ../pc-base.nix ];
 
   config = {
     machines.base = {
       machineType = "x86_linux";
-      graphical = true;
-      recreational = true;
-      developer = true;
-      isATS = false;
-      agentFrameworks = [
-        "claude"
-        "codex"
-      ];
-      serveNotesWiki = false;
-      enableMetrics = true;
-      enableFileServers = true;
-      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";
@@ -58,8 +42,45 @@ in
           dirname = "more-games";
         }
       ];
-      enableOrchestrator = true;
-      timedOrchJobs = [
+    };
+    machines.features = {
+      desktop.enable = true;
+      development.enable = true;
+      recreation.enable = true;
+      headsetAudio.enable = true;
+      externalDrives.enable = true;
+      homeVpn.enable = true;
+      agentUi.enable = true;
+      upgradeUi.enable = true;
+      fileServers.enable = true;
+      metrics.enable = true;
+      notesWiki.enable = false;
+      orchestrator.enable = true;
+      auth.enable = false;
+      budget.enable = false;
+      languageQuiz.enable = false;
+      music.enable = false;
+      tester.enable = false;
+      disciple.enable = false;
+      tasks.enable = false;
+      videoDownload.enable = false;
+      brom.enable = false;
+      intake.enable = false;
+      mail.enable = false;
+      plex.enable = false;
+      vikunja.enable = false;
+      gameStreaming.enable = true;
+      gpu.enable = false;
+      notebooks.enable = false;
+      imageGeneration.enable = false;
+      localLlm.enable = false;
+      folio.enable = true;
+      tactical.enable = false;
+      agents.frameworks = [
+        "claude"
+        "codex"
+      ];
+      orchestrator.jobs = [
         {
           name = "budgets-backup";
           jobShellScript = pkgs.writeShellScript "budgets-backup" ''
@@ -88,26 +109,8 @@ in
           };
         }
       ];
-      extraOrchestratorPackages = [ ];
-    };
-    machines.claude = {
-      marketplaces = claudeDefaults.marketplaces;
-      plugins = claudeDefaults.plugins;
-      permissionsAllow = claudeDefaults.permissionsAllow;
-      hooks = claudeDefaults.hooks;
-    };
-    machines.codex = {
-      model = codexDefaults.model;
-      modelProvider = codexDefaults.modelProvider;
-      approvalPolicy = codexDefaults.approvalPolicy;
-      sandboxMode = codexDefaults.sandboxMode;
-      extraSettings = codexDefaults.extraSettings;
+      orchestrator.extraPackages = [ ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
-    services.homeVpnNode.enable = true;
-    services.folio-backend.enable = true;
-    services.folio-backend.desktop = true;
-    # Spoke: lease the ground-truth database from the ATS hub over the VPN.
-    services.folio-backend.hubHost = "ats.local";
   };
 }

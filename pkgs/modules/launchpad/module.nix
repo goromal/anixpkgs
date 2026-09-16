@@ -34,7 +34,33 @@ in
     pythonPackages = lib.mkOption {
       type = lib.types.functionTo (lib.types.listOf lib.types.package);
       description = "Additional Python packages (function from python313 package set to list)";
-      default = _ps: [ ];
+      default =
+        ps: with ps; [
+          numpy
+          scipy
+          matplotlib
+          pandas
+          scikit-learn
+          sympy
+          cvxpy
+          statsmodels
+          torch
+          tqdm
+          pywavelets
+          ipyparallel
+          (hmmlearn.overridePythonAttrs (_: {
+            nativeCheckInputs = [ ];
+          }))
+          imageio
+          opencv4
+          geometry
+          pysignals
+          pyceres
+          pyceres_factors
+          mesh-plotter
+          indi-harness
+          find_rotational_conventions
+        ];
     };
   };
 
