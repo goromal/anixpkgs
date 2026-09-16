@@ -196,15 +196,17 @@ in
         group = "Job Logs";
       }
     ]
-    ++ lib.concatMap (
-      job:
-      map (t: {
-        kind = "logs";
-        title = "${t} Logs";
-        tag = t;
-        group = "Job Logs";
-      }) (job.logTags or [ job.name ])
-    ) globalCfg.timedOrchJobs;
+    ++ lib.optionals config.machines.features.orchestrator.enable (
+      lib.concatMap (
+        job:
+        map (t: {
+          kind = "logs";
+          title = "${t} Logs";
+          tag = t;
+          group = "Job Logs";
+        }) job.logTags
+      ) config.machines.features.orchestrator.jobs
+    );
 
     # Register Grafana in the web services landing page
     machines.base.webServices = [

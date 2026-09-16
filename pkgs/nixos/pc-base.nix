@@ -7,27 +7,10 @@
 with import ./dependencies.nix;
 let
   cfg = config.machines.base;
+  features = config.machines.features;
   remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
-  atsudo = pkgs.writeShellScriptBin "atsudo" ''
-    args=""
-    for word in "$@"; do
-      args+="$word "
-    done
-    args=''${args% }
-    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
-    if [[ ! -z "$pw" ]]; then
-      echo "$pw" | sudo -S $args
-    else
-      sudo $args
-    fi
-  '';
-  machine-rcrsync = anixpkgs.rcrsync.override {
-    homeDir = cfg.homeDir;
-    cloudDirs = cfg.cloudDirs;
-    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
-  };
-  machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
+  inherit (import ./runtime.nix { inherit config pkgs lib; }) atsudo machine-rcrsync machine-authm;
   anix-init = pkgs.writeShellScriptBin "anix-init" ''
     make-title -c yellow "Setting up rcrsync"
 
@@ -83,7 +66,6 @@ let
     echo
     echo_green "Have fun!"
   '';
-  enableSunshine = cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational;
 in
 {
   options.machines.base = {
@@ -109,24 +91,9 @@ in
       description = "(x86_linux) Boot partition mount point (default: /boot/efi)";
       default = "/boot";
     };
-    graphical = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes a graphical interface.";
-    };
-    recreational = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes recreational packages.";
-    };
-    developer = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes developer packages.";
-    };
-    isATS = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for a personal server instance.";
-    };
     runWebServer = lib.mkOption {
       type = lib.types.bool;
+      internal = true;
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
@@ -150,6 +117,11 @@ in
               type = lib.types.str;
               description = "Brief description of the service";
             };
+            port = lib.mkOption {
+              type = lib.types.nullOr lib.types.port;
+              default = null;
+              description = "Dedicated public port, or null for a path on the shared webserver.";
+            };
             icon = lib.mkOption {
               type = lib.types.str;
               description = "Font Awesome 6 solid icon class name (e.g. 'arrows-rotate')";
@@ -172,85 +144,26 @@ in
       default = "wlo1";
     };
     webServerInsecurePort = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.port;
       description = "Public insecure port";
       default = 80;
     };
     webServerSecurePort = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.port;
       description = "Public secure port";
       default = 443;
     };
-    serveNotesWiki = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether to serve the notes wiki site.";
-    };
-    notesWikiPort = lib.mkOption {
-      type = lib.types.int;
-      description = "Public insecure port for the notes wiki site.";
-      default = 80;
-    };
-    enableMetrics = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to export OS metrics";
-    };
-    enableFileServers = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to turn on file servers";
-    };
-    enableUpgradeUI = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether to serve the anix-upgrade web UI (implies running the reverse-proxy webserver).";
-    };
     cloudDirs = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
-      description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
-    };
-    enableOrchestrator = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to enable the orchestrator daemon";
-    };
-    timedOrchJobs = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
-      description = ''
-        Orchestrator job definitions. The type is `attrs`, so unrecognized keys
-        are accepted silently; the keys actually read are:
-
-        - `name` (required): systemd unit name, and the default Loki log tag.
-        - `jobShellScript` (required): script the orchestrator runs.
-        - `timerCfg` (required): `systemd.timers.<name>.timerConfig`; `Unit` is
-          filled in automatically.
-        - `readWritePaths` (optional): `ReadWritePaths=`, defaulting to `[ "/" ]`.
-        - `execStartPre` (optional): extra `ExecStartPre=` entries, appended
-          after the blacklist guard.
-        - `logTags` (optional): list of Loki tags the job's Grafana log panels
-          query, defaulting to `[ name ]`. Set it only when the job's
-          `logger -t` tag differs from its name (e.g. `ats-task-migrator` logs
-          as `ats-grader`). Misspelling this key silently falls back to the
-          default and yields a permanently empty panel, so check the rendered
-          dashboard after adding one. Output not routed through `logger -t` at
-          all does not need an entry here: it lands under the `orchestrator`
-          tag, which `metricsNode` already registers a panel for.
-      '';
-      default = [ ];
-    };
-    extraOrchestratorPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      description = "Packages to add to orchestrator's path";
-      default = [ ];
-    };
-    agentFrameworks = lib.mkOption {
       type = lib.types.listOf (
-        lib.types.enum [
-          "claude"
-          "codex"
-        ]
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption { type = lib.types.str; };
+            cloudname = lib.mkOption { type = lib.types.str; };
+            dirname = lib.mkOption { type = lib.types.str; };
+          };
+        }
       );
-      default = [ ];
-      description = "AI agent frameworks to install and configure (may include both).";
+      description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -266,6 +179,11 @@ in
 
   imports = [
     ./installation-base.nix
+    ./features/options.nix
+    ./features/services.nix
+    ./features/notebooks.nix
+    ./features/orchestrator.nix
+    ./features/game-streaming.nix
     (import "${home-manager}/nixos")
     ../modules/agent-common/module.nix
     ../modules/claude-agent/module.nix
@@ -456,7 +374,7 @@ in
         supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
         binfmt.emulatedSystems = lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
 
-        postBootCommands = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (
+        postBootCommands = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) (
           let
             gdm_user_conf = ''
               [User]
@@ -495,15 +413,15 @@ in
       nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
       nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
-      services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
+      services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) true;
       services.displayManager.gdm.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical
+        cfg.machineType == "x86_linux" && features.desktop.enable
       ) true;
       services.desktopManager.gnome.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical
+        cfg.machineType == "x86_linux" && features.desktop.enable
       ) true;
 
-      services.printing.enable = (cfg.machineType == "x86_linux" && cfg.graphical);
+      services.printing.enable = (cfg.machineType == "x86_linux" && features.desktop.enable);
 
       services.avahi = {
         enable = true;
@@ -518,103 +436,7 @@ in
         };
       };
 
-      services.authui = {
-        enable = cfg.isATS;
-        initScript =
-          (pkgs.writeShellScriptBin "atsauthui-start" ''
-            ${pkgs.systemd}/bin/systemctl stop orchestratord
-          '')
-          + "/bin/atsauthui-start";
-        resetScript =
-          (pkgs.writeShellScriptBin "atsauthui-finish" ''
-            ${machine-rcrsync}/bin/rcrsync override secrets
-            ${pkgs.systemd}/bin/systemctl start orchestratord
-          '')
-          + "/bin/atsauthui-finish";
-      };
-
-      services.budget_ui = {
-        enable = cfg.isATS;
-        pathPkgs = [
-          pkgs.bash
-          pkgs.coreutils
-          pkgs.util-linux
-          pkgs.rclone
-          machine-rcrsync
-          machine-authm
-          anixpkgs.budget_report
-          anixpkgs.fixfname
-        ];
-      };
-
-      services.orchestrator_ui = {
-        enable = cfg.enableOrchestrator;
-      };
-
-      services.anix-upgrade-ui = {
-        enable = cfg.enableUpgradeUI;
-      };
-
-      services.agent_ui.enable = cfg.developer;
-
-      services.sunset = {
-        enable = enableSunshine;
-      };
-
-      services.rankserver = {
-        enable = cfg.isATS || cfg.enableFileServers;
-        package = anixpkgs.rankserver;
-        rootDir = "${cfg.homeDir}/fileservers";
-      };
-
-      services.stampserver = {
-        enable = cfg.isATS || cfg.enableFileServers;
-        package = anixpkgs.stampserver;
-        rootDir = "${cfg.homeDir}/fileservers";
-      };
-
-      services.la-quiz-web = {
-        enable = cfg.isATS;
-        dataDir = "${cfg.homeDir}/data/la-quiz-web";
-      };
-
-      services.navidrome-ats = {
-        enable = cfg.isATS;
-        dataDir = "${cfg.homeDir}/data/navidrome";
-      };
-
-      services.tester = {
-        enable = cfg.isATS;
-        dataDir = "${cfg.homeDir}/data/tester";
-      };
-
-      services.disciple = {
-        enable = cfg.isATS;
-      };
-
-      services.tasks_ui = {
-        enable = cfg.isATS;
-        rcrsync = machine-rcrsync;
-      };
-
-      services.vdlserver = {
-        enable = cfg.isATS;
-      };
-
-      services.brom = {
-        enable = cfg.machineType == "jetson";
-      };
-
-      services.intake_ui = {
-        enable = cfg.isATS;
-      };
-
-      services.mail_ui = {
-        enable = cfg.isATS;
-        rcrsync = machine-rcrsync;
-      };
-
-      environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+      environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) {
         excludePackages = with pkgs; [
           gnome-photos
           gnome-tour
@@ -632,26 +454,18 @@ in
       };
 
       # Specialized bluetooth and sound settings for Apple AirPods
-      hardware.bluetooth =
-        lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-          {
-            enable = true;
-            settings = {
-              General = {
-                ControllerMode = "bredr";
-              };
-            };
+      hardware.bluetooth = lib.mkIf (features.headsetAudio.enable) {
+        enable = true;
+        settings = {
+          General = {
+            ControllerMode = "bredr";
           };
-      services.blueman.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) true;
-      services.pulseaudio.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) false;
-      security.rtkit.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) true;
-      services.pipewire = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational) {
+        };
+      };
+      services.blueman.enable = lib.mkIf (features.headsetAudio.enable) true;
+      services.pulseaudio.enable = lib.mkIf (features.headsetAudio.enable) false;
+      security.rtkit.enable = lib.mkIf (features.headsetAudio.enable) true;
+      services.pipewire = lib.mkIf (features.headsetAudio.enable) {
         enable = true;
         alsa.enable = true;
         pulse.enable = true;
@@ -659,124 +473,8 @@ in
       };
 
       services.udev.packages = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
+        cfg.machineType == "x86_linux" && features.desktop.enable && features.recreation.enable
       ) [ pkgs.dolphin-emu ];
-
-      # Sunshine's encoder test transiently binds port 48010, causing the RTSP
-      # server to fail on the same port immediately after. The service exits 0
-      # so on-failure won't retry — force always-restart so the second attempt
-      # (port now free) succeeds automatically.
-      systemd.user.services.sunshine = lib.mkIf enableSunshine {
-        serviceConfig.Restart = lib.mkForce "always";
-        serviceConfig.RestartSec = lib.mkForce "3s";
-      };
-
-      services.sunshine = lib.mkIf enableSunshine {
-        enable = true;
-        openFirewall = true;
-        capSysAdmin = true;
-        applications = {
-          # Ensure play and rcrsync are reachable from the sunshine user service,
-          # which runs with PATH=null per the NixOS sunshine module design.
-          env.PATH = "$(HOME)/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
-          apps = [
-            {
-              name = "Zelda Collector's Edition";
-              cmd = "play zelda";
-            }
-            {
-              name = "Wind Waker";
-              cmd = "play windwaker";
-            }
-            {
-              name = "Twilight Princess";
-              cmd = "play twilight";
-            }
-            {
-              name = "Super Smash Bros. Melee";
-              cmd = "play melee";
-            }
-            {
-              name = "Super Mario Sunshine";
-              cmd = "play sunshine";
-            }
-          ];
-        };
-      };
-      services.udev.extraRules = lib.mkIf enableSunshine ''
-        KERNEL=="uinput", GROUP="input", MODE="0660"
-      '';
-
-      # Orchestrator jobs
-      services.orchestratord = lib.mkIf cfg.enableOrchestrator {
-        enable = true;
-        orchestratorPkg = anixpkgs.orchestrator;
-        threads = 2;
-        pathPkgs =
-          with pkgs;
-          [
-            bash
-            coreutils
-            util-linux
-            rclone
-            machine-rcrsync
-            machine-authm
-            anixpkgs.mp4
-            anixpkgs.mp4unite
-            anixpkgs.png
-            anixpkgs.scrape
-          ]
-          ++ cfg.extraOrchestratorPackages;
-        statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
-      };
-      # Metric panels are registered by the services that emit them. Both the
-      # orchestrator and tactical panels live in one assignment because Nix
-      # forbids assigning `services.metricsNode.panels` twice in this attrset.
-      services.metricsNode.panels =
-        lib.optionals cfg.enableOrchestrator [
-          {
-            kind = "timeseries";
-            title = "Completed Jobs";
-            metric = "orchestrator_jobs_completed";
-            group = "Orchestrator";
-          }
-          {
-            kind = "timeseries";
-            title = "Discarded Jobs";
-            metric = "orchestrator_jobs_discarded";
-            group = "Orchestrator";
-          }
-          {
-            kind = "timeseries";
-            title = "Queued Jobs";
-            metric = "orchestrator_jobs_queued";
-            group = "Orchestrator";
-          }
-        ]
-        ++ lib.optionals cfg.isATS [
-          {
-            kind = "timeseries";
-            title = "Tactical Visits";
-            metric = "tactical_page_visits";
-            group = "Tactical";
-          }
-        ];
-
-      systemd.timers."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
-        description = "Restart orchestratord weekly";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnCalendar = "Sun 03:00";
-          Persistent = true;
-        };
-      };
-      systemd.services."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
-        description = "Restart orchestratord weekly";
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
-        };
-      };
 
       networking.firewall.allowedTCPPorts = [
         4444
@@ -799,11 +497,7 @@ in
         noto-fonts-color-emoji
       ];
 
-      security.sudo.extraConfig = ''
-        ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
-      '';
-
-      programs.ssh.startAgent = (cfg.graphical == false);
+      programs.ssh.startAgent = (features.desktop.enable == false);
 
       programs.vim.enable = true;
       programs.vim.defaultEditor = true;
@@ -811,37 +505,6 @@ in
       services.journald = {
         rateLimitBurst = 0;
         rateLimitInterval = "0s";
-      };
-
-      # Metrics
-      services.metricsNode.enable = cfg.enableMetrics;
-      services.metricsNode.openFirewall = cfg.enableMetrics;
-
-      # External drives
-      machines.externalDrives.enable = true;
-
-      # Notes Wiki
-      services.notes-wiki.enable = cfg.serveNotesWiki;
-
-      # Daily Tactical
-      services.tacticald = lib.mkIf cfg.isATS {
-        enable = true;
-        user = "andrew";
-        group = "dev";
-        tacticalPkg = anixpkgs.daily_tactical_server;
-        statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
-      };
-
-      # Media
-      services.plexNode.enable = cfg.isATS;
-
-      # Mail
-      services.mailNode.enable = cfg.isATS;
-
-      # Vikunja Task Management
-      services.vikunja-ats = lib.mkIf cfg.isATS {
-        enable = true;
-        domain = "${config.networking.hostName}.local";
       };
 
       # Global packages
@@ -931,36 +594,12 @@ in
         ]
         ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
         ++ (
-          if cfg.enableOrchestrator then
-            [
-              (
-                let
-                  servicelist = builtins.concatStringsSep "/" (map (x: "${x.name}.service") cfg.timedOrchJobs);
-                  triggerscript = ./otrigger.py;
-                in
-                pkgs.writeShellScriptBin "otrigger" ''
-                  servicelist="${builtins.toString servicelist}"
-                  tmpdir=$(mktemp -d)
-                  ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
-                  serviceselection=$(cat $tmpdir/selection)
-                  rm -r $tmpdir
-                  if [[ ! -z "$serviceselection" ]]; then
-                    echo "sudo systemctl restart ''${serviceselection}"
-                    ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
-                  fi
-                ''
-              )
-            ]
-          else
-            [ ]
-        )
-        ++ (
-          if cfg.isATS then
+          if features.auth.enable then
             [
               (pkgs.writeShellScriptBin "atsrefresh" ''
-                ${atsudo}/bin/atsudo systemctl stop orchestratord
+                ${lib.optionalString features.orchestrator.enable "${atsudo}/bin/atsudo systemctl stop orchestratord"}
                 authm refresh --headless --force && rcrsync override secrets
-                ${atsudo}/bin/atsudo systemctl start orchestratord
+                ${lib.optionalString features.orchestrator.enable "${atsudo}/bin/atsudo systemctl start orchestratord"}
               '')
             ]
           else
@@ -970,7 +609,7 @@ in
         ++ [ anix-init ];
 
       programs.bash.interactiveShellInit = ''
-        ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+        ${if features.development.enable then ''eval "$(direnv hook bash)"'' else ""}
         tmux() {
           command tmux "$@"
           local _tmux_exit=$?
@@ -997,7 +636,7 @@ in
       };
 
       programs.captive-browser = {
-        enable = cfg.graphical;
+        enable = features.desktop.enable;
         interface = cfg.wifiInterfaceName;
       };
 
@@ -1023,23 +662,26 @@ in
               ./components/base-pkgs.nix
               ./components/upgrade-hooks.nix
             ]
-            ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
-            ++ (lib.optionals (lib.elem "claude" cfg.agentFrameworks) [ ./components/claude-agent.nix ])
-            ++ (lib.optionals (lib.elem "codex" cfg.agentFrameworks) [ ./components/codex-agent.nix ])
+            ++ (if features.development.enable then [ ./components/base-dev-pkgs.nix ] else [ ])
+            ++ (lib.optionals (lib.elem "claude" features.agents.frameworks) [ ./components/claude-agent.nix ])
+            ++ (lib.optionals (lib.elem "codex" features.agents.frameworks) [ ./components/codex-agent.nix ])
             ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
             ++ (
               if cfg.machineType == "x86_linux" then
                 (
                   [ ./components/x86-pkgs.nix ]
-                  ++ (if cfg.recreational then [ ./components/x86-rec-pkgs.nix ] else [ ])
+                  ++ (if features.recreation.enable then [ ./components/x86-rec-pkgs.nix ] else [ ])
                   ++ (
-                    if cfg.graphical then
+                    if features.desktop.enable then
                       (
                         [ ./components/x86-graphical-pkgs.nix ]
-                        ++ (if cfg.developer then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
-                        ++ (if cfg.recreational then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
+                        ++ (if features.development.enable then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
+                        ++ (if features.recreation.enable then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
                         ++ (
-                          if (cfg.developer && cfg.recreational) then [ ./components/x86-graphical-dev-rec-pkgs.nix ] else [ ]
+                          if (features.development.enable && features.recreation.enable) then
+                            [ ./components/x86-graphical-dev-rec-pkgs.nix ]
+                          else
+                            [ ]
                         )
                       )
                     else
@@ -1055,18 +697,18 @@ in
               standalone = false;
               homeDir = cfg.homeDir;
               browserExec =
-                if cfg.graphical && cfg.machineType == "x86_linux" then
+                if features.desktop.enable && cfg.machineType == "x86_linux" then
                   "${unstable.google-chrome}/bin/google-chrome-stable"
                 else
                   null;
               cloudDirs = cfg.cloudDirs;
               userOrchestrator = false;
-              enableMetrics = cfg.enableMetrics;
+              enableMetrics = features.metrics.enable;
             };
           }
           (
             lib.foldl lib.recursiveUpdate { } [
-              (lib.optionalAttrs (lib.elem "claude" cfg.agentFrameworks) {
+              (lib.optionalAttrs (lib.elem "claude" features.agents.frameworks) {
                 mods.claude = {
                   marketplaces = config.machines.claude.marketplaces;
                   plugins = config.machines.claude.plugins;
@@ -1075,10 +717,10 @@ in
                   skills = config.machines.claude.skills;
                   extraSettings = config.machines.claude.extraSettings;
                   mcpServers = config.machines.claude.mcpServers;
-                  graphical = cfg.graphical;
+                  graphical = features.desktop.enable;
                 };
               })
-              (lib.optionalAttrs (lib.elem "codex" cfg.agentFrameworks) {
+              (lib.optionalAttrs (lib.elem "codex" features.agents.frameworks) {
                 mods.codex = {
                   model = config.machines.codex.model;
                   modelProvider = config.machines.codex.modelProvider;
@@ -1087,64 +729,11 @@ in
                   extraSettings = config.machines.codex.extraSettings;
                   skills = config.machines.codex.skills;
                   mcpServers = config.machines.codex.mcpServers;
-                  graphical = cfg.graphical;
+                  graphical = features.desktop.enable;
                 };
               })
             ]
           );
     }
-    (
-      let
-        # On-disk blacklist: a marker file named after a job in this directory
-        # causes that job's oneshot service to fail immediately instead of
-        # submitting to orchestratord. Managed via the orchestrator UI.
-        orchBlacklistDir = "${cfg.homeDir}/configs/orchestrator-blacklist.d";
-        orchJobGuard = pkgs.writeShellScript "orch-job-guard" ''
-          name="$1"
-          if [ -e "${orchBlacklistDir}/$name" ]; then
-            ${pkgs.util-linux}/bin/logger -t orchestrator "Job '$name' is blacklisted; refusing to run"
-            echo "Orchestrator job '$name' is blacklisted by ${orchBlacklistDir}/$name" >&2
-            exit 1
-          fi
-        '';
-      in
-      {
-        systemd.tmpfiles.rules = [
-          "d ${orchBlacklistDir} 0775 andrew dev -"
-        ];
-        systemd.timers = builtins.listToAttrs (
-          map (job: {
-            name = job.name;
-            value = {
-              description = "${job.name} trigger timer";
-              wantedBy = [ "timers.target" ];
-              timerConfig = job.timerCfg // {
-                Unit = "${job.name}.service";
-              };
-            };
-          }) cfg.timedOrchJobs
-        );
-        systemd.services = builtins.listToAttrs (
-          map (job: {
-            name = job.name;
-            value = {
-              enable = true;
-              description = "${job.name} oneshot service";
-              serviceConfig = {
-                Type = "oneshot";
-                ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${job.jobShellScript}'";
-                ReadWritePaths = job.readWritePaths or [ "/" ];
-                # Blacklist guard runs first for every job, then any
-                # job-specific ExecStartPre.
-                ExecStartPre = [
-                  "${orchJobGuard} ${job.name}"
-                ]
-                ++ lib.optionals ((job.execStartPre or null) != null) (lib.toList job.execStartPre);
-              };
-            };
-          }) cfg.timedOrchJobs
-        );
-      }
-    )
   ];
 }
