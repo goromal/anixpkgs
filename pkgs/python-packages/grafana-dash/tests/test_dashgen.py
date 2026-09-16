@@ -290,6 +290,22 @@ def test_render_expr_overrides_metric():
     assert body[0]["targets"][0]["expr"] == "rate(x[5m])"
 
 
+def test_render_defaults_legend_to_instance():
+    out = render_dashboard("diagnostics", SPEC["panels"], SPEC["hostname"])
+    body = [p for p in out["panels"] if p["type"] != "row"]
+    assert body[0]["targets"][0]["legendFormat"] == "{{instance}}"
+
+
+def test_render_legend_override_labels_series_by_metric_label():
+    # A metric that fans out over a label (dir=) must legend on that label, not on
+    # {{instance}}, or every series collapses to the same host:port line.
+    panels = [{"kind": "timeseries", "title": "Home", "metric": "home_dir_file_count",
+               "legend": "{{dir}}", "group": "Host", "width": 24}]
+    out = render_dashboard("diagnostics", panels, "h")
+    body = [p for p in out["panels"] if p["type"] != "row"]
+    assert body[0]["targets"][0]["legendFormat"] == "{{dir}}"
+
+
 def test_render_uid_is_stable_across_calls():
     a = render_dashboard("diagnostics", SPEC["panels"], "hostA")
     b = render_dashboard("diagnostics", SPEC["panels"], "hostB")
