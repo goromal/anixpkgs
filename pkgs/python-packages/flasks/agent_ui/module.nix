@@ -11,6 +11,10 @@ let
   agents = config.machines.features.agents.frameworks;
   agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
   agentArgs = lib.concatMapStringsSep " " (agent: "--agent ${lib.escapeShellArg agent}") agents;
+  agentTmuxConf = pkgs.writeText "agent-ui-tmux.conf" ''
+    set -g mouse on
+    set -g history-limit 50000
+  '';
 
   agentEnter = pkgs.writeShellApplication {
     name = "agent-ui-enter";
@@ -61,7 +65,7 @@ let
         echo "agent-ui-attach: invalid session" >&2
         exit 2
       fi
-      exec tmux attach-session -t "$1"
+      exec tmux -L agent-ui attach-session -t "$1"
     '';
   };
 
@@ -127,7 +131,7 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
+        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --tmux-socket agent-ui --tmux-config ${agentTmuxConf} --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";
