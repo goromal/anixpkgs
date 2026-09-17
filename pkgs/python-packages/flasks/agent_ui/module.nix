@@ -8,20 +8,15 @@ with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.agent_ui;
   globalCfg = config.machines.base;
-  agents = builtins.filter (
-    agent:
-    lib.elem agent [
-      "claude"
-      "codex"
-    ]
-  ) config.machines.features.agents.frameworks;
+  agents = config.machines.features.agents.frameworks;
+  agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
   agentArgs = lib.concatMapStringsSep " " (agent: "--agent ${lib.escapeShellArg agent}") agents;
 
   agentEnter = pkgs.writeShellApplication {
     name = "agent-ui-enter";
     text = ''
       case "''${AGENT_UI_AGENT:-}" in
-        claude|codex|shell) ;;
+        ${agentAlternation}) ;;
         *) echo "agent-ui-enter: unsupported agent" >&2; exit 2 ;;
       esac
 
@@ -48,7 +43,7 @@ let
       fi
 
       case "$2" in
-        claude|codex|shell) ;;
+        ${agentAlternation}) ;;
         *) echo "agent-ui-session: unsupported agent" >&2; exit 2 ;;
       esac
 
@@ -62,7 +57,7 @@ let
     name = "agent-ui-attach";
     runtimeInputs = [ pkgs.tmux ];
     text = ''
-      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(claude|codex|shell)--[0-9a-f]{8}$ ]]; then
+      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
         echo "agent-ui-attach: invalid session" >&2
         exit 2
       fi
