@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,6 +20,9 @@ def is_whitelisted(ref):
         return True
     # Allow nixos-XX.YY version branches
     if ref.startswith("nixos-"):
+        return True
+    # Home Manager tracks stable NixOS releases on release-XX.YY branches.
+    if re.fullmatch(r"release-\d{2}\.\d{2}", ref):
         return True
     return False
 

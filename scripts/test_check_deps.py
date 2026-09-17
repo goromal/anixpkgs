@@ -36,6 +36,18 @@ class CheckDependenciesTest(unittest.TestCase):
             [],
         )
 
+    def test_versioned_release_branch_is_ignored(self):
+        self.assertEqual(
+            list(side_branch_dependencies(lock_with_ref("release-26.05"))),
+            [],
+        )
+
+    def test_unversioned_release_branch_is_detected(self):
+        self.assertEqual(
+            list(side_branch_dependencies(lock_with_ref("release-experiment"))),
+            [("dependency", "release-experiment")],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
