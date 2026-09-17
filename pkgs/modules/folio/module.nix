@@ -21,9 +21,13 @@ let
     claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
     codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
   };
-  companionPath =
-    [ pkgs.tmux pkgs.procps pkgs.coreutils pkgs.gitMinimal ]
-    ++ map (agent: agentPackages.${agent}) agents;
+  companionPath = [
+    pkgs.tmux
+    pkgs.procps
+    pkgs.coreutils
+    pkgs.gitMinimal
+  ]
+  ++ map (agent: agentPackages.${agent}) agents;
 
   folioTmuxConf = pkgs.writeText "folio-agent-tmux.conf" ''
     set -g mouse on
@@ -123,7 +127,8 @@ in
         # (now-removed) owner, which tmpfiles "z" does not reliably re-chown.
         ExecStartPre = [
           "+${pkgs.coreutils}/bin/chown -R andrew:dev ${cfg.dataDir}"
-        ] ++ lib.optional companion (
+        ]
+        ++ lib.optional companion (
           "+${pkgs.coreutils}/bin/install -o andrew -g dev -m0600 "
           + "${config.services.agent_ui.secretsFile} ${cfg.agentSecretsFile}"
         );
