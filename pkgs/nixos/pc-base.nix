@@ -75,6 +75,11 @@ in
       description = "Home directory for primary user (default: /data/andrew)";
       default = "/data/andrew";
     };
+    additionalNetrcSources = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "/etc/nix/netrc" ];
+      description = "Mutable netrc files merged with Determinate Nix credentials.";
+    };
     nixosState = lib.mkOption {
       type = lib.types.str;
       description = "Initiating state of the NixOS install (example: '22.05')";
@@ -398,6 +403,13 @@ in
       nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
       nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
+      # Determinate Nix owns /etc/nix/nix.conf and its synthesized netrc. Keep
+      # manually managed cache credentials in mutable files and merge them into
+      # the synthesized netrc instead of letting the migration replace them.
+      environment.etc."determinate/config.json".text = builtins.toJSON {
+        authentication.additionalNetrcSources = cfg.additionalNetrcSources;
+      };
+
       services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) true;
       services.displayManager.gdm.enable = lib.mkIf (
         cfg.machineType == "x86_linux" && features.desktop.enable
@@ -627,7 +639,8 @@ in
       systemd.tmpfiles.rules = [
         "d /.c 0750 andrew dev -"
         "x /.c - - -"
-      ];
+      ]
+      ++ map (path: "f ${path} 0600 root root -") cfg.additionalNetrcSources;
 
       # Allow profiles to override the home directory (installation-base.nix sets
       # the default of /data/andrew for all other user attributes).

@@ -64,6 +64,7 @@ in
     lib.filter (panel: panel.group == "Job Logs") config.services.metricsNode.panels
   );
   tmpfiles = config.systemd.tmpfiles.rules;
+  determinateConfig = config.environment.etc."determinate/config.json".text;
   cuda = config.machines.cudaNode.enable;
   folioHub = config.services.folio-backend.isHub;
   folioDesktop = config.services.folio-backend.desktop;

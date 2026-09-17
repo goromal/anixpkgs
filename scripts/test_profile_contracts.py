@@ -227,6 +227,15 @@ class ProfileContracts(unittest.TestCase):
         for name in snapshot["jobs"]:
             self.assertNotIn(f"{name} Logs", snapshot["jobPanels"])
 
+    def test_determinate_preserves_mutable_netrc(self):
+        snapshot = self.snapshot(fixture("workstation"))
+        determinate = json.loads(snapshot["determinateConfig"])
+        self.assertEqual(
+            determinate["authentication"]["additionalNetrcSources"],
+            ["/etc/nix/netrc"],
+        )
+        self.assertIn("f /etc/nix/netrc 0600 root root -", snapshot["tmpfiles"])
+
     def test_gpu_support_does_not_start_applications(self):
         snapshot = self.snapshot(
             fixture(

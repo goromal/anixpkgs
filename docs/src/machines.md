@@ -173,6 +173,14 @@ anix-upgrade [source specification] --local --boot
 
 If your machine was set up before the Determinate Nix migration, the first `anix-upgrade` run uses the old script (channel-based rebuild) and installs the new `anix-upgrade` as part of the rebuilt system. **Run `anix-upgrade` a second time** to complete the migration — the new script sees the target tree's `flake` marker, uses `nixos-rebuild --flake`, and applies the Determinate NixOS module.
 
+Determinate manages `/etc/nix/nix.conf`; declarative `nix.settings` are written to
+`/etc/nix/nix.custom.conf` and included by the managed file. It also synthesizes
+`/nix/var/determinate/netrc`. Existing cache credentials belong in the mutable
+`/etc/nix/netrc`, which is registered through
+`machines.base.additionalNetrcSources` and merged into the synthesized file.
+The default configuration creates an empty root-only file when none exists and
+preserves the contents of an existing file.
+
 ## Build a JetPack Installer ISO
 
 Cross-compiled from x86_64. Requires `binfmt` support for aarch64 (enabled by default on NixOS with `boot.binfmt.emulatedSystems`).
