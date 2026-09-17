@@ -27,7 +27,6 @@ positional arguments:
 options:
   -h, --help  show this help message and exit
 ```
-
 ### resolve
 
 
@@ -40,4 +39,3 @@ positional arguments:
 options:
   -h, --help  show this help message and exit
 ```
-

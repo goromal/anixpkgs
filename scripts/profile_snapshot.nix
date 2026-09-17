@@ -1,8 +1,11 @@
 # Evaluate externally visible profile behavior without building the system.
-{ configuration }:
+{
+  configuration ? null,
+  evaluated ? null,
+}:
 let
-  evaluated = import <nixpkgs/nixos> { inherit configuration; };
-  inherit (evaluated) config pkgs;
+  system = if evaluated != null then evaluated else import <nixpkgs/nixos> { inherit configuration; };
+  inherit (system) config pkgs;
   inherit (pkgs) lib;
   services = [
     "agent_ui"
@@ -61,6 +64,7 @@ in
     lib.filter (panel: panel.group == "Job Logs") config.services.metricsNode.panels
   );
   tmpfiles = config.systemd.tmpfiles.rules;
+  determinateConfig = config.environment.etc."determinate/config.json".text;
   cuda = config.machines.cudaNode.enable;
   folioHub = config.services.folio-backend.isHub;
   folioDesktop = config.services.folio-backend.desktop;

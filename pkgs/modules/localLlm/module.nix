@@ -70,7 +70,14 @@ in
 
     services.ollama = {
       enable = true;
-      inherit (cfg) acceleration host port;
+      inherit (cfg) host port;
+      package =
+        if cfg.acceleration == null then
+          pkgs.ollama
+        else if cfg.acceleration == false then
+          pkgs.ollama-cpu
+        else
+          pkgs.${"ollama-${cfg.acceleration}"};
       loadModels = [ cfg.model ];
       environmentVariables = {
         OLLAMA_CONTEXT_LENGTH = toString cfg.contextLength;

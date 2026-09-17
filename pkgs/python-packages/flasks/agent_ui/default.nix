@@ -27,7 +27,7 @@ buildPythonPackage rec {
     werkzeug
   ];
   nativeCheckInputs = [ pytestCheckHook ];
-  pytestFlagsArray = [ "tests" ];
+  pytestFlags = [ "tests" ];
   meta = {
     description = "Web console for devshell workspaces and agent terminals.";
     longDescription = ''

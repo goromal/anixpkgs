@@ -9,6 +9,7 @@ mkShell {
     lorri
   ];
   buildInputs = [
+    anix-upgrade
     make-title
     devshell
     setupws
