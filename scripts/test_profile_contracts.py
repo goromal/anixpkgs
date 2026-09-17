@@ -89,6 +89,29 @@ def evaluate(configuration):
     )
 
 
+def evaluate_flake(machine):
+    return subprocess.run(
+        [
+            "nix",
+            "eval",
+            "--impure",
+            "--json",
+            "--expr",
+            f'import {REPO_ROOT}/scripts/profile_snapshot.nix '
+            f'{{ evaluated = (builtins.getFlake "{REPO_ROOT}").nixosConfigurations.{machine}; }}',
+        ],
+        env={
+            **os.environ,
+            "NIXPKGS_ALLOW_UNFREE": "1",
+            "NIXPKGS_ALLOW_INSECURE": "1",
+            "NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM": "1",
+        },
+        capture_output=True,
+        text=True,
+        timeout=300,
+    )
+
+
 class ProfileContracts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -103,6 +126,16 @@ class ProfileContracts(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr[-6000:])
             self.snapshots[configuration] = json.loads(result.stdout)
         result = self.snapshots[configuration]
+        self.assertEqual(result["failedAssertions"], [])
+        return result
+
+    def flake_snapshot(self, machine):
+        key = f"flake:{machine}"
+        if key not in self.snapshots:
+            result = evaluate_flake(machine)
+            self.assertEqual(result.returncode, 0, result.stderr[-6000:])
+            self.snapshots[key] = json.loads(result.stdout)
+        result = self.snapshots[key]
         self.assertEqual(result["failedAssertions"], [])
         return result
 
@@ -128,8 +161,6 @@ class ProfileContracts(unittest.TestCase):
             ("personal-dell", PERSONAL | {"launchpad", "comfyui", "ollama"}),
             ("ats-alderlake", ATS),
             ("ats-pi", ATS),
-            ("jetpack-orin-nx", JETPACK),
-            ("jetpack-orin-agx", JETPACK),
         ]:
             with self.subTest(machine=name):
                 snapshot = self.snapshot(f"{NIXOS_DIR}/configurations/{name}.nix")
@@ -138,6 +169,12 @@ class ProfileContracts(unittest.TestCase):
                     snapshot["jobs"].count("launchpad-sync"),
                     1 if "launchpad" in expected else 0,
                 )
+
+        for machine in ["jetson-orin-nx", "jetson-orin-agx"]:
+            with self.subTest(machine=machine):
+                snapshot = self.flake_snapshot(machine)
+                self.assertEqual(set(snapshot["enabledServices"]), JETPACK)
+                self.assertEqual(snapshot["jobs"].count("launchpad-sync"), 1)
 
     def test_workstation_has_agents_without_web_server(self):
         snapshot = self.snapshot(fixture("workstation"))

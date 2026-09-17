@@ -1,8 +1,11 @@
 # Evaluate externally visible profile behavior without building the system.
-{ configuration }:
+{
+  configuration ? null,
+  evaluated ? null,
+}:
 let
-  evaluated = import <nixpkgs/nixos> { inherit configuration; };
-  inherit (evaluated) config pkgs;
+  system = if evaluated != null then evaluated else import <nixpkgs/nixos> { inherit configuration; };
+  inherit (system) config pkgs;
   inherit (pkgs) lib;
   services = [
     "agent_ui"

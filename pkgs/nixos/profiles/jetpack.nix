@@ -10,6 +10,7 @@ with import ../dependencies.nix;
 
   config = {
     hardware.nvidia-jetpack.enable = true;
+    hardware.nvidia-jetpack.configureCuda = true;
     hardware.graphics.enable = true;
 
     machines.base = {
