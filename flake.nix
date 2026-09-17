@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/26.05";
 
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.22.4";
 
     home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -288,7 +288,10 @@
           jetpackNixpkgs.lib.nixosSystem {
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
-            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-nx.nix ];
+            modules = commonModules ++ [
+              jetpack-nixos.nixosModules.default
+              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
+            ];
           };
 
         jetson-orin-agx =
@@ -298,7 +301,10 @@
           jetpackNixpkgs.lib.nixosSystem {
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
-            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-agx.nix ];
+            modules = commonModules ++ [
+              jetpack-nixos.nixosModules.default
+              ./pkgs/nixos/configurations/jetpack-orin-agx.nix
+            ];
           };
 
         # Drone simulation

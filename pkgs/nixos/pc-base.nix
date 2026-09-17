@@ -59,7 +59,9 @@ let
     echo_green "Next steps to finish configuring this machine:"
     echo_yellow "  - Use devshell to create a workspace with anixpkgs"
     echo_yellow "  - Copy the hardware config above into anixpkgs/pkgs/nixos/hardware/"
-    echo_yellow "  - Define the machine in pkgs/nixos/configurations/ and flake.nix"
+    echo_yellow "  - Define the machine in pkgs/nixos/configurations/ and set networking.hostName"
+    echo_yellow "  - Add it to flake.nix with scripts/add-machine-to-flake.py (personal/Jetson)"
+    echo_yellow "  - Ensure the flake attribute matches the runtime hostname: $(hostname)"
     echo_yellow "  - Run anix-upgrade"
     echo_yellow "  - Create new secrets and configs entries"
     echo
@@ -226,17 +228,6 @@ in
     ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix
     ../python-packages/flasks/mail/module.nix
-    (
-      let
-        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
-        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
-        jetpackSrc = builtins.fetchTarball {
-          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
-          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
-        };
-      in
-      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    )
   ];
 
   config = lib.mkMerge [
@@ -387,11 +378,6 @@ in
             echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
           ''
         );
-      };
-
-      hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
-      hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
-        enable = true;
       };
 
       # https://github.com/NixOS/nixpkgs/issues/154163

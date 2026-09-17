@@ -9,6 +9,9 @@ with import ../dependencies.nix;
   imports = [ ../pc-base.nix ];
 
   config = {
+    hardware.nvidia-jetpack.enable = true;
+    hardware.graphics.enable = true;
+
     machines.base = {
       machineType = "jetson";
       cloudDirs = [
