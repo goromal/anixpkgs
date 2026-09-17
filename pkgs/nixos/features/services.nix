@@ -145,6 +145,7 @@ in
       isHub = features.folio.role == "hub";
       desktop = features.folio.desktop;
       hubHost = if features.folio.role == "hub" then "" else features.folio.hubHost;
+      agentCompanion = features.folio.enable && features.agents.frameworks != [ ];
     };
     users.users.andrew.extraGroups = lib.mkIf features.vikunja.enable [ "vikunja" ];
   };

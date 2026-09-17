@@ -9,6 +9,55 @@ with import ../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.folio-backend;
+
+  agents = config.machines.features.agents.frameworks;
+  agentAlternation = lib.concatStringsSep "|" agents;
+  companion = cfg.agentCompanion && agents != [ ];
+
+  # Same llm-agents CLIs the claude/codex agent components install (home.packages),
+  # but placed on the backend service PATH so a spawned `exec claude`/`codex` in a
+  # plain temp dir resolves. procps/coreutils/git cover common agent shell-outs.
+  agentPackages = {
+    claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+    codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
+  };
+  companionPath =
+    [ pkgs.tmux pkgs.procps pkgs.coreutils pkgs.gitMinimal ]
+    ++ map (agent: agentPackages.${agent}) agents;
+
+  folioTmuxConf = pkgs.writeText "folio-agent-tmux.conf" ''
+    set -g mouse on
+    set -g history-limit 50000
+  '';
+
+  folioAgentSession = pkgs.writeShellApplication {
+    name = "folio-agent-session";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      if [ "$#" -ne 2 ]; then
+        echo "usage: folio-agent-session WORKDIR AGENT" >&2
+        exit 2
+      fi
+      case "$2" in
+        ${agentAlternation}) ;;
+        *) echo "folio-agent-session: unsupported agent" >&2; exit 2 ;;
+      esac
+      cd "$1"
+      exec "$2"
+    '';
+  };
+
+  folioAgentAttach = pkgs.writeShellApplication {
+    name = "folio-agent-attach";
+    runtimeInputs = [ pkgs.tmux ];
+    text = ''
+      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^folio-agent--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
+        echo "folio-agent-attach: invalid session" >&2
+        exit 2
+      fi
+      exec tmux -L folio-agent attach-session -t "$1"
+    '';
+  };
 in
 {
   options.services.folio-backend = {
@@ -29,6 +78,20 @@ in
       default = "";
       description = "For spokes: the hub's mDNS host (e.g. \"ats.local\"), resolved via wormhole.";
     };
+
+    agentCompanion = mkEnableOption "folio agent companion (temp-dir agent terminals)";
+
+    agentSecretsFile = mkOption {
+      type = types.str;
+      default = "${globalCfg.homeDir}/secrets/flask/folio_agent.json";
+      description = "Secrets file for the companion; provisioned as a copy of agent_ui.json.";
+    };
+
+    agentSpoolDir = mkOption {
+      type = types.str;
+      default = "/tmp/folio-agent";
+      description = "Base directory holding ephemeral agent session working dirs.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -37,10 +100,18 @@ in
       "z ${cfg.dataDir}/folio.db 0640 andrew dev -"
     ];
 
+    assertions = [
+      {
+        assertion = !companion || config.services.agent_ui.enable;
+        message = "folio agentCompanion needs services.agent_ui.enable (shared secrets source).";
+      }
+    ];
+
     systemd.services.folio-backend = {
       description = "folio backend (FastAPI)";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
+      path = lib.optionals companion companionPath;
 
       serviceConfig = {
         Type = "simple";
@@ -50,7 +121,12 @@ in
         # DB before the andrew-owned service opens it. Makes the migration off the
         # old dedicated "folio" user robust: a pre-existing folio.db keeps the old
         # (now-removed) owner, which tmpfiles "z" does not reliably re-chown.
-        ExecStartPre = "+${pkgs.coreutils}/bin/chown -R andrew:dev ${cfg.dataDir}";
+        ExecStartPre = [
+          "+${pkgs.coreutils}/bin/chown -R andrew:dev ${cfg.dataDir}"
+        ] ++ lib.optional companion (
+          "+${pkgs.coreutils}/bin/install -o andrew -g dev -m0600 "
+          + "${config.services.agent_ui.secretsFile} ${cfg.agentSecretsFile}"
+        );
         ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
@@ -65,7 +141,33 @@ in
           "FOLIO_IS_HUB=${if cfg.isHub then "true" else "false"}"
           "FOLIO_HUB_HOST=${cfg.hubHost}"
           "FOLIO_HUB_PORT=${toString service-ports.folio.public}"
+        ]
+        ++ lib.optionals companion [
+          "FOLIO_AGENTS=${lib.concatStringsSep " " agents}"
+          "FOLIO_AGENT_SECRETS=${cfg.agentSecretsFile}"
+          "FOLIO_AGENT_SPOOL=${cfg.agentSpoolDir}"
+          "FOLIO_AGENT_TMUX=${pkgs.tmux}/bin/tmux"
+          "FOLIO_AGENT_TMUX_CONFIG=${folioTmuxConf}"
+          "FOLIO_AGENT_SESSION_CMD=${folioAgentSession}/bin/folio-agent-session"
         ];
+      };
+    };
+
+    systemd.services.folio-agent-terminal = lib.mkIf companion {
+      description = "folio agent companion ttyd";
+      after = [ "folio-backend.service" ];
+      wants = [ "folio-backend.service" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.tmux ];
+      environment.HOME = globalCfg.homeDir;
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.ttyd}/bin/ttyd --port ${toString service-ports.folio.agentTerminal} --interface 127.0.0.1 --writable --url-arg --check-origin --auth-header X-Folio-Agent-Authenticated --base-path /folio/agent/terminal ${folioAgentAttach}/bin/folio-agent-attach";
+        Restart = "always";
+        RestartSec = 3;
+        User = "andrew";
+        Group = "dev";
+        UMask = "0077";
       };
     };
 
@@ -110,6 +212,25 @@ in
             proxy_buffering off;
             proxy_cache off;
             proxy_read_timeout 3600s;
+          '';
+        };
+        locations."= /folio/agent/auth-check" = lib.mkIf companion {
+          proxyPass = "http://127.0.0.1:${toString service-ports.folio.internal}/agent/auth-check";
+          extraConfig = ''
+            internal;
+            proxy_pass_request_body off;
+            proxy_set_header Content-Length "";
+          '';
+        };
+        locations."/folio/agent/terminal/" = lib.mkIf companion {
+          proxyPass = "http://127.0.0.1:${toString service-ports.folio.agentTerminal}";
+          proxyWebsockets = true;
+          extraConfig = ''
+            auth_request /folio/agent/auth-check;
+            proxy_set_header X-Folio-Agent-Authenticated yes;
+            proxy_set_header Host $host;
+            proxy_read_timeout 86400;
+            proxy_send_timeout 86400;
           '';
         };
       };
