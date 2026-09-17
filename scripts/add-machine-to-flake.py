@@ -34,10 +34,7 @@ def jetpack_entry(variant: str) -> str:
         f"          jetpackNixpkgs.lib.nixosSystem {{\n"
         f"            system = \"aarch64-linux\";\n"
         f"            specialArgs = commonSpecialArgs;\n"
-        f"            modules = commonModules ++ [\n"
-        f"              jetpack-nixos.nixosModules.default\n"
-        f"              ./pkgs/nixos/configurations/jetpack-{variant}.nix\n"
-        f"            ];\n"
+        f"            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-{variant}.nix ];\n"
         f"          }};\n\n"
     )
 

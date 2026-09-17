@@ -5,20 +5,21 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "manif-geom-rs";
-  version = "0.0.1";
+  version = "0.1.0";
   src = pkg-src;
   cargoHash = "sha256-Y7pS5WeFLRdj9jrWiA/kbHdzkdZL+eEZ9Ft0Wh2XNr0=";
   meta = {
-    description = "Rust implementation of [manif-geom-cpp](https://github.com/goromal/manif-geom-cpp) (*under construction*).";
+    description = "Rust implementations of SO(2), SE(2), SO(3), and SE(3), compatible with manif-geom-cpp.";
     longDescription = ''
       [Repository](https://github.com/goromal/manif-geom-rs)
 
-      ***TODO*** Once finished, these docs will contrast the API with `manif-geom-cpp`.
+      Provides complete 2D and 3D rotation and rigid-transform Lie groups,
+      including matrix conversions, point actions, composition, inverse,
+      exponential and logarithmic maps, right-side perturbations, contiguous
+      coefficient access, scalar casts, and nalgebra quaternion interop.
 
-      - [x] SO2
-      - [ ] SO3
-      - [ ] SE2
-      - [ ] SE3
+      Coefficient and tangent ordering follow
+      [manif-geom-cpp](https://github.com/goromal/manif-geom-cpp).
     '';
   };
 }

@@ -5,9 +5,9 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "sunnyside";
-  version = "0.1.1";
+  version = "0.2.0";
   src = pkg-src;
-  cargoHash = "sha256-iKjsrQ/u9SwQZNlSMPjJOxLRSbBuE21Ae0jnJ60fKoE=";
+  cargoHash = "sha256-aAzaj78FkeY7Q74AaKBhmGAm1b0WAeylBEg3vdwiWYc=";
   meta = {
     description = "File scrambler.";
     longDescription = ''

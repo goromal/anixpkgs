@@ -1,6 +1,8 @@
 exit_code=0
 
 tests=(
+    "test_anix_upgrade.sh"
+    "test_no_ifd.sh"
     "test_dirstuff.sh"
     "test_ws_tools.sh"
     "test_sunnyside.sh"
@@ -8,6 +10,7 @@ tests=(
     "test_png.sh"
     "test_mp3.sh"
     "test_mp4.sh"
+    "test_vacuum.sh"
     "test_mp3unite_separate.sh"
     "test_mp4separate.sh"
     "test_fix-perms.sh"

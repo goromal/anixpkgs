@@ -17,9 +17,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if there's already a bot comment on this PR
+          # Check if there's already a changelog bot comment on this PR.
+          # Match on this bot's own marker so other bot comments (e.g. the
+          # closure-diff form) don't get mistaken for it.
           EXISTING_COMMENT=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
-          --jq '.[] | select(.user.login=="github-actions[bot]")')
+          --jq '.[] | select(.body | startswith("## Change Description"))')
           if [[ -z "$EXISTING_COMMENT" ]]; then
             echo "no_comment=true" >> $GITHUB_ENV
           else

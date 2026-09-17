@@ -1,37 +1,20 @@
-{
+args@{
   config,
   pkgs,
   lib,
   ...
-}@args:
+}:
 with import ./dependencies.nix;
 let
   cfg = config.machines.base;
+  features = config.machines.features;
   remoteBuildersCatalog = import ./remote-builders.nix;
   home-manager-nixos-module =
     if args ? hmModule then
       args.hmModule
     else
       (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
-  atsudo = pkgs.writeShellScriptBin "atsudo" ''
-    args=""
-    for word in "$@"; do
-      args+="$word "
-    done
-    args=''${args% }
-    pw=$(${anixpkgs.sread}/bin/sread ${cfg.homeDir}/secrets/${config.networking.hostName}/p.txt.tyz)
-    if [[ ! -z "$pw" ]]; then
-      echo "$pw" | sudo -S $args
-    else
-      sudo $args
-    fi
-  '';
-  machine-rcrsync = anixpkgs.rcrsync.override {
-    homeDir = cfg.homeDir;
-    cloudDirs = cfg.cloudDirs;
-    rcloneCfg = "${cfg.homeDir}/.config/rclone/rclone.conf";
-  };
-  machine-authm = anixpkgs.authm.override { rcrsync = machine-rcrsync; };
+  inherit (import ./runtime.nix { inherit config pkgs lib; }) atsudo machine-rcrsync machine-authm;
   anix-init = pkgs.writeShellScriptBin "anix-init" ''
     make-title -c yellow "Setting up rcrsync"
 
@@ -69,13 +52,19 @@ let
     fi
 
     echo
-    echo_green "DONE. Next steps:"
-    echo_yellow "  - Run: nixos-rebuild switch --flake $HOME/sources/anixpkgs#$(hostname)"
+    echo_green "DONE. Note the hardware-config.nix file below:"
+    echo
+    nixos-generate-config --show-hardware-config
+    echo
+    echo_green "Next steps to finish configuring this machine:"
+    echo_yellow "  - Use devshell to create a workspace with anixpkgs"
+    echo_yellow "  - Copy the hardware config above into anixpkgs/pkgs/nixos/hardware/"
+    echo_yellow "  - Define the machine in pkgs/nixos/configurations/ and flake.nix"
+    echo_yellow "  - Run anix-upgrade"
     echo_yellow "  - Create new secrets and configs entries"
     echo
     echo_green "Have fun!"
   '';
-  enableSunshine = cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational;
 in
 {
   options.machines.base = {
@@ -101,24 +90,9 @@ in
       description = "(x86_linux) Boot partition mount point (default: /boot/efi)";
       default = "/boot";
     };
-    graphical = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes a graphical interface.";
-    };
-    recreational = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes recreational packages.";
-    };
-    developer = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure includes developer packages.";
-    };
-    isATS = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether the closure is for a personal server instance.";
-    };
     runWebServer = lib.mkOption {
       type = lib.types.bool;
+      internal = true;
       description = "Whether to spawn a reverse proxy webserver.";
       default = false;
     };
@@ -130,6 +104,10 @@ in
               type = lib.types.str;
               description = "Display name of the service";
             };
+            tag = lib.mkOption {
+              type = lib.types.str;
+              description = "Landing-page group for the service";
+            };
             path = lib.mkOption {
               type = lib.types.str;
               description = "URL path or full URL to the service";
@@ -138,6 +116,11 @@ in
               type = lib.types.str;
               description = "Brief description of the service";
             };
+            port = lib.mkOption {
+              type = lib.types.nullOr lib.types.port;
+              default = null;
+              description = "Dedicated public port, or null for a path on the shared webserver.";
+            };
             icon = lib.mkOption {
               type = lib.types.str;
               description = "Font Awesome 6 solid icon class name (e.g. 'arrows-rotate')";
@@ -145,7 +128,7 @@ in
             };
             faviconSvg = lib.mkOption {
               type = lib.types.nullOr lib.types.path;
-              description = "Path to SVG file served at {path}favicon.svg; null disables";
+              description = "Path to SVG file served and linked at {path}favicon.svg; null disables";
               default = null;
             };
           };
@@ -160,57 +143,26 @@ in
       default = "wlo1";
     };
     webServerInsecurePort = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.port;
       description = "Public insecure port";
       default = 80;
     };
     webServerSecurePort = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.port;
       description = "Public secure port";
       default = 443;
     };
-    serveNotesWiki = lib.mkOption {
-      type = lib.types.bool;
-      description = "Whether to serve the notes wiki site.";
-    };
-    notesWikiPort = lib.mkOption {
-      type = lib.types.int;
-      description = "Public insecure port for the notes wiki site.";
-      default = 80;
-    };
-    enableMetrics = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to export OS metrics";
-    };
-    enableFileServers = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to turn on file servers";
-    };
     cloudDirs = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
+      type = lib.types.listOf (
+        lib.types.submodule {
+          options = {
+            name = lib.mkOption { type = lib.types.str; };
+            cloudname = lib.mkOption { type = lib.types.str; };
+            dirname = lib.mkOption { type = lib.types.str; };
+          };
+        }
+      );
       description = "List of {name,cloudname,dirname} attributes (dirname is relative to home) defining the syncable directories by rcrsync";
-    };
-    enableOrchestrator = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Whether to enable the orchestrator daemon";
-    };
-    timedOrchJobs = lib.mkOption {
-      type = lib.types.listOf lib.types.attrs;
-      description = "Orchestrator job definitions";
-      default = [ ];
-    };
-    extraOrchestratorPackages = lib.mkOption {
-      type = lib.types.listOf lib.types.package;
-      description = "Packages to add to orchestrator's path";
-      default = [ ];
-    };
-    agentFramework = lib.mkOption {
-      type = lib.types.nullOr (lib.types.enum [ "claude" ]);
-      default = null;
-      description = "AI agent framework to install and configure. Null means none.";
     };
     remoteBuilders = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -226,20 +178,35 @@ in
 
   imports = [
     ./installation-base.nix
+    ./features/options.nix
+    ./features/services.nix
+    ./features/notebooks.nix
+    ./features/orchestrator.nix
+    ./features/game-streaming.nix
     home-manager-nixos-module
-    ./modules/claude-agent/module.nix
-    ./modules/webserverNode/module.nix
-    ./modules/cudaNode/module.nix
-    ./modules/comfyui/module.nix
+    ../modules/agent-common/module.nix
+    ../modules/claude-agent/module.nix
+    ../modules/codex-agent/module.nix
+    ../modules/webserverNode/module.nix
+    ../modules/cudaNode/module.nix
+    ../modules/localLlm/module.nix
+    ../modules/comfyui/module.nix
+    ../modules/externalDrives/module.nix
+    ../modules/homeVpnNode/module.nix
     ../modules/notes-wiki/module.nix
     ../modules/metricsNode/module.nix
     ../modules/plexNode/module.nix
     ../modules/mailNode/module.nix
     ../modules/vikunja/module.nix
     ../modules/vikunja-mcp/module.nix
+    ../modules/folio/module.nix
+    ../modules/folio-mcp/module.nix
+    ../modules/gmail-mcp/module.nix
+    ../modules/navidrome/module.nix
     ../modules/notion-mcp/module.nix
     ../modules/wiki-mcp/module.nix
     ../modules/jupyter-mcp/module.nix
+    ../modules/google-sheets-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
@@ -249,15 +216,80 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
+    ../python-packages/flasks/agent_ui/module.nix
+    ../python-packages/flasks/sunset/module.nix
     ../python-packages/flasks/tester/module.nix
+    ../python-packages/flasks/disciple/module.nix
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
+    ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix
+    ../python-packages/flasks/mail/module.nix
+    (
+      let
+        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
+        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
+        jetpackSrc = builtins.fetchTarball {
+          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
+          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
+        };
+      in
+      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
+    )
   ];
 
   config = lib.mkMerge [
     {
+      # Fail evaluation if two services claim the same port.
+      #
+      # This is specifically a merge hazard: two branches can each add a
+      # DIFFERENT key with the SAME value to service-ports.nix, which git
+      # merges without a textual conflict because the added lines don't
+      # overlap. `brom` and `agent_ui` both took 6767 exactly that way, and
+      # the collision only surfaced after deployment as a unit crash-looping
+      # on "Address already in use" — by which point the other service had
+      # already won the bind. Checking keys is not enough; check values.
+      assertions =
+        let
+          flattenPorts =
+            prefix: attrs:
+            lib.concatLists (
+              lib.mapAttrsToList (
+                n: v:
+                let
+                  path = if prefix == "" then n else "${prefix}.${n}";
+                in
+                if builtins.isInt v then
+                  [
+                    {
+                      name = path;
+                      port = v;
+                    }
+                  ]
+                else if builtins.isAttrs v then
+                  flattenPorts path v
+                else
+                  [ ]
+              ) attrs
+            );
+          entries = flattenPorts "" service-ports;
+          duplicates = lib.filterAttrs (_: es: builtins.length es > 1) (
+            lib.groupBy (e: builtins.toString e.port) entries
+          );
+          rendered = lib.concatStringsSep "; " (
+            lib.mapAttrsToList (
+              p: es: "${p} claimed by ${lib.concatStringsSep " and " (map (e: e.name) es)}"
+            ) duplicates
+          );
+        in
+        [
+          {
+            assertion = duplicates == { };
+            message = "service-ports.nix assigns the same port to more than one service: ${rendered}. Two services cannot bind the same port — pick a free value.";
+          }
+        ];
+
       system.stateVersion = cfg.nixosState;
 
       users.groups.jtop = lib.mkIf (cfg.machineType == "jetson") { };
@@ -341,7 +373,7 @@ in
         supportedFilesystems = lib.mkIf (cfg.machineType == "x86_linux") [ "ntfs" ];
         binfmt.emulatedSystems = lib.mkIf (cfg.machineType == "x86_linux") [ "aarch64-linux" ];
 
-        postBootCommands = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) (
+        postBootCommands = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) (
           let
             gdm_user_conf = ''
               [User]
@@ -355,6 +387,11 @@ in
             echo '${gdm_user_conf}' > /var/lib/AccountsService/users/andrew
           ''
         );
+      };
+
+      hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
+      hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
+        enable = true;
       };
 
       # https://github.com/NixOS/nixpkgs/issues/154163
@@ -375,15 +412,15 @@ in
       nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
       nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
-      services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) true;
+      services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) true;
       services.displayManager.gdm.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical
+        cfg.machineType == "x86_linux" && features.desktop.enable
       ) true;
       services.desktopManager.gnome.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical
+        cfg.machineType == "x86_linux" && features.desktop.enable
       ) true;
 
-      services.printing.enable = (cfg.machineType == "x86_linux" && cfg.graphical);
+      services.printing.enable = (cfg.machineType == "x86_linux" && features.desktop.enable);
 
       services.avahi = {
         enable = true;
@@ -398,79 +435,7 @@ in
         };
       };
 
-      services.authui = {
-        enable = cfg.isATS;
-        initScript =
-          (pkgs.writeShellScriptBin "atsauthui-start" ''
-            ${pkgs.systemd}/bin/systemctl stop orchestratord
-          '')
-          + "/bin/atsauthui-start";
-        resetScript =
-          (pkgs.writeShellScriptBin "atsauthui-finish" ''
-            ${machine-rcrsync}/bin/rcrsync override secrets
-            ${pkgs.systemd}/bin/systemctl start orchestratord
-          '')
-          + "/bin/atsauthui-finish";
-      };
-
-      services.budget_ui = {
-        enable = cfg.isATS;
-        pathPkgs = [
-          pkgs.bash
-          pkgs.coreutils
-          pkgs.util-linux
-          pkgs.rclone
-          machine-rcrsync
-          machine-authm
-          anixpkgs.budget_report
-          anixpkgs.fixfname
-        ];
-      };
-
-      services.orchestrator_ui = {
-        enable = cfg.enableOrchestrator;
-      };
-
-      services.anix-upgrade-ui = {
-        enable = true;
-      };
-
-      services.rankserver = {
-        enable = cfg.isATS || cfg.enableFileServers;
-        package = anixpkgs.rankserver;
-        rootDir = "${cfg.homeDir}/fileservers";
-      };
-
-      services.stampserver = {
-        enable = cfg.isATS || cfg.enableFileServers;
-        package = anixpkgs.stampserver;
-        rootDir = "${cfg.homeDir}/fileservers";
-      };
-
-      services.la-quiz-web = {
-        enable = cfg.isATS;
-        dataDir = "${cfg.homeDir}/data/la-quiz-web";
-      };
-
-      services.tester = {
-        enable = cfg.isATS;
-        dataDir = "${cfg.homeDir}/data/tester";
-      };
-
-      services.tasks_ui = {
-        enable = cfg.isATS;
-        rcrsync = machine-rcrsync;
-      };
-
-      services.vdlserver = {
-        enable = cfg.isATS;
-      };
-
-      services.intake_ui = {
-        enable = cfg.isATS;
-      };
-
-      environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical) {
+      environment.gnome = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) {
         excludePackages = with pkgs; [
           gnome-photos
           gnome-tour
@@ -488,26 +453,18 @@ in
       };
 
       # Specialized bluetooth and sound settings for Apple AirPods
-      hardware.bluetooth =
-        lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational)
-          {
-            enable = true;
-            settings = {
-              General = {
-                ControllerMode = "bredr";
-              };
-            };
+      hardware.bluetooth = lib.mkIf (features.headsetAudio.enable) {
+        enable = true;
+        settings = {
+          General = {
+            ControllerMode = "bredr";
           };
-      services.blueman.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) true;
-      services.pulseaudio.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) false;
-      security.rtkit.enable = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
-      ) true;
-      services.pipewire = lib.mkIf (cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational) {
+        };
+      };
+      services.blueman.enable = lib.mkIf (features.headsetAudio.enable) true;
+      services.pulseaudio.enable = lib.mkIf (features.headsetAudio.enable) false;
+      security.rtkit.enable = lib.mkIf (features.headsetAudio.enable) true;
+      services.pipewire = lib.mkIf (features.headsetAudio.enable) {
         enable = true;
         alsa.enable = true;
         pulse.enable = true;
@@ -515,91 +472,8 @@ in
       };
 
       services.udev.packages = lib.mkIf (
-        cfg.machineType == "x86_linux" && cfg.graphical && cfg.recreational
+        cfg.machineType == "x86_linux" && features.desktop.enable && features.recreation.enable
       ) [ pkgs.dolphin-emu ];
-
-      # Sunshine's encoder test transiently binds port 48010, causing the RTSP
-      # server to fail on the same port immediately after. The service exits 0
-      # so on-failure won't retry — force always-restart so the second attempt
-      # (port now free) succeeds automatically.
-      systemd.user.services.sunshine = lib.mkIf enableSunshine {
-        serviceConfig.Restart = lib.mkForce "always";
-        serviceConfig.RestartSec = lib.mkForce "3s";
-      };
-
-      services.sunshine = lib.mkIf enableSunshine {
-        enable = true;
-        openFirewall = true;
-        capSysAdmin = true;
-        applications = {
-          # Ensure play and rcrsync are reachable from the sunshine user service,
-          # which runs with PATH=null per the NixOS sunshine module design.
-          env.PATH = "$(HOME)/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
-          apps = [
-            {
-              name = "Zelda Collector's Edition";
-              cmd = "play zelda";
-            }
-            {
-              name = "Wind Waker";
-              cmd = "play windwaker";
-            }
-            {
-              name = "Twilight Princess";
-              cmd = "play twilight";
-            }
-            {
-              name = "Super Smash Bros. Melee";
-              cmd = "play melee";
-            }
-            {
-              name = "Super Mario Sunshine";
-              cmd = "play sunshine";
-            }
-          ];
-        };
-      };
-      services.udev.extraRules = lib.mkIf enableSunshine ''
-        KERNEL=="uinput", GROUP="input", MODE="0660"
-      '';
-
-      # Orchestrator jobs
-      services.orchestratord = lib.mkIf cfg.enableOrchestrator {
-        enable = true;
-        orchestratorPkg = anixpkgs.orchestrator;
-        threads = 2;
-        pathPkgs =
-          with pkgs;
-          [
-            bash
-            coreutils
-            util-linux
-            rclone
-            machine-rcrsync
-            machine-authm
-            anixpkgs.mp4
-            anixpkgs.mp4unite
-            anixpkgs.png
-            anixpkgs.scrape
-          ]
-          ++ cfg.extraOrchestratorPackages;
-        statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
-      };
-      systemd.timers."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
-        description = "Restart orchestratord weekly";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnCalendar = "Sun 03:00";
-          Persistent = true;
-        };
-      };
-      systemd.services."weekly-orchestratord-restart" = lib.mkIf cfg.enableOrchestrator {
-        description = "Restart orchestratord weekly";
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${pkgs.systemd}/bin/systemctl restart orchestratord.service";
-        };
-      };
 
       networking.firewall.allowedTCPPorts = [
         4444
@@ -622,11 +496,7 @@ in
         noto-fonts-color-emoji
       ];
 
-      security.sudo.extraConfig = ''
-        ${if cfg.isATS then "Defaults    timestamp_timeout=0" else ""}
-      '';
-
-      programs.ssh.startAgent = (cfg.graphical == false);
+      programs.ssh.startAgent = (features.desktop.enable == false);
 
       programs.vim.enable = true;
       programs.vim.defaultEditor = true;
@@ -635,37 +505,6 @@ in
         rateLimitBurst = 0;
         rateLimitInterval = "0s";
       };
-
-      # Metrics
-      services.metricsNode.enable = cfg.enableMetrics;
-      services.metricsNode.openFirewall = cfg.enableMetrics;
-
-      # Notes Wiki
-      services.notes-wiki.enable = cfg.serveNotesWiki;
-
-      # Daily Tactical
-      services.tacticald = lib.mkIf cfg.isATS {
-        enable = true;
-        user = "andrew";
-        group = "dev";
-        tacticalPkg = anixpkgs.daily_tactical_server;
-        statsdPort = lib.mkIf cfg.enableMetrics service-ports.statsd;
-      };
-
-      # Media
-      services.plexNode.enable = cfg.isATS;
-
-      # Mail
-      services.mailNode.enable = cfg.isATS;
-
-      # Vikunja Task Management
-      services.vikunja-ats = lib.mkIf cfg.isATS {
-        enable = true;
-        domain = "${config.networking.hostName}.local";
-      };
-
-      # Jupyter MCP Server
-      services.jupyter-mcp.enable = (cfg.machineType == "jetson");
 
       # Global packages
       environment.systemPackages =
@@ -753,36 +592,12 @@ in
         ]
         ++ (if cfg.machineType == "pi4" then [ libraspberrypi ] else [ ])
         ++ (
-          if cfg.enableOrchestrator then
-            [
-              (
-                let
-                  servicelist = builtins.concatStringsSep "/" (map (x: "${x.name}.service") cfg.timedOrchJobs);
-                  triggerscript = ./otrigger.py;
-                in
-                pkgs.writeShellScriptBin "otrigger" ''
-                  servicelist="${builtins.toString servicelist}"
-                  tmpdir=$(mktemp -d)
-                  ${python3}/bin/python ${triggerscript} "$servicelist" 2> $tmpdir/selection
-                  serviceselection=$(cat $tmpdir/selection)
-                  rm -r $tmpdir
-                  if [[ ! -z "$serviceselection" ]]; then
-                    echo "sudo systemctl restart ''${serviceselection}"
-                    ${atsudo}/bin/atsudo systemctl restart ''${serviceselection}
-                  fi
-                ''
-              )
-            ]
-          else
-            [ ]
-        )
-        ++ (
-          if cfg.isATS then
+          if features.auth.enable then
             [
               (pkgs.writeShellScriptBin "atsrefresh" ''
-                ${atsudo}/bin/atsudo systemctl stop orchestratord
+                ${lib.optionalString features.orchestrator.enable "${atsudo}/bin/atsudo systemctl stop orchestratord"}
                 authm refresh --headless --force && rcrsync override secrets
-                ${atsudo}/bin/atsudo systemctl start orchestratord
+                ${lib.optionalString features.orchestrator.enable "${atsudo}/bin/atsudo systemctl start orchestratord"}
               '')
             ]
           else
@@ -792,7 +607,7 @@ in
         ++ [ anix-init ];
 
       programs.bash.interactiveShellInit = ''
-        ${if cfg.developer then ''eval "$(direnv hook bash)"'' else ""}
+        ${if features.development.enable then ''eval "$(direnv hook bash)"'' else ""}
         tmux() {
           command tmux "$@"
           local _tmux_exit=$?
@@ -815,10 +630,11 @@ in
       environment.shellAliases = {
         jfu = "journalctl -fu";
         nohistory = "set +o history";
+        ta = "tmux attach";
       };
 
       programs.captive-browser = {
-        enable = cfg.graphical;
+        enable = features.desktop.enable;
         interface = cfg.wifiInterfaceName;
       };
 
@@ -842,23 +658,28 @@ in
             imports = [
               ./components/opts.nix
               ./components/base-pkgs.nix
+              ./components/upgrade-hooks.nix
             ]
-            ++ (if cfg.developer then [ ./components/base-dev-pkgs.nix ] else [ ])
-            ++ (if cfg.agentFramework == "claude" then [ ./components/claude-agent.nix ] else [ ])
+            ++ (if features.development.enable then [ ./components/base-dev-pkgs.nix ] else [ ])
+            ++ (lib.optionals (lib.elem "claude" features.agents.frameworks) [ ./components/claude-agent.nix ])
+            ++ (lib.optionals (lib.elem "codex" features.agents.frameworks) [ ./components/codex-agent.nix ])
             ++ (if cfg.machineType == "pi4" then [ ./components/pi-pkgs.nix ] else [ ])
             ++ (
               if cfg.machineType == "x86_linux" then
                 (
                   [ ./components/x86-pkgs.nix ]
-                  ++ (if cfg.recreational then [ ./components/x86-rec-pkgs.nix ] else [ ])
+                  ++ (if features.recreation.enable then [ ./components/x86-rec-pkgs.nix ] else [ ])
                   ++ (
-                    if cfg.graphical then
+                    if features.desktop.enable then
                       (
                         [ ./components/x86-graphical-pkgs.nix ]
-                        ++ (if cfg.developer then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
-                        ++ (if cfg.recreational then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
+                        ++ (if features.development.enable then [ ./components/x86-graphical-dev-pkgs.nix ] else [ ])
+                        ++ (if features.recreation.enable then [ ./components/x86-graphical-rec-pkgs.nix ] else [ ])
                         ++ (
-                          if (cfg.developer && cfg.recreational) then [ ./components/x86-graphical-dev-rec-pkgs.nix ] else [ ]
+                          if (features.development.enable && features.recreation.enable) then
+                            [ ./components/x86-graphical-dev-rec-pkgs.nix ]
+                          else
+                            [ ]
                         )
                       )
                     else
@@ -874,60 +695,43 @@ in
               standalone = false;
               homeDir = cfg.homeDir;
               browserExec =
-                if cfg.graphical && cfg.machineType == "x86_linux" then
+                if features.desktop.enable && cfg.machineType == "x86_linux" then
                   "${unstable.google-chrome}/bin/google-chrome-stable"
                 else
                   null;
               cloudDirs = cfg.cloudDirs;
               userOrchestrator = false;
-              enableMetrics = cfg.enableMetrics;
+              enableMetrics = features.metrics.enable;
             };
           }
           (
-            lib.optionalAttrs (cfg.agentFramework == "claude") {
-              mods.claude = {
-                marketplaces = config.machines.claude.marketplaces;
-                plugins = config.machines.claude.plugins;
-                permissionsAllow = config.machines.claude.permissionsAllow;
-                hooks = config.machines.claude.hooks;
-                skills = config.machines.claude.skills;
-                extraSettings = config.machines.claude.extraSettings;
-                mcpServers = config.machines.claude.mcpServers;
-                graphical = cfg.graphical;
-              };
-            }
+            lib.foldl lib.recursiveUpdate { } [
+              (lib.optionalAttrs (lib.elem "claude" features.agents.frameworks) {
+                mods.claude = {
+                  marketplaces = config.machines.claude.marketplaces;
+                  plugins = config.machines.claude.plugins;
+                  permissionsAllow = config.machines.claude.permissionsAllow;
+                  hooks = config.machines.claude.hooks;
+                  skills = config.machines.claude.skills;
+                  extraSettings = config.machines.claude.extraSettings;
+                  mcpServers = config.machines.claude.mcpServers;
+                  graphical = features.desktop.enable;
+                };
+              })
+              (lib.optionalAttrs (lib.elem "codex" features.agents.frameworks) {
+                mods.codex = {
+                  model = config.machines.codex.model;
+                  modelProvider = config.machines.codex.modelProvider;
+                  approvalPolicy = config.machines.codex.approvalPolicy;
+                  sandboxMode = config.machines.codex.sandboxMode;
+                  extraSettings = config.machines.codex.extraSettings;
+                  skills = config.machines.codex.skills;
+                  mcpServers = config.machines.codex.mcpServers;
+                  graphical = features.desktop.enable;
+                };
+              })
+            ]
           );
-    }
-    {
-      systemd.timers = builtins.listToAttrs (
-        map (job: {
-          name = job.name;
-          value = {
-            description = "${job.name} trigger timer";
-            wantedBy = [ "timers.target" ];
-            timerConfig = job.timerCfg // {
-              Unit = "${job.name}.service";
-            };
-          };
-        }) cfg.timedOrchJobs
-      );
-      systemd.services = builtins.listToAttrs (
-        map (job: {
-          name = job.name;
-          value = {
-            enable = true;
-            description = "${job.name} oneshot service";
-            serviceConfig = {
-              Type = "oneshot";
-              ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${job.jobShellScript}'";
-              ReadWritePaths = job.readWritePaths or [ "/" ];
-            }
-            // (lib.optionalAttrs ((job.execStartPre or null) != null) {
-              ExecStartPre = job.execStartPre;
-            });
-          };
-        }) cfg.timedOrchJobs
-      );
     }
   ];
 }

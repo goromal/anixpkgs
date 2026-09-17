@@ -25,7 +25,7 @@ in
       description = "Initiating state of the NixOS install (example: '22.05')";
     };
     machine = lib.mkOption {
-      type = lib.types.enum [ "sitl" ]; # TODO e.g., pi4
+      type = lib.types.enum [ "sitl" ]; # TODO e.g., jetson, pi4
       description = "Machine that the closure is targeting.";
     };
     bootMntPt = lib.mkOption {
@@ -33,9 +33,24 @@ in
       description = "(x86_linux) Boot partition mount point (default: /boot/efi)";
       default = "/boot";
     };
+    runAPSITL = lib.mkOption {
+      type = lib.types.bool;
+      description = "Run Ardupilot onboard the computer in SITL mode (default: false). Configured via the services.ardupilot-sim option set.";
+      default = false;
+    };
+    fcSerialDevice = lib.mkOption {
+      type = lib.types.str;
+      description = "Serial connection (<device>[:<baudrate>]) to an external flight controller, routed by mavlink-router when runAPSITL is false";
+      default = "/dev/ttyACM0:115200";
+    };
   };
 
-  imports = [ ../python-packages/orchestrator/module.nix ];
+  imports = [
+    ../python-packages/orchestrator/module.nix
+    ../cxx-packages/arducopter/sitl-module.nix
+    ../cxx-packages/arducopter/router-module.nix
+    ../cxx-packages/microxrce-dds-agent/module.nix
+  ];
 
   config = {
     system.stateVersion = cfg.nixosState;
@@ -86,10 +101,12 @@ in
         substituters = [
           "https://cache.nixos.org/"
           "https://github-public.cachix.org"
+          "https://ros.cachix.org"
         ];
         trusted-public-keys = [
           "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
           "github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc="
+          "ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo="
         ];
       };
       extraOptions = ''
@@ -155,7 +172,9 @@ in
           iotop
           iperf
           iftop
-          python3
+          # python with the S1 trajectory harness replaces the bare python3
+          # (avoids a bin/python3 collision between two interpreters).
+          (anixpkgs.python313.withPackages (ps: [ ps.indi-harness ]))
           xsel
           htop
           jq
@@ -231,7 +250,82 @@ in
           # TODO: docs interfere
           # "orchestrator"
         ])
+        ++ [
+          # Core ROS2 infrastructure: rclcpp/rclpy, an rmw implementation, and
+          # the ros2 CLI suite (ros2 topic/service/node/param/run/launch/...)
+          (ros-pkgs.rosPackages.jazzy.buildEnv {
+            paths = with ros-pkgs.rosPackages.jazzy; [
+              ros-core
+              demo-nodes-cpp
+              demo-nodes-py
+              rosbag2
+              rosbag2-storage-mcap
+              rosbag2-storage-sqlite3
+            ];
+          })
+        ]
       );
+
+    services.ardupilot-sim = {
+      enable = cfg.runAPSITL;
+      package = anixpkgs.arducopter.sitl;
+      rootDir = "${cfg.homeRoot}/${cfg.homeUser}/ardusitl";
+      user = cfg.homeUser;
+      group = "dev";
+      # Native ROS2 interface: the AP_DDS client connects to the local Micro
+      # XRCE-DDS agent over UDP. These match the Ardupilot defaults, but are
+      # pinned here so upstream default changes can't silently break the
+      # ROS2 bridge.
+      # Upstream SITL copter defaults (frame class/type, INS calibration, RC
+      # ranges): without them a fresh eeprom fails prearm ("Motors: Check
+      # frame class and type", "3D Accel calibration needed") and the vehicle
+      # can never arm — sim_vehicle.py always launches SITL with this file.
+      baseDefaultsFile = "${anixpkgs.arducopter.sitl.src}/Tools/autotest/default_params/copter.parm";
+      parameters = [
+        "DDS_ENABLE 1"
+        "DDS_DOMAIN_ID 0"
+        "DDS_UDP_PORT ${toString service-ports.xrce-dds-agent}"
+      ];
+    };
+
+    # Bridges the Ardupilot AP_DDS client into the ROS2 graph. Serial
+    # transport for hardware flight controllers is TODO alongside the first
+    # hardware machine target.
+    services.microxrce-agent = {
+      enable = true;
+      package = anixpkgs.microxrce-dds-agent;
+      transportArgs = "udp4 --port ${toString service-ports.xrce-dds-agent}";
+      user = cfg.homeUser;
+      group = "dev";
+    };
+
+    # The AP_DDS client gives up after DDS_MAX_RETRY failed pings, so make
+    # sure the agent is up before the SITL starts.
+    systemd.services.ardusitl = lib.mkIf cfg.runAPSITL {
+      after = [ "microxrce-agent.service" ];
+      wants = [ "microxrce-agent.service" ];
+    };
+
+    # MAVLink routing runs unconditionally: bound to the local SITL instance
+    # when runAPSITL is set, otherwise to the external flight controller serial
+    # connection.
+    services.ardurouter = {
+      enable = true;
+      package = anixpkgs.ardurouter;
+      rootDir = "${cfg.homeRoot}/${cfg.homeUser}/ardurouter";
+      user = cfg.homeUser;
+      group = "dev";
+      interfaceArgs =
+        if cfg.runAPSITL then
+          "--tcp-endpoint 127.0.0.1:${toString service-ports.mavlink.ap-sitl-tcp} --tcp-port ${toString service-ports.mavlink.router-tcp}"
+        else
+          cfg.fcSerialDevice;
+    };
+
+    systemd.services.ardurouter = lib.mkIf cfg.runAPSITL {
+      after = [ "ardusitl.service" ];
+      wants = [ "ardusitl.service" ];
+    };
 
     services.orchestratord = {
       enable = false; # TODO needed?

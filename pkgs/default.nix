@@ -4,6 +4,7 @@ let
   flakeInputs = final.flakeInputs;
   anixpkgs-version = (builtins.readFile ../ANIX_VERSION);
   unstable = (import ./nixos/dependencies.nix).unstable;
+  ros-pkgs = (import ./nixos/dependencies.nix).ros-pkgs;
   service-ports = import ./nixos/service-ports.nix;
   aapis-fds = prev.stdenvNoCC.mkDerivation {
     name = "aapis-fds";
@@ -24,45 +25,43 @@ let
     let
       # TODO: maybe remove the (Auto-Generated) qualifier when the functionality has proven out
       sub-cmds = if builtins.hasAttr "subCmds" pkg-attr.meta then pkg-attr.meta.subCmds else [ ];
-      auto-usage-doc = (
-        if builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta then
-          (
-            if pkg-attr.meta.autoGenUsageCmd != null then
-              ''
+      has-description = builtins.hasAttr "description" pkg-attr.meta;
+      has-auto-usage =
+        has-description
+        && builtins.hasAttr "autoGenUsageCmd" pkg-attr.meta
+        && pkg-attr.meta.autoGenUsageCmd != null;
+      static-doc = prev.writeText "package-doc-static" (
+        if has-description then
+          ''
+            ${pkg-attr.meta.description}
 
-                ## Usage
-
-                ${prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
-                  packageAttr = pkg-attr;
-                  helpCmd = pkg-attr.meta.autoGenUsageCmd;
-                  subCmds = sub-cmds;
-                }}
-              ''
-            else
-              ""
-          )
+            ${pkg-attr.meta.longDescription}${optionalString has-auto-usage "\n## Usage\n"}
+          ''
         else
-          ""
+          ''
+            No package documentation currently provided.
+          ''
       );
+      usage-doc =
+        if has-auto-usage then
+          prev.callPackage ./bash-packages/bash-utils/genusagedoc.nix {
+            packageAttr = pkg-attr;
+            helpCmd = pkg-attr.meta.autoGenUsageCmd;
+            subCmds = sub-cmds;
+          }
+        else
+          null;
     in
     pkg-attr
-    // rec {
-      doc = prev.writeTextFile {
-        name = "doc";
-        destination = "/doc.txt";
-        text = (
-          if builtins.hasAttr "description" pkg-attr.meta then
-            (''
-              ${pkg-attr.meta.description}
-
-              ${pkg-attr.meta.longDescription}${auto-usage-doc}
-            '')
-          else
-            ''
-              No package documentation currently provided.
-            ''
-        );
-      };
+    // {
+      doc = prev.runCommand "doc" { } ''
+        mkdir -p $out
+        cat ${static-doc} > $out/doc.txt
+        ${optionalString has-auto-usage ''
+          cat ${usage-doc} >> $out/doc.txt
+          printf '\n\n' >> $out/doc.txt
+        ''}
+      '';
     };
 
   minJRE = prev.jre_minimal.override {
@@ -106,6 +105,7 @@ let
                 }
               );
               budget_report = addDoc (pySelf.callPackage ./python-packages/budget-report { });
+              grafana_dash = addDoc (pySelf.callPackage ./python-packages/grafana-dash { });
               surveys_report = addDoc (pySelf.callPackage ./python-packages/surveys-report { });
               easy-google-auth = addDoc (
                 pySelf.callPackage ./python-packages/easy-google-auth {
@@ -117,6 +117,9 @@ let
                   pkg-src = flakeInputs.gmail-parser;
                 }
               );
+              gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
+                pkg-src = flakeInputs.gmail-parser;
+              };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -241,6 +244,11 @@ let
                   pkg-src = flakeInputs.mavlog-utils;
                 }
               );
+              indi-harness = addDoc (
+                pySelf.callPackage ./python-packages/indi-harness {
+                  pkg-src = flakeInputs.indi-harness;
+                }
+              );
               mesh-plotter = addDoc (
                 pySelf.callPackage ./python-packages/mesh-plotter {
                   pkg-src = flakeInputs.mesh-plotter;
@@ -291,19 +299,74 @@ let
               flask-mp3server = addDoc (pySelf.callPackage ./python-packages/flasks/mp3server { });
               flask-smfserver = addDoc (pySelf.callPackage ./python-packages/flasks/smfserver { });
               flask-oatbox = addDoc (pySelf.callPackage ./python-packages/flasks/oatbox { });
-              rankserver = addDoc (pySelf.callPackage ./python-packages/flasks/rankserver { });
-              stampserver = addDoc (pySelf.callPackage ./python-packages/flasks/stampserver { });
-              authui = addDoc (pySelf.callPackage ./python-packages/flasks/authui { });
-              budget_ui = addDoc (pySelf.callPackage ./python-packages/flasks/budget_ui { });
-              orchestrator_ui = addDoc (pySelf.callPackage ./python-packages/flasks/orchestrator_ui { });
-              la_quiz_web = addDoc (pySelf.callPackage ./python-packages/flasks/la-quiz-web { });
-              anix_upgrade_ui = addDoc (pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui { });
-              self-tester-app = addDoc (pySelf.callPackage ./python-packages/flasks/tester { });
-              tasks_ui = addDoc (pySelf.callPackage ./python-packages/flasks/tasks_ui { });
-              intake_ui = addDoc (pySelf.callPackage ./python-packages/flasks/intake_ui { });
-              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { });
+              rankserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/rankserver { pkg-src = flakeInputs.flasks; }
+              );
+              stampserver = addDoc (
+                pySelf.callPackage ./python-packages/flasks/stampserver { pkg-src = flakeInputs.flasks; }
+              );
+              authui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/authui { pkg-src = flakeInputs.flasks; }
+              );
+              budget_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/budget_ui { pkg-src = flakeInputs.flasks; }
+              );
+              orchestrator_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/orchestrator_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              la_quiz_web = addDoc (
+                pySelf.callPackage ./python-packages/flasks/la-quiz-web { pkg-src = flakeInputs.flasks; }
+              );
+              disciple = addDoc (
+                pySelf.callPackage ./python-packages/flasks/disciple { pkg-src = flakeInputs.flasks; }
+              );
+              anix_upgrade_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/anix-upgrade-ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              agent_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/agent_ui {
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              sunset = addDoc (
+                pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
+              );
+              self-tester-app = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
+              );
+              folio-backend = pySelf.callPackage ./python-packages/folio-backend {
+                pkg-src = flakeInputs.folio;
+              };
+              folio-mcp = pySelf.callPackage ./python-packages/folio-mcp {
+                pkg-src = flakeInputs.folio;
+              };
+              tasks_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
+              );
+              intake_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/intake_ui { pkg-src = flakeInputs.flasks; }
+              );
+              mail_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/mail { pkg-src = flakeInputs.flasks; }
+              );
+              wormhole = addDoc (
+                pySelf.callPackage ./python-packages/flasks/wormhole { pkg-src = flakeInputs.flasks; }
+              );
+              cozy = addDoc (pySelf.callPackage ./python-packages/flasks/cozy { pkg-src = flakeInputs.flasks; });
               vdlserver = addDoc (
-                pySelf.callPackage ./python-packages/flasks/videodl { yt-dlp = unstable.yt-dlp; }
+                pySelf.callPackage ./python-packages/flasks/videodl {
+                  yt-dlp = unstable.yt-dlp;
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
+              brom = addDoc (
+                pySelf.callPackage ./python-packages/flasks/brom {
+                  pkg-src = flakeInputs.flasks;
+                }
               );
               pinned-mavproxy = addDoc (pySelf.callPackage ./python-packages/mavproxy { });
             }
@@ -373,9 +436,12 @@ rec {
 
   aapis-py = final.python313.pkgs.aapis-py;
   budget_report = final.python313.pkgs.budget_report;
+  grafana_dash = final.python313.pkgs.grafana_dash;
   surveys_report = final.python313.pkgs.surveys_report;
   makepyshell = final.python313.pkgs.makepyshell;
   mavlog-utils = final.python313.pkgs.mavlog-utils;
+  indi-harness = final.python313.pkgs.indi-harness;
+  mavproxy = final.python313.pkgs.pinned-mavproxy;
   fqt = final.python313.pkgs.fqt;
   ichabod = final.python313.pkgs.ichabod;
   norbert = final.python313.pkgs.norbert;
@@ -406,12 +472,25 @@ rec {
   budget_ui = final.python313.pkgs.budget_ui;
   orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
+  disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  agent_ui = final.python313.pkgs.agent_ui;
+  sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
+  folio-backend = final.python313.pkgs.folio-backend;
+  folio-mcp = final.python313.pkgs.folio-mcp;
+  folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
+  folio-desktop = final.callPackage ./folio-desktop {
+    pkg-src = flakeInputs.folio;
+    folioPort = service-ports.folio.internal;
+  };
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
+  mail_ui = final.python313.pkgs.mail_ui;
+  wormhole = final.python313.pkgs.wormhole;
   cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
+  brom = final.python313.pkgs.brom;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
   workout-planner = final.python313.pkgs.workout-planner;
@@ -421,6 +500,7 @@ rec {
   notion-tools = final.python313.pkgs.notion-tools;
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
+  gmail-mcp = final.python313.pkgs.gmail-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
   onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
@@ -486,6 +566,7 @@ rec {
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
+  anix-llm = addDoc (prev.callPackage ./python-packages/anix-llm { });
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (
@@ -563,6 +644,7 @@ rec {
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   generate-local-ssl-certs = prev.callPackage ./bash-packages/generate-local-ssl-certs { };
+  tor-ephemeral = addDoc (prev.callPackage ./bash-packages/tor-ephemeral { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
@@ -577,7 +659,23 @@ rec {
     }
   );
   ardurouter = (prev.callPackage ./cxx-packages/arducopter { }).router;
-  arducopter = (prev.callPackage ./cxx-packages/arducopter { python = python313; }).copter;
+  arducopter =
+    (prev.callPackage ./cxx-packages/arducopter {
+      python = python313;
+      microxrceddsgen = final.microxrceddsgen;
+    }).copter;
+  microxrceddsgen = prev.callPackage ./cxx-packages/microxrce-dds-gen {
+    pkg-src = flakeInputs.microxrce-dds-gen;
+  };
+  # Built with the nix-ros-overlay jazzy scope so its fastdds matches the rmw
+  # used by the ROS2 environment on drone machines.
+  microxrce-dds-agent = ros-pkgs.rosPackages.jazzy.callPackage ./cxx-packages/microxrce-dds-agent {
+    pkg-src = flakeInputs.microxrce-dds-agent;
+  };
+  # Custom ROS 2 differential-flatness setpoint interface. Built with the
+  # jazzy scope so the generated fastrtps type support is wire-compatible with
+  # the AP_DDS FlatSetpoint message in the arducopter fork.
+  ardupilot-msgs = ros-pkgs.rosPackages.jazzy.callPackage ./nixos/ros/ardupilot_msgs { };
   manif-geom-cpp = addDoc (
     prev.callPackage ./cxx-packages/manif-geom-cpp {
       pkg-src = flakeInputs.manif-geom-cpp;
@@ -604,7 +702,6 @@ rec {
       pkg-src = flakeInputs.signals-cpp;
     }
   );
-  gnc = addDoc (prev.callPackage ./cxx-packages/gnc { pkg-src = flakeInputs.gnc; });
   secure-delete = addDoc (
     prev.callPackage ./cxx-packages/secure-delete {
       pkg-src = flakeInputs.secure-delete;
@@ -654,6 +751,14 @@ rec {
       pkg-src = flakeInputs.manif-geom-rs;
     }
   );
+  # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
+  # rustc; build it with unstable's rustPlatform until the pin catches up.
+  msrs = addDoc (
+    prev.callPackage ./rust-packages/msrs {
+      pkg-src = flakeInputs.msrs;
+      rustPlatform = unstable.rustPlatform;
+    }
+  );
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
@@ -686,7 +791,4 @@ rec {
   };
 
   multirotor-sim = prev.callPackage ./nixos/multirotor/run.nix baseModuleArgs;
-
-  # Override claude-code-bin to use version 2.1.177
-  claude-code-bin = prev.callPackage ./by-name/cl/claude-code-bin/package.nix { };
 }

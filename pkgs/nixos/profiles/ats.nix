@@ -5,24 +5,12 @@
   ...
 }:
 with import ../dependencies.nix;
-let
-  claudeDefaults = import ../claude-defaults.nix;
-in
 {
   imports = [ ../pc-base.nix ];
 
   config = {
     machines.base = {
       machineType = "x86_linux";
-      graphical = false;
-      recreational = false;
-      developer = true;
-      isATS = true;
-      agentFramework = "claude";
-      serveNotesWiki = true;
-      notesWikiPort = 8080;
-      enableMetrics = true;
-      enableFileServers = true;
       cloudDirs = [
         {
           name = "configs";
@@ -50,8 +38,46 @@ in
           dirname = "Documents";
         }
       ];
-      enableOrchestrator = true;
-      timedOrchJobs = [
+    };
+    machines.features = {
+      desktop.enable = false;
+      development.enable = true;
+      recreation.enable = false;
+      headsetAudio.enable = false;
+      externalDrives.enable = true;
+      homeVpn.enable = false;
+      agentUi.enable = true;
+      upgradeUi.enable = true;
+      fileServers.enable = true;
+      metrics.enable = true;
+      notesWiki.enable = true;
+      orchestrator.enable = true;
+      auth.enable = true;
+      budget.enable = true;
+      languageQuiz.enable = true;
+      music.enable = true;
+      tester.enable = true;
+      disciple.enable = true;
+      tasks.enable = true;
+      videoDownload.enable = true;
+      brom.enable = false;
+      intake.enable = true;
+      mail.enable = true;
+      plex.enable = true;
+      vikunja.enable = true;
+      gameStreaming.enable = false;
+      gpu.enable = false;
+      notebooks.enable = false;
+      imageGeneration.enable = false;
+      localLlm.enable = false;
+      folio.enable = true;
+      tactical.enable = true;
+      agents.frameworks = [
+        "claude"
+        "codex"
+      ];
+      folio.role = "hub";
+      orchestrator.jobs = [
         {
           name = "ats-triaging";
           jobShellScript = pkgs.writeShellScript "ats-triaging" ''
@@ -110,7 +136,21 @@ in
           };
         }
         {
+          name = "ats-disciple-report";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-report" ''
+            disciple-report --db-path $HOME/data/disciple/disciple.db || { >&2 logger -t ats-disciple-report "disciple report error!"; exit 1; }
+            logger -t ats-disciple-report "🕮 Disciple study result reported to tactical server"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 05:00:00" ];
+            Persistent = true;
+          };
+        }
+        {
           name = "ats-task-migrator";
+          # This job's `logger -t` tag does not match its name; without the
+          # override the derived log panel would query a tag nothing emits.
+          logTags = [ "ats-grader" ];
           jobShellScript = pkgs.writeShellScript "ats-task-migrator" ''
             authm refresh --headless || { logger -t authm "Authm refresh UNSUCCESSFUL"; >&2 echo "authm refresh error!"; exit 1; }
             tmpdir=$(mktemp -d)
@@ -174,6 +214,17 @@ in
           };
         }
         {
+          name = "ats-navidrome-backup";
+          jobShellScript = pkgs.writeShellScript "ats-navidrome-backup" ''
+            rcrsync override data navidrome || { logger -t ats-navidrome-backup "Navidrome Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-navidrome-backup "Navidrome backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
           name = "ats-la-quiz-backup";
           jobShellScript = pkgs.writeShellScript "ats-la-quiz-backup" ''
             rcrsync override data la-quiz-web || { logger -t authm "LA Quiz Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
@@ -189,6 +240,29 @@ in
           jobShellScript = pkgs.writeShellScript "ats-tester-backup" ''
             rcrsync override data tester || { logger -t ats-tester-backup "Tester Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
             logger -t ats-tester-backup "Tester backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-disciple-backup";
+          jobShellScript = pkgs.writeShellScript "ats-disciple-backup" ''
+            rcrsync override data disciple || { logger -t ats-disciple-backup "Disciple Backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-disciple-backup "Disciple backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-gmail-archive-backup";
+          jobShellScript = pkgs.writeShellScript "ats-gmail-archive-backup" ''
+            mkdir -p $HOME/data/gmail
+            rcrsync mirror data gmail || { logger -t ats-gmail-archive-backup "GMail archive backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-gmail-archive-backup "GMail archive backup successful!"
           '';
           timerCfg = {
             OnCalendar = [ "*-*-* 00:00:00" ];
@@ -250,8 +324,24 @@ in
             Persistent = false;
           };
         }
+        {
+          name = "ats-folio-backup";
+          jobShellScript = pkgs.writeShellScript "ats-folio-backup" ''
+            DEST="$HOME/data/folio"
+            mkdir -p "$DEST"
+            ${pkgs.sqlite}/bin/sqlite3 /var/lib/folio/folio.db ".backup '$DEST/folio.db'" \
+              || { logger -t ats-folio-backup "DB backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data folio \
+              || { logger -t ats-folio-backup "folio backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t ats-folio-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
       ];
-      extraOrchestratorPackages = [
+      orchestrator.extraPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.workout-planner
@@ -261,21 +351,10 @@ in
         anixpkgs.providence-tasker
         anixpkgs.daily_tactical_server
         anixpkgs.surveys_report
-      ];
-    };
-    machines.claude = {
-      marketplaces = claudeDefaults.marketplaces;
-      plugins = claudeDefaults.plugins;
-      permissionsAllow = claudeDefaults.permissionsAllow;
-      hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
+        anixpkgs.disciple
       ];
     };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-    users.users.andrew.extraGroups = [ "vikunja" ];
+    security.sudo.extraConfig = "Defaults timestamp_timeout=0";
   };
 }

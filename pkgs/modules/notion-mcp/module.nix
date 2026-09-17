@@ -12,7 +12,7 @@ let
 in
 {
   options.services.notion-mcp = {
-    enable = lib.mkEnableOption "Notion MCP server for Claude Code";
+    enable = lib.mkEnableOption "Notion MCP server for local coding agents";
   };
 
   config = lib.mkIf config.services.notion-mcp.enable {

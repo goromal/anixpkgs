@@ -9,6 +9,7 @@ mkShell {
     lorri
   ];
   buildInputs = [
+    anix-upgrade
     make-title
     devshell
     setupws
@@ -33,6 +34,7 @@ mkShell {
     png
     mp3
     mp4
+    gif
     ckfile
     ffmpeg
   ];

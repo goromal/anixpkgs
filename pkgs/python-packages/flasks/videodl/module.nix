@@ -33,6 +33,7 @@ in
     machines.base.webServices = [
       {
         name = "Video Downloader";
+        tag = "Content";
         path = "/videodl/";
         description = "Download videos from YouTube, TikTok, and more";
         icon = "download";

@@ -1,8 +1,10 @@
-import sys
-import os
-import subprocess
 import curses
-import json
+import os
+import shlex
+import subprocess
+import sys
+
+from devshellctl import WorkspaceError, WorkspaceManager
 
 
 class Context:
@@ -10,6 +12,8 @@ class Context:
         self.help_mode = False
         self.dev_dir = ""
         self.hist_file = ""
+        self.devrc = ""
+        self.drop_to_shell = False
         self.wsname = ""
         self.repos = []
         self.scripts = []
@@ -20,115 +24,29 @@ class Context:
         self.start_row = 2
         self.current_row = self.start_row
         self.end_row = self.start_row
+        self.manager = None
 
     def load_sources(self):
         self.repos = []
-        hist_data = {}
         try:
-            with open(self.hist_file, "r") as hf:
-                hist_data = json.loads(hf.read())
-        except:
-            hist_data = {}
-        bin_dir = os.path.join(self.dev_dir, ".bin")
-        if os.path.isdir(bin_dir):
-            self.scripts = [
-                f
-                for f in os.listdir(bin_dir)
-                if os.path.isfile(os.path.join(bin_dir, f))
-                and os.access(os.path.join(bin_dir, f), os.X_OK)
-            ]
-        else:
+            status = self.manager.status(self.wsname)
+        except (OSError, WorkspaceError):
             self.scripts = []
-        sources_dir = os.path.join(self.dev_dir, "sources")
-        if not os.path.isdir(sources_dir):
-            return  # no sources directory, nothing to load
-        for root, dirs, _ in os.walk(sources_dir):
-            if ".git" in dirs:
-                # Don't recurse into .git directories
-                dirs.remove(".git")
-                # Skip if .git is in the sources root itself (not a real repo)
-                if root == sources_dir:
-                    continue
-                git_dir = os.path.join(root, ".git")
-                if os.path.isdir(git_dir):
-                    reponame = os.path.basename(root)
-                    try:
-                        branch = (
-                            subprocess.check_output(
-                                [
-                                    "git",
-                                    "-C",
-                                    root,
-                                    "rev-parse",
-                                    "--abbrev-ref",
-                                    "HEAD",
-                                ],
-                                stderr=subprocess.PIPE,
-                            )
-                            .decode()
-                            .strip()
-                        )
-                    except:
-                        continue  # no branch or remote yet
-                    try:
-                        clean = not bool(
-                            subprocess.check_output(
-                                ["git", "-C", root, "status", "--porcelain"],
-                                stderr=subprocess.PIPE,
-                            )
-                            .decode()
-                            .strip()
-                        )
-                    except:
-                        continue  # corrupted git repo
-                    try:
-                        hash = (
-                            subprocess.check_output(
-                                ["git", "-C", root, "rev-parse", "HEAD"],
-                                stderr=subprocess.PIPE,
-                            )
-                            .decode()
-                            .strip()
-                        )
-                    except:
-                        continue  # no commits yet
-                    try:
-                        local = bool(
-                            subprocess.check_output(
-                                ["git", "-C", root, "log", f"origin/{branch}..HEAD"],
-                                stderr=subprocess.PIPE,
-                            )
-                            .decode()
-                            .strip()
-                        )
-                    except:
-                        local = True  # a locally checked out branch will fail the above query
-                    try:
-                        sync_branch = hist_data[self.wsname][reponame]["branch"]
-                    except:
-                        sync_branch = None
-                    try:
-                        url = (
-                            subprocess.check_output(
-                                [
-                                    "git",
-                                    "-C",
-                                    root,
-                                    "remote",
-                                    "get-url",
-                                    "--push",
-                                    "origin",
-                                ],
-                                stderr=subprocess.PIPE,
-                            )
-                            .decode()
-                            .strip()
-                        )
-                    except:
-                        url = None  # no remote configured
-                    self.repos.append(
-                        (reponame, branch, clean, hash, local, sync_branch, url)
+            return
+        self.scripts = status["scripts"]
+        for repo in status["repositories"]:
+            if repo["present"]:
+                self.repos.append(
+                    (
+                        repo["name"],
+                        repo["branch"],
+                        repo["clean"],
+                        repo["head"],
+                        repo["local"],
+                        repo["saved_branch"],
+                        repo["remote"],
                     )
+                )
         self.max_script_len = (
             max([len(script) for script in self.scripts])
             if len(self.scripts) > 0
@@ -141,20 +59,7 @@ class Context:
             self.repos.sort(key=lambda x: x[0])
 
     def save_ws_repo_branch(self, reponame, branch):
-        hist_data = {}
-        try:
-            with open(self.hist_file, "r") as hf:
-                hist_data = json.loads(hf.read())
-        except:
-            hist_data = {}
-        if self.wsname not in hist_data:
-            hist_data[self.wsname] = {reponame: {"branch": branch}}
-        elif reponame not in hist_data[self.wsname]:
-            hist_data[self.wsname][reponame] = {"branch": branch}
-        else:
-            hist_data[self.wsname][reponame]["branch"] = branch
-        with open(self.hist_file, "w") as hf:
-            hf.write(json.dumps(hist_data))
+        self.manager.save_branch(self.wsname, reponame)
 
 
 ctx = Context()
@@ -181,7 +86,8 @@ def display_output(stdscr):
             stdscr.addstr(13, 0, "[n]  Nuke")
             stdscr.addstr(14, 0, "[o]  Add source")
             stdscr.addstr(15, 0, "[i]  Add script")
-            stdscr.addstr(16, 0, "[q]  Quit")
+            stdscr.addstr(16, 0, "[d]  Drop into workspace devshell")
+            stdscr.addstr(17, 0, "[q]  Quit")
             for j, script in enumerate(ctx.scripts):
                 stdscr.addstr(3 + j, 42, f"| {script}")
 
@@ -252,8 +158,16 @@ def main(stdscr):
 
     ctx.wsname = sys.argv[1]
     ctx.dev_dir = sys.argv[2]
-    editor = sys.argv[3]
+    # Editor may be a multi-word command (e.g. "code --no-sandbox"), so split
+    # it into argv tokens rather than passing the whole string as argv[0].
+    editor = shlex.split(sys.argv[3])
     ctx.hist_file = sys.argv[4]
+    ctx.devrc = sys.argv[5] if len(sys.argv) > 5 else ""
+    ctx.manager = WorkspaceManager(
+        ctx.devrc,
+        ctx.hist_file,
+        parse_script=os.path.join(os.path.dirname(__file__), "parseWorkspace.py"),
+    )
     ctx.load_sources()
 
     curses.curs_set(0)
@@ -277,6 +191,10 @@ def main(stdscr):
         elif key == ord("q"):
             break
 
+        elif key == ord("d"):
+            ctx.drop_to_shell = True
+            break
+
         elif not ctx.help_mode:
 
             if key == curses.KEY_UP:
@@ -295,7 +213,7 @@ def main(stdscr):
                 display_output(stdscr)
                 try:
                     subprocess.check_output(
-                        [editor, os.path.join(ctx.dev_dir, "sources", reponame)],
+                        [*editor, os.path.join(ctx.dev_dir, "sources", reponame)],
                         stderr=subprocess.PIPE,
                     )
                 except:
@@ -308,7 +226,7 @@ def main(stdscr):
                 display_output(stdscr)
                 try:
                     subprocess.check_output(
-                        [editor, os.path.join(ctx.dev_dir, "sources")],
+                        [*editor, os.path.join(ctx.dev_dir, "sources")],
                         stderr=subprocess.PIPE,
                     )
                 except:
@@ -321,7 +239,11 @@ def main(stdscr):
                 branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = f"Saving off staging branch {reponame}:{branch}..."
                 display_output(stdscr)
-                ctx.save_ws_repo_branch(reponame, branch)
+                try:
+                    ctx.save_ws_repo_branch(reponame, branch)
+                except WorkspaceError:
+                    ctx.status_msg = f"Saving off staging branch {reponame}:{branch}... UNSUCCESSFUL."
+                    continue
                 ctx.load_sources()
                 ctx.status_msg = (
                     f"Saving off staging branch {reponame}:{branch}... Done."
@@ -329,28 +251,13 @@ def main(stdscr):
 
             elif key == ord("s"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = ctx.repos[ctx.current_row - ctx.start_row][5]
                 if branch is not None:
                     ctx.status_msg = f"Synchonizing {reponame}:{branch}..."
                     display_output(stdscr)
                     try:
-                        subprocess.check_output(
-                            ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
-                        )
-                        subprocess.check_output(
-                            ["git", "-C", repopath, "fetch", "origin", branch],
-                            stderr=subprocess.PIPE,
-                        )
-                        subprocess.check_output(
-                            ["git", "-C", repopath, "checkout", branch],
-                            stderr=subprocess.PIPE,
-                        )
-                        subprocess.check_output(
-                            ["git", "-C", repopath, "pull", "origin", branch],
-                            stderr=subprocess.PIPE,
-                        )
-                    except:
+                        ctx.manager.sync(ctx.wsname, reponame)
+                    except WorkspaceError:
                         ctx.load_sources()
                         ctx.status_msg = (
                             f"Synchonizing {reponame}:{branch}... UNSUCCESSFUL."
@@ -364,16 +271,12 @@ def main(stdscr):
 
             elif key == ord("p"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = f"Pushing {reponame}:{branch} to origin..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "push", "origin", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.push(ctx.wsname, reponame)
+                except WorkspaceError:
                     ctx.load_sources()
                     ctx.status_msg = (
                         f"Pushing {reponame}:{branch} to origin... UNSUCCESSFUL."
@@ -384,22 +287,14 @@ def main(stdscr):
 
             elif key == ord("R"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = (
                     f"Rebasing and pushing {reponame}:{branch} to origin..."
                 )
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "pull", "--rebase", "origin", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "push", "origin", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.rebase_push(ctx.wsname, reponame)
+                except WorkspaceError:
                     ctx.load_sources()
                     ctx.status_msg = f"Rebasing and pushing {reponame}:{branch} to origin... UNSUCCESSFUL."
                     continue
@@ -410,16 +305,12 @@ def main(stdscr):
 
             elif key == ord("b"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 new_branch = branch_prompt(stdscr)
                 ctx.status_msg = f"Creating {reponame}:{new_branch}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "checkout", "-b", new_branch],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.create_branch(ctx.wsname, reponame, new_branch)
+                except WorkspaceError:
                     ctx.load_sources()
                     ctx.status_msg = (
                         f"Creating {reponame}:{new_branch}... UNSUCCESSFUL."
@@ -430,29 +321,14 @@ def main(stdscr):
 
             elif key == ord("c"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = branch_prompt(stdscr)
                 if not branch:
                     branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = f"Checking out {reponame}:{branch}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "stash"], stderr=subprocess.PIPE
-                    )
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "fetch", "origin", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "checkout", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                    subprocess.check_output(
-                        ["git", "-C", repopath, "pull", "origin", branch],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.checkout(ctx.wsname, reponame, branch)
+                except WorkspaceError:
                     ctx.load_sources()
                     ctx.status_msg = (
                         f"Checking out {reponame}:{branch}... UNSUCCESSFUL."
@@ -466,10 +342,8 @@ def main(stdscr):
                 ctx.status_msg = f"Adding source {source_spec[0]}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["addsrc", *source_spec], stderr=subprocess.PIPE
-                    )
-                except:
+                    ctx.manager.add_source(ctx.wsname, *source_spec)
+                except (IndexError, WorkspaceError):
                     ctx.load_sources()
                     ctx.status_msg = f"Adding source {source_spec[0]}... UNSUCCESSFUL."
                     continue
@@ -481,10 +355,8 @@ def main(stdscr):
                 ctx.status_msg = f"Adding script {script_spec[0]}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["addscr", *script_spec], stderr=subprocess.PIPE
-                    )
-                except:
+                    ctx.manager.add_script(ctx.wsname, *script_spec)
+                except (IndexError, WorkspaceError):
                     ctx.load_sources()
                     ctx.status_msg = f"Adding script {script_spec[0]}... UNSUCCESSFUL."
                     continue
@@ -493,36 +365,14 @@ def main(stdscr):
 
             elif key == ord("n"):
                 reponame = ctx.repos[ctx.current_row - ctx.start_row][0]
-                url = ctx.repos[ctx.current_row - ctx.start_row][6]
-                if url is None:
-                    ctx.status_msg = f"Cannot nuke {reponame}: no remote URL configured."
-                    continue
-                repopath = os.path.join(ctx.dev_dir, "sources", reponame)
                 branch = branch_prompt(stdscr)
                 if not branch:
                     branch = ctx.repos[ctx.current_row - ctx.start_row][1]
                 ctx.status_msg = f"Nuking and checking out {reponame}:{branch}..."
                 display_output(stdscr)
                 try:
-                    subprocess.check_output(
-                        ["rm", "-rf", repopath],
-                        stderr=subprocess.PIPE,
-                    )
-                    subprocess.check_output(
-                        [
-                            "git",
-                            "clone",
-                            "--filter=blob:none",
-                            "--no-single-branch",
-                            "--recurse-submodules",
-                            url,
-                            repopath,
-                            "--branch",
-                            branch,
-                        ],
-                        stderr=subprocess.PIPE,
-                    )
-                except:
+                    ctx.manager.nuke(ctx.wsname, reponame, branch)
+                except (OSError, WorkspaceError):
                     ctx.load_sources()
                     ctx.status_msg = (
                         f"Nuking and checking out {reponame}:{branch}... UNSUCCESSFUL."
@@ -570,3 +420,19 @@ def script_prompt(stdscr):
 
 if __name__ == "__main__":
     curses.wrapper(main)
+    if ctx.drop_to_shell:
+        # If we're already inside an interactive devshell for this workspace,
+        # exiting the TUI drops us back into it; nothing more to do. Otherwise
+        # (e.g. launched via `devshell WS --run dev` or a bare invocation), we
+        # replace this process with a fresh interactive devshell.
+        if os.environ.get("DEVSHELL_ACTIVE") != ctx.wsname:
+            devshell_cmd = ["devshell", ctx.wsname]
+            if ctx.hist_file:
+                devshell_cmd += ["-s", os.path.expanduser(ctx.hist_file)]
+            if ctx.devrc:
+                devshell_cmd += ["-d", os.path.expanduser(ctx.devrc)]
+            try:
+                os.execvp("devshell", devshell_cmd)
+            except OSError as e:
+                sys.stderr.write(f"Could not launch devshell: {e}\n")
+                sys.exit(1)

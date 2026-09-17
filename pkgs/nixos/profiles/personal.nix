@@ -4,23 +4,12 @@
   lib,
   ...
 }:
-let
-  claudeDefaults = import ../claude-defaults.nix;
-in
 {
   imports = [ ../pc-base.nix ];
 
   config = {
     machines.base = {
       machineType = "x86_linux";
-      graphical = true;
-      recreational = true;
-      developer = true;
-      isATS = false;
-      agentFramework = "claude";
-      serveNotesWiki = false;
-      enableMetrics = true;
-      enableFileServers = false;
       cloudDirs = [
         {
           name = "configs";
@@ -53,8 +42,45 @@ in
           dirname = "more-games";
         }
       ];
-      enableOrchestrator = true;
-      timedOrchJobs = [
+    };
+    machines.features = {
+      desktop.enable = true;
+      development.enable = true;
+      recreation.enable = true;
+      headsetAudio.enable = true;
+      externalDrives.enable = true;
+      homeVpn.enable = true;
+      agentUi.enable = true;
+      upgradeUi.enable = true;
+      fileServers.enable = true;
+      metrics.enable = true;
+      notesWiki.enable = false;
+      orchestrator.enable = true;
+      auth.enable = false;
+      budget.enable = false;
+      languageQuiz.enable = false;
+      music.enable = false;
+      tester.enable = false;
+      disciple.enable = false;
+      tasks.enable = false;
+      videoDownload.enable = false;
+      brom.enable = false;
+      intake.enable = false;
+      mail.enable = false;
+      plex.enable = false;
+      vikunja.enable = false;
+      gameStreaming.enable = true;
+      gpu.enable = false;
+      notebooks.enable = false;
+      imageGeneration.enable = false;
+      localLlm.enable = false;
+      folio.enable = true;
+      tactical.enable = false;
+      agents.frameworks = [
+        "claude"
+        "codex"
+      ];
+      orchestrator.jobs = [
         {
           name = "budgets-backup";
           jobShellScript = pkgs.writeShellScript "budgets-backup" ''
@@ -66,19 +92,24 @@ in
             OnUnitActiveSec = "60m";
           };
         }
+        {
+          name = "folio-backup";
+          jobShellScript = pkgs.writeShellScript "folio-backup" ''
+            DEST="$HOME/data/folio/${config.networking.hostName}"
+            mkdir -p "$DEST"
+            ${pkgs.sqlite}/bin/sqlite3 /var/lib/folio/folio.db ".backup '$DEST/folio.db'" \
+              || { logger -t folio-backup "DB backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            rcrsync override data folio \
+              || { logger -t folio-backup "folio backup UNSUCCESSFUL"; >&2 echo "backup error!"; exit 1; }
+            logger -t folio-backup "Backup successful!"
+          '';
+          timerCfg = {
+            OnCalendar = [ "*-*-* 00:00:00" ];
+            Persistent = false;
+          };
+        }
       ];
-      extraOrchestratorPackages = [ ];
-    };
-    machines.claude = {
-      marketplaces = claudeDefaults.marketplaces;
-      plugins = claudeDefaults.plugins;
-      permissionsAllow = claudeDefaults.permissionsAllow;
-      hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.wiki
-      ];
+      orchestrator.extraPackages = [ ];
     };
     services.logind.settings.Login.HandleLidSwitch = "ignore";
   };

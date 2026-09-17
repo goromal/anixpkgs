@@ -17,6 +17,7 @@ callPackage ../pythonPkgFromScript.nix {
   version = "1.0.0";
   description = "Manage mail for GBot and Journal.";
   script-file = ./cli.py;
+  test-dir = ./tests;
   inherit pytestCheckHook buildPythonPackage;
   propagatedBuildInputs = [
     easy-google-auth

@@ -15,5 +15,10 @@ rm my.mp4 && mp4 4444-720-480-100.random my.mp4
 ckfile -c $EXPECTED_MD5 my.mp4 || { echo_red "Unexpected random MP4 hash"; exit 1; }
 ckfile -c abcdefg my.mp4 && { echo_red "Unexpected random MP4 hash check"; exit 1; }
 
+# Direct (non-vacuum) conversion still runs ffmpeg inline.
+ffmpeg -f lavfi -i color=green:s=32x32:rate=5 -t 0.4 "$tmpdir/direct.flv" 2>/dev/null
+mp4 "$tmpdir/direct.flv" "$tmpdir/direct.mp4"
+[[ -s "$tmpdir/direct.mp4" ]] || { echo_red "direct flv conversion produced no output"; exit 1; }
+
 # Cleanup
 rm -rf "$tmpdir"

@@ -12,7 +12,7 @@ let
 in
 {
   options.services.wiki-mcp = {
-    enable = lib.mkEnableOption "Wiki MCP server for Claude Code";
+    enable = lib.mkEnableOption "Wiki MCP server for local coding agents";
   };
 
   config = lib.mkIf config.services.wiki-mcp.enable {

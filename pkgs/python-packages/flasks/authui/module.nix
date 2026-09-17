@@ -42,6 +42,7 @@ in
     machines.base.webServices = [
       {
         name = "Auth UI";
+        tag = "Utilities";
         path = "/auth/";
         description = "Authentication management";
         icon = "key";

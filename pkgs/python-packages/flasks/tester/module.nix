@@ -43,6 +43,7 @@ in
     machines.base.webServices = [
       {
         name = "Tester";
+        tag = "Aspiration";
         path = "/tester/";
         description = "Self-testing and exam tool";
         icon = "graduation-cap";

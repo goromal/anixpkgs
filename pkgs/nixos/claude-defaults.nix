@@ -2,7 +2,6 @@
 # Kept in a separate file to avoid bloating the options declarations.
 let
   sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
-  ports = import ./service-ports.nix;
 in
 {
   marketplaces = [
@@ -80,70 +79,14 @@ in
     "mcp__wiki__wiki_search"
     "mcp__notion__notion_list_blocks"
     "mcp__notion__notion_list_subpages"
+    # MCP write tools
+    "mcp__notion__notion_append"
+    "mcp__notion__notion_create_subpage"
+    "mcp__notion__notion_delete_block"
+    "mcp__notion__notion_move_block"
+    "mcp__notion__notion_move_blocks"
+    "mcp__notion__notion_update_block"
   ];
-
-  skills = [
-    {
-      name = "anixpkgs-deploy";
-      file = ./res/claude-skills/anixpkgs-deploy/SKILL.md;
-    }
-    {
-      name = "anixpkgs-packages";
-      file = ./res/claude-skills/anixpkgs-packages/SKILL.md;
-    }
-    {
-      name = "editing-skills";
-      file = ./res/claude-skills/editing-skills/SKILL.md;
-    }
-    {
-      name = "rtk-usage";
-      file = ./res/claude-skills/rtk-usage/SKILL.md;
-    }
-    {
-      name = "wiki-usage";
-      file = ./res/claude-skills/wiki-usage/SKILL.md;
-    }
-    {
-      name = "karpathy-guidelines";
-      file = ./res/claude-skills/karpathy-guidelines/SKILL.md;
-    }
-    {
-      name = "mscpp-services";
-      file = ./res/claude-skills/mscpp-services/SKILL.md;
-    }
-  ];
-
-  mcpServers = {
-    vikunja = {
-      name = "vikunja";
-      command = "/run/current-system/sw/bin/vikunja-mcp-server";
-      env = {
-        VIKUNJA_URL = "https://ats.local:${toString ports.vikunja.public}";
-        VIKUNJA_INSECURE = "1";
-      };
-      secretsPath = "$HOME/secrets/vikunja/secrets.json";
-      secretsEnvVar = "VIKUNJA_TOKEN_FILE";
-    };
-    notion = {
-      name = "notion";
-      command = "/run/current-system/sw/bin/notion-mcp-server";
-      secretsPath = "$HOME/secrets/notion/secret.json";
-      secretsEnvVar = "NOTION_TOKEN_FILE";
-    };
-    wiki = {
-      name = "wiki";
-      command = "/run/current-system/sw/bin/wiki-mcp-server";
-      secretsPath = "$HOME/secrets/wiki";
-      secretsEnvVar = "WIKI_SECRETS_DIR";
-    };
-    jupyter = {
-      name = "jupyter-mcp";
-      command = "/run/current-system/sw/bin/jupyter-mcp-server";
-      env = {
-        SERVER_URL = "http://localhost:${toString ports.launchpad}";
-      };
-    };
-  };
 
   hooks = [
     {

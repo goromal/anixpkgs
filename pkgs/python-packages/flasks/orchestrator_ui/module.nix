@@ -8,7 +8,9 @@ with import ../../../nixos/dependencies.nix;
 let
   globalCfg = config.machines.base;
   cfg = config.services.orchestrator_ui;
-  serviceList = builtins.concatStringsSep "/" (map (x: "${x.name}.service") globalCfg.timedOrchJobs);
+  serviceList = builtins.concatStringsSep "/" (
+    map (x: "${x.name}.service") config.machines.features.orchestrator.jobs
+  );
 in
 {
   options.services.orchestrator_ui = {
@@ -24,6 +26,7 @@ in
     machines.base.webServices = [
       {
         name = "Orchestrator";
+        tag = "Utilities";
         path = "/orchestrator/";
         description = "Orchestrator job management";
         icon = "gears";
@@ -39,7 +42,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator}${
+        ExecStart = "${cfg.package}/bin/orchestrator_ui --subdomain /orchestrator --port ${builtins.toString service-ports.orchestrator_ui} --orch-port ${builtins.toString service-ports.orchestrator} --blacklist-dir ${globalCfg.homeDir}/configs/orchestrator-blacklist.d${
           lib.optionalString (serviceList != "") " --services ${serviceList}"
         }";
         Restart = "always";

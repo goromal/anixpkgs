@@ -21,6 +21,11 @@ in
       description = "Home directory (will be cwd of the server)";
       default = "/data/andrew";
     };
+    secretsFile = lib.mkOption {
+      type = lib.types.str;
+      description = "Path to JSON file with secret_key and password_hash";
+      default = "/data/andrew/secrets/flask/stampserver.json";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -32,6 +37,7 @@ in
     machines.base.webServices = [
       {
         name = "Files";
+        tag = "Content";
         path = "/stamp/";
         description = "Manage filesystem";
         icon = "folder";
@@ -57,7 +63,7 @@ in
       };
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/stampserver --port ${builtins.toString service-ports.stampserver} --data-dir ${cfg.rootDir}/stampables --subdomain /stamp";
+        ExecStart = "${cfg.package}/bin/stampserver --port ${builtins.toString service-ports.stampserver} --data-dir ${cfg.rootDir}/stampables --subdomain /stamp --secrets-file ${cfg.secretsFile}";
         ReadWritePaths = [ "/" ];
         WorkingDirectory = cfg.rootDir;
         Restart = "always";
@@ -80,6 +86,9 @@ in
           proxy_set_header X-Forwarded-Proto $scheme;
           proxy_read_timeout 600;
           proxy_send_timeout 600;
+          # Media uploads (videos, HEIC photos) routinely exceed nginx's 10 MB
+          # default body limit; raise it so /api/upload isn't rejected with 413.
+          client_max_body_size 512m;
         '';
       };
     };

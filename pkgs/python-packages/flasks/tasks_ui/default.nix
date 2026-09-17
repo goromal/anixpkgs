@@ -4,6 +4,7 @@
   flask,
   task-tools,
   python,
+  pkg-src,
 }:
 let
   pythonLibDir = "lib/python${python.passthru.pythonVersion}/site-packages";
@@ -13,10 +14,10 @@ buildPythonPackage rec {
   version = "0.0.1";
   pyproject = true;
   build-system = [ setuptools ];
-  src = ./.;
+  src = "${pkg-src}/tasks_ui";
   prePatch = ''
     mkdir -p $out/${pythonLibDir}/templates
-    cp ${./templates/main.html} $out/${pythonLibDir}/templates/main.html
+    cp templates/main.html $out/${pythonLibDir}/templates/main.html
   '';
   propagatedBuildInputs = [
     flask

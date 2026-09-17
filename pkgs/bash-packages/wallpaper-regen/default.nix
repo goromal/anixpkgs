@@ -54,7 +54,7 @@ let
     ${imagemagick}/bin/magick -font ${pkgData.fonts.nexa.data} -pointsize 30 -fill white \
       "$SOURCE_IMAGE" \
       -resize "$RESOLUTION^" -gravity west -extent "$RESOLUTION" -gravity northwest \
-      \( ${pkgData.img.ajt-logo-white.data} -resize ''${LOGO_W}x''${LOGO_H}! \) \
+      \( ${pkgData.img.ajt-logo-outline.data} -resize ''${LOGO_W}x''${LOGO_H}! \) \
         -geometry +''${LOGO_X}+''${LOGO_Y} -composite \
       \( ${pkgData.img.anix-logo-white-bmp.data} -resize ''${ANIX_W}x''${ANIX_H}! \) \
         -geometry +''${ANIX_X}+''${ANIX_Y} -composite \

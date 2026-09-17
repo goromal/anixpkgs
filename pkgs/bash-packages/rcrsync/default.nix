@@ -16,7 +16,7 @@ let
     map (x: "${x.name}	${x.cloudname}	<->  ~/${x.dirname}") cloudDirs
   );
   longDescription = ''
-    usage: ${pkgname} [OPTS] init|sync|copy|override CLOUD_DIR [subdir]
+    usage: ${pkgname} [OPTS] init|sync|copy|override|mirror CLOUD_DIR [subdir]
 
     Manage cloud directories with rclone.
 
@@ -154,6 +154,19 @@ in
       _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} copy $LOCAL_DIR $CLOUD_DIR" || { _success=0; }
       if [[ "$_success" == "0" ]]; then
         ${printErr} "Override failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
+        exit 1
+      fi
+      echo "Done."
+    elif [[ "$1" == "mirror" ]]; then
+      if [[ ! -d "$LOCAL_DIR" ]]; then
+        ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
+        exit 1
+      fi
+      ${printCyn} "Mirroring $LOCAL_DIR to $CLOUD_DIR (deleting extraneous cloud files)..."
+      _success=1
+      _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} sync $LOCAL_DIR $CLOUD_DIR" || { _success=0; }
+      if [[ "$_success" == "0" ]]; then
+        ${printErr} "Mirror failed. Consider running 'rclone config reconnect ''${CLOUD_DIR%%:*}:'. Exiting."
         exit 1
       fi
       echo "Done."

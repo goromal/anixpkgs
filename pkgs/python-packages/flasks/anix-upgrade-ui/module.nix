@@ -43,6 +43,7 @@ in
     machines.base.webServices = [
       {
         name = "anix-upgrade";
+        tag = "Utilities";
         path = "/anix-upgrade/";
         description = "System upgrade management";
         icon = "arrows-rotate";

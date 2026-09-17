@@ -11,6 +11,20 @@
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
+    # Pin bun2nix (a transitive input of llm-agents) by rev rather than the
+    # upstream "fix-structured-attrs-hook" side branch, so check_deps.py stays
+    # green. This is the exact commit upstream currently points that branch at;
+    # its sub-inputs follow llm-agents' as upstream wires them, so the build is
+    # identical to the floating side-branch lock.
+    bun2nix.url = "github:Mic92/bun2nix/5765b0614591f75ee8ba5596e81ae85c167d1071";
+    bun2nix.inputs.nixpkgs.follows = "llm-agents/nixpkgs";
+    bun2nix.inputs.flake-parts.follows = "llm-agents/flake-parts";
+    bun2nix.inputs.systems.follows = "llm-agents/systems";
+    bun2nix.inputs.treefmt-nix.follows = "llm-agents/treefmt-nix";
+
+    llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents.inputs.bun2nix.follows = "bun2nix";
+
     phps.url = "github:fossar/nix-phps";
 
     flake-compat.url = "github:edolstra/flake-compat";
@@ -24,7 +38,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=master&submodules=1";
+    ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
 
     book-notes-sync.url = "github:goromal/book-notes-sync";
@@ -32,6 +46,9 @@
 
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
+
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.flake = false;
 
     crowcpp.url = "github:goromal/Crow?ref=dev/26.05";
     crowcpp.flake = false;
@@ -42,17 +59,17 @@
     easy-google-auth.url = "github:goromal/easy-google-auth";
     easy-google-auth.flake = false;
 
-    spandrel-src.url = "github:chaiNNer-org/spandrel";
-    spandrel-src.flake = false;
-
-    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
-    comfyui-src.flake = false;
-
     evil-hangman.url = "github:goromal/evil-hangman";
     evil-hangman.flake = false;
 
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
+
+    flasks.url = "github:goromal/flasks";
+    flasks.flake = false;
+
+    folio.url = "github:goromal/folio";
+    folio.flake = false;
 
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
@@ -60,18 +77,18 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
+    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.flake = false;
+
     jetson-stats.url = "github:rbonghi/jetson_stats";
     jetson-stats.flake = false;
-
-    gnc.url = "github:goromal/gnc";
-    gnc.flake = false;
 
     # TODO gradebook would need dev/warn-suppress branch
 
     makepyshell.url = "git+https://gist.github.com/e64b6bdc8a176c38092e9bde4c434d31";
     makepyshell.flake = false;
 
-    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.0";
+    manif-geom-cpp.url = "github:goromal/manif-geom-cpp?ref=refs/tags/release/1.1";
     manif-geom-cpp.flake = false;
 
     manif-geom-rs.url = "github:goromal/manif-geom-rs";
@@ -89,11 +106,22 @@
     mesh-plotter.url = "github:goromal/mesh-plotter";
     mesh-plotter.flake = false;
 
+    microxrce-dds-agent.url = "github:eProsima/Micro-XRCE-DDS-Agent?ref=refs/tags/v2.4.3";
+    microxrce-dds-agent.flake = false;
+
+    microxrce-dds-gen.url = "git+https://github.com/ardupilot/Micro-XRCE-DDS-Gen?ref=refs/tags/v4.7.1&submodules=1";
+    microxrce-dds-gen.flake = false;
+
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
     mscpp.url = "github:goromal/mscpp?ref=dev/26.05";
     mscpp.flake = false;
+
+    msrs.url = "github:goromal/msrs";
+    msrs.flake = false;
+
+    nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
 
     notion-tools.url = "github:goromal/notion-tools";
     notion-tools.flake = false;
@@ -148,6 +176,9 @@
 
     sorting.url = "github:goromal/sorting";
     sorting.flake = false;
+
+    spandrel-src.url = "github:chaiNNer-org/spandrel";
+    spandrel-src.flake = false;
 
     spelling-corrector.url = "github:goromal/spelling-corrector";
     spelling-corrector.flake = false;
@@ -257,17 +288,24 @@
           jetpackNixpkgs.lib.nixosSystem {
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
-            modules = commonModules ++ [
-              jetpack-nixos.nixosModules.default
-              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
-            ];
+            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-nx.nix ];
+          };
+
+        jetson-orin-agx =
+          let
+            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;
+          in
+          jetpackNixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            specialArgs = commonSpecialArgs;
+            modules = commonModules ++ [ ./pkgs/nixos/configurations/jetpack-orin-agx.nix ];
           };
 
         # Drone simulation
-        drone-sitl = nixpkgs.lib.nixosSystem {
+        drone-obc-sitl = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           specialArgs = commonSpecialArgs;
-          modules = commonModules ++ [ ./pkgs/nixos/configurations/drone-sitl.nix ];
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/drone-obc-sitl.nix ];
         };
 
         # x86_64 personal installer ISO

@@ -34,6 +34,7 @@ in
     machines.base.webServices = [
       {
         name = "Budget";
+        tag = "Utilities";
         path = "/budget/";
         description = "Budget tracking";
         icon = "piggy-bank";

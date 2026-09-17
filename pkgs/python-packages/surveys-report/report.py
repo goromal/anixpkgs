@@ -3,6 +3,7 @@ import click
 import sys
 import os
 import json
+import time
 import importlib.util
 from types import ModuleType
 from typing import Callable
@@ -14,6 +15,39 @@ from gmail_parser.defaults import GmailParserDefaults as GPD
 from aapis.tactical.v1 import tactical_pb2_grpc, tactical_pb2
 
 import gspread
+
+
+# The Sheets API intermittently returns 5xx/429 responses that succeed on a retry;
+# any other status is a real error and should fail the run right away.
+_TRANSIENT_HTTP_CODES = (408, 429, 500, 502, 503, 504)
+_MAX_ATTEMPTS = 5
+_INITIAL_BACKOFF_S = 2
+
+
+def _api_error_code(err: gspread.exceptions.APIError) -> int:
+    # gspread reports code -1 when the error body isn't JSON, which is common for
+    # Google's 5xx pages; the raw HTTP status is what tells us it's transient.
+    if err.code == -1 and err.response is not None:
+        return err.response.status_code
+    return err.code
+
+
+def _with_retries(description: str, func: Callable):
+    """Run func(), retrying transient Google API errors with exponential backoff."""
+    backoff = _INITIAL_BACKOFF_S
+    for attempt in range(1, _MAX_ATTEMPTS + 1):
+        try:
+            return func()
+        except gspread.exceptions.APIError as err:
+            code = _api_error_code(err)
+            if code not in _TRANSIENT_HTTP_CODES or attempt == _MAX_ATTEMPTS:
+                raise
+            print(
+                f"WARNING: {description} failed with transient API error {code} "
+                f"(attempt {attempt}/{_MAX_ATTEMPTS}); retrying in {backoff}s"
+            )
+            time.sleep(backoff)
+            backoff *= 2
 
 
 def _api_res_from_int(i):
@@ -119,14 +153,20 @@ def cli(ctx: click.Context, secrets_json, refresh_file, config_json, enable_logg
     ctx.obj = {"config": config, "surveys": []}
     module_path = config["modules_path"]
     for survey in config["surveys"]:
-        sheet = gspread.authorize(
-            getGoogleCreds(
-                secrets_json,
-                refresh_file,
-                headless=True,
-            )
-        ).open_by_key(survey["spreadsheetId"])
-        data = sheet.worksheet(survey["sheetName"]).get_all_records()
+        sheet = _with_retries(
+            f"opening the spreadsheet for survey {survey['name']}",
+            lambda: gspread.authorize(
+                getGoogleCreds(
+                    secrets_json,
+                    refresh_file,
+                    headless=True,
+                )
+            ).open_by_key(survey["spreadsheetId"]),
+        )
+        data = _with_retries(
+            f"reading worksheet {survey['sheetName']} of survey {survey['name']}",
+            lambda: sheet.worksheet(survey["sheetName"]).get_all_records(),
+        )
 
         row_func = None
         try:

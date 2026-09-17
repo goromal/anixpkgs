@@ -33,7 +33,9 @@ in
     machines.base.webServices = [
       {
         name = "Vikunja";
+        tag = "Aspiration";
         path = "#";
+        port = service-ports.vikunja.public;
         description = "Task management system (port ${toString service-ports.vikunja.public})";
         icon = "clipboard-check";
       }

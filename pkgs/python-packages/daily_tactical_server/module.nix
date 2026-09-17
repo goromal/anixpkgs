@@ -47,6 +47,7 @@ in
     machines.base.webServices = [
       {
         name = "Tactical";
+        tag = "Aspiration";
         path = "/tactical/";
         description = "Daily tactical planning";
         icon = "calendar-check";

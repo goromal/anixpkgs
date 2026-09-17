@@ -32,11 +32,6 @@
                 "docs": true
             },
             {
-                "attr": "gnc",
-                "ci": true,
-                "docs": true
-            },
-            {
                 "attr": "secure-delete",
                 "ci": true,
                 "docs": true
@@ -75,11 +70,31 @@
                 "attr": "arducopter.sitl",
                 "ci": true,
                 "docs": false
+            },
+            {
+                "attr": "microxrceddsgen",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "microxrce-dds-agent",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "ardupilot-msgs",
+                "ci": true,
+                "docs": false
             }
         ],
         "rust": [
             {
                 "attr": "manif-geom-rs",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "msrs",
                 "ci": true,
                 "docs": true
             },
@@ -127,6 +142,11 @@
             },
             {
                 "attr": "mavlog-utils",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "indi-harness",
                 "ci": true,
                 "docs": false
             },
@@ -191,6 +211,11 @@
                 "docs": true
             },
             {
+                "attr": "gmail-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "trafficsim",
                 "ci": true,
                 "docs": true
@@ -241,6 +266,26 @@
                 "docs": true
             },
             {
+                "attr": "folio-backend",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "folio-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "folio-frontend",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "folio-desktop",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "rankserver",
                 "ci": true,
                 "docs": true
@@ -256,12 +301,27 @@
                 "docs": true
             },
             {
+                "attr": "disciple",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "anix_upgrade_ui",
                 "ci": true,
                 "docs": true
             },
             {
+                "attr": "agent_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "tasks_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "sunset",
                 "ci": true,
                 "docs": true
             },
@@ -336,6 +396,11 @@
                 "docs": false
             },
             {
+                "attr": "brom",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "spandrel",
                 "ci": true,
                 "docs": false
@@ -397,6 +462,16 @@
             },
             {
                 "attr": "cozy",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "wormhole",
+                "ci": true,
+                "docs": true
+            },
+            {
+                "attr": "grafana_dash",
                 "ci": true,
                 "docs": true
             }
@@ -701,6 +776,11 @@
                 "attr": "rcrsync",
                 "ci": true,
                 "docs": true
+            },
+            {
+                "attr": "tor-ephemeral",
+                "ci": true,
+                "docs": false
             }
         ],
         "java": [

@@ -56,6 +56,8 @@ in
               "org.inkscape.Inkscape.desktop"
               "audacity.desktop"
               "blender.desktop"
+              "homevpn-gui.desktop"
+              "folio.desktop"
             ];
             "enabled-extensions" = [ "Vitals@CoreCoding.com" ];
           };
