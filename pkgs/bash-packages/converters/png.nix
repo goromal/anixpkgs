@@ -71,7 +71,11 @@ let
         else
             _stp2="$_stp1"
         fi
-        ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
       '';
@@ -87,7 +91,11 @@ let
         else
             _stp2="$_stp1"
         fi
-        ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
       '';
@@ -103,7 +111,11 @@ let
         else
             _stp2="$_stp1"
         fi
-        ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
       '';
@@ -119,7 +131,11 @@ let
         else
             _stp2="$_stp1"
         fi
-        ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        if [[ "$scrub" == "1" ]]; then
+            ${apply_scrub "$tmpdir" "$_stp2" "_stp3"}
+        else
+            _stp3="$_stp2"
+        fi
         mv "$_stp3" "$outfile"
         rm -rf $tmpdir
       '';
