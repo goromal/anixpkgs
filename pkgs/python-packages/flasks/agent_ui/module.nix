@@ -80,13 +80,29 @@ let
 
   agentAttach = pkgs.writeShellApplication {
     name = "agent-ui-attach";
-    runtimeInputs = [ pkgs.tmux ];
+    runtimeInputs = [
+      pkgs.tmux
+      pkgs.coreutils
+    ];
     text = ''
       if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
         echo "agent-ui-attach: invalid session" >&2
         exit 2
       fi
-      exec tmux -L agent-ui attach-session -t "$1"
+      # When the session is gone (agent exited), don't exit -- that makes ttyd
+      # silently reconnect-loop. Show a clear notice and hold the pane open so the
+      # message stays until the user closes the tab or navigates away.
+      hold() {
+        printf '\r\n\033[1;33mSession ended.\033[0m Close this tab or return to the Agents list.\r\n'
+        sleep infinity
+      }
+      if ! tmux -L agent-ui has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
+      tmux -L agent-ui attach-session -t "$1" || true
+      if ! tmux -L agent-ui has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
     '';
   };
 

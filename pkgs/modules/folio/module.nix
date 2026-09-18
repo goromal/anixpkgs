@@ -36,7 +36,11 @@ let
 
   folioAgentSession = pkgs.writeShellApplication {
     name = "folio-agent-session";
-    runtimeInputs = [ pkgs.coreutils ];
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.jq
+      pkgs.util-linux
+    ];
     text = ''
       if [ "$#" -ne 2 ]; then
         echo "usage: folio-agent-session WORKDIR AGENT" >&2
@@ -46,6 +50,24 @@ let
         ${agentAlternation}) ;;
         *) echo "folio-agent-session: unsupported agent" >&2; exit 2 ;;
       esac
+      # Pre-accept Claude Code's workspace-trust dialog so a headless companion
+      # launch does not stall on it. Trust the stable spool parent (not each
+      # ephemeral session dir): claude honors an ancestor's trust, so every
+      # session under the spool inherits it without accumulating stale
+      # ~/.claude.json entries. Idempotent, flock-guarded.
+      if [ "$2" = claude ]; then
+        spool="$(dirname "$1")"
+        cfg="$HOME/.claude.json"
+        (
+          flock 9
+          tmp="$(mktemp "$HOME/.claude.json.folio.XXXXXX")"
+          if [ -f "$cfg" ]; then base="$cfg"; else base="$tmp"; printf '{}' >"$base"; fi
+          if jq --arg d "$spool" '.projects[$d].hasTrustDialogAccepted = true' "$base" >"$tmp.out"; then
+            mv "$tmp.out" "$cfg"
+          fi
+          rm -f "$tmp" "$tmp.out"
+        ) 9>"$HOME/.claude.json.folio.lock" || true
+      fi
       cd "$1"
       exec "$2"
     '';
@@ -53,13 +75,28 @@ let
 
   folioAgentAttach = pkgs.writeShellApplication {
     name = "folio-agent-attach";
-    runtimeInputs = [ pkgs.tmux ];
+    runtimeInputs = [
+      pkgs.tmux
+      pkgs.coreutils
+    ];
     text = ''
       if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^folio-agent--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
         echo "folio-agent-attach: invalid session" >&2
         exit 2
       fi
-      exec tmux -L folio-agent attach-session -t "$1"
+      # When the session is gone (agent exited), hold the pane with a notice
+      # instead of exiting, so ttyd doesn't silently reconnect-loop.
+      hold() {
+        printf '\r\n\033[1;33mSession ended.\033[0m Close this panel or start a new session.\r\n'
+        sleep infinity
+      }
+      if ! tmux -L folio-agent has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
+      tmux -L folio-agent attach-session -t "$1" || true
+      if ! tmux -L folio-agent has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
     '';
   };
 in
