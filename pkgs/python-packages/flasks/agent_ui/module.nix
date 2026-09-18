@@ -11,6 +11,25 @@ let
   agents = config.machines.features.agents.frameworks;
   agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
   agentArgs = lib.concatMapStringsSep " " (agent: "--agent ${lib.escapeShellArg agent}") agents;
+
+  # The configured agent CLIs (same llm-agents packages the agent components
+  # install into the user profile) must be on the service PATH: the dedicated
+  # `-L agent-ui` tmux server inherits this service's env, and `agent-ui-enter`
+  # exec's the agent by name inside it. Without this a session dies with
+  # "exec: claude: not found". procps/coreutils/git cover common agent shell-outs.
+  agentPackages = {
+    claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+    codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
+  };
+  agentSessionPath =
+    [
+      pkgs.tmux
+      pkgs.procps
+      pkgs.coreutils
+      pkgs.gitMinimal
+    ]
+    ++ map (agent: agentPackages.${agent}) agents;
+
   agentTmuxConf = pkgs.writeText "agent-ui-tmux.conf" ''
     set -g mouse on
     set -g history-limit 50000
@@ -164,7 +183,7 @@ in
       description = "Workspace Agent Terminal UI";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.tmux ];
+      path = agentSessionPath;
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
