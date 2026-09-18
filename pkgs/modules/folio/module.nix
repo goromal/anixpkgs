@@ -32,6 +32,12 @@ let
   folioTmuxConf = pkgs.writeText "folio-agent-tmux.conf" ''
     set -g mouse on
     set -g history-limit 50000
+    # Smooth one-line scrolling in copy-mode (mirrors agent-ui): a finger-drag in
+    # the companion terminal pages scrollback line by line, not a screen at a time.
+    bind -T copy-mode    Up   send-keys -X scroll-up
+    bind -T copy-mode    Down send-keys -X scroll-down
+    bind -T copy-mode-vi Up   send-keys -X scroll-up
+    bind -T copy-mode-vi Down send-keys -X scroll-down
   '';
 
   folioAgentSession = pkgs.writeShellApplication {
