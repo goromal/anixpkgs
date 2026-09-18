@@ -21,14 +21,13 @@ let
     claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
     codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
   };
-  agentSessionPath =
-    [
-      pkgs.tmux
-      pkgs.procps
-      pkgs.coreutils
-      pkgs.gitMinimal
-    ]
-    ++ map (agent: agentPackages.${agent}) agents;
+  agentSessionPath = [
+    pkgs.tmux
+    pkgs.procps
+    pkgs.coreutils
+    pkgs.gitMinimal
+  ]
+  ++ map (agent: agentPackages.${agent}) agents;
 
   agentTmuxConf = pkgs.writeText "agent-ui-tmux.conf" ''
     set -g mouse on
