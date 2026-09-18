@@ -136,6 +136,10 @@ in
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
         RestartSec = "5s";
+        # Companion tmux sessions run on a `-L folio-agent` server spawned by this
+        # unit; kill only the main process on stop so a restart/redeploy leaves
+        # those sessions alive ("persist until closed").
+        KillMode = "process";
         Environment = [
           "HOME=${globalCfg.homeDir}"
           "FOLIO_DB=${cfg.dataDir}/folio.db"

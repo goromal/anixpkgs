@@ -137,6 +137,10 @@ in
         User = "andrew";
         Group = "dev";
         UMask = "0077";
+        # The dedicated `-L agent-ui` tmux server is spawned by the first session
+        # and lives in this unit's cgroup. Kill only the main process on stop so a
+        # restart/redeploy leaves the tmux server (and its sessions) running.
+        KillMode = "process";
       };
     };
 
