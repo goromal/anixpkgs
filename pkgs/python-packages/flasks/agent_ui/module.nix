@@ -32,6 +32,13 @@ let
   agentTmuxConf = pkgs.writeText "agent-ui-tmux.conf" ''
     set -g mouse on
     set -g history-limit 50000
+    # Smooth one-line scrolling in copy-mode: bind Up/Down to scroll-up/down
+    # (no cursor-first lag), so a finger-drag from the web terminal pages the
+    # scrollback line by line rather than a full screen at a time.
+    bind -T copy-mode    Up   send-keys -X scroll-up
+    bind -T copy-mode    Down send-keys -X scroll-down
+    bind -T copy-mode-vi Up   send-keys -X scroll-up
+    bind -T copy-mode-vi Down send-keys -X scroll-down
   '';
 
   agentEnter = pkgs.writeShellApplication {
