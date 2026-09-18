@@ -18,6 +18,11 @@ let
 
   agentEnter = pkgs.writeShellApplication {
     name = "agent-ui-enter";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
     text = ''
       case "''${AGENT_UI_AGENT:-}" in
         ${agentAlternation}) ;;
@@ -27,6 +32,22 @@ let
       cd "$DEVSHELL_ROOT/sources"
       if [ "$AGENT_UI_AGENT" = shell ]; then
         exec ${pkgs.bashInteractive}/bin/bash -i
+      fi
+      # Pre-accept Claude Code's workspace-trust dialog for this workspace so a
+      # headless agent-ui launch does not stall on it -- its default "No, exit"
+      # would otherwise be selected and kill the session. Idempotent, and locked
+      # so concurrent session launches don't clobber ~/.claude.json.
+      if [ "$AGENT_UI_AGENT" = claude ]; then
+        cfg="$HOME/.claude.json"
+        (
+          flock 9
+          tmp="$(mktemp "$HOME/.claude.json.agentui.XXXXXX")"
+          if [ -f "$cfg" ]; then base="$cfg"; else base="$tmp"; printf '{}' >"$base"; fi
+          if jq --arg d "$PWD" '.projects[$d].hasTrustDialogAccepted = true' "$base" >"$tmp.out"; then
+            mv "$tmp.out" "$cfg"
+          fi
+          rm -f "$tmp" "$tmp.out"
+        ) 9>"$HOME/.claude.json.agentui.lock" || true
       fi
       exec "$AGENT_UI_AGENT"
     '';
