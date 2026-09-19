@@ -195,7 +195,10 @@ in
           "FOLIO_HUB_PORT=${toString service-ports.folio.public}"
         ]
         ++ lib.optionals companion [
-          "FOLIO_AGENTS=${lib.concatStringsSep " " agents}"
+          # Comma-joined, not space: a space in a systemd Environment= value is
+          # parsed as a separator between assignments, which silently dropped every
+          # agent after the first. folio-backend splits on comma or whitespace.
+          "FOLIO_AGENTS=${lib.concatStringsSep "," agents}"
           "FOLIO_AGENT_SECRETS=${cfg.agentSecretsFile}"
           "FOLIO_AGENT_SPOOL=${cfg.agentSpoolDir}"
           "FOLIO_AGENT_TMUX=${pkgs.tmux}/bin/tmux"
@@ -280,7 +283,10 @@ in
           extraConfig = ''
             auth_request /folio/agent/auth-check;
             proxy_set_header X-Folio-Agent-Authenticated yes;
-            proxy_set_header Host $host;
+            # $http_host keeps the client's host:port so ttyd's --check-origin
+            # (Origin vs Host) matches on this non-default port; $host drops the
+            # port and makes ttyd refuse the websocket (endless reconnect loop).
+            proxy_set_header Host $http_host;
             proxy_read_timeout 86400;
             proxy_send_timeout 86400;
           '';
