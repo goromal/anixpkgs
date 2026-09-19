@@ -66,7 +66,12 @@ in
     fromdir=""
     previous_kind=""
     prev_symlink=""
+    transaction_started=0
+    upgrade_complete=0
     restore_source() {
+      if [[ "$transaction_started" == "0" ]]; then
+        return
+      fi
       rm -rf anixpkgs
       if [[ "$previous_kind" == "symlink" ]]; then
         ${printYellow} "Restoring previous anixpkgs symlink."
@@ -75,11 +80,62 @@ in
         ${printYellow} "Restoring previous anixpkgs directory."
         mv "$fromdir" anixpkgs
       fi
+      transaction_started=0
     }
-    cd ~/sources
-    vcurr=$(cat ~/.anix-version)
+    cleanup() {
+      status=$?
+      trap - EXIT HUP INT TERM
+      if [[ "$upgrade_complete" == "0" ]]; then
+        restore_source
+      fi
+      rm -rf "$tmpdir"
+      exit "$status"
+    }
+    trap cleanup EXIT
+    trap 'exit 130' HUP INT TERM
+
+    sources_dir="$HOME/sources"
+    if [[ ! -d "$sources_dir" ]]; then
+      ${printError} "Source directory does not exist: $sources_dir"
+      exit 1
+    fi
+    if ! cd "$sources_dir"; then
+      ${printError} "Could not enter source directory: $sources_dir"
+      exit 1
+    fi
+    if [[ -n "$source" && "$source" != /* ]]; then
+      ${printError} "Please provide an absolute path to the source tree."
+      exit 1
+    fi
+    if [[ -n "$source" && ! -d "$source" ]]; then
+      ${printError} "Source tree does not exist: $source"
+      exit 1
+    fi
+    if [[ -n "$source" && -d anixpkgs && ! -L anixpkgs \
+      && "$(realpath "$source")" == "$(realpath anixpkgs)" ]]; then
+      ${printError} "The source tree cannot also be the managed $sources_dir/anixpkgs directory."
+      exit 1
+    fi
+    ${
+      if standalone then
+        ''
+          home_config="''${XDG_CONFIG_HOME:-$HOME/.config}/home-manager/home.nix"
+          if [[ ! -f "$home_config" ]]; then
+            ${printError} "Home Manager configuration does not exist: $home_config"
+            exit 1
+          fi
+        ''
+      else
+        ""
+    }
+
+    if [[ -f "$HOME/.anix-version" ]]; then
+      vcurr=$(cat "$HOME/.anix-version")
+    else
+      vcurr="unknown"
+    fi
     if [[ "$vcurr" != "Local Build"* ]]; then
-      vcurr=''${vcurr:1}
+      vcurr=''${vcurr#v}
     fi
     if [[ "$local" == "1" ]]; then
       localVar=true
@@ -98,20 +154,30 @@ in
       else
         ""
     }
-    if [[ -d anixpkgs ]]; then
+    if [[ -e anixpkgs || -L anixpkgs ]]; then
       if [[ -L anixpkgs ]]; then
         ${printYellow} "Removing existing symlink."
         previous_kind="symlink"
         prev_symlink=$(readlink anixpkgs)
         fromdir="$prev_symlink"
+        transaction_started=1
         rm anixpkgs
-      else
+      elif [[ -d anixpkgs ]]; then
         ${printYellow} "Removing existing directory."
         previous_kind="directory"
-        cp -r anixpkgs "$tmpdir"
+        if ! cp -a anixpkgs "$tmpdir"; then
+          ${printError} "Could not back up the existing anixpkgs directory."
+          exit 1
+        fi
         fromdir="$tmpdir/anixpkgs"
+        transaction_started=1
         rm -rf anixpkgs
+      else
+        ${printError} "$sources_dir/anixpkgs exists but is not a directory or symlink."
+        exit 1
       fi
+    else
+      transaction_started=1
     fi
     if [[ -n "$version" ]]; then
       nix-build -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/tags/v'"''${version}"'"; }' -o anixpkgs
@@ -120,11 +186,10 @@ in
     elif [[ -n "$branch" ]]; then
       nix-build --tarball-ttl 0 -E 'with (import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}); pkgsSource { local = '"$localVar"'; ref = "refs/heads/'"$branch"'"; }' -o anixpkgs
     elif [[ -n "$source" ]]; then
-      if [[ "$source" != /* ]]; then
-        ${printError} "Please provide an absolute path to the source tree."
+      if ! ${git-cc}/bin/git-cc "$source" anixpkgs; then
+        ${printError} "Could not copy source tree: $source"
         exit 1
       fi
-      ${git-cc}/bin/git-cc "$source" anixpkgs
       if [[ "$localVar" == "true" ]]; then
         sed -i 's|local-build = false;|local-build = true;|g' anixpkgs/pkgs/nixos/dependencies.nix
       fi
@@ -146,20 +211,22 @@ in
     else
       vdest=$(cat anixpkgs/ANIX_VERSION)
     fi
+    if [[ ! -f anixpkgs/NIXOS_VERSION ]]; then
+      ${printError} "Selected source tree has no NIXOS_VERSION."
+      exit 1
+    fi
     nixos_dest=$(cat anixpkgs/NIXOS_VERSION)
     rebuild_mode="channels"
     if [[ -f anixpkgs/NIXOS_REBUILD_MODE ]]; then
       read -r rebuild_mode < anixpkgs/NIXOS_REBUILD_MODE
     fi
+    if [[ "$rebuild_mode" != "flake" && "$rebuild_mode" != "channels" ]]; then
+      ${printError} "Unsupported rebuild mode: $rebuild_mode"
+      exit 1
+    fi
     ${
       if standalone == false then
         ''
-          if [[ "$rebuild_mode" != "flake" && "$rebuild_mode" != "channels" ]]; then
-            ${printError} "Unsupported NixOS rebuild mode: $rebuild_mode"
-            restore_source
-            rm -rf "$tmpdir"
-            exit 1
-          fi
           if [[ "$rebuild_mode" == "channels" ]]; then
             nixos_curr=$(nixos-version 2>/dev/null | cut -d'.' -f1,2 || echo "")
             host=$(hostname)
@@ -192,9 +259,34 @@ in
           fi
         ''
       else
-        ""
+        ''
+          prepare_home_rebuild() {
+            if [[ "$rebuild_mode" == "flake" ]]; then
+              if ! system=$(nix eval --impure --raw --expr builtins.currentSystem); then
+                ${printError} "Could not determine the current Nix system."
+                return 1
+              fi
+              if ! target_nixpkgs=$(
+                nix eval --raw "$HOME/sources/anixpkgs#legacyPackages.$system.path"
+              ); then
+                ${printError} "Could not evaluate the target Nixpkgs revision."
+                return 1
+              fi
+              home_rebuild=(nix run "$HOME/sources/anixpkgs#home-manager" -- switch -f "$home_config")
+            else
+              if ! command -v home-manager >/dev/null; then
+                ${printError} "The installed home-manager command is required for this legacy target."
+                return 1
+              fi
+              target_nixpkgs=""
+              home_rebuild=(home-manager switch -f "$home_config")
+            fi
+          }
+        ''
     }
-    ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (NixOS $nixos_dest)..."
+    ${printYellow} "Upgrading anixpkgs from $vcurr -> $vdest (${
+      if standalone then "Home Manager" else "NixOS"
+    } $nixos_dest)..."
     build_success=0
     if [[ "$boot" == "1" ]]; then
       ${
@@ -213,7 +305,9 @@ in
         else
           ''
             ${printYellow} "Ignoring boot flag for home switch"
-            if home-manager switch; then
+            if prepare_home_rebuild \
+              && NIX_PATH="''${target_nixpkgs:+nixpkgs=$target_nixpkgs:}''${NIX_PATH:-}" \
+              "''${home_rebuild[@]}"; then
               ${printYellow} "Done."
               build_success=1
             fi
@@ -235,7 +329,9 @@ in
           ''
         else
           ''
-            if home-manager switch; then
+            if prepare_home_rebuild \
+              && NIX_PATH="''${target_nixpkgs:+nixpkgs=$target_nixpkgs:}''${NIX_PATH:-}" \
+              "''${home_rebuild[@]}"; then
               ${printYellow} "Done."
               build_success=1
             fi
@@ -244,8 +340,6 @@ in
     fi
     if [[ "$build_success" == "0" ]]; then
       ${printError} "Build/switch failed."
-      restore_source
-      rm -rf "$tmpdir"
       exit 1
     fi
     echo ""
@@ -254,7 +348,7 @@ in
     else
       ${printYellow} "No prior anixpkgs tree found; skipping changelog compare."
     fi
-    rm -rf "$tmpdir"
+    upgrade_complete=1
   ''
 )
 // {

@@ -24,6 +24,25 @@ cat > "$mock_bin/hostname" <<'EOF'
 #!/usr/bin/env bash
 echo test-host
 EOF
+cat > "$mock_bin/nix" <<'EOF'
+#!/usr/bin/env bash
+printf 'NIX_PATH=%s nix %s\n' "${NIX_PATH:-}" "$*" >> "$ANIX_UPGRADE_TEST_LOG"
+if [[ "$*" == "eval --impure --raw --expr builtins.currentSystem" ]]; then
+  printf 'x86_64-linux'
+elif [[ "$*" == eval\ --raw\ *legacyPackages.x86_64-linux.path ]]; then
+  printf '/nix/store/mock-nixpkgs'
+elif [[ "$*" == run\ *#home-manager\ --\ switch\ -f\ * ]]; then
+  [[ "${ANIX_UPGRADE_FAIL_HOME:-0}" != "1" ]]
+else
+  echo "Unexpected nix invocation: $*" >&2
+  exit 1
+fi
+EOF
+cat > "$mock_bin/home-manager" <<'EOF'
+#!/usr/bin/env bash
+printf 'NIX_PATH=%s home-manager %s\n' "${NIX_PATH:-}" "$*" >> "$ANIX_UPGRADE_TEST_LOG"
+[[ "${ANIX_UPGRADE_FAIL_HOME:-0}" != "1" ]]
+EOF
 chmod +x "$mock_bin"/*
 
 make_source() {
@@ -87,3 +106,89 @@ if ANIX_UPGRADE_TEST_LOG="$restore_home/commands.log" \
   exit 1
 fi
 grep -Fxq 'keep me' "$restore_home/sources/anixpkgs/sentinel"
+
+relative_home="$test_root/relative"
+mkdir -p "$relative_home/sources/anixpkgs"
+printf 'keep me\n' > "$relative_home/sources/anixpkgs/sentinel"
+printf 'v0.0.0\n' > "$relative_home/.anix-version"
+if ANIX_UPGRADE_TEST_LOG="$relative_home/commands.log" \
+  HOME="$relative_home" PATH="$mock_bin:$PATH" \
+  "$upgrade" --source relative/path; then
+  echo "relative source unexpectedly succeeded" >&2
+  exit 1
+fi
+grep -Fxq 'keep me' "$relative_home/sources/anixpkgs/sentinel"
+
+same_source_home="$test_root/same-source"
+mkdir -p "$same_source_home/sources/anixpkgs"
+printf 'keep me\n' > "$same_source_home/sources/anixpkgs/sentinel"
+printf 'v0.0.0\n' > "$same_source_home/.anix-version"
+if ANIX_UPGRADE_TEST_LOG="$same_source_home/commands.log" \
+  HOME="$same_source_home" PATH="$mock_bin:$PATH" \
+  "$upgrade" --source "$same_source_home/sources/anixpkgs"; then
+  echo "managed source tree unexpectedly accepted itself as input" >&2
+  exit 1
+fi
+grep -Fxq 'keep me' "$same_source_home/sources/anixpkgs/sentinel"
+
+missing_sources_home="$test_root/missing-sources"
+missing_sources_cwd="$test_root/unrelated-cwd"
+mkdir -p "$missing_sources_home" "$missing_sources_cwd/anixpkgs"
+printf 'keep me\n' > "$missing_sources_cwd/anixpkgs/sentinel"
+if (
+  cd "$missing_sources_cwd"
+  ANIX_UPGRADE_TEST_LOG="$missing_sources_home/commands.log" \
+    HOME="$missing_sources_home" PATH="$mock_bin:$PATH" \
+    "$upgrade" --source "$flake_source"
+); then
+  echo "missing sources directory unexpectedly succeeded" >&2
+  exit 1
+fi
+grep -Fxq 'keep me' "$missing_sources_cwd/anixpkgs/sentinel"
+
+if [[ -z "${ANIX_UPGRADE_STANDALONE_BIN:-}" ]]; then
+  echo "ANIX_UPGRADE_STANDALONE_BIN is required" >&2
+  exit 1
+fi
+
+standalone_home="$test_root/standalone"
+mkdir -p "$standalone_home/sources/anixpkgs" "$standalone_home/.config/home-manager"
+printf 'old source\n' > "$standalone_home/sources/anixpkgs/sentinel"
+printf 'v0.0.0\n' > "$standalone_home/.anix-version"
+printf '{}\n' > "$standalone_home/.config/home-manager/home.nix"
+ANIX_UPGRADE_TEST_LOG="$standalone_home/commands.log" \
+  HOME="$standalone_home" PATH="$mock_bin:$PATH" \
+  "$ANIX_UPGRADE_STANDALONE_BIN" --source "$flake_source"
+grep -Fq "NIX_PATH=nixpkgs=/nix/store/mock-nixpkgs" "$standalone_home/commands.log"
+grep -Fq \
+  "nix run $standalone_home/sources/anixpkgs#home-manager -- switch -f $standalone_home/.config/home-manager/home.nix" \
+  "$standalone_home/commands.log"
+
+standalone_restore_home="$test_root/standalone-restore"
+mkdir -p "$standalone_restore_home/sources/anixpkgs" "$standalone_restore_home/.config/home-manager"
+printf 'keep me\n' > "$standalone_restore_home/sources/anixpkgs/sentinel"
+printf 'v0.0.0\n' > "$standalone_restore_home/.anix-version"
+printf '{}\n' > "$standalone_restore_home/.config/home-manager/home.nix"
+if ANIX_UPGRADE_TEST_LOG="$standalone_restore_home/commands.log" \
+  ANIX_UPGRADE_FAIL_HOME=1 \
+  HOME="$standalone_restore_home" PATH="$mock_bin:$PATH" \
+  "$ANIX_UPGRADE_STANDALONE_BIN" --source "$flake_source"; then
+  echo "failed standalone switch unexpectedly succeeded" >&2
+  exit 1
+fi
+grep -Fxq 'keep me' "$standalone_restore_home/sources/anixpkgs/sentinel"
+
+standalone_legacy_home="$test_root/standalone-legacy"
+mkdir -p "$standalone_legacy_home/sources" "$standalone_legacy_home/.config/home-manager"
+printf 'v0.0.0\n' > "$standalone_legacy_home/.anix-version"
+printf '{}\n' > "$standalone_legacy_home/.config/home-manager/home.nix"
+ANIX_UPGRADE_TEST_LOG="$standalone_legacy_home/commands.log" \
+  HOME="$standalone_legacy_home" PATH="$mock_bin:$PATH" \
+  "$ANIX_UPGRADE_STANDALONE_BIN" --source "$legacy_source"
+grep -Fq \
+  "home-manager switch -f $standalone_legacy_home/.config/home-manager/home.nix" \
+  "$standalone_legacy_home/commands.log"
+if grep -Fq '#home-manager' "$standalone_legacy_home/commands.log"; then
+  echo "legacy standalone upgrade unexpectedly used the target flake" >&2
+  exit 1
+fi

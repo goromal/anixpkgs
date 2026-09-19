@@ -237,6 +237,7 @@
       ];
     in
     flake-utils.lib.eachSystem supported-systems (system: {
+      packages.home-manager = home-manager.packages.${system}.home-manager;
       legacyPackages = import nixpkgs {
         inherit system;
         overlays = [ anixpkgsOverlay ];

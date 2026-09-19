@@ -1,8 +1,10 @@
 let
   pkgs = import ../default.nix { };
+  standalone-anix-upgrade = pkgs.anix-upgrade.override { standalone = true; };
 in
 with pkgs;
 mkShell {
+  ANIX_UPGRADE_STANDALONE_BIN = "${standalone-anix-upgrade}/bin/anix-upgrade";
   nativeBuildInputs = [
     git
     direnv

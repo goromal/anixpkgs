@@ -4,22 +4,50 @@
 
 ## Home-Manager Example
 
-This repo uses [Determinate Nix](https://determinate.systems/nix) for standalone (non-NixOS) machines. Determinate Nix automatically enables flakes, `nix-command`, and manages `/etc/nix/nix.conf` — no manual editing of that file is needed.
+This repo uses [Determinate Nix](https://determinate.systems/nix) for standalone (non-NixOS) machines. Determinate Nix automatically enables flakes and `nix-command`, and manages `/etc/nix/nix.conf`. If Determinate is already installed, keep that installation and skip the installer step; `anix-upgrade` does not reinstall or upgrade Nix.
 
 1. Install Nix (Determinate):
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
 
-2. Add cache settings for anixpkgs by appending to `~/.config/nix/nix.conf` (user-level config, respected by Determinate):
-```
-substituters = https://cache.nixos.org/ https://github-public.cachix.org
-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+2. Add cache settings for anixpkgs to Determinate's supported custom configuration file, `/etc/nix/nix.custom.conf`:
+```nix
+extra-substituters = https://github-public.cachix.org
+extra-trusted-public-keys = github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
 narinfo-cache-positive-ttl = 0
 narinfo-cache-negative-ttl = 0
 ```
 
-3. Install home-manager (standalone): https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
+Do not edit Determinate's generated `/etc/nix/nix.conf`. Restart the daemon after changing the custom file:
+
+```bash
+sudo systemctl restart nix-daemon.service
+```
+
+For an authenticated cache, keep credentials in a stable mutable file such as
+`/etc/determinate/netrc.custom`, then add it to the existing
+`/etc/determinate/config.json` without discarding any other settings:
+
+```json
+{
+  "authentication": {
+    "additionalNetrcSources": [
+      "/etc/determinate/netrc.custom"
+    ]
+  }
+}
+```
+
+The source file must exist, must not be in `/nix/store`, and should be readable
+only by root. Restart `nix-daemon.service` after changing either file.
+
+3. Bootstrap Home Manager, placing the configuration at
+`~/.config/home-manager/home.nix`. `anix-upgrade` subsequently runs the Home
+Manager release and Nixpkgs revision pinned by the selected anixpkgs tree, so a
+host-installed Home Manager version or channel cannot drift from a current
+flake-based target. Older channel-based targets retain the installed Home
+Manager command as a compatibility path for downgrades.
 
 Example `home.nix` file for personal use:
 
