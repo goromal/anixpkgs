@@ -16,15 +16,24 @@ let
 
   # Same llm-agents CLIs the claude/codex agent components install (home.packages),
   # but placed on the backend service PATH so a spawned `exec claude`/`codex` in a
-  # plain temp dir resolves. procps/coreutils/git cover common agent shell-outs.
+  # plain temp dir resolves. Unlike Agent UI, the companion runs the agent in a bare
+  # temp dir with NO devshell/direnv wrapping, so this PATH is the agent's entire
+  # userland: it must carry a shell and the standard GNU tools the agent shells out
+  # to (Claude Code's Bash tool runs `bash -c`), not just enough to exec the CLI.
   agentPackages = {
     claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
     codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
   };
   companionPath = [
+    pkgs.bashInteractive
     pkgs.tmux
     pkgs.procps
     pkgs.coreutils
+    pkgs.gnugrep
+    pkgs.gnused
+    pkgs.gawk
+    pkgs.findutils
+    pkgs.which
     pkgs.gitMinimal
   ]
   ++ map (agent: agentPackages.${agent}) agents;
@@ -56,6 +65,10 @@ let
         ${agentAlternation}) ;;
         *) echo "folio-agent-session: unsupported agent" >&2; exit 2 ;;
       esac
+      # No devshell wraps this session, so nothing sets SHELL; Claude Code's Bash
+      # tool would fall back to /bin/bash, which doesn't exist on NixOS. Point it
+      # at the bash on the service PATH so shell tool calls work.
+      export SHELL="${pkgs.bashInteractive}/bin/bash"
       # Pre-accept Claude Code's workspace-trust dialog so a headless companion
       # launch does not stall on it. Trust the stable spool parent (not each
       # ephemeral session dir): claude honors an ancestor's trust, so every
