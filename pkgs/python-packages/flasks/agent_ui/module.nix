@@ -8,26 +8,71 @@ with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.agent_ui;
   globalCfg = config.machines.base;
-  agents = builtins.filter (
-    agent:
-    lib.elem agent [
-      "claude"
-      "codex"
-    ]
-  ) config.machines.features.agents.frameworks;
+  agents = config.machines.features.agents.frameworks;
+  agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
   agentArgs = lib.concatMapStringsSep " " (agent: "--agent ${lib.escapeShellArg agent}") agents;
+
+  # The configured agent CLIs (same llm-agents packages the agent components
+  # install into the user profile) must be on the service PATH: the dedicated
+  # `-L agent-ui` tmux server inherits this service's env, and `agent-ui-enter`
+  # exec's the agent by name inside it. Without this a session dies with
+  # "exec: claude: not found". procps/coreutils/git cover common agent shell-outs.
+  agentPackages = {
+    claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
+    codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
+  };
+  agentSessionPath = [
+    pkgs.tmux
+    pkgs.procps
+    pkgs.coreutils
+    pkgs.gitMinimal
+  ]
+  ++ map (agent: agentPackages.${agent}) agents;
+
+  agentTmuxConf = pkgs.writeText "agent-ui-tmux.conf" ''
+    set -g mouse on
+    set -g history-limit 50000
+    # Smooth one-line scrolling in copy-mode: bind Up/Down to scroll-up/down
+    # (no cursor-first lag), so a finger-drag from the web terminal pages the
+    # scrollback line by line rather than a full screen at a time.
+    bind -T copy-mode    Up   send-keys -X scroll-up
+    bind -T copy-mode    Down send-keys -X scroll-down
+    bind -T copy-mode-vi Up   send-keys -X scroll-up
+    bind -T copy-mode-vi Down send-keys -X scroll-down
+  '';
 
   agentEnter = pkgs.writeShellApplication {
     name = "agent-ui-enter";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
     text = ''
       case "''${AGENT_UI_AGENT:-}" in
-        claude|codex|shell) ;;
+        ${agentAlternation}) ;;
         *) echo "agent-ui-enter: unsupported agent" >&2; exit 2 ;;
       esac
 
       cd "$DEVSHELL_ROOT/sources"
       if [ "$AGENT_UI_AGENT" = shell ]; then
         exec ${pkgs.bashInteractive}/bin/bash -i
+      fi
+      # Pre-accept Claude Code's workspace-trust dialog for this workspace so a
+      # headless agent-ui launch does not stall on it -- its default "No, exit"
+      # would otherwise be selected and kill the session. Idempotent, and locked
+      # so concurrent session launches don't clobber ~/.claude.json.
+      if [ "$AGENT_UI_AGENT" = claude ]; then
+        cfg="$HOME/.claude.json"
+        (
+          flock 9
+          tmp="$(mktemp "$HOME/.claude.json.agentui.XXXXXX")"
+          if [ -f "$cfg" ]; then base="$cfg"; else base="$tmp"; printf '{}' >"$base"; fi
+          if jq --arg d "$PWD" '.projects[$d].hasTrustDialogAccepted = true' "$base" >"$tmp.out"; then
+            mv "$tmp.out" "$cfg"
+          fi
+          rm -f "$tmp" "$tmp.out"
+        ) 9>"$HOME/.claude.json.agentui.lock" || true
       fi
       exec "$AGENT_UI_AGENT"
     '';
@@ -48,7 +93,7 @@ let
       fi
 
       case "$2" in
-        claude|codex|shell) ;;
+        ${agentAlternation}) ;;
         *) echo "agent-ui-session: unsupported agent" >&2; exit 2 ;;
       esac
 
@@ -60,13 +105,29 @@ let
 
   agentAttach = pkgs.writeShellApplication {
     name = "agent-ui-attach";
-    runtimeInputs = [ pkgs.tmux ];
+    runtimeInputs = [
+      pkgs.tmux
+      pkgs.coreutils
+    ];
     text = ''
-      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(claude|codex|shell)--[0-9a-f]{8}$ ]]; then
+      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^agent-ui-[A-Za-z0-9_-]+--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
         echo "agent-ui-attach: invalid session" >&2
         exit 2
       fi
-      exec tmux attach-session -t "$1"
+      # When the session is gone (agent exited), don't exit -- that makes ttyd
+      # silently reconnect-loop. Show a clear notice and hold the pane open so the
+      # message stays until the user closes the tab or navigates away.
+      hold() {
+        printf '\r\n\033[1;33mSession ended.\033[0m Close this tab or return to the Agents list.\r\n'
+        sleep infinity
+      }
+      if ! tmux -L agent-ui has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
+      tmux -L agent-ui attach-session -t "$1" || true
+      if ! tmux -L agent-ui has-session -t "$1" 2>/dev/null; then
+        hold
+      fi
     '';
   };
 
@@ -128,16 +189,20 @@ in
       description = "Workspace Agent Terminal UI";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.tmux ];
+      path = agentSessionPath;
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
+        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --tmux-socket agent-ui --tmux-config ${agentTmuxConf} --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";
         Group = "dev";
         UMask = "0077";
+        # The dedicated `-L agent-ui` tmux server is spawned by the first session
+        # and lives in this unit's cgroup. Kill only the main process on stop so a
+        # restart/redeploy leaves the tmux server (and its sessions) running.
+        KillMode = "process";
       };
     };
 
