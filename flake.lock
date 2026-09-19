@@ -331,16 +331,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1789841108,
+        "lastModified": 1789847276,
         "narHash": "sha256-ChKLxMhqJLEuPGRmycThkLS/+dMgrXOjVqxKD8b7Yk8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "65980c4e68083ff8e70bfa11ab56a64ba02a97d6",
+        "rev": "4932a2826551fad7f53f163ce8a5548c18a7672b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/folio-agent-companion",
         "repo": "flasks",
         "type": "github"
       }
@@ -348,16 +347,15 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1789825748,
+        "lastModified": 1789847314,
         "narHash": "sha256-3LECIVz/ZItlLa7V9JcPdutTq6o7MYEoJudvjvwXjV4=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "c5d332dc25df4a74727b614aa60a1b6c837b02ce",
+        "rev": "313eed6b2f30c72f33a90e879ad507f906d71fc3",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/folio-agent-companion",
         "repo": "folio",
         "type": "github"
       }
