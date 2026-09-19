@@ -145,7 +145,12 @@ in
       isHub = features.folio.role == "hub";
       desktop = features.folio.desktop;
       hubHost = if features.folio.role == "hub" then "" else features.folio.hubHost;
-      agentCompanion = features.folio.enable && features.agents.frameworks != [ ];
+      # The companion reuses Agent UI's secrets file, so it can only run where
+      # Agent UI does. Gate on agentUi too (not just folio + frameworks) so
+      # enabling folio without Agent UI cleanly leaves the companion off instead
+      # of tripping the module's hard assertion.
+      agentCompanion =
+        features.folio.enable && features.agentUi.enable && features.agents.frameworks != [ ];
     };
     users.users.andrew.extraGroups = lib.mkIf features.vikunja.enable [ "vikunja" ];
   };
