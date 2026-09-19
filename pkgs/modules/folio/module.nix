@@ -217,7 +217,14 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.ttyd}/bin/ttyd --port ${toString service-ports.folio.agentTerminal} --interface 127.0.0.1 --writable --url-arg --check-origin --auth-header X-Folio-Agent-Authenticated --base-path /folio/agent/terminal ${folioAgentAttach}/bin/folio-agent-attach";
+        # No --check-origin here (unlike agent-ui on :443): folio runs on a
+        # non-default port, so the browser Origin carries ":6869" while nginx
+        # forwards Host without it, and ttyd would refuse every websocket. The WS
+        # is already protected by the nginx auth_request gate + the SameSite=strict
+        # session cookie (a cross-site WS can't carry the cookie), so the origin
+        # check is redundant here. Forwarding Host with the port ($http_host) is
+        # rejected by gixy as host-spoofing, hence dropping the check instead.
+        ExecStart = "${pkgs.ttyd}/bin/ttyd --port ${toString service-ports.folio.agentTerminal} --interface 127.0.0.1 --writable --url-arg --auth-header X-Folio-Agent-Authenticated --base-path /folio/agent/terminal ${folioAgentAttach}/bin/folio-agent-attach";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";
@@ -283,10 +290,7 @@ in
           extraConfig = ''
             auth_request /folio/agent/auth-check;
             proxy_set_header X-Folio-Agent-Authenticated yes;
-            # $http_host keeps the client's host:port so ttyd's --check-origin
-            # (Origin vs Host) matches on this non-default port; $host drops the
-            # port and makes ttyd refuse the websocket (endless reconnect loop).
-            proxy_set_header Host $http_host;
+            proxy_set_header Host $host;
             proxy_read_timeout 86400;
             proxy_send_timeout 86400;
           '';
