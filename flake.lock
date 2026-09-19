@@ -348,11 +348,11 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1789791946,
-        "narHash": "sha256-NSRKusHmlou/p4AGXx7FKxXj+nZttJbtz2zVHEeYEFc=",
+        "lastModified": 1789792831,
+        "narHash": "sha256-cNzyAJK804ULQsmO62/0umSVTITmPyVXR8xbU3dmTp4=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "31375409e0d1979942aeff100f1d4032b5c267b5",
+        "rev": "cf72afcf52fb13e3277ea3e6707bb48bed32f884",
         "type": "github"
       },
       "original": {
