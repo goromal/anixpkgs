@@ -8,6 +8,7 @@
   beautifulsoup4,
   python-multipart,
   httpx,
+  werkzeug,
   wormhole,
   pkg-src,
 }:
@@ -25,6 +26,7 @@ buildPythonPackage {
     beautifulsoup4
     python-multipart
     httpx
+    werkzeug
     wormhole
   ];
   nativeCheckInputs = [ httpx ];

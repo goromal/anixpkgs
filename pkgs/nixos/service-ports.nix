@@ -27,6 +27,7 @@
   folio = {
     internal = 6868;
     public = 6869;
+    agentTerminal = 6870;
   };
   navidrome = 4533;
   la-quiz-web = 5656;
