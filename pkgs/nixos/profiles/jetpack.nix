@@ -24,6 +24,11 @@ in
     # it as a dependency even though single-GPU services do not use it.
     nixpkgs.config.allowUnsupportedSystem = true;
 
+    # Distributed builds run as root, so the builders must be trusted through
+    # the system host-key file rather than Andrew's user-level known_hosts.
+    programs.ssh.knownHosts."atorgesen-dell.local".publicKey =
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEdoj0khQi8tFw2ZOeGPaPzVJgJZ9f0QOkZYpe8FFYhy";
+
     hardware.nvidia-jetpack.enable = true;
     hardware.nvidia-jetpack.configureCuda = true;
     hardware.graphics.enable = true;
