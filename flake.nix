@@ -290,7 +290,6 @@
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
             modules = commonModules ++ [
-              jetpack-nixos.nixosModules.default
               ./pkgs/nixos/configurations/jetpack-orin-nx.nix
             ];
           };
@@ -303,7 +302,6 @@
             system = "aarch64-linux";
             specialArgs = commonSpecialArgs;
             modules = commonModules ++ [
-              jetpack-nixos.nixosModules.default
               ./pkgs/nixos/configurations/jetpack-orin-agx.nix
             ];
           };

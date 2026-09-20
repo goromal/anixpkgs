@@ -5,10 +5,25 @@
   ...
 }:
 with import ../dependencies.nix;
+let
+  lock = builtins.fromJSON (builtins.readFile ../../../flake.lock);
+  jetpackSrc = builtins.fetchTarball {
+    url = "https://github.com/anduril/jetpack-nixos/archive/${lock.nodes.jetpack-nixos.locked.rev}.tar.gz";
+    sha256 = lock.nodes.jetpack-nixos.locked.narHash;
+  };
+  jetpackModule = import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"));
+in
 {
-  imports = [ ../pc-base.nix ];
+  imports = [
+    jetpackModule
+    ../pc-base.nix
+  ];
 
   config = {
+    # nixpkgs marks NCCL unsupported on pre-Thor Jetsons. PyTorch still carries
+    # it as a dependency even though single-GPU services do not use it.
+    nixpkgs.config.allowUnsupportedSystem = true;
+
     hardware.nvidia-jetpack.enable = true;
     hardware.nvidia-jetpack.configureCuda = true;
     hardware.graphics.enable = true;
