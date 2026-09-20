@@ -9,6 +9,11 @@ let
   cfg = config.machines.base;
   features = config.machines.features;
   remoteBuildersCatalog = import ./remote-builders.nix;
+  glancesPackage = pkgs.glances.overridePythonAttrs (old: {
+    # The suite depends on sandbox CPU/network topology on AArch64: psutil can
+    # fail during collection, and the REST tests race their local API server.
+    doCheck = (old.doCheck or true) && !pkgs.stdenv.hostPlatform.isAarch64;
+  });
   home-manager-nixos-module =
     if args ? hmModule then
       args.hmModule
@@ -581,7 +586,7 @@ in
           unstable.mprocs
           bandwhich
           btop
-          glances
+          glancesPackage
           gping
           dog
           atsudo
