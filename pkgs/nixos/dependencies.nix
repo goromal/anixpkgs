@@ -2,6 +2,17 @@ let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
   anixpkgs-meta = (builtins.readFile ../../ANIX_META);
+  nativeProcessTestsOverlay = _final: prev: {
+    # QEMU user-mode emulation does not preserve posix_spawn's synchronous
+    # ENOENT result. Keep SDL's process tests enabled and run this derivation
+    # natively when an AArch64 machine also has emulated remote builders.
+    sdl3 = prev.sdl3.overrideAttrs (
+      _:
+      prev.lib.optionalAttrs prev.stdenv.hostPlatform.isAarch64 {
+        preferLocalBuild = true;
+      }
+    );
+  };
 in
 rec {
   local-build = false;
@@ -23,7 +34,9 @@ rec {
       }
     else
       (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anixpkgs-version}.tar.gz");
-  anixpkgs = import anixpkgs-src { };
+  anixpkgs = import anixpkgs-src {
+    overlays = [ nativeProcessTestsOverlay ];
+  };
   unstable =
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
       { };
