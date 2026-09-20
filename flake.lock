@@ -146,8 +146,8 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/26.05",
         "repo": "Crow",
-        "rev": "b702453a4dc9442d57aa4e7ca6c25af231d1a314",
         "type": "github"
       }
     },
@@ -783,8 +783,8 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "dev/26.05",
         "repo": "mscpp",
-        "rev": "99c71c0fb736b968db0b72616b681715d1a95c08",
         "type": "github"
       }
     },

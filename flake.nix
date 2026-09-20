@@ -50,7 +50,7 @@
     comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
     comfyui-src.flake = false;
 
-    crowcpp.url = "github:goromal/Crow?rev=b702453a4dc9442d57aa4e7ca6c25af231d1a314";
+    crowcpp.url = "github:goromal/Crow?ref=dev/26.05";
     crowcpp.flake = false;
 
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
@@ -115,7 +115,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp?rev=99c71c0fb736b968db0b72616b681715d1a95c08";
+    mscpp.url = "github:goromal/mscpp?ref=dev/26.05";
     mscpp.flake = false;
 
     msrs.url = "github:goromal/msrs";
