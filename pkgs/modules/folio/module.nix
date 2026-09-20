@@ -217,6 +217,10 @@ in
           "FOLIO_AGENT_TMUX=${pkgs.tmux}/bin/tmux"
           "FOLIO_AGENT_TMUX_CONFIG=${folioTmuxConf}"
           "FOLIO_AGENT_SESSION_CMD=${folioAgentSession}/bin/folio-agent-session"
+          # Lets the backend reverse-proxy /folio/agent/terminal/** to ttyd, so the
+          # Electron desktop (which loads the SPA from the backend, bypassing nginx)
+          # can reach the terminal instead of a 404 (black panel).
+          "FOLIO_AGENT_TERMINAL_ORIGIN=http://127.0.0.1:${toString service-ports.folio.agentTerminal}"
         ];
       };
     };

@@ -9,6 +9,7 @@
   python-multipart,
   httpx,
   werkzeug,
+  websockets,
   wormhole,
   pkg-src,
 }:
@@ -27,6 +28,7 @@ buildPythonPackage {
     python-multipart
     httpx
     werkzeug
+    websockets
     wormhole
   ];
   nativeCheckInputs = [ httpx ];
