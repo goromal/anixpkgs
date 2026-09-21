@@ -435,6 +435,7 @@
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/anix-upgrade-recovery",
         "repo": "flasks",
         "type": "github"
       }

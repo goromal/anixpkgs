@@ -27,6 +27,7 @@ in
     # All supported Orin variants use Ampere compute capability 8.7. Avoid
     # compiling large CUDA packages such as PyTorch for unrelated GPU targets.
     nixpkgs.config.cudaCapabilities = [ "8.7" ];
+    nixpkgs.overlays = [ emulatedAarch64SdlTestsOverlay ];
 
     # Distributed builds run as root, so the builders must be trusted through
     # the system host-key file rather than Andrew's user-level known_hosts.

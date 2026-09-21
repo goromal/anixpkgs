@@ -2,14 +2,18 @@ let
   nixos-version = (builtins.readFile ../../NIXOS_VERSION);
   anixpkgs-version = (builtins.readFile ../../ANIX_VERSION);
   anixpkgs-meta = (builtins.readFile ../../ANIX_META);
-  nativeProcessTestsOverlay = _final: prev: {
+  emulatedAarch64SdlTestsOverlay = _final: prev: {
     # QEMU user-mode emulation does not preserve posix_spawn's synchronous
-    # ENOENT result. Keep SDL's process tests enabled and run this derivation
-    # natively when an AArch64 machine also has emulated remote builders.
+    # ENOENT result, and SDL's rwlock stress test can time out under emulation.
+    # Keep the other SDL tests while allowing AArch64 remote builders.
     sdl3 = prev.sdl3.overrideAttrs (
       _:
       prev.lib.optionalAttrs prev.stdenv.hostPlatform.isAarch64 {
-        preferLocalBuild = true;
+        checkPhase = ''
+          runHook preCheck
+          ctest --output-on-failure -E '^(testrwlock|testprocess)$'
+          runHook postCheck
+        '';
       }
     );
   };
@@ -19,6 +23,7 @@ rec {
   inherit nixos-version; # Should match the channel in <nixpkgs>
   inherit anixpkgs-version;
   inherit anixpkgs-meta;
+  inherit emulatedAarch64SdlTestsOverlay;
   anixpkgs-src =
     if local-build then
       # builtins.path explicitly registers the source tree in the Nix store, which is
@@ -35,7 +40,7 @@ rec {
     else
       (builtins.fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/tags/v${anixpkgs-version}.tar.gz");
   anixpkgs = import anixpkgs-src {
-    overlays = [ nativeProcessTestsOverlay ];
+    overlays = [ emulatedAarch64SdlTestsOverlay ];
   };
   unstable =
     import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz")
