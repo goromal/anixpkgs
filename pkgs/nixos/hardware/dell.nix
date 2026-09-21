@@ -51,6 +51,7 @@
   hardware.enableAllFirmware = true;
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  nixpkgs.config.cudaCapabilities = [ "8.9" ];
 
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
