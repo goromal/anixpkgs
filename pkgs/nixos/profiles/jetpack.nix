@@ -24,6 +24,10 @@ in
     # it as a dependency even though single-GPU services do not use it.
     nixpkgs.config.allowUnsupportedSystem = true;
 
+    # All supported Orin variants use Ampere compute capability 8.7. Avoid
+    # compiling large CUDA packages such as PyTorch for unrelated GPU targets.
+    nixpkgs.config.cudaCapabilities = [ "8.7" ];
+
     # Distributed builds run as root, so the builders must be trusted through
     # the system host-key file rather than Andrew's user-level known_hosts.
     programs.ssh.knownHosts."atorgesen-dell.local".publicKey =

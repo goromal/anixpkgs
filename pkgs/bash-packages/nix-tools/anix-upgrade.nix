@@ -349,6 +349,7 @@ in
       ${printYellow} "No prior anixpkgs tree found; skipping changelog compare."
     fi
     upgrade_complete=1
+    echo "ANIX-UPGRADE_STATUS=SUCCESS"
   ''
 )
 // {
