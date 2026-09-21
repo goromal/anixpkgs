@@ -528,7 +528,12 @@ rec {
       torch = pyPkgs.torch;
       torchsde = pyPkgs.torchsde;
       torchvision = pyPkgs.torchvision;
-      torchaudio = pyPkgs.torchaudio;
+      # The full upstream suite exceeds the memory available on GitHub's
+      # standard runner. Keep the package's import check, but omit pytest for
+      # this unmodified runtime dependency of ComfyUI.
+      torchaudio = pyPkgs.torchaudio.overridePythonAttrs (_: {
+        nativeCheckInputs = [ ];
+      });
       numpy = pyPkgs.numpy;
       einops = pyPkgs.einops;
       transformers = pyPkgs.transformers;
