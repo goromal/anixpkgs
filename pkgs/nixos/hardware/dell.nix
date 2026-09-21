@@ -19,6 +19,10 @@
     "rtsx_pci_sdmmc"
   ];
   boot.initrd.kernelModules = [ ];
+  # NVIDIA's open 595 module does not build against Linux 7.2. Use Nixpkgs'
+  # stable kernel series on this GPU host while the other machines can continue
+  # tracking linuxPackages_latest.
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
