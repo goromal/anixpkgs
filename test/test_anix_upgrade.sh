@@ -157,7 +157,7 @@ printf 'old source\n' > "$standalone_home/sources/anixpkgs/sentinel"
 printf 'v0.0.0\n' > "$standalone_home/.anix-version"
 printf '{}\n' > "$standalone_home/.config/home-manager/home.nix"
 ANIX_UPGRADE_TEST_LOG="$standalone_home/commands.log" \
-  HOME="$standalone_home" PATH="$mock_bin:$PATH" \
+  HOME="$standalone_home" XDG_CONFIG_HOME="$standalone_home/.config" PATH="$mock_bin:$PATH" \
   "$ANIX_UPGRADE_STANDALONE_BIN" --source "$flake_source"
 grep -Fq "NIX_PATH=nixpkgs=/nix/store/mock-nixpkgs" "$standalone_home/commands.log"
 grep -Fq \
@@ -171,7 +171,7 @@ printf 'v0.0.0\n' > "$standalone_restore_home/.anix-version"
 printf '{}\n' > "$standalone_restore_home/.config/home-manager/home.nix"
 if ANIX_UPGRADE_TEST_LOG="$standalone_restore_home/commands.log" \
   ANIX_UPGRADE_FAIL_HOME=1 \
-  HOME="$standalone_restore_home" PATH="$mock_bin:$PATH" \
+  HOME="$standalone_restore_home" XDG_CONFIG_HOME="$standalone_restore_home/.config" PATH="$mock_bin:$PATH" \
   "$ANIX_UPGRADE_STANDALONE_BIN" --source "$flake_source"; then
   echo "failed standalone switch unexpectedly succeeded" >&2
   exit 1
@@ -183,7 +183,7 @@ mkdir -p "$standalone_legacy_home/sources" "$standalone_legacy_home/.config/home
 printf 'v0.0.0\n' > "$standalone_legacy_home/.anix-version"
 printf '{}\n' > "$standalone_legacy_home/.config/home-manager/home.nix"
 ANIX_UPGRADE_TEST_LOG="$standalone_legacy_home/commands.log" \
-  HOME="$standalone_legacy_home" PATH="$mock_bin:$PATH" \
+  HOME="$standalone_legacy_home" XDG_CONFIG_HOME="$standalone_legacy_home/.config" PATH="$mock_bin:$PATH" \
   "$ANIX_UPGRADE_STANDALONE_BIN" --source "$legacy_source"
 grep -Fq \
   "home-manager switch -f $standalone_legacy_home/.config/home-manager/home.nix" \
