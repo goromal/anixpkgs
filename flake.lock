@@ -137,16 +137,15 @@
     "crowcpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1781969066,
+        "lastModified": 1790052744,
         "narHash": "sha256-gMoBewSqT5BLS/LmT3FtN5AIHFugoBCxpIINrB6J618=",
         "owner": "goromal",
         "repo": "Crow",
-        "rev": "b702453a4dc9442d57aa4e7ca6c25af231d1a314",
+        "rev": "968cea6d82854eeb1cabece271d18595afab3673",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/26.05",
         "repo": "Crow",
         "type": "github"
       }
@@ -426,16 +425,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1789965534,
+        "lastModified": 1790052777,
         "narHash": "sha256-fb89ozGJYR7ZmsNfMSuEQsOpwXY9dud6vHM78NLOBQ4=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "158d037d7b499e3e6b6c48c9ff5552d9b627159d",
+        "rev": "939ef6e2bd91e1e81d8610a344b878611b89dcfa",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/anix-upgrade-recovery",
         "repo": "flasks",
         "type": "github"
       }
@@ -775,16 +773,15 @@
     "mscpp": {
       "flake": false,
       "locked": {
-        "lastModified": 1781993739,
+        "lastModified": 1790052694,
         "narHash": "sha256-yNNdvJWaF13jhothVLDyhNA76BhFvT8YO4NBWvdsB7g=",
         "owner": "goromal",
         "repo": "mscpp",
-        "rev": "99c71c0fb736b968db0b72616b681715d1a95c08",
+        "rev": "54c02ba44b6771465724c7768d269d9bfaf096c6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "dev/26.05",
         "repo": "mscpp",
         "type": "github"
       }
