@@ -7,7 +7,7 @@
 let
   service-ports = import ../../nixos/service-ports.nix;
   cfg = config.services.comfyui;
-  extendedPkgs = pkgs.extend (import ../../../overlay.nix);
+  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
   isJetson = config.machines.base.machineType == "jetson";
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
   # Memory-pressure flags (cfg.lowMem). Needed wherever the resident weight set

@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.machines.localLlm;
-  extendedPkgs = pkgs.extend (import ../../../overlay.nix);
+  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
   baseUrl = "http://${cfg.host}:${toString cfg.port}";
 in
 {
