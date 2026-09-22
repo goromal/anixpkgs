@@ -405,7 +405,23 @@ in
       ];
 
       nix.distributedBuilds = cfg.remoteBuilders != [ ];
-      nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+      nix.buildMachines = map (
+        name: builtins.removeAttrs remoteBuildersCatalog.${name} [ "hostPublicKey" ]
+      ) cfg.remoteBuilders;
+
+      # Distributed builds run as root, which does not consult any user's
+      # known_hosts file, so pin every referenced builder system-wide.
+      programs.ssh.knownHosts = lib.listToAttrs (
+        lib.concatMap (
+          name:
+          let
+            builder = remoteBuildersCatalog.${name};
+          in
+          lib.optional (builder.hostPublicKey != null) (
+            lib.nameValuePair builder.hostName { publicKey = builder.hostPublicKey; }
+          )
+        ) cfg.remoteBuilders
+      );
       nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
 
       # Determinate Nix owns /etc/nix/nix.conf and its synthesized netrc. Keep
