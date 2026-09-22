@@ -1,16 +1,13 @@
 final: prev:
-with prev.lib;
 let
-  # Fetched via flake.lock (not flakeInputs) to avoid infinite recursion:
-  # the overlay's attribute names may not depend on `final`.
-  nix-ros-overlay =
-    let
-      lock = builtins.fromJSON (builtins.readFile ./flake.lock);
-    in
-    fetchTarball {
-      url = "https://github.com/lopsided98/nix-ros-overlay/archive/${lock.nodes.nix-ros-overlay.locked.rev}.tar.gz";
-      sha256 = lock.nodes.nix-ros-overlay.locked.narHash;
-    };
+  # nix-ros-overlay is deliberately NOT composed in here. Its overlay patches
+  # base packages (libfyaml among them), and libfyaml reaches chromium through
+  # appstream -> libadwaita -> zenity -> sdl3 -> sdl2-compat -> ffmpeg, so every
+  # machine applying this overlay system-wide loses the binary cache for the
+  # whole GNOME/ffmpeg/chromium chain and compiles chromium from source. ROS
+  # consumers take their packages from `ros-pkgs` in pkgs/nixos/dependencies.nix,
+  # which imports nix-ros-overlay as its own package set on its own pinned
+  # nixpkgs, so the ROS side is unaffected by this.
   flakeInputs =
     let
       flake-compat = import (
@@ -27,10 +24,7 @@ let
       src = final.lib.cleanSource ./.;
     }).defaultNix.inputs;
 in
-(foldr composeExtensions (_: _: { }) [
-  (import "${nix-ros-overlay}/overlay.nix")
-  (import ./pkgs)
-] final prev)
+(import ./pkgs final prev)
 // {
   inherit flakeInputs;
 }
