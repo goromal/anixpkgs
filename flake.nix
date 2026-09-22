@@ -50,7 +50,7 @@
     comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
     comfyui-src.flake = false;
 
-    crowcpp.url = "github:goromal/Crow?ref=dev/26.05";
+    crowcpp.url = "github:goromal/Crow";
     crowcpp.flake = false;
 
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
@@ -65,7 +65,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks?ref=refs/heads/dev/anix-upgrade-recovery";
+    flasks.url = "github:goromal/flasks";
     flasks.flake = false;
 
     folio.url = "github:goromal/folio";
@@ -115,7 +115,7 @@
     mfn.url = "github:goromal/mfn";
     mfn.flake = false;
 
-    mscpp.url = "github:goromal/mscpp?ref=dev/26.05";
+    mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
     msrs.url = "github:goromal/msrs";
