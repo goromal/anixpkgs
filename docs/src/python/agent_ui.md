@@ -32,4 +32,3 @@ options:
   --workspace-command WORKSPACE_COMMAND
   --history HISTORY
 ```
-

@@ -1,4 +1,4 @@
-{
+args@{
   config,
   pkgs,
   lib,
@@ -9,7 +9,16 @@ let
   cfg = config.machines.base;
   features = config.machines.features;
   remoteBuildersCatalog = import ./remote-builders.nix;
-  home-manager = builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz";
+  glancesPackage = pkgs.glances.overridePythonAttrs (old: {
+    # The suite depends on sandbox CPU/network topology on AArch64: psutil can
+    # fail during collection, and the REST tests race their local API server.
+    doCheck = (old.doCheck or true) && !pkgs.stdenv.hostPlatform.isAarch64;
+  });
+  home-manager-nixos-module =
+    if args ? hmModule then
+      args.hmModule
+    else
+      (import "${builtins.fetchTarball "https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz"}/nixos");
   inherit (import ./runtime.nix { inherit config pkgs lib; }) atsudo machine-rcrsync machine-authm;
   anix-init = pkgs.writeShellScriptBin "anix-init" ''
     make-title -c yellow "Setting up rcrsync"
@@ -47,20 +56,17 @@ let
       echo_yellow "Skipping SSH config setup"
     fi
 
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-    sudo nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixos
-    sudo nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-    sudo nix-channel --update
-    echo
     echo
     echo_green "DONE. Note the hardware-config.nix file below:"
     echo
     nixos-generate-config --show-hardware-config
     echo
-    echo_green  "Use the config above as you set up anix-upgrade:"
+    echo_green "Next steps to finish configuring this machine:"
     echo_yellow "  - Use devshell to create a workspace with anixpkgs"
-    echo_yellow "  - Use the config above to define a new configuration in anixpkgs"
-    echo_yellow "  - Symlink /etc/nixos/configuration.nix to $HOME/sources"
+    echo_yellow "  - Copy the hardware config above into anixpkgs/pkgs/nixos/hardware/"
+    echo_yellow "  - Define the machine in pkgs/nixos/configurations/ and set networking.hostName"
+    echo_yellow "  - Add it to flake.nix with scripts/add-machine-to-flake.py (personal/Jetson)"
+    echo_yellow "  - Ensure the flake attribute matches the runtime hostname: $(hostname)"
     echo_yellow "  - Run anix-upgrade"
     echo_yellow "  - Create new secrets and configs entries"
     echo
@@ -73,6 +79,11 @@ in
       type = lib.types.str;
       description = "Home directory for primary user (default: /data/andrew)";
       default = "/data/andrew";
+    };
+    additionalNetrcSources = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "/etc/nix/netrc" ];
+      description = "Mutable netrc files merged with Determinate Nix credentials.";
     };
     nixosState = lib.mkOption {
       type = lib.types.str;
@@ -184,7 +195,7 @@ in
     ./features/notebooks.nix
     ./features/orchestrator.nix
     ./features/game-streaming.nix
-    (import "${home-manager}/nixos")
+    home-manager-nixos-module
     ../modules/agent-common/module.nix
     ../modules/claude-agent/module.nix
     ../modules/codex-agent/module.nix
@@ -227,17 +238,6 @@ in
     ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix
     ../python-packages/flasks/mail/module.nix
-    (
-      let
-        # Pinned to d4f7c8220fa5 (before PR #485 which added pre-switch-checks.nix,
-        # which unconditionally evaluates pkgs.nvidia-jetpack and breaks non-Jetpack builds)
-        jetpackSrc = builtins.fetchTarball {
-          url = "https://github.com/anduril/jetpack-nixos/archive/d4f7c8220fa53abfe0448e76ce04fa5017bccb53.tar.gz";
-          sha256 = "1gcbwxhg6gzs4i8va9w0y6dv05bvdn44j7frzg919agcixrwvysm";
-        };
-      in
-      import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"))
-    )
   ];
 
   config = lib.mkMerge [
@@ -390,11 +390,6 @@ in
         );
       };
 
-      hardware.nvidia-jetpack.enable = (cfg.machineType == "jetson");
-      hardware.graphics = lib.mkIf (cfg.machineType == "jetson") {
-        enable = true;
-      };
-
       # https://github.com/NixOS/nixpkgs/issues/154163
       nixpkgs.overlays = lib.mkIf (cfg.machineType == "pi4") [
         (final: super: {
@@ -410,8 +405,31 @@ in
       ];
 
       nix.distributedBuilds = cfg.remoteBuilders != [ ];
-      nix.buildMachines = map (name: remoteBuildersCatalog.${name}) cfg.remoteBuilders;
+      nix.buildMachines = map (
+        name: builtins.removeAttrs remoteBuildersCatalog.${name} [ "hostPublicKey" ]
+      ) cfg.remoteBuilders;
+
+      # Distributed builds run as root, which does not consult any user's
+      # known_hosts file, so pin every referenced builder system-wide.
+      programs.ssh.knownHosts = lib.listToAttrs (
+        lib.concatMap (
+          name:
+          let
+            builder = remoteBuildersCatalog.${name};
+          in
+          lib.optional (builder.hostPublicKey != null) (
+            lib.nameValuePair builder.hostName { publicKey = builder.hostPublicKey; }
+          )
+        ) cfg.remoteBuilders
+      );
       nix.settings.trusted-users = lib.mkIf cfg.acceptRemoteBuilds [ "andrew" ];
+
+      # Determinate Nix owns /etc/nix/nix.conf and its synthesized netrc. Keep
+      # manually managed cache credentials in mutable files and merge them into
+      # the synthesized netrc instead of letting the migration replace them.
+      environment.etc."determinate/config.json".text = builtins.toJSON {
+        authentication.additionalNetrcSources = cfg.additionalNetrcSources;
+      };
 
       services.xserver.enable = lib.mkIf (cfg.machineType == "x86_linux" && features.desktop.enable) true;
       services.displayManager.gdm.enable = lib.mkIf (
@@ -550,7 +568,6 @@ in
           sd
           clang
           clang-tools
-          neofetch
           onefetch
           man-pages
           black
@@ -585,7 +602,7 @@ in
           unstable.mprocs
           bandwhich
           btop
-          glances
+          glancesPackage
           gping
           dog
           atsudo
@@ -643,7 +660,8 @@ in
       systemd.tmpfiles.rules = [
         "d /.c 0750 andrew dev -"
         "x /.c - - -"
-      ];
+      ]
+      ++ map (path: "f ${path} 0600 root root -") cfg.additionalNetrcSources;
 
       # Allow profiles to override the home directory (installation-base.nix sets
       # the default of /data/andrew for all other user attributes).

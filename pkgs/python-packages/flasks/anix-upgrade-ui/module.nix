@@ -65,6 +65,14 @@ in
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}";
+        # nixos-rebuild may restart this UI while its upgrade child is still
+        # finishing. Leave that child running so the replacement UI can keep
+        # following its persisted PID and log.
+        KillMode = "process";
+        # A memory-heavy compiler child may be selected by the kernel OOM
+        # killer. Let the runner observe the failed command instead of having
+        # systemd stop the entire UI cgroup and lose its exit status.
+        OOMPolicy = "continue";
         Restart = "always";
         RestartSec = 5;
         User = "andrew";

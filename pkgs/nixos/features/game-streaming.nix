@@ -47,7 +47,9 @@ in
       };
     };
     services.udev.extraRules = lib.mkIf enableSunshine ''
-      KERNEL=="uinput", GROUP="input", MODE="0660"
+      # The Sunshine module also assigns uinput to its own group. Keep the
+      # device accessible to users in input regardless of rule ordering.
+      SUBSYSTEM=="misc", KERNEL=="uinput", GROUP:="input", MODE:="0660"
     '';
 
   };

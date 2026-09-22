@@ -49,4 +49,3 @@ options:
                         yesterday
   --dry-run
 ```
-

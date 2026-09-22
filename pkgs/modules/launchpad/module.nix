@@ -7,10 +7,9 @@
 with import ../../nixos/dependencies.nix;
 let
   cfg = config.services.launchpad;
-  # Extend system pkgs (which carries jetpack CUDA config) with the anixpkgs
-  # overlay so withPackages sees both CUDA-enabled stdlib packages and the
-  # custom anixpkgs Python packages (geometry, pysignals, etc.) in one set.
-  extendedPkgs = pkgs.extend (import ../../../overlay.nix);
+  # Keep the system package set, including its CUDA config, when the anixpkgs
+  # overlay is already present. Applying it twice duplicates package patches.
+  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
   pythonEnv = extendedPkgs.python313.withPackages (ps: [ ps.jupyterlab ] ++ (cfg.pythonPackages ps));
 in
 {

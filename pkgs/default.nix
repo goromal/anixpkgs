@@ -74,33 +74,6 @@ let
     jre = minJRE;
   };
 
-  # crates.io returns 403 for requests without a User-Agent header. nixpkgs PR #512735 fixes this
-  # in fetchCargoVendor but was not backported to nixos-25.11. Remove this once the flake.nix
-  # nixpkgs input is updated to a branch/rev that includes that PR (nixos-26.05 or later).
-  patchedRustPlatform = prev.rustPlatform.overrideScope (
-    rFinal: rPrev: {
-      fetchCargoVendor = rPrev.fetchCargoVendor.override {
-        writers = prev.writers // {
-          writePython3Bin =
-            name: args: content:
-            prev.writers.writePython3Bin name args (
-              if name != "fetch-cargo-vendor-util" then
-                content
-              else
-                builtins.replaceStrings
-                  [
-                    "    session = requests.Session()\n    session.mount('http://"
-                  ]
-                  [
-                    "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
-                  ]
-                  content
-            );
-        };
-      };
-    }
-  );
-
   baseModuleArgs = {
     pkgs = final;
     config = final.config;
@@ -508,6 +481,7 @@ rec {
   folio-mcp = final.python313.pkgs.folio-mcp;
   folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
   folio-desktop = final.callPackage ./folio-desktop {
+    electron = final.electron-bin;
     pkg-src = flakeInputs.folio;
     folioPort = service-ports.folio.internal;
   };
@@ -554,7 +528,12 @@ rec {
       torch = pyPkgs.torch;
       torchsde = pyPkgs.torchsde;
       torchvision = pyPkgs.torchvision;
-      torchaudio = pyPkgs.torchaudio;
+      # The full upstream suite exceeds the memory available on GitHub's
+      # standard runner. Keep the package's import check, but omit pytest for
+      # this unmodified runtime dependency of ComfyUI.
+      torchaudio = pyPkgs.torchaudio.overridePythonAttrs (_: {
+        nativeCheckInputs = [ ];
+      });
       numpy = pyPkgs.numpy;
       einops = pyPkgs.einops;
       transformers = pyPkgs.transformers;
@@ -776,7 +755,6 @@ rec {
   manif-geom-rs = addDoc (
     prev.callPackage ./rust-packages/manif-geom-rs {
       pkg-src = flakeInputs.manif-geom-rs;
-      rustPlatform = patchedRustPlatform;
     }
   );
   # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
@@ -790,19 +768,16 @@ rec {
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
-      rustPlatform = patchedRustPlatform;
     }
   );
   sunnyside = addDoc (
     prev.callPackage ./rust-packages/sunnyside {
       pkg-src = flakeInputs.sunnyside;
-      rustPlatform = patchedRustPlatform;
     }
   );
   rtk = addDoc (
     prev.callPackage ./rust-packages/rtk {
       pkg-src = flakeInputs.rtk;
-      rustPlatform = patchedRustPlatform;
     }
   );
 

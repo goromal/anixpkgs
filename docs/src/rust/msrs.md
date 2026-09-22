@@ -11,4 +11,3 @@ machine), a `Transport` plug-in trait with a real-time-configurable driver
 thread, and ingress/egress bridge tasks for wiring transports into a copper
 task graph. Deterministic replay from copper's unified log is exercised
 end-to-end by the bundled echo example.
-

@@ -6,7 +6,7 @@
 }:
 let
   cfg = config.machines.localLlm;
-  extendedPkgs = pkgs.extend (import ../../../overlay.nix);
+  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
   baseUrl = "http://${cfg.host}:${toString cfg.port}";
 in
 {
@@ -70,7 +70,14 @@ in
 
     services.ollama = {
       enable = true;
-      inherit (cfg) acceleration host port;
+      inherit (cfg) host port;
+      package =
+        if cfg.acceleration == null then
+          pkgs.ollama
+        else if cfg.acceleration == false then
+          pkgs.ollama-cpu
+        else
+          pkgs.${"ollama-${cfg.acceleration}"};
       loadModels = [ cfg.model ];
       environmentVariables = {
         OLLAMA_CONTEXT_LENGTH = toString cfg.contextLength;

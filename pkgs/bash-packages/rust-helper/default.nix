@@ -33,6 +33,7 @@ let
     if [[ "$dev" == "1" ]]; then
         ${printGrn} "Entering a Rust development shell from anixpkgs v${anixpkgs-version}..."
         nix-shell ${directShellFile} \
+          --arg pkgs "import <anixpkgs> {}" \
           --argstr shellName "Rust" \
           --arg pkgList "[ ${cargo} ${rustc} ${rustfmt} ]" \
           --arg colorCode 31
