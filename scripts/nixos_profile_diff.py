@@ -13,16 +13,18 @@ import subprocess
 import sys
 from pathlib import Path
 
-KNOWN_CONFIGURATIONS = [
-    "jetpack-orin-nx",
-    "jetpack-orin-agx",
-    "personal-inspiron",
-    "personal-panasonic",
-    "personal-dell",
-    "ats-alderlake",
-    "ats-pi",
-    "drone-obc-sitl",
-]
+# Configuration file stem -> flake attribute in `nixosConfigurations`.
+# Kept in step with scripts/check_machines.sh.
+FLAKE_KEYS = {
+    "jetpack-orin-nx": "jetson-orin-nx",
+    "jetpack-orin-agx": "jetson-orin-agx",
+    "personal-inspiron": "atorgesen-inspiron",
+    "personal-panasonic": "atorgesen-panasonic",
+    "personal-dell": "atorgesen-dell",
+    "ats-alderlake": "ats",
+    "ats-pi": "ats-pi",
+    "drone-obc-sitl": "drone-obc-sitl",
+}
 
 NIX_ENV = {
     **os.environ,
@@ -43,17 +45,27 @@ def patch_local_build(repo_dir: str, enable: bool) -> None:
 
 
 def instantiate(repo_dir: str, config: str) -> str | None:
-    """Return .drv path, 'ERROR', or None if config file absent."""
+    """Return .drv path, 'ERROR', or None if config file absent.
+
+    Evaluated through the checkout's own flake, the way the machines are
+    actually built (see scripts/check_machines.sh). Going through
+    `nix-instantiate <nixpkgs/nixos>` instead would evaluate against whatever
+    nixpkgs the runner's NIX_PATH happens to point at, and without the flake's
+    common modules: no Determinate module, no anixpkgs overlay on the system
+    package set, and no `hmModule` special arg.
+    """
     config_path = Path(repo_dir) / f"pkgs/nixos/configurations/{config}.nix"
     if not config_path.exists():
         return None
+    flake_key = FLAKE_KEYS[config]
+    flake_ref = f"{Path(repo_dir).resolve()}#nixosConfigurations.{flake_key}.config.system.build.toplevel.drvPath"
     result = subprocess.run(
         [
-            "nix-instantiate",
-            "<nixpkgs/nixos>",
-            "-A", "config.system.build.toplevel",
-            "-I", f"nixos-config={config_path}",
-            "--no-gc-warning",
+            "nix", "eval",
+            "--raw",
+            "--impure",
+            "--no-warn-dirty",
+            flake_ref,
         ],
         capture_output=True,
         text=True,
@@ -62,7 +74,11 @@ def instantiate(repo_dir: str, config: str) -> str | None:
     if result.returncode != 0:
         print(f"    {config}: eval failed:\n{result.stderr[-3000:]}", flush=True)
         return "ERROR"
-    return result.stdout.strip().splitlines()[-1]  # last line is the .drv path
+    drv = result.stdout.strip()
+    if not drv:
+        print(f"    {config}: eval produced no derivation path", flush=True)
+        return "ERROR"
+    return drv
 
 
 def closure_names(drv_path: str) -> set[str]:
@@ -102,7 +118,7 @@ def main() -> None:
     try:
         base_configs = {p.stem for p in (Path(base_dir) / "pkgs/nixos/configurations").glob("*.nix")}
         pr_configs   = {p.stem for p in (Path(pr_dir)   / "pkgs/nixos/configurations").glob("*.nix")}
-        all_configs  = sorted((base_configs | pr_configs) & set(KNOWN_CONFIGURATIONS))
+        all_configs  = sorted((base_configs | pr_configs) & set(FLAKE_KEYS))
 
         # (config, status, added_set | None, removed_set | None)
         results = []
