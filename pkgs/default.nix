@@ -428,6 +428,18 @@ rec {
       ''
     );
 
+  # Navidrome migrates its database forward on startup and cannot run against a
+  # schema from a newer release. The DB was migrated by 0.64.0 (nixos-26.05
+  # branch), while the 26.05 tag ships 0.61.2, which fails to scan the now
+  # nullable bpm/bit_depth columns.
+  navidrome =
+    let
+      pkg = flakeInputs.nixpkgs-26-05-branch.legacyPackages.${prev.stdenv.hostPlatform.system}.navidrome;
+    in
+    assert assertMsg (versionAtLeast pkg.version "0.64.0")
+      "navidrome ${pkg.version} would downgrade a database already migrated by 0.64.0";
+    pkg;
+
   php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
 
   python310 = pythonOverridesFor prev.python310;

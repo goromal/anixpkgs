@@ -3,6 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/26.05";
+    # The 26.05 release branch, for packages that must be newer than the 26.05 tag.
+    nixpkgs-26-05-branch.url = "github:NixOS/nixpkgs?ref=refs/heads/nixos-26.05";
 
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.22.4";
 

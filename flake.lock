@@ -874,6 +874,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-26-05-branch": {
+      "locked": {
+        "lastModified": 1790113641,
+        "narHash": "sha256-D2aaQetafdpHxbwA4ldAxs51UX0b11pXL+JL/5L8VrM=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1bc55b9def8165e82073919945c3239903fe4dc2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "refs/heads/nixos-26.05",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-regression": {
       "locked": {
         "lastModified": 1643052045,
@@ -1238,6 +1254,7 @@
         "msrs": "msrs",
         "nix-ros-overlay": "nix-ros-overlay",
         "nixpkgs": "nixpkgs_6",
+        "nixpkgs-26-05-branch": "nixpkgs-26-05-branch",
         "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
