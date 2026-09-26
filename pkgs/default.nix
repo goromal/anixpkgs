@@ -491,8 +491,8 @@ rec {
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
   folio-mcp = final.python313.pkgs.folio-mcp;
-  folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
-  folio-desktop = final.callPackage ./folio-desktop {
+  folio-frontend = final.callPackage ./js-packages/folio-frontend { pkg-src = flakeInputs.folio; };
+  folio-desktop = final.callPackage ./js-packages/folio-desktop {
     electron = final.electron-bin;
     pkg-src = flakeInputs.folio;
     folioPort = service-ports.folio.internal;
