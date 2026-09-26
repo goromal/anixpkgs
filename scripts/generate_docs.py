@@ -28,6 +28,7 @@ langs = [
     ("python", "Python Packages", "Packages written (or bound) in Python."),
     ("bash", "Bash Packages", "Packages written (or glued together) in Bash."),
     ("java", "Java Packages", "(Toy) Packages written in Java."),
+    ("js", "JavaScript Packages", "Packages written (or bundled) in JavaScript."),
 ]
 
 summaryfile = open(os.path.join(ANIXDIR, "docs", "src", "SUMMARY.md"), "w")

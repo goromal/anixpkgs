@@ -121,3 +121,6 @@
   - [evil-hangman](./java/evil-hangman.md)
   - [spelling-corrector](./java/spelling-corrector.md)
   - [simple-image-editor](./java/simple-image-editor.md)
+- [JavaScript Packages](./js/js.md)
+  - [folio-frontend](./js/folio-frontend.md)
+  - [folio-desktop](./js/folio-desktop.md)
