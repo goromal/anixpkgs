@@ -10,7 +10,7 @@ let
 in
 {
   options.services.sunset = {
-    enable = lib.mkEnableOption "enable the sunset Dolphin status/kill web UI";
+    enable = lib.mkEnableOption "enable the sunset emulator status/stop web UI";
     package = lib.mkOption {
       type = lib.types.package;
       description = "The sunset package to use";
@@ -34,14 +34,14 @@ in
         name = "sunset";
         tag = "Utilities";
         path = "/sunset/";
-        description = "Kill the Dolphin emulator";
+        description = "Control game emulators";
         icon = "gamepad";
         faviconSvg = anixpkgs.pkgData.icons.favicons."gamepad".data;
       }
     ];
 
     systemd.services.sunset = {
-      description = "sunset Dolphin status/kill Web UI";
+      description = "sunset emulator status/stop Web UI";
       serviceConfig = {
         Type = "simple";
         ExecStart = "${cfg.package}/bin/sunset --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain}";

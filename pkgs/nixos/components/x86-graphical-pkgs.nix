@@ -43,6 +43,9 @@ in
             "clock-format" = "12h";
             "clock-show-weekday" = true;
           };
+          "org/gnome/desktop/notifications" = {
+            "show-banners" = lib.mkDefault false;
+          };
           "org/gnome/desktop/privacy" = {
             "remember-recent-files" = false;
           };
