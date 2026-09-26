@@ -425,15 +425,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1790052777,
-        "narHash": "sha256-fb89ozGJYR7ZmsNfMSuEQsOpwXY9dud6vHM78NLOBQ4=",
+        "lastModified": 1790395321,
+        "narHash": "sha256-uM3aBRQ5fbR5iBOKZa3r9sj9PK7wg5k0JhoJnx/MOkw=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "939ef6e2bd91e1e81d8610a344b878611b89dcfa",
+        "rev": "89a7985fc081f3cb09e1751ed729161537522b55",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/ps2-streaming",
         "repo": "flasks",
         "type": "github"
       }

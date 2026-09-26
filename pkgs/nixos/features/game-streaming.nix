@@ -22,28 +22,25 @@ in
         # Ensure play and rcrsync are reachable from the sunshine user service,
         # which runs with PATH=null per the NixOS sunshine module design.
         env.PATH = "$(HOME)/.nix-profile/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin";
-        apps = [
-          {
-            name = "Zelda Collector's Edition";
-            cmd = "play zelda";
-          }
-          {
-            name = "Wind Waker";
-            cmd = "play windwaker";
-          }
-          {
-            name = "Twilight Princess";
-            cmd = "play twilight";
-          }
-          {
-            name = "Super Smash Bros. Melee";
-            cmd = "play melee";
-          }
-          {
-            name = "Super Mario Sunshine";
-            cmd = "play sunshine";
-          }
-        ];
+        apps =
+          map
+            (game: {
+              name = game.title;
+              cmd = "play ${game.name}";
+              # Keep the wrapper alive through emulator shutdown and save upload.
+              auto-detach = false;
+              wait-all = true;
+              exit-timeout = 120;
+            })
+            (
+              (import ../../bash-packages/play/games.nix)
+              ++ [
+                {
+                  name = "setup-ps2";
+                  title = "PS2 Setup";
+                }
+              ]
+            );
       };
     };
     services.udev.extraRules = lib.mkIf enableSunshine ''
