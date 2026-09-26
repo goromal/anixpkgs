@@ -26,7 +26,7 @@ let
             name = "claude-code";
             publisher = "anthropic";
             version = claudeCodeVersion;
-            sha256 = "sha256-EcjGwiAMVwojG+KwxjZJouQ4BTVkaggaVXdPXyPJDG8=";
+            sha256 = "sha256-WsLJWSRh3/psoheuIvBy4JiGFYlw92tl1OzPD1MCKYg=";
           }
         ]
       );

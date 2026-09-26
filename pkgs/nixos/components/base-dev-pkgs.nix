@@ -59,6 +59,7 @@ in
       };
       push = {
         default = "current";
+        autoSetupRemote = true;
       };
       pull = {
         default = "current";
