@@ -441,15 +441,16 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1789882529,
-        "narHash": "sha256-cmRfErGWXeUerj6lYosJuMcXCsbWUgcmIhtzJjN0iYo=",
+        "lastModified": 1790456396,
+        "narHash": "sha256-DfmkGuP75HH5xpxLs52PCyx0NcNa0U4lEZfaEQXGY+c=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "56c29d84539bd389ddb317c2ba7e45df7e633d5c",
+        "rev": "ce53e850f77d2daf133806eb7017e590cf7698ad",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/folio-agent-terminal-controls",
         "repo": "folio",
         "type": "github"
       }
