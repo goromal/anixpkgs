@@ -7,18 +7,61 @@
 with import ../../nixos/dependencies.nix;
 let
   cfg = config.machines.base;
-  # Built entirely via JS DOM so element.style overrides any page stylesheet.
-  # No single quotes (nginx wraps replacement in single quotes).
-  homeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href="/";a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src="/icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
-  ownPortHomeButton = ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/";var h=document.createElement("div");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647";var a=document.createElement("a");a.href=b;a.title="Home";a.style.cssText="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;border-radius:50%;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.25)";var i=document.createElement("img");i.src=b+"icons/house.svg";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
-  ownPortHomeButtonVhosts = lib.listToAttrs (
+  themeCss = pkgs.writeText "anix-theme.css" ''
+    :root[data-anix-theme="light"] { color-scheme: light; --anix-bg: #f5f7f9; --anix-surface: #ffffff; --anix-surface-alt: #eef3f7; --anix-text: #17212b; --anix-muted: #5f6b76; --anix-border: #cbd5df; --anix-link: #0069d9; --anix-shadow: rgba(31,48,61,.16); --anix-success-bg: #e7f4e8; --anix-success: #245c2a; --anix-warning-bg: #fff3cd; --anix-warning: #664d03; --anix-danger-bg: #f8d7da; --anix-danger: #842029; }
+    :root[data-anix-theme="dark"] { color-scheme: dark; --anix-bg: #111827; --anix-surface: #1f2937; --anix-surface-alt: #263449; --anix-text: #e5e7eb; --anix-muted: #b6c2d0; --anix-border: #52647b; --anix-link: #7cc0ff; --anix-shadow: rgba(0,0,0,.45); --anix-success-bg: #153b2a; --anix-success: #9be7b4; --anix-warning-bg: #453817; --anix-warning: #ffe08a; --anix-danger-bg: #4a2028; --anix-danger: #ffb4bd; --bs-body-color: var(--anix-text); --bs-body-bg: var(--anix-bg); --bs-secondary-color: var(--anix-muted); --bs-secondary-bg: var(--anix-surface-alt); --bs-tertiary-bg: var(--anix-surface-alt); --bs-emphasis-color: #ffffff; --bs-heading-color: #f1f5f9; --bs-border-color: var(--anix-border); --bs-card-bg: var(--anix-surface); --bs-modal-bg: var(--anix-surface); }
+    :root[data-anix-theme] body { background: var(--anix-bg) !important; color: var(--anix-text) !important; }
+    :root[data-anix-theme] :is(.container,.card,.panel,.section,.service-group,.service-card,.question-card,.detail-card,.compare-card,.fetch-card,.region-card,.setup-panel,.debug-panel,.login-card,.modal-content,.modal-box,.modal,.list-group-item,.workspace,.repo,.add-card,.browser,.entry,.passage,.controls-section,.upload-section,.edit-points-section,.dir-picker,.ref-section,.rankables-config,.stampables-config,.type-tab,.type-section,.controls,.header,.map-container,.feedback,.account,.image-container,.autoplay-bar,#videoSection,.video-info,.file-meta,.realpath-value) { background-color: var(--anix-surface) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; box-shadow: 0 2px 10px var(--anix-shadow); }
+    :root[data-anix-theme] :is(input,textarea,select,.form-control,.form-select,.blank-input,.sa-textarea,.ws-input,.stamp-search) { background-color: var(--anix-surface-alt) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme] :is(table,thead,tbody,tr,th,td,.table,.ref-table,.dir-list,.rank-list,.stamp-list,.watch-list,.q-list) { background-color: var(--anix-surface) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme] :is(pre,code,.log-box,.prog-out,.orch-restart-log,.rank-txt,.terminal) { background-color: var(--anix-surface-alt) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme="dark"] form { background-color: var(--anix-surface) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme] :is(.text-muted,.muted,.description,.subtitle,.hint,.meta,.help,.realpath-label,.upload-hint,.loading-message,.dir-list-empty,.empty,.no-regions) { color: var(--anix-muted) !important; }
+    :root[data-anix-theme] a:not(.btn):not(.button):not(.service-card) { color: var(--anix-link); }
+    :root[data-anix-theme] hr { border-color: var(--anix-border); }
+    :root[data-anix-theme="dark"] :is(.bg-light,.bg-white) { background-color: var(--anix-surface-alt) !important; color: var(--anix-text) !important; }
+    :root[data-anix-theme="dark"] :is(h1,h2,h3,h4,h5,h6,label,legend,summary,.form-label,.question-text,.detail-question,.detail-row,.score-label,.chunk-shown,.ctrl-info,.ref,.context,.verse-num,.sort-link,.csv-group-header,.realpath-label,.modal-header,.modal-body,.dir-picker-path,.dir-btn,.edit-point-row,.txt-name,.progress-label,.city-prompt,.score,.region-title,.video-title,#videoTitle) { color: var(--anix-text) !important; }
+    :root[data-anix-theme="dark"] :is(.question-num,.sub,.count,.opt,.kw-empty,.status-pending,.file-size,.video-meta,.duration,.crop-info,.edit-point-time,.cal-header,.csv-desc,.modal-close,figcaption,#crop-label,#fit-note,#fit-result,#modal-path,#csv-save-status) { color: var(--anix-muted) !important; }
+    :root[data-anix-theme="dark"] :is(.dir-picker-header,.dir-picker-actions,.option-label:hover,.arch-item:hover,.stamp-list a:hover,.browser .entry:hover,#modal-list li:hover,.debug-info,.add-city-form,.job-detail-box,.progress-track,.progress,.tab,.cal-cell,.crop-info,.flash,#status,#csv-add-btn) { background-color: var(--anix-surface-alt) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme="dark"] :is(.verse.christ-ref,.detail-correct,.status-success,.status-downloading,.status-complete,.notice:not(.error),td.ok,#status.running) { background-color: var(--anix-success-bg) !important; color: var(--anix-success) !important; border-color: var(--anix-success) !important; }
+    :root[data-anix-theme="dark"] :is(.detail-partial,.error-message,.status-warning,.status-paused,.banner,#csv-dirty-banner) { background-color: var(--anix-warning-bg) !important; color: var(--anix-warning) !important; border-color: var(--anix-warning) !important; }
+    :root[data-anix-theme="dark"] :is(.detail-wrong,.status-error,.status-interrupted,.notice.error,td.error,.flash-error,#status.stopped) { background-color: var(--anix-danger-bg) !important; color: var(--anix-danger) !important; border-color: var(--anix-danger) !important; }
+    :root[data-anix-theme="dark"] :is(.status-badge,.status-metadata,.status-queued,.status-cancelled) { background-color: var(--anix-surface-alt) !important; color: var(--anix-muted) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme="dark"] :is(.ok,.status-done) { color: var(--anix-success) !important; }
+    :root[data-anix-theme="dark"] .error { color: var(--anix-danger) !important; }
+    :root[data-anix-theme="dark"] :is(.badge-rote,.badge-multiple_choice,.badge-short_answer,.score-high,.score-mid,.score-low,.tag-chip,.tag) { background-color: var(--anix-surface-alt) !important; color: var(--anix-text) !important; border-color: var(--anix-border) !important; }
+    :root[data-anix-theme="dark"] :is(.btn-secondary,.secondary,.skip) { background-color: #3b4a5e !important; color: #f1f5f9 !important; border-color: #64748b !important; }
+    :root[data-anix-theme="dark"] #loading-overlay { background: rgba(17,24,39,.9) !important; }
+    :root[data-anix-theme="dark"] .title-icon { filter: brightness(0) invert(1); }
+    :root[data-anix-theme="dark"] :is([style*="color:#333"],[style*="color: #333"],[style*="color:#444"],[style*="color: #444"],[style*="color:#555"],[style*="color: #555"],[style*="color:#666"],[style*="color: #666"],[style*="color:#777"],[style*="color: #777"],[style*="color:#888"],[style*="color: #888"],[style*="color:#aaa"],[style*="color: #aaa"],[style*="color:#1a3a5c"],[style*="color: #1a3a5c"],[style*="color:#2c3e50"],[style*="color: #2c3e50"]) { color: var(--anix-muted) !important; }
+  '';
+  # No single quotes: nginx wraps each sub_filter replacement in single quotes.
+  themeHead = lib.replaceStrings [ "\n" ] [ " " ] ''
+    <link rel="stylesheet" href="/anix-theme.css">
+    <script>(function(){var c=document.cookie.split("; ");var m=c.find(function(v){return v.indexOf("anix-theme=")===0;});var t=m?m.slice(11):null;try{t=t||localStorage.getItem("anix-theme");}catch(e){}if(t!=="light"&&t!=="dark"){t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}document.documentElement.dataset.anixTheme=t;document.documentElement.setAttribute("data-bs-theme",t);})();</script></head>
+  '';
+  themeCssLocation = {
+    alias = themeCss;
+    extraConfig = ''
+      default_type text/css;
+      add_header Cache-Control "no-cache";
+    '';
+  };
+  pageControls =
+    homeBase:
+    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:10px";var s="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;color:white;border:0;border-radius:50%;font:22px/1 sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer";var t=document.createElement("button");t.type="button";t.style.cssText=s;function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.style.cssText=s;var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(t);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  pageControlsMain = pageControls ''"/"'';
+  pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'';
+  ownPortPageControlVhosts = lib.listToAttrs (
     map (s: {
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
-        sub_filter </body> '${ownPortHomeButton}';
+        sub_filter </head> '${themeHead}';
+        sub_filter </body> '${pageControlsOwnPort}';
         sub_filter_once on;
         proxy_set_header Accept-Encoding "";
       '';
+      value.locations."= /anix-theme.css" = themeCssLocation;
     }) (lib.filter (s: s.port != null) cfg.webServices)
   );
 in
@@ -36,10 +79,11 @@ in
           sslCertificateKey = "${cfg.homeDir}/secrets/vpn/key.pem";
           sslCertificate = "${cfg.homeDir}/secrets/vpn/chain.pem";
           # Server-level fallback: covers locations without their own sub_filter
-          # (e.g. wiki's ~ \.php$ FastCGI location). The homeButtonLocations entries
+          # (e.g. wiki's ~ \.php$ FastCGI location). The pageControlLocations entries
           # define their own sub_filter, which takes precedence per nginx inheritance rules.
           extraConfig = ''
-            sub_filter </body> '${homeButton}';
+            sub_filter </head> '${themeHead}';
+            sub_filter </body> '${pageControlsMain}';
             sub_filter_once on;
           '';
           listen = [
@@ -184,18 +228,20 @@ in
                   )
                 ) cfg.webServices
               );
-              # homeButton defined in the outer let; accessible here via lexical scoping.
+              # Shared theme and controls are defined in the outer let.
               # extraConfig is types.lines so this concatenates with each service's existing config.
-              homeButtonLocations = lib.listToAttrs (
+              pageControlLocations = lib.listToAttrs (
                 lib.concatMap (
                   s:
                   lib.optional (s.path != "#") {
                     name = s.path;
                     value.extraConfig = ''
-                      ${lib.optionalString (s.faviconSvg != null) ''
-                        sub_filter </head> '<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg"></head>';
-                      ''}
-                      sub_filter </body> '${homeButton}';
+                      sub_filter </head> '${
+                        lib.optionalString (
+                          s.faviconSvg != null
+                        ) ''<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg">''
+                      }${themeHead}';
+                      sub_filter </body> '${pageControlsMain}';
                       sub_filter_once on;
                       proxy_set_header Accept-Encoding "";
                     '';
@@ -215,11 +261,14 @@ in
             }
             // iconsLocation
             // rootFaviconLocation
+            // {
+              "= /anix-theme.css" = themeCssLocation;
+            }
             // faviconLocations
-            // homeButtonLocations;
+            // pageControlLocations;
         };
       }
-      // ownPortHomeButtonVhosts;
+      // ownPortPageControlVhosts;
     };
   };
 }
