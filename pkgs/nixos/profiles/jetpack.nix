@@ -30,7 +30,9 @@ in
     nixpkgs.overlays = [ emulatedAarch64SdlTestsOverlay ];
 
     hardware.nvidia-jetpack.enable = true;
-    hardware.nvidia-jetpack.configureCuda = true;
+    # configureCuda would turn on cudaSupport for the whole system package set.
+    # Keep it CPU-only; GPU workloads use machines.cudaNode.pkgs instead.
+    hardware.nvidia-jetpack.configureCuda = false;
     hardware.graphics.enable = true;
 
     machines.base = {
