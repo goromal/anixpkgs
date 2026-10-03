@@ -1,0 +1,39 @@
+name: "Closure Diff Bot Setup"
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  comment-pr:
+    name: Generate Closure Diff Comment
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check for Existing Comment
+        id: check_comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check if there's already a closure-diff bot comment on this PR
+          EXISTING_COMMENT=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments \
+          --jq '.[] | select(.body | startswith("## NixOS Closure Diff"))')
+          if [[ -z "$EXISTING_COMMENT" ]]; then
+            echo "no_comment=true" >> $GITHUB_ENV
+          else
+            echo "no_comment=false" >> $GITHUB_ENV
+          fi
+      - name: Post Closure Diff Form
+        if: env.no_comment == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -s \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "body": "## NixOS Closure Diff\n\nCheck the box to compute the NixOS profile closure diff for this PR against its merge-base with master.\n\n- [ ] Run NixOS closure diff"
+            }' \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
