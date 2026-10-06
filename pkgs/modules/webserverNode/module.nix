@@ -43,7 +43,8 @@ let
       '';
       value.locations = {
         "= /anix-page-controls.css" = pageControlsCssLocation;
-      } // lib.optionalAttrs (s.name != "folio") { "= /anix-theme.css" = themeCssLocation; };
+      }
+      // lib.optionalAttrs (s.name != "folio") { "= /anix-theme.css" = themeCssLocation; };
     }) (lib.filter (s: s.port != null) cfg.webServices)
   );
 in
