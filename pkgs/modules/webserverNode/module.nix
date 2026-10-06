@@ -61,19 +61,21 @@ let
   };
   pageControls =
     homeBase:
-    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:10px";var s="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;color:white;border:0;border-radius:50%;font:22px/1 sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer";var t=document.createElement("button");t.type="button";t.style.cssText=s;function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.style.cssText=s;var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(t);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
-  pageControlsMain = pageControls ''"/"'';
-  pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'';
+    showThemeToggle:
+    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:10px";var s="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;color:white;border:0;border-radius:50%;font:22px/1 sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer";${lib.optionalString showThemeToggle ''var t=document.createElement("button");t.type="button";t.style.cssText=s;function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();h.appendChild(t);''}var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.style.cssText=s;var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+  pageControlsMain = pageControls ''"/"'' true;
+  pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' true;
+  pageControlsOwnPortHomeOnly = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' false;
   ownPortPageControlVhosts = lib.listToAttrs (
     map (s: {
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
-        sub_filter </head> '${themeHead}';
-        sub_filter </body> '${pageControlsOwnPort}';
+        ${lib.optionalString (s.name != "folio") "sub_filter </head> '${themeHead}';"}
+        sub_filter </body> '${if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort}';
         sub_filter_once on;
         proxy_set_header Accept-Encoding "";
       '';
-      value.locations."= /anix-theme.css" = themeCssLocation;
+      value.locations = lib.optionalAttrs (s.name != "folio") { "= /anix-theme.css" = themeCssLocation; };
     }) (lib.filter (s: s.port != null) cfg.webServices)
   );
 in
