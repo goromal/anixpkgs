@@ -49,6 +49,11 @@ in
       enable = features.upgradeUi.enable;
     };
 
+    services.nexus-ui = {
+      advertise = features.nexus.enable;
+      enable = features.nexus.enable && features.nexus.role == "hub";
+    };
+
     services.agent_ui.enable = features.agentUi.enable;
 
     services.rankserver = {

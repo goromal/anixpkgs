@@ -36,6 +36,7 @@
   launchpad = 8888;
   comfyui = 8188;
   anix_upgrade_ui = 5858;
+  nexus_ui = 6969;
   agent_ui = {
     web = 6767;
     terminal = 6768;

@@ -70,6 +70,14 @@ in
             description = "Additional packages on the orchestrator's PATH.";
           };
         };
+        nexus.role = mkOption {
+          type = types.enum [
+            "hub"
+            "spoke"
+          ];
+          default = "spoke";
+          description = "A spoke advertises itself over mDNS; a hub also runs the Nexus UI.";
+        };
         folio = {
           role = mkOption {
             type = types.enum [
