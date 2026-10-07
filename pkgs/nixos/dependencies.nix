@@ -16,14 +16,20 @@ let
         '';
       }
     );
-    # Under QEMU the ffmpeg children run as qemu-aarch64, so imageio's
-    # process-termination test can't find them by name ("assert 0 == 2").
+    # Python tests that only fail under QEMU:
+    # - imageio: the ffmpeg children run as qemu-aarch64, so the
+    #   process-termination test can't find them by name ("assert 0 == 2").
+    # - cvxpy: emulated SCIPY hits its tiny time limit before finding any
+    #   feasible point, so the solve errors instead of reporting the limit.
     pythonPackagesExtensions =
       prev.pythonPackagesExtensions
       ++ prev.lib.optionals prev.stdenv.hostPlatform.isAarch64 [
         (_pyFinal: pyPrev: {
           imageio = pyPrev.imageio.overridePythonAttrs (old: {
             disabledTests = (old.disabledTests or [ ]) ++ [ "test_process_termination" ];
+          });
+          cvxpy = pyPrev.cvxpy.overridePythonAttrs (old: {
+            disabledTests = (old.disabledTests or [ ]) ++ [ "test_scipy_mi_time_limit_reached" ];
           });
         })
       ];
