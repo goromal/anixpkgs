@@ -8,6 +8,12 @@ let
   service-ports = import ../../nixos/service-ports.nix;
   cfg = config.services.comfyui;
   extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
+  # ComfyUI itself needs CUDA torch; cozy and the rest stay on the system set.
+  gpuPkgs =
+    let
+      base = config.machines.cudaNode.pkgs;
+    in
+    if base ? anix-llm then base else base.extend (import ../../../overlay.nix);
   isJetson = config.machines.base.machineType == "jetson";
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
   # Memory-pressure flags (cfg.lowMem). Needed wherever the resident weight set
@@ -41,7 +47,7 @@ in
     };
     package = lib.mkOption {
       type = lib.types.package;
-      default = extendedPkgs.comfyui;
+      default = gpuPkgs.comfyui;
     };
     vramMode = lib.mkOption {
       type = lib.types.enum [
