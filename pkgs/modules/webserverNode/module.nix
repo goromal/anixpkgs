@@ -35,7 +35,9 @@ let
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
         sub_filter </head> '${if s.name == "folio" then pageControlsHead else themeHead}';
-        sub_filter </body> '${(if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort) s.homeButton}';
+        sub_filter </body> '${
+          (if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort) s.homeButton
+        }';
         sub_filter_once on;
         proxy_set_header Accept-Encoding "";
       '';
