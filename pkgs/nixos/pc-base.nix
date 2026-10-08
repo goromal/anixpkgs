@@ -143,6 +143,11 @@ in
               description = "Path to SVG file served and linked at {path}favicon.svg; null disables";
               default = null;
             };
+            homeButton = lib.mkOption {
+              type = lib.types.bool;
+              description = "Inject the floating Home button into this service's pages";
+              default = true;
+            };
           };
         }
       );

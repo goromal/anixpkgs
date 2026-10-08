@@ -68,6 +68,8 @@ in
           description = "LAN machine hub and bulk upgrades";
           icon = "network-wired";
           faviconSvg = anixpkgs.pkgData.icons.favicons."network-wired".data;
+          # Nexus is the hub; a Home button back to one machine's page is confusing.
+          homeButton = false;
         }
       ];
 
