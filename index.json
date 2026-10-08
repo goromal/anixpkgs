@@ -301,6 +301,11 @@
                 "docs": true
             },
             {
+                "attr": "nexus_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "agent_ui",
                 "ci": true,
                 "docs": true

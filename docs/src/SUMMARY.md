@@ -50,6 +50,7 @@
   - [la_quiz_web](./python/la_quiz_web.md)
   - [disciple](./python/disciple.md)
   - [anix_upgrade_ui](./python/anix_upgrade_ui.md)
+  - [nexus_ui](./python/nexus_ui.md)
   - [agent_ui](./python/agent_ui.md)
   - [tasks_ui](./python/tasks_ui.md)
   - [sunset](./python/sunset.md)

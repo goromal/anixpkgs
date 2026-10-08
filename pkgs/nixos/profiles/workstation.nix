@@ -37,6 +37,7 @@
       homeVpn.enable = false;
       agentUi.enable = false;
       upgradeUi.enable = false;
+      nexus.enable = false;
       fileServers.enable = false;
       metrics.enable = false;
       notesWiki.enable = false;

@@ -7,9 +7,12 @@
 with import ../../nixos/dependencies.nix;
 let
   cfg = config.services.launchpad;
-  # Keep the system package set, including its CUDA config, when the anixpkgs
-  # overlay is already present. Applying it twice duplicates package patches.
-  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
+  # On CUDA machines draw the notebook environment from the CUDA-enabled package
+  # set so torch, opencv, etc. are GPU-accelerated. Skip re-applying the anixpkgs
+  # overlay when it is already present; applying it twice duplicates patches.
+  basePkgs = config.machines.cudaNode.pkgs;
+  extendedPkgs =
+    if basePkgs ? anix-llm then basePkgs else basePkgs.extend (import ../../../overlay.nix);
   pythonEnv = extendedPkgs.python313.withPackages (ps: [ ps.jupyterlab ] ++ (cfg.pythonPackages ps));
 in
 {

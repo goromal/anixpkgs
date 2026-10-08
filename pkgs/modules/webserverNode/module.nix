@@ -25,8 +25,8 @@ let
   '';
   pageControlsHead = ''<link rel="stylesheet" href="/anix-page-controls.css"></head>'';
   pageControls =
-    homeBase: showThemeToggle:
-    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.className="anix-page-controls";${lib.optionalString showThemeToggle ''var t=document.createElement("button");t.type="button";t.className="anix-page-control";function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();h.appendChild(t);''}var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.className="anix-page-control";var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";a.appendChild(i);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+    homeBase: showThemeToggle: showHome:
+    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.className="anix-page-controls";${lib.optionalString showThemeToggle ''var t=document.createElement("button");t.type="button";t.className="anix-page-control";function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();h.appendChild(t);''}${lib.optionalString showHome ''var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.className="anix-page-control";var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";a.appendChild(i);h.appendChild(a);''}document.body.appendChild(h);})();</script></body>'';
   pageControlsMain = pageControls ''"/"'' true;
   pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' true;
   pageControlsOwnPortHomeOnly = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' false;
@@ -35,9 +35,7 @@ let
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
         sub_filter </head> '${if s.name == "folio" then pageControlsHead else themeHead}';
-        sub_filter </body> '${
-          if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort
-        }';
+        sub_filter </body> '${(if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort) s.homeButton}';
         sub_filter_once on;
         proxy_set_header Accept-Encoding "";
       '';
@@ -66,7 +64,7 @@ in
           # define their own sub_filter, which takes precedence per nginx inheritance rules.
           extraConfig = ''
             sub_filter </head> '${themeHead}';
-            sub_filter </body> '${pageControlsMain}';
+            sub_filter </body> '${pageControlsMain true}';
             sub_filter_once on;
           '';
           listen = [
@@ -112,6 +110,9 @@ in
                   </ul>
                 </section>
               '') tags;
+              nexusLink =
+                lib.optionalString (cfg.nexusUrl != null)
+                  ''<a href="${cfg.nexusUrl}" class="nexus-link" title="All LAN machines"><img src="/icons/network-wired.svg" class="service-icon" alt="">Nexus</a>'';
               # Build one directory containing index.html and per-service favicon.svg files
               staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
                 ''
@@ -128,7 +129,10 @@ in
                   </head>
                   <body>
                     <div class="container">
-                      <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
+                      <div class="title-row">
+                        <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
+                        ${nexusLink}
+                      </div>
                   ${serviceGroups}
                     </div>
                   </body>
@@ -150,7 +154,10 @@ in
                   # Copy root-page icon SVGs from anixdata (deduped by icon name)
                   (
                     let
-                      iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                      iconNames = lib.unique (
+                        lib.filter (n: n != "") (map (s: s.icon) services)
+                        ++ lib.optional (cfg.nexusUrl != null) "network-wired"
+                      );
                       fa6 = anixpkgs.pkgData.icons.fa6-solid;
                     in
                     "mkdir -p $out/icons\n"
@@ -203,7 +210,7 @@ in
                           s.faviconSvg != null
                         ) ''<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg">''
                       }${themeHead}';
-                      sub_filter </body> '${pageControlsMain}';
+                      sub_filter </body> '${pageControlsMain s.homeButton}';
                       sub_filter_once on;
                       proxy_set_header Accept-Encoding "";
                     '';

@@ -49,6 +49,12 @@ in
       enable = features.upgradeUi.enable;
     };
 
+    services.nexus-ui = {
+      advertise = features.nexus.enable;
+      enable = features.nexus.enable && features.nexus.role == "hub";
+      inherit (features.nexus) hubHost;
+    };
+
     services.agent_ui.enable = features.agentUi.enable;
 
     services.rankserver = {

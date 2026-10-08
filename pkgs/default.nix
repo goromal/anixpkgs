@@ -129,7 +129,6 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
-              opencv4 = pySuper.opencv4.override { enableCuda = false; };
               # aarch64 (Jetson): nixpkgs' from-source kornia-rs is
               # badPlatforms=aarch64-linux (rustc SIGSEGV); use the prebuilt
               # wheel so kornia (and thus comfyui) builds. See
@@ -327,6 +326,9 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              nexus_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/nexus { pkg-src = flakeInputs.flasks; }
+              );
               agent_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/agent_ui {
                   pkg-src = flakeInputs.flasks;
@@ -486,6 +488,7 @@ rec {
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  nexus_ui = final.python313.pkgs.nexus_ui;
   agent_ui = final.python313.pkgs.agent_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
@@ -520,7 +523,6 @@ rec {
   gmail-mcp = final.python313.pkgs.gmail-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
-  onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
   segment-anything = final.python313.pkgs.segment-anything;
   comfy-kitchen = final.python313.pkgs.comfy-kitchen;
   comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
@@ -536,7 +538,20 @@ rec {
   comfyui-embedded-docs = final.python313.pkgs.comfyui-embedded-docs;
   comfyui =
     let
-      py = final.python313;
+      # ComfyUI only needs CUDA for torch. Keep its opencv (and onnxruntime, via
+      # ultralytics) CPU-only so a CUDA package set doesn't rebuild them with
+      # CUDA. Scoped here so other consumers, e.g. launchpad, still get CUDA.
+      py = final.python313.override (old: {
+        self = py;
+        packageOverrides = composeExtensions (old.packageOverrides or (_: _: { })) (
+          pySelf: pySuper: {
+            opencv4 = pySuper.opencv4.override { enableCuda = false; };
+            onnxruntime = pySuper.onnxruntime.override (oldOrt: {
+              onnxruntime = oldOrt.onnxruntime.override { cudaSupport = false; };
+            });
+          }
+        );
+      });
       pyPkgs = py.pkgs;
     in
     prev.callPackage ./python-packages/comfyui {
