@@ -19,16 +19,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1791417344,
+        "lastModified": 1791423038,
         "narHash": "sha256-Q6BuLGe69ctrADjPZil7ep+nvcCySQZULqY4dgca3vA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "4154a3973d2b6e11d83177f31d80f624f3d6b664",
+        "rev": "dae9e9f523bd23593acb085344a6e5f850de0866",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/nexus-ui",
         "repo": "anixdata",
         "type": "github"
       }
@@ -426,16 +425,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791421252,
+        "lastModified": 1791423004,
         "narHash": "sha256-Qwaho66iKnTTLMnpwjerinJGdjA5MtXKp0zJh44oiHc=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "8d1c982da99c34556ef3590826d2dcb222309590",
+        "rev": "4d209326ea488d746abde7763556b3442ece6d8e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/nexus-ui",
         "repo": "flasks",
         "type": "github"
       }
