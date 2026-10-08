@@ -19,16 +19,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1791426827,
+        "lastModified": 1791464852,
         "narHash": "sha256-811C8DFRcxwVznkM+4UaeSVcuVdl9TeAzvDWqwdtTV8=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "7e3c38715ea7937f8342447323c5d3bd20fb907c",
+        "rev": "b052c041885180184be4e1f1e6e1d3ee24f35eae",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/shared-theme-palette-contrast",
         "repo": "anixdata",
         "type": "github"
       }
