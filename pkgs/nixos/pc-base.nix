@@ -149,6 +149,11 @@ in
       description = "List of web services to display on landing page";
       default = [ ];
     };
+    nexusUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Nexus hub URL linked from the landing page; null hides the link.";
+    };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
       description = "Network interface name for the WiFi.";

@@ -29,12 +29,20 @@ in
       description = "Subdomain path for reverse proxy";
       default = "/nexus";
     };
+    hubHost = lib.mkOption {
+      type = lib.types.str;
+      description = "Hub hostname that an advertising machine's landing page links to";
+      default = "ats.local";
+    };
   };
 
   config = lib.mkMerge [
     (lib.mkIf cfg.advertise {
       # The advertised home page is this machine's landing page.
       machines.base.runWebServer = true;
+      # The hub links to its own Nexus relatively so it works however it is reached.
+      machines.base.nexusUrl =
+        if cfg.enable then "${cfg.subdomain}/" else "http://${cfg.hubHost}${cfg.subdomain}/";
       services.avahi.publish.userServices = true;
       services.avahi.extraServiceFiles.anix-nexus = ''
         <?xml version="1.0" standalone="no"?>
