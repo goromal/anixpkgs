@@ -143,11 +143,21 @@ in
               description = "Path to SVG file served and linked at {path}favicon.svg; null disables";
               default = null;
             };
+            homeButton = lib.mkOption {
+              type = lib.types.bool;
+              description = "Inject the floating Home button into this service's pages";
+              default = true;
+            };
           };
         }
       );
       description = "List of web services to display on landing page";
       default = [ ];
+    };
+    nexusUrl = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Nexus hub URL linked from the landing page; null hides the link.";
     };
     wifiInterfaceName = lib.mkOption {
       type = lib.types.str;
@@ -228,6 +238,7 @@ in
     ../python-packages/flasks/stampserver/module.nix
     ../python-packages/flasks/la-quiz-web/module.nix
     ../python-packages/flasks/anix-upgrade-ui/module.nix
+    ../python-packages/flasks/nexus/module.nix
     ../python-packages/flasks/agent_ui/module.nix
     ../python-packages/flasks/sunset/module.nix
     ../python-packages/flasks/tester/module.nix

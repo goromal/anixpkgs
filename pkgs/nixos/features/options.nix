@@ -70,6 +70,21 @@ in
             description = "Additional packages on the orchestrator's PATH.";
           };
         };
+        nexus = {
+          role = mkOption {
+            type = types.enum [
+              "hub"
+              "spoke"
+            ];
+            default = "spoke";
+            description = "A spoke advertises itself over mDNS; a hub also runs the Nexus UI.";
+          };
+          hubHost = mkOption {
+            type = types.str;
+            default = "ats.local";
+            description = "Hub hostname linked from a spoke's landing page.";
+          };
+        };
         folio = {
           role = mkOption {
             type = types.enum [

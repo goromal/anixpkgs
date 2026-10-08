@@ -47,9 +47,11 @@ let
       add_header Cache-Control "no-cache";
     '';
   };
+  # showHome = false drops the Home button (for pages, like Nexus, that are
+  # themselves a hub); the theme toggle is always shown.
   pageControls =
-    homeBase:
-    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:10px";var s="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;color:white;border:0;border-radius:50%;font:22px/1 sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer";var t=document.createElement("button");t.type="button";t.style.cssText=s;function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.style.cssText=s;var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(t);h.appendChild(a);document.body.appendChild(h);})();</script></body>'';
+    homeBase: showHome:
+    ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.style.cssText="all:initial;position:fixed;bottom:20px;right:20px;z-index:2147483647;display:flex;gap:10px";var s="display:flex;align-items:center;justify-content:center;width:44px;height:44px;background:#007bff;color:white;border:0;border-radius:50%;font:22px/1 sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer";var t=document.createElement("button");t.type="button";t.style.cssText=s;function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();h.appendChild(t);${lib.optionalString showHome ''var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.style.cssText=s;var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";i.style.cssText="width:20px;height:20px;display:block;filter:invert(1)";a.appendChild(i);h.appendChild(a);''}document.body.appendChild(h);})();</script></body>'';
   pageControlsMain = pageControls ''"/"'';
   pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'';
   ownPortPageControlVhosts = lib.listToAttrs (
@@ -57,7 +59,7 @@ let
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
         sub_filter </head> '${themeHead}';
-        sub_filter </body> '${pageControlsOwnPort}';
+        sub_filter </body> '${pageControlsOwnPort s.homeButton}';
         sub_filter_once on;
         proxy_set_header Accept-Encoding "";
       '';
@@ -83,7 +85,7 @@ in
           # define their own sub_filter, which takes precedence per nginx inheritance rules.
           extraConfig = ''
             sub_filter </head> '${themeHead}';
-            sub_filter </body> '${pageControlsMain}';
+            sub_filter </body> '${pageControlsMain true}';
             sub_filter_once on;
           '';
           listen = [
@@ -129,6 +131,9 @@ in
                   </ul>
                 </section>
               '') tags;
+              nexusLink =
+                lib.optionalString (cfg.nexusUrl != null)
+                  ''<a href="${cfg.nexusUrl}" class="nexus-link" title="All LAN machines"><img src="/icons/network-wired.svg" class="service-icon" alt="">Nexus</a>'';
               # Build one directory containing index.html and per-service favicon.svg files
               staticRoot = pkgs.runCommand "nginx-static-${hostname}" { } (
                 ''
@@ -146,6 +151,11 @@ in
                       body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; background: #f5f7f9; color: #17212b; }
                       .container { background: white; padding: 30px; border: 1px solid #dce3e8; border-radius: 20px; box-shadow: 0 12px 34px rgba(31,48,61,0.08); }
                       h1 { color: #333; margin-top: 0; display: flex; align-items: center; gap: 14px; }
+                      .title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 0.67em; }
+                      .title-row h1 { margin-bottom: 0; }
+                      .nexus-link { display: inline-flex; align-items: center; gap: 8px; padding: 7px 13px; border: 1px solid #78ade0; border-radius: 999px; color: #007bff; font-weight: 600; text-decoration: none; }
+                      .nexus-link:hover { background: #e8f2fc; }
+                      .nexus-link .service-icon { width: 18px; height: 18px; }
                       h2 { color: #075eac; font-size: 1.05rem; margin: 0 0 12px; }
                       .title-icon { width: 28px; height: 28px; flex-shrink: 0; filter: invert(18%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(40%) contrast(100%); }
                       .service-group { background: linear-gradient(135deg, #f3f8fd, #fff 70%); border: 2px solid #2680d9; border-radius: 16px; margin-top: 18px; padding: 18px; }
@@ -166,7 +176,10 @@ in
                   </head>
                   <body>
                     <div class="container">
-                      <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
+                      <div class="title-row">
+                        <h1><img src="/icons/server.svg" class="title-icon" alt="server">${hostname} Services</h1>
+                        ${nexusLink}
+                      </div>
                   ${serviceGroups}
                     </div>
                   </body>
@@ -188,7 +201,10 @@ in
                   # Copy root-page icon SVGs from anixdata (deduped by icon name)
                   (
                     let
-                      iconNames = lib.unique (lib.filter (n: n != "") (map (s: s.icon) services));
+                      iconNames = lib.unique (
+                        lib.filter (n: n != "") (map (s: s.icon) services)
+                        ++ lib.optional (cfg.nexusUrl != null) "network-wired"
+                      );
                       fa6 = anixpkgs.pkgData.icons.fa6-solid;
                     in
                     "mkdir -p $out/icons\n"
@@ -241,7 +257,7 @@ in
                           s.faviconSvg != null
                         ) ''<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg">''
                       }${themeHead}';
-                      sub_filter </body> '${pageControlsMain}';
+                      sub_filter </body> '${pageControlsMain s.homeButton}';
                       sub_filter_once on;
                       proxy_set_header Accept-Encoding "";
                     '';
