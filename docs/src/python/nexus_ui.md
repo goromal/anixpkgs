@@ -18,3 +18,4 @@ options:
   --avahi-browse-bin AVAHI_BROWSE_BIN
                         avahi-browse command used for mDNS discovery
 ```
+
