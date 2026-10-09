@@ -49,7 +49,7 @@
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
-    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.39.0";
     comfyui-src.flake = false;
 
     crowcpp.url = "github:goromal/Crow";

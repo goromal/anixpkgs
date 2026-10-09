@@ -4,14 +4,14 @@
 }:
 buildPythonPackage rec {
   pname = "comfyui-embedded-docs";
-  version = "0.4.0";
+  version = "0.5.13";
   format = "wheel";
   src = fetchPypi {
     inherit version format;
     pname = "comfyui_embedded_docs";
     dist = "py3";
     python = "py3";
-    hash = "sha256-l8T4zcrOHpSnVBKMTvU+3ODj3wMI354MmYCA68Slv7I=";
+    hash = "sha256-ENi+ho87tk7fC2I47C8JZ60rbT9eCMlw+VGA0cDDRpA=";
   };
   doCheck = false;
   pythonImportsCheck = [ "comfyui_embedded_docs" ];
