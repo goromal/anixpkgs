@@ -416,6 +416,9 @@ in
       ];
 
       nix.distributedBuilds = cfg.remoteBuilders != [ ];
+      # Let builders fetch build inputs from binary caches themselves rather
+      # than having this machine upload every input closure over the LAN.
+      nix.settings.builders-use-substitutes = cfg.remoteBuilders != [ ];
       nix.buildMachines = map (
         name: builtins.removeAttrs remoteBuildersCatalog.${name} [ "hostPublicKey" ]
       ) cfg.remoteBuilders;
