@@ -19,8 +19,14 @@
   nix.settings.cores = lib.mkForce 4;
 
   machines.base.remoteBuilders = [
+    "jetson-orin-agx"
     "personal-inspiron"
     "personal-panasonic"
     "personal-dell"
   ];
+
+  # Distributed builds run as root, which does not consult any user's
+  # known_hosts file, so pin the builder's host key system-wide.
+  programs.ssh.knownHosts."jetson-orin-agx.local".publicKey =
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKMfNIwH8lx9Dp90UC4BzuSRapa+/k+fTJnu6xTcKTNw";
 }

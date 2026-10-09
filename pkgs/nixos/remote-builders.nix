@@ -53,4 +53,17 @@
       "big-parallel"
     ];
   };
+  jetson-orin-agx = {
+    hostName = "jetson-orin-agx.local";
+    sshUser = "andrew";
+    sshKey = "/data/andrew/.ssh/id_rsa";
+    # aarch64-linux natively, so preferred over the emulating x86 builders
+    systems = [ "aarch64-linux" ];
+    maxJobs = 2;
+    speedFactor = 4;
+    supportedFeatures = [
+      "benchmark"
+      "big-parallel"
+    ];
+  };
 }
