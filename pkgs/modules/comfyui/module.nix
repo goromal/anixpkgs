@@ -65,9 +65,9 @@ in
       default = isJetson;
       description = ''
         Apply memory-pressure flags (--fp8_e4m3fn-text-enc, --disable-smart-memory)
-        and the expandable_segments CUDA allocator so the resident weight set stays
-        small enough for constrained memory: Jetson unified memory (default on) or a
-        small-VRAM discrete GPU streaming large models (e.g. Flux.2 dev on 4 GB).
+        so the resident weight set stays small enough for constrained memory: Jetson
+        unified memory (default on) or a small-VRAM discrete GPU streaming large
+        models (e.g. Flux.2 dev on 4 GB).
       '';
     };
     cozy = {
@@ -205,14 +205,13 @@ in
             # trigger a global OOM. Not a hard cap, so workflows whose weight set
             # exceeds RAM (e.g. flux2-dev) can still spill into swap and complete.
             # MemoryHigh = "50G"; TODO - non-starter for flux2-dev
+            # No PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True: ComfyUI >= 0.39
+            # manages memory itself (comfy-aimdo "dynamic VRAM", on by default), and
+            # combined with expandable segments every job fails at the text encoder
+            # with "CUDA driver error: out of memory". Without it, back-to-back runs
+            # still return memory between jobs.
             Environment = [
               "HOME=/data/andrew"
-            ]
-            ++ lib.optionals cfg.lowMem [
-              # The default CUDA allocator fragments and holds freed blocks, eroding
-              # the thin headroom between runs. expandable_segments lets it return
-              # memory so /free (and --disable-smart-memory) actually recover it.
-              "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
             ];
           };
           wantedBy = [ "multi-user.target" ];
