@@ -28,6 +28,8 @@
   spandrel,
   av,
   comfy-kitchen,
+  comfy-aimdo,
+  comfy-angle,
   comfyui-frontend-package,
   comfyui-workflow-templates,
   comfyui-embedded-docs,
@@ -39,6 +41,10 @@
   matplotlib,
   gitpython,
   segment-anything,
+  filelock,
+  simpleeval,
+  blake3,
+  pyopengl,
   pkg-src,
 }:
 let
@@ -69,6 +75,8 @@ let
     spandrel
     av
     comfy-kitchen
+    comfy-aimdo
+    comfy-angle
     comfyui-frontend-package
     comfyui-workflow-templates
     comfyui-embedded-docs
@@ -80,11 +88,15 @@ let
     matplotlib
     gitpython
     segment-anything
+    filelock
+    simpleeval
+    blake3
+    pyopengl
   ]);
 in
 stdenvNoCC.mkDerivation {
   pname = "comfyui";
-  version = "0.11.0";
+  version = "0.39.0";
   src = pkg-src;
   nativeBuildInputs = [ makeWrapper ];
   dontConfigure = true;

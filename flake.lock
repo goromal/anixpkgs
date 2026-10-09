@@ -120,16 +120,16 @@
     "comfyui-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1769486881,
-        "narHash": "sha256-CcA3xTVmBVLGMtM5F74R2LfwafFDxFHZ1uzx5MvrB/4=",
+        "lastModified": 1791238117,
+        "narHash": "sha256-1QZQmMfLzko9HPBGFMEZuHjroxTIjxR2taZVHosIW3E=",
         "owner": "comfyanonymous",
         "repo": "ComfyUI",
-        "rev": "09725967cf76304371c390ca1d6483e04061da48",
+        "rev": "b0b743566f65daafc423b4fea8a2fbda94b3384a",
         "type": "github"
       },
       "original": {
         "owner": "comfyanonymous",
-        "ref": "refs/tags/v0.11.0",
+        "ref": "refs/tags/v0.39.0",
         "repo": "ComfyUI",
         "type": "github"
       }
@@ -876,11 +876,11 @@
     },
     "nixpkgs-26-05-branch": {
       "locked": {
-        "lastModified": 1790113641,
-        "narHash": "sha256-D2aaQetafdpHxbwA4ldAxs51UX0b11pXL+JL/5L8VrM=",
+        "lastModified": 1791426274,
+        "narHash": "sha256-MWhktfFtFE8Jl7bf9Pkp7TR5MSdYCjCswSo0Gkb4ywc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "1bc55b9def8165e82073919945c3239903fe4dc2",
+        "rev": "7c8764b7c7b09b34f632464276218ef9090eaa11",
         "type": "github"
       },
       "original": {

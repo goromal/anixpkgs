@@ -24,8 +24,11 @@
   services.comfyui.cozy.workflows = [
     "imggen"
     "imggen2"
+    "imggen21"
     "imgedit2"
     "imgedit3"
   ];
+  systemd.services.comfyui.serviceConfig.ExecStartPre =
+    "${pkgs.coreutils}/bin/install -m 0644 ${./workflows/imggen21.api.json} /data/andrew/comfyui/imggen21.api.json";
   networking.hostName = "atorgesen-dell";
 }

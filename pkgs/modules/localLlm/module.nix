@@ -7,6 +7,11 @@
 let
   cfg = config.machines.localLlm;
   extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
+  # Qwen 3.5 requires Ollama 0.30.0; the 26.05 tag ships 0.24.0.
+  ollamaPkgs = import pkgs.config.flakeInputs.nixpkgs-26-05-branch {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
   baseUrl = "http://${cfg.host}:${toString cfg.port}";
 in
 {
@@ -73,11 +78,11 @@ in
       inherit (cfg) host port;
       package =
         if cfg.acceleration == null then
-          pkgs.ollama
+          ollamaPkgs.ollama
         else if cfg.acceleration == false then
-          pkgs.ollama-cpu
+          ollamaPkgs.ollama-cpu
         else
-          pkgs.${"ollama-${cfg.acceleration}"};
+          ollamaPkgs.${"ollama-${cfg.acceleration}"};
       loadModels = [ cfg.model ];
       environmentVariables = {
         OLLAMA_CONTEXT_LENGTH = toString cfg.contextLength;

@@ -139,7 +139,18 @@ let
                 else
                   pySuper.kornia-rs;
               comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
+              comfy-aimdo = pySelf.callPackage ./python-packages/comfy-aimdo { };
+              comfy-angle = pySelf.callPackage ./python-packages/comfy-angle { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
+              comfyui-workflow-templates-json =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-json
+                  { };
+              comfyui-workflow-templates-media-assets-01 =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-01
+                  { };
+              comfyui-workflow-templates-media-assets-02 =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-02
+                  { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
                   { };
@@ -525,7 +536,14 @@ rec {
   spandrel = final.python313.pkgs.spandrel;
   segment-anything = final.python313.pkgs.segment-anything;
   comfy-kitchen = final.python313.pkgs.comfy-kitchen;
+  comfy-aimdo = final.python313.pkgs.comfy-aimdo;
+  comfy-angle = final.python313.pkgs.comfy-angle;
   comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
+  comfyui-workflow-templates-json = final.python313.pkgs.comfyui-workflow-templates-json;
+  comfyui-workflow-templates-media-assets-01 =
+    final.python313.pkgs.comfyui-workflow-templates-media-assets-01;
+  comfyui-workflow-templates-media-assets-02 =
+    final.python313.pkgs.comfyui-workflow-templates-media-assets-02;
   comfyui-workflow-templates-core = final.python313.pkgs.comfyui-workflow-templates-core;
   comfyui-workflow-templates-media-api = final.python313.pkgs.comfyui-workflow-templates-media-api;
   comfyui-workflow-templates-media-video =
@@ -587,6 +605,8 @@ rec {
       spandrel = pyPkgs.spandrel;
       av = pyPkgs.av;
       comfy-kitchen = pyPkgs."comfy-kitchen";
+      comfy-aimdo = pyPkgs."comfy-aimdo";
+      comfy-angle = pyPkgs."comfy-angle";
       comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
@@ -598,6 +618,10 @@ rec {
       matplotlib = pyPkgs.matplotlib;
       gitpython = pyPkgs.gitpython;
       segment-anything = pyPkgs."segment-anything";
+      filelock = pyPkgs.filelock;
+      simpleeval = pyPkgs.simpleeval;
+      blake3 = pyPkgs.blake3;
+      pyopengl = pyPkgs.pyopengl;
       pkg-src = flakeInputs.comfyui-src;
     };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;

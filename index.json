@@ -411,7 +411,32 @@
                 "docs": false
             },
             {
+                "attr": "comfy-aimdo",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfy-angle",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "comfyui-frontend-package",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-json",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-assets-01",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "comfyui-workflow-templates-media-assets-02",
                 "ci": true,
                 "docs": false
             },
