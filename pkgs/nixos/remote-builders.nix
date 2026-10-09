@@ -60,4 +60,19 @@
       "big-parallel"
     ];
   };
+  jetson-orin-agx = {
+    hostName = "jetson-orin-agx.local";
+    sshUser = "andrew";
+    sshKey = "/data/andrew/.ssh/id_rsa";
+    hostPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKMfNIwH8lx9Dp90UC4BzuSRapa+/k+fTJnu6xTcKTNw";
+    # aarch64-linux natively, so preferred over the emulating x86 builders
+    systems = [ "aarch64-linux" ];
+    # 12 cores; the AGX caps each build at 4 (nix.settings.cores)
+    maxJobs = 3;
+    speedFactor = 4;
+    supportedFeatures = [
+      "benchmark"
+      "big-parallel"
+    ];
+  };
 }
