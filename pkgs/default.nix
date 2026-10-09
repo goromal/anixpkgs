@@ -143,11 +143,14 @@ let
               comfy-angle = pySelf.callPackage ./python-packages/comfy-angle { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
               comfyui-workflow-templates-json =
-                pySelf.callPackage ./python-packages/comfyui-workflow-templates-json { };
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-json
+                  { };
               comfyui-workflow-templates-media-assets-01 =
-                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-01 { };
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-01
+                  { };
               comfyui-workflow-templates-media-assets-02 =
-                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-02 { };
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-02
+                  { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
                   { };
