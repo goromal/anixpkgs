@@ -425,15 +425,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791579348,
-        "narHash": "sha256-XF6DrZdbieDCjn0XQyP7TZlDehLCcSQT5kWyIkU5zhY=",
+        "lastModified": 1791668147,
+        "narHash": "sha256-BhcHncXdfpTJtpCwVQQAtQ0CimD/W5KbaK57usrXSgQ=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "f0aec4f9298772bcb8c278c24907495af91695ae",
+        "rev": "2bbfa83b2aef8e70f32d52881281e62960401d33",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/comfyui-oom-headroom",
         "repo": "flasks",
         "type": "github"
       }
