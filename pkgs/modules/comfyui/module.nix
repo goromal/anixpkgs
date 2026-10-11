@@ -33,6 +33,14 @@ let
   #  --disable-async-offload: 2-stream offload has no benefit on unified memory,
   #    but it does help a discrete GPU, so keep it Jetson-only.
   jetsonFlags = lib.optionalString isJetson "--disable-async-offload";
+  #  --reserve-vram: VRAM (GB) ComfyUI keeps free of weights at load time for
+  #    activations and kernel scratch. ComfyUI's default (~0.4 GB) is too thin on
+  #    a ~4 GB card: Qwen-Image 2.1's int8 matmuls need ~460 MB scratch buffers,
+  #    and allocator fragmentation across back-to-back jobs then tips sampling
+  #    into an OOM (cozy also retries an OOM once).
+  reserveVramFlag = lib.optionalString (
+    cfg.reserveVram != null
+  ) "--reserve-vram ${builtins.toString cfg.reserveVram}";
 in
 {
   options.services.comfyui = {
@@ -59,6 +67,12 @@ in
       ];
       default = "lowvram";
       description = "ComfyUI VRAM strategy; 'auto' lets ComfyUI decide (no flag).";
+    };
+    reserveVram = lib.mkOption {
+      type = lib.types.nullOr lib.types.float;
+      default = null;
+      example = 1.0;
+      description = "VRAM in GB to keep free for inference (--reserve-vram); null uses ComfyUI's default.";
     };
     lowMem = lib.mkOption {
       type = lib.types.bool;
@@ -190,7 +204,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${lowMemFlags} ${jetsonFlags}";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${reserveVramFlag} ${lowMemFlags} ${jetsonFlags}";
             ReadWritePaths = [
               cfg.dataDir
               "/tmp"
