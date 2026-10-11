@@ -35,7 +35,11 @@ For every cross-repository change involving `anixpkgs`:
 4. At authorized delivery checkpoints, commit coherent work and push the shared branch in every involved repository. Do not leave the hub pointing at an unpushed commit.
 5. Open dependency PRs and the `anixpkgs` hub PR. Cross-reference them in both directions; the `anixpkgs` PR description must link every dependency PR and state merge/re-pin ordering.
 
-The coding agent may create commits, push side branches, and open or update all required PRs without waiting for the user to perform those steps. NEVER merge a PR or enable auto-merge: only the user may merge. Leave all dependency and hub PRs open for the user's review and merge action, and clearly report the required merge order.
+The coding agent may create commits, push side branches, and open or update all required PRs without waiting for the user to perform those steps. The agent may merge a PR only if the user explicitly gives permission to merge it. Do not enable auto-merge. Unless the user authorizes a merge, leave all dependency and hub PRs open for the user's review and merge action, and clearly report the required merge order.
+
+For each `anixpkgs` PR, check with the user whether to add labels (such as `MajorRelease`, `MinorRelease`, `PatchRelease`, or `merge-queue`) and whether to generate a changelog entry by checking `Add to global changelog` in the PR comment. Apply either choice only after the user confirms it.
+
+For every authorized PR merge, whether in a dependency repository or `anixpkgs`, squash-merge. Before merging, remove secondary-author attributions, including `Co-authored-by:` trailers, from the squash commit description so that only the user's email remains in any author attribution.
 
 Before presenting or delivering the result, report the branch, commit, push, PR, and test state for each repository rather than treating the workspace as one Git repository.
 
@@ -48,6 +52,8 @@ The `anixpkgs` hub PR MUST include changes to both `flake.nix` and `flake.lock` 
 3. Commit both files in `anixpkgs`. A filesystem path override or a lock file that merely captures an unpublished local commit is not PR-ready.
 
 Use local path inputs in `flake.nix` only as temporary local-development state. Restore the remote side-branch URL and regenerate the lock before committing or pushing.
+
+Always merge every dependency PR before merging the `anixpkgs` hub PR. After each dependency PR merges, update the `anixpkgs` PR: point that input in `flake.nix` at the dependency's merged target branch, refresh its `flake.lock` entry, verify the locked revision includes the merged change, and commit and push both files before merging the hub PR.
 
 ## Keep local-build local
 

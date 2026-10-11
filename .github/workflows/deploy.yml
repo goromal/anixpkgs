@@ -3,47 +3,80 @@ on:
   pull_request:
     types:
       - closed
+  workflow_call:
+    inputs:
+      release:
+        description: "Version bump type: major, minor, patch, or none"
+        required: true
+        type: string
 
 jobs:
+  resolve:
+    name: Resolve Release
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.resolve.outputs.run }}
+      release: ${{ steps.resolve.outputs.release }}
+    steps:
+    - id: resolve
+      env:
+        INPUT_RELEASE: ${{ inputs.release }}
+        MERGED: ${{ github.event.pull_request.merged }}
+        MAJOR: ${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}
+        MINOR: ${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }}
+        PATCH: ${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }}
+      run: |
+        if [[ -n "$INPUT_RELEASE" ]]; then
+          echo "run=true" >> "$GITHUB_OUTPUT"
+          echo "release=$INPUT_RELEASE" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+        if [[ "$MERGED" == "true" ]]; then
+          echo "run=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "run=false" >> "$GITHUB_OUTPUT"
+        fi
+        if [[ "$MAJOR" == "true" ]]; then
+          echo "release=major" >> "$GITHUB_OUTPUT"
+        elif [[ "$MINOR" == "true" ]]; then
+          echo "release=minor" >> "$GITHUB_OUTPUT"
+        elif [[ "$PATCH" == "true" ]]; then
+          echo "release=patch" >> "$GITHUB_OUTPUT"
+        else
+          echo "release=none" >> "$GITHUB_OUTPUT"
+        fi
   bump-version:
     name: Version Bump
-    if: ${{ (github.event.pull_request.merged == true) }}
+    needs: resolve
+    if: ${{ needs.resolve.outputs.run == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
       with:
+        ref: master
         ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
-    - run: |
+    - env:
+        RELEASE: ${{ needs.resolve.outputs.release }}
+      run: |
         git config user.name "goromal (bot)"
         git config user.email "goromal.bot@gmail.com"
         git checkout master
-        if [[ "${{ contains(github.event.pull_request.labels.*.name, 'MajorRelease') }}" == "true" ]]; then
-            python scripts/increment_anix.py major
+        if [[ "$RELEASE" != "none" ]]; then
+            python scripts/increment_anix.py "$RELEASE"
             git pull origin master
             git add .
-            git commit -m "Bump major ANIX_VERSION -> $(cat ANIX_VERSION)"
-            git push origin master
-        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'MinorRelease') }}" == "true" ]]; then
-            python scripts/increment_anix.py minor
-            git pull origin master
-            git add .
-            git commit -m "Bump minor ANIX_VERSION -> $(cat ANIX_VERSION)"
-            git push origin master
-        elif [[ "${{ contains(github.event.pull_request.labels.*.name, 'PatchRelease') }}" == "true" ]]; then
-            python scripts/increment_anix.py patch
-            git pull origin master
-            git add .
-            git commit -m "Bump patch ANIX_VERSION -> $(cat ANIX_VERSION)"
+            git commit -m "Bump $RELEASE ANIX_VERSION -> $(cat ANIX_VERSION)"
             git push origin master
         fi
   generate-docs:
     name: Generate Docs
-    if: ${{ (github.event.pull_request.merged == true) }}
-    needs: bump-version
+    needs: [resolve, bump-version]
+    if: ${{ needs.resolve.outputs.run == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
       with:
+        ref: master
         ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - uses: cachix/install-nix-action@v31
       with:
@@ -69,8 +102,8 @@ jobs:
         fi
   publish-docs:
     name: Publish Docs
-    if: ${{ (github.event.pull_request.merged == true) }}
-    needs: generate-docs
+    needs: [resolve, generate-docs]
+    if: ${{ needs.resolve.outputs.run == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write  # To push a branch 
@@ -78,6 +111,7 @@ jobs:
     steps:
     - uses: actions/checkout@v5
       with:
+        ref: master
         fetch-depth: 0
     - name: Install latest mdbook
       run: |
@@ -105,12 +139,13 @@ jobs:
         git push --force --set-upstream origin gh-pages
   tag-release:
     name: Tag Release
-    if: ${{ (github.event.pull_request.merged == true) && (contains(github.event.pull_request.labels.*.name, 'MajorRelease') || contains(github.event.pull_request.labels.*.name, 'MinorRelease') || contains(github.event.pull_request.labels.*.name, 'PatchRelease')) }}
-    needs: generate-docs
+    needs: [resolve, generate-docs]
+    if: ${{ needs.resolve.outputs.run == 'true' && needs.resolve.outputs.release != 'none' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
       with:
+        ref: master
         ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
     - run: |
         git config user.name "goromal (bot)"
