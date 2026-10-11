@@ -53,6 +53,8 @@ The `anixpkgs` hub PR MUST include changes to both `flake.nix` and `flake.lock` 
 
 Use local path inputs in `flake.nix` only as temporary local-development state. Restore the remote side-branch URL and regenerate the lock before committing or pushing.
 
+Once a dependency PR merges, update the `anixpkgs` PR before merging it: point that input in `flake.nix` at the dependency's merged target branch, refresh its `flake.lock` entry, verify the locked revision includes the merged change, and commit and push both files to the `anixpkgs` PR.
+
 ## Keep local-build local
 
 `pkgs/nixos/dependencies.nix` normally contains `local-build = false;`. Local deployment tools may temporarily change it to `true` so NixOS evaluates the working `anixpkgs` checkout instead of a published tag. This is useful for local rapid development, but it MUST NEVER be pushed to a remote PR.
