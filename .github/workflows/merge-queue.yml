@@ -1,0 +1,67 @@
+name: "Merge Queue"
+
+on:
+  pull_request:
+    types:
+      - labeled
+  workflow_run:
+    workflows:
+      - "Build Anixpkgs"
+      - "Deploy"
+      - "Manual Release Tag"
+    types:
+      - completed
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: merge-queue
+  cancel-in-progress: false
+
+jobs:
+  advance:
+    name: Advance Queue
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+    outputs:
+      merged_pr: ${{ steps.queue.outputs.merged_pr }}
+      release: ${{ steps.queue.outputs.release }}
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: master
+        fetch-depth: 0
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - id: queue
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        python3 scripts/merge_queue.py
+  deploy:
+    name: Deploy Merged PR
+    needs: advance
+    if: ${{ needs.advance.outputs.merged_pr != '' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/deploy.yml
+    with:
+      release: ${{ needs.advance.outputs.release }}
+    secrets: inherit
+  continue:
+    name: Process Next PR
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+    - env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: gh workflow run merge-queue.yml --repo "${{ github.repository }}" --ref master
