@@ -54,6 +54,27 @@ class WorkspaceManagerTest(unittest.TestCase):
         self.assertEqual(config["workspaces"], {"alpha": ["repo", "helper"]})
         self.assertEqual(self.manager.list()[0]["name"], "alpha")
 
+    def test_status_handles_repository_without_commits(self):
+        empty = self.dev / "alpha" / "sources" / "fresh"
+        subprocess.run(
+            ["git", "init", "-b", "main", empty], check=True, capture_output=True
+        )
+        (empty / "notes").write_text("draft\n", encoding="utf-8")
+        repos = {repo["name"]: repo for repo in self.manager.status("alpha")["repositories"]}
+        self.assertEqual(repos["fresh"]["branch"], "main")
+        self.assertEqual(repos["fresh"]["head"], "")
+        self.assertFalse(repos["fresh"]["clean"])
+        self.assertEqual(repos["repo"]["branch"], "master")
+        self.assertEqual(self.manager.save_branch("alpha", "fresh")["branch"], "main")
+
+    def test_status_reports_detached_head(self):
+        subprocess.run(
+            ["git", "-C", self.repo, "checkout", "-q", "--detach"], check=True
+        )
+        repo = self.manager.status("alpha")["repositories"][0]
+        self.assertEqual(repo["branch"], "HEAD")
+        self.assertEqual(len(repo["head"]), 40)
+
     def test_status_reports_repository(self):
         status = self.manager.status("alpha")
         repo = status["repositories"][0]

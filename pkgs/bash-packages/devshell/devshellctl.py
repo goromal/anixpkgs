@@ -121,7 +121,7 @@ class WorkspaceManager:
 
     def save_branch(self, workspace, repository):
         repo = self._repository(workspace, repository)
-        branch = self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+        branch = self._current_branch(repo)
         history = self._read_history()
         history.setdefault(workspace, {}).setdefault(repository, {})["branch"] = branch
         self._write_history(history)
@@ -165,7 +165,7 @@ class WorkspaceManager:
 
     def push(self, workspace, repository):
         repo = self._repository(workspace, repository)
-        branch = self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+        branch = self._current_branch(repo)
         self._git(repo, "push", "origin", branch)
         return {"message": f"Pushed {repository}:{branch}"}
 
@@ -179,7 +179,7 @@ class WorkspaceManager:
 
     def rebase_push(self, workspace, repository):
         repo = self._repository(workspace, repository)
-        branch = self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+        branch = self._current_branch(repo)
         # --autostash pops the working tree back afterwards, so a dirty repo
         # rebases without the caller having to stage or lose anything.
         self._git(repo, "pull", "--rebase", "--autostash", "origin", branch)
@@ -191,7 +191,7 @@ class WorkspaceManager:
         remote = self._git_optional(repo, "remote", "get-url", "--push", "origin")
         if not remote:
             raise WorkspaceError(f"Cannot nuke {repository}: no remote URL configured")
-        branch = branch or self._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+        branch = branch or self._current_branch(repo)
         self._validate_branch(repo, branch)
         shutil.rmtree(repo)
         self._run(
@@ -251,8 +251,9 @@ class WorkspaceManager:
         return repo
 
     def _repository_status(self, workspace, name, path, saved):
-        branch = self._git(path, "rev-parse", "--abbrev-ref", "HEAD")
-        head = self._git(path, "rev-parse", "HEAD")
+        branch = self._current_branch(path)
+        # A freshly `git init`ed repo has an unborn branch and no HEAD commit.
+        head = self._git_optional(path, "rev-parse", "--verify", "-q", "HEAD") or ""
         dirty = bool(self._git(path, "status", "--porcelain"))
         upstream = self._git_optional(path, "rev-parse", "--abbrev-ref", "@{upstream}")
         ahead = behind = 0
@@ -347,6 +348,14 @@ class WorkspaceManager:
             return False
         self._git(repo, "stash", "push", "--message", "devshellctl autostash")
         return True
+
+    @staticmethod
+    def _current_branch(repo):
+        # symbolic-ref also names an unborn branch, which rev-parse rejects;
+        # it fails on a detached HEAD, where rev-parse reports "HEAD".
+        return WorkspaceManager._git_optional(
+            repo, "symbolic-ref", "--short", "-q", "HEAD"
+        ) or WorkspaceManager._git(repo, "rev-parse", "--abbrev-ref", "HEAD")
 
     @staticmethod
     def _git(repo, *args):
