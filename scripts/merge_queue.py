@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 QUEUE_LABEL = "merge-queue"
+PAUSE_LABEL = "merge-queue-paused"
 BOT_AUTHOR = "goromal (bot)"
 FOLLOW_ON_SUBJECTS = [
     re.compile(r"^Bump (major|minor|patch) ANIX_VERSION -> \S+$"),
@@ -47,6 +48,7 @@ class PrState:
 
 @dataclass(frozen=True)
 class QueueState:
+    paused: bool
     master_writer_busy: bool
     head: Optional[PrState]
 
@@ -111,6 +113,8 @@ def order_queue(entries):
 
 
 def decide(state):
+    if state.paused:
+        return Wait(f"queue is paused; close the open `{PAUSE_LABEL}` issue to resume")
     if state.master_writer_busy:
         return Wait("a workflow that writes to master is running")
     pr = state.head
@@ -150,9 +154,13 @@ def run(client, max_steps=20):
             )
             return action
         if isinstance(action, Merge):
-            if client.merge(action):
+            merged, reason = client.merge(action)
+            if merged:
                 return action
-            return Wait(f"merge of #{action.number} failed; will retry")
+            if reason is None:
+                return Wait(f"merge of #{action.number} raced a push; will retry")
+            client.eject(Eject(action.number, reason))
+            continue
         return action
     return Wait("step limit reached")
 
@@ -246,14 +254,24 @@ class GitHub:
             ci_url=ci_url,
         )
 
+    def paused(self):
+        return bool(
+            self._jsonl(
+                f"repos/{self.repo}/issues?labels={PAUSE_LABEL}&state=open&per_page=1",
+                ".[] | {number}",
+            )
+        )
+
     def fetch_state(self):
+        if self.paused():
+            return QueueState(paused=True, master_writer_busy=False, head=None)
         if self.master_writer_busy():
-            return QueueState(master_writer_busy=True, head=None)
+            return QueueState(paused=False, master_writer_busy=True, head=None)
         queue = order_queue(
             [{"number": n, "labeled_at": self.labeled_at(n)} for n in self.queued_numbers()]
         )
         head = self.fetch_pr(queue[0]["number"]) if queue else None
-        return QueueState(master_writer_busy=False, head=head)
+        return QueueState(paused=False, master_writer_busy=False, head=head)
 
     def comment(self, number, body):
         _sh("gh", "pr", "comment", str(number), "--repo", self.repo, "--body", body)
@@ -287,6 +305,7 @@ class GitHub:
             _sh("git", "checkout", "master")
 
     def merge(self, action):
+        """Returns (merged, eject_reason); (False, None) means retry later."""
         try:
             _sh(
                 "gh", "api", "-X", "PUT",
@@ -297,9 +316,11 @@ class GitHub:
             )
         except subprocess.CalledProcessError as e:
             print(f"merge-queue: merge of #{action.number} failed: {e.stderr}")
-            return False
+            if "(HTTP 409)" in e.stderr:
+                return False, None
+            return False, f"GitHub rejected the merge: {e.stderr.strip()}"
         self.comment(action.number, "Merged by the merge queue.")
-        return True
+        return True, None
 
 
 def main():

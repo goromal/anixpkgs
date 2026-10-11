@@ -54,8 +54,8 @@ def pr(**overrides):
     return PrState(**fields)
 
 
-def state(head=None, busy=False):
-    return QueueState(master_writer_busy=busy, head=head)
+def state(head=None, busy=False, paused=False):
+    return QueueState(paused=paused, master_writer_busy=busy, head=head)
 
 
 class IsFollowOnTest(unittest.TestCase):
@@ -137,6 +137,9 @@ class OrderQueueTest(unittest.TestCase):
 
 
 class DecideTest(unittest.TestCase):
+    def test_waits_while_paused(self):
+        self.assertIsInstance(decide(state(pr(), paused=True)), Wait)
+
     def test_waits_while_master_writer_busy(self):
         self.assertIsInstance(decide(state(pr(), busy=True)), Wait)
 
@@ -185,10 +188,10 @@ class JsonStreamTest(unittest.TestCase):
 
 
 class FakeClient:
-    def __init__(self, states, update_result=(True, None), merge_ok=True):
+    def __init__(self, states, update_result=(True, None), merge_result=(True, None)):
         self.states = list(states)
         self.update_result = update_result
-        self.merge_ok = merge_ok
+        self.merge_result = merge_result
         self.calls = []
 
     def fetch_state(self):
@@ -206,7 +209,7 @@ class FakeClient:
 
     def merge(self, action):
         self.calls.append(("merge", action.number))
-        return self.merge_ok
+        return self.merge_result
 
 
 class RunTest(unittest.TestCase):
@@ -233,10 +236,20 @@ class RunTest(unittest.TestCase):
         self.assertEqual(run(client), UpdateBranch(1, "dev/thing"))
         self.assertEqual(client.calls, [("update", 1), ("comment", 1)])
 
-    def test_failed_merge_waits(self):
-        client = FakeClient([state(pr(number=1))], merge_ok=False)
+    def test_retryable_merge_failure_waits(self):
+        client = FakeClient([state(pr(number=1))], merge_result=(False, None))
         self.assertIsInstance(run(client), Wait)
         self.assertEqual(client.calls, [("merge", 1)])
+
+    def test_permanent_merge_failure_ejects_and_continues(self):
+        client = FakeClient(
+            [state(pr(number=1)), state(None)],
+            merge_result=(False, "merge rejected: HTTP 403"),
+        )
+        self.assertIsInstance(run(client), Wait)
+        self.assertEqual(
+            client.calls, [("merge", 1), ("eject", 1, "merge rejected: HTTP 403")]
+        )
 
     def test_wait_stops_without_actions(self):
         client = FakeClient([state(pr(), busy=True)])

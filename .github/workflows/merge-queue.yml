@@ -1,7 +1,9 @@
 name: "Merge Queue"
 
 on:
-  pull_request:
+  # pull_request_target (not pull_request) so label-triggered runs use master's
+  # workflow definitions; no job checks out or executes PR code.
+  pull_request_target:
     types:
       - labeled
   workflow_run:
@@ -11,6 +13,9 @@ on:
       - "Manual Release Tag"
     types:
       - completed
+  issues:
+    types:
+      - closed
   schedule:
     - cron: "*/30 * * * *"
   workflow_dispatch:
@@ -65,3 +70,24 @@ jobs:
     - env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: gh workflow run merge-queue.yml --repo "${{ github.repository }}" --ref master
+  pause:
+    name: Pause Queue On Deploy Failure
+    needs:
+    - advance
+    - deploy
+    if: ${{ failure() && needs.deploy.result == 'failure' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+    - env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO: ${{ github.repository }}
+        PR: ${{ needs.advance.outputs.merged_pr }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        gh label create merge-queue-paused --repo "$REPO" --color B60205 --force \
+          --description "Open issues with this label pause the merge queue"
+        gh issue create --repo "$REPO" --label merge-queue-paused \
+          --title "Merge queue paused: deploy of #$PR failed" \
+          --body "Post-merge deploy of #$PR failed: $RUN_URL. Fix master (version bump, docs, tag), then close this issue to resume the queue."
