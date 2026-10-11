@@ -53,7 +53,7 @@ The `anixpkgs` hub PR MUST include changes to both `flake.nix` and `flake.lock` 
 
 Use local path inputs in `flake.nix` only as temporary local-development state. Restore the remote side-branch URL and regenerate the lock before committing or pushing.
 
-Once a dependency PR merges, update the `anixpkgs` PR before merging it: point that input in `flake.nix` at the dependency's merged target branch, refresh its `flake.lock` entry, verify the locked revision includes the merged change, and commit and push both files to the `anixpkgs` PR.
+Always merge every dependency PR before merging the `anixpkgs` hub PR. After each dependency PR merges, update the `anixpkgs` PR: point that input in `flake.nix` at the dependency's merged target branch, refresh its `flake.lock` entry, verify the locked revision includes the merged change, and commit and push both files before merging the hub PR.
 
 ## Keep local-build local
 
