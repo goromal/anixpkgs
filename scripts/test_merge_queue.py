@@ -7,12 +7,14 @@ from scripts.merge_queue import (
     QueueState,
     UpdateBranch,
     Wait,
+    _json_stream,
     ci_result,
     decide,
     is_follow_on,
     is_fresh,
     order_queue,
     release_type,
+    run,
 )
 
 
@@ -171,6 +173,80 @@ class DecideTest(unittest.TestCase):
     def test_merges_green_fresh_pr_behind_only_by_follow_ons(self):
         head = pr(behind_commits=[BUMP, DOCS], labels=["merge-queue", "PatchRelease"])
         self.assertEqual(decide(state(head)), Merge(7, "abc123", "patch", "Add thing"))
+
+
+class JsonStreamTest(unittest.TestCase):
+    def test_parses_compact_and_pretty_values(self):
+        text = '{"a": 1}\n{\n  "b": [2, 3]\n}\n\n'
+        self.assertEqual(_json_stream(text), [{"a": 1}, {"b": [2, 3]}])
+
+    def test_empty_output(self):
+        self.assertEqual(_json_stream(""), [])
+
+
+class FakeClient:
+    def __init__(self, states, update_result=(True, None), merge_ok=True):
+        self.states = list(states)
+        self.update_result = update_result
+        self.merge_ok = merge_ok
+        self.calls = []
+
+    def fetch_state(self):
+        return self.states.pop(0)
+
+    def eject(self, action):
+        self.calls.append(("eject", action.number, action.reason))
+
+    def update_branch(self, action):
+        self.calls.append(("update", action.number))
+        return self.update_result
+
+    def comment(self, number, body):
+        self.calls.append(("comment", number))
+
+    def merge(self, action):
+        self.calls.append(("merge", action.number))
+        return self.merge_ok
+
+
+class RunTest(unittest.TestCase):
+    def test_ejects_red_head_then_merges_next(self):
+        client = FakeClient([state(pr(number=1, ci="red")), state(pr(number=2))])
+        result = run(client)
+        self.assertEqual(result, Merge(2, "abc123", "none", "Add thing"))
+        self.assertEqual(
+            client.calls, [("eject", 1, "CI failed: https://ci/1"), ("merge", 2)]
+        )
+
+    def test_update_conflict_ejects_and_continues(self):
+        client = FakeClient(
+            [state(pr(number=1, mergeable=False)), state(None)],
+            update_result=(False, "conflicts with master"),
+        )
+        self.assertIsInstance(run(client), Wait)
+        self.assertEqual(
+            client.calls, [("update", 1), ("eject", 1, "conflicts with master")]
+        )
+
+    def test_successful_update_comments_and_stops(self):
+        client = FakeClient([state(pr(number=1, behind_commits=[HUMAN]))])
+        self.assertEqual(run(client), UpdateBranch(1, "dev/thing"))
+        self.assertEqual(client.calls, [("update", 1), ("comment", 1)])
+
+    def test_failed_merge_waits(self):
+        client = FakeClient([state(pr(number=1))], merge_ok=False)
+        self.assertIsInstance(run(client), Wait)
+        self.assertEqual(client.calls, [("merge", 1)])
+
+    def test_wait_stops_without_actions(self):
+        client = FakeClient([state(pr(), busy=True)])
+        self.assertIsInstance(run(client), Wait)
+        self.assertEqual(client.calls, [])
+
+    def test_bounded_steps(self):
+        client = FakeClient([state(pr(number=n, draft=True)) for n in range(3)])
+        self.assertIsInstance(run(client, max_steps=3), Wait)
+        self.assertEqual(len(client.calls), 3)
 
 
 if __name__ == "__main__":
