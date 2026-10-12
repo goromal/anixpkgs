@@ -425,16 +425,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791768109,
+        "lastModified": 1791769847,
         "narHash": "sha256-Ry6kz8NhRr3gcc1jpZlZVodQGORWqYnefruNjTcey8E=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "8af20856a56fdd8cb45957597533493f6107beca",
+        "rev": "6091e40014ea8ece759a00171fd3b80617a3c319",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/ssl-port-http-redirect",
         "repo": "flasks",
         "type": "github"
       }
