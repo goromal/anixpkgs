@@ -2,7 +2,7 @@
 
 LAN hub UI for machine status and bulk anix-upgrade
 
-Discovers opted-in LAN machines over mDNS, links to each machine's landing page, shows online status and versions, and fans out anix-upgrade runs to selected machines.
+Discovers opted-in LAN machines over mDNS, links to each machine's landing page, shows online status and versions (flagging machines behind anixpkgs master), and fans out anix-upgrade runs to selected machines.
 ## Usage
 
 ```bash
