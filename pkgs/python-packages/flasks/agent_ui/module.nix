@@ -16,7 +16,8 @@ let
   # install into the user profile) must be on the service PATH: the dedicated
   # `-L agent-ui` tmux server inherits this service's env, and `agent-ui-enter`
   # exec's the agent by name inside it. Without this a session dies with
-  # "exec: claude: not found". procps/coreutils/git/curl/ssh cover common agent shell-outs.
+  # "exec: claude: not found". procps/coreutils/git/curl/ssh/gh/nix/which/hostname
+  # cover common agent shell-outs.
   agentPackages = {
     claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
     codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
@@ -28,6 +29,10 @@ let
     pkgs.gitMinimal
     pkgs.curl
     pkgs.openssh
+    pkgs.gh
+    config.nix.package
+    pkgs.which
+    pkgs.hostname
   ]
   ++ map (agent: agentPackages.${agent}) agents;
 
