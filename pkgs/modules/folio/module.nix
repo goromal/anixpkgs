@@ -258,8 +258,13 @@ in
         onlySSL = true;
         sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
+        # The landing-page card follows the landing page's own scheme, so opening it
+        # over http:// sends a plain-HTTP request to this SSL-only port. Redirect it
+        # (nginx's 497) to HTTPS instead of failing with "plain HTTP request was
+        # sent to HTTPS port".
         extraConfig = ''
           client_max_body_size 512m;
+          error_page 497 =301 https://$host:$server_port$request_uri;
         '';
         listen = [
           {
