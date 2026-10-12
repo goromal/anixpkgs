@@ -27,7 +27,7 @@ buildPythonPackage rec {
   nativeCheckInputs = [ pytestCheckHook ];
   meta = {
     description = "LAN hub UI for machine status and bulk anix-upgrade";
-    longDescription = "Discovers opted-in LAN machines over mDNS, links to each machine's landing page, shows online status and versions, and fans out anix-upgrade runs to selected machines.";
+    longDescription = "Discovers opted-in LAN machines over mDNS, links to each machine's landing page, shows online status and versions (flagging machines behind anixpkgs master), and fans out anix-upgrade runs to selected machines.";
     autoGenUsageCmd = "--help";
   };
 }
