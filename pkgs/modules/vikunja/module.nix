@@ -155,6 +155,11 @@ in
         onlySSL = true;
         sslCertificateKey = "${globalCfg.homeDir}/secrets/vpn/key.pem";
         sslCertificate = "${globalCfg.homeDir}/secrets/vpn/chain.pem";
+        # Redirect plain-HTTP requests on this SSL-only port (nginx's 497) to HTTPS,
+        # e.g. when the landing-page card is followed from http://.
+        extraConfig = ''
+          error_page 497 =301 https://$host:$server_port$request_uri;
+        '';
         listen = [
           {
             addr = "0.0.0.0";

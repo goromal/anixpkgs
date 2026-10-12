@@ -42,7 +42,7 @@ in
       machines.base.runWebServer = true;
       # The hub links to its own Nexus relatively so it works however it is reached.
       machines.base.nexusUrl =
-        if cfg.enable then "${cfg.subdomain}/" else "http://${cfg.hubHost}${cfg.subdomain}/";
+        if cfg.enable then "${cfg.subdomain}/" else "https://${cfg.hubHost}${cfg.subdomain}/";
       services.avahi.publish.userServices = true;
       services.avahi.extraServiceFiles.anix-nexus = ''
         <?xml version="1.0" standalone="no"?>
