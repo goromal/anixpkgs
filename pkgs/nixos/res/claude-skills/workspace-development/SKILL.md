@@ -39,6 +39,11 @@ The coding agent may create commits, push side branches, and open or update all 
 
 For each `anixpkgs` PR, check with the user whether to add labels (such as `MajorRelease`, `MinorRelease`, `PatchRelease`, or `merge-queue`) and whether to generate a changelog entry by checking `Add to global changelog` in the PR comment. Apply either choice only after the user confirms it.
 
+The user may request one of two named merge types for an `anixpkgs` hub PR. Either request authorizes the agent to finish the merge workflow. First, merge the dependency PRs and re-pin the hub PR's flake inputs (see below). Then hand the final hub merge to the GitHub bot by applying the `merge-queue` label. Do not merge the hub PR directly.
+
+- **Full merge**: check `Add to global changelog` in the PR comment, add a release label (`PatchRelease`, `MinorRelease`, or `MajorRelease`), and add `merge-queue`. If the user did not specify the release level, ask whether it is patch, minor, or major before applying any labels.
+- **Minimal merge**: add only `merge-queue`. Do not check the changelog box and do not add a release label.
+
 For every authorized PR merge, whether in a dependency repository or `anixpkgs`, squash-merge. Before merging, remove secondary-author attributions, including `Co-authored-by:` trailers, from the squash commit description so that only the user's email remains in any author attribution.
 
 Before presenting or delivering the result, report the branch, commit, push, PR, and test state for each repository rather than treating the workspace as one Git repository.
