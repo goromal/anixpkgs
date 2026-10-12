@@ -425,16 +425,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791740230,
+        "lastModified": 1791763672,
         "narHash": "sha256-S0X8aCtWCmjUhAC0JYYC8c7tREXt3GYuRojgE8l9fZY=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "b3def9f4c522ea03db1e7f38f78b7c6f4fa31b37",
+        "rev": "2c5366bcb09e96f70e848ba9a7cab04b6b6ecfdc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/webp-ui-support",
         "repo": "flasks",
         "type": "github"
       }
