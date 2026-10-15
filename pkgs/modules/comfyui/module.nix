@@ -7,7 +7,13 @@
 let
   service-ports = import ../../nixos/service-ports.nix;
   cfg = config.services.comfyui;
-  extendedPkgs = pkgs.extend (import ../../../overlay.nix);
+  extendedPkgs = if pkgs ? anix-llm then pkgs else pkgs.extend (import ../../../overlay.nix);
+  # ComfyUI itself needs CUDA torch; cozy and the rest stay on the system set.
+  gpuPkgs =
+    let
+      base = config.machines.cudaNode.pkgs;
+    in
+    if base ? anix-llm then base else base.extend (import ../../../overlay.nix);
   isJetson = config.machines.base.machineType == "jetson";
   vramFlag = if cfg.vramMode == "auto" then "" else "--${cfg.vramMode}";
   # Memory-pressure flags (cfg.lowMem). Needed wherever the resident weight set
@@ -27,14 +33,18 @@ let
   #  --disable-async-offload: 2-stream offload has no benefit on unified memory,
   #    but it does help a discrete GPU, so keep it Jetson-only.
   jetsonFlags = lib.optionalString isJetson "--disable-async-offload";
+  #  --reserve-vram: VRAM (GB) ComfyUI keeps free of weights at load time for
+  #    activations and kernel scratch. ComfyUI's default (~0.4 GB) is too thin on
+  #    a ~4 GB card: Qwen-Image 2.1's int8 matmuls need ~460 MB scratch buffers,
+  #    and allocator fragmentation across back-to-back jobs then tips sampling
+  #    into an OOM (cozy also retries an OOM once).
+  reserveVramFlag = lib.optionalString (
+    cfg.reserveVram != null
+  ) "--reserve-vram ${builtins.toString cfg.reserveVram}";
 in
 {
   options.services.comfyui = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = config.machines.cudaNode.enable;
-      description = "ComfyUI Stable Diffusion server (defaults on for GPU/cudaNode machines)";
-    };
+    enable = lib.mkEnableOption "ComfyUI Stable Diffusion server";
     port = lib.mkOption {
       type = lib.types.port;
       default = service-ports.comfyui;
@@ -45,7 +55,7 @@ in
     };
     package = lib.mkOption {
       type = lib.types.package;
-      default = extendedPkgs.comfyui;
+      default = gpuPkgs.comfyui;
     };
     vramMode = lib.mkOption {
       type = lib.types.enum [
@@ -58,14 +68,20 @@ in
       default = "lowvram";
       description = "ComfyUI VRAM strategy; 'auto' lets ComfyUI decide (no flag).";
     };
+    reserveVram = lib.mkOption {
+      type = lib.types.nullOr lib.types.float;
+      default = null;
+      example = 1.0;
+      description = "VRAM in GB to keep free for inference (--reserve-vram); null uses ComfyUI's default.";
+    };
     lowMem = lib.mkOption {
       type = lib.types.bool;
       default = isJetson;
       description = ''
         Apply memory-pressure flags (--fp8_e4m3fn-text-enc, --disable-smart-memory)
-        and the expandable_segments CUDA allocator so the resident weight set stays
-        small enough for constrained memory: Jetson unified memory (default on) or a
-        small-VRAM discrete GPU streaming large models (e.g. Flux.2 dev on 4 GB).
+        so the resident weight set stays small enough for constrained memory: Jetson
+        unified memory (default on) or a small-VRAM discrete GPU streaming large
+        models (e.g. Flux.2 dev on 4 GB).
       '';
     };
     cozy = {
@@ -114,6 +130,17 @@ in
         type = lib.types.str;
         default = "/data/andrew/secrets/flask/cozy.json";
         description = "Path to JSON file with secret_key and password_hash";
+      };
+      maxInputBytes = lib.mkOption {
+        type = lib.types.int;
+        default = 1048576;
+        description = ''
+          Byte ceiling on the image an edit workflow hands to ComfyUI. Larger
+          inputs are re-encoded and, if that is not enough, resized down; a
+          cropped selection is measured on its own, and the outer image is
+          scaled to match so the composite stays accurate. 0 disables the
+          ceiling.
+        '';
       };
       promptDbDir = lib.mkOption {
         type = lib.types.str;
@@ -177,7 +204,7 @@ in
           unitConfig.StartLimitIntervalSec = 0;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${lowMemFlags} ${jetsonFlags}";
+            ExecStart = "${cfg.package}/bin/comfyui --listen 127.0.0.1 --port ${builtins.toString cfg.port} --base-directory ${cfg.dataDir} --database-url sqlite:///${cfg.dataDir}/user/comfyui.db ${vramFlag} ${reserveVramFlag} ${lowMemFlags} ${jetsonFlags}";
             ReadWritePaths = [
               cfg.dataDir
               "/tmp"
@@ -192,14 +219,13 @@ in
             # trigger a global OOM. Not a hard cap, so workflows whose weight set
             # exceeds RAM (e.g. flux2-dev) can still spill into swap and complete.
             # MemoryHigh = "50G"; TODO - non-starter for flux2-dev
+            # No PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True: ComfyUI >= 0.39
+            # manages memory itself (comfy-aimdo "dynamic VRAM", on by default), and
+            # combined with expandable segments every job fails at the text encoder
+            # with "CUDA driver error: out of memory". Without it, back-to-back runs
+            # still return memory between jobs.
             Environment = [
               "HOME=/data/andrew"
-            ]
-            ++ lib.optionals cfg.lowMem [
-              # The default CUDA allocator fragments and holds freed blocks, eroding
-              # the thin headroom between runs. expandable_segments lets it return
-              # memory so /free (and --disable-smart-memory) actually recover it.
-              "PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True"
             ];
           };
           wantedBy = [ "multi-user.target" ];
@@ -255,7 +281,7 @@ in
           ];
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --max-input-bytes ${builtins.toString cfg.cozy.maxInputBytes} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";

@@ -42,5 +42,8 @@ callPackage ./mkConverter.nix {
     optsWithVarsAndDefaults
     convOptCmds
     ;
+  # Unimplemented and matches every extension, so there is nothing to
+  # dispatch and a directory-wide sweep would only queue failures.
+  vacuumViaOrchestrator = false;
   description = "Generate GIF animations from similar media formats (*not finished yet!*).";
 }

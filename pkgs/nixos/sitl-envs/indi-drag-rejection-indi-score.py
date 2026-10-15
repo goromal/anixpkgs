@@ -1,8 +1,8 @@
 """INDI-on-JSON-backend scorer (diagnostic).
 
-Asserts the shipped Layer-B INDI (CC_TYPE=3, CC3_OUTER_EN=1) flies the battery on
+Asserts the shipped flatness outer loop INDI (CC_TYPE=3, CC3_OUTER_EN=1) flies the battery on
 the pysignals JSON backend (drag OFF) within a documented tolerance of the
-benign-SITL Layer-B baseline, and extracts the inner-loop buzz / omega-inversion
+benign-SITL flatness outer loop baseline, and extracts the inner-loop buzz / omega-inversion
 health so clean-vs-buzz is a first-class finding. All diagnostics are PRINTED
 before any assertion, so a controller-buzz finding survives a failed gate.
 Reusable helpers live in indi_harness.sitl.binscore. Finding writeup:
@@ -163,7 +163,7 @@ def _print_gyro(label, gy):
 
 def _print_inner(label, om, rate):
     """Inner-loop buzz block: omega_dot inversion + roll/pitch RATE. Benign-SITL
-    Layer-B reference (circle_slow fixture): roll/pitch exc_rms ~3.8/4.9 rad/s^2,
+    flatness outer loop reference (circle_slow fixture): roll/pitch exc_rms ~3.8/4.9 rad/s^2,
     RATE act_rms ~31/38 deg/s, buzz_ddt_rms ~21/27 deg/s. Multiples of THOSE are
     the buzz signal (the actuator-lag inner-loop risk)."""
     print(f"--- inner-loop [{label}] omega_dot inversion + RATE buzz ---", flush=True)

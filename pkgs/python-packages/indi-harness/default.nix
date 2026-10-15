@@ -26,7 +26,7 @@ buildPythonPackage rec {
   nativeCheckInputs = [ pytestCheckHook ];
   src = pkg-src;
   meta = {
-    description = "Quaternion INDI prototype and SITL trajectory harness (S0/S1 of the ArduPilot INDI plan).";
+    description = "Quaternion INDI control models, rotor-dynamics simulator, and SITL trajectory harness.";
     longDescription = ''
       [Repository](https://github.com/goromal/indi-harness)
     '';

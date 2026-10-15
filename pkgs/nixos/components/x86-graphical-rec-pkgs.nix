@@ -13,6 +13,7 @@ in
     [
       anixpkgs.trafficsim
       anixpkgs.la-quiz
+      anixpkgs.tor-ephemeral
       (anixpkgs.play.override { standalone-opt = cfg.standalone; })
     ]
     ++ (

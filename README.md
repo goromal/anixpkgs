@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v8.52.0](https://github.com/goromal/anixpkgs/tree/v8.52.0)**
+**LATEST RELEASE: [v9.6.9](https://github.com/goromal/anixpkgs/tree/v9.6.9)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
@@ -31,7 +31,7 @@ nix-shell -p nixfmt --run "bash scripts/lint.sh"
 Comprehensive documentation for individual packages and common NixOS use cases is served in site form [here](https://goromal.github.io/anixpkgs/) using `mdbook` on the `docs/` directory. To generate new docs, run
 
 ```bash
-NIXPKGS_ALLOW_UNFREE=1 python scripts/generate_docs.py
+python scripts/generate_docs.py
 ```
 
 *Auto-generated as part of CD pipeline.*

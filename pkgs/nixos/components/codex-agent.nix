@@ -16,7 +16,12 @@ let
       value = {
         command = s.command;
         args = s.args;
-        env = s.env;
+        env =
+          s.env
+          // s.secretsEnv
+          // lib.optionalAttrs (s.secretsEnvVar != null) {
+            ${s.secretsEnvVar} = s.secretsPath;
+          };
       }
       // lib.optionalAttrs (s.startupTimeoutSec != null) {
         startup_timeout_sec = s.startupTimeoutSec;

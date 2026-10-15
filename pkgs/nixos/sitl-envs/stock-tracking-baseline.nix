@@ -23,7 +23,7 @@ pkgs.testers.runNixOSTest {
         virtualisation.diskSize = 8192;
         # Diagnostic probe: prints prearm STATUSTEXT / ACKs / key params so
         # arming failures in the headless battery are explainable from logs.
-        environment.etc."s1-arm-probe.py".text = ''
+        environment.etc."stock-arm-probe.py".text = ''
           import time
           from pymavlink import mavutil
 
@@ -81,13 +81,13 @@ pkgs.testers.runNixOSTest {
       # EKF needs sim GPS lock before arming; the battery's arm() retries, but
       # give the stack a generous head start on loaded runners.
       machines[0].succeed("python3 -c 'import indi_harness.sitl.baseline'")
-      print(machines[0].execute("timeout 180 python3 /etc/s1-arm-probe.py 2>&1")[1])
+      print(machines[0].execute("timeout 180 python3 /etc/stock-arm-probe.py 2>&1")[1])
       try:
           machines[0].succeed(
               "timeout 3600 python3 -m indi_harness.sitl.baseline"
               " --url tcp:127.0.0.1:5790"
               " --logs-dir /data/drone/ardusitl/logs"
-              " --out /tmp/s1_baseline >&2"
+              " --out /tmp/stock_guided >&2"
           )
       except Exception:
           print("=== ardusitl journal (arm/EKF/GPS lines) ===")
@@ -95,8 +95,8 @@ pkgs.testers.runNixOSTest {
           print("=== log dir ===")
           print(machines[0].execute("find /data/drone -name '*.BIN' 2>/dev/null; ls -la /data/drone/ardusitl 2>/dev/null")[1])
           raise
-      machines[0].succeed("test -s /tmp/s1_baseline/s1_baseline.json")
-      machines[0].copy_from_vm("/tmp/s1_baseline/s1_baseline.json", "")
-      print(machines[0].succeed("cat /tmp/s1_baseline/s1_baseline.json"))
+      machines[0].succeed("test -s /tmp/stock_guided/stock_guided.json")
+      machines[0].copy_from_vm("/tmp/stock_guided/stock_guided.json", "")
+      print(machines[0].succeed("cat /tmp/stock_guided/stock_guided.json"))
     '';
 }

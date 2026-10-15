@@ -29,7 +29,13 @@
     ];
   };
 
-  swapDevices = [ ];
+  # Keep large CUDA compiler processes from exhausting physical memory.
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 8192;
+    }
+  ];
 
   nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

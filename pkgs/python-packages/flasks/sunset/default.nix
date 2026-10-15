@@ -22,8 +22,8 @@ buildPythonPackage rec {
     flask
   ];
   meta = {
-    description = "Web UI to show and force-kill the running Dolphin emulator";
-    longDescription = "Provides a browser-based interface at /sunset for checking whether the Dolphin emulator is running and force-killing it while leaving the launcher wrapper intact.";
+    description = "Web UI to monitor Dolphin and PCSX2 and stop running games";
+    longDescription = "Provides a browser-based interface at /sunset to monitor Dolphin and PCSX2, gracefully stop PCSX2, or force-quit emulators while leaving play running to sync memory cards.";
     autoGenUsageCmd = "--help";
   };
 }

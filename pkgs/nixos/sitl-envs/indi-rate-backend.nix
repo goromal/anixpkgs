@@ -37,7 +37,7 @@ pkgs.testers.runNixOSTest {
           "CC_AXIS_MASK 7"
           "RC9_OPTION 109"
         ];
-        # Same prearm/EKF warm-up probe S1 uses (arm() needs a sim GPS lock
+        # Same prearm/EKF warm-up probe stock-guided uses (arm() needs a sim GPS lock
         # before NAV_TAKEOFF will climb); prints STATUSTEXT/GPS/params so an
         # arm/takeoff failure in the headless battery is explainable.
         environment.etc."arm-probe.py".text = ''
@@ -105,7 +105,7 @@ pkgs.testers.runNixOSTest {
               "timeout 3600 python3 -m indi_harness.sitl.baseline_cc"
               " --url tcp:127.0.0.1:5790 --engage-rc 9"
               " --logs-dir /data/drone/ardusitl/logs"
-              " --out /tmp/s3_layerA >&2"
+              " --out /tmp/indi_rate >&2"
           )
       except Exception:
           print("=== arm/EKF/GPS probe ===")
@@ -116,17 +116,17 @@ pkgs.testers.runNixOSTest {
           raise
       # Hard requirement: the scored 5-case battery JSON (exported as an
       # artifact rather than dumped to stdout).
-      machines[0].succeed("test -s /tmp/s3_layerA/s3_layerA.json")
-      machines[0].copy_from_vm("/tmp/s3_layerA/s3_layerA.json", "")
+      machines[0].succeed("test -s /tmp/indi_rate/indi_rate.json")
+      machines[0].copy_from_vm("/tmp/indi_rate/indi_rate.json", "")
       # Export the newest .BIN (INDI health source of truth) for offline scoring
       # of predicted-vs-measured angular accel.
-      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/s3_layerA/s3_layerA.BIN")
-      machines[0].copy_from_vm("/tmp/s3_layerA/s3_layerA.BIN", "")
+      machines[0].succeed("cp $(ls -t /data/drone/ardusitl/logs/*.BIN | head -1) /tmp/indi_rate/indi_rate.BIN")
+      machines[0].copy_from_vm("/tmp/indi_rate/indi_rate.BIN", "")
       # INDI health summary (proves the INDI backend actually flew it).
       print(machines[0].succeed(
           "python3 -c \""
           "from indi_harness.sitl.binlog import read_indi_health; import numpy as np; "
-          "h=read_indi_health('/tmp/s3_layerA/s3_layerA.BIN'); "
+          "h=read_indi_health('/tmp/indi_rate/indi_rate.BIN'); "
           "print('INDI msgs', len(h['time_us']), 'sat_frac', round(float(h['sat'].mean()),3))\""
       ))
     '';

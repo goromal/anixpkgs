@@ -1,6 +1,6 @@
 # ardupilot_msgs: custom ROS 2 interface package built with the nix-ros-overlay
 # jazzy set (we cannot modify the overlay, so this lives in anixpkgs and is
-# built via ros-pkgs.rosPackages.jazzy.callPackage). Provides the S3 Layer-B
+# built via ros-pkgs.rosPackages.jazzy.callPackage). Provides the INDI outer-loop
 # FlatSetpoint message consumed by the in-firmware INDI outer loop over AP_DDS.
 {
   lib,
@@ -39,7 +39,7 @@ buildRosPackage {
   nativeBuildInputs = [ ament-cmake ];
 
   meta = {
-    description = "ArduPilot custom ROS 2 messages (S3 Layer-B FlatSetpoint)";
+    description = "ArduPilot custom ROS 2 differential-flatness setpoint messages";
     license = with lib.licenses; [ gpl3Plus ];
   };
 }

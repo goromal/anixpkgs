@@ -6,27 +6,37 @@
 }:
 with import ../dependencies.nix;
 let
-  claudeDefaults = import ../claude-defaults.nix;
-  codexDefaults = import ../codex-defaults.nix { homeDir = config.machines.base.homeDir; };
+  lock = builtins.fromJSON (builtins.readFile ../../../flake.lock);
+  jetpackSrc = builtins.fetchTarball {
+    url = "https://github.com/anduril/jetpack-nixos/archive/${lock.nodes.jetpack-nixos.locked.rev}.tar.gz";
+    sha256 = lock.nodes.jetpack-nixos.locked.narHash;
+  };
+  jetpackModule = import (jetpackSrc + "/modules/default.nix") (import (jetpackSrc + "/overlay.nix"));
 in
 {
-  imports = [ ../pc-base.nix ];
+  imports = [
+    jetpackModule
+    ../pc-base.nix
+  ];
 
   config = {
+    # nixpkgs marks NCCL unsupported on pre-Thor Jetsons. PyTorch still carries
+    # it as a dependency even though single-GPU services do not use it.
+    nixpkgs.config.allowUnsupportedSystem = true;
+
+    # All supported Orin variants use Ampere compute capability 8.7. Avoid
+    # compiling large CUDA packages such as PyTorch for unrelated GPU targets.
+    nixpkgs.config.cudaCapabilities = [ "8.7" ];
+    nixpkgs.overlays = [ emulatedAarch64SdlTestsOverlay ];
+
+    hardware.nvidia-jetpack.enable = true;
+    # configureCuda would turn on cudaSupport for the whole system package set.
+    # Keep it CPU-only; GPU workloads use machines.cudaNode.pkgs instead.
+    hardware.nvidia-jetpack.configureCuda = false;
+    hardware.graphics.enable = true;
+
     machines.base = {
       machineType = "jetson";
-      graphical = false;
-      recreational = false;
-      developer = true;
-      isATS = false;
-      agentFrameworks = [
-        "claude"
-        "codex"
-      ];
-      serveNotesWiki = false;
-      enableMetrics = true;
-      enableFileServers = true;
-      enableUpgradeUI = true;
       cloudDirs = [
         {
           name = "configs";
@@ -44,49 +54,46 @@ in
           dirname = "data";
         }
       ];
-      enableOrchestrator = true;
-      timedOrchJobs = [
-        {
-          name = "launchpad-sync";
-          jobShellScript = pkgs.writeShellScript "launchpad-sync" ''
-            export PATH="${
-              pkgs.lib.makeBinPath [
-                pkgs.git
-                pkgs.openssh
-              ]
-            }:$PATH"
-            REPO=$HOME/launchpad
-            if [[ -d "$REPO/.git" ]]; then
-              cd "$REPO"
-              if [[ -n "$(git status --porcelain)" ]]; then
-                git add -A
-                git commit -m "Auto-commit $(date '+%Y-%m-%d %H:%M:%S')"
-              fi
-              pull_out=$(git pull --rebase origin master 2>&1)
-              if [[ $? -eq 0 ]]; then
-                push_out=$(git push origin master 2>&1)
-                if [[ $? -eq 0 ]]; then
-                  logger -t launchpad-sync "Sync complete"
-                else
-                  echo "$push_out" >&2
-                  logger -t launchpad-sync "Push to master failed"
-                fi
-              else
-                echo "$pull_out" >&2
-                git rebase --abort 2>/dev/null
-                logger -t launchpad-sync "Rebase conflict detected, manual intervention needed"
-              fi
-            else
-              logger -t launchpad-sync "No git repository found at $REPO, skipping"
-            fi
-          '';
-          timerCfg = {
-            OnCalendar = [ "*-*-* 03:00:00" ];
-            Persistent = true;
-          };
-        }
+    };
+    machines.features = {
+      desktop.enable = false;
+      development.enable = true;
+      recreation.enable = false;
+      headsetAudio.enable = false;
+      externalDrives.enable = true;
+      homeVpn.enable = false;
+      agentUi.enable = true;
+      upgradeUi.enable = true;
+      nexus.enable = true;
+      fileServers.enable = true;
+      metrics.enable = true;
+      notesWiki.enable = false;
+      orchestrator.enable = true;
+      auth.enable = false;
+      budget.enable = false;
+      languageQuiz.enable = false;
+      music.enable = false;
+      tester.enable = false;
+      disciple.enable = false;
+      tasks.enable = false;
+      videoDownload.enable = false;
+      brom.enable = true;
+      intake.enable = false;
+      mail.enable = false;
+      plex.enable = false;
+      vikunja.enable = false;
+      gameStreaming.enable = false;
+      gpu.enable = true;
+      notebooks.enable = true;
+      imageGeneration.enable = true;
+      localLlm.enable = false;
+      folio.enable = false;
+      tactical.enable = false;
+      agents.frameworks = [
+        "claude"
+        "codex"
       ];
-      extraOrchestratorPackages = [
+      orchestrator.extraPackages = [
         anixpkgs.wiki-tools
         anixpkgs.task-tools
         anixpkgs.notion-tools
@@ -98,36 +105,7 @@ in
         anixpkgs.surveys_report
       ];
     };
-    machines.cudaNode.enable = true;
-    machines.claude = {
-      marketplaces = claudeDefaults.marketplaces;
-      plugins = claudeDefaults.plugins;
-      permissionsAllow = claudeDefaults.permissionsAllow;
-      hooks = claudeDefaults.hooks;
-      skills = claudeDefaults.skills;
-      mcpServers = [
-        claudeDefaults.mcpServers.vikunja
-        claudeDefaults.mcpServers.notion
-        claudeDefaults.mcpServers.jupyter
-        claudeDefaults.mcpServers.googleSheets
-      ];
-    };
-    machines.codex = {
-      model = codexDefaults.model;
-      modelProvider = codexDefaults.modelProvider;
-      approvalPolicy = codexDefaults.approvalPolicy;
-      sandboxMode = codexDefaults.sandboxMode;
-      extraSettings = codexDefaults.extraSettings;
-      skills = codexDefaults.skills;
-      mcpServers = [
-        codexDefaults.mcpServers.vikunja
-        codexDefaults.mcpServers.notion
-        codexDefaults.mcpServers.jupyter
-        codexDefaults.mcpServers.googleSheets
-      ];
-    };
     users.users.andrew.hashedPassword = lib.mkForce "$6$Kof8OUytwcMojJXx$vc82QBfFMxCJ96NuEYsrIJ0gJORjgpkeeyO9PzCBgSGqbQePK73sa13oK1FGY1CGd09qbAlsdiXWmO6m9c3K.0";
-    services.google-sheets-mcp.enable = true;
     environment.systemPackages = [
       anixpkgs.jetson-stats
     ];

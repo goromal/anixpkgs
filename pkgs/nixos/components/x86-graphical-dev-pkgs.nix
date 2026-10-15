@@ -63,14 +63,14 @@ in
           {
             name = "vscode-rustfmt";
             publisher = "statiolake";
-            version = "0.1.2";
-            sha256 = "0kprx45j63w1wr776q0cl2q3l7ra5ln8nwy9nnxhzfhillhqpipi";
+            version = "0.4.0";
+            sha256 = "sha256-/GcL6Heah6cT5+6W6DQjlh3Zp0SEhk2fRaxoNYvi7Ks=";
           }
           {
             name = "protobuf-vsc";
             publisher = "DrBlury";
-            version = "1.0.1";
-            sha256 = "sha256-DFLm0efm7krqcObblbgAlO9PsEGDtw9vrsIDeCtjd14=s";
+            version = "1.6.15";
+            sha256 = "sha256-KWWjDiINAJljQnKzwqyJMZc6ZCOx4/Wq+4fNAn0v2CI=";
           }
         ];
     };

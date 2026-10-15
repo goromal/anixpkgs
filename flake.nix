@@ -2,11 +2,30 @@
   description = "A collection of personal (or otherwise personally useful) software packaged in Nix.";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs?ref=refs/tags/26.05";
+    # The 26.05 release branch, for packages that must be newer than the 26.05 tag.
+    nixpkgs-26-05-branch.url = "github:NixOS/nixpkgs?ref=refs/heads/nixos-26.05";
+
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3.22.4";
+
+    home-manager.url = "github:nix-community/home-manager?ref=refs/heads/release-26.05";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     jetpack-nixos.url = "github:anduril/jetpack-nixos";
 
+    # Pin bun2nix (a transitive input of llm-agents) by rev rather than the
+    # upstream "fix-structured-attrs-hook" side branch, so check_deps.py stays
+    # green. This is the exact commit upstream currently points that branch at;
+    # its sub-inputs follow llm-agents' as upstream wires them, so the build is
+    # identical to the floating side-branch lock.
+    bun2nix.url = "github:Mic92/bun2nix/5765b0614591f75ee8ba5596e81ae85c167d1071";
+    bun2nix.inputs.nixpkgs.follows = "llm-agents/nixpkgs";
+    bun2nix.inputs.flake-parts.follows = "llm-agents/flake-parts";
+    bun2nix.inputs.systems.follows = "llm-agents/systems";
+    bun2nix.inputs.treefmt-nix.follows = "llm-agents/treefmt-nix";
+
     llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents.inputs.bun2nix.follows = "bun2nix";
 
     phps.url = "github:fossar/nix-phps";
 
@@ -30,7 +49,7 @@
     ceres-factors.url = "github:goromal/ceres-factors";
     ceres-factors.flake = false;
 
-    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.11.0";
+    comfyui-src.url = "github:comfyanonymous/ComfyUI?ref=refs/tags/v0.39.0";
     comfyui-src.flake = false;
 
     crowcpp.url = "github:goromal/Crow";
@@ -59,9 +78,6 @@
 
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
-
-    gnc.url = "github:goromal/gnc";
-    gnc.flake = false;
 
     indi-harness.url = "github:goromal/indi-harness";
     indi-harness.flake = false;
@@ -197,6 +213,8 @@
       nixpkgs,
       flake-utils,
       jetpack-nixos,
+      determinate,
+      home-manager,
       ...
     }@inputs:
     let
@@ -206,8 +224,22 @@
       ];
       nixos-version = builtins.readFile ./NIXOS_VERSION;
       anixpkgsOverlay = import ./overlay.nix;
+      commonNixpkgsModule = {
+        nixpkgs.overlays = [ anixpkgsOverlay ];
+        nixpkgs.config.allowUnfree = true;
+        nixpkgs.config.flakeInputs = inputs;
+      };
+      commonSpecialArgs = {
+        inherit nixos-version;
+        hmModule = home-manager.nixosModules.home-manager;
+      };
+      commonModules = [
+        determinate.nixosModules.default
+        commonNixpkgsModule
+      ];
     in
     flake-utils.lib.eachSystem supported-systems (system: {
+      packages.home-manager = home-manager.packages.${system}.home-manager;
       legacyPackages = import nixpkgs {
         inherit system;
         overlays = [ anixpkgsOverlay ];
@@ -219,6 +251,70 @@
     })
     // {
       nixosConfigurations = {
+        # Personal workstations
+        atorgesen-inspiron = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-inspiron.nix ];
+        };
+
+        atorgesen-panasonic = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-panasonic.nix ];
+        };
+
+        atorgesen-dell = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/personal-dell.nix ];
+        };
+
+        # ATS servers
+        ats = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/ats-alderlake.nix ];
+        };
+
+        ats-pi = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/ats-pi.nix ];
+        };
+
+        # NVIDIA Jetson
+        jetson-orin-nx =
+          let
+            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;
+          in
+          jetpackNixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            specialArgs = commonSpecialArgs;
+            modules = commonModules ++ [
+              ./pkgs/nixos/configurations/jetpack-orin-nx.nix
+            ];
+          };
+
+        jetson-orin-agx =
+          let
+            jetpackNixpkgs = jetpack-nixos.inputs.nixpkgs;
+          in
+          jetpackNixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            specialArgs = commonSpecialArgs;
+            modules = commonModules ++ [
+              ./pkgs/nixos/configurations/jetpack-orin-agx.nix
+            ];
+          };
+
+        # Drone simulation
+        drone-obc-sitl = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = commonSpecialArgs;
+          modules = commonModules ++ [ ./pkgs/nixos/configurations/drone-obc-sitl.nix ];
+        };
+
         # x86_64 personal installer ISO
         # Build: nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage
         installer-personal = nixpkgs.lib.nixosSystem {
@@ -327,9 +423,6 @@
                     # --- INSTALL NIXOS ---
                     echo
                     echo "Installing NixOS profile..."
-                    nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-                    nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-                    nix-channel --update
                     nixos-generate-config --root /mnt/nixos
                     sudo -u andrew HARDWARE_NAME="$HARDWARE_NAME" bash <<'EOF'
                     cd /data/andrew
@@ -340,18 +433,10 @@
                     sed -i 's/machines\.base\.nixosState *= *"[^"]*"/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     sed -i '/bootMntPt/d' anixpkgs/pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
                     cd anixpkgs
-                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix
-                    cd /data/andrew
-                    mkdir -p ~/.config/nixpkgs
-                    echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                    python3 scripts/add-machine-to-flake.py personal $HARDWARE_NAME
+                    git add pkgs/nixos/hardware/$HARDWARE_NAME.nix pkgs/nixos/configurations/personal-$HARDWARE_NAME.nix flake.nix
                     EOF
-                    mkdir -p /root/.config/nixpkgs
-                    cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
-                    rm /mnt/nixos/etc/nixos/*
-                    ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/personal-''${HARDWARE_NAME}.nix /mnt/nixos/etc/nixos/configuration.nix
-                    export NIXPKGS_ALLOW_UNFREE=1
-                    export NIXPKGS_ALLOW_INSECURE=1
-                    nixos-install --root /mnt/nixos
+                    nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#atorgesen-$HARDWARE_NAME
                     echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                   '')
                 ];
@@ -480,9 +565,6 @@
                       # --- INSTALL NIXOS ---
                       echo
                       echo "Installing NixOS profile..."
-                      nix-channel --add https://nixos.org/channels/nixos-${nixos-version} nixpkgs
-                      nix-channel --add https://github.com/nix-community/home-manager/archive/release-${nixos-version}.tar.gz home-manager
-                      nix-channel --update
                       nixos-generate-config --root /mnt/nixos
                       sudo -u andrew VARIANT="$VARIANT" bash <<'INNEREOF'
                       cd /data/andrew
@@ -492,18 +574,10 @@
                       sed -i "s/orin-nx/$VARIANT/g" anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       sed -i 's/machines\.base\.nixosState *= *[^;]*/machines.base.nixosState = "${nixos-version}"/' anixpkgs/pkgs/nixos/configurations/jetpack-$VARIANT.nix
                       cd anixpkgs
-                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix
-                      cd /data/andrew
-                      mkdir -p ~/.config/nixpkgs
-                      echo "{ allowUnfree = true; }" > ~/.config/nixpkgs/config.nix
+                      python3 scripts/add-machine-to-flake.py jetpack $VARIANT
+                      git add pkgs/nixos/hardware/$VARIANT.nix pkgs/nixos/configurations/jetpack-$VARIANT.nix flake.nix
                       INNEREOF
-                      mkdir -p /root/.config/nixpkgs
-                      cp /data/andrew/.config/nixpkgs/config.nix /root/.config/nixpkgs
-                      rm /mnt/nixos/etc/nixos/*
-                      ln -s /data/andrew/anixpkgs/pkgs/nixos/configurations/jetpack-''${VARIANT}.nix /mnt/nixos/etc/nixos/configuration.nix
-                      export NIXPKGS_ALLOW_UNFREE=1
-                      export NIXPKGS_ALLOW_INSECURE=1
-                      nixos-install --root /mnt/nixos
+                      nixos-install --root /mnt/nixos --flake /data/andrew/anixpkgs#jetson-$VARIANT
                       echo "Done! Please shutdown and reboot, then proceed with the anix-init command while connected to the internet."
                     '')
                   ];
