@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1768144916,
-        "narHash": "sha256-SlA5mbKsWjSnoGFw8HE44efy2BB6QeUmX6IHDMMrbxo=",
+        "lastModified": 1792191155,
+        "narHash": "sha256-52w2p1He/HL5UtuYcw+gSAfP5gAgOL4S84QOcfjw4mQ=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "e7cad057b29a7acbcf2409fb9e899f7864a4c08a",
+        "rev": "39a0204651603b6090dd02aa974dcf091aecc7fc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/bitd",
         "repo": "aapis",
         "type": "github"
       }
@@ -49,6 +50,23 @@
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
+      }
+    },
+    "bit-rs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792193413,
+        "narHash": "sha256-JVaDD4dKU8MjDc2dV4RCu6bK2MrowyUA1w7v5OB+0ro=",
+        "owner": "goromal",
+        "repo": "bit-rs",
+        "rev": "66a1644fe8d221eabc2f9d3cdf71d986de7d2fc0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "ref": "refs/heads/dev/bitd",
+        "repo": "bit-rs",
+        "type": "github"
       }
     },
     "book-notes-sync": {
@@ -425,15 +443,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791850553,
-        "narHash": "sha256-yCkMG6DdRPymJ6J4evOlBmc1uyZHAHeIJtDFuHiZjYY=",
+        "lastModified": 1792193415,
+        "narHash": "sha256-06PhXM3QabsEeYcwGCvcjKgnxnVBSsj+wA/t2qrbmZg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "6296db4940faf89a69109fa505e7341352ce0ce7",
+        "rev": "6fc64b84ec3841e7194e3aaa2049c17fe80f14c8",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/bitd",
         "repo": "flasks",
         "type": "github"
       }
@@ -1219,6 +1238,7 @@
         "aapis": "aapis",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
+        "bit-rs": "bit-rs",
         "book-notes-sync": "book-notes-sync",
         "bun2nix": "bun2nix",
         "ceres-factors": "ceres-factors",

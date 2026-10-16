@@ -89,6 +89,11 @@
         ],
         "rust": [
             {
+                "attr": "bit-rs",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "manif-geom-rs",
                 "ci": true,
                 "docs": true

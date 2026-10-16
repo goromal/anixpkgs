@@ -37,8 +37,11 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=refs/heads/dev/bitd";
     aapis.flake = false;
+
+    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/dev/bitd";
+    bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
@@ -67,7 +70,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks";
+    flasks.url = "github:goromal/flasks?ref=refs/heads/dev/bitd";
     flasks.flake = false;
 
     folio.url = "github:goromal/folio";

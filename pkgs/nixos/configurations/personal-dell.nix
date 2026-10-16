@@ -21,6 +21,7 @@
     acceleration = "cuda";
   };
   services.comfyui.lowMem = true;
+  services.bitd.checks = [ "cozy_imgedit2" ];
   # 4 GB RTX 500: leave room for Qwen-Image 2.1's sampling scratch buffers.
   services.comfyui.reserveVram = 1.0;
   services.comfyui.cozy.workflows = [

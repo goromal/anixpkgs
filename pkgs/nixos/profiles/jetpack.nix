@@ -20,6 +20,7 @@ in
   ];
 
   config = {
+    services.bitd.checks = [ "avahi" ];
     # nixpkgs marks NCCL unsupported on pre-Thor Jetsons. PyTorch still carries
     # it as a dependency even though single-GPU services do not use it.
     nixpkgs.config.allowUnsupportedSystem = true;
