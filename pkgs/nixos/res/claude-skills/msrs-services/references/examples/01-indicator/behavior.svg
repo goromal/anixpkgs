@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="345" viewBox="0 0 860 345" role="img" aria-labelledby="title desc">
+<title id="title">1. A virtual indicator</title>
+<desc id="desc">Editable source is the adjacent behavior.drawio. Transition and rule IDs refer to SPEC.md.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="#334155"/></marker></defs>
+<rect width="860" height="345" fill="white"/>
+<g font-family="DejaVu Sans, sans-serif" fill="#0f172a">
+<text x="430.0" y="35.7" text-anchor="middle" font-size="22" font-weight="bold">1. A virtual indicator</text>
+<ellipse cx="85.0" cy="155.0" rx="10.0" ry="10.0" fill="#334155"/>
+<rect x="150" y="120" width="170" height="70" rx="10" fill="#e0f2fe" stroke="#334155" stroke-width="1.5"/>
+<text x="235.0" y="161.0" font-size="16" text-anchor="middle">S1 / off</text>
+<rect x="510" y="120" width="170" height="70" rx="10" fill="#e0f2fe" stroke="#334155" stroke-width="1.5"/>
+<text x="595.0" y="161.0" font-size="16" text-anchor="middle">S2 / on</text>
+<path d="M95,155 L150,155" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M235,120 L235,90 L595,90 L595,120" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="415.0" y="71.9" text-anchor="middle" font-size="14">T1: Set(true)</text>
+<path d="M595,190 L595,225 L235,225 L235,190" fill="none" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="415.0" y="246.9" text-anchor="middle" font-size="14">T2: Set(false)</text>
+<text x="430.0" y="291.9" text-anchor="middle" font-size="14">T3: repeated value → reply with current value; no state re-entry.</text>
+<text x="430.0" y="319.9" text-anchor="middle" font-size="14">Every command produces one Status. Startup is off with no output.</text>
+</g></svg>

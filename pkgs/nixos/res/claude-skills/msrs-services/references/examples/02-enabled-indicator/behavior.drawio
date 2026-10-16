@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="02-enabled-indicator" name="Behavior">
+    <mxGraphModel dx="900" dy="495" grid="1" gridSize="10" page="1" pageWidth="900" pageHeight="495" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="heading" value="2. An enabled indicator" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontFamily=DejaVu Sans;fontColor=#0f172a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="0" y="12" width="900" height="32" />
+        </mxCell>
+        <mxCell id="start" value="" style="ellipse;html=0;whiteSpace=wrap;fillColor=#334155;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="20" y="185" width="20" height="20" />
+        </mxCell>
+        <mxCell id="S1" value="S1 / disabled" style="rounded=1;arcSize=12;html=0;whiteSpace=wrap;fillColor=#e0f2fe;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="65" y="160" width="160" height="70" />
+        </mxCell>
+        <mxCell id="S2" value="S2 / enabled" style="rounded=1;arcSize=12;html=0;whiteSpace=wrap;fillColor=#f8fafc;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;verticalAlign=top;spacingTop=12;container=1;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="365" y="65" width="450" height="270" />
+        </mxCell>
+        <mxCell id="enabled-initial" value="" style="ellipse;html=0;whiteSpace=wrap;fillColor=#334155;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;" vertex="1" parent="S2">
+          <mxGeometry as="geometry" x="55" y="50" width="20" height="20" />
+        </mxCell>
+        <mxCell id="S3" value="S3 / off" style="rounded=1;arcSize=12;html=0;whiteSpace=wrap;fillColor=#e0f2fe;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;" vertex="1" parent="S2">
+          <mxGeometry as="geometry" x="40" y="100" width="150" height="60" />
+        </mxCell>
+        <mxCell id="S4" value="S4 / on" style="rounded=1;arcSize=12;html=0;whiteSpace=wrap;fillColor=#e0f2fe;strokeColor=#334155;fontColor=#0f172a;fontSize=16;fontFamily=DejaVu Sans;" vertex="1" parent="S2">
+          <mxGeometry as="geometry" x="260" y="100" width="150" height="60" />
+        </mxCell>
+        <mxCell id="initial" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=1.0;exitY=0.5;entryX=0.0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="start" target="S1">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="enabled-entry" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=0.5;exitY=1.0;entryX=0.16666666666666666;entryY=0.0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="enabled-initial" target="S3">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="T1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=1.0;exitY=0.5;entryX=0.0;entryY=0.5;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="S1" target="S3">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="T1-label" value="T1: Enable" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="230" y="160" width="170" height="24" />
+        </mxCell>
+        <mxCell id="T2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=0.7666666666666667;exitY=0.0;entryX=0.5;entryY=0.0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="S3" target="S4">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="520" y="125" />
+              <mxPoint x="700" y="125" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T2-label" value="T2: Set(true)" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="525" y="98" width="170" height="24" />
+        </mxCell>
+        <mxCell id="T3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=0.5;exitY=1.0;entryX=0.5;entryY=1.0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="S4" target="S3">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="700" y="265" />
+              <mxPoint x="480" y="265" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T3-label" value="T3: Set(false)" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="505" y="271" width="170" height="24" />
+        </mxCell>
+        <mxCell id="T4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#334155;strokeWidth=1.5;exitX=0.5;exitY=1.0;entryX=0.5;entryY=1.0;exitPerimeter=0;entryPerimeter=0;" edge="1" parent="1" source="S2" target="S1">
+          <mxGeometry as="geometry" relative="1">
+            <Array as="points">
+              <mxPoint x="590" y="375" />
+              <mxPoint x="145" y="375" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T4-label" value="T4: Disable (either child)" style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="235" y="340" width="270" height="24" />
+        </mxCell>
+        <mxCell id="note-0" value="T5: Set while disabled → rejected. T6: Disable while disabled → accepted." style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="10" y="410" width="880" height="24" />
+        </mxCell>
+        <mxCell id="note-1" value="T7: Enable while enabled, or repeated Set → accepted; keep current child." style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="10" y="438" width="880" height="24" />
+        </mxCell>
+        <mxCell id="note-2" value="All commands reply once. Enabling from disabled enters off; no history." style="text;html=0;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontFamily=DejaVu Sans;fontColor=#0f172a;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="10" y="466" width="880" height="24" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
