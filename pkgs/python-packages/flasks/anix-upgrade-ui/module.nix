@@ -8,6 +8,7 @@ with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.anix-upgrade-ui;
   globalCfg = config.machines.base;
+  bitdCfg = config.services.bitd;
 in
 {
   options.services.anix-upgrade-ui = {
@@ -64,7 +65,8 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}";
+        # bitctl serves Nexus a read-only view of bitd, whose gRPC port stays on loopback.
+        ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}${lib.optionalString bitdCfg.enable " --bitctl-bin ${bitdCfg.package}/bin/bitctl"}";
         # nixos-rebuild may restart this UI while its upgrade child is still
         # finishing. Leave that child running so the replacement UI can keep
         # following its persisted PID and log.

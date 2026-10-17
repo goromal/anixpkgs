@@ -441,15 +441,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792216045,
-        "narHash": "sha256-06PhXM3QabsEeYcwGCvcjKgnxnVBSsj+wA/t2qrbmZg=",
+        "lastModified": 1792275062,
+        "narHash": "sha256-ZFdmFl8C3xATaR/1c0Vn/Dz7FAgR5GzLJjKgpADzAzs=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "fd3edc889dcaef97c1456aa378b1f0acd32705d7",
+        "rev": "31ea8fd1d9449cdb56b4c6b7f3eb89cf60aff5b6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/nexus-health",
         "repo": "flasks",
         "type": "github"
       }
