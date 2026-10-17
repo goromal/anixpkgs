@@ -21,14 +21,19 @@ rustPlatform.buildRustPackage {
     "cozy_imgedit2"
     "cozy_imggen_quantized"
     "nvidia_power"
+    "ardupilot"
+    "ros2_topics"
   ];
   postInstall = ''
-    mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin $cozy_imggen_quantized/bin $nvidia_power/bin
+    mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin $cozy_imggen_quantized/bin $nvidia_power/bin \
+      $ardupilot/bin $ros2_topics/bin
     mv $out/bin/bit-check-internet $internet/bin/
     mv $out/bin/bit-check-avahi $avahi/bin/
     mv $out/bin/bit-check-cozy-imgedit2 $cozy_imgedit2/bin/
     mv $out/bin/bit-check-cozy-imggen-quantized $cozy_imggen_quantized/bin/
     mv $out/bin/bit-check-nvidia-power $nvidia_power/bin/
+    mv $out/bin/bit-check-ardupilot $ardupilot/bin/
+    mv $out/bin/bit-check-ros2-topics $ros2_topics/bin/
   '';
   meta = {
     description = "Machine health and regression checks with bitd and the bitctl TUI.";

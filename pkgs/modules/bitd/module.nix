@@ -8,6 +8,15 @@ let
   cfg = config.services.bitd;
   anixPkgs = if pkgs ? bit-rs then pkgs else pkgs.extend (import ../../../overlay.nix);
   ports = import ../../nixos/service-ports.nix;
+  # Cozy checks restart ComfyUI after their job so it frees the RAM its loaded
+  # models hold. --no-block keeps the stop/start out of the check's deadline;
+  # authorization (the comfyui module's polkit rule) is still checked up front.
+  comfyuiRestart = [
+    "${pkgs.systemd}/bin/systemctl"
+    "--no-block"
+    "restart"
+    "comfyui.service"
+  ];
   json = pkgs.formats.json { };
   known = builtins.attrNames cfg.plugins;
   selected = lib.unique cfg.checks;
@@ -26,6 +35,7 @@ let
         config = plugin.settings;
       }
       // lib.optionalAttrs (plugin.kind == "health") { rate_hz = plugin.rateHz; }
+      // lib.optionalAttrs plugin.exclusive { exclusive = true; }
     ) valid;
   };
 in
@@ -40,6 +50,15 @@ in
     port = lib.mkOption {
       type = lib.types.port;
       default = ports.bitd;
+    };
+    user = lib.mkOption {
+      type = lib.types.str;
+      default = "andrew";
+      description = "User that bitd and its plugins run as.";
+    };
+    group = lib.mkOption {
+      type = lib.types.str;
+      default = "dev";
     };
     checks = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -69,6 +88,11 @@ in
             timeoutMs = lib.mkOption {
               type = lib.types.ints.positive;
               default = 4000;
+            };
+            exclusive = lib.mkOption {
+              type = lib.types.bool;
+              default = false;
+              description = "Regression only: never run alongside another regression check (e.g. it needs the GPU to itself).";
             };
             settings = lib.mkOption {
               type = lib.types.attrsOf json.type;
@@ -103,6 +127,7 @@ in
       };
       cozy_imgedit2 = {
         kind = "regression";
+        exclusive = lib.mkDefault true;
         command = lib.mkDefault "${cfg.package.cozy_imgedit2}/bin/bit-check-cozy-imgedit2";
         timeoutMs = lib.mkDefault 900000;
         settings = {
@@ -111,10 +136,12 @@ in
           png_command = lib.mkDefault "${anixPkgs.png}/bin/png";
           # Reserve time for upload, HTTP deadlines, and cancelling the job.
           max_seconds = lib.mkDefault 870;
+          restart_command = lib.mkDefault comfyuiRestart;
         };
       };
       cozy_imggen_quantized = {
         kind = "regression";
+        exclusive = lib.mkDefault true;
         command = lib.mkDefault "${cfg.package.cozy_imggen_quantized}/bin/bit-check-cozy-imggen-quantized";
         # 60 s job budget plus HTTP deadlines and cancelling the job.
         timeoutMs = lib.mkDefault 90000;
@@ -124,7 +151,27 @@ in
           max_seconds = lib.mkDefault 60;
           width = lib.mkDefault 500;
           height = lib.mkDefault 500;
+          restart_command = lib.mkDefault comfyuiRestart;
         };
+      };
+      ardupilot = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.ardupilot}/bin/bit-check-ardupilot";
+        rateHz = lib.mkDefault 0.2;
+        timeoutMs = lib.mkDefault 4500;
+        settings = {
+          address = lib.mkDefault "127.0.0.1:${toString ports.mavlink.router-tcp}";
+          max_seconds = lib.mkDefault 3;
+        };
+      };
+      # Needs settings.ros2 (the machine's ros2 CLI) and settings.topics.
+      ros2_topics = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.ros2_topics}/bin/bit-check-ros2-topics";
+        # Each run starts the Python ros2 CLI once per topic.
+        rateHz = lib.mkDefault (1.0 / 15.0);
+        timeoutMs = lib.mkDefault 12000;
+        settings.max_seconds = lib.mkDefault 8;
       };
     };
     assertions = [
@@ -150,6 +197,12 @@ in
         ) valid;
         message = "bitd health plugins need a positive rateHz <= 100; regression plugins must omit rateHz; timeoutMs must be <= 86400000.";
       }
+      {
+        assertion = builtins.all (
+          name: cfg.plugins.${name}.exclusive -> cfg.plugins.${name}.kind == "regression"
+        ) valid;
+        message = "Only bitd regression plugins can be exclusive.";
+      }
     ];
     environment.systemPackages = [ cfg.package ];
     environment.shellAliases.b = "bitctl";
@@ -167,8 +220,8 @@ in
       serviceConfig = {
         ExecStartPre = "${cfg.package}/bin/bitd --config ${configuration} --check-config";
         ExecStart = "${cfg.package}/bin/bitd --config ${configuration}";
-        User = "andrew";
-        Group = "dev";
+        User = cfg.user;
+        Group = cfg.group;
         Restart = "on-failure";
         RestartSec = 5;
         TimeoutStopSec = 10;

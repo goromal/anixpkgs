@@ -32,7 +32,9 @@ Do not detach helpers from that group.
 
 Health checks require a rate and must be lightweight. Regression checks run
 only on explicit request. Different checks run concurrently; a check never
-overlaps itself. Keep test fixtures deterministic and correlate remote results
+overlaps itself. A regression that needs the machine to itself (GPU, shared
+queue) sets `exclusive`: it never runs alongside another regression, while
+health checks keep their schedule. Keep test fixtures deterministic and correlate remote results
 to the submitted job ID. Timeouts kill local processes, but a remote job may
 continue: implement targeted cleanup where the remote API supports it.
 
@@ -45,7 +47,8 @@ bitctl; plugin output paths enter the system closure when selected.
 
 Modules append string names to `services.bitd.checks`. Definitions live under
 `services.bitd.plugins.<name>`: `kind`, absolute `command`, `timeoutMs`,
-`rateHz` (health only), and JSON-compatible `settings`. Use `lib.mkDefault` for
+`rateHz` (health only), `exclusive` (regression only), and JSON-compatible
+`settings`. `services.bitd.user`/`group` set the account plugins run as. Use `lib.mkDefault` for
 tunable defaults. Add checks to the narrowest applicable profile/module.
 The daemon reads its configuration at startup; NixOS restarts it when the
 generated configuration changes.
