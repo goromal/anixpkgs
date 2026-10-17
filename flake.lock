@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1792247936,
+        "lastModified": 1792250433,
         "narHash": "sha256-3UN04RApjKyhRXVD8cXWaBnMX5RdJrQeHMmO0cQu8mc=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "fa2c29455bd6c810272e13a9af3f86fa941d5404",
+        "rev": "129df89d276cf1c9365664bc4574c16f28e61df0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bit-remediation",
         "repo": "aapis",
         "type": "github"
       }
@@ -55,16 +54,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792248703,
-        "narHash": "sha256-b3s46fa1dcNKZNVYvUcD0MMhgAHHozYGeG8WpnguvW8=",
+        "lastModified": 1792250585,
+        "narHash": "sha256-ke6VnFTLnMdhBKe58rfE0+akDm/2zQOiMCd4iUkjQyE=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "b0dce9c3eac310274f911009e82fb3c45be62ebd",
+        "rev": "61088d934a24c4184deb522d372b8b7f1dc84cad",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bit-remediation",
         "repo": "bit-rs",
         "type": "github"
       }
