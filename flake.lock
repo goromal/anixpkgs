@@ -55,11 +55,11 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792197495,
-        "narHash": "sha256-fdjoPcLrRGPLrVT8ix+ch4XtLhyZKTefOubOTPutjf0=",
+        "lastModified": 1792203089,
+        "narHash": "sha256-1/vO4RSwHnlqMPGSAyvnkvD23RZbfvQ+1xKfKUh8lHI=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "ab6b6e1dac0f31b4a93d278cda9b37912c1f4b9d",
+        "rev": "887904fd5dc68e6fbf3aa9303be7a456ca4a3c17",
         "type": "github"
       },
       "original": {
