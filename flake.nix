@@ -37,10 +37,10 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    aapis.url = "github:goromal/aapis";
+    aapis.url = "github:goromal/aapis?ref=refs/heads/dev/bit-remediation";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/fix/gpu-power-limit";
+    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/dev/bit-remediation";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";

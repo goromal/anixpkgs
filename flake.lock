@@ -3,15 +3,16 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1792216036,
-        "narHash": "sha256-52w2p1He/HL5UtuYcw+gSAfP5gAgOL4S84QOcfjw4mQ=",
+        "lastModified": 1792247936,
+        "narHash": "sha256-3UN04RApjKyhRXVD8cXWaBnMX5RdJrQeHMmO0cQu8mc=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "6f4d57da71668e52cbc6e857accdbc8c4b2eedc6",
+        "rev": "fa2c29455bd6c810272e13a9af3f86fa941d5404",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/bit-remediation",
         "repo": "aapis",
         "type": "github"
       }
@@ -54,16 +55,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792247058,
-        "narHash": "sha256-hsJBu0WrPuh6JxvMpaGzsDIO4HmYeCUyTdExM9yDWfM=",
+        "lastModified": 1792247938,
+        "narHash": "sha256-CgIFqgIqtedAFU5UfeYxnruoWHDTUY9AG03e1uk/cJU=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "e70436d7a7ca1204f670ed1c9b17b48ee0e9af2d",
+        "rev": "663dfc3f5385b9837ff144575141a95dae0d145a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/gpu-power-limit",
+        "ref": "refs/heads/dev/bit-remediation",
         "repo": "bit-rs",
         "type": "github"
       }
