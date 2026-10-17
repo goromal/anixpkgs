@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1792191155,
+        "lastModified": 1792216036,
         "narHash": "sha256-52w2p1He/HL5UtuYcw+gSAfP5gAgOL4S84QOcfjw4mQ=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "39a0204651603b6090dd02aa974dcf091aecc7fc",
+        "rev": "6f4d57da71668e52cbc6e857accdbc8c4b2eedc6",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bitd",
         "repo": "aapis",
         "type": "github"
       }
@@ -55,16 +54,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792208480,
-        "narHash": "sha256-NBYfZsUmqLniswZcXTxNT99rkpyQB5IFkd9YSvIMuTQ=",
+        "lastModified": 1792216186,
+        "narHash": "sha256-ON80/AxGxPj9+oxxTRHfp20YbsRNbG3WcqS4nzTq2Ew=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "8eadb651b0ae96565853dbc3e86b886620cbffe6",
+        "rev": "0187d8b6bad5e2f7d865faf6a655e58392ae857c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bitd",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -443,16 +441,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792193415,
+        "lastModified": 1792216045,
         "narHash": "sha256-06PhXM3QabsEeYcwGCvcjKgnxnVBSsj+wA/t2qrbmZg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "6fc64b84ec3841e7194e3aaa2049c17fe80f14c8",
+        "rev": "fd3edc889dcaef97c1456aa378b1f0acd32705d7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bitd",
         "repo": "flasks",
         "type": "github"
       }
