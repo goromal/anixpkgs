@@ -54,15 +54,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792216186,
-        "narHash": "sha256-ON80/AxGxPj9+oxxTRHfp20YbsRNbG3WcqS4nzTq2Ew=",
+        "lastModified": 1792247058,
+        "narHash": "sha256-hsJBu0WrPuh6JxvMpaGzsDIO4HmYeCUyTdExM9yDWfM=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "0187d8b6bad5e2f7d865faf6a655e58392ae857c",
+        "rev": "e70436d7a7ca1204f670ed1c9b17b48ee0e9af2d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/gpu-power-limit",
         "repo": "bit-rs",
         "type": "github"
       }

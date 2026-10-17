@@ -93,6 +93,14 @@ in
         rateHz = lib.mkDefault 0.2;
         settings.hostname = lib.mkDefault "${config.networking.hostName}.local";
       };
+      nvidia_power = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.nvidia_power}/bin/bit-check-nvidia-power";
+        # Every 5 minutes: each query wakes a runtime-suspended laptop dGPU.
+        rateHz = lib.mkDefault (1.0 / 300.0);
+        timeoutMs = lib.mkDefault 15000;
+        settings.nvidia_smi = lib.mkDefault "${config.hardware.nvidia.package.bin}/bin/nvidia-smi";
+      };
       cozy_imgedit2 = {
         kind = "regression";
         command = lib.mkDefault "${cfg.package.cozy_imgedit2}/bin/bit-check-cozy-imgedit2";

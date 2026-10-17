@@ -40,7 +40,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs";
+    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/fix/gpu-power-limit";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
