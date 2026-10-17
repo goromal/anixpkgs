@@ -14,12 +14,17 @@ plugins do not need a contract change.
 
 Plugins are separate Rust executables implementing `bit_rs::plugin::BitCheck`.
 Derive `serde::Deserialize` with `deny_unknown_fields` on the configuration
-type, implement async `check(&self) -> anyhow::Result<()>`, and call
+type, implement async `check(&self) -> anyhow::Result<()>` and
+`remediation(&self) -> String`, and call
 `bit_rs::plugin::run::<Config>().await` from the Tokio main function. See
 `src/bin/internet.rs` for the smallest example.
 
 The executable receives one JSON object on stdin, logs to stdout (inherited
-by bitd's journal), and exits zero for pass or nonzero for failure. Never print
+by bitd's journal), and exits zero for pass or nonzero for failure.
+`remediation()` returns concrete, config-aware plain-text steps for a failing
+check (commands to run, likely causes); bitd fetches it once at startup via
+`<plugin> --remediation` (same stdin JSON, no check runs) and bitctl shows it
+under the highlighted check. Keep it short enough to read in a terminal panel. Never print
 tokens or secrets. Reference credential files in configuration; do not embed
 credentials in Nix store files. The daemon gives each invocation a process
 group, enforces a wall-clock timeout, and kills helpers on completion or stop.

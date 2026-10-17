@@ -67,4 +67,7 @@
     };
   };
   environment.systemPackages = [ pkgs.nvtopPackages.full ];
+  # Resume (notably hybrid-sleep) can leave the dGPU capped at ~6 W of 30 W,
+  # silently making ComfyUI jobs ~13x slower until reboot.
+  services.bitd.checks = [ "nvidia_power" ];
 }
