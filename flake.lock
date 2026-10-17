@@ -19,15 +19,16 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1791464852,
-        "narHash": "sha256-811C8DFRcxwVznkM+4UaeSVcuVdl9TeAzvDWqwdtTV8=",
+        "lastModified": 1792247914,
+        "narHash": "sha256-siJyyQ6UNL/oj/hrOY5n/jLbA4/YJMR+SG76srMqPuA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "b052c041885180184be4e1f1e6e1d3ee24f35eae",
+        "rev": "1eccf43b48efae83681c40cd614d32a91f7163b5",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/directory-picker-dark-highlight",
         "repo": "anixdata",
         "type": "github"
       }
