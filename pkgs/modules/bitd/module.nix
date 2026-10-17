@@ -152,6 +152,7 @@ in
       }
     ];
     environment.systemPackages = [ cfg.package ];
+    environment.shellAliases.b = "bitctl";
     environment.etc."bitd.json".source = configuration;
     environment.sessionVariables.BITD_ENDPOINT = "http://127.0.0.1:${toString cfg.port}";
     systemd.services.bitd = {
