@@ -6,6 +6,7 @@
 }:
 let
   cfg = config.services.bitd;
+  anixPkgs = if pkgs ? bit-rs then pkgs else pkgs.extend (import ../../../overlay.nix);
   ports = import ../../nixos/service-ports.nix;
   json = pkgs.formats.json { };
   known = builtins.attrNames cfg.plugins;
@@ -33,7 +34,7 @@ in
     enable = lib.mkEnableOption "machine built-in tests";
     package = lib.mkOption {
       type = lib.types.package;
-      default = (if pkgs ? bit-rs then pkgs else pkgs.extend (import ../../../overlay.nix)).bit-rs;
+      default = anixPkgs.bit-rs;
       description = "Package containing bitd, bitctl, and initial plugin outputs.";
     };
     port = lib.mkOption {
@@ -99,6 +100,7 @@ in
         settings = {
           url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
           token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
+          png_command = lib.mkDefault "${anixPkgs.png}/bin/png";
           # Reserve time for upload, HTTP deadlines, and cancelling the job.
           max_seconds = lib.mkDefault 870;
         };
