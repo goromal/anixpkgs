@@ -19,12 +19,14 @@ rustPlatform.buildRustPackage {
     "internet"
     "avahi"
     "cozy_imgedit2"
+    "cozy_imggen_quantized"
   ];
   postInstall = ''
-    mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin
+    mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin $cozy_imggen_quantized/bin
     mv $out/bin/bit-check-internet $internet/bin/
     mv $out/bin/bit-check-avahi $avahi/bin/
     mv $out/bin/bit-check-cozy-imgedit2 $cozy_imgedit2/bin/
+    mv $out/bin/bit-check-cozy-imggen-quantized $cozy_imggen_quantized/bin/
   '';
   meta = {
     description = "Machine health and regression checks with bitd and the bitctl TUI.";

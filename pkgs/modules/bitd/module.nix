@@ -105,6 +105,19 @@ in
           max_seconds = lib.mkDefault 870;
         };
       };
+      cozy_imggen_quantized = {
+        kind = "regression";
+        command = lib.mkDefault "${cfg.package.cozy_imggen_quantized}/bin/bit-check-cozy-imggen-quantized";
+        # 60 s job budget plus HTTP deadlines and cancelling the job.
+        timeoutMs = lib.mkDefault 90000;
+        settings = {
+          url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
+          token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
+          max_seconds = lib.mkDefault 60;
+          width = lib.mkDefault 500;
+          height = lib.mkDefault 500;
+        };
+      };
     };
     assertions = [
       {
