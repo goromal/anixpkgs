@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1768144916,
-        "narHash": "sha256-SlA5mbKsWjSnoGFw8HE44efy2BB6QeUmX6IHDMMrbxo=",
+        "lastModified": 1792216036,
+        "narHash": "sha256-52w2p1He/HL5UtuYcw+gSAfP5gAgOL4S84QOcfjw4mQ=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "e7cad057b29a7acbcf2409fb9e899f7864a4c08a",
+        "rev": "6f4d57da71668e52cbc6e857accdbc8c4b2eedc6",
         "type": "github"
       },
       "original": {
@@ -49,6 +49,22 @@
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
+      }
+    },
+    "bit-rs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792216186,
+        "narHash": "sha256-ON80/AxGxPj9+oxxTRHfp20YbsRNbG3WcqS4nzTq2Ew=",
+        "owner": "goromal",
+        "repo": "bit-rs",
+        "rev": "0187d8b6bad5e2f7d865faf6a655e58392ae857c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "bit-rs",
+        "type": "github"
       }
     },
     "book-notes-sync": {
@@ -425,11 +441,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791850553,
-        "narHash": "sha256-yCkMG6DdRPymJ6J4evOlBmc1uyZHAHeIJtDFuHiZjYY=",
+        "lastModified": 1792216045,
+        "narHash": "sha256-06PhXM3QabsEeYcwGCvcjKgnxnVBSsj+wA/t2qrbmZg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "6296db4940faf89a69109fa505e7341352ce0ce7",
+        "rev": "fd3edc889dcaef97c1456aa378b1f0acd32705d7",
         "type": "github"
       },
       "original": {
@@ -1219,6 +1235,7 @@
         "aapis": "aapis",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
+        "bit-rs": "bit-rs",
         "book-notes-sync": "book-notes-sync",
         "bun2nix": "bun2nix",
         "ceres-factors": "ceres-factors",

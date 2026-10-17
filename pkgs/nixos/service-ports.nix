@@ -1,5 +1,6 @@
 {
   orchestrator = 40040;
+  bitd = 40041;
   rankserver = 4018;
   stampserver = 5018;
   statsd = 9000;

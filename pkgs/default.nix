@@ -812,6 +812,12 @@ rec {
       pkg-src = flakeInputs.manif-geom-rs;
     }
   );
+  bit-rs = addDoc (
+    prev.callPackage ./rust-packages/bit-rs {
+      pkg-src = flakeInputs.bit-rs;
+      aapis-src = flakeInputs.aapis;
+    }
+  );
   # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
   # rustc; build it with unstable's rustPlatform until the pin catches up.
   msrs = addDoc (

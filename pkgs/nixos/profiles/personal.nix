@@ -8,6 +8,7 @@
   imports = [ ../pc-base.nix ];
 
   config = {
+    services.bitd.checks = [ "avahi" ];
     machines.base = {
       machineType = "x86_linux";
       cloudDirs = [

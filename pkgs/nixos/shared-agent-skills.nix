@@ -1,5 +1,9 @@
 [
   {
+    name = "bitd-plugins";
+    file = ./res/claude-skills/bitd-plugins/SKILL.md;
+  }
+  {
     name = "anixpkgs-deploy";
     file = ./res/claude-skills/anixpkgs-deploy/SKILL.md;
   }
