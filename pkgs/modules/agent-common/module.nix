@@ -60,6 +60,9 @@ in
         services.google-sheets-mcp.enable = hasServer "google-sheets";
         services.google-slides-mcp.enable = hasServer "google-slides";
         services.gmail-mcp.enable = hasServer "gmail";
+        # A failed settings merge leaves agents on stale config (e.g. missing
+        # MCP servers) without any visible error.
+        services.bitd.checks = map (framework: "${framework}_settings") frameworks;
       }
     ]
   );

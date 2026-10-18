@@ -117,6 +117,19 @@ in
         rateHz = lib.mkDefault 0.2;
         settings.hostname = lib.mkDefault "${config.networking.hostName}.local";
       };
+      # Units that merge Nix-managed settings into each agent's config file.
+      claude_settings = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.user_units}/bin/bit-check-user-units";
+        rateHz = lib.mkDefault (1.0 / 60.0);
+        settings.units = lib.mkDefault [ "claude-settings-update.service" ];
+      };
+      codex_settings = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.user_units}/bin/bit-check-user-units";
+        rateHz = lib.mkDefault (1.0 / 60.0);
+        settings.units = lib.mkDefault [ "codex-settings-update.service" ];
+      };
       nvidia_power = {
         kind = "health";
         command = lib.mkDefault "${cfg.package.nvidia_power}/bin/bit-check-nvidia-power";
