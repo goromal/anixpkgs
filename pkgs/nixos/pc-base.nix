@@ -230,6 +230,7 @@ in
     ../modules/wiki-mcp/module.nix
     ../modules/jupyter-mcp/module.nix
     ../modules/google-sheets-mcp/module.nix
+    ../modules/google-slides-mcp/module.nix
     ../python-packages/orchestrator/module.nix
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix

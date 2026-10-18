@@ -221,6 +221,11 @@
                 "docs": false
             },
             {
+                "attr": "google-slides-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "trafficsim",
                 "ci": true,
                 "docs": true
