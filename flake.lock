@@ -441,16 +441,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792334038,
+        "lastModified": 1792335448,
         "narHash": "sha256-WrsBfcwgsdxodh51e1DFxIslayhLS+gaBrRNZixfzAc=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "8c19f82f6e2236aedfe86ff3217db1d704a3c21c",
+        "rev": "81adb4d684c055d0988bcf66b9d9b41416d3e61a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/flask-tweaks",
         "repo": "flasks",
         "type": "github"
       }
