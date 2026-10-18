@@ -120,6 +120,7 @@ let
               gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
                 pkg-src = flakeInputs.gmail-parser;
               };
+              google-slides-mcp = pySelf.callPackage ./python-packages/google-slides-mcp { };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -532,6 +533,7 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   gmail-mcp = final.python313.pkgs.gmail-mcp;
+  google-slides-mcp = final.python313.pkgs.google-slides-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
   segment-anything = final.python313.pkgs.segment-anything;
