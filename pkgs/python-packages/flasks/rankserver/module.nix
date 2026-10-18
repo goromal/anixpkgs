@@ -23,7 +23,7 @@ in
     };
     secretsFile = lib.mkOption {
       type = lib.types.str;
-      description = "Path to JSON file with secret_key and password_hash";
+      description = "Path to JSON file with username, secret_key and password_hash";
       default = "/data/andrew/secrets/flask/rankserver.json";
     };
   };
