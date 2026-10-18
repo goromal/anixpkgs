@@ -37,7 +37,8 @@ options:
                         Directory of saved prompt .txt files (default <state-
                         dir>/prompts)
   --secrets-file SECRETS_FILE
-                        Path to JSON file with username, secret_key and password_hash
+                        Path to JSON file with username, secret_key and
+                        password_hash
   --comfyui-restart-cmd COMFYUI_RESTART_CMD
                         Command run to restart ComfyUI (e.g. 'systemctl
                         restart comfyui.service'); empty hides the restart

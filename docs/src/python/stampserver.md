@@ -16,6 +16,7 @@ options:
                         Subdomain for a reverse proxy
   --data-dir DATA_DIR   Directory containing the stampable elements
   --secrets-file SECRETS_FILE
-                        Path to JSON file with username, secret_key and password_hash
+                        Path to JSON file with username, secret_key and
+                        password_hash
 ```
 
