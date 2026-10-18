@@ -54,16 +54,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792297926,
+        "lastModified": 1792300294,
         "narHash": "sha256-oZuZggKe0U8WtJc1f4RLsq8itfuChwerIvATQDDAs8Q=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "73f44ad0d30b7f4e935d31ad8233b5b08ae72185",
+        "rev": "b5d0c50480fc5eca544ac3772fb2706f27ab58af",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/google-slides-mcp",
         "repo": "bit-rs",
         "type": "github"
       }
