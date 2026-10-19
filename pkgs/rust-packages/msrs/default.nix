@@ -7,11 +7,11 @@ rustPlatform.buildRustPackage rec {
   pname = "msrs";
   version = "0.1.0";
   src = pkg-src;
-  cargoHash = "sha256-LCyTOS2cXzXoJXBO2N376e4/Gq2oG761lYjp8eqK0+k=";
-  # The workspace's only binary is the `echo` demo example (whose log paths
-  # are baked to the build directory); don't ship a bin named `echo`.
+  cargoHash = "sha256-9EH4CspWobXxjVZep+X8mYe66hyvUYO1hu/C8ov6iGI=";
+  # The workspace's only binaries are the `echo` and `watchdog` demo examples
+  # (whose log paths are baked to the build directory); don't ship them.
   postInstall = ''
-    rm -f $out/bin/echo
+    rm -f $out/bin/echo $out/bin/watchdog
   '';
   meta = {
     description = "Deterministic microservice conventions for Rust: pure stores + statig FSMs packaged as copper-rs tasks.";

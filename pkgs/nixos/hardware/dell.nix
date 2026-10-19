@@ -19,6 +19,10 @@
     "rtsx_pci_sdmmc"
   ];
   boot.initrd.kernelModules = [ ];
+  # NVIDIA's open 595 module does not build against Linux 7.2. Use Nixpkgs'
+  # stable kernel series on this GPU host while the other machines can continue
+  # tracking linuxPackages_latest.
+  boot.kernelPackages = lib.mkForce pkgs.linuxPackages;
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
@@ -47,6 +51,7 @@
   hardware.enableAllFirmware = true;
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  nixpkgs.config.cudaCapabilities = [ "8.9" ];
 
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
@@ -62,4 +67,7 @@
     };
   };
   environment.systemPackages = [ pkgs.nvtopPackages.full ];
+  # Resume (notably hybrid-sleep) can leave the dGPU capped at ~6 W of 30 W,
+  # silently making ComfyUI jobs ~13x slower until reboot.
+  services.bitd.checks = [ "nvidia_power" ];
 }

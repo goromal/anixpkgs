@@ -106,6 +106,7 @@ in
         name = "Plex";
         tag = "Content";
         path = "#";
+        port = 32400;
         description = "Plex Media Server (port 32400)";
         icon = "film";
       }

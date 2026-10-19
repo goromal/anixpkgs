@@ -4,25 +4,50 @@
 
 ## Home-Manager Example
 
-1. Install Nix standalone:
+This repo uses [Determinate Nix](https://determinate.systems/nix) for standalone (non-NixOS) machines. Determinate Nix automatically enables flakes and `nix-command`, and manages `/etc/nix/nix.conf`. If Determinate is already installed, keep that installation and skip the installer step; `anix-upgrade` does not reinstall or upgrade Nix.
+
+1. Install Nix (Determinate):
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
 ```
-3. Set proper Nix settings in `/etc/nix/nix.conf`:
-```
-substituters = https://cache.nixos.org/ https://github-public.cachix.org
-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
+
+2. Add cache settings for anixpkgs to Determinate's supported custom configuration file, `/etc/nix/nix.custom.conf`:
+```nix
+extra-substituters = https://github-public.cachix.org
+extra-trusted-public-keys = github-public.cachix.org-1:xofQDaQZRkCqt+4FMyXS5D6RNenGcWwnpAXRXJ2Y5kc=
 narinfo-cache-positive-ttl = 0
 narinfo-cache-negative-ttl = 0
-experimental-features = nix-command flakes auto-allocate-uids
 ```
-4. Add these Nix channels via `nix-channel --add URL NAME`:
+
+Do not edit Determinate's generated `/etc/nix/nix.conf`. Restart the daemon after changing the custom file:
+
 ```bash
-$ nix-channel --list
-home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
-nixpkgs https://nixos.org/channels/nixos-25.11
+sudo systemctl restart nix-daemon.service
 ```
-5. Install home-manager: https://nix-community.github.io/home-manager/index.xhtml#sec-install-standalone
+
+For an authenticated cache, keep credentials in a stable mutable file such as
+`/etc/determinate/netrc.custom`, then add it to the existing
+`/etc/determinate/config.json` without discarding any other settings:
+
+```json
+{
+  "authentication": {
+    "additionalNetrcSources": [
+      "/etc/determinate/netrc.custom"
+    ]
+  }
+}
+```
+
+The source file must exist, must not be in `/nix/store`, and should be readable
+only by root. Restart `nix-daemon.service` after changing either file.
+
+3. Bootstrap Home Manager, placing the configuration at
+`~/.config/home-manager/home.nix`. `anix-upgrade` subsequently runs the Home
+Manager release and Nixpkgs revision pinned by the selected anixpkgs tree, so a
+host-installed Home Manager version or channel cannot drift from a current
+flake-based target. Older channel-based targets retain the installed Home
+Manager command as a compatibility path for downgrades.
 
 Example `home.nix` file for personal use:
 
@@ -74,12 +99,12 @@ Symlink to `~/.config/home-manager/home.nix`.
 Corresponding `~/.bashrc`:
 
 ```bash
-export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels${NIX_PATH:+:$NIX_PATH}
 . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
-export NIXPKGS_ALLOW_UNFREE=1
 # alias code='codium'
 # eval "$(direnv hook bash)"
 ```
+
+Determinate Nix manages the shell environment setup automatically, so the manual `NIX_PATH` export is no longer needed.
 
 ### Claude Code status line & on-change upgrade hooks
 
@@ -129,7 +154,7 @@ watched path actually changed** — no manual diffing. Inspect a run with
 - https://nixos.wiki/wiki/NixOS_Installation_Guide
 - https://alexherbo2.github.io/wiki/nixos/install-guide/
 
-1. Build the installation ISO with `NIXPKGS_ALLOW_UNFREE=1 nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
+1. Build the installation ISO with `nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage`
 2. Plug in a USB stick large enough to accommodate the image.
 3. Find the right device with `lsblk` or `fdisk -l`. Replace `/dev/sdX` with the proper device (do not use `/dev/sdX1` or partitions of the disk; use the whole disk `/dev/sdX`).
 4. Burn ISO to USB stick with `dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync`
@@ -140,7 +165,7 @@ watched path actually changed** — no manual diffing. Inspect a run with
 9. If everything went well, reboot
 10. On the next reboot, login as user `andrew` again
 11. Connect to the internet
-12. Run `anix-init` 
+12. Run `anix-init` to set up cloud sync and SSH keys, then follow the printed next steps
 13. Enjoy!
 
 ## JetPack Machine Installation Instructions
@@ -157,25 +182,32 @@ watched path actually changed** — no manual diffing. Inspect a run with
 10. If everything went well, reboot
 11. On the next reboot, login as user `andrew` again
 12. Connect to the internet
-13. Run `anix-init` 
+13. Run `anix-init` to set up cloud sync and SSH keys, then follow the printed next steps
 14. Enjoy!
 
 ## Upgrading NixOS versions with `anixpkgs`
 
-Aside from the source code changes in `anixpkgs`, ensure that your channels have been updated **for the root user**:
+NixOS machines managed via the flake do not require channel updates. The flake's locked inputs (pinned nixpkgs, home-manager) handle all version management automatically.
 
-```bash
-# e.g., upgrading to 25.11:
-home-manager https://github.com/nix-community/home-manager/archive/release-25.11.tar.gz
-nixos https://nixos.org/channels/nixos-25.11
-nixpkgs https://nixos.org/channels/nixos-25.11
-```
-
-`sudo nix-channel --update`. Then upgrade with
+Simply run:
 
 ```bash
 anix-upgrade [source specification] --local --boot
 ```
+
+`anix-upgrade` reads `NIXOS_REBUILD_MODE` from the selected source tree. Current trees set it to `flake` and rebuild the matching hostname from `nixosConfigurations`. Older releases have no marker, so `anix-upgrade` prepares their legacy channels and selects the matching configuration under `pkgs/nixos/configurations/` (falling back to `/etc/nixos/configuration.nix` for nonstandard layouts). This means selecting an older tag or commit remains a supported downgrade path after the migration, including on machines installed without legacy channels or an `/etc/nixos` symlink.
+
+### One-time migration to Determinate Nix
+
+If your machine was set up before the Determinate Nix migration, the first `anix-upgrade` run uses the old script (channel-based rebuild) and installs the new `anix-upgrade` as part of the rebuilt system. **Run `anix-upgrade` a second time** to complete the migration — the new script sees the target tree's `flake` marker, uses `nixos-rebuild --flake`, and applies the Determinate NixOS module.
+
+Determinate manages `/etc/nix/nix.conf`; declarative `nix.settings` are written to
+`/etc/nix/nix.custom.conf` and included by the managed file. It also synthesizes
+`/nix/var/determinate/netrc`. Existing cache credentials belong in the mutable
+`/etc/nix/netrc`, which is registered through
+`machines.base.additionalNetrcSources` and merged into the synthesized file.
+The default configuration creates an empty root-only file when none exists and
+preserves the contents of an existing file.
 
 ## Build a JetPack Installer ISO
 
@@ -191,14 +223,14 @@ dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M status=progress conv=fdatasync
 
 ## Build a NixOS ISO Image
 
-***TODO (untested)***; work out hardware configuration portion.
+Use the flake-based installer target (same as the personal installer above):
 
 ```bash
-nixos-generate -f iso -c /path/to/personal/configuration.nix [-I nixpkgs=/path/to/alternative/nixpkgs]
+nix build .#nixosConfigurations.installer-personal.config.system.build.isoImage
 ```
 
 ```bash
-sudo dd if=/path/to/nixos.iso of=/dev/sdX bs=4M conv=fsync status=progress
+sudo dd if=result/iso/[...]linux.iso of=/dev/sdX bs=4M conv=fsync status=progress
 ```
 
 ## Local SSL Setup for HTTPS Access
@@ -366,7 +398,7 @@ The easiest way is to store your API token in `~/secrets/vikunja/secrets.json` o
 
 After adding the token, rebuild your system configuration to install the MCP server:
 ```bash
-sudo nixos-rebuild switch
+anix-upgrade --local
 ```
 
 Then run the `claude-setup` script to register the MCP server:

@@ -1,5 +1,6 @@
 {
   orchestrator = 40040;
+  bitd = 40041;
   rankserver = 4018;
   stampserver = 5018;
   statsd = 9000;
@@ -27,6 +28,7 @@
   folio = {
     internal = 6868;
     public = 6869;
+    agentTerminal = 6870;
   };
   navidrome = 4533;
   la-quiz-web = 5656;
@@ -35,6 +37,7 @@
   launchpad = 8888;
   comfyui = 8188;
   anix_upgrade_ui = 5858;
+  nexus_ui = 6969;
   agent_ui = {
     web = 6767;
     terminal = 6768;

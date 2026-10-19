@@ -47,6 +47,7 @@ let
 in
 (writeArgparseScriptBin pkgname usage_str [ ] ''
   nix-shell ${shellFile} \
+    --arg pkgs "import <anixpkgs> {}" \
     --arg pkgList "[ ${pythonEnv} ]" \
     --argstr shellName "${pkgname}" \
     --argstr hookCmd "${hookCmd}" \

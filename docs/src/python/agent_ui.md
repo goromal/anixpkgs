@@ -10,7 +10,9 @@ workspaces and attaching to tmux-backed shell, Claude, and Codex sessions.
 ```bash
 usage: agent-ui [-h] [--port PORT] [--subdomain SUBDOMAIN] [--devrc DEVRC]
                 [--agent AGENTS] --secrets-file SECRETS_FILE
-                [--tmux-bin TMUX_BIN] [--session-command SESSION_COMMAND]
+                [--tmux-bin TMUX_BIN] [--tmux-socket TMUX_SOCKET]
+                [--tmux-config TMUX_CONFIG]
+                [--session-command SESSION_COMMAND]
                 [--workspace-command WORKSPACE_COMMAND] [--history HISTORY]
 
 Workspace-aware terminal agent launcher
@@ -24,6 +26,8 @@ options:
   --secrets-file SECRETS_FILE
                         Path to JSON file with secret_key and password_hash
   --tmux-bin TMUX_BIN
+  --tmux-socket TMUX_SOCKET
+  --tmux-config TMUX_CONFIG
   --session-command SESSION_COMMAND
   --workspace-command WORKSPACE_COMMAND
   --history HISTORY

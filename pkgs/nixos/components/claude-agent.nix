@@ -17,7 +17,7 @@ let
   # (present in the NixOS system PATH). Replaces the retired claude-code-bin.
   claudeCli = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
 
-  claudeCodeVersion = "2.1.263";
+  claudeCodeVersion = "2.1.281";
   claudeCodeExt =
     let
       base = builtins.head (
@@ -26,7 +26,7 @@ let
             name = "claude-code";
             publisher = "anthropic";
             version = claudeCodeVersion;
-            sha256 = "sha256-BtMWvq+8OaEAmpzrameNuKEu5G419optcjCGz1c1Z8g=";
+            sha256 = "sha256-WsLJWSRh3/psoheuIvBy4JiGFYlw92tl1OzPD1MCKYg=";
           }
         ]
       );
@@ -193,7 +193,7 @@ in
         }
       );
       default = [ ];
-      description = "List of Claude Code skills to install into ~/.claude/skills/<name>/SKILL.md";
+      description = "List of Claude Code skill directories to install into ~/.claude/skills/<name>";
     };
     extraSettings = lib.mkOption {
       type = lib.types.attrs;
@@ -232,9 +232,10 @@ in
 
     home.file = builtins.listToAttrs (
       map (skill: {
-        name = ".claude/skills/${skill.name}/SKILL.md";
+        name = ".claude/skills/${skill.name}";
         value = {
-          source = skill.file;
+          source = builtins.dirOf skill.file;
+          recursive = true;
         };
       }) cfg.skills
     );

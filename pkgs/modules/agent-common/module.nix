@@ -1,15 +1,24 @@
 { config, lib, ... }:
 let
-  frameworks = config.machines.base.agentFrameworks;
+  claudeDefaults = import ../../nixos/claude-defaults.nix;
+  codexDefaults = import ../../nixos/codex-defaults.nix;
+  frameworks = config.machines.features.agents.frameworks;
   enabled = frameworks != [ ];
   mcpServerCatalog = builtins.attrValues (
     import ../../nixos/shared-agent-mcp-servers.nix {
       homeDir = config.machines.base.homeDir;
     }
   );
+  flakeInputs = config.nixpkgs.config.flakeInputs or { };
+  sharedSkillCatalog =
+    if builtins.hasAttr "agent-skills" flakeInputs then
+      import "${flakeInputs.agent-skills}/catalog.nix"
+    else
+      [ ];
+  localSkillCatalog = import ../../nixos/shared-agent-skills.nix;
   skillCatalog = builtins.filter (
     skill: !(lib.elem skill.name config.machines.agents.excludedSkills)
-  ) (import ../../nixos/shared-agent-skills.nix);
+  ) (sharedSkillCatalog ++ localSkillCatalog);
   forFramework =
     framework: catalog:
     map (entry: builtins.removeAttrs entry [ "frameworks" ]) (
@@ -38,13 +47,13 @@ in
   config = lib.mkIf enabled (
     lib.mkMerge [
       (lib.mkIf (lib.elem "claude" frameworks) {
-        machines.claude = {
+        machines.claude = (lib.mapAttrs (_: lib.mkDefault) claudeDefaults) // {
           skills = skillsFor "claude";
           mcpServers = mcpServersFor "claude";
         };
       })
       (lib.mkIf (lib.elem "codex" frameworks) {
-        machines.codex = {
+        machines.codex = (lib.mapAttrs (_: lib.mkDefault) codexDefaults) // {
           skills = skillsFor "codex";
           mcpServers = mcpServersFor "codex";
         };
@@ -56,7 +65,11 @@ in
         services.wiki-mcp.enable = hasServer "wiki";
         services.jupyter-mcp.enable = hasServer "jupyter-mcp";
         services.google-sheets-mcp.enable = hasServer "google-sheets";
+        services.google-slides-mcp.enable = hasServer "google-slides";
         services.gmail-mcp.enable = hasServer "gmail";
+        # A failed settings merge leaves agents on stale config (e.g. missing
+        # MCP servers) without any visible error.
+        services.bitd.checks = map (framework: "${framework}_settings") frameworks;
       }
     ]
   );

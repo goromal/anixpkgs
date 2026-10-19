@@ -19,6 +19,7 @@
   nix.settings.cores = lib.mkForce 4;
 
   machines.base.remoteBuilders = [
+    "jetson-orin-agx"
     "personal-inspiron"
     "personal-panasonic"
     "personal-dell"

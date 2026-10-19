@@ -74,33 +74,6 @@ let
     jre = minJRE;
   };
 
-  # crates.io returns 403 for requests without a User-Agent header. nixpkgs PR #512735 fixes this
-  # in fetchCargoVendor but was not backported to nixos-25.11. Remove this once the flake.nix
-  # nixpkgs input is updated to a branch/rev that includes that PR (nixos-26.05 or later).
-  patchedRustPlatform = prev.rustPlatform.overrideScope (
-    rFinal: rPrev: {
-      fetchCargoVendor = rPrev.fetchCargoVendor.override {
-        writers = prev.writers // {
-          writePython3Bin =
-            name: args: content:
-            prev.writers.writePython3Bin name args (
-              if name != "fetch-cargo-vendor-util" then
-                content
-              else
-                builtins.replaceStrings
-                  [
-                    "    session = requests.Session()\n    session.mount('http://"
-                  ]
-                  [
-                    "    session = requests.Session()\n    session.headers.update({'User-Agent': 'nixpkgs fetchCargoVendor'})\n    session.mount('http://"
-                  ]
-                  content
-            );
-        };
-      };
-    }
-  );
-
   baseModuleArgs = {
     pkgs = final;
     config = final.config;
@@ -147,6 +120,7 @@ let
               gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
                 pkg-src = flakeInputs.gmail-parser;
               };
+              google-slides-mcp = pySelf.callPackage ./python-packages/google-slides-mcp { };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -156,7 +130,6 @@ let
                 pkg-src = flakeInputs.spandrel-src;
               };
               segment-anything = pySelf.callPackage ./python-packages/segment-anything { };
-              opencv4 = pySuper.opencv4.override { enableCuda = false; };
               # aarch64 (Jetson): nixpkgs' from-source kornia-rs is
               # badPlatforms=aarch64-linux (rustc SIGSEGV); use the prebuilt
               # wheel so kornia (and thus comfyui) builds. See
@@ -167,7 +140,18 @@ let
                 else
                   pySuper.kornia-rs;
               comfy-kitchen = pySelf.callPackage ./python-packages/comfy-kitchen { };
+              comfy-aimdo = pySelf.callPackage ./python-packages/comfy-aimdo { };
+              comfy-angle = pySelf.callPackage ./python-packages/comfy-angle { };
               comfyui-frontend-package = pySelf.callPackage ./python-packages/comfyui-frontend-package { };
+              comfyui-workflow-templates-json =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-json
+                  { };
+              comfyui-workflow-templates-media-assets-01 =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-01
+                  { };
+              comfyui-workflow-templates-media-assets-02 =
+                pySelf.callPackage ./python-packages/comfyui-workflow-templates-media-assets-02
+                  { };
               comfyui-workflow-templates-core =
                 pySelf.callPackage ./python-packages/comfyui-workflow-templates-core
                   { };
@@ -354,6 +338,9 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              nexus_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/nexus { pkg-src = flakeInputs.flasks; }
+              );
               agent_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/agent_ui {
                   pkg-src = flakeInputs.flasks;
@@ -455,6 +442,18 @@ rec {
       ''
     );
 
+  # Navidrome migrates its database forward on startup and cannot run against a
+  # schema from a newer release. The DB was migrated by 0.64.0 (nixos-26.05
+  # branch), while the 26.05 tag ships 0.61.2, which fails to scan the now
+  # nullable bpm/bit_depth columns.
+  navidrome =
+    let
+      pkg = flakeInputs.nixpkgs-26-05-branch.legacyPackages.${prev.stdenv.hostPlatform.system}.navidrome;
+    in
+    assert assertMsg (versionAtLeast pkg.version "0.64.0")
+      "navidrome ${pkg.version} would downgrade a database already migrated by 0.64.0";
+    pkg;
+
   php74 = flakeInputs.phps.packages.${builtins.currentSystem}.php74;
 
   python310 = pythonOverridesFor prev.python310;
@@ -501,16 +500,22 @@ rec {
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   disciple = final.python313.pkgs.disciple;
   anix_upgrade_ui = final.python313.pkgs.anix_upgrade_ui;
+  nexus_ui = final.python313.pkgs.nexus_ui;
   agent_ui = final.python313.pkgs.agent_ui;
   sunset = final.python313.pkgs.sunset;
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
   folio-mcp = final.python313.pkgs.folio-mcp;
-  folio-frontend = final.callPackage ./folio-frontend { pkg-src = flakeInputs.folio; };
-  folio-desktop = final.callPackage ./folio-desktop {
-    pkg-src = flakeInputs.folio;
-    folioPort = service-ports.folio.internal;
-  };
+  folio-frontend = addDoc (
+    final.callPackage ./js-packages/folio-frontend { pkg-src = flakeInputs.folio; }
+  );
+  folio-desktop = addDoc (
+    final.callPackage ./js-packages/folio-desktop {
+      electron = final.electron-bin;
+      pkg-src = flakeInputs.folio;
+      folioPort = service-ports.folio.internal;
+    }
+  );
   tasks_ui = final.python313.pkgs.tasks_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
@@ -528,12 +533,19 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   gmail-mcp = final.python313.pkgs.gmail-mcp;
+  google-slides-mcp = final.python313.pkgs.google-slides-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
-  onnxruntime = prev.onnxruntime.override { cudaSupport = false; };
   segment-anything = final.python313.pkgs.segment-anything;
   comfy-kitchen = final.python313.pkgs.comfy-kitchen;
+  comfy-aimdo = final.python313.pkgs.comfy-aimdo;
+  comfy-angle = final.python313.pkgs.comfy-angle;
   comfyui-frontend-package = final.python313.pkgs.comfyui-frontend-package;
+  comfyui-workflow-templates-json = final.python313.pkgs.comfyui-workflow-templates-json;
+  comfyui-workflow-templates-media-assets-01 =
+    final.python313.pkgs.comfyui-workflow-templates-media-assets-01;
+  comfyui-workflow-templates-media-assets-02 =
+    final.python313.pkgs.comfyui-workflow-templates-media-assets-02;
   comfyui-workflow-templates-core = final.python313.pkgs.comfyui-workflow-templates-core;
   comfyui-workflow-templates-media-api = final.python313.pkgs.comfyui-workflow-templates-media-api;
   comfyui-workflow-templates-media-video =
@@ -546,7 +558,20 @@ rec {
   comfyui-embedded-docs = final.python313.pkgs.comfyui-embedded-docs;
   comfyui =
     let
-      py = final.python313;
+      # ComfyUI only needs CUDA for torch. Keep its opencv (and onnxruntime, via
+      # ultralytics) CPU-only so a CUDA package set doesn't rebuild them with
+      # CUDA. Scoped here so other consumers, e.g. launchpad, still get CUDA.
+      py = final.python313.override (old: {
+        self = py;
+        packageOverrides = composeExtensions (old.packageOverrides or (_: _: { })) (
+          pySelf: pySuper: {
+            opencv4 = pySuper.opencv4.override { enableCuda = false; };
+            onnxruntime = pySuper.onnxruntime.override (oldOrt: {
+              onnxruntime = oldOrt.onnxruntime.override { cudaSupport = false; };
+            });
+          }
+        );
+      });
       pyPkgs = py.pkgs;
     in
     prev.callPackage ./python-packages/comfyui {
@@ -554,7 +579,12 @@ rec {
       torch = pyPkgs.torch;
       torchsde = pyPkgs.torchsde;
       torchvision = pyPkgs.torchvision;
-      torchaudio = pyPkgs.torchaudio;
+      # The full upstream suite exceeds the memory available on GitHub's
+      # standard runner. Keep the package's import check, but omit pytest for
+      # this unmodified runtime dependency of ComfyUI.
+      torchaudio = pyPkgs.torchaudio.overridePythonAttrs (_: {
+        nativeCheckInputs = [ ];
+      });
       numpy = pyPkgs.numpy;
       einops = pyPkgs.einops;
       transformers = pyPkgs.transformers;
@@ -577,6 +607,8 @@ rec {
       spandrel = pyPkgs.spandrel;
       av = pyPkgs.av;
       comfy-kitchen = pyPkgs."comfy-kitchen";
+      comfy-aimdo = pyPkgs."comfy-aimdo";
+      comfy-angle = pyPkgs."comfy-angle";
       comfyui-frontend-package = pyPkgs.comfyui-frontend-package;
       comfyui-workflow-templates = pyPkgs.comfyui-workflow-templates;
       comfyui-embedded-docs = pyPkgs.comfyui-embedded-docs;
@@ -588,6 +620,10 @@ rec {
       matplotlib = pyPkgs.matplotlib;
       gitpython = pyPkgs.gitpython;
       segment-anything = pyPkgs."segment-anything";
+      filelock = pyPkgs.filelock;
+      simpleeval = pyPkgs.simpleeval;
+      blake3 = pyPkgs.blake3;
+      pyopengl = pyPkgs.pyopengl;
       pkg-src = flakeInputs.comfyui-src;
     };
   jupyter-mcp-server = final.python313.pkgs.jupyter-mcp-server;
@@ -671,6 +707,7 @@ rec {
   flake-update = addDoc (prev.callPackage ./bash-packages/nix-tools/flake-update.nix { });
   rcrsync = addDoc (prev.callPackage ./bash-packages/rcrsync { });
   generate-local-ssl-certs = prev.callPackage ./bash-packages/generate-local-ssl-certs { };
+  tor-ephemeral = addDoc (prev.callPackage ./bash-packages/tor-ephemeral { });
   getres = addDoc (prev.callPackage ./bash-packages/getres { });
   aptest = addDoc (
     prev.callPackage ./bash-packages/aptest {
@@ -775,7 +812,12 @@ rec {
   manif-geom-rs = addDoc (
     prev.callPackage ./rust-packages/manif-geom-rs {
       pkg-src = flakeInputs.manif-geom-rs;
-      rustPlatform = patchedRustPlatform;
+    }
+  );
+  bit-rs = addDoc (
+    prev.callPackage ./rust-packages/bit-rs {
+      pkg-src = flakeInputs.bit-rs;
+      aapis-src = flakeInputs.aapis;
     }
   );
   # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's
@@ -789,19 +831,16 @@ rec {
   xv-lidar-rs = addDoc (
     prev.callPackage ./rust-packages/xv-lidar-rs {
       pkg-src = flakeInputs.xv-lidar-rs;
-      rustPlatform = patchedRustPlatform;
     }
   );
   sunnyside = addDoc (
     prev.callPackage ./rust-packages/sunnyside {
       pkg-src = flakeInputs.sunnyside;
-      rustPlatform = patchedRustPlatform;
     }
   );
   rtk = addDoc (
     prev.callPackage ./rust-packages/rtk {
       pkg-src = flakeInputs.rtk;
-      rustPlatform = patchedRustPlatform;
     }
   );
 

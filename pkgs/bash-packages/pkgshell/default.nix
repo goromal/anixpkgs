@@ -52,13 +52,20 @@ in
     else
       pkgpath=$(nix-build "$pkgs" -A "$attr" --no-out-link)
     fi
+    if [[ "$pkgs" == "anixpkgs" ]]; then
+      pkgs_nix_expr='import (fetchTarball "https://github.com/goromal/anixpkgs/archive/refs/heads/master.tar.gz") {}'
+    else
+      pkgs_nix_expr="import $pkgs {}"
+    fi
     if [[ -z "$runcmd" ]]; then
       nix-shell $flags ${shellFile} \
+        --arg pkgs "$pkgs_nix_expr" \
         --arg pkgList "[ $pkgpath ]" \
         --argstr shellName "pkgshell=$attr" \
         --arg colorCode 35
     else
       nix-shell $flags ${shellFile} \
+        --arg pkgs "$pkgs_nix_expr" \
         --arg pkgList "[ $pkgpath ]" \
         --argstr shellName "pkgshell=$attr" \
         --arg colorCode 35 \

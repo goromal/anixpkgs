@@ -7,6 +7,18 @@
 with import ./dependencies.nix;
 let
   cfg = config.drone.base;
+  # Core ROS2 infrastructure: rclcpp/rclpy, an rmw implementation, and the
+  # ros2 CLI suite (ros2 topic/service/node/param/run/launch/...)
+  rosEnv = ros-pkgs.rosPackages.jazzy.buildEnv {
+    paths = with ros-pkgs.rosPackages.jazzy; [
+      ros-core
+      demo-nodes-cpp
+      demo-nodes-py
+      rosbag2
+      rosbag2-storage-mcap
+      rosbag2-storage-sqlite3
+    ];
+  };
 in
 {
   options.drone.base = {
@@ -50,6 +62,7 @@ in
     ../cxx-packages/arducopter/sitl-module.nix
     ../cxx-packages/arducopter/router-module.nix
     ../cxx-packages/microxrce-dds-agent/module.nix
+    ../modules/bitd/module.nix
   ];
 
   config = {
@@ -191,7 +204,7 @@ in
           sd
           clang
           clang-tools
-          neofetch
+          fastfetch
           onefetch
           man-pages
           black
@@ -250,20 +263,7 @@ in
           # TODO: docs interfere
           # "orchestrator"
         ])
-        ++ [
-          # Core ROS2 infrastructure: rclcpp/rclpy, an rmw implementation, and
-          # the ros2 CLI suite (ros2 topic/service/node/param/run/launch/...)
-          (ros-pkgs.rosPackages.jazzy.buildEnv {
-            paths = with ros-pkgs.rosPackages.jazzy; [
-              ros-core
-              demo-nodes-cpp
-              demo-nodes-py
-              rosbag2
-              rosbag2-storage-mcap
-              rosbag2-storage-sqlite3
-            ];
-          })
-        ]
+        ++ [ rosEnv ]
       );
 
     services.ardupilot-sim = {
@@ -325,6 +325,28 @@ in
     systemd.services.ardurouter = lib.mkIf cfg.runAPSITL {
       after = [ "ardusitl.service" ];
       wants = [ "ardusitl.service" ];
+    };
+
+    # Built-in tests: MAVLink connectivity to Ardupilot through mavlink-router
+    # every 5 s, and ROS2 health as a message arriving from Ardupilot's AP_DDS
+    # client through the Micro XRCE-DDS agent into the ROS2 graph.
+    services.bitd = {
+      enable = true;
+      user = cfg.homeUser;
+      group = "dev";
+      checks = [
+        "ardupilot"
+        "ros2_topics"
+      ];
+      plugins.ros2_topics.settings = {
+        ros2 = "${rosEnv}/bin/ros2";
+        topics = [
+          {
+            name = "/ap/time";
+            type = "builtin_interfaces/msg/Time";
+          }
+        ];
+      };
     };
 
     services.orchestratord = {
