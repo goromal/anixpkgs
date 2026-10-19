@@ -16,6 +16,23 @@
         "type": "github"
       }
     },
+    "agent-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792374034,
+        "narHash": "sha256-8q+7NGjv0KjcAQzmEp2RihXv4Ntvdu2Mj20Bf8aHirA=",
+        "owner": "goromal",
+        "repo": "agent-skills",
+        "rev": "8224a613e49e7c60d448b2245143614de75f5be8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "ref": "refs/heads/msrs-skill-hierarchical-fsm",
+        "repo": "agent-skills",
+        "type": "github"
+      }
+    },
     "anixdata": {
       "flake": false,
       "locked": {
@@ -1217,6 +1234,7 @@
     "root": {
       "inputs": {
         "aapis": "aapis",
+        "agent-skills": "agent-skills",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
         "book-notes-sync": "book-notes-sync",

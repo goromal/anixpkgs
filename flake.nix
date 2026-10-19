@@ -37,6 +37,9 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
+    agent-skills.url = "github:goromal/agent-skills?ref=refs/heads/msrs-skill-hierarchical-fsm";
+    agent-skills.flake = false;
+
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 

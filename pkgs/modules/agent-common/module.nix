@@ -9,9 +9,10 @@ let
       homeDir = config.machines.base.homeDir;
     }
   );
+  sharedSkillCatalog = import "${config.nixpkgs.config.flakeInputs.agent-skills}/catalog.nix";
   skillCatalog = builtins.filter (
     skill: !(lib.elem skill.name config.machines.agents.excludedSkills)
-  ) (import ../../nixos/shared-agent-skills.nix);
+  ) sharedSkillCatalog;
   forFramework =
     framework: catalog:
     map (entry: builtins.removeAttrs entry [ "frameworks" ]) (
