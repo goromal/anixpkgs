@@ -126,7 +126,7 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
-    msrs.url = "github:goromal/msrs";
+    msrs.url = "github:goromal/msrs?ref=refs/heads/msrs-skill-hierarchical-fsm";
     msrs.flake = false;
 
     nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";

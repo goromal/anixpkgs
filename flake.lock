@@ -19,11 +19,11 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1792374034,
-        "narHash": "sha256-8q+7NGjv0KjcAQzmEp2RihXv4Ntvdu2Mj20Bf8aHirA=",
+        "lastModified": 1792380171,
+        "narHash": "sha256-IAGG/z3vqK33aMdheBpvnOFuWXVNe+ccgpWpWul3Uzk=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "8224a613e49e7c60d448b2245143614de75f5be8",
+        "rev": "7336a374aff6d9f891d2e9699c0334cfc24fabe3",
         "type": "github"
       },
       "original": {
@@ -822,15 +822,16 @@
     "msrs": {
       "flake": false,
       "locked": {
-        "lastModified": 1783050612,
-        "narHash": "sha256-72q+JfL/mBViK1pyqcQ+sp/0IqXAoC8drvgOGXBNTBs=",
+        "lastModified": 1792379914,
+        "narHash": "sha256-7mDLWm923Ia4vLDoudjjnf5YV9LVdf/7gOhvyh6aeTM=",
         "owner": "goromal",
         "repo": "msrs",
-        "rev": "9528ecf69523e0fde0ff38b2f72441197cf29729",
+        "rev": "db12b260f97d9851d2a923abf40546d1a066d7a0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/msrs-skill-hierarchical-fsm",
         "repo": "msrs",
         "type": "github"
       }

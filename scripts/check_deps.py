@@ -14,10 +14,12 @@ branches_whitelist = [
     "dev/controller",  # goromal/ardupilot INDI backend
 ]
 
-# Temporary paired integration branch for the agent-skills extraction PR.
-# Remove this exception after anixpkgs is repinned to agent-skills main.
+# Temporary paired integration branches for the agent-skills extraction and
+# msrs bring-up feedback PRs. Remove each exception after anixpkgs is repinned
+# to that dependency's main.
 dependency_branch_whitelist = {
     ("agent-skills", "msrs-skill-hierarchical-fsm"),
+    ("msrs", "msrs-skill-hierarchical-fsm"),
 }
 
 def is_whitelisted(ref):
