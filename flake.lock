@@ -19,16 +19,16 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1792380436,
-        "narHash": "sha256-XgPiIpFmMfWJXLFtmMfGK6mRu90dH+JWyxxfR9qncb0=",
+        "lastModified": 1792387270,
+        "narHash": "sha256-vOEUP0XKhf15zY+RLLEh7YEw5Oyd4/wlGiMPj/77EbE=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "075b18e3ac6bb28f7dc3f239678c97f501577c95",
+        "rev": "3c72fe3d68a66f32433449176b691cf9aaf3b22a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/msrs-skill-hierarchical-fsm",
+        "ref": "refs/heads/dev/msrs-drone-examples",
         "repo": "agent-skills",
         "type": "github"
       }
@@ -822,16 +822,16 @@
     "msrs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792379914,
-        "narHash": "sha256-7mDLWm923Ia4vLDoudjjnf5YV9LVdf/7gOhvyh6aeTM=",
+        "lastModified": 1792386968,
+        "narHash": "sha256-vHrR3Q2cAB3+Ui5llFn24CmtlxwnbbwB71Ya5x++d2Q=",
         "owner": "goromal",
         "repo": "msrs",
-        "rev": "db12b260f97d9851d2a923abf40546d1a066d7a0",
+        "rev": "a1a8370ebcd73cd456fb580bf8fd253ddfc09494",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/msrs-skill-hierarchical-fsm",
+        "ref": "refs/heads/dev/msrs-drone-examples",
         "repo": "msrs",
         "type": "github"
       }
