@@ -89,6 +89,11 @@
         ],
         "rust": [
             {
+                "attr": "bit-rs",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "manif-geom-rs",
                 "ci": true,
                 "docs": true
@@ -212,6 +217,11 @@
             },
             {
                 "attr": "gmail-mcp",
+                "ci": true,
+                "docs": false
+            },
+            {
+                "attr": "google-slides-mcp",
                 "ci": true,
                 "docs": false
             },

@@ -10,9 +10,10 @@ let
     }
   );
   sharedSkillCatalog = import "${config.nixpkgs.config.flakeInputs.agent-skills}/catalog.nix";
+  localSkillCatalog = import ../../nixos/shared-agent-skills.nix;
   skillCatalog = builtins.filter (
     skill: !(lib.elem skill.name config.machines.agents.excludedSkills)
-  ) sharedSkillCatalog;
+  ) (sharedSkillCatalog ++ localSkillCatalog);
   forFramework =
     framework: catalog:
     map (entry: builtins.removeAttrs entry [ "frameworks" ]) (
@@ -59,7 +60,11 @@ in
         services.wiki-mcp.enable = hasServer "wiki";
         services.jupyter-mcp.enable = hasServer "jupyter-mcp";
         services.google-sheets-mcp.enable = hasServer "google-sheets";
+        services.google-slides-mcp.enable = hasServer "google-slides";
         services.gmail-mcp.enable = hasServer "gmail";
+        # A failed settings merge leaves agents on stale config (e.g. missing
+        # MCP servers) without any visible error.
+        services.bitd.checks = map (framework: "${framework}_settings") frameworks;
       }
     ]
   );

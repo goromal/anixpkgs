@@ -120,6 +120,7 @@ let
               gmail-mcp = pySelf.callPackage ./python-packages/gmail-mcp {
                 pkg-src = flakeInputs.gmail-parser;
               };
+              google-slides-mcp = pySelf.callPackage ./python-packages/google-slides-mcp { };
               jetson-stats = addDoc (
                 pySelf.callPackage ./python-packages/jetson-stats {
                   pkg-src = flakeInputs.jetson-stats;
@@ -532,6 +533,7 @@ rec {
   book-notes-sync = final.python313.pkgs.book-notes-sync;
   gmail-parser = final.python313.pkgs.gmail-parser;
   gmail-mcp = final.python313.pkgs.gmail-mcp;
+  google-slides-mcp = final.python313.pkgs.google-slides-mcp;
   jetson-stats = final.python313.pkgs.jetson-stats;
   spandrel = final.python313.pkgs.spandrel;
   segment-anything = final.python313.pkgs.segment-anything;
@@ -810,6 +812,12 @@ rec {
   manif-geom-rs = addDoc (
     prev.callPackage ./rust-packages/manif-geom-rs {
       pkg-src = flakeInputs.manif-geom-rs;
+    }
+  );
+  bit-rs = addDoc (
+    prev.callPackage ./rust-packages/bit-rs {
+      pkg-src = flakeInputs.bit-rs;
+      aapis-src = flakeInputs.aapis;
     }
   );
   # msrs depends on cu29, whose MSRV (1.95) is newer than this nixpkgs pin's

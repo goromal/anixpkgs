@@ -73,17 +73,17 @@ rec {
 
       readToJson =
         if format == "toml" then
-          ''${dasel} -f "$TARGET" -r toml -w json''
+          ''${dasel} -i toml -o json < "$TARGET"''
         else
           ''${coreutils}/bin/cat "$TARGET"'';
       writeFromJson =
         if format == "toml" then
-          ''${dasel} -f "$TMP" -r json -w toml > "$TARGET"''
+          ''${dasel} -i json -o toml < "$TMP" > "$TARGET"''
         else
           ''${coreutils}/bin/cp "$TMP" "$TARGET"'';
       initFromJson =
         if format == "toml" then
-          ''echo '${settingsJson}' | ${dasel} -r json -w toml > "$TARGET"''
+          ''echo '${settingsJson}' | ${dasel} -i json -o toml > "$TARGET"''
         else
           ''echo '${settingsJson}' > "$TARGET"'';
 

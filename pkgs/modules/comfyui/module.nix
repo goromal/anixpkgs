@@ -129,7 +129,7 @@ in
       secretsFile = lib.mkOption {
         type = lib.types.str;
         default = "/data/andrew/secrets/flask/cozy.json";
-        description = "Path to JSON file with secret_key and password_hash";
+        description = "Path to JSON file with username, secret_key and password_hash";
       };
       maxInputBytes = lib.mkOption {
         type = lib.types.int;
@@ -273,7 +273,7 @@ in
           description = "cozy ComfyUI image-generation UI";
           after = [ "comfyui.service" ];
           unitConfig.StartLimitIntervalSec = 0;
-          # Tools the input/output flush.sh scripts need when cozy's Flush button runs them.
+          # Tools the input/output .flush.sh scripts need when cozy's Flush button runs them.
           path = [
             pkgs.bash
             pkgs.openssh

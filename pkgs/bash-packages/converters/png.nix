@@ -152,7 +152,7 @@ let
         width="''${BASH_REMATCH[2]}"
         height="''${BASH_REMATCH[3]}"
         ${printWarn} "Generating a random ''${width}x''${height} PNG with seed $seed -> ''${outfile}..."
-        key=$(printf "%s" "$seed" | sha256sum | awk '{print $1}')
+        key=$(printf "%s" "$seed" | sha256sum | cut -d' ' -f1)
         nbytes=$((width * height * 3))
         dd if=/dev/zero bs=$nbytes count=1 2>/dev/null \
           | ${openssl}/bin/openssl enc -aes-256-ctr -K "$key" -iv 0 \

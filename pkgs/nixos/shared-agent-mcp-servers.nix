@@ -41,6 +41,14 @@ in
       TOKEN_PATH = "${homeDir}/secrets/google/refresh.json";
     };
   };
+  googleSlides = {
+    name = "google-slides";
+    command = "/run/current-system/sw/bin/google-slides-mcp-server";
+    secretsEnv = {
+      CREDENTIALS_PATH = "${homeDir}/secrets/google/client_secrets.json";
+      TOKEN_PATH = "${homeDir}/secrets/google/refresh.json";
+    };
+  };
   gmail = {
     name = "gmail";
     command = "/run/current-system/sw/bin/gmail-mcp-server";

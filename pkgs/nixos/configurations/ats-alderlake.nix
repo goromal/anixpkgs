@@ -12,4 +12,5 @@
   machines.base.nixosState = "24.05";
   networking.hostName = "ats";
   machines.features.nexus.role = "hub";
+  services.bitd.checks = [ "avahi" ];
 }

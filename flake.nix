@@ -43,6 +43,9 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
+    bit-rs.url = "github:goromal/bit-rs";
+    bit-rs.flake = false;
+
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
     ardupilot.flake = false;
 

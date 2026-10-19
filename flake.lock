@@ -3,11 +3,11 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1768144916,
-        "narHash": "sha256-SlA5mbKsWjSnoGFw8HE44efy2BB6QeUmX6IHDMMrbxo=",
+        "lastModified": 1792250433,
+        "narHash": "sha256-3UN04RApjKyhRXVD8cXWaBnMX5RdJrQeHMmO0cQu8mc=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "e7cad057b29a7acbcf2409fb9e899f7864a4c08a",
+        "rev": "129df89d276cf1c9365664bc4574c16f28e61df0",
         "type": "github"
       },
       "original": {
@@ -36,11 +36,11 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1791464852,
-        "narHash": "sha256-811C8DFRcxwVznkM+4UaeSVcuVdl9TeAzvDWqwdtTV8=",
+        "lastModified": 1792248431,
+        "narHash": "sha256-siJyyQ6UNL/oj/hrOY5n/jLbA4/YJMR+SG76srMqPuA=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "b052c041885180184be4e1f1e6e1d3ee24f35eae",
+        "rev": "739ca548871f82919f8d3c3130bfd13515ef6072",
         "type": "github"
       },
       "original": {
@@ -66,6 +66,22 @@
         "submodules": true,
         "type": "git",
         "url": "ssh://git@github.com/goromal/ardupilot"
+      }
+    },
+    "bit-rs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792300294,
+        "narHash": "sha256-oZuZggKe0U8WtJc1f4RLsq8itfuChwerIvATQDDAs8Q=",
+        "owner": "goromal",
+        "repo": "bit-rs",
+        "rev": "b5d0c50480fc5eca544ac3772fb2706f27ab58af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "bit-rs",
+        "type": "github"
       }
     },
     "book-notes-sync": {
@@ -442,11 +458,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1791850553,
-        "narHash": "sha256-yCkMG6DdRPymJ6J4evOlBmc1uyZHAHeIJtDFuHiZjYY=",
+        "lastModified": 1792343372,
+        "narHash": "sha256-WhSs+MkdcWzPEMyagxCWTE9ULcBij6W/ixrf9xO2pdw=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "6296db4940faf89a69109fa505e7341352ce0ce7",
+        "rev": "2285b0b99a2a6b5a67ba824c6cdbd73a5424a585",
         "type": "github"
       },
       "original": {
@@ -1237,6 +1253,7 @@
         "agent-skills": "agent-skills",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
+        "bit-rs": "bit-rs",
         "book-notes-sync": "book-notes-sync",
         "bun2nix": "bun2nix",
         "ceres-factors": "ceres-factors",

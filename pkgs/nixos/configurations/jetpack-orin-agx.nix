@@ -19,6 +19,7 @@
     "imggen-quantized"
     "imggen2-quantized"
   ];
+  services.bitd.checks = [ "cozy_imggen_quantized" ];
 
   nix.settings.max-jobs = lib.mkForce 1;
   nix.settings.cores = lib.mkForce 4;
