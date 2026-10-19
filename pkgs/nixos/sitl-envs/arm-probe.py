@@ -23,5 +23,8 @@ print(f"probe: gps_ok={gps_ok}", flush=True)
 armed = mavflight.arm_with_retry(m, timeout=90, verbose=True)
 print(f"probe: armed={armed}", flush=True)
 if armed:
-    mavflight.disarm(m, force=True)
+    disarmed = mavflight.disarm_with_retry(m, timeout=10, force=True)
+    print(f"probe: disarmed={disarmed}", flush=True)
+    if not disarmed:
+        raise RuntimeError("probe failed to confirm disarm")
 print("probe: done", flush=True)
