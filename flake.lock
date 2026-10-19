@@ -19,11 +19,11 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1792380171,
-        "narHash": "sha256-IAGG/z3vqK33aMdheBpvnOFuWXVNe+ccgpWpWul3Uzk=",
+        "lastModified": 1792380436,
+        "narHash": "sha256-XgPiIpFmMfWJXLFtmMfGK6mRu90dH+JWyxxfR9qncb0=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "7336a374aff6d9f891d2e9699c0334cfc24fabe3",
+        "rev": "075b18e3ac6bb28f7dc3f239678c97f501577c95",
         "type": "github"
       },
       "original": {
