@@ -37,6 +37,9 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
+    agent-skills.url = "github:goromal/agent-skills";
+    agent-skills.flake = false;
+
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 

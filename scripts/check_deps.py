@@ -14,6 +14,14 @@ branches_whitelist = [
     "dev/controller",  # goromal/ardupilot INDI backend
 ]
 
+# Temporary paired integration branches for the agent-skills extraction and
+# msrs bring-up feedback PRs. Remove each exception after anixpkgs is repinned
+# to that dependency's main.
+dependency_branch_whitelist = {
+    ("agent-skills", "msrs-skill-hierarchical-fsm"),
+    ("msrs", "msrs-skill-hierarchical-fsm"),
+}
+
 def is_whitelisted(ref):
     """Check if a ref is whitelisted, including version-agnostic patterns."""
     if ref in branches_whitelist:
@@ -38,7 +46,11 @@ def side_branch_dependencies(lock):
     for src, node in lock["nodes"].items():
         ref = node.get("original", {}).get("ref")
         branch = branch_from_ref(ref) if ref is not None else None
-        if branch is not None and not is_whitelisted(branch):
+        if (
+            branch is not None
+            and not is_whitelisted(branch)
+            and (src, branch) not in dependency_branch_whitelist
+        ):
             yield src, branch
 
 

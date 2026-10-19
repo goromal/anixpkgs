@@ -16,6 +16,22 @@
         "type": "github"
       }
     },
+    "agent-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792432398,
+        "narHash": "sha256-vOEUP0XKhf15zY+RLLEh7YEw5Oyd4/wlGiMPj/77EbE=",
+        "owner": "goromal",
+        "repo": "agent-skills",
+        "rev": "b108ad52535f165b26393d9d7d42957b8199f632",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "repo": "agent-skills",
+        "type": "github"
+      }
+    },
     "anixdata": {
       "flake": false,
       "locked": {
@@ -805,11 +821,11 @@
     "msrs": {
       "flake": false,
       "locked": {
-        "lastModified": 1783050612,
-        "narHash": "sha256-72q+JfL/mBViK1pyqcQ+sp/0IqXAoC8drvgOGXBNTBs=",
+        "lastModified": 1792432351,
+        "narHash": "sha256-vHrR3Q2cAB3+Ui5llFn24CmtlxwnbbwB71Ya5x++d2Q=",
         "owner": "goromal",
         "repo": "msrs",
-        "rev": "9528ecf69523e0fde0ff38b2f72441197cf29729",
+        "rev": "ff4bea35768c1cf245163099aaf8316d8b8484ba",
         "type": "github"
       },
       "original": {
@@ -1233,6 +1249,7 @@
     "root": {
       "inputs": {
         "aapis": "aapis",
+        "agent-skills": "agent-skills",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
         "bit-rs": "bit-rs",
