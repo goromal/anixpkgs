@@ -37,7 +37,7 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    agent-skills.url = "github:goromal/agent-skills?ref=refs/heads/dev/msrs-drone-examples";
+    agent-skills.url = "github:goromal/agent-skills";
     agent-skills.flake = false;
 
     aapis.url = "github:goromal/aapis";
@@ -126,7 +126,7 @@
     mscpp.url = "github:goromal/mscpp";
     mscpp.flake = false;
 
-    msrs.url = "github:goromal/msrs?ref=refs/heads/dev/msrs-drone-examples";
+    msrs.url = "github:goromal/msrs";
     msrs.flake = false;
 
     nix-ros-overlay.url = "github:lopsided98/nix-ros-overlay/master";
