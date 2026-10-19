@@ -9,7 +9,12 @@ let
       homeDir = config.machines.base.homeDir;
     }
   );
-  sharedSkillCatalog = import "${config.nixpkgs.config.flakeInputs.agent-skills}/catalog.nix";
+  flakeInputs = config.nixpkgs.config.flakeInputs or { };
+  sharedSkillCatalog =
+    if builtins.hasAttr "agent-skills" flakeInputs then
+      import "${flakeInputs.agent-skills}/catalog.nix"
+    else
+      [ ];
   localSkillCatalog = import ../../nixos/shared-agent-skills.nix;
   skillCatalog = builtins.filter (
     skill: !(lib.elem skill.name config.machines.agents.excludedSkills)
