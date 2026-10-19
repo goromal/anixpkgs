@@ -564,16 +564,15 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1789318736,
+        "lastModified": 1792450408,
         "narHash": "sha256-L+gdsT5J+jczmJxyQeRDAnE2j+PRlpprRNs2ZGOqSCw=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "e6c5223c17e63d87831f28e2bbe9d990e4148fa7",
+        "rev": "af19a40aff241618d2f76c6400c5e9d67b028edd",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/indi-guided-handover-investigation",
         "repo": "indi-harness",
         "type": "github"
       }
