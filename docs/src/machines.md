@@ -432,12 +432,20 @@ claude mcp add -s user \
 #### Available MCP Tools
 
 Once configured, Claude Code has native access to these Vikunja tools:
-- `vikunja_list_projects`, `vikunja_get_project` - Browse and view projects
-- `vikunja_list_tasks`, `vikunja_get_task` - View tasks
-- `vikunja_create_task` - Create new tasks
-- `vikunja_update_task` - Update task fields (title, description, priority, etc.)
+- `vikunja_list_projects`, `vikunja_get_project` - Browse and view projects (lists are compact summaries unless `compact=false`)
+- `vikunja_create_project` - Create a project, optionally under a parent project
+- `vikunja_list_tasks`, `vikunja_get_task` - View tasks; lists cover every page and include related task IDs
+- `vikunja_create_task` - Create a task with optional priority, due date, and parent task (subtask)
+- `vikunja_create_tasks` - Create a tree of tasks with nested subtasks in one call
+- `vikunja_add_task_relation`, `vikunja_delete_task_relation` - Link tasks (subtask, precedes, blocking, related, ...)
+- `vikunja_update_task` - Update task fields (title, description, priority, etc.); unspecified fields are preserved
 - `vikunja_complete_task` - Mark tasks as done
+- `vikunja_delete_task` - Permanently delete a task
 - `vikunja_add_comment`, `vikunja_get_comments` - Add and view task comments
+
+New tasks always get an explicit position. Vikunja 2.3.0 fails the 25th
+default-position task in a project with a `task_positions` UNIQUE-constraint
+500, so tasks created outside the MCP server should also pass `position`.
 
 #### Usage Examples
 

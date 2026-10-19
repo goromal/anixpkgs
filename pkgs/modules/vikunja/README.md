@@ -191,10 +191,15 @@ Add this to your Claude Code MCP settings (usually in `~/.config/claude-code/mcp
 Once configured, Claude Code will have access to these tools:
 
 - `vikunja_list_projects` - List all projects
+- `vikunja_create_project` - Create a project, optionally nested
 - `vikunja_get_project` - Get project details
-- `vikunja_list_tasks` - List tasks
+- `vikunja_list_tasks` - List tasks (all pages)
 - `vikunja_get_task` - Get task details
-- `vikunja_create_task` - Create new task
+- `vikunja_create_task` - Create new task, optionally as a subtask
+- `vikunja_create_tasks` - Create a tree of tasks and subtasks
+- `vikunja_add_task_relation` / `vikunja_delete_task_relation` - Link or unlink tasks
+- `vikunja_update_task` - Update fields, preserving the rest
+- `vikunja_delete_task` - Delete a task
 - `vikunja_complete_task` - Mark task complete
 - `vikunja_add_comment` - Add comment to task
 - `vikunja_get_comments` - Get task comments
