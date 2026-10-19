@@ -52,6 +52,7 @@ in
           valentjn.vscode-ltex
           b4dm4n.vscode-nixpkgs-fmt
           ms-vscode.cpptools
+          hediet.vscode-drawio
         ]
         ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
           {
@@ -71,6 +72,12 @@ in
             publisher = "DrBlury";
             version = "1.6.15";
             sha256 = "sha256-KWWjDiINAJljQnKzwqyJMZc6ZCOx4/Wq+4fNAn0v2CI=";
+          }
+          {
+            name = "excalidraw-editor";
+            publisher = "pomdtr";
+            version = "3.9.3";
+            sha256 = "sha256-2K2LF7J6yaogHQjtA60qRL/m1g5gKtDl7XR4PBtEcUk=";
           }
         ];
     };
