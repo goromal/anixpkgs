@@ -9,6 +9,7 @@ Provides a browser-based interface for running anix-upgrade and viewing its outp
 usage: anix-upgrade-ui [-h] [--port PORT] [--subdomain SUBDOMAIN]
                        [--anix-upgrade-bin ANIX_UPGRADE_BIN]
                        [--state-dir STATE_DIR] [--bitctl-bin BITCTL_BIN]
+                       [--reboot-cmd REBOOT_CMD]
 
 options:
   -h, --help            show this help message and exit
@@ -20,5 +21,8 @@ options:
                         Directory for run log and state persistence
   --bitctl-bin BITCTL_BIN
                         Path to bitctl; enables the read-only health API
+  --reboot-cmd REBOOT_CMD
+                        Command that reboots this machine; enables the reboot
+                        API
 ```
 
