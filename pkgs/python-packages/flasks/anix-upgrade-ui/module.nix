@@ -66,7 +66,8 @@ in
       serviceConfig = {
         Type = "simple";
         # bitctl serves Nexus a read-only view of bitd, whose gRPC port stays on loopback.
-        ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}${lib.optionalString bitdCfg.enable " --bitctl-bin ${bitdCfg.package}/bin/bitctl"}";
+        # Reboot escalates through atsudo, the same path anix-upgrade itself uses.
+        ExecStart = "${cfg.package}/bin/anix-upgrade-ui --port ${builtins.toString cfg.port} --subdomain ${cfg.subdomain} --anix-upgrade-bin ${cfg.anixUpgradeBin}${lib.optionalString bitdCfg.enable " --bitctl-bin ${bitdCfg.package}/bin/bitctl"} --reboot-cmd \"/run/current-system/sw/bin/atsudo /run/current-system/sw/bin/systemctl reboot\"";
         # nixos-rebuild may restart this UI while its upgrade child is still
         # finishing. Leave that child running so the replacement UI can keep
         # following its persisted PID and log.
