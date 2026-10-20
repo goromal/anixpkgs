@@ -564,16 +564,15 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1792471867,
+        "lastModified": 1792472583,
         "narHash": "sha256-ZC4feuiqU8NmVs4tRodmDtnd054KADYjoJ6/wv1jEsQ=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "b47a9b4a00014a1250613e4e64ae1f66e62494a2",
+        "rev": "a3ee52b853a8420e8de3f82ce3800e594378ad00",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/indi-takeoff-flake",
         "repo": "indi-harness",
         "type": "github"
       }
