@@ -457,11 +457,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792467719,
-        "narHash": "sha256-zW1d62UrQq+1qgZcWwLDv7HOb8CdhO2G6rYvghNL7ao=",
+        "lastModified": 1792469005,
+        "narHash": "sha256-S1ouvADblikTxNE1/03UxD3y/70nAFgQTGuM08sI3dg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "637211f3c600a1e6f0d02c1dfad3afe2fe29305d",
+        "rev": "2339d2460154315491e6c56c1b0bc991c6e2408f",
         "type": "github"
       },
       "original": {
