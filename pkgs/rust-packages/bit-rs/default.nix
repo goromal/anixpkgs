@@ -24,10 +24,11 @@ rustPlatform.buildRustPackage {
     "ardupilot"
     "ros2_topics"
     "user_units"
+    "systemd_units"
   ];
   postInstall = ''
     mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin $cozy_imggen_quantized/bin $nvidia_power/bin \
-      $ardupilot/bin $ros2_topics/bin $user_units/bin
+      $ardupilot/bin $ros2_topics/bin $user_units/bin $systemd_units/bin
     mv $out/bin/bit-check-internet $internet/bin/
     mv $out/bin/bit-check-avahi $avahi/bin/
     mv $out/bin/bit-check-cozy-imgedit2 $cozy_imgedit2/bin/
@@ -36,6 +37,7 @@ rustPlatform.buildRustPackage {
     mv $out/bin/bit-check-ardupilot $ardupilot/bin/
     mv $out/bin/bit-check-ros2-topics $ros2_topics/bin/
     mv $out/bin/bit-check-user-units $user_units/bin/
+    mv $out/bin/bit-check-systemd-units $systemd_units/bin/
   '';
   meta = {
     description = "Machine health and regression checks with bitd and the bitctl TUI.";

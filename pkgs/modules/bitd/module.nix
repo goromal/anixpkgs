@@ -104,6 +104,8 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
+    # Every machine with bitd watches for failed or crash-looping system units.
+    services.bitd.checks = [ "systemd_units" ];
     services.bitd.plugins = {
       internet = {
         kind = "health";
@@ -129,6 +131,17 @@ in
         command = lib.mkDefault "${cfg.package.user_units}/bin/bit-check-user-units";
         rateHz = lib.mkDefault (1.0 / 60.0);
         settings.units = lib.mkDefault [ "codex-settings-update.service" ];
+      };
+      systemd_units = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.systemd_units}/bin/bit-check-systemd-units";
+        rateHz = lib.mkDefault (1.0 / 30.0);
+        settings = {
+          max_restarts = lib.mkDefault 3;
+          window_seconds = lib.mkDefault 600;
+          # Unit names expected to fail or restart often on this machine.
+          ignore = lib.mkDefault [ ];
+        };
       };
       nvidia_power = {
         kind = "health";
