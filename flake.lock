@@ -938,6 +938,23 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792094642,
+        "narHash": "sha256-zp8ToDMnqZcu4o4IH9pdwXFXGp7yLm/M0dEnNWnyd7I=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "fe13242281a67641c0102cdb1087f0ebe586c7df",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "refs/heads/nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1788752844,
@@ -1289,6 +1306,7 @@
         "nix-ros-overlay": "nix-ros-overlay",
         "nixpkgs": "nixpkgs_6",
         "nixpkgs-26-05-branch": "nixpkgs-26-05-branch",
+        "nixpkgs-unstable": "nixpkgs-unstable",
         "notion-tools": "notion-tools",
         "orchestrator": "orchestrator",
         "orchestrator-cpp": "orchestrator-cpp",
