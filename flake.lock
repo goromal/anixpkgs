@@ -457,11 +457,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792428326,
-        "narHash": "sha256-lA0dKIQCQWzNiABIuLD/F5tS317awpON2btsZaOLMZM=",
+        "lastModified": 1792472510,
+        "narHash": "sha256-XcAVGnulc9cQjTsYMQW9nKpJeG2BKX1O9h08iZLJfVk=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "be75a54fb9949515b0ea86d3ef3676791396f55b",
+        "rev": "d01465b491d7f03e2687e629c68127afa9942ed7",
         "type": "github"
       },
       "original": {
@@ -564,11 +564,11 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1792450408,
-        "narHash": "sha256-L+gdsT5J+jczmJxyQeRDAnE2j+PRlpprRNs2ZGOqSCw=",
+        "lastModified": 1792472583,
+        "narHash": "sha256-ZC4feuiqU8NmVs4tRodmDtnd054KADYjoJ6/wv1jEsQ=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "af19a40aff241618d2f76c6400c5e9d67b028edd",
+        "rev": "a3ee52b853a8420e8de3f82ce3800e594378ad00",
         "type": "github"
       },
       "original": {
