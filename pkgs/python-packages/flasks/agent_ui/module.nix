@@ -7,6 +7,7 @@
 with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.agent_ui;
+  inherit (import ../../../nixos/runtime.nix { inherit config pkgs lib; }) atsudo;
   globalCfg = config.machines.base;
   agents = config.machines.features.agents.frameworks;
   agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
@@ -92,6 +93,7 @@ let
       pkgs.direnv
       pkgs.lorri
       agentEnter
+      atsudo
     ];
     text = ''
       if [ "$#" -ne 2 ]; then
@@ -105,6 +107,7 @@ let
       esac
 
       export AGENT_UI_AGENT="$2"
+      export PATH="$PATH:/run/wrappers/bin"
       # shellcheck disable=SC2016 # Expanded by the devshell's inner shell.
       exec devshell "$1" --run 'exec direnv exec "$DEVSHELL_ROOT" ${agentEnter}/bin/agent-ui-enter'
     '';

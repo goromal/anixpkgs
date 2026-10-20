@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v9.10.2](https://github.com/goromal/anixpkgs/tree/v9.10.2)**
+**LATEST RELEASE: [v9.11.1](https://github.com/goromal/anixpkgs/tree/v9.11.1)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 
@@ -108,6 +108,14 @@ The VM's SSH port is forwarded to the host, so it can also be reached with
 ```bash
 ssh drone@localhost -p 4444
 ```
+
+Each rebuilt VM gets a new host key, so ssh will refuse the connection with a changed-key warning. Remove only the stale entry:
+
+```bash
+ssh-keygen -R "[localhost]:4444"
+```
+
+Do not delete `~/.ssh/known_hosts` instead: that also drops `github.com`, and unattended git-over-SSH jobs (e.g. `launchpad-sync`) then fail with `Host key verification failed` (flagged by the `ssh_known_hosts` bitd check).
 
 The drone closure ships the core ROS2 (jazzy) infrastructure from [nix-ros-overlay](https://github.com/lopsided98/nix-ros-overlay), including the `ros2` CLI tools. To sanity-check pub/sub inside the VM:
 

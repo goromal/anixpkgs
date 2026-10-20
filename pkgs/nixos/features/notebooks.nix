@@ -6,6 +6,7 @@
 }:
 {
   config = lib.mkIf config.machines.features.notebooks.enable {
+    services.bitd.checks = [ "ssh_known_hosts" ];
     machines.features.orchestrator.jobs = [
       {
         name = "launchpad-sync";
