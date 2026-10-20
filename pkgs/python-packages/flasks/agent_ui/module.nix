@@ -34,8 +34,6 @@ let
     config.nix.package
     pkgs.which
     pkgs.hostname
-    atsudo
-    "/run/wrappers"
   ]
   ++ map (agent: agentPackages.${agent}) agents;
 
@@ -95,6 +93,7 @@ let
       pkgs.direnv
       pkgs.lorri
       agentEnter
+      atsudo
     ];
     text = ''
       if [ "$#" -ne 2 ]; then
@@ -108,6 +107,7 @@ let
       esac
 
       export AGENT_UI_AGENT="$2"
+      export PATH="$PATH:/run/wrappers/bin"
       # shellcheck disable=SC2016 # Expanded by the devshell's inner shell.
       exec devshell "$1" --run 'exec direnv exec "$DEVSHELL_ROOT" ${agentEnter}/bin/agent-ui-enter'
     '';
