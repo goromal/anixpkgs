@@ -457,16 +457,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792471555,
+        "lastModified": 1792472510,
         "narHash": "sha256-XcAVGnulc9cQjTsYMQW9nKpJeG2BKX1O9h08iZLJfVk=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d56666e534229b41cb6ed6cdec7884424164f432",
+        "rev": "d01465b491d7f03e2687e629c68127afa9942ed7",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/uptime",
         "repo": "flasks",
         "type": "github"
       }
