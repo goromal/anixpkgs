@@ -7,6 +7,7 @@
 with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.agent_ui;
+  inherit (import ../../../nixos/runtime.nix { inherit config pkgs lib; }) atsudo;
   globalCfg = config.machines.base;
   agents = config.machines.features.agents.frameworks;
   agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
@@ -33,6 +34,8 @@ let
     config.nix.package
     pkgs.which
     pkgs.hostname
+    atsudo
+    "/run/wrappers"
   ]
   ++ map (agent: agentPackages.${agent}) agents;
 

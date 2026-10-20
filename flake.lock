@@ -70,15 +70,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792463230,
-        "narHash": "sha256-FZGpbhKM4AscQ4/Y0vK9H8BltDozb78mhx4LDRNA65U=",
+        "lastModified": 1792467414,
+        "narHash": "sha256-mYFtzoNuTFqv63dpocJtrXq1D1XYQWWIKbOPAhCs4lM=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "f77cfedeba681b64fb48761f7a51a0d8719849f6",
+        "rev": "721882e2942a1b0cfec8a565cccd44afaed46b8e",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/ssh-known-hosts",
         "repo": "bit-rs",
         "type": "github"
       }
