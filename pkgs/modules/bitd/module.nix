@@ -143,6 +143,19 @@ in
           ignore = lib.mkDefault [ ];
         };
       };
+      ssh_known_hosts = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.ssh_known_hosts}/bin/bit-check-ssh-known-hosts";
+        rateHz = lib.mkDefault (1.0 / 300.0);
+        settings = {
+          hosts = lib.mkDefault [ "github.com" ];
+          files = lib.mkDefault [
+            "${config.machines.base.homeDir}/.ssh/known_hosts"
+            "/etc/ssh/ssh_known_hosts"
+          ];
+          ssh_keygen = lib.mkDefault "${pkgs.openssh}/bin/ssh-keygen";
+        };
+      };
       nvidia_power = {
         kind = "health";
         command = lib.mkDefault "${cfg.package.nvidia_power}/bin/bit-check-nvidia-power";
