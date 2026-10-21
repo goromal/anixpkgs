@@ -70,11 +70,11 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792472669,
-        "narHash": "sha256-mYFtzoNuTFqv63dpocJtrXq1D1XYQWWIKbOPAhCs4lM=",
+        "lastModified": 1792561985,
+        "narHash": "sha256-8U5UgvE5DnN/A7uAZka9yCdpfFzar7u8VwJFRXovxCw=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "bb8462d9f79111b4d28ca35173abf9eb898e3f18",
+        "rev": "f36cd0a66a99cfe63db71b3f8e835ffa8fb1895c",
         "type": "github"
       },
       "original": {
@@ -457,11 +457,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792472510,
-        "narHash": "sha256-XcAVGnulc9cQjTsYMQW9nKpJeG2BKX1O9h08iZLJfVk=",
+        "lastModified": 1792561981,
+        "narHash": "sha256-Th8DgpwMIXl00ZRTugJ3Cbr1kIGoeT6+bpigOoAHgqg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d01465b491d7f03e2687e629c68127afa9942ed7",
+        "rev": "f2e24ce4604c9a38debd672fcd89a40326147651",
         "type": "github"
       },
       "original": {
