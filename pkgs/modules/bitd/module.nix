@@ -153,6 +153,7 @@ in
             "${config.machines.base.homeDir}/.ssh/known_hosts"
             "/etc/ssh/ssh_known_hosts"
           ];
+          seeds = lib.mkDefault [ "${config.machines.base.homeDir}/data/.ssh/known_hosts" ];
           ssh_keygen = lib.mkDefault "${pkgs.openssh}/bin/ssh-keygen";
         };
       };

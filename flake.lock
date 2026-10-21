@@ -70,15 +70,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792472669,
-        "narHash": "sha256-mYFtzoNuTFqv63dpocJtrXq1D1XYQWWIKbOPAhCs4lM=",
+        "lastModified": 1792560256,
+        "narHash": "sha256-8U5UgvE5DnN/A7uAZka9yCdpfFzar7u8VwJFRXovxCw=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "bb8462d9f79111b4d28ca35173abf9eb898e3f18",
+        "rev": "353938033f3b02af6b88dd94a3c03d2369baf94d",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/fleet-host-keys",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -457,15 +458,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792472510,
-        "narHash": "sha256-XcAVGnulc9cQjTsYMQW9nKpJeG2BKX1O9h08iZLJfVk=",
+        "lastModified": 1792560256,
+        "narHash": "sha256-Th8DgpwMIXl00ZRTugJ3Cbr1kIGoeT6+bpigOoAHgqg=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d01465b491d7f03e2687e629c68127afa9942ed7",
+        "rev": "88dc149a902c9c9a1063b5a96c8c8fb433763964",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/fleet-host-keys",
         "repo": "flasks",
         "type": "github"
       }
