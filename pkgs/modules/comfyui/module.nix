@@ -278,6 +278,7 @@ in
             pkgs.bash
             pkgs.openssh
             pkgs.gawk
+            extendedPkgs.wormhole
           ];
           serviceConfig = {
             Type = "simple";
