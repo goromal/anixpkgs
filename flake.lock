@@ -473,16 +473,15 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1792623689,
+        "lastModified": 1792625321,
         "narHash": "sha256-HbA2w5lmG/NxVVo2k8rc6UxLmOwjeHP8OulTAioJwUA=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "9a2419a544acc021e93432cb44e56534d13a8bd9",
+        "rev": "9527559c505f66af0b98ef7b7b21ec8661e22ca0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/epub-div-ingest",
         "repo": "folio",
         "type": "github"
       }

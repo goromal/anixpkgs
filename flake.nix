@@ -78,7 +78,7 @@
     flasks.url = "github:goromal/flasks";
     flasks.flake = false;
 
-    folio.url = "github:goromal/folio?ref=refs/heads/fix/epub-div-ingest";
+    folio.url = "github:goromal/folio";
     folio.flake = false;
 
     geometry.url = "github:goromal/geometry";
