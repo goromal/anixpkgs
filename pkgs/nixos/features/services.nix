@@ -39,6 +39,9 @@ in
         anixpkgs.budget_report
         anixpkgs.fixfname
       ];
+      # Same gating as folio's companion: it reuses Agent UI's secrets file.
+      agentCompanion =
+        features.budget.enable && features.agentUi.enable && features.agents.frameworks != [ ];
     };
 
     services.orchestrator_ui = {

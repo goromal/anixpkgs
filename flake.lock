@@ -457,15 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792561981,
-        "narHash": "sha256-Th8DgpwMIXl00ZRTugJ3Cbr1kIGoeT6+bpigOoAHgqg=",
+        "lastModified": 1792638325,
+        "narHash": "sha256-/PHxZXECPkaHiFcM5JE0nmLDhbxbAZff/C5t+7WwDrk=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "f2e24ce4604c9a38debd672fcd89a40326147651",
+        "rev": "613f568a229266b239844c64a5883d7152fe98f3",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/folio-skill",
         "repo": "flasks",
         "type": "github"
       }

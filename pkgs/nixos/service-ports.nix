@@ -16,6 +16,7 @@
   };
   authui = 4242;
   budget_ui = 4343;
+  budget_ui_agent_terminal = 4344;
   orchestrator_ui = 4545;
   tactical = {
     insecure = 60060;
