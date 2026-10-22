@@ -13,6 +13,9 @@ with import ./dependencies.nix;
   skill,
   # Phrase naming the host app in the primer, e.g. "the Folio reading app".
   appLabel,
+  # What the skill governs, completing "follow it for <skillScope>", e.g.
+  # "all mcp__folio__* work".
+  skillScope,
   terminalPort,
   terminalBasePath,
   authHeader,
@@ -95,13 +98,13 @@ let
         args+=(-c "projects={$(jq -n --arg d "$1" '$d')={trust_level=\"trusted\"}}")
       fi
       # Preload the ${skill} skill into the agent's instructions so every
-      # companion session knows the folio MCP workflow without being asked to
+      # companion session knows the app's workflow without being asked to
       # load it. Missing skill file -> launch the agent unprimed.
       skill="$HOME/.$2/skills/${skill}/SKILL.md"
       if [ ! -r "$skill" ]; then
         exec "$2" "''${args[@]}"
       fi
-      primer="You are running inside ${appLabel}'s agent companion. The ${skill} skill is preloaded below; follow it for all mcp__folio__* work.
+      primer="You are running inside ${appLabel}'s agent companion. The ${skill} skill is preloaded below; follow it for ${skillScope}.
 
       $(cat "$skill")"
       case "$2" in

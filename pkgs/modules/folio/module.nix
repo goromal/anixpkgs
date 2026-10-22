@@ -18,6 +18,7 @@ let
     inherit agents;
     skill = "folio-usage";
     appLabel = "the Folio reading app";
+    skillScope = "all mcp__folio__* work";
     terminalPort = service-ports.folio.agentTerminal;
     terminalBasePath = "/folio/agent/terminal";
     authHeader = "X-Folio-Agent-Authenticated";

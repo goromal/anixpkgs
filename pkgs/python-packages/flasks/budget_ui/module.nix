@@ -17,13 +17,16 @@ let
     inherit agents;
     skill = "budget-usage";
     appLabel = "the budget app";
+    skillScope = "all budget work";
     terminalPort = service-ports.budget_ui_agent_terminal;
     terminalBasePath = "/budget/agent/terminal";
     authHeader = "X-Budget-Agent-Authenticated";
     backendService = "budget_ui";
     homeDir = globalCfg.homeDir;
-    # Served on the default HTTPS port, so Origin and Host agree (unlike folio).
-    checkOrigin = true;
+    # nginx forwards Host without a port, so the browser Origin only matches it on
+    # the default HTTPS port; elsewhere ttyd would refuse every websocket (folio's
+    # reason for skipping the check).
+    checkOrigin = config.machines.base.webServerSecurePort == 443;
   };
 in
 {
