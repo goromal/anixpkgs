@@ -19,11 +19,11 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1792432398,
-        "narHash": "sha256-vOEUP0XKhf15zY+RLLEh7YEw5Oyd4/wlGiMPj/77EbE=",
+        "lastModified": 1792647657,
+        "narHash": "sha256-9ho2WDHTG5ehBoPHe19GNpiyZU4dxkfvqeyTOTc0fOQ=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "b108ad52535f165b26393d9d7d42957b8199f632",
+        "rev": "ba8a519813375096adabb2ef005ea111db2e409a",
         "type": "github"
       },
       "original": {
@@ -457,16 +457,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792643282,
+        "lastModified": 1792647661,
         "narHash": "sha256-GozRPH2CIt9kipydxXB2ZRdnvL5hcAQAN05FbbPl8nA=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "752ea51d14e6fe29a7fb559abf9f4aa3ae42824f",
+        "rev": "d021cd9c23e83d5a48ffd00d0264e5f9acb97bed",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/folio-skill",
         "repo": "flasks",
         "type": "github"
       }
