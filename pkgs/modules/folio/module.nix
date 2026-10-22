@@ -88,19 +88,27 @@ let
         ) 9>"$HOME/.claude.json.folio.lock" || true
       fi
       cd "$1"
+      # Codex has no ancestor trust (unlike claude above) and would show its
+      # folder-trust dialog in every fresh session dir, so trust the session dir
+      # for this launch only. Inline-table form: a dotted projects."<dir>" key
+      # override is ignored. Nothing is written to ~/.codex/config.toml.
+      args=()
+      if [ "$2" = codex ]; then
+        args+=(-c "projects={$(jq -n --arg d "$1" '$d')={trust_level=\"trusted\"}}")
+      fi
       # Preload the folio-usage skill into the agent's instructions so every
       # companion session knows the folio MCP workflow without being asked to
       # load it. Missing skill file -> launch the agent unprimed.
       skill="$HOME/.$2/skills/folio-usage/SKILL.md"
       if [ ! -r "$skill" ]; then
-        exec "$2"
+        exec "$2" "''${args[@]}"
       fi
       primer="You are running inside the Folio reading app's agent companion. The folio-usage skill is preloaded below; follow it for all mcp__folio__* work.
 
       $(cat "$skill")"
       case "$2" in
         # -c values parse as TOML; JSON-encode so the markdown is one TOML string.
-        codex) exec codex -c "developer_instructions=$(jq -Rs . <<<"$primer")" ;;
+        codex) exec codex "''${args[@]}" -c "developer_instructions=$(jq -Rs . <<<"$primer")" ;;
         *) exec "$2" --append-system-prompt "$primer" ;;
       esac
     '';
