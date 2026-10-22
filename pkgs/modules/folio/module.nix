@@ -11,112 +11,19 @@ let
   cfg = config.services.folio-backend;
 
   agents = config.machines.features.agents.frameworks;
-  agentAlternation = lib.concatStringsSep "|" agents;
   companion = cfg.agentCompanion && agents != [ ];
 
-  # Same llm-agents CLIs the claude/codex agent components install (home.packages),
-  # but placed on the backend service PATH so a spawned `exec claude`/`codex` in a
-  # plain temp dir resolves. Unlike Agent UI, the companion runs the agent in a bare
-  # temp dir with NO devshell/direnv wrapping, so this PATH is the agent's entire
-  # userland: it must carry a shell and the standard GNU tools the agent shells out
-  # to (Claude Code's Bash tool runs `bash -c`), not just enough to exec the CLI.
-  agentPackages = {
-    claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
-    codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
-  };
-  companionPath = [
-    pkgs.bashInteractive
-    pkgs.tmux
-    pkgs.procps
-    pkgs.coreutils
-    pkgs.gnugrep
-    pkgs.gnused
-    pkgs.gawk
-    pkgs.findutils
-    pkgs.which
-    pkgs.gitMinimal
-  ]
-  ++ map (agent: agentPackages.${agent}) agents;
-
-  folioTmuxConf = pkgs.writeText "folio-agent-tmux.conf" ''
-    set -g mouse on
-    set -g history-limit 50000
-    # Smooth one-line scrolling in copy-mode (mirrors agent-ui): a finger-drag in
-    # the companion terminal pages scrollback line by line, not a screen at a time.
-    bind -T copy-mode    Up   send-keys -X scroll-up
-    bind -T copy-mode    Down send-keys -X scroll-down
-    bind -T copy-mode-vi Up   send-keys -X scroll-up
-    bind -T copy-mode-vi Down send-keys -X scroll-down
-  '';
-
-  folioAgentSession = pkgs.writeShellApplication {
-    name = "folio-agent-session";
-    runtimeInputs = [
-      pkgs.coreutils
-      pkgs.jq
-      pkgs.util-linux
-    ];
-    text = ''
-      if [ "$#" -ne 2 ]; then
-        echo "usage: folio-agent-session WORKDIR AGENT" >&2
-        exit 2
-      fi
-      case "$2" in
-        ${agentAlternation}) ;;
-        *) echo "folio-agent-session: unsupported agent" >&2; exit 2 ;;
-      esac
-      # No devshell wraps this session, so nothing sets SHELL; Claude Code's Bash
-      # tool would fall back to /bin/bash, which doesn't exist on NixOS. Point it
-      # at the bash on the service PATH so shell tool calls work.
-      export SHELL="${pkgs.bashInteractive}/bin/bash"
-      # Pre-accept Claude Code's workspace-trust dialog so a headless companion
-      # launch does not stall on it. Trust the stable spool parent (not each
-      # ephemeral session dir): claude honors an ancestor's trust, so every
-      # session under the spool inherits it without accumulating stale
-      # ~/.claude.json entries. Idempotent, flock-guarded.
-      if [ "$2" = claude ]; then
-        spool="$(dirname "$1")"
-        cfg="$HOME/.claude.json"
-        (
-          flock 9
-          tmp="$(mktemp "$HOME/.claude.json.folio.XXXXXX")"
-          if [ -f "$cfg" ]; then base="$cfg"; else base="$tmp"; printf '{}' >"$base"; fi
-          if jq --arg d "$spool" '.projects[$d].hasTrustDialogAccepted = true' "$base" >"$tmp.out"; then
-            mv "$tmp.out" "$cfg"
-          fi
-          rm -f "$tmp" "$tmp.out"
-        ) 9>"$HOME/.claude.json.folio.lock" || true
-      fi
-      cd "$1"
-      exec "$2"
-    '';
-  };
-
-  folioAgentAttach = pkgs.writeShellApplication {
-    name = "folio-agent-attach";
-    runtimeInputs = [
-      pkgs.tmux
-      pkgs.coreutils
-    ];
-    text = ''
-      if [ "$#" -ne 1 ] || [[ ! "$1" =~ ^folio-agent--(${agentAlternation})--[0-9a-f]{8}$ ]]; then
-        echo "folio-agent-attach: invalid session" >&2
-        exit 2
-      fi
-      # When the session is gone (agent exited), hold the pane with a notice
-      # instead of exiting, so ttyd doesn't silently reconnect-loop.
-      hold() {
-        printf '\r\n\033[1;33mSession ended.\033[0m Close this panel or start a new session.\r\n'
-        sleep infinity
-      }
-      if ! tmux -L folio-agent has-session -t "$1" 2>/dev/null; then
-        hold
-      fi
-      tmux -L folio-agent attach-session -t "$1" || true
-      if ! tmux -L folio-agent has-session -t "$1" 2>/dev/null; then
-        hold
-      fi
-    '';
+  folioCompanion = import ../../nixos/agent-companion.nix { inherit pkgs lib; } {
+    name = "folio";
+    inherit agents;
+    skill = "folio-usage";
+    appLabel = "the Folio reading app";
+    skillScope = "all mcp__folio__* work";
+    terminalPort = service-ports.folio.agentTerminal;
+    terminalBasePath = "/folio/agent/terminal";
+    authHeader = "X-Folio-Agent-Authenticated";
+    backendService = "folio-backend";
+    homeDir = globalCfg.homeDir;
   };
 in
 {
@@ -171,7 +78,7 @@ in
       description = "folio backend (FastAPI)";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
-      path = lib.optionals companion companionPath;
+      path = lib.optionals companion folioCompanion.servicePath;
 
       serviceConfig = {
         Type = "simple";
@@ -215,8 +122,8 @@ in
           "FOLIO_AGENT_SECRETS=${cfg.agentSecretsFile}"
           "FOLIO_AGENT_SPOOL=${cfg.agentSpoolDir}"
           "FOLIO_AGENT_TMUX=${pkgs.tmux}/bin/tmux"
-          "FOLIO_AGENT_TMUX_CONFIG=${folioTmuxConf}"
-          "FOLIO_AGENT_SESSION_CMD=${folioAgentSession}/bin/folio-agent-session"
+          "FOLIO_AGENT_TMUX_CONFIG=${folioCompanion.tmuxConf}"
+          "FOLIO_AGENT_SESSION_CMD=${folioCompanion.sessionCommand}"
           # Lets the backend reverse-proxy /folio/agent/terminal/** to ttyd, so the
           # Electron desktop (which loads the SPA from the backend, bypassing nginx)
           # can reach the terminal instead of a 404 (black panel).
@@ -225,30 +132,14 @@ in
       };
     };
 
-    systemd.services.folio-agent-terminal = lib.mkIf companion {
-      description = "folio agent companion ttyd";
-      after = [ "folio-backend.service" ];
-      wants = [ "folio-backend.service" ];
-      wantedBy = [ "multi-user.target" ];
-      path = [ pkgs.tmux ];
-      environment.HOME = globalCfg.homeDir;
-      serviceConfig = {
-        Type = "simple";
-        # No --check-origin here (unlike agent-ui on :443): folio runs on a
-        # non-default port, so the browser Origin carries ":6869" while nginx
-        # forwards Host without it, and ttyd would refuse every websocket. The WS
-        # is already protected by the nginx auth_request gate + the SameSite=strict
-        # session cookie (a cross-site WS can't carry the cookie), so the origin
-        # check is redundant here. Forwarding Host with the port ($http_host) is
-        # rejected by gixy as host-spoofing, hence dropping the check instead.
-        ExecStart = "${pkgs.ttyd}/bin/ttyd --port ${toString service-ports.folio.agentTerminal} --interface 127.0.0.1 --writable --url-arg --auth-header X-Folio-Agent-Authenticated --base-path /folio/agent/terminal ${folioAgentAttach}/bin/folio-agent-attach";
-        Restart = "always";
-        RestartSec = 3;
-        User = "andrew";
-        Group = "dev";
-        UMask = "0077";
-      };
-    };
+    # No --check-origin here (unlike agent-ui on :443): folio runs on a
+    # non-default port, so the browser Origin carries ":6869" while nginx
+    # forwards Host without it, and ttyd would refuse every websocket. The WS
+    # is already protected by the nginx auth_request gate + the SameSite=strict
+    # session cookie (a cross-site WS can't carry the cookie), so the origin
+    # check is redundant here. Forwarding Host with the port ($http_host) is
+    # rejected by gixy as host-spoofing, hence dropping the check instead.
+    systemd.services.folio-agent-terminal = lib.mkIf companion folioCompanion.terminalService;
 
     # ---- web: nginx serves folio (SPA at /folio + API) on the dedicated public
     # port; the backend itself binds localhost only. Mirrors the vikunja pattern. ----

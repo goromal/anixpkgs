@@ -3,6 +3,7 @@
   setuptools,
   flask,
   werkzeug,
+  pytestCheckHook,
   python,
   pkg-src,
 }:
@@ -19,11 +20,15 @@ buildPythonPackage rec {
     mkdir -p $out/${pythonLibDir}/templates
     cp main.html $out/${pythonLibDir}/templates/main.html
     cp upload_config.html $out/${pythonLibDir}/templates/upload_config.html
+    mkdir -p $out/${pythonLibDir}/static
+    cp budget_agent_panel.js budget_agent_panel.css $out/${pythonLibDir}/static/
   '';
   propagatedBuildInputs = [
     flask
     werkzeug
   ];
+  nativeCheckInputs = [ pytestCheckHook ];
+  pytestFlags = [ "tests" ];
   meta = {
     description = "Provides an easy interface for doing the budget.";
     longDescription = "Must be run on a server with the `budget_report` tool.";
