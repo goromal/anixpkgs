@@ -744,6 +744,8 @@ in
                   permissionsAllow = config.machines.claude.permissionsAllow;
                   hooks = config.machines.claude.hooks;
                   skills = config.machines.claude.skills;
+                  privateSkills = config.machines.agents.privateSkills;
+                  privateSkillsDir = config.machines.agents.privateSkillsDir;
                   extraSettings = config.machines.claude.extraSettings;
                   mcpServers = config.machines.claude.mcpServers;
                   graphical = features.desktop.enable;
@@ -757,6 +759,8 @@ in
                   sandboxMode = config.machines.codex.sandboxMode;
                   extraSettings = config.machines.codex.extraSettings;
                   skills = config.machines.codex.skills;
+                  privateSkills = config.machines.agents.privateSkills;
+                  privateSkillsDir = config.machines.agents.privateSkillsDir;
                   mcpServers = config.machines.codex.mcpServers;
                   graphical = features.desktop.enable;
                 };

@@ -43,6 +43,20 @@ in
     default = [ ];
     description = "Shared agent skills to omit on this machine";
   };
+  options.machines.agents.privateSkills = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [ ];
+    description = ''
+      Skill directory names linked (out of the Nix store, live-editable) from
+      privateSkillsDir into every enabled agent framework's skill roots. For
+      skills whose content must not live in any repository.
+    '';
+  };
+  options.machines.agents.privateSkillsDir = lib.mkOption {
+    type = lib.types.str;
+    default = "${config.machines.base.homeDir}/configs/private-skills";
+    description = "Directory holding one <name>/SKILL.md folder per private skill";
+  };
 
   config = lib.mkIf enabled (
     lib.mkMerge [
@@ -58,6 +72,21 @@ in
           mcpServers = mcpServersFor "codex";
         };
       })
+      {
+        assertions = [
+          (
+            let
+              clash = lib.intersectLists config.machines.agents.privateSkills (
+                map (skill: skill.name) skillCatalog
+              );
+            in
+            {
+              assertion = clash == [ ];
+              message = "machines.agents.privateSkills collides with public skills: ${lib.concatStringsSep ", " clash}";
+            }
+          )
+        ];
+      }
       {
         services.vikunja-mcp.enable = hasServer "vikunja";
         services.folio-mcp.enable = hasServer "folio";

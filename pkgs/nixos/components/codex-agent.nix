@@ -109,6 +109,16 @@ in
       default = [ ];
       description = "List of Codex skill directories to link into ~/.agents/skills and ~/.codex/skills";
     };
+    privateSkills = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Skill names linked out of the store from privateSkillsDir into ~/.agents/skills and ~/.codex/skills";
+    };
+    privateSkillsDir = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Directory holding private skill folders";
+    };
     mcpServers = lib.mkOption {
       type = lib.types.listOf agentLib.mcpServerType;
       default = [ ];
@@ -139,24 +149,42 @@ in
       '') skillTargets
     );
 
-    home.file = builtins.listToAttrs (
-      lib.concatMap (skill: [
-        {
-          name = ".agents/skills/${skill.name}";
-          value = {
-            source = builtins.dirOf skill.file;
-            force = true;
-          };
-        }
-        {
-          name = ".codex/skills/${skill.name}";
-          value = {
-            source = builtins.dirOf skill.file;
-            force = true;
-          };
-        }
-      ]) cfg.skills
-    );
+    home.file =
+      builtins.listToAttrs (
+        lib.concatMap (skill: [
+          {
+            name = ".agents/skills/${skill.name}";
+            value = {
+              source = builtins.dirOf skill.file;
+              force = true;
+            };
+          }
+          {
+            name = ".codex/skills/${skill.name}";
+            value = {
+              source = builtins.dirOf skill.file;
+              force = true;
+            };
+          }
+        ]) cfg.skills
+      )
+      // builtins.listToAttrs (
+        lib.concatMap (
+          skill:
+          map
+            (root: {
+              name = "${root}/${skill}";
+              value = {
+                source = config.lib.file.mkOutOfStoreSymlink "${cfg.privateSkillsDir}/${skill}";
+                force = true;
+              };
+            })
+            [
+              ".agents/skills"
+              ".codex/skills"
+            ]
+        ) cfg.privateSkills
+      );
 
     # NOTE: the Codex VSCode extension (openai.chatgpt) is intentionally deferred.
     # It is a platform-specific bundle shipping native ELF binaries that require

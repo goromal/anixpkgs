@@ -195,6 +195,16 @@ in
       default = [ ];
       description = "List of Claude Code skill directories to install into ~/.claude/skills/<name>";
     };
+    privateSkills = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "Skill names linked out of the store from privateSkillsDir into ~/.claude/skills/";
+    };
+    privateSkillsDir = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Directory holding private skill folders";
+    };
     extraSettings = lib.mkOption {
       type = lib.types.attrs;
       default = { };
@@ -230,15 +240,22 @@ in
       '')
     ];
 
-    home.file = builtins.listToAttrs (
-      map (skill: {
-        name = ".claude/skills/${skill.name}";
-        value = {
-          source = builtins.dirOf skill.file;
-          recursive = true;
-        };
-      }) cfg.skills
-    );
+    home.file =
+      builtins.listToAttrs (
+        map (skill: {
+          name = ".claude/skills/${skill.name}";
+          value = {
+            source = builtins.dirOf skill.file;
+            recursive = true;
+          };
+        }) cfg.skills
+      )
+      // builtins.listToAttrs (
+        map (skill: {
+          name = ".claude/skills/${skill}";
+          value.source = config.lib.file.mkOutOfStoreSymlink "${cfg.privateSkillsDir}/${skill}";
+        }) cfg.privateSkills
+      );
 
     programs.vscode.profiles.default.extensions = lib.mkIf cfg.graphical [ claudeCodeExt ];
 
