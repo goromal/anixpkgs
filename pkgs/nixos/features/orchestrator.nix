@@ -6,7 +6,6 @@
 }:
 with import ../dependencies.nix;
 let
-  cfg = config.machines.base;
   features = config.machines.features;
   inherit (import ../runtime.nix { inherit config pkgs lib; }) atsudo machine-rcrsync machine-authm;
 in
@@ -116,7 +115,7 @@ in
         # On-disk blacklist: a marker file named after a job in this directory
         # causes that job's oneshot service to fail immediately instead of
         # submitting to orchestratord. Managed via the orchestrator UI.
-        orchBlacklistDir = "${cfg.homeDir}/configs/orchestrator-blacklist.d";
+        orchBlacklistDir = features.orchestrator.blacklistDir;
         orchJobGuard = pkgs.writeShellScript "orch-job-guard" ''
           name="$1"
           if [ -e "${orchBlacklistDir}/$name" ]; then

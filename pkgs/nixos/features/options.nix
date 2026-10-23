@@ -69,6 +69,11 @@ in
             default = [ ];
             description = "Additional packages on the orchestrator's PATH.";
           };
+          blacklistDir = mkOption {
+            type = types.str;
+            default = "/var/lib/orchestrator/blacklist.d";
+            description = "Host-local directory of job-name marker files that block those jobs from running.";
+          };
         };
         nexus = {
           role = mkOption {
