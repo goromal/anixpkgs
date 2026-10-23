@@ -6,7 +6,6 @@
 }:
 with import ../dependencies.nix;
 let
-  cfg = config.machines.base;
   features = config.machines.features;
   inherit (import ../runtime.nix { inherit config pkgs lib; }) atsudo machine-rcrsync machine-authm;
 in
@@ -116,7 +115,7 @@ in
         # On-disk blacklist: a marker file named after a job in this directory
         # causes that job's oneshot service to fail immediately instead of
         # submitting to orchestratord. Managed via the orchestrator UI.
-        orchBlacklistDir = "${cfg.homeDir}/configs/orchestrator-blacklist.d";
+        orchBlacklistDir = features.orchestrator.blacklistDir;
         orchJobGuard = pkgs.writeShellScript "orch-job-guard" ''
           name="$1"
           if [ -e "${orchBlacklistDir}/$name" ]; then
@@ -164,5 +163,22 @@ in
         );
       }
     )
+    # TODO(temporary): remove once every orchestrator host has migrated.
+    # Copies blacklist markers from the old synced ~/configs location into the
+    # host-local blacklist. Copy-only: deleting the synced source here could
+    # propagate to hosts that have not migrated yet, so remove
+    # ~/configs/orchestrator-blacklist.d by hand afterward.
+    (lib.mkIf features.orchestrator.enable {
+      systemd.services.orchestrator-blacklist-migrate = {
+        description = "Copy orchestrator blacklist markers out of ~/configs";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "systemd-tmpfiles-setup.service" ];
+        unitConfig.ConditionDirectoryNotEmpty = "${config.machines.base.homeDir}/configs/orchestrator-blacklist.d";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.coreutils}/bin/cp -rv --update=none ${config.machines.base.homeDir}/configs/orchestrator-blacklist.d/. ${features.orchestrator.blacklistDir}/";
+        };
+      };
+    })
   ];
 }
