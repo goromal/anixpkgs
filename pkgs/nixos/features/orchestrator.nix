@@ -163,5 +163,22 @@ in
         );
       }
     )
+    # TODO(temporary): remove once every orchestrator host has migrated.
+    # Copies blacklist markers from the old synced ~/configs location into the
+    # host-local blacklist. Copy-only: deleting the synced source here could
+    # propagate to hosts that have not migrated yet, so remove
+    # ~/configs/orchestrator-blacklist.d by hand afterward.
+    (lib.mkIf features.orchestrator.enable {
+      systemd.services.orchestrator-blacklist-migrate = {
+        description = "Copy orchestrator blacklist markers out of ~/configs";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "systemd-tmpfiles-setup.service" ];
+        unitConfig.ConditionDirectoryNotEmpty = "${config.machines.base.homeDir}/configs/orchestrator-blacklist.d";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.coreutils}/bin/cp -rv --update=none ${config.machines.base.homeDir}/configs/orchestrator-blacklist.d/. ${features.orchestrator.blacklistDir}/";
+        };
+      };
+    })
   ];
 }

@@ -217,6 +217,7 @@ class ProfileContracts(unittest.TestCase):
         for name in snapshot["jobs"] + [
             "weekly-orchestratord-restart",
             "orchestratord",
+            "orchestrator-blacklist-migrate",
         ]:
             self.assertNotIn(name, snapshot["units"])
             self.assertNotIn(name, snapshot["timers"])
@@ -234,6 +235,7 @@ class ProfileContracts(unittest.TestCase):
             snapshot["tmpfiles"],
         )
         self.assertFalse(any("/configs/" in rule for rule in snapshot["tmpfiles"]))
+        self.assertIn("orchestrator-blacklist-migrate", snapshot["units"])
 
     def test_determinate_preserves_mutable_netrc(self):
         snapshot = self.snapshot(fixture("workstation"))
