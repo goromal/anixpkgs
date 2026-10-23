@@ -114,6 +114,11 @@
                 "docs": true
             },
             {
+                "attr": "nix-exporter",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "rtk",
                 "ci": true,
                 "docs": false

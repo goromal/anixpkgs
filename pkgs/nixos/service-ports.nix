@@ -9,6 +9,7 @@
     output = 9001;
   };
   node-exporter = 5554;
+  nix-exporter = 9944;
   loki = 3666;
   grafana = {
     internal = 5555;
