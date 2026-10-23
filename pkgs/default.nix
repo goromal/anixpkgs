@@ -838,6 +838,11 @@ rec {
       pkg-src = flakeInputs.sunnyside;
     }
   );
+  nix-exporter = addDoc (
+    prev.callPackage ./rust-packages/nix-exporter {
+      pkg-src = flakeInputs.nix-exporter;
+    }
+  );
   rtk = addDoc (
     prev.callPackage ./rust-packages/rtk {
       pkg-src = flakeInputs.rtk;

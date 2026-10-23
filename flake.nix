@@ -29,6 +29,9 @@
     llm-agents.url = "github:numtide/llm-agents.nix";
     llm-agents.inputs.bun2nix.follows = "bun2nix";
 
+    nix-exporter.url = "github:burk3/nix-exporter";
+    nix-exporter.flake = false;
+
     phps.url = "github:fossar/nix-phps";
 
     flake-compat.url = "github:edolstra/flake-compat";
@@ -36,7 +39,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    anixdata.url = "github:goromal/anixdata";
+    anixdata.url = "github:goromal/anixdata?ref=refs/heads/dev/nix-metrics";
     anixdata.flake = false;
 
     agent-skills.url = "github:goromal/agent-skills";

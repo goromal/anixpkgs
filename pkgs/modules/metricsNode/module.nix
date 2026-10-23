@@ -55,7 +55,10 @@ let
   # Copied to its declared name first because `sanitize` keys the output on the
   # input's basename, and a raw store path carries a hash prefix that would churn
   # the output filename on every anixdata bump.
-  vendoredDashboards = [ anixpkgs.pkgData.dashboards.node-exporter-full ];
+  vendoredDashboards = with anixpkgs.pkgData.dashboards; [
+    node-exporter-full
+    nix-exporter
+  ];
   dashboardPkg = pkgs.runCommand "anix-grafana-dashboards" { } ''
     mkdir -p $out vendor
     ${lib.concatMapStringsSep "\n" (d: ''cp ${d.data} "vendor/${d.name}"'') vendoredDashboards}
@@ -65,6 +68,15 @@ let
   '';
 in
 {
+  # Upstream's module, imported from the packaged source so the unit definitions
+  # track the pinned exporter. Its `self` argument only supplies the default
+  # `package`, which is always overridden below, so it is never forced.
+  imports = [
+    (import "${anixpkgs.nix-exporter.src}/nix/module.nix" {
+      self = throw "nix-exporter: services.nix-exporter.package must be set explicitly";
+    })
+  ];
+
   options.services.metricsNode = {
     enable = lib.mkEnableOption "enable metrics node services";
     openFirewall = lib.mkOption {
@@ -374,6 +386,14 @@ in
           ];
         }
         {
+          job_name = "nix";
+          static_configs = [
+            {
+              targets = [ "127.0.0.1:${builtins.toString service-ports.nix-exporter}" ];
+            }
+          ];
+        }
+        {
           job_name = "node";
           static_configs = [
             {
@@ -387,6 +407,15 @@ in
         port = service-ports.node-exporter;
         extraFlags = [ "--collector.textfile.directory=${textfileDir}" ];
       };
+    };
+
+    # Nix store, daemon, build and upkeep metrics, charted by the vendored
+    # nix-exporter dashboard. Listens on loopback only; Prometheus is local.
+    services.nix-exporter = {
+      enable = true;
+      package = anixpkgs.nix-exporter;
+      nixPackage = config.nix.package;
+      port = service-ports.nix-exporter;
     };
 
     # Only the node_exporter textfile collector needs a managed directory now;
