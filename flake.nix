@@ -39,7 +39,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    anixdata.url = "github:goromal/anixdata?ref=refs/heads/dev/nix-metrics";
+    anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
     agent-skills.url = "github:goromal/agent-skills";

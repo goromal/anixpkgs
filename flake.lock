@@ -35,16 +35,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1792717472,
+        "lastModified": 1792723222,
         "narHash": "sha256-6haWBdcu3UV5tc61VSgqiDe4c6kzt6q5PhvAdr+O9Ac=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "612e3ed534357b5d45d7056a22015112b26ce9cb",
+        "rev": "2e5c5d5f82b2eb3607c925151f76072700eb817a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/nix-metrics",
         "repo": "anixdata",
         "type": "github"
       }
