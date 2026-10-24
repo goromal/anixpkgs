@@ -458,15 +458,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792647661,
-        "narHash": "sha256-GozRPH2CIt9kipydxXB2ZRdnvL5hcAQAN05FbbPl8nA=",
+        "lastModified": 1792871300,
+        "narHash": "sha256-ESkVAV7yLEQ+3z6kXFf0rBwPQQdGcCx+Z2mOrNqQyH8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d021cd9c23e83d5a48ffd00d0264e5f9acb97bed",
+        "rev": "645ebd9ccaa3f73f7707f50692eafa2a50097a33",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/avahi-hostname-conflict",
         "repo": "flasks",
         "type": "github"
       }
