@@ -117,8 +117,8 @@ in
               description = "Display name of the service";
             };
             tag = lib.mkOption {
-              type = lib.types.str;
-              description = "Landing-page group for the service";
+              type = lib.types.enum (import ./web-categories.nix);
+              description = "Landing-page group for the service, and its UI usage category";
             };
             path = lib.mkOption {
               type = lib.types.str;

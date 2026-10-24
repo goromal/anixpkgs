@@ -27,6 +27,51 @@ let
   dashboardConstants = import ./panels.nix;
   grafana-dash = "${anixpkgs.grafana_dash}/bin/grafana_dash";
 
+  # UI usage: every page served through nginx carries a heartbeat (see
+  # webserverNode) that POSTs here while the page is visible and in use. Spokes
+  # forward their heartbeats to the hub, which turns everyone's into one
+  # Prometheus counter and hands the raw events to Tactical's archive.
+  usageCfg = cfg.usage;
+  usageBeaconPath = "/anix-usage";
+  usageBeaconLocation = {
+    proxyPass = "http://127.0.0.1:${toString service-ports.usage.beacon}${usageBeaconPath}";
+    extraConfig = ''
+      limit_except POST { deny all; }
+      client_max_body_size 1k;
+    '';
+  };
+  # Disk-buffered so heartbeats survive the hub (or Tactical) being down, or a
+  # laptop being off the LAN, and are delivered when it comes back. 256 MiB is
+  # Vector's minimum disk buffer; heartbeats are ~150 bytes each.
+  usageDiskBuffer = {
+    type = "disk";
+    max_size = 268435488;
+    when_full = "drop_newest";
+  };
+  # Heartbeats are trusted only as far as their shape: the page could be any
+  # script on the LAN, so anything outside the known enums or a sane heartbeat
+  # length is dropped rather than becoming a stray pie slice or a huge count.
+  usageValidate = ''
+    service = string(.service) ?? ""
+    category = string(.category) ?? ""
+    device = string(.device) ?? ""
+    seconds = to_int(.seconds) ?? 0
+    if service == "" || strlen(service) > 64 ||
+       !includes(${builtins.toJSON (import ../../nixos/web-categories.nix)}, category) ||
+       !includes(["desktop", "mobile"], device) ||
+       seconds <= 0 || seconds > 60 {
+      abort
+    }
+    . = {
+      "timestamp": now(),
+      "host": "${config.networking.hostName}",
+      "service": service,
+      "category": category,
+      "device": device,
+      "seconds": seconds
+    }
+  '';
+
   # Panels named in an assertion failure, so the message points at the offending
   # registration instead of leaving the reader to grep three files for it.
   panelTitles = panels: lib.concatMapStringsSep ", " (p: "'${p.title}'") panels;
@@ -83,6 +128,34 @@ in
       type = lib.types.bool;
       description = "Whether to open the specific firewall port for inter-computer usage";
       default = false;
+    };
+    retentionTime = lib.mkOption {
+      type = lib.types.str;
+      default = if cfg.usage.isHub then "400d" else "15d";
+      description = ''
+        How long Prometheus keeps samples. The hub keeps a year and change so
+        UI usage can be charted over a year; spokes only need recent history.
+      '';
+    };
+    usage = {
+      isHub = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = "Collect every host's UI usage here instead of forwarding it to `hubHost`.";
+      };
+      hubHost = lib.mkOption {
+        type = lib.types.str;
+        default = "ats.local";
+        description = "Host a spoke forwards UI usage heartbeats to.";
+      };
+      archiveUrl = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Hub only: HTTP endpoint that receives raw usage events as NDJSON and
+          keeps the durable record. Null keeps usage in Prometheus alone.
+        '';
+      };
     };
     # Declared outside `config = lib.mkIf cfg.enable`, so any module can append a
     # panel without first knowing whether metrics are enabled on this host.
@@ -221,6 +294,36 @@ in
         group = "Job Logs";
       }
     ]
+    ++ lib.optionals usageCfg.isHub [
+      {
+        kind = "timeseries";
+        title = "UI Active Time by Category";
+        expr = "sum by (category) (increase(anix_ui_active_seconds_total[1h])) / 60";
+        legend = "{{category}}";
+        unit = "m";
+        group = "UI Usage";
+        dashboard = "usage";
+      }
+      {
+        kind = "timeseries";
+        title = "UI Active Time by Device";
+        expr = "sum by (device) (increase(anix_ui_active_seconds_total[1h])) / 60";
+        legend = "{{device}}";
+        unit = "m";
+        group = "UI Usage";
+        dashboard = "usage";
+      }
+      {
+        kind = "timeseries";
+        title = "UI Active Time by Service";
+        expr = "sum by (service) (increase(anix_ui_active_seconds_total[1h])) / 60";
+        legend = "{{service}}";
+        unit = "m";
+        group = "UI Usage";
+        dashboard = "usage";
+        width = 24;
+      }
+    ]
     ++ lib.optionals config.machines.features.orchestrator.enable (
       lib.concatMap (
         job:
@@ -244,7 +347,9 @@ in
       }
     ];
 
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ service-ports.grafana.internal ];
+    networking.firewall.allowedTCPPorts =
+      lib.optional cfg.openFirewall service-ports.grafana.internal
+      ++ lib.optional usageCfg.isHub service-ports.usage.hub;
 
     services.vector = {
       enable = true;
@@ -260,6 +365,21 @@ in
           service_logs = {
             type = "journald";
           };
+          usage_beacons = {
+            # https://vector.dev/docs/reference/configuration/sources/http_server/
+            type = "http_server";
+            address = "127.0.0.1:${toString service-ports.usage.beacon}";
+            path = usageBeaconPath;
+            method = "POST";
+            decoding.codec = "json";
+          };
+        }
+        // lib.optionalAttrs usageCfg.isHub {
+          usage_remote = {
+            # https://vector.dev/docs/reference/configuration/sources/vector/
+            type = "vector";
+            address = "0.0.0.0:${toString service-ports.usage.hub}";
+          };
         };
         transforms = {
           tagged_service_logs = {
@@ -268,6 +388,35 @@ in
             source = ''
               .tag = if exists(.SYSLOG_IDENTIFIER) { .SYSLOG_IDENTIFIER } else { "unknown" }
             '';
+          };
+          usage_events = {
+            type = "remap";
+            inputs = [ "usage_beacons" ];
+            source = usageValidate;
+          };
+        }
+        // lib.optionalAttrs usageCfg.isHub {
+          usage_metrics = {
+            # https://vector.dev/docs/reference/configuration/transforms/log_to_metric/
+            type = "log_to_metric";
+            inputs = [
+              "usage_events"
+              "usage_remote"
+            ];
+            metrics = [
+              {
+                type = "counter";
+                field = "seconds";
+                increment_by_value = true;
+                name = "anix_ui_active_seconds_total";
+                tags = {
+                  service = "{{ service }}";
+                  category = "{{ category }}";
+                  device = "{{ device }}";
+                  host = "{{ host }}";
+                };
+              }
+            ];
           };
         };
         sinks = {
@@ -288,7 +437,50 @@ in
               tag = "{{ tag }}"; # label for filtering
             };
           };
-        };
+        }
+        // (
+          if usageCfg.isHub then
+            {
+              usage_prometheus = {
+                # Its own exporter rather than the statsd one: Vector expires a
+                # series once it goes `flush_period_secs` without an update, and a
+                # usage series idle for an evening must keep counting from where
+                # it left off instead of reappearing as a fresh counter.
+                type = "prometheus_exporter";
+                inputs = [ "usage_metrics" ];
+                address = "127.0.0.1:${toString service-ports.usage.exporter}";
+                flush_period_secs = 31536000;
+              };
+            }
+            // lib.optionalAttrs (usageCfg.archiveUrl != null) {
+              usage_archive = {
+                # https://vector.dev/docs/reference/configuration/sinks/http/
+                type = "http";
+                inputs = [
+                  "usage_events"
+                  "usage_remote"
+                ];
+                uri = usageCfg.archiveUrl;
+                method = "post";
+                encoding.codec = "json";
+                framing.method = "newline_delimited";
+                buffer = usageDiskBuffer;
+              };
+            }
+          else
+            {
+              usage_forward = {
+                # https://vector.dev/docs/reference/configuration/sinks/vector/
+                type = "vector";
+                inputs = [ "usage_events" ];
+                address = "${usageCfg.hubHost}:${toString service-ports.usage.hub}";
+                buffer = usageDiskBuffer;
+                # The hub being unreachable at startup is routine (laptops roam);
+                # the buffer covers it, so it should not read as a failure.
+                healthcheck.enabled = false;
+              };
+            }
+        );
       };
     };
 
@@ -375,7 +567,10 @@ in
     services.prometheus = {
       enable = true;
       port = service-ports.prometheus.output;
-      retentionTime = "15d";
+      inherit (cfg) retentionTime;
+      # A ceiling under the time limit, so a series explosion on the hub cannot
+      # quietly fill the disk over 400 days.
+      extraFlags = [ "--storage.tsdb.retention.size=10GB" ];
       scrapeConfigs = [
         {
           job_name = "vector";
@@ -393,6 +588,18 @@ in
             }
           ];
         }
+      ]
+      ++ lib.optionals usageCfg.isHub [
+        {
+          job_name = "usage";
+          static_configs = [
+            {
+              targets = [ "127.0.0.1:${toString service-ports.usage.exporter}" ];
+            }
+          ];
+        }
+      ]
+      ++ [
         {
           job_name = "node";
           static_configs = [
@@ -487,18 +694,30 @@ in
     };
 
     machines.base.runWebServer = true;
-    services.nginx.virtualHosts."${config.networking.hostName}.local" = {
-      locations."/grafana/" = {
-        proxyPass = "http://127.0.0.1:${builtins.toString service-ports.grafana.internal}/grafana/";
-        proxyWebsockets = true;
-        extraConfig = ''
-          proxy_set_header Host $host;
-          proxy_set_header X-Real-IP $remote_addr;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_set_header X-Forwarded-Host $host;
-        '';
+    # Services on their own port answer heartbeats on their own origin, since
+    # the injected page script posts same-origin.
+    services.nginx.virtualHosts =
+      lib.listToAttrs (
+        map (s: {
+          name = "${config.networking.hostName}.local:${toString s.port}";
+          value.locations."= ${usageBeaconPath}" = usageBeaconLocation;
+        }) (lib.filter (s: s.port != null) globalCfg.webServices)
+      )
+      // {
+        "${config.networking.hostName}.local" = {
+          locations."= ${usageBeaconPath}" = usageBeaconLocation;
+          locations."/grafana/" = {
+            proxyPass = "http://127.0.0.1:${builtins.toString service-ports.grafana.internal}/grafana/";
+            proxyWebsockets = true;
+            extraConfig = ''
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header X-Forwarded-Host $host;
+            '';
+          };
+        };
       };
-    };
   };
 }

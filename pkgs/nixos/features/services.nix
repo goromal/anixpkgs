@@ -116,6 +116,14 @@ in
     # Metrics
     services.metricsNode.enable = features.metrics.enable;
     services.metricsNode.openFirewall = features.metrics.enable;
+    services.metricsNode.usage = {
+      isHub = features.metrics.role == "hub";
+      inherit (features.metrics) hubHost;
+      # Tactical keeps the durable record of every host's usage and charts it.
+      archiveUrl = lib.mkIf (
+        features.metrics.role == "hub" && features.tactical.enable
+      ) "http://127.0.0.1:${toString service-ports.tactical.web}/tactical/api/usage/ingest";
+    };
 
     # External drives
     machines.externalDrives.enable = features.externalDrives.enable;

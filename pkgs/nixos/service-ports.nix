@@ -8,6 +8,13 @@
     input = 9598;
     output = 9001;
   };
+  # UI usage heartbeats: nginx -> local vector (beacon), spoke vector -> hub
+  # vector (hub), and the hub's usage-only Prometheus exporter (exporter).
+  usage = {
+    beacon = 9599;
+    hub = 9600;
+    exporter = 9601;
+  };
   node-exporter = 5554;
   nix-exporter = 9944;
   loki = 3666;
