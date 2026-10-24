@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent.resolve()
@@ -155,17 +156,21 @@ def main():
     failures = []
     timings = []
 
-    with _LocalBuildPatch():
-        for mt in MACHINE_TYPES:
-            for i, opts in enumerate(cases):
-                short = " ".join(
-                    f"{k[:3]}={'T' if v else 'F'}" for k, v in opts.items()
-                )
-                label = f"{mt}/perm-{i:03d}  {short}"
-                ok, elapsed = eval_config(render_config(mt, opts), label)
-                timings.append(elapsed)
-                if not ok:
-                    failures.append(label)
+    checks = []
+    for mt in MACHINE_TYPES:
+        for i, opts in enumerate(cases):
+            short = " ".join(f"{k[:3]}={'T' if v else 'F'}" for k, v in opts.items())
+            checks.append((render_config(mt, opts), f"{mt}/perm-{i:03d}  {short}"))
+
+    # Each check is an independent nix eval subprocess; PROFILE_TEST_JOBS
+    # bounds how many (each a few GB) run at once.
+    workers = int(os.environ.get("PROFILE_TEST_JOBS", "3"))
+    with _LocalBuildPatch(), ThreadPoolExecutor(workers) as pool:
+        results = list(pool.map(lambda check: eval_config(*check), checks))
+    for (_, label), (ok, elapsed) in zip(checks, results):
+        timings.append(elapsed)
+        if not ok:
+            failures.append(label)
 
     print()
     print(

@@ -13,13 +13,9 @@ cd "$DIR/.."
 
 if [[ "$1" == "check" ]]; then
     echo "Validating format of .nix files..."
-    for nixfile in $(find . -type f -name "*.nix"); do
-        nixfmt -c "$nixfile"
-    done
+    find . -type f -name "*.nix" -print0 | xargs -0 nixfmt -c
 else
     echo "Formatting .nix files..."
-    for nixfile in $(find . -type f -name "*.nix"); do 
-        nixfmt "$nixfile"
-    done
+    find . -type f -name "*.nix" -print0 | xargs -0 nixfmt
 fi
 echo "Done."
