@@ -12,6 +12,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 import unittest
 from concurrent.futures import Future, ThreadPoolExecutor
 
@@ -400,7 +401,9 @@ def run_concurrently(workers):
 
     def run(test):
         result = unittest.TestResult()
+        start = time.monotonic()
         test(result)
+        result.elapsed = time.monotonic() - start
         return result
 
     ProfileContracts.setUpClass()
@@ -413,7 +416,7 @@ def run_concurrently(workers):
     problems = []
     for test, result in zip(tests, results):
         failed = result.failures + result.errors
-        print(f"{test.id()} ... {'FAIL' if failed else 'ok'}")
+        print(f"{test.id()} ... {'FAIL' if failed else 'ok'} ({result.elapsed:.1f}s)")
         problems.extend(failed)
     for test, trace in problems:
         print(f"\n{'=' * 70}\nFAIL: {test}\n{'-' * 70}\n{trace}")
