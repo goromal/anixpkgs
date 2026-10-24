@@ -14,7 +14,6 @@ Usage:
 import argparse
 import json
 import os
-import shlex
 import shutil
 import subprocess
 import sys
@@ -28,16 +27,20 @@ NIX_ENV = dict(os.environ, NIXPKGS_ALLOW_UNFREE="1")
 
 
 def _nix_eval_jobs(args):
-    """Command line for nix-eval-jobs, from PATH or else the <nixpkgs> channel."""
+    """Command line for nix-eval-jobs, from PATH or else this repo's pinned nixpkgs.
+
+    The pinned build does not depend on <nixpkgs>, which deploy.yml once left
+    unset.
+    """
     if shutil.which("nix-eval-jobs"):
         return ["nix-eval-jobs"] + args
-    return [
-        "nix-shell",
-        "-p",
-        "nix-eval-jobs",
-        "--run",
-        shlex.join(["nix-eval-jobs"] + args),
-    ]
+    out = subprocess.run(
+        ["nix-build", ANIXDIR, "-A", "nix-eval-jobs", "--no-out-link"],
+        stdout=subprocess.PIPE,
+        text=True,
+        check=True,
+    ).stdout.strip()
+    return [os.path.join(out, "bin", "nix-eval-jobs")] + args
 
 
 def _default_output(record):
