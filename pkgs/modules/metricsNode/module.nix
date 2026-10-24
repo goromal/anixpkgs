@@ -450,6 +450,11 @@ in
                 inputs = [ "usage_metrics" ];
                 address = "127.0.0.1:${toString service-ports.usage.exporter}";
                 flush_period_secs = 31536000;
+                # Otherwise each sample carries its last heartbeat's time: every
+                # scrape after the first is dropped as a duplicate, and the series
+                # goes stale 5m after you stop using a UI, so instant queries and
+                # short-range increase() come back empty.
+                suppress_timestamp = true;
               };
             }
             // lib.optionalAttrs (usageCfg.archiveUrl != null) {
