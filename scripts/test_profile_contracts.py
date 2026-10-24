@@ -70,8 +70,18 @@ def fixture(profile, extra=""):
     """
 
 
+# Each NixOS evaluation peaks at a few GB, so at most PROFILE_TEST_JOBS run at
+# once however many tests are in flight.
+EVAL_SLOTS = threading.BoundedSemaphore(int(os.environ.get("PROFILE_TEST_JOBS", "3")))
+
+
+def _bounded_run(*args, **kwargs):
+    with EVAL_SLOTS:
+        return subprocess.run(*args, **kwargs)
+
+
 def evaluate(configuration):
-    return subprocess.run(
+    return _bounded_run(
         [
             "nix",
             "eval",
@@ -94,7 +104,7 @@ def evaluate(configuration):
 
 
 def evaluate_flake(machine):
-    return subprocess.run(
+    return _bounded_run(
         [
             "nix",
             "eval",
@@ -143,6 +153,12 @@ class ProfileContracts(unittest.TestCase):
         self.assertEqual(snapshot["failedAssertions"], [])
         return snapshot
 
+    def prefetch(self, *snapshots):
+        """Start memoized evaluations concurrently; callers assert on them later."""
+        with ThreadPoolExecutor(len(snapshots)) as pool:
+            for snapshot in snapshots:
+                pool.submit(snapshot)
+
     def snapshot(self, configuration):
         return self._memoized(configuration, lambda: evaluate(configuration))
 
@@ -165,13 +181,22 @@ class ProfileContracts(unittest.TestCase):
                 self.assertEqual(set(snapshot["enabledServices"]), expected)
 
     def test_concrete_machine_service_sets(self):
-        for name, expected in [
+        machines = [
             ("personal-inspiron", PERSONAL),
             ("personal-panasonic", PERSONAL),
             ("personal-dell", PERSONAL | {"launchpad", "comfyui", "ollama"}),
             ("ats-alderlake", ATS),
             ("ats-pi", ATS),
-        ]:
+        ]
+        flake_machines = ["jetson-orin-nx", "jetson-orin-agx"]
+        self.prefetch(
+            *(
+                lambda name=name: self.snapshot(f"{NIXOS_DIR}/configurations/{name}.nix")
+                for name, _ in machines
+            ),
+            *(lambda machine=machine: self.flake_snapshot(machine) for machine in flake_machines),
+        )
+        for name, expected in machines:
             with self.subTest(machine=name):
                 snapshot = self.snapshot(f"{NIXOS_DIR}/configurations/{name}.nix")
                 self.assertEqual(set(snapshot["enabledServices"]), expected)
@@ -180,7 +205,7 @@ class ProfileContracts(unittest.TestCase):
                     1 if "launchpad" in expected else 0,
                 )
 
-        for machine in ["jetson-orin-nx", "jetson-orin-agx"]:
+        for machine in flake_machines:
             with self.subTest(machine=machine):
                 snapshot = self.flake_snapshot(machine)
                 self.assertEqual(set(snapshot["enabledServices"]), JETPACK)
@@ -391,11 +416,11 @@ class ProfileContracts(unittest.TestCase):
         self.assertFalse(ok)
 
 
-def run_concurrently(workers):
-    """Run each test method on a thread pool; the work is in nix subprocesses.
+def run_concurrently():
+    """Run every test method at once on threads; the work is in nix subprocesses.
 
-    Each NixOS evaluation peaks at a few GB, so PROFILE_TEST_JOBS bounds how
-    many run at once. Results print in test order once all have finished.
+    EVAL_SLOTS bounds the concurrent evaluations. Results print in test order
+    once all have finished.
     """
     tests = list(unittest.defaultTestLoader.loadTestsFromTestCase(ProfileContracts))
 
@@ -408,7 +433,7 @@ def run_concurrently(workers):
 
     ProfileContracts.setUpClass()
     try:
-        with ThreadPoolExecutor(workers) as pool:
+        with ThreadPoolExecutor(len(tests)) as pool:
             results = list(pool.map(run, tests))
     finally:
         ProfileContracts.doClassCleanups()
@@ -425,4 +450,4 @@ def run_concurrently(workers):
 
 
 if __name__ == "__main__":
-    sys.exit(0 if run_concurrently(int(os.environ.get("PROFILE_TEST_JOBS", "3"))) else 1)
+    sys.exit(0 if run_concurrently() else 1)
