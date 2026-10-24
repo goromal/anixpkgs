@@ -58,7 +58,18 @@ jobs:
       run: |
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         t() { local s=$(date +%s.%N); "$@" >/dev/null 2>/tmp/err || { tail -5 /tmp/err; }; python3 -c "print(f'TIMING {round($(date +%s.%N)-$s,1)}s', '''$*'''[:90])"; }
-        t nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
-        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
-        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
-        t nix-instantiate . -A make-title
+        nix eval -v --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure 2>&1 >/dev/null \
+          | while IFS= read -r l; do printf '%s %s\n' "$(date +%s.%N)" "$l"; done > /tmp/tl.log
+        python3 - <<'PY'
+        import re
+        rows=[l.split(" ",1) for l in open("/tmp/tl.log").read().splitlines() if " " in l]
+        t0=float(rows[0][0]); tot={}
+        for i,(t,m) in enumerate(rows):
+            nxt=float(rows[i+1][0]) if i+1<len(rows) else float(t)
+            k=re.sub(r"/nix/store/[a-z0-9]{32}-|'[^']*'|[0-9a-f]{40}|\d+","X",m)[:70]
+            tot[k]=tot.get(k,0)+nxt-float(t)
+        print("TOTAL", round(float(rows[-1][0])-t0,1))
+        for k,v in sorted(tot.items(),key=lambda x:-x[1])[:15]: print(f"GAP {v:6.1f}s {k}")
+        print("COUNT copying", sum("copying path" in m for _,m in rows), "unpacking", sum("unpacking" in m for _,m in rows))
+        PY
+        grep -E "copying path|unpacking|fetching" /tmp/tl.log | awk 'NR>1{printf "%.1fs %s\n", $1-p, substr(q,1,140)} {p=$1; $1=""; q=$0}' | sort -rn | head -15 | sed 's/^/SLOW /'
