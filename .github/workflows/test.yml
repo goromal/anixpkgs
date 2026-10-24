@@ -98,11 +98,46 @@ jobs:
         else
           echo "No dependencies detected on a side branch"
         fi
+  fetch-cache:
+    name: Warm Nix Fetch Cache
+    runs-on: ubuntu-latest
+    # Every evaluating job's first eval otherwise spends ~1-2 min downloading
+    # and unpacking ~60 flake inputs into ~/.cache/nix. This archives all of
+    # them once per flake.lock; other jobs restore it (falling back to the
+    # previous lock's cache, which covers most inputs).
+    steps:
+    - uses: actions/checkout@v5
+    - id: lookup
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        lookup-only: true
+    - if: steps.lookup.outputs.cache-hit != 'true'
+      uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - if: steps.lookup.outputs.cache-hit != 'true'
+      run: |
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+        nix flake archive >/dev/null
+        nix-instantiate --eval -E '(import <nixpkgs> { }).lib.version' >/dev/null
+    - if: steps.lookup.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
   envs:
     name: Build Environments
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -118,6 +153,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -133,6 +174,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -148,6 +195,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -163,6 +216,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -178,6 +237,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -193,6 +258,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -208,6 +279,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -228,6 +305,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -242,6 +325,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: cachix/install-nix-action@v31
       with:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
@@ -256,6 +345,12 @@ jobs:
         shard: [0, 1, 2]
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - uses: docker/setup-qemu-action@v4
       with:
         platforms: arm64
@@ -324,6 +419,12 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - name: Enable KVM for the test VM
       run: |
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -369,6 +470,12 @@ jobs:
     timeout-minutes: 60
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - name: Enable KVM for the test VM
       run: |
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -402,6 +509,12 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - name: Enable KVM for the test VM
       run: |
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -442,6 +555,12 @@ jobs:
     timeout-minutes: 30
     steps:
     - uses: actions/checkout@v5
+    # Flake inputs unpacked by earlier runs; see the fetch-cache job.
+    - uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: nix-fetch-${{ hashFiles('flake.lock') }}
+        restore-keys: nix-fetch-
     - name: Enable KVM for the test VM
       run: |
         echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
