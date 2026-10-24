@@ -1,0 +1,64 @@
+name: "TEMP Fetch Probe"
+on:
+  pull_request:
+
+env:
+  NIXOS_VERSION: 26.05
+  NIXPKGS_ALLOW_UNFREE: 1
+  NIXPKGS_ALLOW_INSECURE: 1
+  NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM: 1
+
+jobs:
+  cold:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        skipPush: true
+    - run: git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: probe
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        t() { local s=$(date +%s.%N); "$@" >/dev/null 2>/tmp/err || { tail -5 /tmp/err; }; python3 -c "print(f'TIMING {round($(date +%s.%N)-$s,1)}s', '''$*'''[:90])"; }
+        t nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
+        t nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
+        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
+        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
+        t nix-instantiate . -A make-title
+        t nix-instantiate . -A make-title
+        du -sh ~/.cache/nix/* | sort -h
+    - uses: actions/cache/save@v4
+      with:
+        path: ~/.cache/nix
+        key: fetch-probe-${{ hashFiles('flake.lock') }}-${{ github.run_id }}
+  cached:
+    needs: cold
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        skipPush: true
+    - run: git config --global url."https://github.com/".insteadOf ssh://git@github.com/
+    - name: restore
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.cache/nix
+        key: fetch-probe-${{ hashFiles('flake.lock') }}-${{ github.run_id }}
+    - name: probe
+      run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
+        t() { local s=$(date +%s.%N); "$@" >/dev/null 2>/tmp/err || { tail -5 /tmp/err; }; python3 -c "print(f'TIMING {round($(date +%s.%N)-$s,1)}s', '''$*'''[:90])"; }
+        t nix-instantiate --eval -E '(import <nixpkgs> {}).lib.version'
+        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
+        t nix eval --raw .#nixosConfigurations.ats.config.system.build.toplevel.drvPath --impure
+        t nix-instantiate . -A make-title
