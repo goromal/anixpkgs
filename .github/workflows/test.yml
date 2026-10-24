@@ -8,6 +8,13 @@ on:
 env:
   NIXOS_VERSION: 26.05
 
+# A newer push to a PR (including the lint/lock bots' auto-commits) supersedes
+# its in-flight run; the merge queue only reads CI for the PR's head SHA.
+# Pushes to master are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   lint:
     name: Check Lint Nix Files
@@ -93,7 +100,6 @@ jobs:
         fi
   envs:
     name: Build Environments
-    needs: check-flake-lock
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -109,7 +115,6 @@ jobs:
     - run: ./scripts/build_envs.sh
   cpp:
     name: C++ Packages
-    needs: envs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -125,7 +130,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh cpp
   rust:
     name: Rust Packages
-    needs: envs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -141,7 +145,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh rust
   python:
     name: Python Packages
-    needs: cpp
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -157,7 +160,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh python
   bash:
     name: Bash Packages
-    needs: python
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -173,7 +175,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh bash
   java:
     name: Java Packages
-    needs: envs
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -189,7 +190,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh java
   js:
     name: JavaScript Packages
-    needs: java
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -205,13 +205,6 @@ jobs:
     - run: ./scripts/build_pkgs.sh js
   generate-docs-dry:
     name: Generate Docs (Dry Run)
-    needs:
-    - cpp
-    - rust
-    - python
-    - bash
-    - java
-    - js
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -232,13 +225,6 @@ jobs:
         fi
   regression:
     name: Regression Tests
-    needs:
-    - cpp
-    - rust
-    - python
-    - bash
-    - java
-    - js
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
@@ -394,8 +380,37 @@ jobs:
         sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         nix-build pkgs/nixos/sitl-envs/indi-flatness-outer-loop.nix -A driver -o /tmp/flight-driver
         /tmp/flight-driver/bin/nixos-test-driver
+
+  drone-indi-actuator-probe:
+    name: Drone INDI Actuator Probe
+    needs: changes
+    if: needs.changes.outputs.drone == 'true'
+    runs-on: ubuntu-latest
+    # Split from the flight gate so the two run concurrently.
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v5
+    - name: Enable KVM for the test VM
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
+        extra_nix_config: |
+          extra-substituters = https://ros.cachix.org
+          extra-trusted-public-keys = ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+    - uses: cachix/cachix-action@v14
+      with:
+        name: github-public
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        skipPush: true
+    - run: >
+        git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - name: Check measured-actuator math, flight, RPM dropout and recovery
       run: |
+        sed -i 's|local-build = false;|local-build = true;|g' pkgs/nixos/dependencies.nix
         nix-build pkgs/nixos/sitl-envs/indi-actuator-probe.nix -A flight -o /tmp/actuator-probe
 
   drone-indi-drag-frame:
