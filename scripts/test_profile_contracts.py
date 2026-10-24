@@ -10,7 +10,10 @@ import io
 import json
 import os
 import subprocess
+import sys
+import threading
 import unittest
+from concurrent.futures import Future, ThreadPoolExecutor
 
 from smoke_test_profiles import (
     NIXOS_DIR,
@@ -119,25 +122,31 @@ class ProfileContracts(unittest.TestCase):
         patch.__enter__()
         cls.addClassCleanup(patch.__exit__, None, None, None)
         cls.snapshots = {}
+        cls.snapshots_lock = threading.Lock()
+
+    def _memoized(self, key, run):
+        """Evaluate once per key, even when tests run concurrently."""
+        with self.snapshots_lock:
+            future = self.snapshots.get(key)
+            owner = future is None
+            if owner:
+                future = self.snapshots[key] = Future()
+        if owner:
+            try:
+                future.set_result(run())
+            except BaseException as error:
+                future.set_exception(error)
+        result = future.result()
+        self.assertEqual(result.returncode, 0, result.stderr[-6000:])
+        snapshot = json.loads(result.stdout)
+        self.assertEqual(snapshot["failedAssertions"], [])
+        return snapshot
 
     def snapshot(self, configuration):
-        if configuration not in self.snapshots:
-            result = evaluate(configuration)
-            self.assertEqual(result.returncode, 0, result.stderr[-6000:])
-            self.snapshots[configuration] = json.loads(result.stdout)
-        result = self.snapshots[configuration]
-        self.assertEqual(result["failedAssertions"], [])
-        return result
+        return self._memoized(configuration, lambda: evaluate(configuration))
 
     def flake_snapshot(self, machine):
-        key = f"flake:{machine}"
-        if key not in self.snapshots:
-            result = evaluate_flake(machine)
-            self.assertEqual(result.returncode, 0, result.stderr[-6000:])
-            self.snapshots[key] = json.loads(result.stdout)
-        result = self.snapshots[key]
-        self.assertEqual(result["failedAssertions"], [])
-        return result
+        return self._memoized(f"flake:{machine}", lambda: evaluate_flake(machine))
 
     def rejected(self, configuration, message):
         result = evaluate(configuration)
@@ -381,5 +390,36 @@ class ProfileContracts(unittest.TestCase):
         self.assertFalse(ok)
 
 
+def run_concurrently(workers):
+    """Run each test method on a thread pool; the work is in nix subprocesses.
+
+    Each NixOS evaluation peaks at a few GB, so PROFILE_TEST_JOBS bounds how
+    many run at once. Results print in test order once all have finished.
+    """
+    tests = list(unittest.defaultTestLoader.loadTestsFromTestCase(ProfileContracts))
+
+    def run(test):
+        result = unittest.TestResult()
+        test(result)
+        return result
+
+    ProfileContracts.setUpClass()
+    try:
+        with ThreadPoolExecutor(workers) as pool:
+            results = list(pool.map(run, tests))
+    finally:
+        ProfileContracts.doClassCleanups()
+
+    problems = []
+    for test, result in zip(tests, results):
+        failed = result.failures + result.errors
+        print(f"{test.id()} ... {'FAIL' if failed else 'ok'}")
+        problems.extend(failed)
+    for test, trace in problems:
+        print(f"\n{'=' * 70}\nFAIL: {test}\n{'-' * 70}\n{trace}")
+    print(f"\nRan {len(tests)} tests: {'FAILED' if problems else 'OK'}")
+    return not problems
+
+
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    sys.exit(0 if run_concurrently(int(os.environ.get("PROFILE_TEST_JOBS", "3"))) else 1)
