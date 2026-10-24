@@ -45,7 +45,10 @@ buildPythonPackage rec {
     pillow-heif
     opencv4
   ];
-  nativeCheckInputs = [ pytestCheckHook ffmpeg-headless ];
+  nativeCheckInputs = [
+    pytestCheckHook
+    ffmpeg-headless
+  ];
   meta = {
     description = "Provides an interface for stamping metadata on PNGs, JPEGs, HEICs, and MP4s.";
     longDescription = "";
