@@ -247,9 +247,13 @@ jobs:
         nix_path: nixpkgs=channel:nixos-${{ env.NIXOS_VERSION }}
     - run: NIXOS_VERSION=${{ env.NIXOS_VERSION }} python3 scripts/test_profile_contracts.py
     - run: NIXOS_VERSION=${{ env.NIXOS_VERSION }} python3 scripts/smoke_test_profiles.py
-  machines:
-    name: Machine Checks
+  machines-shard:
+    name: Machine Checks (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2]
     steps:
     - uses: actions/checkout@v5
     - uses: docker/setup-qemu-action@v4
@@ -267,7 +271,15 @@ jobs:
     - run: >
         git config --global url."https://github.com/".insteadOf ssh://git@github.com/
     - run: >
-        bash scripts/check_machines.sh
+        MACHINE_CHECK_SHARD=${{ matrix.shard }}/3 bash scripts/check_machines.sh
+  machines:
+    # Required status check; passes only if every shard passed.
+    name: Machine Checks
+    needs: machines-shard
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - run: '[[ "${{ needs.machines-shard.result }}" == "success" ]]'
   changes:
     name: Detect drone path changes
     runs-on: ubuntu-latest

@@ -55,6 +55,18 @@ for installer in "${!installer_artifacts[@]}"; do
     checks+=("installer: $installer ($artifact)|nix build ${DIR}/..#nixosConfigurations.${installer}.config.system.build.${artifact} --no-link --dry-run --impure --show-trace")
 done
 
+# MACHINE_CHECK_SHARD=i/n keeps only every n-th check starting at index i, so
+# CI can split the checks across runners.
+if [[ -n "$MACHINE_CHECK_SHARD" ]]; then
+    shard_index=${MACHINE_CHECK_SHARD%/*}
+    shard_count=${MACHINE_CHECK_SHARD#*/}
+    sharded=()
+    for i in "${!checks[@]}"; do
+        (( i % shard_count == shard_index )) && sharded+=("${checks[$i]}")
+    done
+    checks=("${sharded[@]}")
+fi
+
 logdir=$(mktemp -d)
 run_check() {
     local idx=$1 label=${2%%|*} cmd=${2#*|}
