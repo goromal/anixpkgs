@@ -27,6 +27,16 @@ let
   pageControls =
     homeBase: showThemeToggle: showHome:
     ''<script>(function(){if(!document.querySelector("meta[name=viewport]")){var mv=document.createElement("meta");mv.name="viewport";mv.content="width=device-width,initial-scale=1";(document.head||document.documentElement).appendChild(mv);}if(!document.body)return;var b=${homeBase};var h=document.createElement("div");h.setAttribute("aria-label","Page controls");h.className="anix-page-controls";${lib.optionalString showThemeToggle ''var t=document.createElement("button");t.type="button";t.className="anix-page-control";function u(){var d=document.documentElement.dataset.anixTheme==="dark";t.textContent=d?"☀":"☾";t.title=d?"Use light theme":"Use dark theme";t.setAttribute("aria-label",t.title);t.setAttribute("aria-pressed",String(d));}t.addEventListener("click",function(){var n=document.documentElement.dataset.anixTheme==="dark"?"light":"dark";document.documentElement.dataset.anixTheme=n;document.documentElement.setAttribute("data-bs-theme",n);document.cookie="anix-theme="+n+"; Path=/; Max-Age=31536000; SameSite=Lax";try{localStorage.setItem("anix-theme",n);}catch(e){}u();});u();h.appendChild(t);''}${lib.optionalString showHome ''var a=document.createElement("a");a.href=b;a.title="Home";a.setAttribute("aria-label","Home");a.className="anix-page-control";var i=document.createElement("img");i.src=b+"icons/house.svg";i.alt="";a.appendChild(i);h.appendChild(a);''}document.body.appendChild(h);})();</script></body>'';
+  # UI usage heartbeat, injected only where metricsNode runs to receive it. Every
+  # 5s it accrues the time since the last tick, counting only while the page is
+  # visible and was used in the last 90s; it reports every 30s accrued, and
+  # flushes the remainder when the page is hidden or left. The flush matters for
+  # UIs that reload on every click (e.g. rankserver's form POSTs), where a page
+  # never lives 30s. Same-origin, so it works on own-port services and over
+  # HTTPS without CORS. A touch-only primary pointer means mobile.
+  usageScript =
+    s:
+    lib.optionalString config.services.metricsNode.enable ''<script>(function(){if(!navigator.sendBeacon)return;function now(){return Date.now();}var last=now(),mark=last,acc=0,vis=document.visibilityState==="visible";var d=window.matchMedia&&window.matchMedia("(hover: none) and (pointer: coarse)").matches?"mobile":"desktop";["pointerdown","pointermove","keydown","wheel","scroll","touchstart"].forEach(function(e){window.addEventListener(e,function(){last=now();},{passive:true,capture:true});});function send(n){navigator.sendBeacon("/anix-usage",JSON.stringify({service:${builtins.toJSON s.name},category:${builtins.toJSON s.tag},device:d,seconds:n}));}function accrue(){var n=now();if(vis&&n-last<=90000)acc+=n-mark;mark=n;vis=document.visibilityState==="visible";}function flush(){accrue();var n=Math.floor(acc/1000);acc-=n*1000;while(n>0){var c=Math.min(n,30);send(c);n-=c;}}setInterval(function(){accrue();while(acc>=30000){acc-=30000;send(30);}},5000);document.addEventListener("visibilitychange",function(){if(document.visibilityState==="hidden")flush();else accrue();});window.addEventListener("pagehide",flush);})();</script>'';
   pageControlsMain = pageControls ''"/"'' true;
   pageControlsOwnPort = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' true;
   pageControlsOwnPortHomeOnly = pageControls ''window.location.protocol+"//"+window.location.hostname+":${toString cfg.webServerSecurePort}/"'' false;
@@ -35,7 +45,7 @@ let
       name = "${config.networking.hostName}.local:${toString s.port}";
       value.extraConfig = ''
         sub_filter </head> '${if s.name == "folio" then pageControlsHead else themeHead}';
-        sub_filter </body> '${
+        sub_filter </body> '${usageScript s}${
           (if s.name == "folio" then pageControlsOwnPortHomeOnly else pageControlsOwnPort) s.homeButton
         }';
         sub_filter_once on;
@@ -212,7 +222,7 @@ in
                           s.faviconSvg != null
                         ) ''<link rel="icon" type="image/svg+xml" href="${s.path}favicon.svg">''
                       }${themeHead}';
-                      sub_filter </body> '${pageControlsMain s.homeButton}';
+                      sub_filter </body> '${usageScript s}${pageControlsMain s.homeButton}';
                       sub_filter_once on;
                       proxy_set_header Accept-Encoding "";
                     '';

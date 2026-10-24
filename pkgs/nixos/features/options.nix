@@ -90,6 +90,21 @@ in
             description = "Hub hostname linked from a spoke's landing page.";
           };
         };
+        metrics = {
+          role = mkOption {
+            type = types.enum [
+              "hub"
+              "spoke"
+            ];
+            default = "spoke";
+            description = "A spoke forwards UI usage to the hub; the hub stores and charts every host's usage.";
+          };
+          hubHost = mkOption {
+            type = types.str;
+            default = "ats.local";
+            description = "Hub hostname a spoke forwards UI usage to.";
+          };
+        };
         folio = {
           role = mkOption {
             type = types.enum [

@@ -78,6 +78,7 @@ with import ../dependencies.nix;
         "codex"
       ];
       folio.role = "hub";
+      metrics.role = "hub";
       orchestrator.jobs = [
         {
           name = "ats-triaging";
