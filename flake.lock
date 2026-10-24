@@ -70,15 +70,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792561985,
-        "narHash": "sha256-8U5UgvE5DnN/A7uAZka9yCdpfFzar7u8VwJFRXovxCw=",
+        "lastModified": 1792868562,
+        "narHash": "sha256-0dxwtVBqbwxhG4go72hy7fPj9qmigN92/a5tBF6WDsk=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "f36cd0a66a99cfe63db71b3f8e835ffa8fb1895c",
+        "rev": "49f0cecc5c3448908f767b2f80151aec2cc88484",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/avahi-hostname-conflict",
         "repo": "bit-rs",
         "type": "github"
       }
