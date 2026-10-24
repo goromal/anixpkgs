@@ -70,16 +70,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792868562,
+        "lastModified": 1792871350,
         "narHash": "sha256-0dxwtVBqbwxhG4go72hy7fPj9qmigN92/a5tBF6WDsk=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "49f0cecc5c3448908f767b2f80151aec2cc88484",
+        "rev": "c26cee26959ac1937cd92907fe3886191dfd2efc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/avahi-hostname-conflict",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -458,16 +457,15 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792871300,
+        "lastModified": 1792871354,
         "narHash": "sha256-ESkVAV7yLEQ+3z6kXFf0rBwPQQdGcCx+Z2mOrNqQyH8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "645ebd9ccaa3f73f7707f50692eafa2a50097a33",
+        "rev": "f384134259a1bd261e2b74cc51992f3b56680c89",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/avahi-hostname-conflict",
         "repo": "flasks",
         "type": "github"
       }
