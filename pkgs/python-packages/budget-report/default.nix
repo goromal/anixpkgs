@@ -13,6 +13,7 @@ callPackage ../pythonPkgFromScript.nix {
   version = "1.0.0";
   description = "Generate a budget report.";
   script-file = ./report.py;
+  test-dir = ./tests;
   inherit pytestCheckHook buildPythonPackage;
   propagatedBuildInputs = [
     gspread
