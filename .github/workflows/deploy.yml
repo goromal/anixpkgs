@@ -10,6 +10,9 @@ on:
         required: true
         type: string
 
+env:
+  NIXOS_VERSION: 26.05
+
 jobs:
   resolve:
     name: Resolve Release
