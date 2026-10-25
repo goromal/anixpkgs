@@ -1,6 +1,7 @@
 import json
 import os
-from subprocess import Popen, PIPE
+
+import ci_build
 
 ANIXDIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -50,6 +51,10 @@ for rfc in pkgs["rfcs"]:
     rfcsfile.write(f"- [{rfc['title']}](./{rfc['file']}.md)\n")
     summaryfile.write(f"  - [{rfc['title']}](./rfcs/{rfc['file']}.md)\n")
 
+# Evaluate every package's doc in parallel and realise them all at once.
+docs = ci_build.evaluate([lang for lang, _, _ in langs], docs=True)
+ci_build.realise(docs)
+
 for lang, title, desc in langs:
     lang_pkgs = [
         {"name": pkg["attr"].split(".")[-1], "attr": pkg["attr"]}
@@ -74,25 +79,7 @@ for lang, title, desc in langs:
                 os.path.join(ANIXDIR, "docs", "src", lang, pkgMdname), "w"
             ) as pkgfile:
                 pkgfile.write(f"# {lang_pkg['attr']}\n\n")
-                process = Popen(
-                    [
-                        "nix-build",
-                        ".",
-                        "-A",
-                        f"{lang_pkg['attr']}.doc",
-                        "--no-out-link",
-                    ],
-                    stdout=PIPE,
-                    stderr=PIPE,
-                )
-                docf, stderr = process.communicate()
-                exit_code = process.returncode
-                if exit_code != 0:
-                    print(
-                        f"ERROR: doc attribute generation for package {lang_pkg['attr']} failed: {docf.decode()}\n\n{stderr.decode()}"
-                    )
-                    exit(1)
-                docpath = docf.decode().strip()
+                docpath = docs[lang_pkg["attr"]]["outputs"]["out"]
                 docpath = os.path.join(docpath, "doc.txt") if os.path.isdir(docpath) else docpath
                 with open(docpath, "r") as docfile:
                     docstr = docfile.read()

@@ -10,7 +10,11 @@ import io
 import json
 import os
 import subprocess
+import sys
+import threading
+import time
 import unittest
+from concurrent.futures import Future, ThreadPoolExecutor
 
 from smoke_test_profiles import (
     NIXOS_DIR,
@@ -66,8 +70,18 @@ def fixture(profile, extra=""):
     """
 
 
+# Each NixOS evaluation peaks at a few GB, so at most PROFILE_TEST_JOBS run at
+# once however many tests are in flight.
+EVAL_SLOTS = threading.BoundedSemaphore(int(os.environ.get("PROFILE_TEST_JOBS", "3")))
+
+
+def _bounded_run(*args, **kwargs):
+    with EVAL_SLOTS:
+        return subprocess.run(*args, **kwargs)
+
+
 def evaluate(configuration):
-    return subprocess.run(
+    return _bounded_run(
         [
             "nix",
             "eval",
@@ -90,7 +104,7 @@ def evaluate(configuration):
 
 
 def evaluate_flake(machine):
-    return subprocess.run(
+    return _bounded_run(
         [
             "nix",
             "eval",
@@ -119,25 +133,37 @@ class ProfileContracts(unittest.TestCase):
         patch.__enter__()
         cls.addClassCleanup(patch.__exit__, None, None, None)
         cls.snapshots = {}
+        cls.snapshots_lock = threading.Lock()
+
+    def _memoized(self, key, run):
+        """Evaluate once per key, even when tests run concurrently."""
+        with self.snapshots_lock:
+            future = self.snapshots.get(key)
+            owner = future is None
+            if owner:
+                future = self.snapshots[key] = Future()
+        if owner:
+            try:
+                future.set_result(run())
+            except BaseException as error:
+                future.set_exception(error)
+        result = future.result()
+        self.assertEqual(result.returncode, 0, result.stderr[-6000:])
+        snapshot = json.loads(result.stdout)
+        self.assertEqual(snapshot["failedAssertions"], [])
+        return snapshot
+
+    def prefetch(self, *snapshots):
+        """Start memoized evaluations concurrently; callers assert on them later."""
+        with ThreadPoolExecutor(len(snapshots)) as pool:
+            for snapshot in snapshots:
+                pool.submit(snapshot)
 
     def snapshot(self, configuration):
-        if configuration not in self.snapshots:
-            result = evaluate(configuration)
-            self.assertEqual(result.returncode, 0, result.stderr[-6000:])
-            self.snapshots[configuration] = json.loads(result.stdout)
-        result = self.snapshots[configuration]
-        self.assertEqual(result["failedAssertions"], [])
-        return result
+        return self._memoized(configuration, lambda: evaluate(configuration))
 
     def flake_snapshot(self, machine):
-        key = f"flake:{machine}"
-        if key not in self.snapshots:
-            result = evaluate_flake(machine)
-            self.assertEqual(result.returncode, 0, result.stderr[-6000:])
-            self.snapshots[key] = json.loads(result.stdout)
-        result = self.snapshots[key]
-        self.assertEqual(result["failedAssertions"], [])
-        return result
+        return self._memoized(f"flake:{machine}", lambda: evaluate_flake(machine))
 
     def rejected(self, configuration, message):
         result = evaluate(configuration)
@@ -155,13 +181,22 @@ class ProfileContracts(unittest.TestCase):
                 self.assertEqual(set(snapshot["enabledServices"]), expected)
 
     def test_concrete_machine_service_sets(self):
-        for name, expected in [
+        machines = [
             ("personal-inspiron", PERSONAL),
             ("personal-panasonic", PERSONAL),
             ("personal-dell", PERSONAL | {"launchpad", "comfyui", "ollama"}),
             ("ats-alderlake", ATS),
             ("ats-pi", ATS),
-        ]:
+        ]
+        flake_machines = ["jetson-orin-nx", "jetson-orin-agx"]
+        self.prefetch(
+            *(
+                lambda name=name: self.snapshot(f"{NIXOS_DIR}/configurations/{name}.nix")
+                for name, _ in machines
+            ),
+            *(lambda machine=machine: self.flake_snapshot(machine) for machine in flake_machines),
+        )
+        for name, expected in machines:
             with self.subTest(machine=name):
                 snapshot = self.snapshot(f"{NIXOS_DIR}/configurations/{name}.nix")
                 self.assertEqual(set(snapshot["enabledServices"]), expected)
@@ -170,7 +205,7 @@ class ProfileContracts(unittest.TestCase):
                     1 if "launchpad" in expected else 0,
                 )
 
-        for machine in ["jetson-orin-nx", "jetson-orin-agx"]:
+        for machine in flake_machines:
             with self.subTest(machine=machine):
                 snapshot = self.flake_snapshot(machine)
                 self.assertEqual(set(snapshot["enabledServices"]), JETPACK)
@@ -381,5 +416,38 @@ class ProfileContracts(unittest.TestCase):
         self.assertFalse(ok)
 
 
+def run_concurrently():
+    """Run every test method at once on threads; the work is in nix subprocesses.
+
+    EVAL_SLOTS bounds the concurrent evaluations. Results print in test order
+    once all have finished.
+    """
+    tests = list(unittest.defaultTestLoader.loadTestsFromTestCase(ProfileContracts))
+
+    def run(test):
+        result = unittest.TestResult()
+        start = time.monotonic()
+        test(result)
+        result.elapsed = time.monotonic() - start
+        return result
+
+    ProfileContracts.setUpClass()
+    try:
+        with ThreadPoolExecutor(len(tests)) as pool:
+            results = list(pool.map(run, tests))
+    finally:
+        ProfileContracts.doClassCleanups()
+
+    problems = []
+    for test, result in zip(tests, results):
+        failed = result.failures + result.errors
+        print(f"{test.id()} ... {'FAIL' if failed else 'ok'} ({result.elapsed:.1f}s)")
+        problems.extend(failed)
+    for test, trace in problems:
+        print(f"\n{'=' * 70}\nFAIL: {test}\n{'-' * 70}\n{trace}")
+    print(f"\nRan {len(tests)} tests: {'FAILED' if problems else 'OK'}")
+    return not problems
+
+
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    sys.exit(0 if run_concurrently() else 1)

@@ -1,7 +1,7 @@
 ORCH_PORT=6666
 anixdir="$(dirname $PWD)"
 export NIX_PATH="anixpkgs=$anixdir:$NIX_PATH"
-tmpdir="$anixdir/test/tmpdir"
+tmpdir="${TEST_TMPDIR:-$anixdir/test/tmpdir}"
 if [[ -d $tmpdir ]]; then
     rm -rf $tmpdir
 fi
