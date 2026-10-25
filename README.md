@@ -4,7 +4,7 @@
 
 ![](https://raw.githubusercontent.com/goromal/anixdata/master/data/img/anixpkgs.png "anixpkgs")
 
-**LATEST RELEASE: [v9.16.1](https://github.com/goromal/anixpkgs/tree/v9.16.1)**
+**LATEST RELEASE: [v9.16.3](https://github.com/goromal/anixpkgs/tree/v9.16.3)**
 
 **[Docs Website](https://goromal.github.io/anixpkgs/)**
 

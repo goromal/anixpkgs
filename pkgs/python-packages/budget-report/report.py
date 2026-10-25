@@ -24,6 +24,67 @@ def column_index_to_letter(column_index):
     return result
 
 
+def parse_amount(text):
+    """Parse a bank CSV amount such as "12.34", "$ 1,234.56" or " -$ 491.80".
+
+    Returns None for an empty cell and raises ValueError for anything else
+    that is not a number.
+    """
+    cleaned = re.sub(r"[\s$,]", "", text)
+    if cleaned == "":
+        return None
+    return float(cleaned)
+
+
+def parse_raw_transactions(rows, account, acct_cfg):
+    """Turn raw bank CSV rows into (account, date, description, amount) tuples.
+
+    Returns (transactions, errors). Each error describes a row that could not
+    be parsed; callers should refuse the file rather than upload part of it.
+    """
+    transactions = []
+    errors = []
+    start_row = acct_cfg["StartRow"]
+    width = len(rows[start_row - 1]) if 0 < start_row <= len(rows) else None
+    for i, row in enumerate(rows):
+        if i < start_row or not any(cell.strip() for cell in row):
+            continue
+        # Extra empty trailing cells are harmless (Chase checking ends rows with ",").
+        cells = list(row)
+        while width is not None and len(cells) > width and cells[-1] == "":
+            cells.pop()
+        if width is not None and len(cells) != width:
+            errors.append(
+                f"row {i + 1}: expected {width} columns, got {len(cells)} "
+                f"(unquoted comma in a value?): {','.join(row)}"
+            )
+            continue
+        row_desc = re.sub(r"\s+", " ", cells[acct_cfg["Description"]]).strip()
+        if "ORIG CO NAME" in row_desc:
+            continue
+        amount = None
+        try:
+            for amount_col in acct_cfg["Amount"]:
+                amount = parse_amount(cells[amount_col])
+                if amount is not None:
+                    break
+        except ValueError:
+            errors.append(f"row {i + 1}: unreadable amount: {','.join(row)}")
+            continue
+        if amount is None:
+            errors.append(f"row {i + 1}: no amount: {','.join(row)}")
+            continue
+        transactions.append(
+            (
+                account.replace("_", " "),
+                cells[acct_cfg["Date"]],
+                row_desc,
+                amount * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
+            )
+        )
+    return transactions, errors
+
+
 @click.group()
 @click.pass_context
 @click.option(
@@ -250,33 +311,19 @@ def transactions_upload(ctx: click.Context, raw_csv, account, dry_run):
             break
     if acct_cfg is None:
         raise Exception(f"Could not find config for account {account}")
-    transactions = []
-    amount_cols = acct_cfg["Amount"]
-    with open(raw_csv, "r", newline="") as csvfile:
-        reader = csv.reader(csvfile)
-        for i, row in enumerate(reader):
-            if i >= acct_cfg["StartRow"]:
-                processed_line = False
-                row_desc = re.sub(r"\s+", " ", row[acct_cfg["Description"]]).strip()
-                for amount_col in amount_cols:
-                    if "ORIG CO NAME" in row_desc:
-                        continue
-                    try:
-                        transactions.append(
-                            (
-                                account.replace("_", " "),
-                                row[acct_cfg["Date"]],
-                                row_desc,
-                                float(row[amount_col])
-                                * (-1.0 if acct_cfg["NegateAmount"] else 1.0),
-                            )
-                        )
-                        processed_line = True
-                        break
-                    except ValueError:
-                        continue
-                if not processed_line:
-                    print(f"{Fore.YELLOW} WARNING: Did not process transaction {row_desc} due to unexpected value formatting {Style.RESET_ALL}")
+    with open(raw_csv, "r", newline="", encoding="utf-8-sig") as csvfile:
+        transactions, errors = parse_raw_transactions(
+            list(csv.reader(csvfile)), account, acct_cfg
+        )
+    if errors:
+        # Refuse the whole file: a partial upload silently drops transactions,
+        # and a misaligned row can record the wrong amount.
+        for error in errors:
+            print(f"{Fore.RED}ERROR: {error}{Style.RESET_ALL}")
+        print(
+            f"{Fore.RED}Not uploading {account}: {len(errors)} row(s) could not be parsed.{Style.RESET_ALL}"
+        )
+        sys.exit(1)
     new_transactions = [
         transaction
         for transaction in transactions
