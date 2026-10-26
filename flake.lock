@@ -19,16 +19,15 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1792985305,
+        "lastModified": 1792985342,
         "narHash": "sha256-mP0Yepvjf4BjFxyGz1733sIj0N+rOmidy37VQcwoH74=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "645c970909400fa9634c791ee2c788fd251786d4",
+        "rev": "67067ae80a62eb3b220ad7c4ae8c122c1c4fc100",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/workspace-dev-merge-hardening",
         "repo": "agent-skills",
         "type": "github"
       }
