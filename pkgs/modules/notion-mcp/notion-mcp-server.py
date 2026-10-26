@@ -13,6 +13,14 @@ import urllib.error
 from typing import Any
 
 
+class MoveError(Exception):
+    """A failed move, with details describing source and destination state."""
+
+    def __init__(self, message: str, details: dict):
+        super().__init__(message)
+        self.details = details
+
+
 class NotionClient:
     """Client for Notion REST API"""
 
@@ -194,46 +202,154 @@ class NotionClient:
         result = self._request("POST", "/pages", data)
         return result["id"]
 
-    def _build_block_with_children(self, block: dict) -> dict:
-        """Recursively build a block payload including any nested children."""
+    # -------------------------------------------------------------------------
+    # Block moves
+    # -------------------------------------------------------------------------
+
+    # A single append accepts at most 100 blocks per children array and two
+    # levels of nesting below the appended blocks. Moves therefore copy one
+    # level per request and attach deeper descendants to the new parent IDs.
+    # These types must be created together with their children (a table with
+    # its rows, a column list with its columns, a column with its content).
+    _MAX_CHILDREN = 100
+    _MAX_INLINE_DEPTH = 2
+    _INLINE_CHILD_TYPES = {"table", "column_list", "column"}
+
+    def _fetch_tree(self, block: dict) -> dict:
+        """Fetch a block and its complete descendant tree in sibling order."""
+        children = []
+        if block.get("has_children"):
+            children = [
+                self._fetch_tree(child)
+                for child in self._get_block_children(block["id"])
+            ]
+        return {"block": block, "children": children}
+
+    def _block_payload(self, block: dict) -> dict:
+        """Build a creatable block payload without children."""
         btype = block["type"]
         bdata = dict(block[btype])
+        bdata.pop("children", None)
         if "rich_text" in bdata:
             bdata["rich_text"] = self._safe_rich_text(bdata["rich_text"])
-        if block.get("has_children"):
-            children = self._get_block_children(block["id"])
-            bdata["children"] = [self._build_block_with_children(c) for c in children]
         return self._prune_nulls({"object": "block", "type": btype, btype: bdata})
 
+    def _inlines_children(self, tree: dict) -> bool:
+        return bool(tree["children"]) and (
+            tree["block"]["type"] in self._INLINE_CHILD_TYPES
+        )
+
+    def _check_inline_depth(self, tree: dict, depth: int = 0) -> None:
+        """Reject trees that cannot be created within the API nesting limit."""
+        if self._inlines_children(tree):
+            if depth >= self._MAX_INLINE_DEPTH:
+                raise Exception(
+                    f"Block {tree['block']['id']} ({tree['block']['type']}) is "
+                    "nested too deeply inside blocks that Notion requires to be "
+                    "created together with their children"
+                )
+            for child in tree["children"][: self._MAX_CHILDREN]:
+                self._check_inline_depth(child, depth + 1)
+        else:
+            for child in tree["children"]:
+                self._check_inline_depth(child, 0)
+
+    def _payload_for(self, tree: dict) -> dict:
+        """Build a payload, inlining only the children the API requires."""
+        payload = self._block_payload(tree["block"])
+        if self._inlines_children(tree):
+            btype = payload["type"]
+            payload[btype]["children"] = [
+                self._payload_for(child)
+                for child in tree["children"][: self._MAX_CHILDREN]
+            ]
+        return payload
+
+    def _append_trees(self, parent_id: str, trees: list[dict], on_created=None):
+        """Append trees under parent_id in order and return the new block IDs."""
+        new_ids = []
+        for start in range(0, len(trees), self._MAX_CHILDREN):
+            chunk = trees[start : start + self._MAX_CHILDREN]
+            response = self._request(
+                "PATCH",
+                f"/blocks/{parent_id}/children",
+                {"children": [self._payload_for(tree) for tree in chunk]},
+            )
+            created = response.get("results", [])
+            if on_created:
+                on_created([block["id"] for block in created])
+            if len(created) != len(chunk):
+                raise Exception(
+                    f"Notion created {len(created)} blocks under {parent_id} "
+                    f"but {len(chunk)} were submitted"
+                )
+            new_ids.extend(block["id"] for block in created)
+        for tree, new_id in zip(trees, new_ids):
+            self._attach_descendants(tree, new_id)
+        return new_ids
+
+    def _attach_descendants(self, tree: dict, new_id: str) -> None:
+        """Copy the descendants that were not created with new_id itself."""
+        children = tree["children"]
+        if not children:
+            return
+        if not self._inlines_children(tree):
+            self._append_trees(new_id, children)
+            return
+        inlined = children[: self._MAX_CHILDREN]
+        created = self._get_block_children(new_id)
+        if len(created) != len(inlined):
+            raise Exception(
+                f"Notion created {len(created)} children under {new_id} "
+                f"but {len(inlined)} were submitted"
+            )
+        for child, new_child in zip(inlined, created):
+            self._attach_descendants(child, new_child["id"])
+        if len(children) > len(inlined):
+            self._append_trees(new_id, children[len(inlined) :])
+
+    def _tree_signature(self, tree: dict):
+        """Summarize a tree's types, text, and structure for verification."""
+        block = tree["block"]
+        btype = block["type"]
+        bdata = block.get(btype, {})
+        text = self._rich_text_to_plain(bdata.get("rich_text", []))
+        if btype == "table_row":
+            text = [self._rich_text_to_plain(cell) for cell in bdata.get("cells", [])]
+        return (
+            btype,
+            text,
+            tuple(self._tree_signature(child) for child in tree["children"]),
+        )
+
     def move_blocks(self, block_ids: list[str], dest_page_id: str) -> list[dict]:
-        """Copy an ordered block batch, then archive its sources."""
+        """Copy an ordered block batch with its full trees, then archive sources."""
         if not block_ids:
             raise Exception("At least one block_id is required")
-        if len(block_ids) > 100:
+        if len(block_ids) > self._MAX_CHILDREN:
             raise Exception("A move batch cannot contain more than 100 blocks")
         if len(set(block_ids)) != len(block_ids):
             raise Exception("A move batch cannot contain duplicate block IDs")
 
-        source_blocks = [
-            self._request("GET", f"/blocks/{block_id}") for block_id in block_ids
+        source_trees = [
+            self._fetch_tree(self._request("GET", f"/blocks/{block_id}"))
+            for block_id in block_ids
         ]
-        payloads = [self._build_block_with_children(block) for block in source_blocks]
-        response = self._request(
-            "PATCH",
-            f"/blocks/{dest_page_id}/children",
-            {"children": payloads},
-        )
-        created = response.get("results", [])
-        if len(created) != len(block_ids):
-            for block in created:
-                try:
-                    self._request("DELETE", f"/blocks/{block['id']}")
-                except Exception:
-                    pass
-            raise Exception(
-                "Notion returned an unexpected number of copied blocks; "
-                "the source blocks were left in place"
-            )
+        for tree in source_trees:
+            self._check_inline_depth(tree)
+
+        copies = []
+        try:
+            self._append_trees(dest_page_id, source_trees, on_created=copies.extend)
+            for source_tree, new_id in zip(source_trees, copies):
+                copy_tree = self._fetch_tree(self._request("GET", f"/blocks/{new_id}"))
+                if self._tree_signature(copy_tree) != self._tree_signature(source_tree):
+                    raise Exception(
+                        f"Copy {new_id} of block {source_tree['block']['id']} "
+                        "does not match its source tree"
+                    )
+        except Exception as error:
+            raise self._rollback_copies(copies, error) from error
 
         archived = []
         try:
@@ -242,17 +358,54 @@ class NotionClient:
                 archived.append(block_id)
         except Exception as error:
             remaining = [block_id for block_id in block_ids if block_id not in archived]
-            created_ids = [block["id"] for block in created]
-            raise Exception(
-                "Copied all blocks but could not archive every source block. "
-                f"Archived: {archived}; still present: {remaining}; "
-                f"new copies: {created_ids}; error: {error}"
+            raise MoveError(
+                "Copied and verified all blocks but could not archive every "
+                f"source block: {error}",
+                {
+                    "archived_sources": archived,
+                    "remaining_sources": remaining,
+                    "verified_copies": [
+                        {"source_id": source_id, "new_id": new_id}
+                        for source_id, new_id in zip(block_ids, copies)
+                    ],
+                    "recovery": (
+                        "Archive the remaining sources; the verified copies "
+                        "already hold their complete trees"
+                    ),
+                },
             ) from error
 
         return [
-            {"source_id": source_id, "new_id": new_block["id"]}
-            for source_id, new_block in zip(block_ids, created)
+            {"source_id": source_id, "new_id": new_id}
+            for source_id, new_id in zip(block_ids, copies)
         ]
+
+    def _rollback_copies(self, copies: list[str], error: Exception) -> "MoveError":
+        """Archive partial top-level copies and describe what remains."""
+        rolled_back, left_in_place = [], []
+        for new_id in copies:
+            try:
+                self._request("DELETE", f"/blocks/{new_id}")
+                rolled_back.append(new_id)
+            except Exception:
+                left_in_place.append(new_id)
+        recovery = "All source blocks were left in place unchanged."
+        if left_in_place:
+            recovery += (
+                " Archive the partial destination copies listed in "
+                "partial_copies_left_in_place before retrying."
+            )
+        else:
+            recovery += " No partial copies remain; the move can be retried."
+        return MoveError(
+            f"Move failed before any source block was archived: {error}",
+            {
+                "sources_archived": False,
+                "partial_copies_rolled_back": rolled_back,
+                "partial_copies_left_in_place": left_in_place,
+                "recovery": recovery,
+            },
+        )
 
     def move_block(self, block_id: str, dest_page_id: str) -> dict:
         return self.move_blocks([block_id], dest_page_id)[0]
@@ -641,8 +794,10 @@ TOOLS = [
         "description": (
             "Move a block from its current page to a destination page. Handles "
             "unsupported rich-text mention types (e.g. link embeds) by converting "
-            "them to plain text links and preserves nested children. Copies first, "
-            "then archives the source. Use this to execute an approved single-note move."
+            "them to plain text links and preserves the complete nested child tree "
+            "at any depth. Copies and verifies first, then archives the source; on "
+            "failure the source is untouched and partial copies are rolled back. "
+            "Use this to execute an approved single-note move."
         ),
         "inputSchema": {
             "type": "object",
@@ -663,8 +818,9 @@ TOOLS = [
         "name": "notion_move_blocks",
         "description": (
             "Move an ordered batch of up to 100 top-level blocks to one destination. "
-            "Copies the complete batch first, preserving each block's nested children "
-            "and formatting, then archives the sources. Use this for approved compound "
+            "Copies and verifies the complete batch first, preserving each block's "
+            "nested children at any depth and formatting, then archives the sources; "
+            "on failure the sources are untouched. Use this for approved compound "
             "notes represented by adjacent paragraphs, lists, code, or other blocks."
         ),
         "inputSchema": {
@@ -816,7 +972,10 @@ def handle_tool_call(client: NotionClient, tool_name: str, arguments: dict[str, 
 
     except Exception as e:
         print(f"Error in {tool_name}: {type(e).__name__}: {e}", file=sys.stderr)
-        return {"success": False, "error": str(e)}
+        result = {"success": False, "error": str(e)}
+        if isinstance(e, MoveError):
+            result["details"] = e.details
+        return result
 
 
 def handle_request(
@@ -828,7 +987,7 @@ def handle_request(
         return {
             "protocolVersion": "2024-11-05",
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "notion-mcp-server", "version": "1.2.0"},
+            "serverInfo": {"name": "notion-mcp-server", "version": "1.3.0"},
         }
 
     elif method == "notifications/initialized":
@@ -842,7 +1001,10 @@ def handle_request(
         result = handle_tool_call(
             client, params.get("name"), params.get("arguments", {})
         )
-        return {"content": [{"type": "text", "text": json.dumps(result, indent=2)}]}
+        return {
+            "content": [{"type": "text", "text": json.dumps(result, indent=2)}],
+            "isError": not result.get("success", False),
+        }
 
     else:
         return {"error": f"Unknown method: {method}"}
