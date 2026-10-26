@@ -54,7 +54,7 @@ ATS = COMMON | {
     "vdlserver",
     "vikunja-ats",
 }
-JETPACK = COMMON | {"brom", "comfyui", "launchpad"}
+JETPACK = COMMON | {"brom", "comfyui", "launchpad", "vdlserver"}
 
 
 def fixture(profile, extra=""):
@@ -210,6 +210,8 @@ class ProfileContracts(unittest.TestCase):
                 snapshot = self.flake_snapshot(machine)
                 self.assertEqual(set(snapshot["enabledServices"]), JETPACK)
                 self.assertEqual(snapshot["jobs"].count("launchpad-sync"), 1)
+                self.assertIn("vdlserver", snapshot["units"])
+                self.assertIn("/videodl/", snapshot["routes"][f"{machine}.local"])
 
     def test_workstation_has_agents_without_web_server(self):
         snapshot = self.snapshot(fixture("workstation"))

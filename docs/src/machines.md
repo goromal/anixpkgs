@@ -579,9 +579,9 @@ Navidrome is served through nginx as a reverse proxy:
 - Started with `--baseurl /navidrome` so all URLs are served under the `/navidrome` subpath, proxied on ports 80/443
 - SSL certificates: same self-signed certificates as the main web server (`~/secrets/vpn/`)
 
-## Video Downloader (ATS Only)
+## Video Downloader (ATS and Jetson)
 
-ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
+ATS and Jetson machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://<hostname>.local/videodl/` (for example, `https://ats.local/videodl/` or `https://jetson-orin-agx.local/videodl/`).
 
 ### Cookie Setup (Optional but recommended)
 
@@ -607,7 +607,7 @@ The directory is created automatically when the service starts. The file is read
 
 #### 3. Verify it works
 
-Open `https://ats.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
+Open `https://<hostname>.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
 
 ### Cookie Expiry
 
