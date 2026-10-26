@@ -26,3 +26,4 @@ Play a game. Your options:
       setup-ps2  Configure the PS2 BIOS, controller, and memory cards.
 
 ```
+
