@@ -235,6 +235,7 @@ in
     ../python-packages/daily_tactical_server/module.nix
     ../python-packages/flasks/authui/module.nix
     ../python-packages/flasks/budget_ui/module.nix
+    ../python-packages/flasks/assistant_ui/module.nix
     ../python-packages/flasks/orchestrator_ui/module.nix
     ../python-packages/flasks/rankserver/module.nix
     ../python-packages/flasks/stampserver/module.nix

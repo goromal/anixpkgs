@@ -17,6 +17,7 @@
   orchestrator = "scheduled jobs, orchestrator daemon and web UI";
   auth = "credential refresh UI and command";
   budget = "budget reporting web UI";
+  assistant = "Assistant web UI (agent sessions rooted in the second-brain repo)";
   languageQuiz = "language quiz web application";
   music = "Navidrome music server";
   tester = "tester web application";

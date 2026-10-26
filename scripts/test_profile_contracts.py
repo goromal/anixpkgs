@@ -37,6 +37,7 @@ COMMON = {
 }
 PERSONAL = COMMON | {"folio-backend", "homeVpnNode", "sunset", "sunshine"}
 ATS = COMMON | {
+    "assistant_ui",
     "authui",
     "budget_ui",
     "disciple",

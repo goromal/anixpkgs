@@ -55,6 +55,7 @@ with import ../dependencies.nix;
       orchestrator.enable = true;
       auth.enable = true;
       budget.enable = true;
+      assistant.enable = true;
       languageQuiz.enable = true;
       music.enable = true;
       tester.enable = true;

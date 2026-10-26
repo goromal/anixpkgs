@@ -72,6 +72,7 @@ in
       orchestrator.enable = true;
       auth.enable = false;
       budget.enable = false;
+      assistant.enable = false;
       languageQuiz.enable = false;
       music.enable = false;
       tester.enable = false;
