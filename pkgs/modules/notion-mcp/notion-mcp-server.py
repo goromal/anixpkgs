@@ -7,9 +7,13 @@ import sys
 import json
 import os
 import re
+import shutil
+import tempfile
 import time
+import urllib.parse
 import urllib.request
 import urllib.error
+import uuid
 from typing import Any
 
 
@@ -35,11 +39,33 @@ class NotionClient:
         }
 
     def _request(self, method: str, endpoint: str, data: dict = None) -> dict:
-        url = f"{self.BASE_URL}{endpoint}"
         body = json.dumps(data).encode("utf-8") if data is not None else None
-        req = urllib.request.Request(
-            url, data=body, headers=self.headers, method=method
+        return self._send(method, endpoint, body, self.headers)
+
+    def _send_form(self, endpoint: str, fields: dict, filename: str, content: bytes):
+        """POST multipart/form-data with string fields and one file part."""
+        boundary = f"notion-mcp-{uuid.uuid4().hex}"
+        parts = []
+        for name, value in fields.items():
+            parts.append(
+                f'--{boundary}\r\nContent-Disposition: form-data; name="{name}"'
+                f"\r\n\r\n{value}\r\n".encode("utf-8")
+            )
+        quoted = filename.replace('"', "%22")
+        parts.append(
+            f'--{boundary}\r\nContent-Disposition: form-data; name="file"; '
+            f'filename="{quoted}"\r\nContent-Type: application/octet-stream'
+            "\r\n\r\n".encode("utf-8")
         )
+        parts.append(content)
+        parts.append(f"\r\n--{boundary}--\r\n".encode("utf-8"))
+        headers = dict(self.headers)
+        headers["Content-Type"] = f"multipart/form-data; boundary={boundary}"
+        return self._send("POST", endpoint, b"".join(parts), headers)
+
+    def _send(self, method: str, endpoint: str, body: bytes, headers: dict) -> dict:
+        url = f"{self.BASE_URL}{endpoint}"
+        req = urllib.request.Request(url, data=body, headers=headers, method=method)
         try:
             with urllib.request.urlopen(req) as resp:
                 return json.loads(resp.read().decode("utf-8"))
@@ -225,13 +251,130 @@ class NotionClient:
             ]
         return {"block": block, "children": children}
 
-    def _block_payload(self, block: dict) -> dict:
+    # Notion-hosted files read back as {"type": "file", "file": {"url": ...}}
+    # with a signed URL that expires after an hour, and cannot be written in
+    # that form. Moves download each hosted file and re-upload it through the
+    # File Upload API, then create the copy with {"type": "file_upload"}.
+    # Uploads not attached within an hour expire on their own. Block icons
+    # (callouts) do not accept uploads, so hosted icons cannot be moved.
+    _FILE_BLOCK_TYPES = {"file", "image", "pdf", "video", "audio"}
+    _SINGLE_PART_LIMIT = 20 * 1024 * 1024
+    _PART_SIZE = 10 * 1024 * 1024
+
+    def _hosted_files(self, block: dict) -> dict:
+        """Return this block's Notion-hosted file objects, keyed by slot."""
+        btype = block["type"]
+        bdata = block.get(btype) or {}
+        hosted = {}
+        if btype in self._FILE_BLOCK_TYPES and bdata.get("type") == "file":
+            hosted["media"] = bdata
+        icon = bdata.get("icon") or {}
+        if icon.get("type") == "file":
+            hosted["icon"] = icon
+        return hosted
+
+    def _download(self, url: str, dest) -> str:
+        """Stream a hosted file into dest and return its content type."""
+        with urllib.request.urlopen(url) as resp:
+            shutil.copyfileobj(resp, dest)
+            return resp.headers.get_content_type()
+
+    def _upload_filename(self, file_obj: dict, url: str) -> str:
+        name = file_obj.get("name")
+        if name:
+            return name
+        path = urllib.parse.urlparse(url).path
+        return urllib.parse.unquote(path.rsplit("/", 1)[-1]) or "attachment"
+
+    def _transfer_file(self, file_obj: dict) -> str:
+        """Re-upload a hosted file object and return the new file upload ID."""
+        url = file_obj["file"]["url"]
+        filename = self._upload_filename(file_obj, url)
+        with tempfile.TemporaryFile() as tmp:
+            try:
+                content_type = self._download(url, tmp)
+            except Exception as error:
+                raise Exception(f"Could not download attachment {filename}: {error}")
+            size = tmp.tell()
+            tmp.seek(0)
+            create = {"filename": filename}
+            if content_type not in ("application/octet-stream", "binary/octet-stream"):
+                create["content_type"] = content_type
+            parts = max(1, -(-size // self._PART_SIZE))
+            multi = size > self._SINGLE_PART_LIMIT
+            if multi:
+                create.update(mode="multi_part", number_of_parts=parts)
+            upload = self._request("POST", "/file_uploads", create)
+            upload_id = upload["id"]
+            if multi:
+                for part in range(1, parts + 1):
+                    self._send_form(
+                        f"/file_uploads/{upload_id}/send",
+                        {"part_number": str(part)},
+                        filename,
+                        tmp.read(self._PART_SIZE),
+                    )
+                result = self._request("POST", f"/file_uploads/{upload_id}/complete")
+            else:
+                result = self._send_form(
+                    f"/file_uploads/{upload_id}/send", {}, filename, tmp.read()
+                )
+        if result.get("status") != "uploaded":
+            raise Exception(
+                f"Upload of attachment {filename} ended with status "
+                f"{result.get('status')!r}"
+            )
+        return upload_id
+
+    def _prepare_attachments(self, tree: dict) -> None:
+        """Re-upload every hosted file in a tree before anything is written."""
+        uploads = {}
+        for slot, file_obj in self._hosted_files(tree["block"]).items():
+            if slot == "icon":
+                raise Exception(
+                    f"Block {tree['block']['id']} ({tree['block']['type']}) has "
+                    "an uploaded icon, which Notion cannot copy to a new block; "
+                    "change the icon to an emoji or external image, then retry"
+                )
+            try:
+                uploads[slot] = self._transfer_file(file_obj)
+            except Exception as error:
+                raise Exception(
+                    f"Attachment transfer failed for block {tree['block']['id']} "
+                    f"({tree['block']['type']}): {error}"
+                ) from error
+        tree["uploads"] = uploads
+        for child in tree["children"]:
+            self._prepare_attachments(child)
+
+    def _uploaded_file(self, file_obj: dict, upload_id: str) -> dict:
+        """Rewrite a hosted file object to reference a completed upload."""
+        rewritten = {
+            key: value for key, value in file_obj.items() if key not in ("type", "file")
+        }
+        rewritten["type"] = "file_upload"
+        rewritten["file_upload"] = {"id": upload_id}
+        return rewritten
+
+    def _block_payload(self, block: dict, uploads: dict = None) -> dict:
         """Build a creatable block payload without children."""
         btype = block["type"]
         bdata = dict(block[btype])
         bdata.pop("children", None)
         if "rich_text" in bdata:
             bdata["rich_text"] = self._safe_rich_text(bdata["rich_text"])
+        if "caption" in bdata:
+            bdata["caption"] = self._safe_rich_text(bdata["caption"] or [])
+        uploads = uploads or {}
+        hosted = self._hosted_files(block)
+        for slot in hosted:
+            if slot not in uploads:
+                raise Exception(
+                    f"Block {block['id']} ({btype}) has a Notion-hosted file "
+                    "that was not re-uploaded"
+                )
+        if "media" in hosted:
+            bdata = self._uploaded_file(bdata, uploads["media"])
         return self._prune_nulls({"object": "block", "type": btype, btype: bdata})
 
     def _inlines_children(self, tree: dict) -> bool:
@@ -256,7 +399,7 @@ class NotionClient:
 
     def _payload_for(self, tree: dict) -> dict:
         """Build a payload, inlining only the children the API requires."""
-        payload = self._block_payload(tree["block"])
+        payload = self._block_payload(tree["block"], tree.get("uploads"))
         if self._inlines_children(tree):
             btype = payload["type"]
             payload[btype]["children"] = [
@@ -316,9 +459,19 @@ class NotionClient:
         text = self._rich_text_to_plain(bdata.get("rich_text", []))
         if btype == "table_row":
             text = [self._rich_text_to_plain(cell) for cell in bdata.get("cells", [])]
+        attachment = None
+        if btype in self._FILE_BLOCK_TYPES:
+            ftype = bdata.get("type")
+            attachment = (
+                "hosted" if ftype in ("file", "file_upload") else ftype,
+                bdata.get(ftype, {}).get("url") if ftype == "external" else None,
+                bdata.get("name"),
+                self._rich_text_to_plain(bdata.get("caption") or []),
+            )
         return (
             btype,
             text,
+            attachment,
             tuple(self._tree_signature(child) for child in tree["children"]),
         )
 
@@ -340,6 +493,8 @@ class NotionClient:
 
         copies = []
         try:
+            for tree in source_trees:
+                self._prepare_attachments(tree)
             self._append_trees(dest_page_id, source_trees, on_created=copies.extend)
             for source_tree, new_id in zip(source_trees, copies):
                 copy_tree = self._fetch_tree(self._request("GET", f"/blocks/{new_id}"))
@@ -795,7 +950,9 @@ TOOLS = [
             "Move a block from its current page to a destination page. Handles "
             "unsupported rich-text mention types (e.g. link embeds) by converting "
             "them to plain text links and preserves the complete nested child tree "
-            "at any depth. Copies and verifies first, then archives the source; on "
+            "at any depth. Notion-hosted file, image, PDF, video, and audio "
+            "attachments are re-uploaded so the copies keep their files. Copies "
+            "and verifies first, then archives the source; on "
             "failure the source is untouched and partial copies are rolled back. "
             "Use this to execute an approved single-note move."
         ),
@@ -819,7 +976,8 @@ TOOLS = [
         "description": (
             "Move an ordered batch of up to 100 top-level blocks to one destination. "
             "Copies and verifies the complete batch first, preserving each block's "
-            "nested children at any depth and formatting, then archives the sources; "
+            "nested children at any depth, formatting, and attachments (hosted "
+            "files are re-uploaded), then archives the sources; "
             "on failure the sources are untouched. Use this for approved compound "
             "notes represented by adjacent paragraphs, lists, code, or other blocks."
         ),
