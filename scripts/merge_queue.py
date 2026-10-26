@@ -313,6 +313,10 @@ class GitHub:
                 "-f", "merge_method=squash",
                 "-f", f"sha={action.head_sha}",
                 "-f", f"commit_title={action.title} (#{action.number})",
+                # An explicit empty body: without one, GitHub appends a
+                # Co-authored-by trailer for every other commit author on the
+                # branch, so agent and bot authorship would land on master.
+                "-f", "commit_message=",
             )
         except subprocess.CalledProcessError as e:
             print(f"merge-queue: merge of #{action.number} failed: {e.stderr}")

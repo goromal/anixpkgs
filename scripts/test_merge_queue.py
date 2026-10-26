@@ -1,6 +1,8 @@
 import unittest
+from unittest import mock
 
 from scripts.merge_queue import (
+    GitHub,
     Eject,
     Merge,
     PrState,
@@ -260,6 +262,17 @@ class RunTest(unittest.TestCase):
         client = FakeClient([state(pr(number=n, draft=True)) for n in range(3)])
         self.assertIsInstance(run(client, max_steps=3), Wait)
         self.assertEqual(len(client.calls), 3)
+
+
+class GitHubMergeTest(unittest.TestCase):
+    def test_squash_merge_sends_blank_body_to_drop_coauthor_trailers(self):
+        with mock.patch("scripts.merge_queue._sh") as sh:
+            merged = GitHub("o/r").merge(Merge(7, "abc123", "patch", "Add thing"))
+        self.assertEqual(merged, (True, None))
+        args = sh.call_args_list[0].args
+        self.assertIn("merge_method=squash", args)
+        self.assertIn("commit_title=Add thing (#7)", args)
+        self.assertIn("commit_message=", args)
 
 
 if __name__ == "__main__":
