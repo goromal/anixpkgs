@@ -1,7 +1,8 @@
 # Shared builder for "agent companion" terminals embedded in app UIs (Folio,
-# budget). Each companion runs Claude/Codex in throwaway temp dirs inside tmux
-# sessions on a dedicated socket, served to the browser by a localhost ttyd
-# behind an nginx auth_request gate. The app backend owns the session API.
+# budget, Assistant). Each companion runs Claude/Codex inside tmux sessions on a
+# dedicated socket, served to the browser by a localhost ttyd behind an nginx
+# auth_request gate. The app backend owns the session API. Sessions run in
+# throwaway temp dirs, or (with workRepo) all in one persistent repo checkout.
 { pkgs, lib }:
 with import ./dependencies.nix;
 {
@@ -23,6 +24,10 @@ with import ./dependencies.nix;
   backendService,
   homeDir,
   checkOrigin ? false,
+  # "owner/name" GitHub repo. When set, the session WORKDIR is a durable checkout
+  # of it shared by every session: the session clones it if missing and pulls it
+  # (best effort) before launching, and trusts that dir itself.
+  workRepo ? null,
 }:
 let
   prefix = "${name}-agent";
@@ -38,6 +43,22 @@ let
     claude = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.claude-code;
     codex = anixpkgs.flakeInputs.llm-agents.packages.${pkgs.system}.codex;
   };
+
+  # Appended to an existing script line (not its own line) so companions without
+  # workRepo keep byte-identical session scripts.
+  repoSync = lib.optionalString (workRepo != null) (
+    "\n"
+    + ''
+      # Shared durable checkout: make sure it exists and is current. A failed
+      # clone/pull (offline, auth) must not block the agent launch.
+      if [ ! -d "$1/.git" ]; then
+        mkdir -p "$(dirname "$1")"
+        gh repo clone ${workRepo} "$1" || echo "${prefix}-session: clone of ${workRepo} failed" >&2
+      else
+        git -C "$1" pull --rebase --autostash --quiet || echo "${prefix}-session: git pull failed" >&2
+      fi
+      mkdir -p "$1"''
+  );
 
   tmuxConf = pkgs.writeText "${prefix}-tmux.conf" ''
     set -g mouse on
@@ -56,6 +77,11 @@ let
       pkgs.coreutils
       pkgs.jq
       pkgs.util-linux
+    ]
+    ++ lib.optionals (workRepo != null) [
+      pkgs.gh
+      pkgs.git
+      pkgs.openssh
     ];
     text = ''
       if [ "$#" -ne 2 ]; then
@@ -69,14 +95,14 @@ let
       # No devshell wraps this session, so nothing sets SHELL; Claude Code's Bash
       # tool would fall back to /bin/bash, which doesn't exist on NixOS. Point it
       # at the bash on the service PATH so shell tool calls work.
-      export SHELL="${pkgs.bashInteractive}/bin/bash"
+      export SHELL="${pkgs.bashInteractive}/bin/bash"${repoSync}
       # Pre-accept Claude Code's workspace-trust dialog so a headless companion
       # launch does not stall on it. Trust the stable spool parent (not each
       # ephemeral session dir): claude honors an ancestor's trust, so every
       # session under the spool inherits it without accumulating stale
       # ~/.claude.json entries. Idempotent, flock-guarded.
       if [ "$2" = claude ]; then
-        spool="$(dirname "$1")"
+        spool="${if workRepo != null then "$1" else "$(dirname \"$1\")"}"
         cfg="$HOME/.claude.json"
         (
           flock 9

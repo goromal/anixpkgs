@@ -10,6 +10,7 @@ let
   services = [
     "agent_ui"
     "anix-upgrade-ui"
+    "assistant_ui"
     "authui"
     "brom"
     "budget_ui"

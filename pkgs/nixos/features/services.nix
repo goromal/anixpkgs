@@ -44,6 +44,10 @@ in
         features.budget.enable && features.agentUi.enable && features.agents.frameworks != [ ];
     };
 
+    services.assistant_ui = {
+      enable = features.assistant.enable;
+    };
+
     services.orchestrator_ui = {
       enable = features.orchestrator.enable;
     };

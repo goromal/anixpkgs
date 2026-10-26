@@ -322,6 +322,9 @@ let
               budget_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/budget_ui { pkg-src = flakeInputs.flasks; }
               );
+              assistant_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/assistant_ui { pkg-src = flakeInputs.flasks; }
+              );
               orchestrator_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/orchestrator_ui {
                   pkg-src = flakeInputs.flasks;
@@ -496,6 +499,7 @@ rec {
   stampserver = final.python313.pkgs.stampserver;
   authui = final.python313.pkgs.authui;
   budget_ui = final.python313.pkgs.budget_ui;
+  assistant_ui = final.python313.pkgs.assistant_ui;
   orchestrator_ui = final.python313.pkgs.orchestrator_ui;
   la_quiz_web = final.python313.pkgs.la_quiz_web;
   disciple = final.python313.pkgs.disciple;

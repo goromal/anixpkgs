@@ -331,6 +331,11 @@
                 "docs": true
             },
             {
+                "attr": "assistant_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "sunset",
                 "ci": true,
                 "docs": true
