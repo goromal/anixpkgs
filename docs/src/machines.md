@@ -579,9 +579,9 @@ Navidrome is served through nginx as a reverse proxy:
 - Started with `--baseurl /navidrome` so all URLs are served under the `/navidrome` subpath, proxied on ports 80/443
 - SSL certificates: same self-signed certificates as the main web server (`~/secrets/vpn/`)
 
-## Video Downloader (ATS Only)
+## Video Downloader (ATS and Jetson)
 
-ATS machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://ats.local/videodl/`.
+ATS and Jetson machines include a web UI for downloading videos from YouTube, TikTok, and any other site supported by [yt-dlp](https://github.com/yt-dlp/yt-dlp). Accessible at `https://<hostname>.local/videodl/` (for example, `https://ats.local/videodl/` or `https://jetson-orin-agx.local/videodl/`).
 
 ### Cookie Setup (Optional but recommended)
 
@@ -607,7 +607,7 @@ The directory is created automatically when the service starts. The file is read
 
 #### 3. Verify it works
 
-Open `https://ats.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
+Open `https://<hostname>.local/videodl/` in a browser, paste a video URL, and click **Fetch**.
 
 ### Cookie Expiry
 
@@ -644,7 +644,7 @@ Sunshine starts automatically with your GNOME graphical session. After a fresh d
    - When prompted for a PIN, go to the Sunshine web UI → **PIN** tab and enter it there
    - The pairing completes automatically
 
-5. **Launch a game** from Moonlight. The five games from `play` appear as individual apps.
+5. **Launch a game** from Moonlight. The games from `play` appear as individual apps.
 6. **Set up inputs** in Dolphin (by clicking to the controller setup menu). The "Device" to select for "GameCube Controller at Port 1" is *SDL/0/Xbox One S Controller*. You will need to relaunch the game for this to take effect.
 7. **Preferred Moonlight Settings**: Low latency is the most important thing:
    1. Resolution: 360p

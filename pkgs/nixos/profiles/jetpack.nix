@@ -77,7 +77,7 @@ in
       tester.enable = false;
       disciple.enable = false;
       tasks.enable = false;
-      videoDownload.enable = false;
+      videoDownload.enable = true;
       brom.enable = true;
       intake.enable = false;
       mail.enable = false;
