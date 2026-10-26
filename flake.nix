@@ -39,7 +39,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    anixdata.url = "github:goromal/anixdata?ref=refs/heads/dev/assistant";
+    anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
     agent-skills.url = "github:goromal/agent-skills";
@@ -78,7 +78,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks?ref=refs/heads/dev/assistant";
+    flasks.url = "github:goromal/flasks?ref=refs/heads/master";
     flasks.flake = false;
 
     folio.url = "github:goromal/folio";

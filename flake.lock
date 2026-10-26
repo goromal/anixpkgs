@@ -35,16 +35,15 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1792979022,
+        "lastModified": 1792981924,
         "narHash": "sha256-pK+x9UMqY7cOREo0y7t3YONa0ymTdfds+HUYyr6G2N0=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "c7df5de7d55b63177c60154f6312263d4b2d6bfe",
+        "rev": "7662a51150ddcd18c01bed2c0d8c1af732f6850b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/assistant",
         "repo": "anixdata",
         "type": "github"
       }
@@ -458,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1792980179,
+        "lastModified": 1792981921,
         "narHash": "sha256-bKc85h8XvUSsg7xMypwadP834II7ifjur7wSJkLT/rQ=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "8903d006b1b7d05c11ec606295e5e02215492e9d",
+        "rev": "4bbd5fdb40a22899f895bcfa1e00de3ed1bcf0f0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/assistant",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
