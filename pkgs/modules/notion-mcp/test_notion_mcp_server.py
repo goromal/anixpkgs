@@ -33,7 +33,9 @@ def text_block(block_id, text, *, btype="paragraph", has_children=False, icon=No
 class FakeNotionClient(MODULE.NotionClient):
     """In-memory Notion that enforces the append nesting and size limits."""
 
-    def __init__(self, blocks=None, children=None, fail_patch=None):
+    def __init__(
+        self, blocks=None, children=None, fail_patch=None, files=None, fail_upload=None
+    ):
         self.blocks = dict(blocks or {})
         self.children = {key: list(value) for key, value in (children or {}).items()}
         for siblings in self.children.values():
@@ -43,6 +45,24 @@ class FakeNotionClient(MODULE.NotionClient):
         self.calls = []
         self.fail_patch = fail_patch
         self.next_id = 0
+        self.files = dict(files or {})
+        self.fail_upload = fail_upload
+        self.uploads = {}
+
+    def _download(self, url, dest):
+        if url not in self.files:
+            raise Exception("HTTP Error 403: Forbidden")
+        dest.write(self.files[url])
+        return "text/plain"
+
+    def _send_form(self, endpoint, fields, filename, content):
+        self.calls.append(("FORM", endpoint, dict(fields)))
+        upload_id = endpoint.split("/")[2]
+        upload = self.uploads[upload_id]
+        upload["parts"].append((fields.get("part_number"), content))
+        if upload["mode"] == "single_part":
+            upload["status"] = "uploaded"
+        return dict(upload)
 
     def _get_block_children(self, page_id):
         return [
@@ -69,6 +89,12 @@ class FakeNotionClient(MODULE.NotionClient):
         btype = payload["type"]
         data = json.loads(json.dumps(payload[btype]))
         nested = data.pop("children", [])
+        if data.get("type") == "file_upload":
+            upload = self.uploads[data.pop("file_upload")["id"]]
+            if upload["status"] != "uploaded":
+                raise Exception("Notion API 400: file upload is not uploaded")
+            data["type"] = "file"
+            data["file"] = {"url": f"https://files/{upload['id']}", "expiry_time": "t"}
         for rich_text in data.get("rich_text", []):
             if rich_text["type"] == "text":
                 rich_text["plain_text"] = rich_text["text"]["content"]
@@ -82,6 +108,8 @@ class FakeNotionClient(MODULE.NotionClient):
 
     def _request(self, method, endpoint, data=None):
         self.calls.append((method, endpoint, data))
+        if endpoint.startswith("/file_uploads"):
+            return self._file_upload_request(endpoint, data)
         block_id = endpoint.removeprefix("/blocks/").removesuffix("/children")
         if method == "GET":
             return self.blocks[block_id]
@@ -98,6 +126,25 @@ class FakeNotionClient(MODULE.NotionClient):
             return {}
         raise AssertionError(f"Unexpected request: {method} {endpoint}")
 
+    def _file_upload_request(self, endpoint, data):
+        if endpoint == "/file_uploads":
+            if self.fail_upload and self.fail_upload(data):
+                raise Exception("Notion API 400: upload rejected")
+            self.next_id += 1
+            upload_id = f"upload-{self.next_id}"
+            self.uploads[upload_id] = {
+                "id": upload_id,
+                "mode": data.get("mode", "single_part"),
+                "request": data,
+                "status": "pending",
+                "parts": [],
+            }
+            return dict(self.uploads[upload_id])
+        upload = self.uploads[endpoint.split("/")[2]]
+        assert endpoint.endswith("/complete"), endpoint
+        upload["status"] = "uploaded"
+        return dict(upload)
+
     def tree(self, block_id):
         block = self.blocks[block_id]
         btype = block["type"]
@@ -108,6 +155,27 @@ class FakeNotionClient(MODULE.NotionClient):
                 self.tree(child["id"]) for child in self._get_block_children(block_id)
             ],
         }
+
+
+def hosted_file_block(block_id, url, *, btype="file", name=None, caption=""):
+    data = {
+        "caption": [{"type": "text", "text": {"content": caption}}] if caption else [],
+        "type": "file",
+        "file": {"url": url, "expiry_time": "2026-10-26T23:00:00.000Z"},
+    }
+    if name:
+        data["name"] = name
+    return {"id": block_id, "type": btype, "has_children": False, btype: data}
+
+
+def external_file_block(block_id, url, *, btype="file", name=None):
+    data = {"caption": [], "type": "external", "external": {"url": url}}
+    if name:
+        data["name"] = name
+    return {"id": block_id, "type": btype, "has_children": False, btype: data}
+
+
+SIGNED = "https://prod-files-secure.s3.amazonaws.com/ws/abc/{}?X-Amz-Signature=x"
 
 
 def deep_chain(prefix, depth):
@@ -298,6 +366,170 @@ class NotionClientTests(unittest.TestCase):
             ["school-0", "sibling"],
         )
         self.assertFalse(client.archived & {"school-0", "sibling"})
+
+    def nested_attachment_client(self, **kwargs):
+        note = text_block("note", "Note", btype="bulleted_list_item", has_children=True)
+        nested = text_block(
+            "nested", "Nested", btype="bulleted_list_item", has_children=True
+        )
+        attachment = hosted_file_block(
+            "attachment", SIGNED.format("notes.txt"), name="notes.txt", caption="Cap"
+        )
+        image = hosted_file_block(
+            "image", SIGNED.format("photo%20one.png"), btype="image"
+        )
+        external = external_file_block(
+            "external", "https://example.com/doc.pdf", name="doc.pdf"
+        )
+        sibling = text_block("sibling", "Sibling")
+        return FakeNotionClient(
+            children={
+                "science": [note, sibling],
+                "note": [nested],
+                "nested": [attachment, image, external],
+            },
+            files={
+                SIGNED.format("notes.txt"): b"notes",
+                SIGNED.format("photo%20one.png"): b"png",
+            },
+            **kwargs,
+        )
+
+    def test_move_reuploads_nested_hosted_attachments(self):
+        client = self.nested_attachment_client()
+
+        result = client.move_block("note", "abstraction")
+
+        new_note = client._get_block_children(result["new_id"])[0]
+        copied = client._get_block_children(new_note["id"])
+        self.assertEqual([block["type"] for block in copied], ["file", "image", "file"])
+        uploaded, image, external = (block[block["type"]] for block in copied)
+        self.assertEqual(uploaded["name"], "notes.txt")
+        self.assertEqual(uploaded["caption"][0]["text"]["content"], "Cap")
+        self.assertTrue(uploaded["file"]["url"].startswith("https://files/upload-"))
+        self.assertTrue(image["file"]["url"].startswith("https://files/upload-"))
+        self.assertEqual(external["external"]["url"], "https://example.com/doc.pdf")
+        self.assertEqual(
+            [upload["request"]["filename"] for upload in client.uploads.values()],
+            ["notes.txt", "photo one.png"],
+        )
+        self.assertEqual(
+            [upload["parts"][0][1] for upload in client.uploads.values()],
+            [b"notes", b"png"],
+        )
+        self.assertEqual(client._get_block_children("science")[0]["id"], "sibling")
+        payloads = [
+            child
+            for method, _, data in client.calls
+            if method == "PATCH"
+            for child in data["children"]
+        ]
+        file_payloads = [p["file"] for p in payloads if p["type"] == "file"]
+        self.assertEqual(file_payloads[0]["type"], "file_upload")
+        self.assertNotIn("file", file_payloads[0])
+        self.assertEqual(
+            file_payloads[1],
+            {
+                "caption": [],
+                "type": "external",
+                "external": {"url": "https://example.com/doc.pdf"},
+                "name": "doc.pdf",
+            },
+        )
+        last_upload = max(i for i, call in enumerate(client.calls) if call[0] == "FORM")
+        first_patch = min(
+            i for i, call in enumerate(client.calls) if call[0] == "PATCH"
+        )
+        self.assertLess(last_upload, first_patch)
+
+    def test_batch_move_reuploads_top_level_attachments(self):
+        client = FakeNotionClient(
+            children={
+                "science": [
+                    text_block("a", "A"),
+                    hosted_file_block("pdf", SIGNED.format("paper.pdf"), btype="pdf"),
+                ]
+            },
+            files={SIGNED.format("paper.pdf"): b"%PDF"},
+        )
+
+        result = client.move_blocks(["a", "pdf"], "abstraction")
+
+        copied = client.blocks[result[1]["new_id"]]
+        self.assertEqual(copied["type"], "pdf")
+        self.assertTrue(copied["pdf"]["file"]["url"].startswith("https://files/"))
+        self.assertEqual(client._get_block_children("science"), [])
+
+    def test_large_attachment_uses_multi_part_upload(self):
+        client = FakeNotionClient(
+            children={"science": [hosted_file_block("big", SIGNED.format("big.txt"))]},
+            files={SIGNED.format("big.txt"): b"x" * 25},
+        )
+        client._SINGLE_PART_LIMIT = 20
+        client._PART_SIZE = 10
+
+        client.move_block("big", "abstraction")
+
+        (upload,) = client.uploads.values()
+        self.assertEqual(upload["request"]["mode"], "multi_part")
+        self.assertEqual(upload["request"]["number_of_parts"], 3)
+        self.assertEqual(
+            upload["parts"], [("1", b"x" * 10), ("2", b"x" * 10), ("3", b"x" * 5)]
+        )
+        self.assertIn(
+            ("POST", f"/file_uploads/{upload['id']}/complete", None), client.calls
+        )
+
+    def test_failed_attachment_download_writes_nothing(self):
+        client = self.nested_attachment_client()
+        del client.files[SIGNED.format("photo%20one.png")]
+
+        with self.assertRaises(MODULE.MoveError) as raised:
+            client.move_blocks(["note", "sibling"], "abstraction")
+
+        self.assertIn(
+            "Attachment transfer failed for block image", str(raised.exception)
+        )
+        details = raised.exception.details
+        self.assertFalse(details["sources_archived"])
+        self.assertEqual(details["partial_copies_rolled_back"], [])
+        self.assertEqual(details["partial_copies_left_in_place"], [])
+        self.assertFalse(
+            [call for call in client.calls if call[0] in ("PATCH", "DELETE")]
+        )
+        self.assertEqual(
+            [block["id"] for block in client._get_block_children("science")],
+            ["note", "sibling"],
+        )
+
+    def test_rejected_attachment_upload_writes_nothing(self):
+        client = self.nested_attachment_client(
+            fail_upload=lambda data: data["filename"] == "notes.txt"
+        )
+
+        with self.assertRaisesRegex(MODULE.MoveError, "upload rejected"):
+            client.move_block("note", "abstraction")
+
+        self.assertFalse(
+            [call for call in client.calls if call[0] in ("PATCH", "DELETE")]
+        )
+        self.assertEqual(client._get_block_children("abstraction"), [])
+
+    def test_hosted_callout_icon_fails_before_writing(self):
+        callout = text_block(
+            "callout",
+            "Callout",
+            btype="callout",
+            icon={"type": "file", "file": {"url": SIGNED.format("i.png")}},
+        )
+        client = FakeNotionClient(children={"science": [callout]})
+
+        with self.assertRaisesRegex(MODULE.MoveError, "uploaded icon"):
+            client.move_block("callout", "abstraction")
+
+        self.assertFalse(
+            [call for call in client.calls if call[0] in ("PATCH", "DELETE")]
+        )
 
     def test_failed_tool_call_sets_mcp_error_flag(self):
         root, children = deep_chain("school", 4)
