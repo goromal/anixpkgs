@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793037480,
+        "lastModified": 1793037947,
         "narHash": "sha256-CKuf3yWJkdkM9rUbejJp6CYDrvlGAxZSm1SAMcMglLU=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "0ed4709578a6b171ed717d66d821b811b0402b99",
+        "rev": "84ae0def138fa62f2494989983633638a165d92a",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/videodl-h264",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
