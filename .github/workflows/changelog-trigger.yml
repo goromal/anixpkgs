@@ -30,8 +30,10 @@ jobs:
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
         run: |
-          # Read the body from the env, not ${{ }}: inlining it into the script
-          # made bash expand $-, $(...) and backticks in the comment text.
+          # Read the body from the env, not an inline expression: inlining it into
+          # the script made bash expand $-, $(...) and backticks in the comment text.
+          # (Never write an empty expression here, even in a comment: it invalidates
+          # the whole workflow.)
           printf '%s\n' "$COMMENT_BODY" > comment_body.txt
           output=$(python3 .github/extract_description.py comment_body.txt)
           echo "CHANGE_DESCRIPTION=$output" >> $GITHUB_ENV
