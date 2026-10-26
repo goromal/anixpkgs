@@ -35,6 +35,13 @@
     cloudDir = "games2";
   }
   {
+    name = "bountyhunter";
+    title = "Star Wars: Bounty Hunter";
+    location = "$HOME/more-games/StarWarsBountyHunter.iso";
+    emulator = "dolphin";
+    cloudDir = "games2";
+  }
+  {
     name = "kh2";
     title = "Kingdom Hearts II";
     location = "$HOME/more-games/kingdomheartsii.chd";

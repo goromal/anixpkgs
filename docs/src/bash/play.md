@@ -19,10 +19,10 @@ Play a game. Your options:
       twilight	Twilight Princess
       melee	Super Smash Bros. Melee
       sunshine	Super Mario Sunshine
+      bountyhunter	Star Wars: Bounty Hunter
       kh2	Kingdom Hearts II
       jak2	Jak II
       jak3	Jak 3
       setup-ps2  Configure the PS2 BIOS, controller, and memory cards.
 
 ```
-

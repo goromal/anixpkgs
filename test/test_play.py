@@ -116,14 +116,22 @@ def test_restores_card_and_keeps_backup(session):
     assert (cloud.with_name("memcards.bak") / "Mcd001.ps2").read_text() == "cloud progress"
 
 
-def test_dolphin_still_syncs(session):
+@pytest.mark.parametrize(
+    "alias,filename,syncs",
+    [
+        ("zelda", "games/LegendOfZeldaCollectorsEdition.iso", ["sync games", "sync games"]),
+        ("bountyhunter", "more-games/StarWarsBountyHunter.iso", ["sync games2", "sync games", "sync games"]),
+    ],
+)
+def test_dolphin_still_syncs(session, alias, filename, syncs):
     home, _, _ = session
-    (home / "games/LegendOfZeldaCollectorsEdition.iso").touch()
+    (home / filename).touch()
     (home / "games/MemoryCardA.USA.raw").write_text("dolphin progress")
-    result = run(session, "zelda", EXPECT_CARD="dolphin progress")
+    result = run(session, alias, EXPECT_CARD="dolphin progress")
     assert result.returncode == 0, result.stdout + result.stderr
-    assert json.loads((home / "argv.json").read_text()) == ["-a", "LLE", "-e", str(home / "games/LegendOfZeldaCollectorsEdition.iso")]
+    assert json.loads((home / "argv.json").read_text()) == ["-a", "LLE", "-e", str(home / filename)]
     assert (home / "games/MemoryCardA.USA.raw").read_text() == "saved progress"
+    assert (home / "sync.log").read_text().splitlines() == syncs
 
 
 @pytest.mark.parametrize("failure", ["1", "2"])

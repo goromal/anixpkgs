@@ -644,7 +644,7 @@ Sunshine starts automatically with your GNOME graphical session. After a fresh d
    - When prompted for a PIN, go to the Sunshine web UI → **PIN** tab and enter it there
    - The pairing completes automatically
 
-5. **Launch a game** from Moonlight. The five games from `play` appear as individual apps.
+5. **Launch a game** from Moonlight. The games from `play` appear as individual apps.
 6. **Set up inputs** in Dolphin (by clicking to the controller setup menu). The "Device" to select for "GameCube Controller at Port 1" is *SDL/0/Xbox One S Controller*. You will need to relaunch the game for this to take effect.
 7. **Preferred Moonlight Settings**: Low latency is the most important thing:
    1. Resolution: 360p
