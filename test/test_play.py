@@ -120,7 +120,7 @@ def test_restores_card_and_keeps_backup(session):
     "alias,filename,syncs",
     [
         ("zelda", "games/LegendOfZeldaCollectorsEdition.iso", ["sync games", "sync games"]),
-        ("bountyhunter", "more-games/StarWarsBountyHunter.iso", ["sync games2", "sync games", "sync games"]),
+        ("bountyhunter", "more-games/StarWarsBountyHunter.nkit.iso", ["sync games2", "sync games", "sync games"]),
     ],
 )
 def test_dolphin_still_syncs(session, alias, filename, syncs):

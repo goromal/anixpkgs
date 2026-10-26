@@ -37,7 +37,7 @@
   {
     name = "bountyhunter";
     title = "Star Wars: Bounty Hunter";
-    location = "$HOME/more-games/StarWarsBountyHunter.iso";
+    location = "$HOME/more-games/StarWarsBountyHunter.nkit.iso";
     emulator = "dolphin";
     cloudDir = "games2";
   }
