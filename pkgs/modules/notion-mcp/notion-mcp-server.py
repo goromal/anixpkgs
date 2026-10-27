@@ -624,6 +624,10 @@ class NotionClient:
         r"|(?P<link>\[[^\]]+\]\([^)]+\))"
         r"|(?P<italic>\*[^*]+\*)"
     )
+    # A backslash makes the next markup character literal: \*\*10/26/2026\*\*
+    # stores "**10/26/2026**" (goromail's date marker) instead of bold text.
+    _ESCAPABLE = "\\`*[]()"
+    _ESCAPE_RE = re.compile(r"\\([\\`*\[\]()])")
     _HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
     _BULLET_RE = re.compile(r"^\s*[-*+]\s+(.*)$")
     _NUMBER_RE = re.compile(r"^\s*\d+\.\s+(.*)$")
@@ -656,24 +660,37 @@ class NotionClient:
             items.append(item)
         return items
 
+    def _hide_escapes(self, text: str) -> str:
+        """Swap escaped markup characters for private-use placeholders."""
+        return self._ESCAPE_RE.sub(
+            lambda m: chr(0xE000 + self._ESCAPABLE.index(m.group(1))), text
+        )
+
+    def _show_escapes(self, text: str) -> str:
+        for i, ch in enumerate(self._ESCAPABLE):
+            text = text.replace(chr(0xE000 + i), ch)
+        return text
+
     def _inline_rich_text(self, text: str) -> list[dict]:
+        text = self._hide_escapes(text)
+        show = self._show_escapes
         rich: list[dict] = []
         pos = 0
         for m in self._INLINE_RE.finditer(text):
             if m.start() > pos:
-                rich += self._rt(text[pos : m.start()])
+                rich += self._rt(show(text[pos : m.start()]))
             if m.group("code"):
-                rich += self._rt(m.group("code")[1:-1], code=True)
+                rich += self._rt(show(m.group("code")[1:-1]), code=True)
             elif m.group("bold"):
-                rich += self._rt(m.group("bold")[2:-2], bold=True)
+                rich += self._rt(show(m.group("bold")[2:-2]), bold=True)
             elif m.group("italic"):
-                rich += self._rt(m.group("italic")[1:-1], italic=True)
+                rich += self._rt(show(m.group("italic")[1:-1]), italic=True)
             elif m.group("link"):
                 lm = re.match(r"\[([^\]]+)\]\(([^)]+)\)", m.group("link"))
-                rich += self._rt(lm.group(1), link=lm.group(2))
+                rich += self._rt(show(lm.group(1)), link=show(lm.group(2)))
             pos = m.end()
         if pos < len(text):
-            rich += self._rt(text[pos:])
+            rich += self._rt(show(text[pos:]))
         return rich
 
     def _block(self, btype: str, text: str = "", extra: dict = None) -> dict:
@@ -848,7 +865,15 @@ class NotionClient:
         lines = [l for l in text.split("\n") if l.strip()]
         if not lines:
             raise Exception("No content to append")
-        children = [self._block("bulleted_list_item", line) for line in lines]
+        # Literal: no inline Markdown, so goromail-style "[**MM/DD/YYYY**]" survives.
+        children = [
+            {
+                "object": "block",
+                "type": "bulleted_list_item",
+                "bulleted_list_item": {"rich_text": self._rt(line)},
+            }
+            for line in lines
+        ]
         return self._append_children(page_id, children)
 
     def delete_block(self, block_id: str) -> None:
@@ -1007,8 +1032,11 @@ TOOLS = [
             "(```lang), tables (| a | b | with a |---| separator row), bulleted and "
             "numbered lists, blockquotes (>), dividers (---), paragraphs, and inline "
             "**bold**, *italic*, `code`, and [links](url). Blank lines separate "
-            "paragraphs. Set format='bullets' to instead turn each input line into a "
-            "literal bullet (legacy behavior)."
+            "paragraphs. Backslash-escape a markup character to keep it literal "
+            "(\\*\\*10/26/2026\\*\\* stores **10/26/2026**). Set format='bullets' to "
+            "instead turn each input line into a bullet whose text is stored exactly "
+            "as given, with no Markdown parsing at all (use this for goromail-style "
+            "[**MM/DD/YYYY**] date markers)."
         ),
         "inputSchema": {
             "type": "object",
@@ -1019,7 +1047,7 @@ TOOLS = [
                 },
                 "text": {
                     "type": "string",
-                    "description": "Markdown text to append (or raw lines if format='bullets')",
+                    "description": "Markdown text to append (or literal lines if format='bullets')",
                 },
                 "format": {
                     "type": "string",
@@ -1053,7 +1081,8 @@ TOOLS = [
         "description": (
             "Replace the text content of an existing block in place, keeping its "
             "type. 'text' is parsed for inline **bold**, *italic*, `code`, and "
-            "[links](url). Only works on text-bearing blocks (paragraph, headings, "
+            "[links](url); backslash-escape a markup character to keep it literal "
+            "(\\*\\*10/26/2026\\*\\* stores **10/26/2026**). Only works on text-bearing blocks (paragraph, headings, "
             "list items, quote, etc.); to change a block's type, delete and re-append."
         ),
         "inputSchema": {

@@ -411,6 +411,11 @@
                 "docs": false
             },
             {
+                "attr": "media2notes",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "brom",
                 "ci": true,
                 "docs": false

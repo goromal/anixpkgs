@@ -70,6 +70,9 @@ in
     ];
     machines.agents.privateSkills = [ "assistant" ];
 
+    # Also on interactive shells of the assistant host, for manual media intake.
+    environment.systemPackages = [ anixpkgs.media2notes ];
+
     machines.base.webServices = [
       {
         name = "Assistant";
@@ -121,7 +124,8 @@ in
       wantedBy = [ "multi-user.target" ];
       # Full git (+ssh) ahead of the companion's git-minimal, then what the
       # assistant skill shells out to: gh, rg, sqlite3 (Tactical, read-only),
-      # python3 (tools/sb), task-tools (Google Tasks), wiki-tools.
+      # python3 (tools/sb), task-tools (Google Tasks), wiki-tools, media2notes
+      # (media intake: URL -> transcript + frames).
       path = [
         pkgs.git
         pkgs.openssh
@@ -134,6 +138,7 @@ in
         pkgs.diffutils
         anixpkgs.task-tools
         anixpkgs.wiki-tools
+        anixpkgs.media2notes
       ]
       ++ cfg.pathPkgs
       ++ companion.servicePath;
