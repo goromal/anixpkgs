@@ -380,6 +380,14 @@ let
                   pkg-src = flakeInputs.flasks;
                 }
               );
+              media2notes = addDoc (
+                pySelf.callPackage ./python-packages/flasks/media2notes {
+                  yt-dlp = unstable.yt-dlp;
+                  # SDL only serves the mic/stream examples; it drags ~1 GB of GUI deps.
+                  whisper-cpp = prev.whisper-cpp.override { withSDL = false; };
+                  pkg-src = flakeInputs.flasks;
+                }
+              );
               brom = addDoc (
                 pySelf.callPackage ./python-packages/flasks/brom {
                   pkg-src = flakeInputs.flasks;
@@ -526,6 +534,7 @@ rec {
   wormhole = final.python313.pkgs.wormhole;
   cozy = final.python313.pkgs.cozy;
   vdlserver = final.python313.pkgs.vdlserver;
+  media2notes = final.python313.pkgs.media2notes;
   brom = final.python313.pkgs.brom;
   easy-google-auth = final.python313.pkgs.easy-google-auth;
   task-tools = final.python313.pkgs.task-tools;
