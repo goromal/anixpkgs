@@ -116,6 +116,14 @@ class FakeNotionClient(MODULE.NotionClient):
         if method == "PATCH":
             if self.fail_patch and self.fail_patch(block_id, data):
                 raise Exception("Notion API 500: injected failure")
+            if "children" not in data:  # update_block: replace the text in place
+                block = self.blocks[block_id]
+                btype = block["type"]
+                rich = json.loads(json.dumps(data[btype]["rich_text"]))
+                for item in rich:
+                    item["plain_text"] = item["text"]["content"]
+                block[btype]["rich_text"] = rich
+                return block
             self._validate(data["children"], "body.children", 0)
             created = [self._create(block_id, payload) for payload in data["children"]]
             if block_id in self.blocks:
@@ -572,6 +580,87 @@ class NotionClientTests(unittest.TestCase):
         )
 
         self.assertFalse(response["isError"])
+
+
+
+class LiteralMarkupTests(unittest.TestCase):
+    """anixpkgs#729: agents must be able to store goromail's literal [**date**] marker."""
+
+    MARKER = "[**10/26/2026**] text"
+
+    def rich(self, client, block_id):
+        block = client.blocks[block_id]
+        return block[block["type"]]["rich_text"]
+
+    def plain(self, client, block_id):
+        return client._rich_text_to_plain(self.rich(client, block_id))
+
+    def test_bullets_format_is_literal(self):
+        client = FakeNotionClient(children={"page": []})
+        response = MODULE.handle_request(
+            client,
+            {
+                "method": "tools/call",
+                "params": {
+                    "name": "notion_append",
+                    "arguments": {
+                        "page_id": "page",
+                        "text": self.MARKER + "\n*not italic* and `not code`",
+                        "format": "bullets",
+                    },
+                },
+            },
+        )
+        self.assertFalse(response["isError"])
+        ids = [b["id"] for b in client.children["page"]]
+        self.assertEqual(
+            [self.plain(client, i) for i in ids],
+            [self.MARKER, "*not italic* and `not code`"],
+        )
+        for i in ids:
+            self.assertFalse(any("annotations" in r for r in self.rich(client, i)))
+
+    def test_markdown_escapes(self):
+        client = FakeNotionClient(children={"page": []})
+        client.append_markdown("page", "- [\\*\\*10/26/2026\\*\\*] text")
+        (block,) = client.children["page"]
+        self.assertEqual(block["type"], "bulleted_list_item")
+        self.assertEqual(self.plain(client, block["id"]), self.MARKER)
+        self.assertFalse(any("annotations" in r for r in self.rich(client, block["id"])))
+
+    def test_update_block_escapes(self):
+        client = FakeNotionClient(
+            children={"page": [text_block("b", "old", btype="bulleted_list_item")]}
+        )
+        client.update_block("b", "[\\*\\*10/26/2026\\*\\*] text")
+        self.assertEqual(self.plain(client, "b"), self.MARKER)
+
+    def test_every_escapable_character(self):
+        client = FakeNotionClient()
+        rich = client._inline_rich_text("\\` \\* \\[x\\](y) \\\\ \\( \\)")
+        self.assertEqual(client._rich_text_to_plain(rich), "` * [x](y) \\ ( )")
+        self.assertFalse(any("annotations" in r or r["text"].get("link") for r in rich))
+
+    def test_unescaped_markdown_unchanged(self):
+        client = FakeNotionClient()
+        rich = client._inline_rich_text("a **b** *c* `d` [e](https://f) g")
+        self.assertEqual(
+            [(r["text"]["content"], r.get("annotations"), r["text"].get("link")) for r in rich],
+            [
+                ("a ", None, None),
+                ("b", {"bold": True}, None),
+                (" ", None, None),
+                ("c", {"italic": True}, None),
+                (" ", None, None),
+                ("d", {"code": True}, None),
+                (" ", None, None),
+                ("e", None, {"url": "https://f"}),
+                (" g", None, None),
+            ],
+        )
+        # escapes still work inside markup
+        rich = client._inline_rich_text("**a\\*b**")
+        self.assertEqual([(r["text"]["content"], r.get("annotations")) for r in rich], [("a*b", {"bold": True})])
 
 
 if __name__ == "__main__":

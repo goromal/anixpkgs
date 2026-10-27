@@ -15,7 +15,11 @@ buildPythonPackage rec {
   build-system = [ setuptools ];
   src = "${pkg-src}/media2notes";
   propagatedBuildInputs = [ pillow ];
-  nativeCheckInputs = [ pytestCheckHook ];
+  # ffmpeg runs the synthetic-video frame selection regression test.
+  nativeCheckInputs = [
+    pytestCheckHook
+    ffmpeg-headless
+  ];
   makeWrapperArgs = [
     "--prefix"
     "PATH"
