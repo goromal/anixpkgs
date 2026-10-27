@@ -43,6 +43,7 @@ Packages written (or bound) in Python.
 - [notion-tools](./notion-tools.md)
 - [book-notes-sync](./book-notes-sync.md)
 - [goromail](./goromail.md)
+- [media2notes](./media2notes.md)
 - [cozy](./cozy.md)
 - [wormhole](./wormhole.md)
 - [grafana_dash](./grafana_dash.md)

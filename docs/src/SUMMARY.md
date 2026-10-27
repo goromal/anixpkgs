@@ -65,6 +65,7 @@
   - [notion-tools](./python/notion-tools.md)
   - [book-notes-sync](./python/book-notes-sync.md)
   - [goromail](./python/goromail.md)
+  - [media2notes](./python/media2notes.md)
   - [cozy](./python/cozy.md)
   - [wormhole](./python/wormhole.md)
   - [grafana_dash](./python/grafana_dash.md)
