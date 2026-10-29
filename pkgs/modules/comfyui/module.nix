@@ -41,6 +41,14 @@ let
   reserveVramFlag = lib.optionalString (
     cfg.reserveVram != null
   ) "--reserve-vram ${builtins.toString cfg.reserveVram}";
+  # cozy's Video tab judges frames with the host's local Ollama vision model.
+  localLlm = config.machines.localLlm or { enable = false; };
+  videoFlags = lib.optionalString cfg.cozy.video.enable "--ollama-url http://${localLlm.host}:${builtins.toString localLlm.port} --video-model ${cfg.cozy.video.model} --max-video-bytes ${builtins.toString cfg.cozy.video.maxBytes}";
+  # nginx must admit a video upload as large as cozy will accept, plus
+  # multipart framing. Hosts without the Video tab keep nginx's default.
+  cozyBodyLimit = lib.optionalString cfg.cozy.video.enable ''
+    client_max_body_size ${builtins.toString (cfg.cozy.video.maxBytes / 1048576 + 16)}m;
+  '';
 in
 {
   options.services.comfyui = {
@@ -147,6 +155,29 @@ in
         default = "${cfg.cozy.stateDir}/prompts";
         description = "Directory of saved prompt .txt files (the default local prompt database)";
       };
+      video = {
+        enable = lib.mkOption {
+          type = lib.types.bool;
+          default = localLlm.enable;
+          defaultText = lib.literalExpression "config.machines.localLlm.enable";
+          description = ''
+            Show cozy's Video tab, which trims a video down to the frames
+            matching a prompt. Frames are judged by the local Ollama vision
+            model (machines.localLlm), so this needs that service.
+          '';
+        };
+        model = lib.mkOption {
+          type = lib.types.str;
+          default = localLlm.model or "qwen3.5:35b-a3b";
+          defaultText = lib.literalExpression "config.machines.localLlm.model";
+          description = "Ollama vision model that judges video frames; pulled declaratively.";
+        };
+        maxBytes = lib.mkOption {
+          type = lib.types.int;
+          default = 2147483648;
+          description = "Largest video accepted by upload or remote (wormhole) staging.";
+        };
+      };
     };
   };
 
@@ -248,6 +279,17 @@ in
           "d ${cfg.cozy.stateDir} 0755 andrew dev -"
           "d ${cfg.cozy.promptDbDir} 0755 andrew dev -"
         ];
+        assertions = [
+          {
+            assertion = !cfg.cozy.video.enable || localLlm.enable;
+            message = "services.comfyui.cozy.video needs machines.localLlm (Ollama) enabled.";
+          }
+        ];
+        # localLlm already pulls its own model; only a different video model
+        # needs adding.
+        services.ollama.loadModels = lib.mkIf (
+          cfg.cozy.video.enable && cfg.cozy.video.model != (localLlm.model or "")
+        ) [ cfg.cozy.video.model ];
         environment.systemPackages = [
           (pkgs.runCommand "cozyctl" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
             mkdir -p $out/bin
@@ -279,10 +321,12 @@ in
             pkgs.openssh
             pkgs.gawk
             extendedPkgs.wormhole
-          ];
+          ]
+          # The Video tab probes, samples and cuts with ffmpeg/ffprobe.
+          ++ lib.optional cfg.cozy.video.enable pkgs.ffmpeg;
           serviceConfig = {
             Type = "simple";
-            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --max-input-bytes ${builtins.toString cfg.cozy.maxInputBytes} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service'";
+            ExecStart = "${cfg.cozy.package}/bin/cozy --port ${builtins.toString service-ports.cozy} --subdomain /cozy --comfyui-url http://127.0.0.1:${builtins.toString cfg.port} --state-dir ${cfg.cozy.stateDir} --workflow-dir ${cfg.cozy.workflowDir} --input-dir ${cfg.cozy.inputDir} --output-dir ${cfg.cozy.outputDir} --workflows ${lib.concatStringsSep "," cfg.cozy.workflows} --secrets-file ${cfg.cozy.secretsFile} --prompt-db-dir ${cfg.cozy.promptDbDir} --max-input-bytes ${builtins.toString cfg.cozy.maxInputBytes} --comfyui-restart-cmd '${pkgs.systemd}/bin/systemctl restart comfyui.service' ${videoFlags}";
             ReadWritePaths = [ cfg.cozy.stateDir ];
             WorkingDirectory = cfg.cozy.stateDir;
             Restart = "always";
@@ -296,7 +340,7 @@ in
           locations."/cozy/" = {
             proxyPass = "http://127.0.0.1:${builtins.toString service-ports.cozy}/cozy/";
             proxyWebsockets = true;
-            extraConfig = ''
+            extraConfig = cozyBodyLimit + ''
               proxy_set_header Host $host;
               proxy_set_header X-Real-IP $remote_addr;
               proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

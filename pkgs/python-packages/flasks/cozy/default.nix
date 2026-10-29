@@ -2,6 +2,7 @@
   buildPythonPackage,
   setuptools,
   pytestCheckHook,
+  ffmpeg,
   flask,
   flask-login,
   flask-wtf,
@@ -30,6 +31,7 @@ buildPythonPackage rec {
     cp templates/index.html $out/${pythonLibDir}/templates/index.html
     cp templates/login.html $out/${pythonLibDir}/templates/login.html
     cp tv.svg $out/${pythonLibDir}/static/tv.svg
+    cp static/video.js $out/${pythonLibDir}/static/video.js
   '';
   propagatedBuildInputs = [
     flask
@@ -43,7 +45,12 @@ buildPythonPackage rec {
     pillow-heif
     wormhole
   ];
-  nativeCheckInputs = [ pytestCheckHook ];
+  # ffmpeg lets the Video tab's end-to-end tests build and cut real clips;
+  # without it they skip.
+  nativeCheckInputs = [
+    pytestCheckHook
+    ffmpeg
+  ];
   meta = {
     description = "One-pager UI for generating images with ComfyUI workflows.";
     longDescription = "";
