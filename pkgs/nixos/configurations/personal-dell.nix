@@ -34,8 +34,22 @@
     "imggen21"
     "imgedit2"
     "imgedit3"
+    "imgedit4"
   ];
+  # imgedit4 is imgedit3 at 8 steps on flux2_dev_turbo_fp8mixed.safetensors: the
+  # Flux.2 Turbo LoRA baked offline into flux2_dev_fp8mixed by
+  # workflows/merge_flux2_lora.py (applying the LoRA at runtime OOMs the 4 GB
+  # card, which requantizes each patched fp8 weight on the GPU). ~3.5x faster
+  # than imgedit2 at matching quality.
   systemd.services.comfyui.serviceConfig.ExecStartPre =
-    "${pkgs.coreutils}/bin/install -m 0644 ${./workflows/imggen21.api.json} /data/andrew/comfyui/imggen21.api.json";
+    map
+      (
+        wf:
+        "${pkgs.coreutils}/bin/install -m 0644 ${./workflows}/${wf}.api.json /data/andrew/comfyui/${wf}.api.json"
+      )
+      [
+        "imggen21"
+        "imgedit4"
+      ];
   networking.hostName = "atorgesen-dell";
 }
