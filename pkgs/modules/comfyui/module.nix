@@ -278,7 +278,10 @@ in
         systemd.tmpfiles.rules = [
           "d ${cfg.cozy.stateDir} 0755 andrew dev -"
           "d ${cfg.cozy.promptDbDir} 0755 andrew dev -"
-        ];
+        ]
+        # Where the Video tab exports; created up front so a bitd unit that
+        # opens it for writing (the cozy_video check) finds it at start.
+        ++ lib.optional cfg.cozy.video.enable "d ${cfg.cozy.outputDir}/video 0755 andrew dev -";
         assertions = [
           {
             assertion = !cfg.cozy.video.enable || localLlm.enable;

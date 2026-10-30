@@ -18,6 +18,11 @@ let
     "comfyui.service"
   ];
   json = pkgs.formats.json { };
+  # Where cozy's Video tab exports (the cozy_video check writes and deletes
+  # there). bitd can run on hosts without the comfyui module.
+  cozyVideoOutput = "${
+    config.services.comfyui.cozy.outputDir or "/data/andrew/comfyui/output"
+  }/video";
   known = builtins.attrNames cfg.plugins;
   selected = lib.unique cfg.checks;
   valid = builtins.filter (name: builtins.hasAttr name cfg.plugins) selected;
@@ -97,6 +102,16 @@ in
             settings = lib.mkOption {
               type = lib.types.attrsOf json.type;
               default = { };
+            };
+            writablePaths = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = ''
+                Paths this plugin must write despite the unit's
+                ProtectSystem=strict / ProtectHome=read-only. Added to bitd's
+                ReadWritePaths only while the plugin is selected; a missing
+                path is skipped rather than failing the unit.
+              '';
             };
           };
         }
@@ -208,11 +223,11 @@ in
           video = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins.data}";
           expect_file = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins-expect.data}";
           ffprobe_command = lib.mkDefault "${pkgs.ffmpeg}/bin/ffprobe";
-          output_dir = lib.mkDefault (
-            config.services.comfyui.cozy.outputDir or "/data/andrew/comfyui/output"
-          );
+          output_dir = lib.mkDefault (builtins.dirOf cozyVideoOutput);
           max_seconds = lib.mkDefault 390;
         };
+        # The check deletes the export it makes there.
+        writablePaths = lib.mkDefault [ cozyVideoOutput ];
       };
       ardupilot = {
         kind = "health";
@@ -289,6 +304,9 @@ in
         NoNewPrivileges = true;
         ProtectSystem = "strict";
         ProtectHome = "read-only";
+        ReadWritePaths = map (path: "-${path}") (
+          lib.concatMap (name: cfg.plugins.${name}.writablePaths) valid
+        );
         PrivateTmp = true;
         StandardOutput = "journal";
         StandardError = "journal";
