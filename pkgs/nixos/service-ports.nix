@@ -54,6 +54,7 @@
     terminal = 6768;
   };
   tasks_ui = 5959;
+  chat_ui = 4747;
   videodl = 6060;
   brom = 6700;
   brom-aria2-rpc = 6800;

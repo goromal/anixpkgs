@@ -248,6 +248,7 @@ in
     ../python-packages/flasks/disciple/module.nix
     ../modules/launchpad/module.nix
     ../python-packages/flasks/tasks_ui/module.nix
+    ../python-packages/flasks/chat_ui/module.nix
     ../python-packages/flasks/videodl/module.nix
     ../python-packages/flasks/brom/module.nix
     ../python-packages/flasks/intake_ui/module.nix

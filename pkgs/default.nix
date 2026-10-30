@@ -364,6 +364,9 @@ let
               tasks_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tasks_ui { pkg-src = flakeInputs.flasks; }
               );
+              chat_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/chat_ui { pkg-src = flakeInputs.flasks; }
+              );
               intake_ui = addDoc (
                 pySelf.callPackage ./python-packages/flasks/intake_ui { pkg-src = flakeInputs.flasks; }
               );
@@ -529,6 +532,7 @@ rec {
     }
   );
   tasks_ui = final.python313.pkgs.tasks_ui;
+  chat_ui = final.python313.pkgs.chat_ui;
   intake_ui = final.python313.pkgs.intake_ui;
   mail_ui = final.python313.pkgs.mail_ui;
   wormhole = final.python313.pkgs.wormhole;
