@@ -95,7 +95,10 @@ let
       # No devshell wraps this session, so nothing sets SHELL; Claude Code's Bash
       # tool would fall back to /bin/bash, which doesn't exist on NixOS. Point it
       # at the bash on the service PATH so shell tool calls work.
-      export SHELL="${pkgs.bashInteractive}/bin/bash"${repoSync}
+      export SHELL="${pkgs.bashInteractive}/bin/bash"
+      # Append the login-shell profile dirs (setuid wrappers like sudo, user and
+      # system packages) so agents see the same commands a terminal does.
+      export PATH="$PATH:/run/wrappers/bin:$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"${repoSync}
       # Pre-accept Claude Code's workspace-trust dialog so a headless companion
       # launch does not stall on it. Trust the stable spool parent (not each
       # ephemeral session dir): claude honors an ancestor's trust, so every
