@@ -244,6 +244,7 @@ in
     ../python-packages/flasks/nexus/module.nix
     ../python-packages/flasks/agent_ui/module.nix
     ../python-packages/flasks/sunset/module.nix
+    ../python-packages/flasks/rcrsync_ui/module.nix
     ../python-packages/flasks/tester/module.nix
     ../python-packages/flasks/disciple/module.nix
     ../modules/launchpad/module.nix
@@ -672,6 +673,12 @@ in
       systemd.tmpfiles.rules = [
         "d /.c 0750 andrew dev -"
         "x /.c - - -"
+        # rcrsync's history (read by rcrsync_ui) must stay writable by andrew
+        # even when root runs rcrsync first (e.g. the authui reset script).
+        "d ${cfg.homeDir}/.local 0755 andrew dev -"
+        "d ${cfg.homeDir}/.local/state 0755 andrew dev -"
+        "d ${cfg.homeDir}/.local/state/rcrsync 0755 andrew dev -"
+        "f ${cfg.homeDir}/.local/state/rcrsync/history.jsonl 0664 andrew dev -"
       ]
       ++ map (path: "f ${path} 0600 root root -") cfg.additionalNetrcSources;
 

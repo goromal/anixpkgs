@@ -352,6 +352,9 @@ let
               sunset = addDoc (
                 pySelf.callPackage ./python-packages/flasks/sunset { pkg-src = flakeInputs.flasks; }
               );
+              rcrsync_ui = addDoc (
+                pySelf.callPackage ./python-packages/flasks/rcrsync_ui { pkg-src = flakeInputs.flasks; }
+              );
               self-tester-app = addDoc (
                 pySelf.callPackage ./python-packages/flasks/tester { pkg-src = flakeInputs.flasks; }
               );
@@ -515,6 +518,7 @@ rec {
   nexus_ui = final.python313.pkgs.nexus_ui;
   agent_ui = final.python313.pkgs.agent_ui;
   sunset = final.python313.pkgs.sunset;
+  rcrsync_ui = final.python313.pkgs.rcrsync_ui;
   self-tester-app = final.python313.pkgs.self-tester-app;
   folio-backend = final.python313.pkgs.folio-backend;
   folio-mcp = final.python313.pkgs.folio-mcp;

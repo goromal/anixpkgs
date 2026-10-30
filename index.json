@@ -341,6 +341,11 @@
                 "docs": true
             },
             {
+                "attr": "rcrsync_ui",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "easy-google-auth",
                 "ci": true,
                 "docs": true
