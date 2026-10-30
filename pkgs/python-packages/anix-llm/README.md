@@ -30,6 +30,13 @@ anix-llm ensure
 anix-llm workspace --context ./project --output-dir ./generated
 ```
 
+## Models
+
+`machines.localLlm.model` is the default model. `machines.localLlm.extraModels`
+pulls more models into the same Ollama cache. `anix-llm models` lists them all,
+and `--model` selects one per invocation. Vision-capable models also appear in
+cozy's Video tab model dropdown.
+
 Global overrides precede the command:
 
 ```console

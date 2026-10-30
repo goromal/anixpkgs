@@ -22,6 +22,16 @@ in
       default = "qwen3.5:35b-a3b";
       description = "Ollama model loaded declaratively and used by anix-llm.";
     };
+    extraModels = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "huihui_ai/qwen3.5-abliterated:35b-a3b" ];
+      description = ''
+        Additional Ollama models pulled declaratively next to `model`. They
+        appear in `anix-llm models`, can be used with `anix-llm --model`, and
+        vision-capable ones are offered in cozy's Video tab model dropdown.
+      '';
+    };
     host = lib.mkOption {
       type = lib.types.str;
       default = "127.0.0.1";
@@ -83,7 +93,7 @@ in
           ollamaPkgs.ollama-cpu
         else
           ollamaPkgs.${"ollama-${cfg.acceleration}"};
-      loadModels = [ cfg.model ];
+      loadModels = lib.unique ([ cfg.model ] ++ cfg.extraModels);
       environmentVariables = {
         OLLAMA_CONTEXT_LENGTH = toString cfg.contextLength;
         OLLAMA_FLASH_ATTENTION = "1";
