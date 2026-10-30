@@ -56,6 +56,7 @@
   - [tasks_ui](./python/tasks_ui.md)
   - [assistant_ui](./python/assistant_ui.md)
   - [sunset](./python/sunset.md)
+  - [rcrsync_ui](./python/rcrsync_ui.md)
   - [easy-google-auth](./python/easy-google-auth.md)
   - [rcdo](./python/rcdo.md)
   - [task-tools](./python/task-tools.md)
