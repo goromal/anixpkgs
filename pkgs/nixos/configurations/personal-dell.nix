@@ -19,6 +19,12 @@
   machines.features.localLlm.enable = lib.mkForce true;
   machines.localLlm = {
     acceleration = "cuda";
+    # Uncensored vision model for cozy's Video tab (and anix-llm --model).
+    # Of six uncensored vision models tested on the dolphin fixture and a
+    # 47 s ocean clip, the only one as accurate as the default -- in fact
+    # with no false positives -- at ~2x its per-frame time (~12 s here).
+    # Abliterated general Qwen 3.5/3.6 builds leaned toward "yes".
+    extraModels = [ "huihui_ai/qwen3-vl-abliterated:8b-instruct" ];
   };
   services.comfyui.lowMem = true;
   services.bitd.checks = [
