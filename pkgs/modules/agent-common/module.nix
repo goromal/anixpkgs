@@ -36,6 +36,7 @@ let
   skillsFor = framework: forFramework framework skillCatalog;
   activeMcpServers = lib.concatMap mcpServersFor frameworks;
   hasServer = name: builtins.any (server: server.name == name) activeMcpServers;
+  hasCloudDir = name: builtins.any (dir: dir.name == name) config.machines.base.cloudDirs;
 in
 {
   options.machines.agents.excludedSkills = lib.mkOption {
@@ -86,6 +87,12 @@ in
             }
           )
         ];
+      }
+      {
+        machines.agents.privateSkills = lib.mkIf (lib.all hasCloudDir [
+          "configs"
+          "secrets"
+        ]) [ "atsudo" ];
       }
       {
         services.vikunja-mcp.enable = hasServer "vikunja";

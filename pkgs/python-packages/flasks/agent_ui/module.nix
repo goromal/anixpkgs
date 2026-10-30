@@ -107,7 +107,9 @@ let
       esac
 
       export AGENT_UI_AGENT="$2"
-      export PATH="$PATH:/run/wrappers/bin"
+      # Append the login-shell profile dirs so agents see the same commands a
+      # terminal does (bitctl, rcrsync, ip, ...), not just the service PATH.
+      export PATH="$PATH:/run/wrappers/bin:$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
       # shellcheck disable=SC2016 # Expanded by the devshell's inner shell.
       exec devshell "$1" --run 'exec direnv exec "$DEVSHELL_ROOT" ${agentEnter}/bin/agent-ui-enter'
     '';
