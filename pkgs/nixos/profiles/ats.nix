@@ -48,6 +48,7 @@ with import ../dependencies.nix;
       homeVpn.enable = false;
       agentUi.enable = true;
       upgradeUi.enable = true;
+      rcrsyncUi.enable = true;
       nexus.enable = true;
       fileServers.enable = true;
       metrics.enable = true;

@@ -53,6 +53,7 @@
       homeVpn.enable = true;
       agentUi.enable = true;
       upgradeUi.enable = true;
+      rcrsyncUi.enable = true;
       nexus.enable = true;
       fileServers.enable = true;
       metrics.enable = true;

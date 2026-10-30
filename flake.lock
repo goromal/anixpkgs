@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793075904,
-        "narHash": "sha256-1zoaZqKjd39wXl95ElHFGh06d3lJH33MkJsTRQs3GAk=",
+        "lastModified": 1793320986,
+        "narHash": "sha256-IQ45EEBaobCrFEami8uOGh9tutBsFKlgOmMLOTh8OK8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "5f1af1bf17a5ce24270148115b7e423aa21b6d80",
+        "rev": "ed6ed92d8536859c637c5b908849c8d4d21956bf",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/rcrsync-ui",
         "repo": "flasks",
         "type": "github"
       }
