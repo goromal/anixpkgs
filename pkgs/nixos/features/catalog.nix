@@ -10,6 +10,7 @@
   homeVpn = "manual home VPN client";
   agentUi = "workspace agent terminal web UI";
   upgradeUi = "anix-upgrade web UI";
+  rcrsyncUi = "rcrsync cloud directory web UI";
   nexus = "Nexus LAN registration (spoke) or hub UI (hub)";
   fileServers = "rank and stamp file servers";
   metrics = "host metrics, logs and Grafana";

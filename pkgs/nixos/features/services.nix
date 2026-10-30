@@ -56,6 +56,11 @@ in
       enable = features.upgradeUi.enable;
     };
 
+    services.rcrsync_ui = {
+      enable = features.rcrsyncUi.enable;
+      rcrsync = machine-rcrsync;
+    };
+
     services.nexus-ui = {
       advertise = features.nexus.enable;
       enable = features.nexus.enable && features.nexus.role == "hub";

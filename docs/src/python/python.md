@@ -34,6 +34,7 @@ Packages written (or bound) in Python.
 - [tasks_ui](./tasks_ui.md)
 - [assistant_ui](./assistant_ui.md)
 - [sunset](./sunset.md)
+- [rcrsync_ui](./rcrsync_ui.md)
 - [easy-google-auth](./easy-google-auth.md)
 - [rcdo](./rcdo.md)
 - [task-tools](./task-tools.md)

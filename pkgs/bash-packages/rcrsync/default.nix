@@ -8,6 +8,7 @@
   coreutils,
   gnugrep,
   rcloneCfg ? "~/.config/rclone/rclone.conf",
+  historyFile ? "${homeDir}/.local/state/rcrsync/history.jsonl",
 }:
 let
   pkgname = "rcrsync";
@@ -71,7 +72,33 @@ in
     fi
 
     _RCLONE_OUT=$(${coreutils}/bin/mktemp)
-    trap 'rm -f "$_RCLONE_OUT"' EXIT
+
+    # Each attempted transfer appends one JSON line to the history file (read
+    # by rcrsync_ui). Set _RECORD_OP right before the transfer starts so that
+    # validation errors and declined prompts are not recorded.
+    _RECORD_OP=""
+    _json_str() {
+      local s="''${1//\\/\\\\}"
+      printf '"%s"' "''${s//\"/\\\"}"
+    }
+    _on_exit() {
+      local rc=$?
+      rm -f "$_RCLONE_OUT"
+      if [[ -n "$_RECORD_OP" ]]; then
+        local ok=false
+        [[ $rc -eq 0 ]] && ok=true
+        {
+          ${coreutils}/bin/mkdir -p "$(${coreutils}/bin/dirname "${historyFile}")" &&
+            printf '{"ts":%s,"op":%s,"dir":%s,"subdir":%s,"ok":%s,"host":%s}\n' \
+              "$(${coreutils}/bin/date +%s)" "$(_json_str "$_RECORD_OP")" "$(_json_str "$_DIR_NAME")" \
+              "$(_json_str "$_SUBDIR")" "$ok" "$(_json_str "$(${coreutils}/bin/uname -n)")" >>"${historyFile}"
+        } 2>/dev/null || ${printYlw} "Warning: could not record history in ${historyFile}"
+      fi
+      return $rc
+    }
+    trap _on_exit EXIT
+    _DIR_NAME="$2"
+    _SUBDIR="$3"
 
     _run() {
       if [[ "$verbose" == "1" ]]; then
@@ -105,6 +132,7 @@ in
         fi
         sudo rm -rf "$LOCAL_DIR"
       fi
+      _RECORD_OP=init
       ${printCyn} "Copying from $CLOUD_DIR to $LOCAL_DIR..."
       _success=1
       _run_with_reconnect ${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR || { _success=0; }
@@ -118,6 +146,7 @@ in
         ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
         exit 1
       fi
+      _RECORD_OP=sync
       ${printCyn} "Syncing $CLOUD_DIR and $LOCAL_DIR..."
       _success=1
       _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} bisync $CLOUD_DIR $LOCAL_DIR" || { _success=0; }
@@ -136,6 +165,7 @@ in
         ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
         exit 1
       fi
+      _RECORD_OP=copy
       ${printCyn} "Copying $CLOUD_DIR to $LOCAL_DIR..."
       _success=1
       _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} copy $CLOUD_DIR $LOCAL_DIR" || { _success=0; }
@@ -149,6 +179,7 @@ in
         ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
         exit 1
       fi
+      _RECORD_OP=override
       ${printCyn} "Overriding $CLOUD_DIR with $LOCAL_DIR..."
       _success=1
       _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} copy $LOCAL_DIR $CLOUD_DIR" || { _success=0; }
@@ -162,6 +193,7 @@ in
         ${printErr} "Local directory $LOCAL_DIR not present. Exiting."
         exit 1
       fi
+      _RECORD_OP=mirror
       ${printCyn} "Mirroring $LOCAL_DIR to $CLOUD_DIR (deleting extraneous cloud files)..."
       _success=1
       _run_with_reconnect ${flock}/bin/flock $LOCAL_DIR -c "${rclone}/bin/rclone $_VFLAG --config ${rcloneCfg} sync $LOCAL_DIR $CLOUD_DIR" || { _success=0; }
