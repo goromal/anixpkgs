@@ -35,15 +35,16 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1792981924,
-        "narHash": "sha256-pK+x9UMqY7cOREo0y7t3YONa0ymTdfds+HUYyr6G2N0=",
+        "lastModified": 1793384697,
+        "narHash": "sha256-NnrWYO7rErF0sI8YPhGb79kpz2p1NAnQz3frh+gSeZM=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "7662a51150ddcd18c01bed2c0d8c1af732f6850b",
+        "rev": "cda00e1edd8e557b99798ff76a05fcde8f4b9ce0",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/cozy-video",
         "repo": "anixdata",
         "type": "github"
       }
@@ -70,15 +71,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792871350,
-        "narHash": "sha256-0dxwtVBqbwxhG4go72hy7fPj9qmigN92/a5tBF6WDsk=",
+        "lastModified": 1793385129,
+        "narHash": "sha256-I0aTfR6yvNr+RLfoO8xKck34wM45IEPIumeDd+7JGsA=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "c26cee26959ac1937cd92907fe3886191dfd2efc",
+        "rev": "5447d684dc513ca63e3ed71196f8d86468cd80b3",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/cozy-video",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -457,11 +459,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793334611,
-        "narHash": "sha256-DKB0OH6PcvTmMADjwlbDOS3FLEPRUb867lUGNmG4VZ4=",
+        "lastModified": 1793384773,
+        "narHash": "sha256-iJ++nkaCvVYxHEzI3LaIJqI7Tk/cvj5iXw2y4DHqpBw=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "057658257f1721d81f9dbc429ea5a44b57b30838",
+        "rev": "30a1f5f674240965911091a629da372e5e7de449",
         "type": "github"
       },
       "original": {

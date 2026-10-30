@@ -39,7 +39,7 @@
 
     flake-utils.url = "github:numtide/flake-utils";
 
-    anixdata.url = "github:goromal/anixdata";
+    anixdata.url = "github:goromal/anixdata?ref=refs/heads/dev/cozy-video";
     anixdata.flake = false;
 
     agent-skills.url = "github:goromal/agent-skills";
@@ -48,7 +48,7 @@
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs";
+    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/dev/cozy-video";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";

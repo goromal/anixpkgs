@@ -194,6 +194,26 @@ in
           restart_command = lib.mkDefault comfyuiRestart;
         };
       };
+      cozy_video = {
+        kind = "regression";
+        exclusive = lib.mkDefault true;
+        command = lib.mkDefault "${cfg.package.cozy_video}/bin/bit-check-cozy-video";
+        # ~10 vision-model calls on a 14 s clip (~1 min on atorgesen-dell),
+        # plus staging, export and HTTP deadlines.
+        timeoutMs = lib.mkDefault 420000;
+        settings = {
+          url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
+          token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
+          # Clip and expectations come from anixdata as a pair.
+          video = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins.data}";
+          expect_file = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins-expect.data}";
+          ffprobe_command = lib.mkDefault "${pkgs.ffmpeg}/bin/ffprobe";
+          output_dir = lib.mkDefault (
+            config.services.comfyui.cozy.outputDir or "/data/andrew/comfyui/output"
+          );
+          max_seconds = lib.mkDefault 390;
+        };
+      };
       ardupilot = {
         kind = "health";
         command = lib.mkDefault "${cfg.package.ardupilot}/bin/bit-check-ardupilot";
