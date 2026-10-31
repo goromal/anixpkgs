@@ -35,15 +35,16 @@
     "anixdata": {
       "flake": false,
       "locked": {
-        "lastModified": 1792981924,
-        "narHash": "sha256-pK+x9UMqY7cOREo0y7t3YONa0ymTdfds+HUYyr6G2N0=",
+        "lastModified": 1793399393,
+        "narHash": "sha256-7/YbY8AJ3GjoZiByWTh4oTzaDyziRAt/R5aF78J/89Y=",
         "owner": "goromal",
         "repo": "anixdata",
-        "rev": "7662a51150ddcd18c01bed2c0d8c1af732f6850b",
+        "rev": "08500a50320ea3a8352d7bc23a62f13191b8966b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/cozy-video",
         "repo": "anixdata",
         "type": "github"
       }
@@ -70,15 +71,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1792871350,
-        "narHash": "sha256-0dxwtVBqbwxhG4go72hy7fPj9qmigN92/a5tBF6WDsk=",
+        "lastModified": 1793386136,
+        "narHash": "sha256-mi/Ry2y40rFefVPPbiTQ6zq36VV6aITYO9bwZRHq5Fg=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "c26cee26959ac1937cd92907fe3886191dfd2efc",
+        "rev": "5696ff9cf75b0dc5267e62d56a099e6e3e37ebf8",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/cozy-video",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -457,16 +459,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793323629,
-        "narHash": "sha256-oj+lCx2PnOcY91TnjN2BbWFMXYVftjrL/ze5emMMxF4=",
+        "lastModified": 1793427927,
+        "narHash": "sha256-SbXZx2da0ndf8MqMC9qoviY3tZdOJiBo7OdYKC0Xbr4=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "e2f40c1be39de55b98c89a518018a787b8bee923",
+        "rev": "2bfbf9d5a898c8ee21b26a82add5a209afbc1439",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/cozy-video",
         "repo": "flasks",
         "type": "github"
       }
