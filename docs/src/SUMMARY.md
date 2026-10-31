@@ -54,6 +54,7 @@
   - [nexus_ui](./python/nexus_ui.md)
   - [agent_ui](./python/agent_ui.md)
   - [tasks_ui](./python/tasks_ui.md)
+  - [chat_ui](./python/chat_ui.md)
   - [assistant_ui](./python/assistant_ui.md)
   - [sunset](./python/sunset.md)
   - [rcrsync_ui](./python/rcrsync_ui.md)

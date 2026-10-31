@@ -32,6 +32,7 @@ Packages written (or bound) in Python.
 - [nexus_ui](./nexus_ui.md)
 - [agent_ui](./agent_ui.md)
 - [tasks_ui](./tasks_ui.md)
+- [chat_ui](./chat_ui.md)
 - [assistant_ui](./assistant_ui.md)
 - [sunset](./sunset.md)
 - [rcrsync_ui](./rcrsync_ui.md)

@@ -12,7 +12,8 @@ usage: cozy [-h] [--port PORT] [--subdomain SUBDOMAIN]
             [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
             [--prompt-db-dir PROMPT_DB_DIR] --secrets-file SECRETS_FILE
             [--comfyui-restart-cmd COMFYUI_RESTART_CMD] [--rest-gap REST_GAP]
-            [--max-input-bytes MAX_INPUT_BYTES]
+            [--max-input-bytes MAX_INPUT_BYTES] [--ollama-url OLLAMA_URL]
+            [--video-model VIDEO_MODEL] [--max-video-bytes MAX_VIDEO_BYTES]
 
 options:
   -h, --help            show this help message and exit
@@ -48,6 +49,13 @@ options:
                         Byte ceiling on the image an edit workflow hands to
                         ComfyUI; larger inputs are resized down. 0 disables
                         the ceiling
+  --ollama-url OLLAMA_URL
+                        Ollama base URL for the Video tab's frame judge; empty
+                        hides the Video tab
+  --video-model VIDEO_MODEL
+                        Ollama vision model that judges video frames
+  --max-video-bytes MAX_VIDEO_BYTES
+                        Largest video accepted by upload or remote staging
 ``````bash
 usage: cozyctl [-h] [--url URL] [--token TOKEN] [--token-file TOKEN_FILE]
                {queue,status,start,stop} ...
