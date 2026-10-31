@@ -103,8 +103,6 @@ in
       };
     };
 
-    # A logged-in web chat over the same models (the only way in from off
-    # the host, since Ollama stays on loopback).
     services.chat_ui = {
       enable = lib.mkDefault true;
       ollamaUrl = lib.mkDefault baseUrl;

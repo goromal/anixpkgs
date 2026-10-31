@@ -18,8 +18,6 @@ let
     "comfyui.service"
   ];
   json = pkgs.formats.json { };
-  # Where cozy's Video tab exports (the cozy_video check writes and deletes
-  # there). bitd can run on hosts without the comfyui module.
   cozyVideoOutput = "${
     config.services.comfyui.cozy.outputDir or "/data/andrew/comfyui/output"
   }/video";
@@ -213,20 +211,16 @@ in
         kind = "regression";
         exclusive = lib.mkDefault true;
         command = lib.mkDefault "${cfg.package.cozy_video}/bin/bit-check-cozy-video";
-        # ~10 vision-model calls on a 14 s clip (~1 min on atorgesen-dell),
-        # plus staging, export and HTTP deadlines.
         timeoutMs = lib.mkDefault 420000;
         settings = {
           url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
           token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
-          # Clip and expectations come from anixdata as a pair.
           video = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins.data}";
           expect_file = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins-expect.data}";
           ffprobe_command = lib.mkDefault "${pkgs.ffmpeg}/bin/ffprobe";
           output_dir = lib.mkDefault (builtins.dirOf cozyVideoOutput);
           max_seconds = lib.mkDefault 390;
         };
-        # The check deletes the export it makes there.
         writablePaths = lib.mkDefault [ cozyVideoOutput ];
       };
       ardupilot = {

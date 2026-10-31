@@ -45,8 +45,6 @@ buildPythonPackage rec {
     pillow-heif
     wormhole
   ];
-  # ffmpeg lets the Video tab's end-to-end tests build and cut real clips;
-  # without it they skip.
   nativeCheckInputs = [
     pytestCheckHook
     ffmpeg

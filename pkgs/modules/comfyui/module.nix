@@ -41,11 +41,8 @@ let
   reserveVramFlag = lib.optionalString (
     cfg.reserveVram != null
   ) "--reserve-vram ${builtins.toString cfg.reserveVram}";
-  # cozy's Video tab judges frames with the host's local Ollama vision model.
   localLlm = config.machines.localLlm or { enable = false; };
   videoFlags = lib.optionalString cfg.cozy.video.enable "--ollama-url http://${localLlm.host}:${builtins.toString localLlm.port} --video-model ${cfg.cozy.video.model} --max-video-bytes ${builtins.toString cfg.cozy.video.maxBytes}";
-  # nginx must admit a video upload as large as cozy will accept, plus
-  # multipart framing. Hosts without the Video tab keep nginx's default.
   cozyBodyLimit = lib.optionalString cfg.cozy.video.enable ''
     client_max_body_size ${builtins.toString (cfg.cozy.video.maxBytes / 1048576 + 16)}m;
   '';
@@ -279,8 +276,6 @@ in
           "d ${cfg.cozy.stateDir} 0755 andrew dev -"
           "d ${cfg.cozy.promptDbDir} 0755 andrew dev -"
         ]
-        # Where the Video tab exports; created up front so a bitd unit that
-        # opens it for writing (the cozy_video check) finds it at start.
         ++ lib.optional cfg.cozy.video.enable "d ${cfg.cozy.outputDir}/video 0755 andrew dev -";
         assertions = [
           {
@@ -288,8 +283,6 @@ in
             message = "services.comfyui.cozy.video needs machines.localLlm (Ollama) enabled.";
           }
         ];
-        # localLlm already pulls its own model; only a different video model
-        # needs adding.
         services.ollama.loadModels = lib.mkIf (
           cfg.cozy.video.enable && cfg.cozy.video.model != (localLlm.model or "")
         ) [ cfg.cozy.video.model ];
@@ -325,7 +318,6 @@ in
             pkgs.gawk
             extendedPkgs.wormhole
           ]
-          # The Video tab probes, samples and cuts with ffmpeg/ffprobe.
           ++ lib.optional cfg.cozy.video.enable pkgs.ffmpeg;
           serviceConfig = {
             Type = "simple";

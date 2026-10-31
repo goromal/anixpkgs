@@ -66,7 +66,6 @@ in
         RestartSec = 5;
         User = "andrew";
         Group = "dev";
-        # Stateless: it reads its secrets file and writes nothing.
         ProtectSystem = "strict";
         ProtectHome = "read-only";
         PrivateTmp = true;
@@ -84,11 +83,8 @@ in
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Forwarded-Proto $scheme;
-          # Replies stream token by token, and a large model offloaded to
-          # CPU can take minutes to finish one.
           proxy_buffering off;
           proxy_read_timeout 900;
-          # A long conversation is resent whole with each message.
           client_max_body_size 4m;
         '';
       };
