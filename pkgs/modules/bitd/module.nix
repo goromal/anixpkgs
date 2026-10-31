@@ -169,13 +169,16 @@ in
         kind = "regression";
         exclusive = lib.mkDefault true;
         command = lib.mkDefault "${cfg.package.cozy_imgedit2}/bin/bit-check-cozy-imgedit2";
-        timeoutMs = lib.mkDefault 900000;
+        # Flux.2 dev streams ~66 GB through a 4 GB laptop GPU: 28 steps take
+        # ~12.5 min cool but >15 min once the GPU is warm and throttling
+        # (27 -> 32.5 s/step across back-to-back runs), so 15 min was too tight.
+        timeoutMs = lib.mkDefault 1200000;
         settings = {
           url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
           token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
           png_command = lib.mkDefault "${anixPkgs.png}/bin/png";
           # Reserve time for upload, HTTP deadlines, and cancelling the job.
-          max_seconds = lib.mkDefault 870;
+          max_seconds = lib.mkDefault 1170;
           restart_command = lib.mkDefault comfyuiRestart;
         };
       };
