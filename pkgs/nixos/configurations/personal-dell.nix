@@ -19,9 +19,13 @@
   machines.features.localLlm.enable = lib.mkForce true;
   machines.localLlm = {
     acceleration = "cuda";
+    extraModels = [ "huihui_ai/qwen3-vl-abliterated:8b-instruct" ];
   };
   services.comfyui.lowMem = true;
-  services.bitd.checks = [ "cozy_imgedit2" ];
+  services.bitd.checks = [
+    "cozy_imgedit2"
+    "cozy_video"
+  ];
   # 4 GB RTX 500: leave room for Qwen-Image 2.1's sampling scratch buffers.
   services.comfyui.reserveVram = 1.0;
   services.comfyui.cozy.workflows = [

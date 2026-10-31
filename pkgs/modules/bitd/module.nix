@@ -18,6 +18,9 @@ let
     "comfyui.service"
   ];
   json = pkgs.formats.json { };
+  cozyVideoOutput = "${
+    config.services.comfyui.cozy.outputDir or "/data/andrew/comfyui/output"
+  }/video";
   known = builtins.attrNames cfg.plugins;
   selected = lib.unique cfg.checks;
   valid = builtins.filter (name: builtins.hasAttr name cfg.plugins) selected;
@@ -97,6 +100,16 @@ in
             settings = lib.mkOption {
               type = lib.types.attrsOf json.type;
               default = { };
+            };
+            writablePaths = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              default = [ ];
+              description = ''
+                Paths this plugin must write despite the unit's
+                ProtectSystem=strict / ProtectHome=read-only. Added to bitd's
+                ReadWritePaths only while the plugin is selected; a missing
+                path is skipped rather than failing the unit.
+              '';
             };
           };
         }
@@ -197,6 +210,22 @@ in
           restart_command = lib.mkDefault comfyuiRestart;
         };
       };
+      cozy_video = {
+        kind = "regression";
+        exclusive = lib.mkDefault true;
+        command = lib.mkDefault "${cfg.package.cozy_video}/bin/bit-check-cozy-video";
+        timeoutMs = lib.mkDefault 420000;
+        settings = {
+          url = lib.mkDefault "http://127.0.0.1:${toString ports.cozy}/cozy";
+          token_file = lib.mkDefault "${config.machines.base.homeDir}/secrets/flask/cozy-api-token";
+          video = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins.data}";
+          expect_file = lib.mkDefault "${anixPkgs.pkgData.media.bitd.cozy-video-dolphins-expect.data}";
+          ffprobe_command = lib.mkDefault "${pkgs.ffmpeg}/bin/ffprobe";
+          output_dir = lib.mkDefault (builtins.dirOf cozyVideoOutput);
+          max_seconds = lib.mkDefault 390;
+        };
+        writablePaths = lib.mkDefault [ cozyVideoOutput ];
+      };
       ardupilot = {
         kind = "health";
         command = lib.mkDefault "${cfg.package.ardupilot}/bin/bit-check-ardupilot";
@@ -272,6 +301,9 @@ in
         NoNewPrivileges = true;
         ProtectSystem = "strict";
         ProtectHome = "read-only";
+        ReadWritePaths = map (path: "-${path}") (
+          lib.concatMap (name: cfg.plugins.${name}.writablePaths) valid
+        );
         PrivateTmp = true;
         StandardOutput = "journal";
         StandardError = "journal";
