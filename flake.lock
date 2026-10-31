@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793484040,
+        "lastModified": 1793481444,
         "narHash": "sha256-N0EkbK6ScnhMq2ZO3pFBuHZLFDEdRCkg515tm5515x4=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "f78b9566b09da277824a17a013cffb140572940a",
+        "rev": "7a428ce0b89700986e5a68e7da290ef2e972759c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/open-url",
         "repo": "flasks",
         "type": "github"
       }
@@ -474,15 +474,16 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1793484043,
+        "lastModified": 1793481444,
         "narHash": "sha256-g2hX+sCdjZ0dBHy145VH2gfNK3VesS3YI9kKOBZBTUM=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "d129c1b4bf8b6c9c361955a85af8d1d1f1354577",
+        "rev": "e38f12b00a699b3ae77b1ac15cc78346ed2d8bfc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/open-url",
         "repo": "folio",
         "type": "github"
       }
