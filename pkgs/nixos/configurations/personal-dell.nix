@@ -34,8 +34,10 @@
     "imggen21"
     "imgedit2"
     "imgedit3"
+    "imgedit4"
+    "imgedit5"
   ];
   systemd.services.comfyui.serviceConfig.ExecStartPre =
-    "${pkgs.coreutils}/bin/install -m 0644 ${./workflows/imggen21.api.json} /data/andrew/comfyui/imggen21.api.json";
+    "${pkgs.coreutils}/bin/install -D -m 0644 ${./comfyui-nodes/flux_token_chunking/__init__.py} /data/andrew/comfyui/custom_nodes/flux_token_chunking/__init__.py";
   networking.hostName = "atorgesen-dell";
 }
