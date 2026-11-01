@@ -37,13 +37,6 @@
     "imgedit4"
     "imgedit5"
   ];
-  # Workflow <name>.api.json files live only on disk in services.comfyui.dataDir;
-  # anixpkgs names them above but never defines or installs them.
-  # imgedit4/imgedit5 need flux2_dev_turbo_fp8mixed.safetensors: the Flux.2 Turbo
-  # LoRA baked offline into flux2_dev_fp8mixed by dataDir/tools/merge_flux2_lora.py
-  # (also on disk only), since applying it at runtime OOMs the 4 GB card. imgedit5
-  # runs at 2 MP through the FluxTokenChunking custom node, which chunks each Flux
-  # block over tokens so its activations fit.
   systemd.services.comfyui.serviceConfig.ExecStartPre =
     "${pkgs.coreutils}/bin/install -D -m 0644 ${./comfyui-nodes/flux_token_chunking/__init__.py} /data/andrew/comfyui/custom_nodes/flux_token_chunking/__init__.py";
   networking.hostName = "atorgesen-dell";
