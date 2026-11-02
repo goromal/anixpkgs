@@ -283,11 +283,11 @@
     "easy-google-auth": {
       "flake": false,
       "locked": {
-        "lastModified": 1788764390,
-        "narHash": "sha256-HydaaM146lEXS2SwidzXk0TZxhd9emcG4kbGY3gleUQ=",
+        "lastModified": 1793583116,
+        "narHash": "sha256-N4b6wqiXO4is1SLGzCz6HOSrZsLxmO8nJl8Q3bDUM+o=",
         "owner": "goromal",
         "repo": "easy-google-auth",
-        "rev": "20339d592be5cd9e251630074249117936bdd2fd",
+        "rev": "51c535795d9a027a48000ec2ae9f54541815f369",
         "type": "github"
       },
       "original": {
@@ -457,11 +457,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793576298,
-        "narHash": "sha256-ZkR0aUsJYFKryq4zZi7RsT/oiiBQsNPjUxEBqMgaMj4=",
+        "lastModified": 1793583124,
+        "narHash": "sha256-MMsH2qcW0/Bloa+xbzcB+mjqfx+aMdBeJedaSah2f/w=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "501cbf37e94a6e1727831655fb08d8a038c2df8d",
+        "rev": "b8fad271f3b77448eeb9851e0af88f62da7ac000",
         "type": "github"
       },
       "original": {
@@ -1596,11 +1596,11 @@
     "task-tools": {
       "flake": false,
       "locked": {
-        "lastModified": 1781406286,
-        "narHash": "sha256-Hshdgk7lR6X4FfNAeUJstdYStVQuxJfF9De8j0cz7cs=",
+        "lastModified": 1793583120,
+        "narHash": "sha256-20scdMu56M76A0puTvrW+amdKzNvNIzg2xPPuMGFOes=",
         "owner": "goromal",
         "repo": "task-tools",
-        "rev": "0c7b7a9b632bd8f25b6a522022e7f1167f60aa73",
+        "rev": "9ed1ce840908a3262359ee6238775ebf183b67b6",
         "type": "github"
       },
       "original": {
