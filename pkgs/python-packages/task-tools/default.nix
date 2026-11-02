@@ -28,7 +28,11 @@ buildPythonPackage rec {
       "list"
       "delete"
       "put"
+      "put-spec"
+      "complete"
+      "move"
       "grader"
+      "event"
     ];
   };
 }

@@ -69,7 +69,7 @@
     daily_tactical_server.url = "github:goromal/daily_tactical_server";
     daily_tactical_server.flake = false;
 
-    easy-google-auth.url = "github:goromal/easy-google-auth";
+    easy-google-auth.url = "github:goromal/easy-google-auth?ref=refs/heads/dev/task-tools-issues";
     easy-google-auth.flake = false;
 
     evil-hangman.url = "github:goromal/evil-hangman";
@@ -202,7 +202,7 @@
     symforce.url = "github:symforce-org/symforce?ref=refs/tags/v0.9.0";
     symforce.flake = false;
 
-    task-tools.url = "github:goromal/task-tools";
+    task-tools.url = "github:goromal/task-tools?ref=refs/heads/dev/task-tools-issues";
     task-tools.flake = false;
 
     trafficsim.url = "git+https://gist.github.com/c37629235750b65b9d0ec0e17456ee96";
