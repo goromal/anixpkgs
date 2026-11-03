@@ -78,7 +78,7 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks?ref=refs/heads/dev/archive-attachments";
+    flasks.url = "github:goromal/flasks?ref=refs/heads/master";
     flasks.flake = false;
 
     folio.url = "github:goromal/folio";
@@ -87,7 +87,7 @@
     geometry.url = "github:goromal/geometry";
     geometry.flake = false;
 
-    gmail-parser.url = "github:goromal/gmail_parser?ref=refs/heads/dev/archive-attachments";
+    gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
     indi-harness.url = "github:goromal/indi-harness";
