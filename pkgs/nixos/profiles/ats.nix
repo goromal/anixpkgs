@@ -320,11 +320,25 @@ with import ../dependencies.nix;
             sleep 5
             authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
             sleep 5
-            gmail-manager clean --num-messages 4000
+            gmail-manager clean --num-messages 2000
             logger -t ats-gmail-clean "GMail cleaning complete"
           '';
           timerCfg = {
             OnCalendar = [ "Sat 23:00" ];
+            Persistent = false;
+          };
+        }
+        {
+          name = "ats-gmail-rules";
+          jobShellScript = pkgs.writeShellScript "ats-gmail-rules" ''
+            sleep 5
+            authm refresh --headless || { >&2 logger -t authm "authm refresh error!"; exit 1; }
+            sleep 5
+            gmail-manager process --config $HOME/configs/mail-clean.csv --archive-root $HOME/data/gmail --num-messages 1000 > /dev/null || { logger -t ats-gmail-rules "GMail rules processing UNSUCCESSFUL"; >&2 echo "process error!"; exit 1; }
+            logger -t ats-gmail-rules "GMail rules processing complete"
+          '';
+          timerCfg = {
+            OnCalendar = [ "Sun 18:00" ];
             Persistent = false;
           };
         }
