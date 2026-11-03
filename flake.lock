@@ -457,11 +457,11 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1793583124,
-        "narHash": "sha256-MMsH2qcW0/Bloa+xbzcB+mjqfx+aMdBeJedaSah2f/w=",
+        "lastModified": 1793680384,
+        "narHash": "sha256-jAicWwKL5y6prLLzdXUA2UcWCSuuC/aOwxLYgLAgNug=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "b8fad271f3b77448eeb9851e0af88f62da7ac000",
+        "rev": "9463939b15abb1e6864038dac0ec9914e2e6a007",
         "type": "github"
       },
       "original": {
@@ -528,11 +528,11 @@
     "gmail-parser": {
       "flake": false,
       "locked": {
-        "lastModified": 1788764413,
-        "narHash": "sha256-wSk7P0xMQXFJNi2OamVaNmdz9Z8pfxXlkg84i1T6K4M=",
+        "lastModified": 1793680378,
+        "narHash": "sha256-/HS52Ldm7/qPi6EIT4dkkHf3/asnHhJCgaQ99H503Ds=",
         "owner": "goromal",
         "repo": "gmail_parser",
-        "rev": "d467b941350833bcc1de462b23375c50b6e68f64",
+        "rev": "e278a138b7c4b30cadb0c20c4e8694a0aa96f224",
         "type": "github"
       },
       "original": {
