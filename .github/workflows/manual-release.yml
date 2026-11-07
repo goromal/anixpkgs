@@ -1,0 +1,33 @@
+name: Manual Release Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  bump-and-tag:
+    name: Bump Version and Tag Release
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ssh-key: ${{ secrets.ANIXBOT_DEPLOY_KEY }}
+    - run: |
+        git config user.name "goromal (bot)"
+        git config user.email "goromal.bot@gmail.com"
+        git checkout master
+        git pull origin master
+        python scripts/increment_anix.py ${{ inputs.release_type }}
+        git add .
+        git commit -m "Bump ${{ inputs.release_type }} ANIX_VERSION -> $(cat ANIX_VERSION)"
+        git push origin master
+        git tag v$(cat ANIX_VERSION) HEAD
+        git push --tags
