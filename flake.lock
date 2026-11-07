@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1794028537,
+        "lastModified": 1794029990,
         "narHash": "sha256-V9OADsCzOwQGZl2W4xTbLOY+b0JDZVysxyjxlb0JTBc=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "fbc88d954e9342919c1f5e9ea94d67e1805ed1ad",
+        "rev": "dc777cf6523931afabdff71312e64d9174d4a990",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/stampserver-fast-trim",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
