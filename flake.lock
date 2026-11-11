@@ -565,11 +565,11 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1794429343,
-        "narHash": "sha256-1bVALfbEpp9/EXcySTzwEunlPnfbOvZ+iAtghMXVEOM=",
+        "lastModified": 1794430238,
+        "narHash": "sha256-wY65jQrbNbQPbZ+McpNcVkddk5zTXU4JZAr2KoI8YAY=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "a61f8e2b7543fb1b79fca17aa52d2ef28caa9074",
+        "rev": "1816f19b1e1ff62a0066d253a5498549be1db14e",
         "type": "github"
       },
       "original": {
