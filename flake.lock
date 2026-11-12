@@ -19,16 +19,15 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1794452684,
+        "lastModified": 1794455188,
         "narHash": "sha256-QAE1CkIVXhxq/JHVOCDyRmvp5q275MLfHFNekTqem9A=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "b6dc11a5d8676f0791b4cb39978e632bfe47df30",
+        "rev": "7a7397f32afc9c8d0e81afa2132201dd03048f3b",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/health-indicator",
         "repo": "agent-skills",
         "type": "github"
       }
@@ -71,16 +70,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1794452641,
+        "lastModified": 1794455184,
         "narHash": "sha256-h/LMeABTuLqyYdUEYeee27OQk/wWHIk8Mfet0qWD8VQ=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "13afcfb001cab5aa86ba8947f89289f963fd4528",
+        "rev": "f8d998cc941c8aefad9893cd466b1abd3ab1dfb9",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/health-indicator",
         "repo": "bit-rs",
         "type": "github"
       }
@@ -459,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1794452250,
+        "lastModified": 1794455176,
         "narHash": "sha256-mG5Fv+SptwyA3Vssuq5lTZmCeWuxUPh65Spa08xXka8=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "37d63a32cc9fbb47407438477504745dadf83936",
+        "rev": "d70de5f020b3ab2fe5f64baedbbc0baa58910f82",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/health-indicator",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
@@ -476,16 +474,15 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1794452250,
+        "lastModified": 1794455180,
         "narHash": "sha256-VHBRVWzEW4iaE1a+++qPtkvglcvRq55thN9B6IpS22E=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "06839d25b7da5f1abd21c6e3ba359de1867f065e",
+        "rev": "caa3b685408a3abdabc7c91d10ea7801a6bae6ee",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/health-indicator",
         "repo": "folio",
         "type": "github"
       }
