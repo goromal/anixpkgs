@@ -270,7 +270,7 @@ in
     #   - `orchestrator`: systemd derives SYSLOG_IDENTIFIER from the ExecStart
     #     basename, which is `orchestrator` for every job unit, so all job
     #     output not routed through an explicit `logger -t` lands here — as do
-    #     the blacklist refusals from the orchJobGuard in pc-base.nix. It is the
+    #     the blacklist refusals from the orchJobGuard in features/orchestrator.nix. It is the
     #     busiest log stream on an orchestrator host.
     services.metricsNode.panels = [
       {
