@@ -565,16 +565,15 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1794430238,
+        "lastModified": 1794453965,
         "narHash": "sha256-wY65jQrbNbQPbZ+McpNcVkddk5zTXU4JZAr2KoI8YAY=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "1816f19b1e1ff62a0066d253a5498549be1db14e",
+        "rev": "594df9ba640d7aa5be72ebb1609449b3dde68f07",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/trajectory-origin-latch",
         "repo": "indi-harness",
         "type": "github"
       }
