@@ -259,7 +259,24 @@ in
   config = lib.mkMerge [
     {
       services.bitd.enable = lib.mkDefault true;
-      services.bitd.checks = [ "internet" ];
+      services.bitd.checks = [
+        "internet"
+        "memory"
+      ];
+      # Act on memory exhaustion in seconds rather than letting the kernel
+      # thrash for hours before its own OOM killer fires (ats, 2026-11-11: a
+      # deploy's nix evaluation on top of ~14 idle agent sessions froze the box
+      # for 5 h). Prefer victims that are safe to lose: a nix evaluation (the
+      # deploy fails and can be rerun) or an agent CLI (its session resumes).
+      services.earlyoom = {
+        enable = lib.mkDefault true;
+        extraArgs = [
+          "--prefer"
+          "^(nix|codex|claude|\\.claude-wrapped)$"
+          "--avoid"
+          "^(sshd|systemd|systemd-.*|nginx|tmux: server|bitd|earlyoom)$"
+        ];
+      };
       # Fail evaluation if two services claim the same port.
       #
       # This is specifically a merge hazard: two branches can each add a

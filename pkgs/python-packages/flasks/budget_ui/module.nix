@@ -103,6 +103,7 @@ in
           "+${pkgs.coreutils}/bin/install -o andrew -g dev -m0600 "
           + "${config.services.agent_ui.secretsFile} ${cfg.agentSecretsFile}"
         );
+        ExecStartPost = lib.optional companion budgetCompanion.restoreSessions;
         # Companion tmux sessions run on a `-L budget-agent` server spawned by this
         # unit; kill only the main process so a redeploy leaves them alive.
         KillMode = "process";
