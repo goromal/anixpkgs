@@ -42,13 +42,13 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    agent-skills.url = "github:goromal/agent-skills";
+    agent-skills.url = "github:goromal/agent-skills?ref=refs/heads/dev/health-indicator";
     agent-skills.flake = false;
 
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs";
+    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/dev/health-indicator";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";
@@ -81,7 +81,7 @@
     flasks.url = "github:goromal/flasks?ref=refs/heads/dev/health-indicator";
     flasks.flake = false;
 
-    folio.url = "github:goromal/folio";
+    folio.url = "github:goromal/folio?ref=refs/heads/dev/health-indicator";
     folio.flake = false;
 
     geometry.url = "github:goromal/geometry";

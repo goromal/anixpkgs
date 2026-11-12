@@ -8,6 +8,7 @@ with import ../../../nixos/dependencies.nix;
 let
   cfg = config.services.agent_ui;
   inherit (import ../../../nixos/runtime.nix { inherit config pkgs lib; }) atsudo;
+  keeper = import ../../../nixos/agent-session-keeper.nix { inherit pkgs lib; };
   globalCfg = config.machines.base;
   agents = config.machines.features.agents.frameworks;
   agentAlternation = lib.concatStringsSep "|" (agents ++ [ "shell" ]);
@@ -63,8 +64,10 @@ let
       esac
 
       cd "$DEVSHELL_ROOT/sources"
+      # Every launch goes through agent-session-run so the session survives a
+      # reboot (a shell comes back as a fresh shell in the same workspace).
       if [ "$AGENT_UI_AGENT" = shell ]; then
-        exec ${pkgs.bashInteractive}/bin/bash -i
+        exec ${keeper.runCommand} ${pkgs.bashInteractive}/bin/bash -i
       fi
       # Pre-accept Claude Code's workspace-trust dialog for this workspace so a
       # headless agent-ui launch does not stall on it -- its default "No, exit"
@@ -82,7 +85,7 @@ let
           rm -f "$tmp" "$tmp.out"
         ) 9>"$HOME/.claude.json.agentui.lock" || true
       fi
-      exec "$AGENT_UI_AGENT"
+      exec ${keeper.runCommand} "$AGENT_UI_AGENT"
     '';
   };
 
@@ -107,6 +110,10 @@ let
       esac
 
       export AGENT_UI_AGENT="$2"
+      # Recorded by agent-session-run so agent-session-restore can replay it.
+      # shellcheck disable=SC2016 # jq's $ARGS, not a shell variable.
+      AGENT_SESSION_ARGS="$(${keeper.exportArgs} "$@")"
+      export AGENT_SESSION_ARGS
       # Append the login-shell profile dirs so agents see the same commands a
       # terminal does (bitctl, rcrsync, ip, ...), not just the service PATH.
       export PATH="$PATH:/run/wrappers/bin:$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"
@@ -186,6 +193,10 @@ in
         message = "Agent UI requires at least one machines.features.agents.frameworks entry.";
       }
     ];
+    # Idle agent sessions (here and in the app companions) quietly add up to
+    # most of RAM; flag it in bitd/Nexus before it starves the machine.
+    services.bitd.checks = [ "agent_sessions" ];
+
     machines.base.webServices = [
       {
         name = "Agent Terminal";
@@ -215,6 +226,8 @@ in
         # and lives in this unit's cgroup. Kill only the main process on stop so a
         # restart/redeploy leaves the tmux server (and its sessions) running.
         KillMode = "process";
+        # Bring back the sessions that were running when the machine went down.
+        ExecStartPost = "-${keeper.restoreCommand} agent-ui ${agentTmuxConf} ${agentSession}/bin/agent-ui-session";
       };
     };
 

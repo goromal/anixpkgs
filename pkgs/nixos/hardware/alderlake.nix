@@ -38,6 +38,9 @@
   };
 
   swapDevices = [ ];
+  # No disk swap, so give memory spikes (a deploy's nix evaluation on top of
+  # running agent sessions) compressed-RAM headroom before earlyoom must act.
+  zramSwap.enable = true;
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
