@@ -5,9 +5,10 @@
 #   - args:     the UI session command's arguments (exported by that command as
 #               AGENT_SESSION_ARGS), replayed against the *current* session
 #               command so a restore never depends on a GC-able store path;
-#   - agent_id: the agent's resumable conversation id. Claude gets one up front
-#               (--session-id); Codex can't be told one, so the watcher reads it
-#               off the thread-writer lock the running codex holds open;
+#   - agent_id: the agent's resumable conversation id. Claude starts with one
+#               (--session-id) and reports each new one (/clear, compaction)
+#               through a SessionStart hook; Codex can't be told one, so the
+#               watcher reads it off the thread-writer lock codex holds open;
 #   - options:  the session's tmux user options (@label, @title, ...).
 # `run` wraps the agent launch, keeps that record current, and deletes it when
 # the agent exits cleanly (the user ended it). The UIs delete it on Kill. A record
@@ -25,6 +26,38 @@ let
     pkgs.procps
     pkgs.util-linux
   ];
+
+  # Claude SessionStart hook (startup, resume, /clear, compact): note the
+  # current conversation id for the watcher. Prints nothing -- SessionStart
+  # stdout would be injected into the conversation.
+  claudeHook = pkgs.writeShellApplication {
+    name = "agent-session-claude-hook";
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.coreutils
+    ];
+    text = ''
+      f="''${AGENT_SESSION_ID_FILE:-}"
+      [ -n "$f" ] || exit 0
+      id="$(jq -r '.session_id // empty' 2>/dev/null || true)"
+      if [ -n "$id" ]; then
+        printf '%s\n' "$id" >"$f.tmp" && mv "$f.tmp" "$f"
+      fi
+      exit 0
+    '';
+  };
+  claudeSettings = builtins.toJSON {
+    hooks.SessionStart = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = "${claudeHook}/bin/agent-session-claude-hook";
+          }
+        ];
+      }
+    ];
+  };
 
   run = pkgs.writeShellApplication {
     name = "agent-session-run";
@@ -57,6 +90,10 @@ let
       state="$state_dir/$name.json"
       mkdir -p "$state_dir"
       chmod 700 "${stateRoot}" "$state_dir"
+      # Where the claude hook reports the live conversation id. Only needed
+      # until the watcher copies it into the record, so /tmp is fine.
+      id_file="''${TMPDIR:-/tmp}/agent-session-$socket-$name.claude-id"
+      export AGENT_SESSION_ID_FILE="$id_file"
 
       agent_id=""
       cmd=()
@@ -65,11 +102,12 @@ let
           claude)
             if [ -n "$1" ]; then
               agent_id="$1"
-              cmd=(claude --resume "$1" "''${args[@]}")
+              cmd=(claude --resume "$1")
             else
               agent_id="$(uuidgen)"
-              cmd=(claude --session-id "$agent_id" "''${args[@]}")
+              cmd=(claude --session-id "$agent_id")
             fi
+            cmd+=(--settings ${lib.escapeShellArg claudeSettings} "''${args[@]}")
             ;;
           codex)
             agent_id="$1"
@@ -127,10 +165,17 @@ let
           if [ "$tick" -gt 0 ] && [ ! -e "$state" ]; then
             return 0
           fi
-          if [ "$agent" = codex ]; then
-            id="$(codex_id)" || true
-            [ -n "$id" ] || id="$1"
-          fi
+          case "$agent" in
+            codex)
+              id="$(codex_id)" || true
+              [ -n "$id" ] || id="$1"
+              ;;
+            claude)
+              if [ -s "$id_file" ]; then
+                id="$(cat "$id_file")"
+              fi
+              ;;
+          esac
           opts="$(options)" || opts='{}'
           jq -n --arg name "$name" --arg socket "$socket" --arg agent "$agent" \
             --arg id "$id" --argjson args "$session_args" --argjson options "$opts" \
@@ -142,6 +187,7 @@ let
         done
       }
 
+      rm -f "$id_file"
       build "$resume"
       watch "$agent_id" &
       watcher=$!
@@ -154,6 +200,7 @@ let
       if [ -n "$resume" ] && [ "$rc" -ne 0 ] && [ $(($(date +%s) - started)) -lt 15 ]; then
         echo "agent-session-run: could not resume $agent session $resume; starting a new one" >&2
         kill "$watcher" 2>/dev/null
+        rm -f "$id_file"
         build ""
         watch "$agent_id" &
         watcher=$!
@@ -162,6 +209,7 @@ let
       fi
       kill "$watcher" 2>/dev/null
       wait "$watcher" 2>/dev/null
+      rm -f "$id_file" "$id_file.tmp"
       # Clean exit = the user ended it: forget the session. A kill (tmux
       # kill-session, shutdown) never gets here, so its record survives.
       if [ "$rc" -eq 0 ]; then
