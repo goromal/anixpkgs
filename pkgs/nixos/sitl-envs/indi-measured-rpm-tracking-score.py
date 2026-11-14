@@ -6,6 +6,10 @@ DIAGNOSTIC (shipped tune, buzzes-by-design) but scores the measured-RPM feedback
 tolerance band: per case, indi_harness.buzz_score.score() must report
 closed=True (tracking RMS within tol of the benign-SITL baseline, actuator
 saturation fraction under sat_tol, omega_dot inversion NRMSE under nrmse_tol).
+The omega_dot NRMSE compares the measured angular accel with the commanded
+accel passed through the known motor-lag and gyro/estimator filter chain
+(indi_harness.sitl.response_model; nothing is fitted). Only excited roll/pitch
+axes count, and the raw command-vs-response NRMSE is reported beside it.
 All diagnostics -- tracking, omega inversion, IMU-gyro buzz, and the INDC
 measured-RPM channel health -- are PRINTED before any assertion, so a
 buzz-still-open finding survives a failed gate with full evidence.
@@ -26,7 +30,7 @@ from indi_harness.sitl.binlog import (
     read_imu_gyro,
     read_indc_health,
 )
-from indi_harness.sitl.align import flat_tracking_score
+from indi_harness.sitl.align import flat_tracking_score, excited_axis_nrmse
 from indi_harness.sitl.binscore import (
     rms,
     active_runs,
@@ -34,7 +38,12 @@ from indi_harness.sitl.binscore import (
     read_engage_msgs,
     gyro_window,
     omega_window,
+    compensated_omega_window,
     rate_window,
+)
+from indi_harness.sitl.response_model import (
+    expected_measured_accel,
+    response_chain_from_parameters,
 )
 from indi_harness.buzz_score import score as buzz_score
 from indi_harness.sysid import normalized_effectiveness
@@ -92,6 +101,13 @@ except Exception as e:
     print(f"  RECON DIAGNOSTIC failed: {e}", flush=True)
 
 
+from pymavlink import DFReader
+parameter_log = DFReader.DFReader_binary(str(BIN))
+parameters = {}
+while (message := parameter_log.recv_match(type="PARM")) is not None:
+    parameters[message.Name] = message.Value
+
+
 # --- outer-loop tracking (INDB) ---------------------------------------------
 h = read_outer_health(BIN)
 tus = h["time_us"]
@@ -115,6 +131,12 @@ engage_msgs = read_engage_msgs(BIN)
 # measured-RPM feedback measured-actuator-state channel (INDC): per-motor measured omega/omega_dot
 # and the reconstructed actuator torque -- proof the RPM path actually ran.
 ic = read_indc_health(BIN)
+# Expected logged measured accel for the commanded accel, through the plant
+# motor lag and the logged gyro/estimator filters, over the whole flight so
+# filter state is continuous into each case window.
+response_chain = response_chain_from_parameters(parameters, QuadParams().tau_m)
+expected_accel = expected_measured_accel(ih["domega_pred"], response_chain,
+                                         time_us=ih["time_us"])
 
 # A controller comparison requires a settled stock handover. Otherwise later
 # runaway is not evidence that measured-RPM feedback (or the DDS outer loop) caused the onset.
@@ -142,6 +164,8 @@ for idx, (i, j) in enumerate(runs):
         "n": int(j - i),
         "t0_us": t0, "t1_us": t1,
         "omega": omega_window(ih, t0, t1),
+        "omega_compensated": compensated_omega_window(
+            ih, expected_accel, response_chain, t0, t1),
         "rate": rate_window(rt, rdes_all, ract_all, pdes_all, pact_all, t0, t1),
         "gyro": gyro_window(gt, gyro_all, t0, t1),
     })
@@ -199,6 +223,7 @@ report = {
         "fallback_frac": indc_fallback_frac,
         "mean_abs_omega": indc_mean_abs_omega,
     },
+    "response_chain": vars(response_chain),
     "n_runs": len(runs),
     "stock_handover": {"first_indi_us": engage_us,
                        "peak_roll_pitch_rate_rad_s": stock_peak_rate,
@@ -252,39 +277,53 @@ def _print_inner(label, om, rate):
               f"buzz_ddt_rms={r['buzz_ddt_rms']:.2f}", flush=True)
 
 
+def _print_compensated(label, om):
+    print(f"--- inner-loop [{label}] delay-compensated omega_dot inversion ---",
+          flush=True)
+    for nm in ("roll", "pitch", "yaw"):
+        o = om[nm]
+        print(f"  {nm:<5} nrmse={o['nrmse']:.3f} (raw {o['nrmse_raw']:.3f})  "
+              f"r2={o['r2']:.3f}  exc_rms={o['exc_rms']:.3f} rad/s^2", flush=True)
+
+
+print(f"response chain    : {vars(response_chain)}", flush=True)
 _print_inner("aggregate", omega, agg_rate)
 _print_gyro("aggregate", agg_gyro)
 for pc in per_case:
     _print_inner(pc["case"], pc["omega"], pc["rate"])
+    _print_compensated(pc["case"], pc["omega_compensated"])
     _print_gyro(pc["case"], pc["gyro"])
 
 # --- buzz-closes scoring (per case) -------------------------------------------
-# omega_dot_nrmse per case = MAX of roll/pitch nrmse (the two axes the initial JSON-backend experiments
-# buzz was found on); sat_frac per case comes straight from that case's
-# omega_window(). track_rms/benign_rms are the same per-case tracking numbers
-# printed above.
+# omega_dot_nrmse per case = MAX of the delay-compensated roll/pitch nrmse over
+# the axes that are excited (exc_rms >= 0.08). A case with no excited roll/pitch
+# axis did not test the inversion and fails (nrmse = inf). The raw
+# command-vs-response maximum is kept beside it. sat_frac per case comes straight
+# from that case's omega_window(); track_rms/benign_rms are the per-case
+# tracking numbers printed above.
 buzz_results = []
 for pc in per_case:
     b = baseline.get(pc["case"], {}).get("rms_m", float("nan"))
     sat_frac_case = pc["omega"]["sat_frac"]
-    nrmse_case = max(pc["omega"]["roll"]["nrmse"], pc["omega"]["pitch"]["nrmse"])
+    comp = pc["omega_compensated"]
+    excited_nrmse = excited_axis_nrmse({0: comp["roll"], 1: comp["pitch"]})
+    nrmse_case = float("inf") if excited_nrmse is None else excited_nrmse
+    raw_nrmse_case = max(comp["roll"]["nrmse_raw"], comp["pitch"]["nrmse_raw"])
     r = buzz_score(pc["rms_m"], b, sat_frac_case, nrmse_case,
                     tol=BUZZ_TOL, sat_tol=SAT_TOL, nrmse_tol=NRMSE_TOL)
     r["case"] = pc["case"]
+    r["omega_dot_nrmse_raw"] = raw_nrmse_case
+    r["omega_excited"] = excited_nrmse is not None
     buzz_results.append(r)
     print(f"BUZZ-CLOSES {pc['case']:<16} closed={r['closed']} "
           f"track={pc['rms_m']:.3f}/{b * BUZZ_TOL:.3f} "
           f"sat={sat_frac_case:.3f}/{SAT_TOL:.3f} "
-          f"nrmse={nrmse_case:.3f}/{NRMSE_TOL:.3f}", flush=True)
+          f"nrmse={nrmse_case:.3f}/{NRMSE_TOL:.3f} "
+          f"(raw {raw_nrmse_case:.3f})", flush=True)
 report["buzz_closes"]["per_case"] = buzz_results
 
 # Compare actual logged gains in normalized mixer-command units, on all axes.
 # Physical 1/J has incompatible torque units and is not this ceiling.
-from pymavlink import DFReader
-parameter_log = DFReader.DFReader_binary(str(BIN))
-parameters = {}
-while (message := parameter_log.recv_match(type="PARM")) is not None:
-    parameters[message.Name] = message.Value
 linear_map = {"MOT_THST_EXPO": 0, "MOT_SPIN_MIN": 0, "MOT_SPIN_MAX": 1,
               "MOT_BAT_VOLT_MIN": 0, "MOT_BAT_VOLT_MAX": 0}
 linear_ok = all(np.isclose(parameters.get(k, np.nan), v) for k, v in linear_map.items())
@@ -364,7 +403,10 @@ for r in buzz_results:
                          f"{r['benign_rms'] * BUZZ_TOL:.3f}")
         if not r["sat_ok"]:
             fails.append(f"sat {r['sat_frac']:.3f} > {SAT_TOL:.3f}")
-        if not r["nrmse_ok"]:
+        if not r["omega_excited"]:
+            fails.append("no roll/pitch axis excited (exc_rms < 0.08): "
+                         "the case did not test the inversion")
+        elif not r["nrmse_ok"]:
             fails.append(f"nrmse {r['omega_dot_nrmse']:.3f} > {NRMSE_TOL:.3f}")
         errs.append(f"{r['case']}: buzz NOT closed ({'; '.join(fails)})")
 

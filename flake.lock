@@ -565,15 +565,16 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1794453965,
-        "narHash": "sha256-wY65jQrbNbQPbZ+McpNcVkddk5zTXU4JZAr2KoI8YAY=",
+        "lastModified": 1794637227,
+        "narHash": "sha256-YJlQI55e+nNmM0JS75ps9pYsjieN2TeNpdEXz2Rwnlk=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "594df9ba640d7aa5be72ebb1609449b3dde68f07",
+        "rev": "a0122f8e87b1598c0b1862e9403bfd83b8125b48",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/dev/delay-compensated-omega-gate",
         "repo": "indi-harness",
         "type": "github"
       }
