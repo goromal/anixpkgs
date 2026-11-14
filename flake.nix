@@ -90,7 +90,7 @@
     gmail-parser.url = "github:goromal/gmail_parser";
     gmail-parser.flake = false;
 
-    indi-harness.url = "github:goromal/indi-harness";
+    indi-harness.url = "github:goromal/indi-harness?ref=refs/heads/dev/delay-compensated-omega-gate";
     indi-harness.flake = false;
 
     jetson-stats.url = "github:rbonghi/jetson_stats";
