@@ -7,6 +7,7 @@
 with import ./dependencies.nix;
 let
   cfg = config.drone.base;
+  glancesPackage = import ./glances.nix { inherit pkgs; };
   # Core ROS2 infrastructure: rclcpp/rclpy, an rmw implementation, and the
   # ros2 CLI suite (ros2 topic/service/node/param/run/launch/...)
   rosEnv = ros-pkgs.rosPackages.jazzy.buildEnv {
@@ -238,7 +239,7 @@ in
           unstable.mprocs
           bandwhich
           btop
-          glances
+          glancesPackage
           gping
           dog
           tmux
