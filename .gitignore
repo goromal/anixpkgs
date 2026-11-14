@@ -1,0 +1,7 @@
+.envrc
+result*
+build/*
+*.log
+.nixos-test-history
+**/*.pyc
+docs/superpowers/
