@@ -476,12 +476,39 @@ in
         enable = true;
         nssmdns4 = true;
         openFirewall = true;
-        # Web server DNS
+        ipv6 = false;
+        denyInterfaces = [
+          "can0"
+          "can1"
+        ];
         publish = lib.mkIf cfg.runWebServer {
           enable = true;
           addresses = true;
           domain = true;
           workstation = true;
+        };
+      };
+
+      systemd.services.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        description = "Restore Avahi's configured host name after a conflict rename";
+        after = [ "avahi-daemon.service" ];
+        requisite = [ "avahi-daemon.service" ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          want="${config.networking.hostName}.local"
+          served=$(${pkgs.systemd}/bin/busctl --system call org.freedesktop.Avahi / \
+            org.freedesktop.Avahi.Server GetHostNameFqdn | ${pkgs.gnused}/bin/sed -n 's/^s "\(.*\)"$/\1/p')
+          if [ -n "$served" ] && [ "''${served,,}" != "''${want,,}" ]; then
+            echo "Avahi serves $served instead of $want; re-probing $want"
+            ${pkgs.avahi}/bin/avahi-set-host-name ${config.networking.hostName}
+          fi
+        '';
+      };
+      systemd.timers.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "2min";
         };
       };
 

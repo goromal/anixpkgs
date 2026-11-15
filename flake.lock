@@ -19,11 +19,11 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1794455188,
-        "narHash": "sha256-QAE1CkIVXhxq/JHVOCDyRmvp5q275MLfHFNekTqem9A=",
+        "lastModified": 1794758442,
+        "narHash": "sha256-lE+nPtCHmTp1L51horl7U5zRitf6NjUDcqShdkiOgl0=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "7a7397f32afc9c8d0e81afa2132201dd03048f3b",
+        "rev": "29a251fbf21a55aa0f8126763868fc317c7d20fa",
         "type": "github"
       },
       "original": {
@@ -70,11 +70,11 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1794455184,
-        "narHash": "sha256-h/LMeABTuLqyYdUEYeee27OQk/wWHIk8Mfet0qWD8VQ=",
+        "lastModified": 1794758438,
+        "narHash": "sha256-zI4ZFS2Qm3vLFQMzmxqWXTP/CCApH7Tsr6oLufg+Lgc=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "f8d998cc941c8aefad9893cd466b1abd3ab1dfb9",
+        "rev": "0a6a978b20479c0623314fa0b61ce37993f92103",
         "type": "github"
       },
       "original": {
