@@ -476,12 +476,49 @@ in
         enable = true;
         nssmdns4 = true;
         openFirewall = true;
+        # IPv4-only mDNS (resolution is already IPv4-only via nssmdns4). IPv6
+        # temporary-address rotation re-registers records while the daemon
+        # runs, and avahi 0.8 sometimes mistakes its own re-announcement for a
+        # host name conflict and renames the machine to <host>-2.local.
+        ipv6 = false;
+        # Never publish on loopback or CAN buses.
+        denyInterfaces = [
+          "lo"
+          "can0"
+          "can1"
+        ];
         # Web server DNS
         publish = lib.mkIf cfg.runWebServer {
           enable = true;
           addresses = true;
           domain = true;
           workstation = true;
+        };
+      };
+
+      # Avahi never reclaims its configured name after a conflict rename, so
+      # periodically re-probe it. A genuine conflict (another device owning the
+      # name) just renames again and is logged on every attempt.
+      systemd.services.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        description = "Restore Avahi's configured host name after a conflict rename";
+        after = [ "avahi-daemon.service" ];
+        requisite = [ "avahi-daemon.service" ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          want="${config.networking.hostName}.local"
+          served=$(${pkgs.systemd}/bin/busctl --system call org.freedesktop.Avahi / \
+            org.freedesktop.Avahi.Server GetHostNameFqdn | ${pkgs.gnused}/bin/sed -n 's/^s "\(.*\)"$/\1/p')
+          if [ -n "$served" ] && [ "''${served,,}" != "''${want,,}" ]; then
+            echo "Avahi serves $served instead of $want; re-probing $want"
+            ${pkgs.avahi}/bin/avahi-set-host-name ${config.networking.hostName}
+          fi
+        '';
+      };
+      systemd.timers.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "2min";
         };
       };
 

@@ -70,15 +70,16 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1794455184,
-        "narHash": "sha256-h/LMeABTuLqyYdUEYeee27OQk/wWHIk8Mfet0qWD8VQ=",
+        "lastModified": 1794756662,
+        "narHash": "sha256-zI4ZFS2Qm3vLFQMzmxqWXTP/CCApH7Tsr6oLufg+Lgc=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "f8d998cc941c8aefad9893cd466b1abd3ab1dfb9",
+        "rev": "4d11e616f3348cd18b2674bed17403bc1be84e31",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
+        "ref": "refs/heads/fix/avahi-self-conflict",
         "repo": "bit-rs",
         "type": "github"
       }
