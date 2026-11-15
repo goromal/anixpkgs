@@ -42,13 +42,13 @@
     anixdata.url = "github:goromal/anixdata";
     anixdata.flake = false;
 
-    agent-skills.url = "github:goromal/agent-skills?ref=refs/heads/fix/avahi-self-conflict";
+    agent-skills.url = "github:goromal/agent-skills";
     agent-skills.flake = false;
 
     aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/fix/avahi-self-conflict";
+    bit-rs.url = "github:goromal/bit-rs";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";

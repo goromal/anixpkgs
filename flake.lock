@@ -19,16 +19,15 @@
     "agent-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1794757769,
+        "lastModified": 1794758442,
         "narHash": "sha256-lE+nPtCHmTp1L51horl7U5zRitf6NjUDcqShdkiOgl0=",
         "owner": "goromal",
         "repo": "agent-skills",
-        "rev": "93a52f1e49578dacee6a5c0aa9a8c5dad563ed8f",
+        "rev": "29a251fbf21a55aa0f8126763868fc317c7d20fa",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/avahi-self-conflict",
         "repo": "agent-skills",
         "type": "github"
       }
@@ -71,16 +70,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1794756662,
+        "lastModified": 1794758438,
         "narHash": "sha256-zI4ZFS2Qm3vLFQMzmxqWXTP/CCApH7Tsr6oLufg+Lgc=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "4d11e616f3348cd18b2674bed17403bc1be84e31",
+        "rev": "0a6a978b20479c0623314fa0b61ce37993f92103",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/avahi-self-conflict",
         "repo": "bit-rs",
         "type": "github"
       }
