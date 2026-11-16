@@ -81,7 +81,7 @@
     flasks.url = "github:goromal/flasks?ref=refs/heads/dev/tester-api";
     flasks.flake = false;
 
-    folio.url = "github:goromal/folio";
+    folio.url = "github:goromal/folio?ref=refs/heads/dev/tester-api";
     folio.flake = false;
 
     geometry.url = "github:goromal/geometry";
