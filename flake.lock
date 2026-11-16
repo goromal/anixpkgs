@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1794852523,
+        "lastModified": 1794854692,
         "narHash": "sha256-dZLcaStdifPT3ZiF9rxCIAqInQ9bitGtjUYTs9mhn5U=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "4f8dab481f259757843cb7b8c91641c41ef732b3",
+        "rev": "4fc67c692fa4296bd600807c45cf54bbb872cb98",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/fileserver-fixes",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
