@@ -95,6 +95,33 @@ def classify_sender(sender):
     return "unknown"
 
 
+def is_task_directive(text):
+    return text[:3].lower() in ("p0:", "p1:", "p2:", "p3:")
+
+
+def split_task_directive(text, generated):
+    """Split a `P[0-3]:` task directive into (title, notes).
+
+    The first line becomes the task title; the second line and beyond become
+    the task description, followed by the `Generated:` stamp. A bare `P1:`
+    first line borrows the next non-blank line as its title so the task never
+    ends up named just "P1:".
+    """
+    lines = text.strip().splitlines()
+    title = lines[0].strip()
+    rest = lines[1:]
+    if not title[3:].strip():
+        while rest and not rest[0].strip():
+            rest.pop(0)
+        if rest:
+            title = f"{title[:3]} {rest.pop(0).strip()}"
+    description = "\n".join(line.rstrip() for line in rest).strip()
+    notes = f"Generated: {generated}"
+    if description:
+        notes = f"{description}\n\n{notes}"
+    return title, notes
+
+
 def handle_nutrition_message(msg, date, tactical_port, dry_run, log):
     """Report a nutrition email as a survey result. Never writes to Notion.
 
@@ -697,20 +724,14 @@ def postfix(ctx: click.Context, categories_csv, tactical_port, dry_run):
                     wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                     if caljo_doku is not None:
                         msg.moveToTrash()
-            elif (
-                text[:3].lower() == "p0:"
-                or text[:3].lower() == "p1:"
-                or text[:3].lower() == "p2:"
-                or text[:3].lower() == "p3:"
-            ):
-                print(f"  {text[:2]} task for {date}: {text[3:]}")
+            elif is_task_directive(text):
+                title, notes = split_task_directive(
+                    text, datetime.now().strftime("%m/%d/%Y")
+                )
+                print(f"  {title[:2]} task for {date}: {title[3:].strip()}")
                 log(f"Task entry for {date}")
                 if not dry_run:
-                    task.putTask(
-                        text,
-                        f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
-                        datetime.today(),
-                    )
+                    task.putTask(title, notes, datetime.today())
                     msg.moveToTrash()
             else:
                 truncated = text[:2000] + ("…" if len(text) > 2000 else "")
@@ -842,21 +863,15 @@ def bot(ctx: click.Context, categories_csv, dry_run):
                     wiki.putPage(id="calorie-journal", content=new_caljo_doku)
                     if caljo_doku is not None:
                         msg.moveToTrash()
-            elif (
-                text[:3].lower() == "p0:"
-                or text[:3].lower() == "p1:"
-                or text[:3].lower() == "p2:"
-                or text[:3].lower() == "p3:"
-            ):
-                print(f"  {text[:2]} task for {date}: {text[3:]}")
+            elif is_task_directive(text):
+                title, notes = split_task_directive(
+                    text, datetime.now().strftime("%m/%d/%Y")
+                )
+                print(f"  {title[:2]} task for {date}: {title[3:].strip()}")
                 if logfile is not None:
                     logfile.write("Task entry\n")
                 if not dry_run:
-                    task.putTask(
-                        text,
-                        f"Generated: {datetime.now().strftime('%m/%d/%Y')}",
-                        datetime.today(),
-                    )
+                    task.putTask(title, notes, datetime.today())
                     msg.moveToTrash()
             else:
                 print(f"  ITNS from {date}: {text}")
