@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1794854692,
-        "narHash": "sha256-dZLcaStdifPT3ZiF9rxCIAqInQ9bitGtjUYTs9mhn5U=",
+        "lastModified": 1794896552,
+        "narHash": "sha256-ER7R2sd5dGj/jPdswc/0uQHNid92k407leBUIslqpK0=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "4fc67c692fa4296bd600807c45cf54bbb872cb98",
+        "rev": "3bc8f3fd13c2cb98f13235d94091fee6b3732774",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/nexus-offline-memory",
         "repo": "flasks",
         "type": "github"
       }
