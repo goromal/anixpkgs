@@ -19,7 +19,11 @@ Inputs:
 Options:
     --transpose [+- # HALF STEPS]
         Powered by https://github.com/breakfastquay/rubberband.
-    --TODO
+    --normalize [TARGET LUFS, e.g. -14.0]
+        Match integrated loudness to the target via a two-pass ffmpeg
+        loudnorm, with a -1.0 dBTP true-peak ceiling. Gain is applied
+        linearly when the peaks allow it; otherwise loudnorm limits
+        dynamically and a warning is printed. Applied after --transpose.
 
 Vacuum sweeps files already in .mp3 form only when an option
 above (other than verbosity) asks for a different conversion; those are
