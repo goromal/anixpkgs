@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1794974687,
+        "lastModified": 1794984716,
         "narHash": "sha256-PerwpbaHC4hBn2WPP3XT+5BcObXbyQYilioGDYs/bwM=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "c984186ca9b1768487d94711320d10090fd8df9b",
+        "rev": "9b16639fca284a0818487a7ab16021333504ba8f",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/stampserver-delete-tag",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
