@@ -42,6 +42,7 @@ callPackage ../pythonPkgFromScript.nix {
       - `P1` = "Must do within a week"
       - `P2` = "Must do within a month"
       - `P3` = "Should do eventually"
+      - The first line is the task title; the second line and beyond become the task description
     - Keyword matchers for routing to specific Wiki pages, which are configurable via a CSV file passed to the `bot` command:
       - `KEYWORD: [P0-1:] ...`
       - `Sort KEYWORD. [P0-1:] ...`

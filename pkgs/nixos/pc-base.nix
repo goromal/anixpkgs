@@ -9,7 +9,7 @@ let
   cfg = config.machines.base;
   features = config.machines.features;
   remoteBuildersCatalog = import ./remote-builders.nix;
-  glancesPackage = pkgs.glances.overridePythonAttrs (old: {
+  glancesPackage = (import ./glances.nix { inherit pkgs; }).overridePythonAttrs (old: {
     # The suite depends on sandbox CPU/network topology on AArch64: psutil can
     # fail during collection, and the REST tests race their local API server.
     doCheck = (old.doCheck or true) && !pkgs.stdenv.hostPlatform.isAarch64;
@@ -259,7 +259,24 @@ in
   config = lib.mkMerge [
     {
       services.bitd.enable = lib.mkDefault true;
-      services.bitd.checks = [ "internet" ];
+      services.bitd.checks = [
+        "internet"
+        "memory"
+      ];
+      # Act on memory exhaustion in seconds rather than letting the kernel
+      # thrash for hours before its own OOM killer fires (ats, 2026-11-11: a
+      # deploy's nix evaluation on top of ~14 idle agent sessions froze the box
+      # for 5 h). Prefer victims that are safe to lose: a nix evaluation (the
+      # deploy fails and can be rerun) or an agent CLI (its session resumes).
+      services.earlyoom = {
+        enable = lib.mkDefault true;
+        extraArgs = [
+          "--prefer"
+          "^(nix|codex|claude|\\.claude-wrapped)$"
+          "--avoid"
+          "^(sshd|systemd|systemd-.*|nginx|tmux: server|bitd|earlyoom)$"
+        ];
+      };
       # Fail evaluation if two services claim the same port.
       #
       # This is specifically a merge hazard: two branches can each add a
@@ -459,12 +476,39 @@ in
         enable = true;
         nssmdns4 = true;
         openFirewall = true;
-        # Web server DNS
+        ipv6 = false;
+        denyInterfaces = [
+          "can0"
+          "can1"
+        ];
         publish = lib.mkIf cfg.runWebServer {
           enable = true;
           addresses = true;
           domain = true;
           workstation = true;
+        };
+      };
+
+      systemd.services.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        description = "Restore Avahi's configured host name after a conflict rename";
+        after = [ "avahi-daemon.service" ];
+        requisite = [ "avahi-daemon.service" ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          want="${config.networking.hostName}.local"
+          served=$(${pkgs.systemd}/bin/busctl --system call org.freedesktop.Avahi / \
+            org.freedesktop.Avahi.Server GetHostNameFqdn | ${pkgs.gnused}/bin/sed -n 's/^s "\(.*\)"$/\1/p')
+          if [ -n "$served" ] && [ "''${served,,}" != "''${want,,}" ]; then
+            echo "Avahi serves $served instead of $want; re-probing $want"
+            ${pkgs.avahi}/bin/avahi-set-host-name ${config.networking.hostName}
+          fi
+        '';
+      };
+      systemd.timers.avahi-hostname-heal = lib.mkIf cfg.runWebServer {
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "2min";
+          OnUnitActiveSec = "2min";
         };
       };
 

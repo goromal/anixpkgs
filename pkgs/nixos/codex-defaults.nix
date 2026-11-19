@@ -1,6 +1,6 @@
 # Default Codex configuration values, referenced by profiles.
 {
-  model = "gpt-5.6";
+  model = "gpt-6-astra";
   modelProvider = "openai";
   approvalPolicy = "never";
   sandboxMode = "danger-full-access";

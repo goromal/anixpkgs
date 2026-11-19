@@ -321,6 +321,12 @@ in
           });
       };
 
+    # claude-settings-update only runs when the user manager starts (a login);
+    # also merge during home-manager activation so headless deploys apply it.
+    home.activation.claudeSettingsUpdate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      run ${lib.concatStringsSep " " (lib.toList config.systemd.user.services.claude-settings-update.Service.ExecStart)}
+    '';
+
     # Re-run claude-setup after an upgrade only when the setup script's content
     # changes (new plugins/marketplaces/MCP servers). Settings-file regen is
     # already handled by the claude-settings-update unit above, which is itself

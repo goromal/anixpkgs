@@ -113,14 +113,17 @@ in
     (
       let
         # On-disk blacklist: a marker file named after a job in this directory
-        # causes that job's oneshot service to fail immediately instead of
-        # submitting to orchestratord. Managed via the orchestrator UI.
+        # makes systemd skip that job's oneshot service (ExecCondition) instead
+        # of submitting to orchestratord. A skip is not a unit failure, so a
+        # deliberately disabled job does not trip bitd's systemd_units check.
+        # Managed via the orchestrator UI.
         orchBlacklistDir = features.orchestrator.blacklistDir;
         orchJobGuard = pkgs.writeShellScript "orch-job-guard" ''
           name="$1"
           if [ -e "${orchBlacklistDir}/$name" ]; then
             ${pkgs.util-linux}/bin/logger -t orchestrator "Job '$name' is blacklisted; refusing to run"
             echo "Orchestrator job '$name' is blacklisted by ${orchBlacklistDir}/$name" >&2
+            # 1-254 from ExecCondition means "skip", not "fail".
             exit 1
           fi
         '';
@@ -151,12 +154,10 @@ in
                 Type = "oneshot";
                 ExecStart = "${anixpkgs.orchestrator}/bin/orchestrator bash 'bash ${job.jobShellScript}'";
                 ReadWritePaths = job.readWritePaths;
-                # Blacklist guard runs first for every job, then any
-                # job-specific ExecStartPre.
-                ExecStartPre = [
-                  "${orchJobGuard} ${job.name}"
-                ]
-                ++ lib.toList job.execStartPre;
+                # Blacklist guard skips the job before any job-specific
+                # ExecStartPre runs.
+                ExecCondition = "${orchJobGuard} ${job.name}";
+                ExecStartPre = job.execStartPre;
               };
             };
           }) features.orchestrator.jobs

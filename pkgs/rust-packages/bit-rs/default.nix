@@ -27,12 +27,14 @@ rustPlatform.buildRustPackage {
     "user_units"
     "systemd_units"
     "ssh_known_hosts"
+    "agent_sessions"
+    "memory"
   ];
   postInstall = ''
     mkdir -p $internet/bin $avahi/bin $cozy_imgedit2/bin $cozy_imggen_quantized/bin $cozy_video/bin \
       $nvidia_power/bin \
       $ardupilot/bin $ros2_topics/bin $user_units/bin $systemd_units/bin \
-      $ssh_known_hosts/bin
+      $ssh_known_hosts/bin $agent_sessions/bin $memory/bin
     mv $out/bin/bit-check-internet $internet/bin/
     mv $out/bin/bit-check-avahi $avahi/bin/
     mv $out/bin/bit-check-cozy-imgedit2 $cozy_imgedit2/bin/
@@ -44,6 +46,8 @@ rustPlatform.buildRustPackage {
     mv $out/bin/bit-check-user-units $user_units/bin/
     mv $out/bin/bit-check-systemd-units $systemd_units/bin/
     mv $out/bin/bit-check-ssh-known-hosts $ssh_known_hosts/bin/
+    mv $out/bin/bit-check-agent-sessions $agent_sessions/bin/
+    mv $out/bin/bit-check-memory $memory/bin/
   '';
   meta = {
     description = "Machine health and regression checks with bitd and the bitctl TUI.";

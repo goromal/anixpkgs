@@ -31,6 +31,7 @@ with import ./dependencies.nix;
 }:
 let
   prefix = "${name}-agent";
+  keeper = import ./agent-session-keeper.nix { inherit pkgs lib; };
   agentAlternation = lib.concatStringsSep "|" agents;
 
   # Same llm-agents CLIs the claude/codex agent components install (home.packages),
@@ -99,6 +100,13 @@ let
       # Append the login-shell profile dirs (setuid wrappers like sudo, user and
       # system packages) so agents see the same commands a terminal does.
       export PATH="$PATH:/run/wrappers/bin:$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin"${repoSync}
+      # Lets agent-session-run record this launch so a reboot can replay it, and
+      # recreate a throwaway session dir that /tmp lost in that reboot.
+      # shellcheck disable=SC2016 # jq's $ARGS, not a shell variable.
+      AGENT_SESSION_ARGS="$(${keeper.exportArgs} "$@")"
+      export AGENT_SESSION_ARGS
+      mkdir -p "$(dirname "$1")"
+      [ -d "$1" ] || mkdir -m 0700 "$1"
       # Pre-accept Claude Code's workspace-trust dialog so a headless companion
       # launch does not stall on it. Trust the stable spool parent (not each
       # ephemeral session dir): claude honors an ancestor's trust, so every
@@ -131,15 +139,15 @@ let
       # load it. Missing skill file -> launch the agent unprimed.
       skill="$HOME/.$2/skills/${skill}/SKILL.md"
       if [ ! -r "$skill" ]; then
-        exec "$2" "''${args[@]}"
+        exec ${keeper.runCommand} "$2" "''${args[@]}"
       fi
       primer="You are running inside ${appLabel}'s agent companion. The ${skill} skill is preloaded below; follow it for ${skillScope}.
 
       $(cat "$skill")"
       case "$2" in
         # -c values parse as TOML; JSON-encode so the markdown is one TOML string.
-        codex) exec codex "''${args[@]}" -c "developer_instructions=$(jq -Rs . <<<"$primer")" ;;
-        *) exec "$2" --append-system-prompt "$primer" ;;
+        codex) exec ${keeper.runCommand} codex "''${args[@]}" -c "developer_instructions=$(jq -Rs . <<<"$primer")" ;;
+        *) exec ${keeper.runCommand} "$2" --append-system-prompt "$primer" ;;
       esac
     '';
   };
@@ -175,6 +183,10 @@ in
   inherit tmuxConf;
   socket = prefix;
   sessionCommand = "${session}/bin/${prefix}-session";
+  # For the backend unit's serviceConfig.ExecStartPost: bring back the sessions
+  # that were still running when the machine (or this backend) went down.
+  # "-": a failed restore must not fail the backend.
+  restoreSessions = "-${keeper.restoreCommand} ${prefix} ${tmuxConf} ${session}/bin/${prefix}-session";
   attachCommand = "${attach}/bin/${prefix}-attach";
   servicePath = [
     pkgs.bashInteractive

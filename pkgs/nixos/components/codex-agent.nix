@@ -73,7 +73,7 @@ in
   options.mods.codex = {
     model = lib.mkOption {
       type = lib.types.str;
-      default = "gpt-5.6";
+      default = "gpt-6-astra";
     };
     modelProvider = lib.mkOption {
       type = lib.types.str;
@@ -198,6 +198,12 @@ in
       format = "toml";
       settings = codexSettings;
     };
+    # The unit above only runs when the user manager starts (a login), so a
+    # headless machine never picked up a changed setting (e.g. the model) on
+    # deploy. Also merge during home-manager activation, which every deploy runs.
+    home.activation.codexSettingsUpdate = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      run ${lib.concatStringsSep " " (lib.toList config.systemd.user.services.codex-settings-update.Service.ExecStart)}
+    '';
 
     mods.upgradeHooks = [
       {

@@ -11,7 +11,7 @@ in
   options.machines.codex = {
     model = lib.mkOption {
       type = lib.types.str;
-      default = "gpt-5.6";
+      default = "gpt-6-astra";
       description = "Default codex model";
     };
     modelProvider = lib.mkOption {

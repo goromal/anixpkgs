@@ -156,6 +156,31 @@ in
           ignore = lib.mkDefault [ ];
         };
       };
+      memory = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.memory}/bin/bit-check-memory";
+        rateHz = lib.mkDefault (1.0 / 60.0);
+        settings = {
+          # Warn above earlyoom's ~10% kill line, while there is still time to act.
+          min_headroom_percent = lib.mkDefault 15;
+          max_full_pressure_percent = lib.mkDefault 10;
+        };
+      };
+      agent_sessions = {
+        kind = "health";
+        command = lib.mkDefault "${cfg.package.agent_sessions}/bin/bit-check-agent-sessions";
+        rateHz = lib.mkDefault (1.0 / 60.0);
+        settings = {
+          # tmux sockets of Agent UI and the agent-companion apps.
+          sockets = lib.mkDefault [
+            "agent-ui"
+            "folio-agent"
+            "budget-agent"
+            "assistant-agent"
+          ];
+          max_memory_percent = lib.mkDefault 40;
+        };
+      };
       ssh_known_hosts = {
         kind = "health";
         command = lib.mkDefault "${cfg.package.ssh_known_hosts}/bin/bit-check-ssh-known-hosts";

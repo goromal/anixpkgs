@@ -96,6 +96,7 @@ in
           + "${config.services.agent_ui.secretsFile} ${cfg.agentSecretsFile}"
         );
         ExecStart = "${anixpkgs.folio-backend}/bin/folio-backend";
+        ExecStartPost = lib.optional companion folioCompanion.restoreSessions;
         WorkingDirectory = cfg.dataDir;
         Restart = "on-failure";
         RestartSec = "5s";
