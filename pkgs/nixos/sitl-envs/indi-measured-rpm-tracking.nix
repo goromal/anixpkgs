@@ -31,7 +31,10 @@ let
   # run -- see indi_harness.buzz_score.score for the exact per-criterion math).
   buzzTol = "1.5"; # track_rms <= benign_rms * buzzTol
   satTol = "0.02"; # saturation fraction ceiling
-  nrmseTol = "0.6"; # omega-dot inversion NRMSE ceiling (initial JSON-backend experiments buzz was ~1.5)
+  # omega-dot inversion NRMSE ceiling (initial JSON-backend experiments buzz was
+  # ~1.5). Scored against the delay-compensated command (motor lag + logged gyro
+  # and estimator filters; indi_harness.sitl.response_model), excited axes only.
+  nrmseTol = "0.6";
 
   pkgs = (
     import (fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-${nixos-version}") {
