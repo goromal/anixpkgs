@@ -565,16 +565,15 @@
     "indi-harness": {
       "flake": false,
       "locked": {
-        "lastModified": 1795236362,
+        "lastModified": 1795241374,
         "narHash": "sha256-1qviEGtVzzZLHBdqrB6b0kqCwrGrsgSzVJv43eP+QIg=",
         "owner": "goromal",
         "repo": "indi-harness",
-        "rev": "6146feca392e2688cd46f604280d61d15819f7eb",
+        "rev": "d680fd3d1b5623d144dcc78cd48b93c4f5246a94",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/drag-rejection-ab",
         "repo": "indi-harness",
         "type": "github"
       }
