@@ -5,8 +5,8 @@
 # backend. controller="custom" engages the measured-RPM INDI outer loop and
 # flies the reference over DDS; controller="stock" never engages and streams the
 # reference as GUIDED targets. drag toggles the backend's linear rotor drag.
-# Each cell writes cell_score.json; `python3 -m indi_harness.sitl.drag_ab gap`
-# compares the four.
+# Each run writes cell_score.json; `python3 -m indi_harness.sitl.drag_ab gate`
+# compares repeated runs of the four cells.
 #
 # Run: nix-build pkgs/nixos/sitl-envs/indi-drag-rejection-ab.nix -A driver \
 #        --argstr controller stock --arg drag true
