@@ -55,7 +55,26 @@ let
     else
       echo_yellow "Skipping SSH config setup"
     fi
+    ${lib.optionalString (cfg.machineType == "x86_linux" && features.desktop.enable) ''
+      make-title -c yellow "Installing private desktop packages"
 
+      # One flake reference per line (e.g. git+ssh URLs to private repos); # starts a comment.
+      # Priority 4 lets these override same-named home-manager packages (priority 5).
+      PRIVATE_PKGS=$HOME/configs/private-profile-pkgs.txt
+      if [[ -f "$PRIVATE_PKGS" ]]; then
+        while read -r ref; do
+          [[ -z "$ref" || "$ref" == \#* ]] && continue
+          name=$(basename "''${ref%%[?#]*}")
+          if nix profile list --json | ${pkgs.jq}/bin/jq -e --arg n "$name" '.elements[$n]' >/dev/null; then
+            nix profile upgrade "$name" </dev/null || echo_yellow "Could not upgrade $name; skipping"
+          else
+            nix profile add --priority 4 "$ref" </dev/null || echo_yellow "Could not install $ref; skipping"
+          fi
+        done <"$PRIVATE_PKGS"
+      else
+        echo_yellow "No $PRIVATE_PKGS; skipping"
+      fi
+    ''}
     echo
     echo_green "DONE. Note the hardware-config.nix file below:"
     echo
