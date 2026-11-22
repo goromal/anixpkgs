@@ -694,7 +694,6 @@ rec {
   mp4separate = addDoc (prev.callPackage ./bash-packages/mp4separate { });
   notabilify = addDoc (prev.callPackage ./bash-packages/converters/notabilify.nix { });
   make-title = addDoc (prev.callPackage ./bash-packages/make-title { });
-  blender-earth = addDoc (prev.callPackage ./bash-packages/blender-earth { });
   pb = addDoc (prev.callPackage ./bash-packages/pb { });
   code2pdf = addDoc (prev.callPackage ./bash-packages/converters/code2pdf.nix { });
   abc = addDoc (prev.callPackage ./bash-packages/converters/abc.nix { });
