@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import tempfile
+import time
 import urllib.parse
 
 sys.path.insert(0, sys.argv[sys.argv.index("--") + 1])
@@ -16,6 +17,9 @@ sys.path.insert(0, sys.argv[sys.argv.index("--") + 1])
 import bpy  # noqa: E402
 
 from earth_tiles import scene, tiles  # noqa: E402
+
+# A blender-earth wrapper preloads its own installed copy; make sure we test this one.
+assert scene.__file__.startswith(os.path.abspath(sys.path[0])), scene.__file__
 
 LAT, LON = 40.748440, -73.985664
 
@@ -94,6 +98,35 @@ def main():
     with open(out, "rb") as f:
         doc, _ = tiles.read_glb(f.read())
     assert doc["asset"]["copyright"] == "Data A; Data B", doc["asset"]
+
+    # Stepwise job, as the modal operator drives it: a zero budget imports one
+    # tile per step, so the importing stage spans several steps.
+    job = scene.ImportJob(LAT, LON, radius=100.0, max_error=4.0)
+    job.start()
+    importing_steps = 0
+    while True:
+        importing = job.stage == "importing"
+        if job.step(budget=0.0):
+            break
+        importing_steps += importing
+        time.sleep(0.01)
+    assert job.error is None and job.stage == "done", job.status
+    assert importing_steps >= 2, importing_steps
+
+    # Cancelling mid-import removes everything the job added.
+    n_objects, n_collections = len(bpy.data.objects), len(bpy.data.collections)
+    job = scene.ImportJob(LAT, LON, radius=100.0, max_error=4.0)
+    job.start()
+    while not (job.stage == "importing" and job.done > 0):
+        assert not job.step(budget=0.0), job.status
+        time.sleep(0.01)
+    assert len(bpy.data.objects) > n_objects
+    job.cancel()
+    while not job.step():
+        time.sleep(0.01)
+    assert isinstance(job.error, tiles.Cancelled), job.error
+    assert (len(bpy.data.objects), len(bpy.data.collections)) == (n_objects, n_collections)
+    assert job._tmp is None
     print("E2E OK")
 
 

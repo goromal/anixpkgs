@@ -39,6 +39,16 @@ class TilesError(RuntimeError):
     pass
 
 
+class Cancelled(TilesError):
+    def __init__(self):
+        super().__init__("Cancelled")
+
+
+def _check(cancel):
+    if cancel is not None and cancel():
+        raise Cancelled()
+
+
 # ---------------------------------------------------------------------------
 # 4x4 matrix helpers (row-major nested lists, float64)
 # ---------------------------------------------------------------------------
@@ -255,11 +265,12 @@ class TileRef:
         self.geometric_error = geometric_error
 
 
-def select_tiles(client, lat, lon, radius, max_error, max_tiles=2000, progress=None, workers=8):
+def select_tiles(client, lat, lon, radius, max_error, max_tiles=2000, progress=None, cancel=None, workers=8):
     """Walk the tileset and return the GLB tiles covering the target cylinder.
 
     Descends (REPLACE refinement) until a tile's geometricError is <= max_error
-    or it has no children.
+    or it has no children. Calls progress(n_selected, n_to_visit) after each
+    level; raises Cancelled once cancel() returns true.
     """
     to_enu = ecef_to_enu_matrix(lat, lon)
     root_url = client.url(ROOT_URL)
@@ -270,6 +281,7 @@ def select_tiles(client, lat, lon, radius, max_error, max_tiles=2000, progress=N
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as pool:
         while frontier:
+            _check(cancel)
             next_frontier = []
             pending = []  # external tilesets to fetch: (url, transform)
             for tile, base, parent_tf in frontier:
@@ -296,10 +308,14 @@ def select_tiles(client, lat, lon, radius, max_error, max_tiles=2000, progress=N
                             f"More than {max_tiles} tiles selected; "
                             "reduce the radius or raise max_error"
                         )
-            for (url, tf), sub in zip(pending, pool.map(lambda p: client.get_json(p[0]), pending)):
+            def fetch(p):
+                _check(cancel)
+                return client.get_json(p[0])
+
+            for (url, tf), sub in zip(pending, pool.map(fetch, pending)):
                 next_frontier.append((sub["root"], url, tf))
             if progress:
-                progress(f"Traversal: {len(selected)} tiles selected, {len(next_frontier)} to visit")
+                progress(len(selected), len(next_frontier))
             frontier = next_frontier
     return selected
 
@@ -367,14 +383,19 @@ def relocate_glb(data, world_to_local):
     return write_glb(doc, rest), copyright_text
 
 
-def download_tiles(client, refs, lat, lon, out_dir, progress=None, workers=8):
-    """Download and relocate tiles into out_dir. Returns (paths, Counter of copyrights)."""
+def download_tiles(client, refs, lat, lon, out_dir, progress=None, cancel=None, workers=8):
+    """Download and relocate tiles into out_dir. Returns (paths, Counter of copyrights).
+
+    Calls progress(n_done, n_total) after each tile; raises Cancelled once
+    cancel() returns true.
+    """
     to_enu = ecef_to_enu_matrix(lat, lon)
     copyrights = Counter()
     paths = []
 
     def fetch(item):
         i, ref = item
+        _check(cancel)
         data, text = relocate_glb(client.get(ref.url), mat_mul(to_enu, ref.transform))
         path = os.path.join(out_dir, f"tile_{i:05d}.glb")
         with open(path, "wb") as f:
@@ -387,8 +408,8 @@ def download_tiles(client, refs, lat, lon, out_dir, progress=None, workers=8):
             for part in text.split(";"):
                 if part.strip():
                     copyrights[part.strip()] += 1
-            if progress and (n % 25 == 0 or n == len(refs)):
-                progress(f"Downloaded {n}/{len(refs)} tiles")
+            if progress:
+                progress(n, len(refs))
     return paths, copyrights
 
 

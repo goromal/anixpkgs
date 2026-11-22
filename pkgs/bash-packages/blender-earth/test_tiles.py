@@ -155,6 +155,20 @@ class TraversalTest(unittest.TestCase):
         self.assertNotIn("session", server.seen[n])
         self.assertEqual(server.seen[n + 1].get("session"), "S1")
 
+    def test_progress_and_cancel(self):
+        client = tiles.Client("K", opener=FakeServer(fake_tileset()))
+        seen = []
+        refs = tiles.select_tiles(client, LAT, LON, radius=1e6, max_error=4.0, progress=lambda n, v: seen.append(n))
+        self.assertEqual(seen[-1], len(refs))
+        ticks = []
+        with tempfile.TemporaryDirectory() as d:
+            tiles.download_tiles(client, refs, LAT, LON, d, progress=lambda n, t: ticks.append((n, t)))
+            self.assertEqual(ticks, [(i + 1, len(refs)) for i in range(len(refs))])
+            with self.assertRaises(tiles.Cancelled):
+                tiles.download_tiles(client, refs, LAT, LON, d, cancel=lambda: True)
+        with self.assertRaises(tiles.Cancelled):
+            tiles.select_tiles(client, LAT, LON, radius=150.0, max_error=4.0, cancel=lambda: True)
+
     def test_coarse_stop(self):
         client = tiles.Client("K", opener=FakeServer(fake_tileset()))
         refs = tiles.select_tiles(client, LAT, LON, radius=150.0, max_error=200.0)

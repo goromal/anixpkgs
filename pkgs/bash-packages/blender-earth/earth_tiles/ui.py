@@ -51,6 +51,17 @@ class EarthTilesSettings(bpy.types.PropertyGroup):
     )
 
 
+# The running import, if any. Only one at a time; the panel draws its progress.
+_job = None
+
+
+def _redraw(context):
+    for window in context.window_manager.windows:
+        for area in window.screen.areas:
+            if area.type == "VIEW_3D":
+                area.tag_redraw()
+
+
 class EARTH_OT_import(bpy.types.Operator):
     bl_idname = "earth_tiles.import_area"
     bl_label = "Import Area"
@@ -59,7 +70,12 @@ class EARTH_OT_import(bpy.types.Operator):
 
     export: bpy.props.BoolProperty(default=False, options={"HIDDEN"})
 
+    @classmethod
+    def poll(cls, context):
+        return _job is None
+
     def execute(self, context):
+        global _job
         s = context.scene.earth_tiles
         prefs = context.preferences.addons[__package__].preferences
         try:
@@ -73,12 +89,8 @@ class EARTH_OT_import(bpy.types.Operator):
             return {"CANCELLED"}
         from . import scene
 
-        def progress(msg):
-            print(f"[earth_tiles] {msg}")
-            context.workspace.status_text_set(msg)
-
         try:
-            _, credit = scene.generate(
+            _job = scene.ImportJob(
                 lat,
                 lon,
                 radius=s.radius,
@@ -91,15 +103,65 @@ class EARTH_OT_import(bpy.types.Operator):
                 ground=s.ground,
                 draco=s.draco,
                 max_tiles=s.max_tiles,
-                progress=progress,
             )
         except tiles.TilesError as e:
             self.report({"ERROR"}, str(e))
             return {"CANCELLED"}
-        finally:
-            context.workspace.status_text_set(None)
-        self.report({"INFO"}, credit)
+        _job.start()
+        wm = context.window_manager
+        self._timer = wm.event_timer_add(0.1, window=context.window)
+        wm.modal_handler_add(self)
+        return {"RUNNING_MODAL"}
+
+    def modal(self, context, event):
+        global _job
+        if _job is None:  # cancelled by a file load
+            return self._end(context, {"CANCELLED"})
+        if event.type == "ESC" and event.value == "PRESS":
+            _job.cancel()
+            return {"RUNNING_MODAL"}
+        if event.type != "TIMER":
+            return {"PASS_THROUGH"}
+        finished = _job.step()
+        context.workspace.status_text_set(f"Earth Tiles: {_job.status} (Esc to cancel)")
+        _redraw(context)
+        if not finished:
+            return {"PASS_THROUGH"}
+        job, _job = _job, None
+        if job.error is not None:
+            level = {"WARNING"} if isinstance(job.error, tiles.Cancelled) else {"ERROR"}
+            self.report(level, str(job.error))
+            return self._end(context, {"CANCELLED"})
+        self.report({"INFO"}, job.credit)
+        return self._end(context, {"FINISHED"})
+
+    def _end(self, context, result):
+        context.window_manager.event_timer_remove(self._timer)
+        context.workspace.status_text_set(None)
+        _redraw(context)
+        return result
+
+
+class EARTH_OT_cancel(bpy.types.Operator):
+    bl_idname = "earth_tiles.cancel"
+    bl_label = "Cancel"
+    bl_description = "Stop the running import and remove what it added"
+
+    @classmethod
+    def poll(cls, context):
+        return _job is not None
+
+    def execute(self, context):
+        _job.cancel()
         return {"FINISHED"}
+
+
+@bpy.app.handlers.persistent
+def _cancel_on_load(*_args):
+    global _job
+    if _job is not None:
+        _job.abandon()
+        _job = None
 
 
 class EARTH_PT_panel(bpy.types.Panel):
@@ -111,6 +173,7 @@ class EARTH_PT_panel(bpy.types.Panel):
     def draw(self, context):
         s = context.scene.earth_tiles
         col = self.layout.column()
+        col.enabled = _job is None
         col.prop(s, "location")
         col.prop(s, "radius")
         col.prop(s, "max_error")
@@ -123,20 +186,27 @@ class EARTH_PT_panel(bpy.types.Panel):
         col.prop(s, "output")
         col.prop(s, "draco")
         col.operator(EARTH_OT_import.bl_idname, text="Import && Export GLB", icon="EXPORT").export = True
-        col.separator()
-        col.label(text="Imagery & 3D: Google", icon="INFO")
+        if _job is not None:
+            box = self.layout.box()
+            box.progress(factor=_job.fraction, type="BAR", text=_job.status)
+            box.operator(EARTH_OT_cancel.bl_idname, icon="CANCEL")
+        self.layout.label(text="Imagery & 3D: Google", icon="INFO")
 
 
-_classes = (EarthTilesPreferences, EarthTilesSettings, EARTH_OT_import, EARTH_PT_panel)
+_classes = (EarthTilesPreferences, EarthTilesSettings, EARTH_OT_import, EARTH_OT_cancel, EARTH_PT_panel)
 
 
 def register():
     for cls in _classes:
         bpy.utils.register_class(cls)
     bpy.types.Scene.earth_tiles = bpy.props.PointerProperty(type=EarthTilesSettings)
+    bpy.app.handlers.load_pre.append(_cancel_on_load)
 
 
 def unregister():
+    _cancel_on_load()
+    if _cancel_on_load in bpy.app.handlers.load_pre:
+        bpy.app.handlers.load_pre.remove(_cancel_on_load)
     del bpy.types.Scene.earth_tiles
     for cls in reversed(_classes):
         bpy.utils.unregister_class(cls)
