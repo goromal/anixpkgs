@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795360690,
+        "lastModified": 1795361756,
         "narHash": "sha256-GFG9m8M/FJkRIs4BWNuuArQg+JZeWSvEoermM6wcrAU=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "9283fd632f109a023e9598e269c01bc23f9383c8",
+        "rev": "e56cc4f3b6f6cda35ef5b0d54897d611f6cedbdc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/nexus-fresh",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
