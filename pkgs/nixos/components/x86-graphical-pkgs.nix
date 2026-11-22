@@ -113,7 +113,7 @@ in
           unstable.google-chrome
           unstable.inkscape
           unstable.audacity
-          blender
+          anixpkgs.blender-earth
         ]
       else
         [ ]

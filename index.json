@@ -703,6 +703,11 @@
                 "docs": true
             },
             {
+                "attr": "blender-earth",
+                "ci": true,
+                "docs": true
+            },
+            {
                 "attr": "pb",
                 "ci": true,
                 "docs": true
