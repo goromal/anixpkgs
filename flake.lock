@@ -457,16 +457,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795368061,
+        "lastModified": 1795371283,
         "narHash": "sha256-Hb8UR0HOkt9Qfyu2xS0TIHxhdV7KyVXSLvZlIytXlX4=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "0a941e290e08f0b749fea3ccce4f59d22e129ff3",
+        "rev": "caccaf676adbf682462d88b31ac18807ff9b578f",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/budget-spending-reports",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
