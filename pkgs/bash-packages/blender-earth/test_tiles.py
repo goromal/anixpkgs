@@ -146,6 +146,15 @@ class TraversalTest(unittest.TestCase):
             self.assertAlmostEqual(v, 0.0, places=4)
         self.assertNotIn("translation", doc["nodes"][0])
 
+    def test_reused_client_root_has_no_session(self):
+        server = FakeServer(fake_tileset())
+        client = tiles.Client("K", opener=server)
+        tiles.select_tiles(client, LAT, LON, radius=150.0, max_error=4.0)
+        n = len(server.seen)
+        tiles.select_tiles(client, LAT, LON, radius=150.0, max_error=4.0)
+        self.assertNotIn("session", server.seen[n])
+        self.assertEqual(server.seen[n + 1].get("session"), "S1")
+
     def test_coarse_stop(self):
         client = tiles.Client("K", opener=FakeServer(fake_tileset()))
         refs = tiles.select_tiles(client, LAT, LON, radius=150.0, max_error=200.0)

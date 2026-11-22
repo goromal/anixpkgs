@@ -209,7 +209,8 @@ class Client:
         if "session" in query and self.session is None:
             self.session = query["session"]
         query.setdefault("key", self.key)
-        if self.session is not None:
+        # root.json rejects a session parameter (HTTP 400); it starts a new session.
+        if self.session is not None and parsed.path != urllib.parse.urlparse(ROOT_URL).path:
             query.setdefault("session", self.session)
         return urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(query)))
 
