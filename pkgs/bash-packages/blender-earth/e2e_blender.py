@@ -75,11 +75,16 @@ def main():
         "/v1/3dtiles/b.glb": placed(base, p1, "Data A;Data B"),
     }
 
+    hang = {"glb": False}
+
     def opener(url, timeout=None):
-        return Resp(routes[urllib.parse.urlparse(url).path])
+        path = urllib.parse.urlparse(url).path
+        if hang["glb"] and path.endswith(".glb"):
+            time.sleep(3.0)  # an unanswered request
+        return Resp(routes[path])
 
     real_client = tiles.Client
-    tiles.Client = lambda key: real_client(key, opener=opener)
+    tiles.Client = lambda key, **kw: real_client(key, opener=opener, **kw)
     os.environ[tiles.KEY_ENV] = "K"
 
     out = os.path.join(tmp, "out.glb")
@@ -127,6 +132,27 @@ def main():
     assert isinstance(job.error, tiles.Cancelled), job.error
     assert (len(bpy.data.objects), len(bpy.data.collections)) == (n_objects, n_collections)
     assert job._tmp is None
+
+    # Cancel while downloads hang: the job ends at once, and the worker removes
+    # its temp dir when its in-flight requests return.
+    hang["glb"] = True
+    job = scene.ImportJob(LAT, LON, radius=100.0, max_error=4.0)
+    job.start()
+    while job.stage != "downloading":
+        assert not job.step(), job.status
+        time.sleep(0.01)
+    while job._tmp is None:
+        time.sleep(0.01)
+    tmp = job._tmp
+    job.cancel()
+    t0 = time.monotonic()
+    assert job.step(), job.status
+    assert time.monotonic() - t0 < 0.5
+    assert isinstance(job.error, tiles.Cancelled), job.error
+    job._thread.join(timeout=10.0)
+    assert not job._thread.is_alive()
+    assert not os.path.exists(tmp), os.listdir(tmp)
+    assert (len(bpy.data.objects), len(bpy.data.collections)) == (n_objects, n_collections)
     print("E2E OK")
 
 

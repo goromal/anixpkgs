@@ -2,7 +2,9 @@ import io
 import json
 import os
 import tempfile
+import time
 import unittest
+import urllib.error
 import urllib.parse
 from collections import Counter
 
@@ -178,6 +180,46 @@ class TraversalTest(unittest.TestCase):
         client = tiles.Client("K", opener=FakeServer(fake_tileset()))
         with self.assertRaises(tiles.TilesError):
             tiles.select_tiles(client, LAT, LON, radius=1e6, max_error=0.1, max_tiles=0)
+
+
+class RetryTest(unittest.TestCase):
+    def test_timeout_is_retried(self):
+        calls = []
+
+        def opener(url, timeout=None):
+            calls.append(timeout)
+            if len(calls) == 1:
+                raise TimeoutError("timed out")
+            return FakeResponse(b"ok")
+
+        reasons = []
+        client = tiles.Client("K", opener=opener, on_retry=reasons.append, backoff=0.01)
+        self.assertEqual(client.get("https://x/y"), b"ok")
+        self.assertEqual(reasons, ["timed out"])
+        self.assertEqual(calls, [tiles.Client.TIMEOUT] * 2)
+
+    def test_gives_up_after_retries(self):
+        def opener(url, timeout=None):
+            raise urllib.error.URLError("unreachable")
+
+        client = tiles.Client("K", opener=opener, retries=2, backoff=0.01)
+        with self.assertRaises(tiles.TilesError) as ctx:
+            client.get("https://x/y?key=SECRET")
+        self.assertNotIn("SECRET", str(ctx.exception))
+        self.assertEqual(client.requests, 3)
+
+    def test_cancel_interrupts_backoff(self):
+        state = {"cancel": False}
+
+        def opener(url, timeout=None):
+            state["cancel"] = True
+            raise urllib.error.URLError("unreachable")
+
+        client = tiles.Client("K", opener=opener, backoff=30.0, cancel=lambda: state["cancel"])
+        t0 = time.monotonic()
+        with self.assertRaises(tiles.Cancelled):
+            client.get("https://x/y")
+        self.assertLess(time.monotonic() - t0, 1.0)
 
 
 class RelocateTest(unittest.TestCase):

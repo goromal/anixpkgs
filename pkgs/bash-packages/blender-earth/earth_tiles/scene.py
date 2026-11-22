@@ -51,15 +51,20 @@ class ImportJob:
         self._coll = None
         self._meshes = []
         self._client = None
+        self._retries = 0
+        self._tmp_lock = threading.Lock()
         self._last_log = 0.0
         self._thread = threading.Thread(target=self._fetch, name="earth-tiles-fetch", daemon=True)
 
     @property
     def status(self):
+        retries = f" ({self._retries} network retries)" if self._retries else ""
         if self.stage == "selecting":
-            return f"Selecting tiles: {self.done} found"
-        if self.stage in ("downloading", "importing"):
-            return f"{self.stage.capitalize()} {self.done}/{self.total} tiles"
+            return f"Selecting tiles: {self.done} found{retries}"
+        if self.stage == "downloading":
+            return f"Downloading {self.done}/{self.total} tiles{retries}"
+        if self.stage == "importing":
+            return f"Importing {self.done}/{self.total} tiles"
         if self.stage == "finishing":
             return "Joining and cropping"
         if self.stage == "failed":
@@ -82,7 +87,6 @@ class ImportJob:
     def abandon(self):
         """Stop without touching bpy data (it is about to be replaced by a file load)."""
         self._cancel.set()
-        self._thread.join(timeout=65.0)
         self._remove_tmp()
 
     def _progress(self, done, total=0):
@@ -92,9 +96,14 @@ class ImportJob:
             self._last_log = now
             _log(self.status)
 
+    def _on_retry(self, reason):
+        self._retries += 1
+        _log(f"Network retry {self._retries}: {reason}")
+
     def _fetch(self):
+        tmp = None
         try:
-            self._client = tiles.Client(self._key)
+            self._client = tiles.Client(self._key, cancel=self._cancel.is_set, on_retry=self._on_retry)
             refs = tiles.select_tiles(
                 self._client,
                 self.lat,
@@ -107,7 +116,9 @@ class ImportJob:
             )
             if not refs:
                 raise tiles.TilesError("No tiles intersect the requested area")
-            self._tmp = tempfile.mkdtemp(prefix="earth-tiles-")
+            with self._tmp_lock:
+                tiles._check(self._cancel.is_set)
+                self._tmp = tmp = tempfile.mkdtemp(prefix="earth-tiles-")
             self.done, self.total = 0, len(refs)
             self.stage = "downloading"
             paths, copyrights = tiles.download_tiles(
@@ -125,14 +136,21 @@ class ImportJob:
             self.stage = "importing"
         except Exception as e:  # reported on the main thread by step()
             self.error = e
+        if self._cancel.is_set() and tmp:
+            # The main thread may already have given up on us, and downloads
+            # still in flight may have written files after it cleaned up.
+            self._remove_tmp()
+            shutil.rmtree(tmp, ignore_errors=True)
 
     def step(self, budget=0.1):
         """Advance on the main thread. Returns True once finished, failed, or cancelled."""
         if self.error is None and self._cancel.is_set():
             self.error = tiles.Cancelled()
         if self.error is not None:
-            if self._thread.is_alive():
-                return False  # let the worker stop before removing its temp dir
+            if self._thread.is_alive() and not self._cancel.is_set():
+                return False  # a failing worker is about to exit
+            # On cancel, don't wait for in-flight requests: the worker stops at its
+            # next check and removes its own temp dir.
             self._abort()
             return True
         try:
@@ -205,9 +223,10 @@ class ImportJob:
         _log(f"Failed: {self.error}")
 
     def _remove_tmp(self):
-        if self._tmp:
-            shutil.rmtree(self._tmp, ignore_errors=True)
-            self._tmp = None
+        with self._tmp_lock:
+            if self._tmp:
+                shutil.rmtree(self._tmp, ignore_errors=True)
+                self._tmp = None
 
 
 def generate(lat, lon, **kwargs):

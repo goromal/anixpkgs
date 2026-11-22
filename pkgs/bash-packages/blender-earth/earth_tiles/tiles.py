@@ -12,6 +12,7 @@ directory that the caller deletes as soon as the tiles are imported.
 """
 
 import concurrent.futures
+import http.client
 import json
 import math
 import os
@@ -203,12 +204,19 @@ class Client:
     renderer tile requests for about three hours.
     """
 
-    def __init__(self, key, opener=None, retries=3):
+    # Seconds without progress on a socket before a request is retried. Google
+    # occasionally leaves a connection unanswered; fail fast and reconnect.
+    TIMEOUT = 15.0
+
+    def __init__(self, key, opener=None, retries=3, cancel=None, on_retry=None, backoff=1.0):
         if not key:
             raise TilesError("No Google Map Tiles API key provided")
         self.key = key
         self.session = None
         self.retries = retries
+        self.backoff = backoff
+        self.cancel = cancel
+        self.on_retry = on_retry  # on_retry(reason) before each retry
         self._opener = opener or urllib.request.urlopen
         self.requests = 0
 
@@ -225,21 +233,30 @@ class Client:
         return urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(query)))
 
     def get(self, url):
-        delay = 1.0
+        delay = self.backoff
         for attempt in range(self.retries + 1):
+            _check(self.cancel)
             try:
                 self.requests += 1
-                with self._opener(url, timeout=60) as resp:
+                with self._opener(url, timeout=self.TIMEOUT) as resp:
                     return resp.read()
             except urllib.error.HTTPError as e:
                 retryable = e.code == 429 or e.code >= 500
                 if not retryable or attempt == self.retries:
                     body = e.read().decode("utf-8", "replace")[:500]
                     raise TilesError(f"HTTP {e.code} for {_redact(url)}: {body}") from e
-            except urllib.error.URLError as e:
+                reason = f"HTTP {e.code}"
+            except (OSError, http.client.HTTPException) as e:  # URLError, timeouts, resets
                 if attempt == self.retries:
                     raise TilesError(f"Request failed for {_redact(url)}: {e}") from e
-            time.sleep(delay)
+                reason = str(getattr(e, "reason", e)) or type(e).__name__
+            if self.on_retry is not None:
+                self.on_retry(reason)
+            # Wake early on cancel rather than sleeping out the backoff.
+            deadline = time.monotonic() + delay
+            while time.monotonic() < deadline:
+                _check(self.cancel)
+                time.sleep(max(0.0, min(0.1, deadline - time.monotonic())))
             delay *= 2.0
         raise AssertionError("unreachable")
 
