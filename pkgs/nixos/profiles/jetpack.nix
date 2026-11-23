@@ -89,6 +89,7 @@ in
       gpu.enable = true;
       notebooks.enable = true;
       imageGeneration.enable = true;
+      aiArt.enable = false;
       localLlm.enable = false;
       folio.enable = false;
       tactical.enable = false;

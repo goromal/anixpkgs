@@ -651,6 +651,10 @@ rec {
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
   anix-llm = addDoc (prev.callPackage ./python-packages/anix-llm { });
+  aiart = addDoc (prev.callPackage ./python-packages/aiart { pkg-src = flakeInputs.aiart; });
+  cozy-workflows = prev.runCommand "cozy-workflows" { } ''
+    cp -r ${flakeInputs.aiart}/cozy-workflows $out
+  '';
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (

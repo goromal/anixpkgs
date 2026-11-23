@@ -165,6 +165,10 @@ in
     services.launchpad.enable = features.notebooks.enable;
     services.comfyui.enable = features.imageGeneration.enable;
     machines.localLlm.enable = features.localLlm.enable;
+    services.aiart = {
+      enable = features.aiArt.enable;
+      agents = features.agents.frameworks;
+    };
     services.homeVpnNode.enable = features.homeVpn.enable;
     services.folio-backend = {
       enable = features.folio.enable;
