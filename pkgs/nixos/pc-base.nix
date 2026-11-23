@@ -233,6 +233,7 @@ in
     ../modules/cudaNode/module.nix
     ../modules/localLlm/module.nix
     ../modules/comfyui/module.nix
+    ../modules/aiart/module.nix
     ../modules/externalDrives/module.nix
     ../modules/homeVpnNode/module.nix
     ../modules/notes-wiki/module.nix

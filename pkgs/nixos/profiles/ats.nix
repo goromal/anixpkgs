@@ -72,6 +72,7 @@ with import ../dependencies.nix;
       gpu.enable = false;
       notebooks.enable = false;
       imageGeneration.enable = false;
+      aiArt.enable = false;
       localLlm.enable = false;
       folio.enable = true;
       tactical.enable = true;

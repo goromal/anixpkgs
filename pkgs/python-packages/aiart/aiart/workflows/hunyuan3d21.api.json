@@ -1,0 +1,50 @@
+{
+  "_aiart": {
+    "kind": "mesh",
+    "title": "Hunyuan3D 2.1 (image to untextured mesh)",
+    "min_vram_gb": 4,
+    "image_node": "2",
+    "save_node": "10",
+    "params": {
+      "seed": ["7", "seed"],
+      "steps": ["7", "steps"],
+      "cfg": ["7", "cfg"],
+      "octree_resolution": ["8", "octree_resolution"],
+      "threshold": ["9", "threshold"],
+      "latent_resolution": ["4", "resolution"]
+    },
+    "models": [
+      {
+        "dir": "checkpoints",
+        "name": "hunyuan_3d_v2.1.safetensors",
+        "url": "https://huggingface.co/Comfy-Org/hunyuan3D_2.1_repackaged/resolve/main/hunyuan_3d_v2.1.safetensors",
+        "bytes": 7365943290
+      },
+      {
+        "dir": "background_removal",
+        "name": "birefnet.safetensors",
+        "url": "https://huggingface.co/Comfy-Org/BiRefNet/resolve/main/background_removal/birefnet.safetensors",
+        "bytes": 444473596
+      }
+    ],
+    "notes": "Shape only: the GLB has smooth normals but no texture or vertex colour. The background is removed with BiRefNet first, so photos work, but frame one whole object."
+  },
+  "1": {"class_type": "ImageOnlyCheckpointLoader", "inputs": {"ckpt_name": "hunyuan_3d_v2.1.safetensors"}},
+  "2": {"class_type": "LoadImage", "inputs": {"image": "input.png"}},
+  "3": {"class_type": "ModelSamplingAuraFlow", "inputs": {"model": ["1", 0], "shift": 1.0}},
+  "20": {"class_type": "LoadBackgroundRemovalModel", "inputs": {"bg_removal_name": "birefnet.safetensors"}},
+  "21": {"class_type": "RemoveBackground", "inputs": {"bg_removal_model": ["20", 0], "image": ["2", 0]}},
+  "22": {"class_type": "GetImageSize", "inputs": {"image": ["2", 0]}},
+  "23": {"class_type": "EmptyImage", "inputs": {"width": ["22", 0], "height": ["22", 1], "batch_size": 1, "color": 16777215}},
+  "24": {"class_type": "ImageCompositeMasked", "inputs": {"destination": ["23", 0], "source": ["2", 0], "x": 0, "y": 0, "resize_source": false, "mask": ["21", 0]}},
+  "13": {"class_type": "CLIPVisionEncode", "inputs": {"clip_vision": ["1", 1], "image": ["24", 0], "crop": "center"}},
+  "6": {"class_type": "Hunyuan3Dv2Conditioning", "inputs": {"clip_vision_output": ["13", 0]}},
+  "4": {"class_type": "EmptyLatentHunyuan3Dv2", "inputs": {"resolution": 4096, "batch_size": 1}},
+  "7": {"class_type": "KSampler", "inputs": {
+    "model": ["3", 0], "positive": ["6", 0], "negative": ["6", 1], "latent_image": ["4", 0],
+    "seed": 0, "steps": 30, "cfg": 5.0, "sampler_name": "euler", "scheduler": "normal", "denoise": 1.0}},
+  "8": {"class_type": "VAEDecodeHunyuan3D", "inputs": {"samples": ["7", 0], "vae": ["1", 2], "num_chunks": 8000, "octree_resolution": 256}},
+  "9": {"class_type": "VoxelToMesh", "inputs": {"voxel": ["8", 0], "algorithm": "surface net", "threshold": 0.6}},
+  "11": {"class_type": "MeshSmoothNormals", "inputs": {"mesh": ["9", 0], "crease_angle": 180.0}},
+  "10": {"class_type": "SaveGLB", "inputs": {"mesh": ["11", 0], "filename_prefix": "aiart/mesh"}}
+}

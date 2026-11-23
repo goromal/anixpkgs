@@ -36,5 +36,6 @@
   notebooks = "Launchpad Jupyter notebook server";
   imageGeneration = "ComfyUI backend and Cozy image-generation UI";
   localLlm = "private local LLM service and CLI";
+  aiArt = "aiart agent TUI and 2D/3D art skills (needs gpu and imageGeneration)";
   folio = "Folio book study backend and optional desktop shell";
 }

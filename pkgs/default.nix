@@ -651,6 +651,7 @@ rec {
   goromail = final.python313.pkgs.goromail;
   orchestrator = final.python313.pkgs.orchestrator;
   anix-llm = addDoc (prev.callPackage ./python-packages/anix-llm { });
+  aiart = addDoc (prev.callPackage ./python-packages/aiart { });
 
   authm = addDoc (prev.callPackage ./bash-packages/authm { python = python313; });
   manage-gmail = addDoc (

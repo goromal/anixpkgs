@@ -17,6 +17,7 @@
   machines.features.notebooks.enable = lib.mkForce true;
   machines.features.imageGeneration.enable = lib.mkForce true;
   machines.features.localLlm.enable = lib.mkForce true;
+  machines.features.aiArt.enable = lib.mkForce true;
   machines.localLlm = {
     acceleration = "cuda";
     extraModels = [ "huihui_ai/qwen3-vl-abliterated:8b-instruct" ];
