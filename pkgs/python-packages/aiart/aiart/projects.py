@@ -85,16 +85,21 @@ class Project:
         return os.path.getmtime(target)
 
 
-def create(projects_dir, name, kind, description=""):
+def create(projects_dir, name, kind, description="", adopt=False):
+    """Make a new project directory. With `adopt`, an existing directory that
+    is not yet a project (earlier work, e.g. ~/data/3D/Castle) becomes one in
+    place; nothing in it is moved or changed."""
     if not _NAME_RE.match(name or ""):
         raise ProjectError("project names use letters, digits, '.', '_' and '-'")
     if kind not in KINDS:
         raise ProjectError("kind must be one of %s" % ", ".join(KINDS))
     root = os.path.join(os.path.expanduser(projects_dir), name)
-    if os.path.exists(root):
-        raise ProjectError("%s already exists" % root)
+    if os.path.exists(os.path.join(root, MARKER)):
+        raise ProjectError("%s is already a project" % root)
+    if os.path.exists(root) and not adopt:
+        raise ProjectError("%s already exists (use --adopt to make it a project)" % root)
     for sub in ("refs", "out"):
-        os.makedirs(os.path.join(root, sub))
+        os.makedirs(os.path.join(root, sub), exist_ok=True)
     meta = {"name": name, "kind": kind, "description": description,
             "created": _now()}
     with open(os.path.join(root, MARKER), "w") as f:
@@ -103,13 +108,17 @@ def create(projects_dir, name, kind, description=""):
     return Project(root)
 
 
-def list_projects(projects_dir):
-    base = os.path.expanduser(projects_dir)
-    if not os.path.isdir(base):
-        return []
-    found = [Project(os.path.join(base, n)) for n in os.listdir(base)
-             if os.path.isfile(os.path.join(base, n, MARKER))]
-    return sorted(found, key=lambda p: p.modified(), reverse=True)
+def list_projects(*projects_dirs):
+    found = {}
+    for d in projects_dirs:
+        base = os.path.expanduser(d)
+        if not os.path.isdir(base):
+            continue
+        for n in os.listdir(base):
+            if os.path.isfile(os.path.join(base, n, MARKER)):
+                p = Project(os.path.join(base, n))
+                found[p.root] = p
+    return sorted(found.values(), key=lambda p: p.modified(), reverse=True)
 
 
 def find(start=None):

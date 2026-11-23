@@ -17,10 +17,17 @@ in
       type = lib.types.package;
       default = extendedPkgs.aiart;
     };
-    projectsDir = lib.mkOption {
-      type = lib.types.str;
-      default = "${config.machines.base.homeDir}/data/aiart";
-      description = "Where aiart projects live, one directory each.";
+    projectsDirs = {
+      "2d" = lib.mkOption {
+        type = lib.types.str;
+        default = "${config.machines.base.homeDir}/data/aiart";
+        description = "Where 2D projects live, one directory each.";
+      };
+      "3d" = lib.mkOption {
+        type = lib.types.str;
+        default = "${config.machines.base.homeDir}/data/3D";
+        description = "Where 3D projects live, one directory each.";
+      };
     };
     agents = lib.mkOption {
       type = lib.types.listOf lib.types.str;
@@ -49,7 +56,7 @@ in
     };
     workflowDirs = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "${cfg.projectsDir}/workflows" ];
+      default = [ "${config.machines.base.homeDir}/data/aiart/workflows" ];
       description = "Extra directories of <name>.api.json mesh workflows; later entries override bundled ones.";
     };
   };
@@ -72,7 +79,7 @@ in
     environment.systemPackages = [ cfg.package ];
 
     environment.etc."aiart/config.json".text = builtins.toJSON {
-      inherit (cfg) projectsDir agents workflowDirs;
+      inherit (cfg) projectsDirs agents workflowDirs;
       backends = cfg.backends;
       cozyUrl = "http://127.0.0.1:${toString service-ports.cozy}/cozy";
       comfyUrl = "http://127.0.0.1:${toString comfy.port}";

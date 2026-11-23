@@ -38,9 +38,9 @@ class NewProject(ModalScreen):
     #buttons { height: auto; align-horizontal: right; }
     """
 
-    def __init__(self, projects_dir):
+    def __init__(self, cfg):
         super().__init__()
-        self.projects_dir = projects_dir
+        self.cfg = cfg
 
     def compose(self) -> ComposeResult:
         with Vertical(id="dialog"):
@@ -67,8 +67,10 @@ class NewProject(ModalScreen):
     def _create(self):
         kind = "3d" if self.query_one("#k3d", RadioButton).value else "2d"
         try:
-            p = projects.create(self.projects_dir, self.query_one("#name", Input).value.strip(),
-                                kind, self.query_one("#description", Input).value.strip())
+            p = projects.create(self.cfg.projects_dir(kind),
+                                self.query_one("#name", Input).value.strip(), kind,
+                                self.query_one("#description", Input).value.strip(),
+                                adopt=True)
         except projects.ProjectError as e:
             self.query_one("#error", Static).update(str(e))
             return
@@ -111,13 +113,14 @@ class AiArtApp(App):
     def action_refresh(self):
         table = self.query_one(DataTable)
         table.clear()
-        self.rows = projects.list_projects(self.cfg.projects_dir)
+        self.rows = projects.list_projects(*self.cfg.projects_dirs.values())
         for p in self.rows:
             when = datetime.datetime.fromtimestamp(p.modified()).strftime("%Y-%m-%d %H:%M")
             table.add_row(p.name, p.kind, str(len(p.journal())), when)
         if not self.rows:
             self.query_one("#detail", Static).update(
-                "No projects yet in %s.\n\nPress n to create one." % self.cfg.path("projects_dir"))
+                "No projects yet in %s.\n\nPress n to create one."
+                % " or ".join(self.cfg.projects_dir(k) for k in self.cfg.projects_dirs))
         else:
             self._show(0)
 
@@ -146,7 +149,7 @@ class AiArtApp(App):
         def created(p):
             if p:
                 self.action_refresh()
-        self.push_screen(NewProject(self.cfg.projects_dir), created)
+        self.push_screen(NewProject(self.cfg), created)
 
     def action_agent(self, agent):
         p = self._current()

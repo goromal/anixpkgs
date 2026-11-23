@@ -48,7 +48,8 @@ def _emit(value):
 
 def cmd_status(cfg, args):
     rows = {"config": os.environ.get("AIART_CONFIG") or config.DEFAULT_PATH,
-            "projects_dir": cfg.path("projects_dir"), "backends": cfg.backends}
+            "projects_dirs": {k: cfg.projects_dir(k) for k in cfg.projects_dirs},
+            "backends": cfg.backends}
     try:
         ops.cozy_client(cfg).status()
         rows["cozy"] = "ok " + cfg.cozy_url
@@ -83,11 +84,12 @@ def cmd_status(cfg, args):
 
 def cmd_project(cfg, args):
     if args.action == "new":
-        p = projects.create(cfg.projects_dir, args.name, args.kind, args.description)
+        p = projects.create(cfg.projects_dir(args.kind), args.name, args.kind,
+                            args.description, args.adopt)
         _emit(p.root)
     elif args.action == "list":
         _emit([{"name": p.name, "kind": p.kind, "root": p.root}
-               for p in projects.list_projects(cfg.projects_dir)])
+               for p in projects.list_projects(*cfg.projects_dirs.values())])
     else:
         p = projects.find()
         if not p:
@@ -188,6 +190,8 @@ def build_parser():
     pn.add_argument("name")
     pn.add_argument("--kind", choices=projects.KINDS, required=True)
     pn.add_argument("--description", default="")
+    pn.add_argument("--adopt", action="store_true",
+                    help="turn an existing directory of earlier work into a project")
     ps.add_parser("list")
     pi = ps.add_parser("info", help="current project and recent journal")
     pi.add_argument("--tail", type=int, default=20)

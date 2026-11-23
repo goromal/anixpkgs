@@ -15,7 +15,7 @@ the module.
 ```console
 aiart                       # TUI: n new project, c/x open Claude/Codex, b Blender, v view image
 aiart status                # services, backends, model readiness, live Blender (JSON)
-aiart project new NAME --kind 2d|3d
+aiart project new NAME --kind 2d|3d [--adopt]
 aiart project info          # current project + journal tail
 
 aiart image gen "PROMPT" [--width W --height H]
@@ -29,6 +29,10 @@ aiart blender scene | import X.glb | save [P] | export P.glb | screenshot P.png
 aiart blender render MODEL [--views front,iso,top] [--engine eevee|cycles|workbench]
 aiart view [IMAGE]
 ```
+
+Projects live in `services.aiart.projectsDirs`: 2D in `~/data/aiart`, 3D in
+`~/data/3D` next to earlier 3D work. `--adopt` (and the TUI's new-project
+dialog) turns an existing folder there into a project in place.
 
 Generation commands print only the output path on stdout. Inside a project
 they write `out/NNN-<slug>.<ext>`, repoint `latest.<ext>`, and append to
