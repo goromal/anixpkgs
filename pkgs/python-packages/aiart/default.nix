@@ -23,10 +23,7 @@ python313Packages.buildPythonApplication {
   meta = {
     description = "Agent-driven local 2D and 3D art workflows";
     longDescription = ''
-      A TUI that opens Claude or Codex sessions per art project, plus the
-      commands those agents drive: 2D generation and editing through cozy,
-      image-to-mesh through ComfyUI, and a live bridge into the user's
-      Blender session. Model choice is configuration, not agent knowledge.
+      A TUI that opens agent sessions per art project for 2D and 3D art.
     '';
     autoGenUsageCmd = "--help";
     platforms = lib.platforms.linux;
