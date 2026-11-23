@@ -526,6 +526,11 @@
                 "docs": true
             },
             {
+                "attr": "cozy-workflows",
+                "ci": true,
+                "docs": false
+            },
+            {
                 "attr": "wormhole",
                 "ci": true,
                 "docs": true

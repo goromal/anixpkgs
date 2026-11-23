@@ -1,13 +1,14 @@
 {
   lib,
   python313Packages,
+  pkg-src,
 }:
 python313Packages.buildPythonApplication {
   pname = "aiart";
   version = "0.1.0";
   pyproject = true;
 
-  src = lib.cleanSource ./.;
+  src = pkg-src;
 
   build-system = [ python313Packages.setuptools ];
   dependencies = with python313Packages; [

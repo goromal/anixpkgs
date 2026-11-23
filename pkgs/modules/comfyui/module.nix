@@ -105,7 +105,7 @@ in
       };
       workflowDir = lib.mkOption {
         type = lib.types.str;
-        default = cfg.dataDir;
+        default = "${extendedPkgs.cozy-workflows}";
         description = "Directory holding <name>.api.json workflow files";
       };
       inputDir = lib.mkOption {

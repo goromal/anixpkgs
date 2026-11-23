@@ -32,6 +32,23 @@
         "type": "github"
       }
     },
+    "aiart": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795403880,
+        "narHash": "sha256-bJ6cbnufo7GgN/lrvHOsmp3BIQFhOOd4N9T8XUlabHQ=",
+        "owner": "goromal",
+        "repo": "aiart",
+        "rev": "381a1255b4f59fbc4100cbc795f60ec42f7c94b2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "goromal",
+        "ref": "refs/heads/dev/aiart",
+        "repo": "aiart",
+        "type": "github"
+      }
+    },
     "anixdata": {
       "flake": false,
       "locked": {
@@ -1284,6 +1301,7 @@
       "inputs": {
         "aapis": "aapis",
         "agent-skills": "agent-skills",
+        "aiart": "aiart",
         "anixdata": "anixdata",
         "ardupilot": "ardupilot",
         "bit-rs": "bit-rs",
