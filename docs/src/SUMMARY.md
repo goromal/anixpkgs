@@ -69,6 +69,7 @@
   - [goromail](./python/goromail.md)
   - [media2notes](./python/media2notes.md)
   - [cozy](./python/cozy.md)
+  - [aiart](./python/aiart.md)
   - [wormhole](./python/wormhole.md)
   - [grafana_dash](./python/grafana_dash.md)
 - [Bash Packages](./bash/bash.md)

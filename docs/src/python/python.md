@@ -47,5 +47,6 @@ Packages written (or bound) in Python.
 - [goromail](./goromail.md)
 - [media2notes](./media2notes.md)
 - [cozy](./cozy.md)
+- [aiart](./aiart.md)
 - [wormhole](./wormhole.md)
 - [grafana_dash](./grafana_dash.md)
