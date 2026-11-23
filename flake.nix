@@ -84,7 +84,7 @@
     folio.url = "github:goromal/folio";
     folio.flake = false;
 
-    aiart.url = "github:goromal/aiart?ref=refs/heads/dev/aiart";
+    aiart.url = "github:goromal/aiart";
     aiart.flake = false;
 
     geometry.url = "github:goromal/geometry";

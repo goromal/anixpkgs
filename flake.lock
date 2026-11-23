@@ -35,16 +35,15 @@
     "aiart": {
       "flake": false,
       "locked": {
-        "lastModified": 1795403880,
+        "lastModified": 1795409516,
         "narHash": "sha256-bJ6cbnufo7GgN/lrvHOsmp3BIQFhOOd4N9T8XUlabHQ=",
         "owner": "goromal",
         "repo": "aiart",
-        "rev": "381a1255b4f59fbc4100cbc795f60ec42f7c94b2",
+        "rev": "12cdfba8243a6a2d33c69b0fea37210b82ae8b53",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/aiart",
         "repo": "aiart",
         "type": "github"
       }
