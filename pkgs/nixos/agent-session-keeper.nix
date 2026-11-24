@@ -350,7 +350,12 @@ in
   runCommand = "${run}/bin/agent-session-run";
   restoreCommand = "${restore}/bin/agent-session-restore";
   sendCommand = "${send}/bin/agent-send";
-  inherit run restore send stateRoot;
+  inherit
+    run
+    restore
+    send
+    stateRoot
+    ;
   # Exported by a UI session command before it reaches the agent, so the record
   # can replay it: AGENT_SESSION_ARGS="$(${exportArgs} "$@")".
   exportArgs = "${pkgs.jq}/bin/jq -cn '$ARGS.positional' --args";
