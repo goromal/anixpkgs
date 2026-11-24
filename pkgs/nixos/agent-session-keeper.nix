@@ -312,8 +312,13 @@ let
       # devices) would otherwise interleave as paste A, paste B, Enter, Enter
       # and merge into one prompt. flock is released by the kernel if this
       # process dies, so a crashed send can't wedge the pane; the wait stays
-      # under the UI backends' request timeouts.
-      lock="''${XDG_RUNTIME_DIR:-/tmp}/agent-send-$socket-''${target//\//_}.lock"
+      # under the UI backends' request timeouts. The lock lives next to the
+      # tmux socket dir (per-user, 0700) rather than XDG_RUNTIME_DIR/tmp
+      # directly, which other users on the same host can also write to.
+      lockdir="''${TMUX_TMPDIR:-/tmp}/tmux-$(id -u)"
+      mkdir -p "$lockdir"
+      chmod 700 "$lockdir"
+      lock="$lockdir/agent-send-$socket-''${target//\//_}.lock"
       exec 9>>"$lock"
       if ! flock -w 5 9; then
         echo "agent-send: $target is busy" >&2
