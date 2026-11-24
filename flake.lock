@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795486585,
+        "lastModified": 1795490222,
         "narHash": "sha256-8K7yVZU7Od8NRzH1gHRKC+jA4lA6MKZrMGIegxT5HHk=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "caaa9f26a37d535a146a419efccdf97f974c3c78",
+        "rev": "f17c479abf4ce4c9fdb0731381a67dbe173298bf",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/fix/ios-password-save",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
