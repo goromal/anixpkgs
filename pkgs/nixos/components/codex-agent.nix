@@ -39,10 +39,19 @@ let
   // cfg.extraSettings;
 
   codexSetup = pkgs.writeShellScriptBin "codex-setup" ''
+    set -e
     if ! command -v codex &> /dev/null; then
       echo "Error: codex not found in PATH" >&2
       exit 1
     fi
+    echo "Installing Codex plugins..."
+    ${lib.concatMapStringsSep "\n    " (
+      marketplace: "codex plugin marketplace add ${lib.escapeShellArg marketplace}"
+    ) cfg.marketplaces}
+    ${lib.concatMapStringsSep "\n    " (
+      plugin: "codex plugin add ${lib.escapeShellArg plugin}"
+    ) cfg.plugins}
+    echo "Done! Verify installed plugins with 'codex plugin list'"
     echo "codex config is managed declaratively via ~/.codex/config.toml"
     if [ -t 0 ]; then
       read -p "Run 'codex login' now? (y|n) " -n 1 -r
@@ -57,6 +66,13 @@ let
 
   codexUpdate = pkgs.writeShellScriptBin "codex-update" ''
     echo "codex is pinned via nix (llm-agents.nix). Version: $(codex --version 2>/dev/null || echo unknown)"
+    echo "Updating Codex marketplaces..."
+    codex plugin marketplace upgrade
+    echo "Updating Codex plugins..."
+    ${lib.concatMapStringsSep "\n    " (
+      plugin: "codex plugin add ${lib.escapeShellArg plugin}"
+    ) cfg.plugins}
+    echo "Done! Restart Codex for updates to take effect."
   '';
 
   skillTargets = lib.concatMap (
@@ -71,6 +87,16 @@ in
   imports = [ ./upgrade-hooks.nix ];
 
   options.mods.codex = {
+    marketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Codex plugin marketplaces to install";
+    };
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Codex plugins to install";
+    };
     model = lib.mkOption {
       type = lib.types.str;
       default = "gpt-6-astra";

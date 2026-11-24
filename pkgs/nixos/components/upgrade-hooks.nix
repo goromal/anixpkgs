@@ -79,5 +79,25 @@ in
 
   config = {
     systemd.user.services = builtins.listToAttrs (map hookService cfg);
+    home.activation.runHeadlessUpgradeHooks = lib.hm.dag.entryAfter [ "reloadSystemd" ] (
+      lib.concatMapStringsSep "\n" (
+        hook:
+        let
+          hookExec = (hookService hook).value.Service.ExecStart;
+        in
+        ''
+          if [ ! -S "/run/user/$(${pkgs.coreutils}/bin/id -u)/bus" ]; then
+            marker="$HOME/.local/state/anixpkgs/upgrade-hooks/${hook.name}"
+            if [ ! -f "$marker" ] || [ "$(${pkgs.coreutils}/bin/cat "$marker")" != ${lib.escapeShellArg hookExec} ]; then
+              run ${hookExec}
+              if [ -z "''${DRY_RUN:-}" ]; then
+                ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "$marker")"
+                ${pkgs.coreutils}/bin/printf '%s' ${lib.escapeShellArg hookExec} > "$marker"
+              fi
+            fi
+          fi
+        ''
+      ) cfg
+    );
   };
 }
