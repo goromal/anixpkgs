@@ -214,7 +214,7 @@
     wiki-tools.url = "github:goromal/wiki-tools";
     wiki-tools.flake = false;
 
-    workout-planner.url = "github:goromal/workout-planner?ref=refs/heads/dev/rest-days";
+    workout-planner.url = "github:goromal/workout-planner";
     workout-planner.flake = false;
 
     xv-lidar-rs.url = "github:goromal/xv-lidar-rs";

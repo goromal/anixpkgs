@@ -1700,16 +1700,15 @@
     "workout-planner": {
       "flake": false,
       "locked": {
-        "lastModified": 1795494999,
+        "lastModified": 1795495326,
         "narHash": "sha256-dFcErUDCv+jrVzpokIySknhhxgIXsk9y2zz95qYAagc=",
         "owner": "goromal",
         "repo": "workout-planner",
-        "rev": "01503bc78268066e7502108eee2ceee5f74da21b",
+        "rev": "6f3e86895545be0e252c1456d3f2dc1e726df3cc",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/rest-days",
         "repo": "workout-planner",
         "type": "github"
       }
