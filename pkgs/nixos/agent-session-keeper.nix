@@ -16,7 +16,13 @@
 # (the backend unit's ExecStartPost) recreates each one whose tmux session is
 # missing, resuming the conversation.
 # `send` (agent-send) is the shared input path for UI composers: it pastes text
-# into a session's pane as one bracketed paste and then presses Enter.
+# into a session's pane as one bracketed paste and then presses Enter. The text
+# is sanitized first so it cannot produce keystrokes other than that final
+# Enter: a pane that hasn't enabled bracketed paste (the shell session type)
+# receives the sanitized text unbracketed, with tmux turning each LF into a CR
+# so every line runs, but nothing in a sanitized payload can act as Ctrl-C, an
+# escape sequence, or (inside a real bracketed paste) the end-of-paste marker
+# that would let the bytes after it be read as keys.
 { pkgs, lib }:
 let
   stateRoot = "$HOME/.local/state/agent-sessions";
@@ -278,6 +284,14 @@ let
   # keystroke after a pause, because Claude Code and Codex treat input that
   # arrives inside a paste burst as more paste (a newline, not "submit"). Empty
   # input just presses Enter. Callers validate the target; this only drives tmux.
+  # Stdin is sanitized (C0 controls other than TAB/LF, and DEL, are dropped)
+  # before it reaches the pane: an embedded end-of-paste marker (ESC [ 201 ~)
+  # would otherwise close the bracketed paste early, and whatever followed it
+  # -- Ctrl-C, CR, more escapes -- would be delivered as real keystrokes rather
+  # than pasted text, letting a companion forward keys the owner never typed.
+  # A pane that hasn't enabled bracketed paste (the shell session type) gets
+  # the sanitized text unbracketed, and tmux turns each LF into a CR, so it
+  # runs line by line, same as a normal paste there.
   send = pkgs.writeShellApplication {
     name = "agent-send";
     runtimeInputs = [
@@ -293,16 +307,19 @@ let
       target="$3"
       t() { tmux -L "$socket" "$@"; }
 
-      # A pane scrolled back into copy-mode would swallow the keys.
-      if [ "$(t display-message -p -t "$target" '#{pane_in_mode}')" = 1 ]; then
+      # A pane scrolled back into copy-mode would swallow the keys. Capture the
+      # mode into a variable rather than branching on the command directly, so
+      # a missing target fails this line (set -e) before anything is buffered.
+      mode="$(t display-message -p -t "$target" '#{pane_in_mode}')"
+      if [ "$mode" = 1 ]; then
         t send-keys -t "$target" -X cancel
       fi
 
+      buf="agent-send-$$"
       tmp="$(mktemp)"
-      trap 'rm -f "$tmp"' EXIT
-      cat >"$tmp"
+      trap 'rm -f "$tmp"; t delete-buffer -b "$buf" 2>/dev/null || true' EXIT
+      tr -d '\000-\010\013-\037\177' >"$tmp"
       if [ -s "$tmp" ]; then
-        buf="agent-send-$$"
         t load-buffer -b "$buf" "$tmp"
         t paste-buffer -p -d -b "$buf" -t "$target"
         sleep 0.15
