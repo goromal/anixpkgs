@@ -18,10 +18,12 @@ buildPythonPackage rec {
   build-system = [ setuptools ];
   src = "${pkg-src}/assistant_ui";
   prePatch = ''
+    # The source symlinks the composer to ../../shared, which is outside src.
+    cp --remove-destination ${pkg-src}/shared/agent_composer.js static/agent_composer.js
     mkdir -p $out/${pythonLibDir}/templates
     cp main.html $out/${pythonLibDir}/templates/main.html
     mkdir -p $out/${pythonLibDir}/static
-    cp assistant.js assistant.css $out/${pythonLibDir}/static/
+    cp assistant.js assistant.css static/agent_composer.js $out/${pythonLibDir}/static/
   '';
   propagatedBuildInputs = [
     flask

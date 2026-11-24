@@ -102,6 +102,7 @@ in
           "--agent-tmux ${pkgs.tmux}/bin/tmux"
           "--agent-tmux-config ${companion.tmuxConf}"
           "--agent-session-cmd ${companion.sessionCommand}"
+          "--agent-send-cmd ${companion.sendCommand}"
           "--git ${pkgs.git}/bin/git"
         ];
         ExecStartPre =

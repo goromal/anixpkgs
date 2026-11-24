@@ -98,6 +98,7 @@ in
             + " --agent-tmux ${pkgs.tmux}/bin/tmux"
             + " --agent-tmux-config ${budgetCompanion.tmuxConf}"
             + " --agent-session-cmd ${budgetCompanion.sessionCommand}"
+            + " --agent-send-cmd ${budgetCompanion.sendCommand}"
           );
         ExecStartPre = lib.optional companion (
           "+${pkgs.coreutils}/bin/install -o andrew -g dev -m0600 "
