@@ -83,7 +83,6 @@ in with import "${anixsrc}/pkgs/nixos/dependencies.nix"; {
     marketplaces = claudeDefaults.marketplaces;
     plugins = claudeDefaults.plugins;
     permissionsAllow = claudeDefaults.permissionsAllow;
-    hooks = claudeDefaults.hooks;
     skills = claudeDefaults.skills;
     mcpServers = [ claudeDefaults.mcpServers.notion claudeDefaults.mcpServers.wiki ];
     graphical = true;
@@ -125,7 +124,14 @@ options need to be set:
   is available even in a standalone `home.nix`). After an `anix-upgrade`, the
   `claude-setup` script re-runs **only if its content changed** (new plugins,
   marketplaces, or MCP servers) — its `gh auth login` prompt is skipped
-  automatically when run non-interactively.
+  automatically when run non-interactively. If no user systemd manager is
+  running, Home Manager runs changed hooks during activation instead.
+
+Codex uses the same `marketplaces` and `plugins` list structure through
+`machines.codex` (or `mods.codex` in a standalone Home Manager configuration).
+`codex-setup` installs the configured plugins after a change, and
+`codex-update` refreshes their marketplaces. Both agents install EGM by default;
+its skills run when selected in Codex or invoked with `/egm:` in Claude Code.
 
 To add your own hook from any leaf module, append to `mods.upgradeHooks`:
 

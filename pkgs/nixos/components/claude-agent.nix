@@ -105,10 +105,14 @@ let
   # upgrade hook (re-run setup only when this script's content changes). The gh
   # auth step is TTY-guarded so the hook can run it non-interactively.
   claudeSetupScript = pkgs.writeShellScriptBin "claude-setup" ''
+    set -e
     if ! command -v claude &> /dev/null; then
       echo_red "Error: claude not found in PATH"
       exit 1
     fi
+    # TODO: Remove the Superpowers uninstall lines after existing installations have migrated.
+    claude plugin uninstall superpowers-extended-cc@superpowers-extended-cc-marketplace 2>/dev/null || true
+    claude plugin marketplace remove superpowers-extended-cc-marketplace 2>/dev/null || true
     echo_yellow "Installing claude plugins..."
     ${lib.concatMapStringsSep "\n      " (
       marketplace: "claude plugin marketplace add ${marketplace}"
@@ -306,19 +310,26 @@ in
         targetFile = "$HOME/.claude/settings.json";
         format = "json";
         settings = nixosSettings;
-        extraMerge =
-          (lib.optional (hooksConfig != { }) {
-            name = "hooks";
-            varName = "new_hooks";
-            valueJson = hooksJson;
-            jqProgram = "reduce ($new_hooks | to_entries[]) as $ev (.; .hooks[$ev.key] = ((.hooks[$ev.key] // []) + $ev.value | unique_by(.hooks[0].command)))";
-          })
-          ++ (lib.optional (cfg.permissionsAllow != [ ]) {
-            name = "permissions";
-            varName = "new_allow";
-            valueJson = permissionsAllowJson;
-            jqProgram = ".permissions.allow = ((.permissions.allow // []) + $new_allow | unique)";
-          });
+        extraMerge = [
+          {
+            name = "obsolete Superpowers hooks cleanup";
+            varName = "unused";
+            valueJson = "null";
+            jqProgram = ''.hooks = ((.hooks // {}) | with_entries(.value |= map(.hooks |= map(select(.command | contains("superpowers-extended-cc-marketplace") | not)) | select(.hooks | length > 0))) | with_entries(select(.value | length > 0)))'';
+          }
+        ]
+        ++ (lib.optional (hooksConfig != { }) {
+          name = "hooks";
+          varName = "new_hooks";
+          valueJson = hooksJson;
+          jqProgram = "reduce ($new_hooks | to_entries[]) as $ev (.; .hooks[$ev.key] = ((.hooks[$ev.key] // []) + $ev.value | unique_by(.hooks[0].command)))";
+        })
+        ++ (lib.optional (cfg.permissionsAllow != [ ]) {
+          name = "permissions";
+          varName = "new_allow";
+          valueJson = permissionsAllowJson;
+          jqProgram = ".permissions.allow = ((.permissions.allow // []) + $new_allow | unique)";
+        });
       };
 
     # claude-settings-update only runs when the user manager starts (a login);
