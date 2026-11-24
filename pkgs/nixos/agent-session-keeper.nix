@@ -297,6 +297,7 @@ let
     runtimeInputs = [
       pkgs.tmux
       pkgs.coreutils
+      pkgs.util-linux
     ];
     text = ''
       if [ "$#" -ne 3 ] || [ "$1" != -L ]; then
@@ -306,6 +307,18 @@ let
       socket="$2"
       target="$3"
       t() { tmux -L "$socket" "$@"; }
+
+      # One send at a time per pane: two concurrent callers (two tabs, two
+      # devices) would otherwise interleave as paste A, paste B, Enter, Enter
+      # and merge into one prompt. flock is released by the kernel if this
+      # process dies, so a crashed send can't wedge the pane; the wait stays
+      # under the UI backends' request timeouts.
+      lock="''${XDG_RUNTIME_DIR:-/tmp}/agent-send-$socket-''${target//\//_}.lock"
+      exec 9>>"$lock"
+      if ! flock -w 5 9; then
+        echo "agent-send: $target is busy" >&2
+        exit 1
+      fi
 
       # A pane scrolled back into copy-mode would swallow the keys. Capture the
       # mode into a variable rather than branching on the command directly, so
