@@ -107,8 +107,9 @@ Usage: workout-planner generate [OPTIONS]
   needed, generates a personalized workout using Claude API 4. Creates a
   Google Task with the workout 5. Logs the workout to history
 
-  No workout is generated if: - There's a carryover workout (incomplete task
-  exists) - Weekly workout target has been reached
+  No workout is generated if: - Today is one of the configured rest days -
+  There's a carryover workout (incomplete task exists) - Weekly workout target
+  has been reached
 
 Options:
   --dry-run                       Generate workout but don't create task or

@@ -1,12 +1,9 @@
 # Default Claude Code configuration values, referenced by pc-base.nix options.
 # Kept in a separate file to avoid bloating the options declarations.
-let
-  sp = "$HOME/.claude/plugins/marketplaces/superpowers-extended-cc-marketplace";
-in
 {
   marketplaces = [
     "DevonMorris/claude-ctags"
-    "pcvelz/superpowers"
+    "google/elephant-goldfish-model"
   ];
 
   plugins = [
@@ -16,7 +13,7 @@ in
     "github@claude-plugins-official"
     "feature-dev@claude-plugins-official"
     "pr-review-toolkit@claude-plugins-official"
-    "superpowers-extended-cc@superpowers-extended-cc-marketplace"
+    "egm@egm"
   ];
 
   permissionsAllow = [
@@ -88,32 +85,4 @@ in
     "mcp__notion__notion_update_block"
   ];
 
-  hooks = [
-    {
-      event = "SessionStart";
-      matcher = "startup|clear|compact";
-      command = "\"${sp}/hooks/run-hook.cmd\" session-start";
-      async = false;
-    }
-    {
-      event = "PreToolUse";
-      matcher = "Bash";
-      command = "bash \"${sp}/hooks/examples/pre-commit-check-tasks.sh\"";
-    }
-    {
-      event = "PostToolUse";
-      matcher = "TaskUpdate";
-      command = "bash \"${sp}/hooks/examples/post-task-complete-revalidate.sh\"";
-    }
-    {
-      event = "Stop";
-      matcher = "";
-      command = "bash \"${sp}/hooks/examples/stop-revalidate-user-gates.sh\"";
-    }
-    {
-      event = "PreToolUse";
-      matcher = "TaskUpdate";
-      command = "bash \"${sp}/hooks/examples/pre-task-blockedby-enforce.sh\"";
-    }
-  ];
 }

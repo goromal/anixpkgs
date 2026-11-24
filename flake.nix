@@ -81,7 +81,7 @@
     flasks.url = "github:goromal/flasks?ref=refs/heads/dev/agent-ui-composer";
     flasks.flake = false;
 
-    folio.url = "github:goromal/folio";
+    folio.url = "github:goromal/folio?ref=refs/heads/dev/agent-ui-composer";
     folio.flake = false;
 
     aiart.url = "github:goromal/aiart";

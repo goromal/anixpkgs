@@ -826,6 +826,8 @@ in
               })
               (lib.optionalAttrs (lib.elem "codex" features.agents.frameworks) {
                 mods.codex = {
+                  marketplaces = config.machines.codex.marketplaces;
+                  plugins = config.machines.codex.plugins;
                   model = config.machines.codex.model;
                   modelProvider = config.machines.codex.modelProvider;
                   approvalPolicy = config.machines.codex.approvalPolicy;
