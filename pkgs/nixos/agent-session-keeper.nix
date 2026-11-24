@@ -15,6 +15,8 @@
 # left behind therefore means "this session was still running": `restore`
 # (the backend unit's ExecStartPost) recreates each one whose tmux session is
 # missing, resuming the conversation.
+# `send` (agent-send) is the shared input path for UI composers: it pastes text
+# into a session's pane as one bracketed paste and then presses Enter.
 { pkgs, lib }:
 let
   stateRoot = "$HOME/.local/state/agent-sessions";
@@ -270,11 +272,50 @@ let
       done
     '';
   };
+
+  # Delivers text typed in a UI's composer to an agent pane: one bracketed paste
+  # (so multi-line text is not submitted line by line), then Enter as its own
+  # keystroke after a pause, because Claude Code and Codex treat input that
+  # arrives inside a paste burst as more paste (a newline, not "submit"). Empty
+  # input just presses Enter. Callers validate the target; this only drives tmux.
+  send = pkgs.writeShellApplication {
+    name = "agent-send";
+    runtimeInputs = [
+      pkgs.tmux
+      pkgs.coreutils
+    ];
+    text = ''
+      if [ "$#" -ne 3 ] || [ "$1" != -L ]; then
+        echo "usage: agent-send -L SOCKET TARGET  (text on stdin)" >&2
+        exit 2
+      fi
+      socket="$2"
+      target="$3"
+      t() { tmux -L "$socket" "$@"; }
+
+      # A pane scrolled back into copy-mode would swallow the keys.
+      if [ "$(t display-message -p -t "$target" '#{pane_in_mode}')" = 1 ]; then
+        t send-keys -t "$target" -X cancel
+      fi
+
+      tmp="$(mktemp)"
+      trap 'rm -f "$tmp"' EXIT
+      cat >"$tmp"
+      if [ -s "$tmp" ]; then
+        buf="agent-send-$$"
+        t load-buffer -b "$buf" "$tmp"
+        t paste-buffer -p -d -b "$buf" -t "$target"
+        sleep 0.15
+      fi
+      t send-keys -t "$target" Enter
+    '';
+  };
 in
 {
   runCommand = "${run}/bin/agent-session-run";
   restoreCommand = "${restore}/bin/agent-session-restore";
-  inherit run restore stateRoot;
+  sendCommand = "${send}/bin/agent-send";
+  inherit run restore send stateRoot;
   # Exported by a UI session command before it reaches the agent, so the record
   # can replay it: AGENT_SESSION_ARGS="$(${exportArgs} "$@")".
   exportArgs = "${pkgs.jq}/bin/jq -cn '$ARGS.positional' --args";
