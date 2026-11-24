@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795371283,
-        "narHash": "sha256-Hb8UR0HOkt9Qfyu2xS0TIHxhdV7KyVXSLvZlIytXlX4=",
+        "lastModified": 1795492457,
+        "narHash": "sha256-e3XQofPljys2LiRRHiEer4CFiBMA0QrBT+fOhdbAdtI=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "caccaf676adbf682462d88b31ac18807ff9b578f",
+        "rev": "fdfa15f3caa3d81dcc0476486b871a645a7d67c5",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/agent-ui-composer",
         "repo": "flasks",
         "type": "github"
       }
