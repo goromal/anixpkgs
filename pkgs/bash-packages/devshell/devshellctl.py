@@ -72,6 +72,8 @@ class WorkspaceManager:
         history = self._read_history()
         saved = history.get(workspace, {})
         sources_dir = root / "sources"
+        if self._remember_cloned_sources(workspace, config, sources_dir):
+            config = parse_devrc(self.devrc)
         repository_names = [
             name
             for name in config["workspaces"][workspace]
@@ -230,6 +232,42 @@ class WorkspaceManager:
         self._setup(workspace)
         return {"message": f"Added script {name} to {workspace}"}
 
+    def _remember_cloned_sources(self, workspace, config, sources_dir):
+        """Record repositories cloned into sources/ outside of add-source.
+
+        Agents and shells often `git clone` straight into a workspace; without
+        a devrc entry the next setup (or another workspace) can't find the URL.
+        Repositories without an origin remote stay unrecorded and show up as
+        unconfigured instead.
+        """
+        if not sources_dir.is_dir():
+            return False
+        remembered = False
+        for child in sorted(sources_dir.iterdir()):
+            if (
+                not (child / ".git").exists()
+                or not SAFE_NAME.fullmatch(child.name)
+                or (
+                    child.name in config["repositories"]
+                    and child.name in config["workspaces"][workspace]
+                )
+            ):
+                continue
+            remote = self._git_optional(child, "remote", "get-url", "origin")
+            # The devrc parser drops any line containing "#".
+            if child.name not in config["repositories"] and (
+                not remote or "#" in remote
+            ):
+                continue
+            try:
+                self._run_parse(
+                    "ADDSRC", workspace, self.devrc, child.name, remote or ""
+                )
+                remembered = True
+            except WorkspaceError:
+                pass
+        return remembered
+
     def _workspace(self, configured_name):
         self._validate_name(configured_name, "workspace")
         config = parse_devrc(self.devrc)
@@ -251,6 +289,7 @@ class WorkspaceManager:
         return repo
 
     def _repository_status(self, workspace, name, path, saved):
+        config = parse_devrc(self.devrc)
         branch = self._current_branch(path)
         # A freshly `git init`ed repo has an unborn branch and no HEAD commit.
         head = self._git_optional(path, "rev-parse", "--verify", "-q", "HEAD") or ""
@@ -267,7 +306,8 @@ class WorkspaceManager:
             "name": name,
             "path": str(path),
             "present": True,
-            "configured": name in parse_devrc(self.devrc)["repositories"],
+            "configured": name in config["repositories"]
+            and name in config["workspaces"].get(workspace, []),
             "branch": branch,
             "head": head,
             "clean": not dirty,

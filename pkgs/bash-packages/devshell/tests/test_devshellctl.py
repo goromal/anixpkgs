@@ -44,7 +44,11 @@ class WorkspaceManagerTest(unittest.TestCase):
             check=True,
             capture_output=True,
         )
-        self.manager = WorkspaceManager(self.devrc, self.history)
+        self.manager = WorkspaceManager(
+            self.devrc,
+            self.history,
+            parse_script=str(Path(__file__).parent.parent / "parseWorkspace.py"),
+        )
 
     def tearDown(self):
         self.temporary.cleanup()
@@ -160,6 +164,42 @@ class WorkspaceManagerTest(unittest.TestCase):
         with self.assertRaisesRegex(WorkspaceError, "no remote URL"):
             self.manager.nuke("alpha", "repo")
         self.assertTrue((self.repo / "README").exists())
+
+    def test_status_remembers_cloned_repository(self):
+        cloned = self.dev / "alpha" / "sources" / "cloned"
+        subprocess.run(
+            ["git", "init", "-b", "main", cloned], check=True, capture_output=True
+        )
+        subprocess.run(
+            ["git", "-C", cloned, "remote", "add", "origin", "git@example/cloned"],
+            check=True,
+        )
+        repos = {repo["name"]: repo for repo in self.manager.status("alpha")["repositories"]}
+        self.assertTrue(repos["cloned"]["configured"])
+        config = parse_devrc(self.devrc)
+        self.assertEqual(config["repositories"]["cloned"], "git@example/cloned")
+        self.assertEqual(config["workspaces"]["alpha"], ["repo", "helper", "cloned"])
+
+    def test_status_leaves_remoteless_repository_unconfigured(self):
+        fresh = self.dev / "alpha" / "sources" / "fresh"
+        subprocess.run(
+            ["git", "init", "-b", "main", fresh], check=True, capture_output=True
+        )
+        repos = {repo["name"]: repo for repo in self.manager.status("alpha")["repositories"]}
+        self.assertFalse(repos["fresh"]["configured"])
+        self.assertNotIn("fresh", parse_devrc(self.devrc)["repositories"])
+
+    def test_status_adds_known_repository_to_workspace(self):
+        with self.devrc.open("a", encoding="utf-8") as devrc:
+            devrc.write("beta = helper\n")
+        other = self.dev / "beta" / "sources" / "repo"
+        subprocess.run(
+            ["git", "init", "-b", "main", other], check=True, capture_output=True
+        )
+        self.manager.status("beta")
+        config = parse_devrc(self.devrc)
+        self.assertEqual(config["workspaces"]["beta"], ["helper", "repo"])
+        self.assertEqual(config["repositories"]["repo"], "git@example/repo")
 
     def test_rejects_unsafe_names(self):
         with self.assertRaisesRegex(WorkspaceError, "Invalid workspace"):
