@@ -9,6 +9,16 @@ let
 in
 {
   options.machines.codex = {
+    marketplaces = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Codex plugin marketplaces to install";
+    };
+    plugins = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      description = "List of Codex plugins to install";
+    };
     model = lib.mkOption {
       type = lib.types.str;
       default = "gpt-6-astra";

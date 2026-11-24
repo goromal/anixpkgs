@@ -1,5 +1,7 @@
 # Default Codex configuration values, referenced by profiles.
 {
+  marketplaces = [ "google/elephant-goldfish-model" ];
+  plugins = [ "egm@egm" ];
   model = "gpt-6-astra";
   modelProvider = "openai";
   approvalPolicy = "never";
