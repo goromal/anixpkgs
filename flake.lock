@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795490558,
+        "lastModified": 1795490909,
         "narHash": "sha256-e5Q0EwNNiAqEaiynpt6sNjqKB5fvWq8wcpDj4jM2qm4=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "a271e2b53642c9e71fd52dd446cf953ef27c812f",
+        "rev": "c8a8cde559f3b67af28a333499d5b653a4f1b819",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/devrc-remember",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
