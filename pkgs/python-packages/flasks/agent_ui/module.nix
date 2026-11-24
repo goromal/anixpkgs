@@ -216,7 +216,7 @@ in
       environment.HOME = globalCfg.homeDir;
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --tmux-socket agent-ui --tmux-config ${agentTmuxConf} --session-command ${agentSession}/bin/agent-ui-session --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
+        ExecStart = "${cfg.package}/bin/agent-ui --port ${toString cfg.port} --subdomain ${cfg.subdomain} --devrc ${cfg.devrc} --history ${globalCfg.homeDir}/.devhist --secrets-file ${cfg.secretsFile} --tmux-bin ${pkgs.tmux}/bin/tmux --tmux-socket agent-ui --tmux-config ${agentTmuxConf} --session-command ${agentSession}/bin/agent-ui-session --send-command ${keeper.sendCommand} --workspace-command ${anixpkgs.devshell}/bin/devshellctl ${agentArgs}";
         Restart = "always";
         RestartSec = 3;
         User = "andrew";
