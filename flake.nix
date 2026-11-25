@@ -78,10 +78,10 @@
     find_rotational_conventions.url = "git+https://gist.github.com/fb15f44150ca4e0951acaee443f72d3e";
     find_rotational_conventions.flake = false;
 
-    flasks.url = "github:goromal/flasks?ref=refs/heads/dev/agent-ui-composer";
+    flasks.url = "github:goromal/flasks?ref=refs/heads/master";
     flasks.flake = false;
 
-    folio.url = "github:goromal/folio?ref=refs/heads/dev/agent-ui-composer";
+    folio.url = "github:goromal/folio";
     folio.flake = false;
 
     aiart.url = "github:goromal/aiart";

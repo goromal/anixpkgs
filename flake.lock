@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795506682,
+        "lastModified": 1795577106,
         "narHash": "sha256-4zkHdligW3bRrwC0Ag0uKXVtJg4/F+CVKvwYXRmQ8mc=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "05fd22b1a2a3e671062634ed600e458835fa3c37",
+        "rev": "16b5a5d9fca86d4155656b0fa8cc0fe9e874493c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/agent-ui-composer",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
@@ -490,16 +490,15 @@
     "folio": {
       "flake": false,
       "locked": {
-        "lastModified": 1795505909,
+        "lastModified": 1795577114,
         "narHash": "sha256-rTvgx+CAeDMheozuHIOpR7NpB4gTDTop8S/ncWTd7X4=",
         "owner": "goromal",
         "repo": "folio",
-        "rev": "d3eafb7d752765a8e1528e0479e8eb73da42f107",
+        "rev": "9c165289890024388351cec75a52cfa6147bc98c",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/agent-ui-composer",
         "repo": "folio",
         "type": "github"
       }
