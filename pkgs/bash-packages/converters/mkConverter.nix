@@ -25,6 +25,8 @@
   # a verbose conversion would succeed, then be recorded as an error, and its
   # source would survive on a job that did its work.
   vacuumUnforwardedVars ? [ "verbose" ],
+  # Per-file bash; may rewrite $outfile and set skip_file/keep_source/serialize.
+  vacuumFileHook ? "",
 }:
 let
   conv_opt_list = map (x: ''
@@ -187,10 +189,17 @@ let
         for a in "''${conv_opts[@]}" "$f" "$target"; do
             cmdstr="$cmdstr $(shquote "$a")"
         done
-        convjob=$(orchestrator "''${orch_args[@]}" bash "''${job_args[@]}" "$cmdstr")
+        blockers=()
+        if [[ "$serialize" == "1" && -n "$prev_convjob" ]]; then
+            blockers=( -b "$prev_convjob" )
+        fi
+        convjob=$(orchestrator "''${orch_args[@]}" bash "''${job_args[@]}" "$cmdstr" "''${blockers[@]}")
         if [[ ! "$convjob" =~ ^[0-9]+$ ]]; then
             ${printerr} "ERROR: could not kick off conversion job for $f: $convjob"
             exit 1
+        fi
+        if [[ "$serialize" == "1" ]]; then
+            prev_convjob="$convjob"
         fi
 
         note=""
@@ -203,7 +212,9 @@ let
             fi
             echo "$f (in place) -> convert job $convjob, move job $movejob"
         else
+            if [[ "$keep_source" != "1" ]]; then
             ${vacuumRemoveStep}
+            fi
             echo "$f -> $outfile (convert job $convjob''${note})"
         fi
   '';
@@ -244,9 +255,18 @@ in
       fi
       ${lib.optionalString vacuumViaOrchestrator vacuumSetup}
       found=0
+      prev_convjob=""
       while IFS= read -r -d "" f; do
           found=1
           outfile=`${strings.replaceExtension} "$f" ${extension}`
+          skip_file=0
+          keep_source=0
+          serialize=0
+          ${vacuumFileHook}
+          if [[ "$skip_file" == "1" ]]; then
+              echo "$f -> skipped"
+              continue
+          fi
           ${if vacuumViaOrchestrator then vacuumDispatch else ''convert_one "$f" "$outfile"''}
       done < <(find "$indir" -maxdepth 1 -type f \( ${inameArgs} \) ${lib.optionalString vacuumViaOrchestrator ''"''${same_ext_filter[@]}"''} -print0 | sort -z)
       if [[ "$found" == "0" ]]; then
