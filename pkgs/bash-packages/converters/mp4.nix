@@ -221,8 +221,6 @@ let
     + builtins.readFile ./res/mp4-upscale.sh;
   };
 
-  # Upscaling replaces the plain conversion entirely, so every option above is
-  # forwarded to the upscaler rather than to ffmpeg.
   upscaleRule = ''
     if [[ -z "$upscale" ]]; then
         for opt in stabilize:0 keep_color:0 model: gpu: host:; do
@@ -255,10 +253,6 @@ let
     fi
   '';
 
-  # Vacuum with --upscale never replaces or deletes anything: each source gets
-  # a NAME_upscaled.mp4 sibling, already-produced outputs are skipped so a long
-  # sweep can be re-run to resume, and model jobs are chained so only one uses
-  # the GPU at a time.
   vacuumFileHook = ''
     if [[ ! -z "$upscale" ]]; then
         keep_source=1

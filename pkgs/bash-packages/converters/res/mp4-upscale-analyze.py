@@ -1,13 +1,4 @@
-"""Measure the color fixes mp4-upscale applies to an old video.
-
-    mp4-upscale-analyze INFILE CROP START END SENDCMD_OUT
-
-CROP is W:H:X:Y; START/END are ffmpeg times or empty strings. Prints
-"chroma H V": the chroma-to-luma offset in luma pixels, 0 0 when not clearly
-measurable. Writes ffmpeg sendcmd lines driving colorchannelmixer@wb with a
-temporally smoothed grey-edge white balance to SENDCMD_OUT (times relative to
-the trimmed output).
-"""
+"""Usage: mp4-upscale-analyze INFILE CROP START END SENDCMD_OUT."""
 
 import subprocess
 import sys
@@ -39,11 +30,6 @@ def to_seconds(t):
     return secs
 
 
-# ---------------------------------------------------------------- chroma offset
-# VHS decks commonly delay chroma relative to luma. Correlate the edge maps of
-# the chroma planes with the luma edge map over candidate shifts; the shift
-# with the best correlation is the offset. Chroma is heavily blurred, so the
-# profile is broad: only a clear win over "no shift" is reported.
 SHIFTS = range(-6, 7)
 
 
@@ -89,13 +75,7 @@ def pick(tot):
 
 print(f"chroma {pick(h_tot)} {pick(v_tot)}")
 
-# --------------------------------------------------------------- white balance
-# ffmpeg's greyedge (difford=1, Minkowski p=5, sigma=2) estimates the
-# illuminant from edges, so a frame dominated by sky or water is not forced to
-# grey the way gray-world forces it. It has no temporal smoothing, though, so
-# it is run only on frames sampled at 2 fps, its effective per-channel gain is
-# read back as the ratio of channel means after/before, and the gains are
-# clamped, smoothed over a few seconds and applied by colorchannelmixer.
+# greyedge flickers per frame, so its gains are sampled at 2 fps and smoothed.
 RATE = 2
 SW, SH = 88, 58
 proc = subprocess.Popen(
@@ -135,7 +115,6 @@ def smooth(a, k, fn):
 
 
 g = smooth(smooth(g, 7, np.median), 5, np.mean)
-# Keep brightness: normalize so the gains leave luma unchanged.
 g /= (g * np.array([0.299, 0.587, 0.114])).sum(axis=1, keepdims=True)
 
 with open(cmd_out, "w") as fh:

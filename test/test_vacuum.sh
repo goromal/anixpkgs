@@ -169,9 +169,7 @@ ckfile -c "$before_md5" "$sxdir/already.mp4" > /dev/null \
 compgen -G "$sxdir/*vacuum-tmp*" > /dev/null \
     && fail "in-place conversion left a temporary behind"
 
-# --upscale never replaces or deletes: each source gets a NAME_upscaled.mp4
-# sibling, and a source whose output already exists (or an _upscaled file
-# itself) is skipped, so re-running a long sweep resumes it.
+# --upscale keeps sources and skips existing _upscaled outputs.
 updir="$tmpdir/upscale"
 mkdir "$updir"
 mkvid "$updir/tape.webm" red

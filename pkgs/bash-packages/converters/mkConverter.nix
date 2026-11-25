@@ -25,12 +25,7 @@
   # a verbose conversion would succeed, then be recorded as an error, and its
   # source would survive on a job that did its work.
   vacuumUnforwardedVars ? [ "verbose" ],
-  # Bash run for each file vacuum finds, after $outfile is computed from $f and
-  # before anything is dispatched. It may rewrite $outfile and set:
-  #   skip_file=1   leave this file alone
-  #   keep_source=1 never queue removal of the source
-  #   serialize=1   block this conversion on the previous one (orchestrator
-  #                 path only), so such jobs never run concurrently
+  # Per-file bash; may rewrite $outfile and set skip_file/keep_source/serialize.
   vacuumFileHook ? "",
 }:
 let
