@@ -15,6 +15,14 @@
 # left behind therefore means "this session was still running": `restore`
 # (the backend unit's ExecStartPost) recreates each one whose tmux session is
 # missing, resuming the conversation.
+# `send` (agent-send) is the shared input path for UI composers: it pastes text
+# into a session's pane as one bracketed paste and then presses Enter. The text
+# is sanitized first so it cannot produce keystrokes other than that final
+# Enter: a pane that hasn't enabled bracketed paste (the shell session type)
+# receives the sanitized text unbracketed, with tmux turning each LF into a CR
+# so every line runs, but nothing in a sanitized payload can act as Ctrl-C, an
+# escape sequence, or (inside a real bracketed paste) the end-of-paste marker
+# that would let the bytes after it be read as keys.
 { pkgs, lib }:
 let
   stateRoot = "$HOME/.local/state/agent-sessions";
@@ -270,11 +278,84 @@ let
       done
     '';
   };
+
+  # Delivers text typed in a UI's composer to an agent pane: one bracketed paste
+  # (so multi-line text is not submitted line by line), then Enter as its own
+  # keystroke after a pause, because Claude Code and Codex treat input that
+  # arrives inside a paste burst as more paste (a newline, not "submit"). Empty
+  # input just presses Enter. Callers validate the target; this only drives tmux.
+  # Stdin is sanitized (C0 controls other than TAB/LF, and DEL, are dropped)
+  # before it reaches the pane: an embedded end-of-paste marker (ESC [ 201 ~)
+  # would otherwise close the bracketed paste early, and whatever followed it
+  # -- Ctrl-C, CR, more escapes -- would be delivered as real keystrokes rather
+  # than pasted text, letting a companion forward keys the owner never typed.
+  # A pane that hasn't enabled bracketed paste (the shell session type) gets
+  # the sanitized text unbracketed, and tmux turns each LF into a CR, so it
+  # runs line by line, same as a normal paste there.
+  send = pkgs.writeShellApplication {
+    name = "agent-send";
+    runtimeInputs = [
+      pkgs.tmux
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
+    text = ''
+      if [ "$#" -ne 3 ] || [ "$1" != -L ]; then
+        echo "usage: agent-send -L SOCKET TARGET  (text on stdin)" >&2
+        exit 2
+      fi
+      socket="$2"
+      target="$3"
+      t() { tmux -L "$socket" "$@"; }
+
+      # One send at a time per pane: two concurrent callers (two tabs, two
+      # devices) would otherwise interleave as paste A, paste B, Enter, Enter
+      # and merge into one prompt. flock is released by the kernel if this
+      # process dies, so a crashed send can't wedge the pane; the wait stays
+      # under the UI backends' request timeouts. The lock lives next to the
+      # tmux socket dir (per-user, 0700) rather than XDG_RUNTIME_DIR/tmp
+      # directly, which other users on the same host can also write to.
+      lockdir="''${TMUX_TMPDIR:-/tmp}/tmux-$(id -u)"
+      mkdir -p "$lockdir"
+      chmod 700 "$lockdir"
+      lock="$lockdir/agent-send-$socket-''${target//\//_}.lock"
+      exec 9>>"$lock"
+      if ! flock -w 5 9; then
+        echo "agent-send: $target is busy" >&2
+        exit 1
+      fi
+
+      # A pane scrolled back into copy-mode would swallow the keys. Capture the
+      # mode into a variable rather than branching on the command directly, so
+      # a missing target fails this line (set -e) before anything is buffered.
+      mode="$(t display-message -p -t "$target" '#{pane_in_mode}')"
+      if [ "$mode" = 1 ]; then
+        t send-keys -t "$target" -X cancel
+      fi
+
+      buf="agent-send-$$"
+      tmp="$(mktemp)"
+      trap 'rm -f "$tmp"; t delete-buffer -b "$buf" 2>/dev/null || true' EXIT
+      tr -d '\000-\010\013-\037\177' >"$tmp"
+      if [ -s "$tmp" ]; then
+        t load-buffer -b "$buf" "$tmp"
+        t paste-buffer -p -d -b "$buf" -t "$target"
+        sleep 0.15
+      fi
+      t send-keys -t "$target" Enter
+    '';
+  };
 in
 {
   runCommand = "${run}/bin/agent-session-run";
   restoreCommand = "${restore}/bin/agent-session-restore";
-  inherit run restore stateRoot;
+  sendCommand = "${send}/bin/agent-send";
+  inherit
+    run
+    restore
+    send
+    stateRoot
+    ;
   # Exported by a UI session command before it reaches the agent, so the record
   # can replay it: AGENT_SESSION_ARGS="$(${exportArgs} "$@")".
   exportArgs = "${pkgs.jq}/bin/jq -cn '$ARGS.positional' --args";

@@ -125,6 +125,7 @@ in
           "FOLIO_AGENT_TMUX=${pkgs.tmux}/bin/tmux"
           "FOLIO_AGENT_TMUX_CONFIG=${folioCompanion.tmuxConf}"
           "FOLIO_AGENT_SESSION_CMD=${folioCompanion.sessionCommand}"
+          "FOLIO_AGENT_SEND_CMD=${folioCompanion.sendCommand}"
           # Lets the backend reverse-proxy /folio/agent/terminal/** to ttyd, so the
           # Electron desktop (which loads the SPA from the backend, bypassing nginx)
           # can reach the terminal instead of a 404 (black panel).

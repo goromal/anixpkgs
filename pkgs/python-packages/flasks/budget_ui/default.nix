@@ -17,11 +17,13 @@ buildPythonPackage rec {
   build-system = [ setuptools ];
   src = "${pkg-src}/budget_ui";
   prePatch = ''
+    # The source symlinks the composer to ../../shared, which is outside src.
+    cp --remove-destination ${pkg-src}/shared/agent_composer.js static/agent_composer.js
     mkdir -p $out/${pythonLibDir}/templates
     cp main.html $out/${pythonLibDir}/templates/main.html
     cp upload_config.html $out/${pythonLibDir}/templates/upload_config.html
     mkdir -p $out/${pythonLibDir}/static
-    cp budget_agent_panel.js budget_agent_panel.css $out/${pythonLibDir}/static/
+    cp budget_agent_panel.js budget_agent_panel.css static/agent_composer.js $out/${pythonLibDir}/static/
   '';
   propagatedBuildInputs = [
     flask

@@ -183,6 +183,8 @@ in
   inherit tmuxConf;
   socket = prefix;
   sessionCommand = "${session}/bin/${prefix}-session";
+  # Delivers composer text to a session pane (the backend's send endpoint).
+  sendCommand = keeper.sendCommand;
   # For the backend unit's serviceConfig.ExecStartPost: bring back the sessions
   # that were still running when the machine (or this backend) went down.
   # "-": a failed restore must not fail the backend.

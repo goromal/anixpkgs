@@ -18,8 +18,10 @@ buildPythonPackage rec {
   build-system = [ setuptools ];
   src = "${pkg-src}/agent_ui";
   prePatch = ''
+    # The source symlinks the composer to ../../shared, which is outside src.
+    cp --remove-destination ${pkg-src}/shared/agent_composer.js templates/agent_composer.js
     mkdir -p $out/${pythonLibDir}/templates
-    cp templates/*.html $out/${pythonLibDir}/templates/
+    cp templates/*.html templates/agent_composer.js $out/${pythonLibDir}/templates/
   '';
   propagatedBuildInputs = [
     flask
