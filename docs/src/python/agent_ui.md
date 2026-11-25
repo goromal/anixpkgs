@@ -13,6 +13,7 @@ usage: agent-ui [-h] [--port PORT] [--subdomain SUBDOMAIN] [--devrc DEVRC]
                 [--tmux-bin TMUX_BIN] [--tmux-socket TMUX_SOCKET]
                 [--tmux-config TMUX_CONFIG]
                 [--session-command SESSION_COMMAND]
+                [--send-command SEND_COMMAND]
                 [--workspace-command WORKSPACE_COMMAND] [--history HISTORY]
 
 Workspace-aware terminal agent launcher
@@ -29,6 +30,7 @@ options:
   --tmux-socket TMUX_SOCKET
   --tmux-config TMUX_CONFIG
   --session-command SESSION_COMMAND
+  --send-command SEND_COMMAND
   --workspace-command WORKSPACE_COMMAND
   --history HISTORY
 ```

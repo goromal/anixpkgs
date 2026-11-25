@@ -13,7 +13,8 @@ usage: assistant_ui [-h] [--port PORT] [--subdomain SUBDOMAIN]
                     [--agents AGENTS] --agent-secrets AGENT_SECRETS
                     [--repo-dir REPO_DIR] [--agent-tmux AGENT_TMUX]
                     [--agent-tmux-config AGENT_TMUX_CONFIG]
-                    [--agent-session-cmd AGENT_SESSION_CMD] [--git GIT]
+                    [--agent-session-cmd AGENT_SESSION_CMD]
+                    [--agent-send-cmd AGENT_SEND_CMD] [--git GIT]
                     [--insecure-cookie]
 
 Assistant: agent sessions rooted in second-brain
@@ -30,6 +31,7 @@ options:
   --agent-tmux AGENT_TMUX
   --agent-tmux-config AGENT_TMUX_CONFIG
   --agent-session-cmd AGENT_SESSION_CMD
+  --agent-send-cmd AGENT_SEND_CMD
   --git GIT
   --insecure-cookie     Allow the login cookie over plain HTTP (local testing
                         only)
