@@ -12,6 +12,8 @@
   gnugrep,
   gnused,
   openssh,
+  writers,
+  python3Packages,
 }:
 let
   name = "mp4";
@@ -56,11 +58,14 @@ let
         -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
         -u | --upscale MODE          Restore + upscale old video. MODE:
                                        classic  ffmpeg only: auto border crop,
-                                                denoise, deblock, aspect fix,
-                                                Lanczos upscale, sharpen
+                                                chroma realignment, smoothed
+                                                white balance, denoise, deblock,
+                                                aspect fix, Lanczos upscale,
+                                                sharpen
                                        model    same front end + Real-ESRGAN on
                                                 a Vulkan GPU (video2x)
              --stabilize             (upscale) Two-pass camera-shake removal
+             --keep-color            (upscale) Skip the automatic white balance
              --model NAME            (upscale model) fast (default) or quality,
                                      or a video2x realesrgan model name
              --gpu INDEX             (upscale model) ncnn GPU index (default:
@@ -137,6 +142,12 @@ let
       flags = "--stabilize";
     }
     {
+      var = "keep_color";
+      isBool = true;
+      default = "0";
+      flags = "--keep-color";
+    }
+    {
       var = "model";
       isBool = false;
       default = "";
@@ -188,9 +199,15 @@ let
 
   fontfile = ./res/fonts/roboto.ttf;
 
+  analyzer = writers.writePython3Bin "mp4-upscale-analyze" {
+    libraries = [ python3Packages.numpy ];
+    flakeIgnore = [ "E501" ];
+  } (builtins.readFile ./res/mp4-upscale-analyze.py);
+
   upscaler = writeShellApplication {
     name = "mp4-upscale";
     runtimeInputs = [
+      analyzer
       ffmpeg
       coreutils
       gawk
@@ -208,10 +225,10 @@ let
   # forwarded to the upscaler rather than to ffmpeg.
   upscaleRule = ''
     if [[ -z "$upscale" ]]; then
-        for opt in stabilize:0 model: gpu: host:; do
+        for opt in stabilize:0 keep_color:0 model: gpu: host:; do
             v="''${opt%%:*}"; d="''${opt#*:}"
             if [[ "''${!v}" != "$d" ]]; then
-                ${printErr} "--''${v} only applies with --upscale."
+                ${printErr} "--''${v//_/-} only applies with --upscale."
                 exit 1
             fi
         done
@@ -224,6 +241,7 @@ let
         [[ "$verbose" == "1" ]] && up_args+=( --verbose )
         [[ "$mute" == "1" ]] && up_args+=( --mute )
         [[ "$stabilize" == "1" ]] && up_args+=( --stabilize )
+        [[ "$keep_color" == "1" ]] && up_args+=( --keep-color )
         [[ -n "$quality" ]] && up_args+=( --quality "$quality" )
         [[ -n "$width" ]] && up_args+=( --width "$width" )
         [[ -n "$crop" ]] && up_args+=( --crop "$crop" )

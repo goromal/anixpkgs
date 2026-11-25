@@ -3,8 +3,9 @@
 #
 #   mp4-upscale [opts] classic|model INFILE OUTFILE
 #
-# classic: crop black borders, (optionally) stabilize, denoise, deblock, fix the
-#          pixel aspect ratio, Lanczos-upscale and sharpen. ffmpeg only.
+# classic: crop black borders, realign chroma, white-balance, (optionally)
+#          stabilize, denoise, deblock, fix the pixel aspect ratio,
+#          Lanczos-upscale and sharpen. ffmpeg only.
 # model:   the same crop/stabilize front end, then a Real-ESRGAN pass through
 #          video2x on a Vulkan GPU, then a downscale to the target size. With
 #          --host, the whole model pipeline runs on that machine over SSH.
@@ -15,6 +16,7 @@
 verbose=0
 mute=0
 stabilize=0
+keep_color=0
 quality=""
 width=""
 crop=""
@@ -30,6 +32,7 @@ while [[ $# -gt 0 ]]; do
     --verbose) verbose=1; shift ;;
     --mute) mute=1; shift ;;
     --stabilize) stabilize=1; shift ;;
+    --keep-color) keep_color=1; shift ;;
     --quality) quality="$2"; shift 2 ;;
     --width) width="$2"; shift 2 ;;
     --crop) crop="$2"; shift 2 ;;
@@ -125,6 +128,7 @@ if [[ "$mode" == "model" && -n "$host" ]]; then
     rargs=(--model "$model" --quality "${quality:-=}" --fontsize "$fontsize")
     [[ "$mute" == "1" ]] && rargs+=(--mute)
     [[ "$stabilize" == "1" ]] && rargs+=(--stabilize)
+    [[ "$keep_color" == "1" ]] && rargs+=(--keep-color)
     [[ -n "$width" ]] && rargs+=(--width "$width")
     [[ -n "$crop" ]] && rargs+=(--crop "$crop")
     [[ -n "$start" ]] && rargs+=(--start "$start")
@@ -203,8 +207,22 @@ else
 fi
 note "Target: ${tw}x${th}"
 
+# ---------------------------------------------------------------- color fixes
+# The analyzer measures the chroma-to-luma offset (VHS decks delay chroma by a
+# few lines) and a temporally smoothed grey-edge white balance, written as
+# sendcmd lines for colorchannelmixer@wb.
+note "Analyzing chroma alignment and white balance..."
+mp4-upscale-analyze "$infile" "$crop" "$start" "$end" "$work/wb.cmd" > "$work/analysis" 2>> "$log" \
+    || fail "color analysis failed."
+read -r _ chroma_h chroma_v < "$work/analysis"
+note "Chroma offset: ${chroma_h}px horizontal, ${chroma_v}px vertical"
+
 # ------------------------------------------------------------------- front end
 front="crop=$crop"
+if [[ "$chroma_h" != "0" || "$chroma_v" != "0" ]]; then
+    # 4:4:4 so the shift is in luma pixels rather than subsampled chroma ones.
+    front="$front,format=yuv444p,chromashift=cbh=$((-chroma_h)):crh=$((-chroma_h)):cbv=$((-chroma_v)):crv=$((-chroma_v))"
+fi
 if [[ "$stabilize" == "1" ]]; then
     note "Stabilization pass 1/2..."
     run ffmpeg -hide_banner -nostdin -y "${trim[@]}" -i "$infile" -an \
@@ -212,6 +230,10 @@ if [[ "$stabilize" == "1" ]]; then
         || fail "stabilization analysis failed."
     front="$front,vidstabtransform=input=$work/motion.trf:smoothing=15:optzoom=1:interpol=bicubic"
 fi
+if [[ "$keep_color" == "0" ]]; then
+    front="$front,format=gbrp,sendcmd=f=$work/wb.cmd,colorchannelmixer@wb"
+fi
+front="$front,format=yuv420p"
 
 tail_filters="scale=$tw:$th:flags=lanczos,setsar=1"
 if [[ -n "$label" ]]; then
