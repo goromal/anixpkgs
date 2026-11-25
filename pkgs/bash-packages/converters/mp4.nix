@@ -6,6 +6,12 @@
   redirects,
   ffmpeg,
   openssl,
+  writeShellApplication,
+  coreutils,
+  gawk,
+  gnugrep,
+  gnused,
+  openssh,
 }:
 let
   name = "mp4";
@@ -21,6 +27,11 @@ let
     directory, preserving each filename (only the extension changes). Every
     option above applies to each dispatched conversion, and each source file is
     removed only once its conversion has succeeded.
+
+    With --upscale, the output is a restored, upscaled copy (1080p tall by
+    default) and the source is always kept. Vacuum writes NAME_upscaled.mp4
+    next to each source, skips sources whose _upscaled output already exists
+    (so an interrupted sweep resumes), and runs model jobs one at a time.
 
     Inputs:
         .mp4
@@ -43,6 +54,19 @@ let
         -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
         -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
         -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
+        -u | --upscale MODE          Restore + upscale old video. MODE:
+                                       classic  ffmpeg only: auto border crop,
+                                                denoise, deblock, aspect fix,
+                                                Lanczos upscale, sharpen
+                                       model    same front end + Real-ESRGAN on
+                                                a Vulkan GPU (video2x)
+             --stabilize             (upscale) Two-pass camera-shake removal
+             --model NAME            (upscale model) fast (default) or quality,
+                                     or a video2x realesrgan model name
+             --gpu INDEX             (upscale model) ncnn GPU index (default:
+                                     first discrete GPU)
+             --host HOST             (upscale model) Run the model pipeline on
+                                     HOST over SSH (e.g. atorgesen-dell.local)
   '';
 
   optsWithVarsAndDefaults = [
@@ -100,6 +124,36 @@ let
       default = "";
       flags = "-e|--end";
     }
+    {
+      var = "upscale";
+      isBool = false;
+      default = "";
+      flags = "-u|--upscale";
+    }
+    {
+      var = "stabilize";
+      isBool = true;
+      default = "0";
+      flags = "--stabilize";
+    }
+    {
+      var = "model";
+      isBool = false;
+      default = "";
+      flags = "--model";
+    }
+    {
+      var = "gpu";
+      isBool = false;
+      default = "";
+      flags = "--gpu";
+    }
+    {
+      var = "host";
+      isBool = false;
+      default = "";
+      flags = "--host";
+    }
   ];
 
   printWarn = "${color-prints}/bin/echo_yellow";
@@ -133,6 +187,75 @@ let
   '';
 
   fontfile = ./res/fonts/roboto.ttf;
+
+  upscaler = writeShellApplication {
+    name = "mp4-upscale";
+    runtimeInputs = [
+      ffmpeg
+      coreutils
+      gawk
+      gnugrep
+      gnused
+      openssh
+    ];
+    text = ''
+      MP4_UPSCALE_FONT=${fontfile}
+    ''
+    + builtins.readFile ./res/mp4-upscale.sh;
+  };
+
+  # Upscaling replaces the plain conversion entirely, so every option above is
+  # forwarded to the upscaler rather than to ffmpeg.
+  upscaleRule = ''
+    if [[ -z "$upscale" ]]; then
+        for opt in stabilize:0 model: gpu: host:; do
+            v="''${opt%%:*}"; d="''${opt#*:}"
+            if [[ "''${!v}" != "$d" ]]; then
+                ${printErr} "--''${v} only applies with --upscale."
+                exit 1
+            fi
+        done
+    else
+        if [[ "$upscale" != "model" && ( -n "$model" || -n "$gpu" || -n "$host" ) ]]; then
+            ${printErr} "--model, --gpu and --host only apply with --upscale model."
+            exit 1
+        fi
+        up_args=( --fontsize "$fontsize" )
+        [[ "$verbose" == "1" ]] && up_args+=( --verbose )
+        [[ "$mute" == "1" ]] && up_args+=( --mute )
+        [[ "$stabilize" == "1" ]] && up_args+=( --stabilize )
+        [[ -n "$quality" ]] && up_args+=( --quality "$quality" )
+        [[ -n "$width" ]] && up_args+=( --width "$width" )
+        [[ -n "$crop" ]] && up_args+=( --crop "$crop" )
+        [[ -n "$start" ]] && up_args+=( --start "$start" )
+        [[ -n "$end" ]] && up_args+=( --end "$end" )
+        [[ -n "$label" ]] && up_args+=( --label "$label" )
+        [[ -n "$model" ]] && up_args+=( --model "$model" )
+        [[ -n "$gpu" ]] && up_args+=( --gpu "$gpu" )
+        [[ -n "$host" ]] && up_args+=( --host "$host" )
+        ${upscaler}/bin/mp4-upscale "''${up_args[@]}" "$upscale" "$infile" "$outfile" || exit 1
+    fi
+  '';
+
+  # Vacuum with --upscale never replaces or deletes anything: each source gets
+  # a NAME_upscaled.mp4 sibling, already-produced outputs are skipped so a long
+  # sweep can be re-run to resume, and model jobs are chained so only one uses
+  # the GPU at a time.
+  vacuumFileHook = ''
+    if [[ ! -z "$upscale" ]]; then
+        keep_source=1
+        case "$f" in
+        *_upscaled.mp4|*_upscaled.MP4) skip_file=1 ;;
+        esac
+        outfile="''${f%.*}_upscaled.mp4"
+        if [[ -e "$outfile" ]]; then
+            skip_file=1
+        fi
+        if [[ "$upscale" == "model" ]]; then
+            serialize=1
+        fi
+    fi
+  '';
   labelRule = ''
     if [[ ! -z "$label" ]]; then
         ffmpeg_args+=( "-vf" "drawtext=fontfile=${fontfile}:text=$label:fontcolor=white:fontsize=$fontsize:box=1:boxcolor=black@0.75:boxborderw=10:x=10:y=h-text_h-10" )
@@ -161,6 +284,8 @@ let
     {
       extension = "mp4|MP4|gif|GIF|mpeg|MPEG|mkv|MKV|mov|MOV|avi|AVI|webm|WEBM|flv|FLV";
       commands = ''
+        ${upscaleRule}
+        if [[ -z "$upscale" ]]; then
         ffmpeg_args=("-y" "-vcodec" "libx264")
         ${qualityRule}
         ${audioRule}
@@ -174,6 +299,7 @@ let
         else
             echo "ffmpeg -i $infile ''${ffmpeg_args[@]} $outfile"
             ${ffmpeg}/bin/ffmpeg -i "$infile" "''${ffmpeg_args[@]}" "$outfile"
+        fi
         fi
       '';
     }
@@ -221,6 +347,7 @@ callPackage ./mkConverter.nix {
     usage_str
     optsWithVarsAndDefaults
     convOptCmds
+    vacuumFileHook
     ;
   description = "Generate and edit MP4 video files using `ffmpeg`.";
 }

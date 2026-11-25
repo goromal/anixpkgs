@@ -169,6 +169,30 @@ ckfile -c "$before_md5" "$sxdir/already.mp4" > /dev/null \
 compgen -G "$sxdir/*vacuum-tmp*" > /dev/null \
     && fail "in-place conversion left a temporary behind"
 
+# --upscale never replaces or deletes: each source gets a NAME_upscaled.mp4
+# sibling, and a source whose output already exists (or an _upscaled file
+# itself) is skipped, so re-running a long sweep resumes it.
+updir="$tmpdir/upscale"
+mkdir "$updir"
+mkvid "$updir/tape.webm" red
+mkvid "$updir/old.mp4" green
+mkvid "$updir/done.mkv" blue
+mkvid "$updir/done_upscaled.mp4" blue
+done_md5=$(ckfile "$updir/done_upscaled.mp4")
+mp4 --orch-port $ORCH_PORT -u classic vacuum "$updir" > /dev/null || fail "upscale vacuum failed to dispatch"
+discarded=$(drain $ORCH_PORT) || fail "upscale jobs never drained"
+[[ "$discarded" == "0" ]] || fail "upscale sweep discarded $discarded job(s)"
+for n in tape.webm old.mp4 done.mkv; do
+    [[ -s "$updir/$n" ]] || fail "upscale vacuum removed source $n"
+done
+for n in tape old; do
+    h=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 "$updir/${n}_upscaled.mp4")
+    [[ "$h" == "1080" ]] || fail "upscaled $n is ${h:-missing}, not 1080 tall"
+done
+ckfile -c "$done_md5" "$updir/done_upscaled.mp4" > /dev/null \
+    || fail "upscale vacuum overwrote an existing _upscaled output"
+[[ -e "$updir/done_upscaled_upscaled.mp4" ]] && fail "upscale vacuum upscaled its own output"
+
 kill $serverPID
 serverPID=""
 
