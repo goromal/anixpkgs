@@ -8,6 +8,7 @@ Provides an interface for stamping metadata on PNGs, JPEGs, HEICs, and MP4s.
 ```bash
 usage: stampserver [-h] [--port PORT] [--subdomain SUBDOMAIN]
                    [--data-dir DATA_DIR] --secrets-file SECRETS_FILE
+                   [--state-dir STATE_DIR]
 
 options:
   -h, --help            show this help message and exit
@@ -18,5 +19,7 @@ options:
   --secrets-file SECRETS_FILE
                         Path to JSON file with username, secret_key and
                         password_hash
+  --state-dir STATE_DIR
+                        Directory for the persistent edit job queue
 ```
 
