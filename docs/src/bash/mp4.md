@@ -17,6 +17,11 @@ directory, preserving each filename (only the extension changes). Every
 option above applies to each dispatched conversion, and each source file is
 removed only once its conversion has succeeded.
 
+With --upscale, the output is a restored, upscaled copy (1080p tall by
+default) and the source is always kept. Vacuum writes NAME_upscaled.mp4
+next to each source, skips sources whose _upscaled output already exists
+(so an interrupted sweep resumes), and runs model jobs one at a time.
+
 Inputs:
     .mp4
     .gif
@@ -38,6 +43,22 @@ Options:
     -c | --crop INT:INT:INT:INT  Crop video (pre-labeling) W:H:X:Y
     -s | --start TIME            INITIAL time: [HH:]MM:SS[.0]
     -e | --end TIME              FINAL time: [HH:]MM:SS[.0]
+    -u | --upscale MODE          Restore + upscale old video. MODE:
+                                   classic  ffmpeg only: auto border crop,
+                                            chroma realignment, smoothed
+                                            white balance, denoise, deblock,
+                                            aspect fix, Lanczos upscale,
+                                            sharpen
+                                   model    same front end + Real-ESRGAN on
+                                            a Vulkan GPU (video2x)
+         --stabilize             (upscale) Two-pass camera-shake removal
+         --keep-color            (upscale) Skip the automatic white balance
+         --model NAME            (upscale model) fast (default) or quality,
+                                 or a video2x realesrgan model name
+         --gpu INDEX             (upscale model) ncnn GPU index (default:
+                                 first discrete GPU)
+         --host HOST             (upscale model) Run the model pipeline on
+                                 HOST over SSH (e.g. atorgesen-dell.local)
 
 Vacuum sweeps files already in .mp4 form only when an option
 above (other than verbosity) asks for a different conversion; those are
