@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795658037,
+        "lastModified": 1795658293,
         "narHash": "sha256-G0d/SKpVD9qdXTUIKbRWJ9px3c8eDwloK1shb6KX8Zc=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "d8d5392313251fc3cb9eae2c8084f79f53c5bf32",
+        "rev": "1f45336f5b4088e88de46d9c875d85fa73a18c8f",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/stampserver-async-jobs",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
