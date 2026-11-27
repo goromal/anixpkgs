@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795752399,
+        "lastModified": 1795796650,
         "narHash": "sha256-Ju2eVwt4LNOethbScT3V4jmJEQx4IkCygn3Uaj2Yn1c=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "b83a18046f9d0ba418bab49019023cf378a3f286",
+        "rev": "60fdd2164e574409568c9947d404edf047d2a838",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/la-quiz-rounds",
+        "ref": "refs/heads/master",
         "repo": "flasks",
         "type": "github"
       }
