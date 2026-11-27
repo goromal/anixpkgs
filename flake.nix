@@ -45,10 +45,10 @@
     agent-skills.url = "github:goromal/agent-skills";
     agent-skills.flake = false;
 
-    aapis.url = "github:goromal/aapis?ref=refs/heads/dev/bitrunning";
+    aapis.url = "github:goromal/aapis";
     aapis.flake = false;
 
-    bit-rs.url = "github:goromal/bit-rs?ref=refs/heads/dev/bitrunning";
+    bit-rs.url = "github:goromal/bit-rs";
     bit-rs.flake = false;
 
     ardupilot.url = "git+ssh://git@github.com/goromal/ardupilot?ref=dev/controller&submodules=1";

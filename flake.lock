@@ -3,16 +3,15 @@
     "aapis": {
       "flake": false,
       "locked": {
-        "lastModified": 1795797951,
+        "lastModified": 1795804312,
         "narHash": "sha256-FnStGrCsRfz2C/11x7Rptl1ZLKRYYXIspYXX952zFWM=",
         "owner": "goromal",
         "repo": "aapis",
-        "rev": "07586daef25763ec60b016251c74ca85f7c739e9",
+        "rev": "0d10829ef83c5a49aba65b13dda90821972532fa",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bitrunning",
         "repo": "aapis",
         "type": "github"
       }
@@ -87,16 +86,15 @@
     "bit-rs": {
       "flake": false,
       "locked": {
-        "lastModified": 1795797971,
-        "narHash": "sha256-S924mAkpcMWHGk4Jd2eeobM5A3LG+khYg79QQ/W0G6Q=",
+        "lastModified": 1795804436,
+        "narHash": "sha256-QBA0INpYebagT/5R+qLapvw9R1CMWCJ81c1d15AJvgE=",
         "owner": "goromal",
         "repo": "bit-rs",
-        "rev": "3e1acba173df5d34b1e92a44c03b27651fde8b04",
+        "rev": "ea8dc36511d4e98353d5ece37de36f156cbee946",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/dev/bitrunning",
         "repo": "bit-rs",
         "type": "github"
       }
