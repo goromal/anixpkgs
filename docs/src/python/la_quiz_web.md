@@ -3,8 +3,10 @@
 A web-based LA geography quiz game with mobile support.
 
 A mobile-friendly Flask web application for testing knowledge of Los Angeles geography.
-Users tap locations on a map to identify cities across different regions.
-Features include score tracking, responsive design, and touch support.
+Places are taught a few at a time in rounds: study them on a zoomed map, practice until
+each is answered correctly twice in a row after a miss, then pass a final check with no
+misses. Spaced review brings missed places back in later rounds, and per-place mastery
+persists across visits.
 
 ## Usage
 
