@@ -1,0 +1,44 @@
+name: "Closure Diff Bot Trigger"
+
+on:
+  issue_comment:
+    types:
+      - edited
+
+jobs:
+  dispatch-diff:
+    name: Trigger NixOS Closure Diff
+    if: ${{ github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      pull-requests: read
+    steps:
+      - name: Check if closure diff box is checked
+        id: check
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+        run: |
+          if echo "$COMMENT_BODY" | grep -qiE '^- \[x\] Run NixOS closure diff'; then
+            echo "checked=true" >> $GITHUB_OUTPUT
+          else
+            echo "checked=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Resolve PR branch
+        if: steps.check.outputs.checked == 'true'
+        id: pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=${{ github.event.issue.number }}
+          PR_BRANCH=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json headRefName --jq '.headRefName')
+          echo "branch=$PR_BRANCH" >> $GITHUB_OUTPUT
+      - name: Dispatch closure diff workflow
+        if: steps.check.outputs.checked == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run nixos-profile-diff.yml \
+            --repo ${{ github.repository }} \
+            --ref ${{ steps.pr.outputs.branch }} \
+            -f pr_number=${{ github.event.issue.number }}
