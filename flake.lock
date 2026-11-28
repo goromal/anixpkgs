@@ -473,16 +473,16 @@
     "flasks": {
       "flake": false,
       "locked": {
-        "lastModified": 1795804428,
-        "narHash": "sha256-3TMzC+gGtBmzl11aE0nsETbvcwPK3LPu8mKEfLR3/XI=",
+        "lastModified": 1795825726,
+        "narHash": "sha256-QC9XI3bRD0ZWC3BiMOCtY6yQnjAYPe9TQhVJZbTOIjI=",
         "owner": "goromal",
         "repo": "flasks",
-        "rev": "76a80cf685a9b2dc269eb5922443688d76f5ce3d",
+        "rev": "a7d1d12fe7652576e6ed5a613ba91171b6aca237",
         "type": "github"
       },
       "original": {
         "owner": "goromal",
-        "ref": "refs/heads/master",
+        "ref": "refs/heads/dev/cozy-queue-pause-load",
         "repo": "flasks",
         "type": "github"
       }
